@@ -8,6 +8,7 @@ package com.arcanc.pulselib.content.player.animation.attachment;
 
 import com.arcanc.pulselib.content.model.animation.BoneFrame;
 import com.arcanc.pulselib.content.model.baked.PBakedBone;
+import com.arcanc.pulselib.content.model.baked.PMeshRenderContext;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationDefinition;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationFrame;
 import com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonMeshAttachmentPose;
@@ -17,41 +18,39 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import org.joml.Matrix4f;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public final class PPlayerAutomaticMeshAttachments
 {
-	private static final java.util.Map<PPlayerAnimationDefinition, List<PBakedBone>> ROOTS =
-			Collections.synchronizedMap(new IdentityHashMap<>());
-
 	private PPlayerAutomaticMeshAttachments()
 	{
 	}
 
-	public static List<PBakedBone> roots(PPlayerAnimationDefinition definition)
+	public static List<PBakedBone> roots(PPlayerAnimationFrame frame)
 	{
+		PPlayerAnimationDefinition definition = frame.definition();
 		if (definition.modelData().getModel() == null)
 			return List.of();
-		List<PBakedBone> cached = ROOTS.get(definition);
-		if (cached != null)
-			return cached;
 
 		Set<String> skeletonBones = new HashSet<>(definition.bindings().values());
+		Set<String> animatedBones = frame.resolver().activeAnimationBones();
 		List<PBakedBone> roots = new ArrayList<>();
 		for (PBakedBone bone : definition.modelData().getModel().bones())
-			findRoots(bone, skeletonBones, false, roots);
-		List<PBakedBone> resolved = List.copyOf(roots);
-		ROOTS.put(definition, resolved);
-		return resolved;
+			findRoots(bone, skeletonBones, animatedBones, roots);
+		return List.copyOf(roots);
 	}
 
 	private static void findRoots(PBakedBone bone,
 	                              Set<String> skeletonBones,
-	                              boolean belongsToSkeleton,
+	                              Set<String> animatedBones,
 	                              List<PBakedBone> roots)
 	{
-		boolean inSkeleton = belongsToSkeleton || skeletonBones.contains(bone.name());
-		if (inSkeleton)
+		if (skeletonBones.contains(bone.name()))
+			return;
+		if (!containsAnimatedBone(bone, animatedBones))
 			return;
 		if (containsMesh(bone))
 		{
@@ -59,7 +58,14 @@ public final class PPlayerAutomaticMeshAttachments
 			return;
 		}
 		for (PBakedBone child : bone.children())
-			findRoots(child, skeletonBones, false, roots);
+			findRoots(child, skeletonBones, animatedBones, roots);
+	}
+
+	private static boolean containsAnimatedBone(PBakedBone bone, Set<String> animatedBones)
+	{
+		if (animatedBones.contains(bone.name()))
+			return true;
+		return bone.children().stream().anyMatch(child -> containsAnimatedBone(child, animatedBones));
 	}
 
 	private static boolean containsMesh(PBakedBone bone)
@@ -102,15 +108,13 @@ public final class PPlayerAutomaticMeshAttachments
 		poseStack.pushPose();
 		try
 		{
-			// transform is the full root transform.  The bone renderer applies
-			// its local transform once, so remove it here to avoid applying it twice.
 			poseStack.mulPose(transform);
 			poseStack.mulPose(localMatrix.invert());
 			root.instantDraw(
 					poseStack,
 					frame.resolver(),
 					(bone, mesh, inherited) -> inherited,
-					new com.arcanc.pulselib.content.model.baked.PMeshRenderContext(
+					new PMeshRenderContext(
 							PRenderTypes.RenderTypeProvider::trianglesCutout,
 							-1,
 							packedLight,

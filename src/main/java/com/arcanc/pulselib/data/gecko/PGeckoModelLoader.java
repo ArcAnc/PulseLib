@@ -11,6 +11,7 @@ package com.arcanc.pulselib.data.gecko;
 
 
 import com.arcanc.pulselib.content.model.PModel;
+import com.arcanc.pulselib.data.PAnimationSidecarParser;
 import com.arcanc.pulselib.data.PModelLoader;
 import com.arcanc.pulselib.util.PLibDatabase;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -37,6 +38,8 @@ public class PGeckoModelLoader implements PModelLoader
 	private static final String ANIMATION_ROOT = "geckolib/animations";
 	private static final String MODEL_EXTENSION = ".geo.json";
 	private static final String ANIMATION_EXTENSION = ".animation.json";
+	private static final String EVENTS_EXTENSION = ".events.json";
+	private static final String ANIMATION_EVENTS_EXTENSION = ".animation_events.json";
 	private static final String JSON_EXTENSION = ".json";
 	
 	private PGeckoModelLoader()
@@ -133,6 +136,22 @@ public class PGeckoModelLoader implements PModelLoader
 		model.animations.putAll(PGeckoModelParser.parseAnimations(
 				resourceManager.getResourceOrThrow(animationResource.get()).open(),
 				model));
+		loadAnimationSidecar(resourceManager, animationResource.get(), model);
+	}
+
+	private void loadAnimationSidecar(ResourceManager resourceManager,
+	                                 Identifier animationResource,
+	                                 PModel model) throws IOException
+	{
+		Optional<Identifier> sidecarResource = sidecarCandidates(animationResource).stream().
+				filter(resource -> resourceManager.getResource(resource).isPresent()).
+				findFirst();
+		if (sidecarResource.isEmpty())
+			return;
+
+		PAnimationSidecarParser.mergeSidecar(
+				PAnimationSidecarParser.parseJson(resourceManager.getResourceOrThrow(sidecarResource.get()).open()),
+				model.animations);
 	}
 	
 	private List<Identifier> animationCandidates(Identifier modelResource)
@@ -146,6 +165,22 @@ public class PGeckoModelLoader implements PModelLoader
 		candidates.add(modelResource.withPath(ANIMATION_ROOT + "/" + fileName + JSON_EXTENSION));
 		candidates.add(modelResource.withPath(ANIMATION_ROOT + "/" + modelName + ANIMATION_EXTENSION));
 		candidates.add(modelResource.withPath(ANIMATION_ROOT + "/" + modelName + JSON_EXTENSION));
+		return candidates;
+	}
+
+	private List<Identifier> sidecarCandidates(Identifier animationResource)
+	{
+		String path = animationResource.getPath();
+		String base = path.endsWith(ANIMATION_EXTENSION) ?
+				path.substring(0, path.length() - ANIMATION_EXTENSION.length()) :
+				path.substring(0, path.length() - JSON_EXTENSION.length());
+		String fileName = base.substring(base.lastIndexOf('/') + 1);
+		String root = base.substring(0, base.lastIndexOf('/'));
+
+		List<Identifier> candidates = new ArrayList<>();
+		candidates.add(animationResource.withPath(base + EVENTS_EXTENSION));
+		candidates.add(animationResource.withPath(base + ANIMATION_EVENTS_EXTENSION));
+		candidates.add(animationResource.withPath(root + "/events/" + fileName + EVENTS_EXTENSION));
 		return candidates;
 	}
 	

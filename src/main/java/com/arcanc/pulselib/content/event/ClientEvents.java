@@ -16,6 +16,7 @@ import com.arcanc.pulselib.content.animatable.singleton.SingletonAnimationManage
 import com.arcanc.pulselib.content.model.textures.atlas.RuntimeLoader;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
 import com.arcanc.pulselib.content.registration.PLibRegistration;
+import com.arcanc.pulselib.content.registration.player.PPlayerAcrobaticDemo;
 import com.arcanc.pulselib.content.registration.player.PPlayerBallDemo;
 import com.arcanc.pulselib.content.registration.block.block_entity.ber.TestBlockEntityRenderer;
 import com.arcanc.pulselib.content.registration.entity.renderer.TestEntityRender;
@@ -71,6 +72,7 @@ public class ClientEvents
 		PLibArmorHandler.register(modEventBus);
 		
 		PPlayerBallDemo.register(modEventBus);
+		PPlayerAcrobaticDemo.register(modEventBus);
 	}
 	
 	private static void registerReloadListeners(final AddClientReloadListenersEvent event)

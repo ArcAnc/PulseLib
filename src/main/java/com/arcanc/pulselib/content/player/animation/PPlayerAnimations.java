@@ -24,8 +24,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Quaternionf;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.*;
@@ -153,7 +153,9 @@ public final class PPlayerAnimations
 					result.add(new PPlayerAnimationAnchorPose(
 							id,
 							anchor,
-							PPlayerAnimationSpace.toPlayerSpace(transform, definition),
+							PPlayerAnimationSpace.toPlayerSpace(
+									transform,
+									definition),
 							weight));
 			}
 		});
@@ -166,12 +168,22 @@ public final class PPlayerAnimations
 		List<PPlayerAnimationMeshAttachmentPose> result = new ArrayList<>();
 		forEachActiveFrame(player, partialTick, (id, frame, definition, weight) ->
 		{
-			for (var root : PPlayerAutomaticMeshAttachments.roots(definition))
+			for (var root : PPlayerAutomaticMeshAttachments.roots(frame))
 			{
-				Matrix4f transform = frame.modelTransform(root.name());
+				Matrix4f transform = frame.rootRelativeTransform(root.name());
 				if (transform != null)
-					result.add(new PPlayerAnimationMeshAttachmentPose(id, definition.modelData(), root, frame,
-							PPlayerAnimationSpace.toPlayerGeometrySpace(transform, definition), weight));
+				{
+					result.add(
+							new PPlayerAnimationMeshAttachmentPose(
+									id,
+									definition.modelData(),
+									root,
+									frame,
+									PPlayerAnimationSpace.toPlayerGeometrySpace(
+											transform,
+											definition),
+									weight));
+				}
 			}
 		});
 		return List.copyOf(result);
@@ -473,7 +485,7 @@ public final class PPlayerAnimations
 			float weight = activationWeight * definition.partWeight(player, part, partialTick);
 			if (weight <= 0.0f)
 				return;
-			Matrix4f transform = firstPersonTransform(frame, part);
+			Matrix4f transform = frame.firstPersonTransform(part);
 			if (transform != null)
 				set(part == PPlayerPart.RIGHT_ARM, PPlayerAnimationSpace.toFirstPersonSpace(transform, definition), definition.blendMode(), weight, false);
 		}
@@ -483,7 +495,7 @@ public final class PPlayerAnimations
 		                     PPlayerAnimationDefinition definition,
 		                     float weight)
 		{
-			Matrix4f transform = firstPersonTransform(frame, anchor);
+			Matrix4f transform = frame.firstPersonTransform(anchor);
 			if (transform != null)
 				set(anchor.equals(PPlayerAnimationAnchors.RIGHT_ITEM), PPlayerAnimationSpace.toFirstPersonSpace(transform, definition), definition.blendMode(), weight, true);
 		}
@@ -499,13 +511,16 @@ public final class PPlayerAnimations
 						anchor.equals(PPlayerAnimationAnchors.RIGHT_ITEM) ||
 						anchor.equals(PPlayerAnimationAnchors.LEFT_ITEM))
 					continue;
-				Matrix4f transform = firstPersonTransform(frame, anchor);
+				Matrix4f transform = frame.firstPersonTransform(anchor);
 				if (transform != null)
-					this.animationAnchors.add(new PPlayerFirstPersonAnchorPose(
-							id,
-							anchor,
-							PPlayerAnimationSpace.toFirstPersonSpace(transform, definition),
-							weight));
+					this.animationAnchors.add(
+							new PPlayerFirstPersonAnchorPose(
+									id,
+									anchor,
+									PPlayerAnimationSpace.toFirstPersonSpace(
+											transform,
+											definition),
+									weight));
 			}
 		}
 
@@ -514,23 +529,21 @@ public final class PPlayerAnimations
 		                                PPlayerAnimationDefinition definition,
 		                                float weight)
 		{
-			for (var root : PPlayerAutomaticMeshAttachments.roots(definition))
+			for (var root : PPlayerAutomaticMeshAttachments.roots(frame))
 			{
 				Matrix4f transform = frame.firstPersonTransform(root.name());
 				if (transform != null)
-					this.meshAttachments.add(new PPlayerFirstPersonMeshAttachmentPose(id, definition.modelData(), root, frame,
-							PPlayerAnimationSpace.toFirstPersonGeometrySpace(transform, definition), weight));
+					this.meshAttachments.add(
+							new PPlayerFirstPersonMeshAttachmentPose(
+									id,
+									definition.modelData(),
+									root,
+									frame,
+									PPlayerAnimationSpace.toFirstPersonGeometrySpace(
+											transform,
+											definition),
+									weight));
 			}
-		}
-
-		private static @Nullable Matrix4f firstPersonTransform(PPlayerAnimationFrame frame, PPlayerPart bone)
-		{
-			return frame.firstPersonTransform(bone);
-		}
-
-		private static @Nullable Matrix4f firstPersonTransform(PPlayerAnimationFrame frame, PPlayerAnimationAnchor bone)
-		{
-			return frame.firstPersonTransform(bone);
 		}
 
 		private void set(boolean right, Matrix4f transform, PPlayerAnimationBlendMode blendMode, float weight, boolean item)

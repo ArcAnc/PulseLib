@@ -119,7 +119,8 @@ public class PPlayerFirstPersonRenderer
 		poseStack.pushPose();
 		try
 		{
-			poseStack.mulPose(new Matrix4f(poseStack.last().pose()).invert());
+			Matrix4f firstPersonPose = new Matrix4f(poseStack.last().pose());
+			poseStack.mulPose(new Matrix4f(firstPersonPose).invert());
 
 			renderItems(
 				player,
@@ -128,11 +129,20 @@ public class PPlayerFirstPersonRenderer
 				submitNodeCollector,
 				packedLight);
 
-			PPlayerAutomaticMeshAttachments.renderFirstPerson(
-					pose.meshAttachments(),
-					poseStack,
-					submitNodeCollector,
-					packedLight);
+			poseStack.pushPose();
+			try
+			{
+				poseStack.mulPose(firstPersonPose);
+				PPlayerAutomaticMeshAttachments.renderFirstPerson(
+						pose.meshAttachments(),
+						poseStack,
+						submitNodeCollector,
+						packedLight);
+			}
+			finally
+			{
+				poseStack.popPose();
+			}
 
 			PPlayerAnimatedAttachments.renderFirstPerson(
 					player,

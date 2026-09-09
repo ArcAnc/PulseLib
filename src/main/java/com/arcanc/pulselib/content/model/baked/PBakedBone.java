@@ -139,6 +139,9 @@ public class PBakedBone
 	                        PMeshRenderResolver resolver,
 	                        PMeshRenderContext inherited)
 	{
+		if (!poseResolver.isVisible(this))
+			return;
+
 		BoneFrame frame = poseResolver.resolve(this).localTransform();
 		poseStack.pushPose();
 		poseStack.translate(frame.translation().x(), frame.translation().y(), frame.translation().z());

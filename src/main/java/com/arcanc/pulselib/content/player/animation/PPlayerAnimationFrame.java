@@ -99,6 +99,23 @@ public final class PPlayerAnimationFrame
 		Matrix4f transform = fullTransform(boneName);
 		return transform == null ? null : new Matrix4f(transform);
 	}
+
+	@Nullable
+	public Matrix4f rootRelativeTransform(String boneName)
+	{
+		Matrix4f transform = fullTransform(boneName);
+		if (transform == null)
+			return null;
+
+		String referenceBone = this.rootBone == null ?
+				this.definition.bindings().get(PPlayerPart.HEAD) :
+				this.rootBone;
+		if (referenceBone == null)
+			return new Matrix4f(transform);
+
+		Matrix4f rootBind = bindTransform(referenceBone);
+		return rootBind == null ? new Matrix4f(transform) : rootBind.invert().mul(transform);
+	}
 	
 	@Nullable
 	private Matrix4f fullTransform(String boneName)

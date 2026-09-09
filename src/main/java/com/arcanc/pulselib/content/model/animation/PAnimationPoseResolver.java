@@ -21,7 +21,9 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 {
@@ -72,6 +74,72 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 				animated,
 				animated,
 				animated);
+	}
+
+	public boolean isVisible(PBakedBone bone)
+	{
+		for (PAnimationController<T> controller : this.controllers)
+		{
+			if (controller.isStopped())
+				continue;
+
+			var layers = controller.graphLayers(this.model);
+			if (!layers.isEmpty())
+			{
+				for (PAnimationGraphRuntime.Layer layer : layers)
+				{
+					if (layer.weight() <= 0.0f)
+						continue;
+					PAnimation animation = this.model.animations().get(layer.animation());
+					if (animation != null && !animation.isBoneVisible(bone.name(), layer.time()))
+						return false;
+				}
+				continue;
+			}
+
+			PRawAnimation.AnimationStage stage = controller.getCurrentStage();
+			if (stage == null || stage.isWaiting())
+				continue;
+			PAnimation animation = this.model.animations().get(stage.animationName());
+			if (animation != null && !animation.isBoneVisible(bone.name(), controller.getInterpolatedTime(this.partialTick)))
+				return false;
+		}
+		return true;
+	}
+
+	public Set<String> activeAnimationBones()
+	{
+		Set<String> result = new HashSet<>();
+		for (PAnimationController<T> controller : this.controllers)
+		{
+			if (controller.isStopped())
+				continue;
+
+			var layers = controller.graphLayers(this.model);
+			if (!layers.isEmpty())
+			{
+				for (PAnimationGraphRuntime.Layer layer : layers)
+				{
+					if (layer.weight() <= 0.0f)
+						continue;
+					addAnimationBones(result, this.model.animations().get(layer.animation()));
+				}
+				continue;
+			}
+
+			PRawAnimation.AnimationStage stage = controller.getCurrentStage();
+			if (stage != null && !stage.isWaiting())
+				addAnimationBones(result, this.model.animations().get(stage.animationName()));
+		}
+		return Set.copyOf(result);
+	}
+
+	private static void addAnimationBones(Set<String> destination, @Nullable PAnimation animation)
+	{
+		if (animation == null)
+			return;
+		destination.addAll(animation.boneAnimations().keySet());
+		destination.addAll(animation.visibilityTracks().keySet());
 	}
 	
 	public @Nullable AnimationDelta animationDelta(String boneName, @Nullable String rootBoneName)

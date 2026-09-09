@@ -43,7 +43,7 @@ public final class PPlayerAnimationDefinition
 	private final String syncGroup;
 	private final ControllerRegistrar controllerRegistrar;
 	private final MolangContextProvider molangContextProvider;
-	
+
 	private final Map<PPlayerAnimationAnchor, String> anchors;
 	private final PPlayerFirstPersonSettings firstPersonSettings;
 
@@ -227,7 +227,7 @@ public final class PPlayerAnimationDefinition
 		private String syncGroup = "";
 		private ControllerRegistrar controllerRegistrar = ControllerRegistrar.EMPTY;
 		private MolangContextProvider molangContextProvider = MolangContextProvider.EMPTY;
-		
+
 		private final Map<PPlayerAnimationAnchor, String> anchors = new HashMap<>();
 		private PPlayerFirstPersonSettings firstPersonSettings = PPlayerFirstPersonSettings.ENABLED;
 

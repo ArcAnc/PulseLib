@@ -88,12 +88,13 @@ public final class PPlayerAnimationSpace
 		return new Matrix4f(PLAYER_MODEL_TO_FIRST_PERSON).
 				mul(toPlayerSpace(matrix, definition));
 	}
-	
+
 	public static Matrix4f toFirstPersonGeometrySpace(
 			Matrix4fc matrix,
 			PPlayerAnimationDefinition definition)
 	{
-		return new Matrix4f(matrix);
+		return new Matrix4f(PLAYER_MODEL_TO_FIRST_PERSON).
+				mul(toPlayerGeometrySpace(matrix, definition));
 	}
 	
 	static PPlayerBonePose toPlayerSpace(

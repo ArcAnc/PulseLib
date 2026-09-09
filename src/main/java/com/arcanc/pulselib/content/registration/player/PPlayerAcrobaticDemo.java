@@ -9,10 +9,15 @@
 
 package com.arcanc.pulselib.content.registration.player;
 
+
 import com.arcanc.pulselib.content.animatable.ControllerState;
 import com.arcanc.pulselib.content.event.PulseLibEvents;
 import com.arcanc.pulselib.content.model.animation.PRawAnimation;
-import com.arcanc.pulselib.content.player.animation.*;
+import com.arcanc.pulselib.content.player.animation.PPlayerAnimationDefinition;
+import com.arcanc.pulselib.content.player.animation.PPlayerAnimationHandle;
+import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
+import com.arcanc.pulselib.content.player.animation.PPlayerAnimationAnchors;
+import com.arcanc.pulselib.content.player.animation.PPlayerPart;
 import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
 import com.arcanc.pulselib.util.PLibDatabase;
@@ -28,20 +33,19 @@ import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import org.lwjgl.glfw.GLFW;
 
-public final class PPlayerBallDemo
+public final class PPlayerAcrobaticDemo
 {
-	private static final Identifier ID = PLibDatabase.rl("demo/player_ball_toss");
-	public static final Identifier TEXTURE = PLibDatabase.rl("player/demo/test_ball_model/0");
+	private static final Identifier ID = PLibDatabase.rl("demo/player_acrobatic");
 	private static final PModelData MODEL = new PModelData.Builder(
-			PLibDatabase.rl("glmodels/player/demo/test_ball_model.gltf"), "", PGltfModelLoader.INSTANCE.id()).build();
-	private static final PRawAnimation BALL_TOSS = PRawAnimation.begin().thenPlay("ball_toss").build();
+			PLibDatabase.rl("glmodels/player/demo/acrobatic.gltf"), "", PGltfModelLoader.INSTANCE.id()).build();
+	private static final PRawAnimation ACROBATIC = PRawAnimation.begin().thenPlay("player_actobatic").build();
 	private static final KeyMapping KEY = new KeyMapping(
-			"key.pulselib.player_ball_toss",
+			"key.pulselib.player_acrobatic",
 			InputConstants.Type.KEYSYM,
-			GLFW.GLFW_KEY_V,
+			GLFW.GLFW_KEY_B,
 			KeyMapping.Category.MISC);
 
-	private PPlayerBallDemo()
+	private PPlayerAcrobaticDemo()
 	{
 	}
 
@@ -49,9 +53,9 @@ public final class PPlayerBallDemo
 	{
 		if (FMLLoader.getCurrent().isProduction())
 			return;
-		modEventBus.addListener(PPlayerBallDemo::registerKeyMapping);
-		modEventBus.addListener(PPlayerBallDemo::registerAnimation);
-		NeoForge.EVENT_BUS.addListener(PPlayerBallDemo::clientTick);
+		modEventBus.addListener(PPlayerAcrobaticDemo::registerKeyMapping);
+		modEventBus.addListener(PPlayerAcrobaticDemo::registerAnimation);
+		NeoForge.EVENT_BUS.addListener(PPlayerAcrobaticDemo::clientTick);
 	}
 
 	private static void registerKeyMapping(RegisterKeyMappingsEvent event)
@@ -62,16 +66,17 @@ public final class PPlayerBallDemo
 	private static void registerAnimation(PulseLibEvents.PlayerAnimationRegistrationEvent event)
 	{
 		event.registration().register(ID, PPlayerAnimationDefinition.builder(MODEL).
-						when(player -> player == Minecraft.getInstance().player).
-						bind(PPlayerPart.HEAD, "head").
-						bind(PPlayerPart.RIGHT_ARM, "right_arm").
-						bind(PPlayerPart.LEFT_ARM, "left_arm").
-						mask(PPlayerPart.RIGHT_ARM, PPlayerPart.LEFT_ARM).
-						anchor(PPlayerAnimationAnchors.FIRST_PERSON_CAMERA, "fp_camera").
-						anchor(PPlayerAnimationAnchors.RIGHT_ITEM, "right_hand").
-						anchor(PPlayerAnimationAnchors.LEFT_ITEM, "left_hand").
-						controllers(registrar -> registrar.add("ball_toss", () -> state ->
-								state.controller().isStopped() ? ControllerState.STOP : ControllerState.PLAY)).
+				when(player -> player == Minecraft.getInstance().player).
+				bind(PPlayerPart.ROOT, "root").
+				bind(PPlayerPart.HEAD, "head").
+				bind(PPlayerPart.BODY, "body").
+				bind(PPlayerPart.RIGHT_ARM, "right_arm").
+				bind(PPlayerPart.LEFT_ARM, "left_arm").
+				bind(PPlayerPart.RIGHT_LEG, "right_leg").
+				bind(PPlayerPart.LEFT_LEG, "left_leg").
+				anchor(PPlayerAnimationAnchors.FIRST_PERSON_CAMERA, "head").
+				controllers(registrar -> registrar.add("acrobatic", () -> state ->
+						state.controller().isStopped() ? ControllerState.STOP : ControllerState.PLAY)).
 				build());
 	}
 
@@ -81,7 +86,7 @@ public final class PPlayerBallDemo
 		if (player == null || !KEY.consumeClick())
 			return;
 		PPlayerAnimationHandle handle = PPlayerAnimations.getHandle(player, ID);
-		if (handle != null && !handle.isPlaying("ball_toss"))
-			handle.play("ball_toss", BALL_TOSS);
+		if (handle != null && !handle.isPlaying("acrobatic"))
+			handle.play("acrobatic", ACROBATIC);
 	}
 }
