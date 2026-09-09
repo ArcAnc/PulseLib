@@ -475,7 +475,7 @@ public final class PPlayerAnimations
 				return;
 			Matrix4f transform = firstPersonTransform(frame, part);
 			if (transform != null)
-				set(part == PPlayerPart.RIGHT_ARM, PPlayerAnimationSpace.toPlayerSpace(transform, definition), definition.blendMode(), weight, false);
+				set(part == PPlayerPart.RIGHT_ARM, PPlayerAnimationSpace.toFirstPersonSpace(transform, definition), definition.blendMode(), weight, false);
 		}
 
 		private void addItem(PPlayerAnimationAnchor anchor,
@@ -485,7 +485,7 @@ public final class PPlayerAnimations
 		{
 			Matrix4f transform = firstPersonTransform(frame, anchor);
 			if (transform != null)
-				set(anchor.equals(PPlayerAnimationAnchors.RIGHT_ITEM), PPlayerAnimationSpace.toPlayerSpace(transform, definition), definition.blendMode(), weight, true);
+				set(anchor.equals(PPlayerAnimationAnchors.RIGHT_ITEM), PPlayerAnimationSpace.toFirstPersonSpace(transform, definition), definition.blendMode(), weight, true);
 		}
 
 		private void addAnimationAnchors(Identifier id,
@@ -504,7 +504,7 @@ public final class PPlayerAnimations
 					this.animationAnchors.add(new PPlayerFirstPersonAnchorPose(
 							id,
 							anchor,
-							PPlayerAnimationSpace.toPlayerSpace(transform, definition),
+							PPlayerAnimationSpace.toFirstPersonSpace(transform, definition),
 							weight));
 			}
 		}
@@ -519,7 +519,7 @@ public final class PPlayerAnimations
 				Matrix4f transform = frame.firstPersonTransform(root.name());
 				if (transform != null)
 					this.meshAttachments.add(new PPlayerFirstPersonMeshAttachmentPose(id, definition.modelData(), root, frame,
-							transform, weight));
+							PPlayerAnimationSpace.toFirstPersonGeometrySpace(transform, definition), weight));
 			}
 		}
 

@@ -185,5 +185,6 @@ public class ClientEvents
 		event.addTextureLocation(TestBlockItemRenderer.PYRAMID).
 				addTextureLocation(TestBlockItemRenderer.CIRCLE);
 		event.addTextureLocation(TestArmorItem.TEXTURE);
+		event.addTextureLocation(PPlayerBallDemo.TEXTURE);
 	}
 }

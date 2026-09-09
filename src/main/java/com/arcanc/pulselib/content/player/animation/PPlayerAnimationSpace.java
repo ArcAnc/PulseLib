@@ -21,6 +21,9 @@ public final class PPlayerAnimationSpace
 	private static final Matrix4f PLAYER_TO_GLTF =
 			new Matrix4f(GLTF_TO_PLAYER).
 					invert();
+
+	private static final Matrix4f PLAYER_MODEL_TO_FIRST_PERSON =
+			new Matrix4f(GLTF_TO_PLAYER);
 	
 	private PPlayerAnimationSpace()
 	{
@@ -76,6 +79,21 @@ public final class PPlayerAnimationSpace
 		if (!usesGltfCoordinates(definition))
 			return new Matrix4f(matrix);
 		return new Matrix4f(GLTF_TO_PLAYER).mul(matrix);
+	}
+	
+	public static Matrix4f toFirstPersonSpace(
+			Matrix4fc matrix,
+			PPlayerAnimationDefinition definition)
+	{
+		return new Matrix4f(PLAYER_MODEL_TO_FIRST_PERSON).
+				mul(toPlayerSpace(matrix, definition));
+	}
+	
+	public static Matrix4f toFirstPersonGeometrySpace(
+			Matrix4fc matrix,
+			PPlayerAnimationDefinition definition)
+	{
+		return new Matrix4f(matrix);
 	}
 	
 	static PPlayerBonePose toPlayerSpace(

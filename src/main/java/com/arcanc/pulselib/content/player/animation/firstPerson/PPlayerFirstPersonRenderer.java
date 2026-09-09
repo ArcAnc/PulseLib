@@ -119,6 +119,8 @@ public class PPlayerFirstPersonRenderer
 		poseStack.pushPose();
 		try
 		{
+			poseStack.mulPose(new Matrix4f(poseStack.last().pose()).invert());
+
 			renderItems(
 				player,
 				pose,
