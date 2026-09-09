@@ -10,11 +10,10 @@
 package com.arcanc.pulselib.content.player.animation.firstPerson;
 
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimatedAttachments;
 import com.arcanc.pulselib.content.player.animation.attachment.PPlayerAutomaticMeshAttachments;
 import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
@@ -120,9 +119,6 @@ public class PPlayerFirstPersonRenderer
 		poseStack.pushPose();
 		try
 		{
-			poseStack.mulPose(new Matrix4f(poseStack.last().pose()).invert());
-			poseStack.mulPose(Axis.ZP.rotationDegrees(180.0f));
-
 			renderItems(
 				player,
 				pose,
