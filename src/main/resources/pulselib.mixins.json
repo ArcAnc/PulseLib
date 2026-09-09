@@ -18,14 +18,12 @@
 	"GameRendererMixin",
 	"GlBufferAccessor",
 	"HumanoidArmorLayerMixin",
-	"ItemInHandRendererAccessor",
 	"ItemInHandRendererMixin",
 	"ItemModelResolverAccessor",
 	"ItemStackRenderStateAccessor",
 	"LivingEntityRendererMixin",
 	"ModelPartCubesMixin",
 	"PlayerRootTransformMixin",
-	"PlayerRendererMixin",
 	"SpecialModelWrapperAccessor",
 	"SpecialModelWrapperRenderStateExtractor"
   ]

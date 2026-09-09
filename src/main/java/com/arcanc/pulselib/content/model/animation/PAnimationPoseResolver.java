@@ -76,32 +76,66 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	
 	public @Nullable AnimationDelta animationDelta(String boneName, @Nullable String rootBoneName)
 	{
-		BonePose bone = resolve(boneName);
-		if (bone == null)
+		int boneIndex = this.model.boneIndex(boneName);
+		
+		if (boneIndex < 0)
 			return null;
-
-		BonePose root = rootBoneName == null ? null : resolve(rootBoneName);
-		Matrix4f current = new Matrix4f(bone.modelTransform());
-		Matrix4f bind = new Matrix4f(bone.bindTransform());
-		if (root != null && !boneName.equals(rootBoneName))
+		
+		Matrix4f current;
+		Matrix4f bind;
+		
+		if (rootBoneName == null || boneName.equals(rootBoneName))
 		{
-			current = new Matrix4f(root.modelTransform()).invert().mul(current);
-			bind = new Matrix4f(root.bindTransform()).invert().mul(bind);
+			current = modelTransform(boneIndex);
+			bind = bindModelTransform(boneIndex);
 		}
-
-		Vector3f currentTranslation = current.getTranslation(new Vector3f());
-		Vector3f bindTranslation = bind.getTranslation(new Vector3f());
-		Vector3f translation = currentTranslation.sub(bindTranslation);
-		Quaternionf currentRotation = current.getUnnormalizedRotation(new Quaternionf());
-		Quaternionf bindRotation = bind.getUnnormalizedRotation(new Quaternionf());
-		Quaternionf rotation = new Quaternionf(bindRotation).invert().premul(currentRotation);
-		Vector3f currentScale = current.getScale(new Vector3f());
-		Vector3f bindScale = bind.getScale(new Vector3f());
+		else
+		{
+			int rootIndex = this.model.boneIndex(rootBoneName);
+			
+			if (rootIndex < 0)
+				return null;
+			
+			current = relativeTransform(
+					boneIndex,
+					rootIndex);
+			
+			bind = relativeBindTransform(
+					boneIndex,
+					rootIndex);
+		}
+		
+		Vector3f currentTranslation =
+				current.getTranslation(new Vector3f());
+		
+		Vector3f bindTranslation =
+				bind.getTranslation(new Vector3f());
+		
+		Vector3f translation =
+				currentTranslation.sub(bindTranslation);
+		
+		Quaternionf currentRotation =
+				current.getUnnormalizedRotation(new Quaternionf());
+		
+		Quaternionf bindRotation =
+				bind.getUnnormalizedRotation(new Quaternionf());
+		
+		Quaternionf rotation =
+				new Quaternionf(bindRotation).
+						invert().
+						premul(currentRotation);
+		
+		Vector3f currentScale =
+				current.getScale(new Vector3f());
+		
+		Vector3f bindScale =
+				bind.getScale(new Vector3f());
+		
 		Vector3f scale = new Vector3f(
 				ratio(currentScale.x, bindScale.x),
 				ratio(currentScale.y, bindScale.y),
 				ratio(currentScale.z, bindScale.z));
-
+		
 		return new AnimationDelta(
 				translation,
 				rotation,
@@ -111,6 +145,74 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 				Math.abs(scale.x - 1.0f) > 1.0e-5f ||
 						Math.abs(scale.y - 1.0f) > 1.0e-5f ||
 						Math.abs(scale.z - 1.0f) > 1.0e-5f);
+	}
+	
+	public @Nullable Matrix4f modelTransform(String boneName)
+	{
+		int index = this.model.boneIndex(boneName);
+		return index < 0 ? null : modelTransform(index);
+	}
+	
+	public Matrix4f modelTransform(PBakedBone bone)
+	{
+		return modelTransform(this.model.boneIndex(bone));
+	}
+	
+	public Matrix4f modelTransform(int boneIndex)
+	{
+		return new Matrix4f(this.modelPose.transform(boneIndex));
+	}
+	
+	public @Nullable Matrix4f bindModelTransform(String boneName)
+	{
+		int index = this.model.boneIndex(boneName);
+		return index < 0 ? null : bindModelTransform(index);
+	}
+	
+	public Matrix4f bindModelTransform(PBakedBone bone)
+	{
+		return bindModelTransform(this.model.boneIndex(bone));
+	}
+	
+	public Matrix4f bindModelTransform(int boneIndex)
+	{
+		return new Matrix4f(this.bindModelPose.transform(boneIndex));
+	}
+	
+	public @Nullable Matrix4f relativeTransform(String boneName, String referenceBoneName)
+	{
+		int boneIndex = this.model.boneIndex(boneName);
+		int referenceIndex = this.model.boneIndex(referenceBoneName);
+		
+		if (boneIndex < 0 || referenceIndex < 0)
+			return null;
+		
+		return relativeTransform(boneIndex, referenceIndex);
+	}
+	
+	public Matrix4f relativeTransform(int boneIndex, int referenceIndex)
+	{
+		return new Matrix4f(this.modelPose.transform(referenceIndex)).
+				invert().
+				mul(this.modelPose.transform(boneIndex));
+	}
+	
+	public @Nullable Matrix4f relativeBindTransform(String boneName, String referenceBoneName)
+	{
+		int boneIndex = this.model.boneIndex(boneName);
+		int referenceIndex = this.model.boneIndex(referenceBoneName);
+		
+		if (boneIndex < 0 || referenceIndex < 0)
+			return null;
+		
+		return relativeBindTransform(boneIndex, referenceIndex);
+	}
+	
+	public Matrix4f relativeBindTransform(int boneIndex, int referenceIndex)
+	{
+		return new Matrix4f(this.bindModelPose.transform(referenceIndex)).
+				invert().
+				mul(this.bindModelPose.transform(boneIndex));
 	}
 	
 	public static <T extends PAnimatable<T>> LocalPose resolveLocal(PBakedBone bone,

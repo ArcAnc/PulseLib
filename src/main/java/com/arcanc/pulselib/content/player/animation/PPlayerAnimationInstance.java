@@ -18,14 +18,13 @@ import com.arcanc.pulselib.content.model.animation.PAnimationPoseResolver;
 import com.arcanc.pulselib.content.model.animation.PTransitionInterruptionPolicy;
 import com.arcanc.pulselib.content.model.baked.PBakedModel;
 import com.arcanc.pulselib.data.gecko.MolangParser;
-import net.minecraft.util.Mth;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
-import org.jetbrains.annotations.Nullable;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
-import java.util.Map;
+import org.jspecify.annotations.Nullable;
+
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimationInstance>
@@ -131,6 +130,12 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 		return this.activation > 0.0f || this.previousActivation > 0.0f || this.targetActive;
 	}
 
+	boolean hasActiveController()
+	{
+		return this.animationManager.getControllers().values().stream().anyMatch(controller ->
+				controller.isPlaying() || controller.isPaused());
+	}
+
 	float activationWeight(float partialTick)
 	{
 		return Mth.lerp(partialTick, this.previousActivation, this.activation);
@@ -166,45 +171,47 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 		this.activation = Mth.lerp(alpha, this.transitionStart, this.transitionTarget);
 	}
 
-	@Nullable PPlayerBonePose sample(String boneName, float partialTick)
+	public @Nullable PPlayerAnimationFrame sampleFrame(float partialTick)
 	{
-		PBakedModel model = this.definition.modelData().getModel();
+		PBakedModel model =
+				this.definition.modelData().getModel();
+		
 		if (model == null)
 			return null;
-
-		PAnimationPoseResolver<PPlayerAnimationInstance> resolver = new PAnimationPoseResolver<>(
-				model,
-				this.animationManager.getControllers().values(),
-				(controller, tick) ->
-				{
-					MolangParser.Context context = new MolangParser.Context().
-							query("anim_time", controller.getInterpolatedTime(tick)).
-							randomSeed(this.animationManager.key().key());
-					this.definition.populateMolangContext(this.player, this, controller, context, tick);
-					return context;
-				},
-				partialTick);
-		PAnimationPoseResolver.AnimationDelta pose = resolver.animationDelta(
-				boneName,
-				this.definition.bindings().get(PPlayerPart.ROOT));
-		if (pose == null || !pose.isAnimated())
-			return null;
-
-		return new PPlayerBonePose(
-				pose.translation(),
-				pose.rotation(),
-				pose.scale(),
-				pose.hasTranslation(),
-				pose.hasRotation(),
-				pose.hasScale());
-	}
-
-	record PPlayerBonePose(Vector3f translation,
-	                      Quaternionf rotation,
-	                      Vector3f scale,
-	                      boolean hasTranslation,
-	                      boolean hasRotation,
-	                      boolean hasScale)
-	{
+		
+		PAnimationPoseResolver<PPlayerAnimationInstance> resolver =
+				new PAnimationPoseResolver<>(
+						model,
+						this.animationManager.
+										getControllers().
+										values(),
+						(controller, tick) ->
+						{
+							MolangParser.Context context =
+									new MolangParser.Context().
+											query(
+												"anim_time",
+												controller.getInterpolatedTime(tick)).
+											randomSeed(
+												this.animationManager.key().key());
+							
+							this.definition.populateMolangContext(
+									this.player,
+									this,
+									controller,
+									context,
+									tick
+							);
+							
+							return context;
+						},
+						partialTick
+				);
+		
+		return new PPlayerAnimationFrame(
+				this.definition,
+				resolver
+		);
+		
 	}
 }

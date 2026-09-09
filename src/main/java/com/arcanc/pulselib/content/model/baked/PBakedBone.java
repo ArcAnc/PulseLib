@@ -126,19 +126,24 @@ public class PBakedBone
 	                                                  PMeshRenderContext inherited,
 	                                                  float partialTick)
 	{
-		BoneFrame frame = mixBone(modelData.getModel(), controllers, partialTick);
+		PAnimationPoseResolver<T> poseResolver = new PAnimationPoseResolver<>(
+				modelData.getModel(),
+				controllers,
+				PAnimationPoseResolver.defaultContexts(),
+				partialTick);
+		instantDraw(poseStack, poseResolver, resolver, inherited);
+	}
+	
+	public void instantDraw(PoseStack poseStack,
+	                        PAnimationPoseResolver<?> poseResolver,
+	                        PMeshRenderResolver resolver,
+	                        PMeshRenderContext inherited)
+	{
+		BoneFrame frame = poseResolver.resolve(this).localTransform();
 		poseStack.pushPose();
-		if (frame != null)
-		{
-			poseStack.translate(frame.translation().x(), frame.translation().y(), frame.translation().z());
-			poseStack.mulPose(frame.rotation());
-			poseStack.scale(frame.scale().x(), frame.scale().y(), frame.scale().z());
-		}
-		else
-		{
-			poseStack.translate(this.basePosition().x(), this.basePosition().y(), this.basePosition().z());
-			poseStack.mulPose(this.baseRotation());
-		}
+		poseStack.translate(frame.translation().x(), frame.translation().y(), frame.translation().z());
+		poseStack.mulPose(frame.rotation());
+		poseStack.scale(frame.scale().x(), frame.scale().y(), frame.scale().z());
 		
 		Minecraft mc = PLibRenderHelper.mc();
 		
@@ -210,7 +215,7 @@ public class PBakedBone
 		});
 		
 		this.children().forEach(children ->
-				children.instantDraw(poseStack, modelData, controllers, resolver, boneContext, partialTick));
+				children.instantDraw(poseStack, poseResolver, resolver, boneContext));
 		
 		poseStack.popPose();
 	}

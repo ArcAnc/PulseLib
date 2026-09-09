@@ -10,12 +10,9 @@
 package com.arcanc.pulselib.data.gecko;
 
 import net.minecraft.util.RandomSource;
+import org.jspecify.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 public final class MolangParser
 {
@@ -62,7 +59,7 @@ public final class MolangParser
 		private final Map<String, Float> queryValues = new HashMap<>();
 		private final Map<String, Float> variables = new HashMap<>();
 		private final Map<String, Float> contextValues = new HashMap<>();
-		private QueryResolver queryResolver;
+		private @Nullable QueryResolver queryResolver;
 		private float thisValue;
 		private float thisX;
 		private float thisY;
@@ -146,8 +143,7 @@ public final class MolangParser
 			this.random.setSeed(seed);
 			return this;
 		}
-
-		/** Copies per-frame query data without touching persistent variables or random state. */
+		
 		public Context copyFrameValuesFrom(Context source)
 		{
 			this.queryValues.clear();
@@ -246,7 +242,7 @@ public final class MolangParser
 
 	private enum Flow { NONE, RETURN, BREAK, CONTINUE }
 
-	private record Value(Float value)
+	private record Value(@Nullable Float value)
 	{
 		private static final Value UNDEFINED = new Value(null);
 
@@ -255,7 +251,7 @@ public final class MolangParser
 			return new Value(value);
 		}
 
-		private static Value ofNullable(Float value)
+		private static Value ofNullable(@Nullable Float value)
 		{
 			return value == null ? UNDEFINED : of(value);
 		}
@@ -277,10 +273,10 @@ public final class MolangParser
 		Value evaluate(Evaluation evaluation);
 	}
 
-	private record Program(List<Node> statements, PExpressionDependency dependency, Float constantValue) implements Expression
+	private record Program(List<Node> statements, PExpressionDependency dependency, @Nullable Float constantValue) implements Expression
 	{
 		@Override
-		public float evaluate(Context context)
+		public float evaluate(@Nullable Context context)
 		{
 			if (this.constantValue != null)
 				return this.constantValue;

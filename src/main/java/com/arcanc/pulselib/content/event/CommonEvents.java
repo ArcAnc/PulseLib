@@ -10,17 +10,20 @@
 package com.arcanc.pulselib.content.event;
 
 
+import com.arcanc.pulselib.content.registration.PLibRegistration;
+import com.arcanc.pulselib.content.registration.entity.TestEntity;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 
 public class CommonEvents
 {
 	public static void registerCommonEvents(final IEventBus modEventBus)
 	{
-		//modEventBus.addListener(CommonEvents :: registerAttributes);
+		modEventBus.addListener(CommonEvents :: registerAttributes);
 	}
 	
-	/*private static void registerAttributes(final EntityAttributeCreationEvent event)
+	private static void registerAttributes(final EntityAttributeCreationEvent event)
 	{
 		event.put(PLibRegistration.EntityTypeReg.TEST_ENTITY.get(), TestEntity.createAttributes().build());
-	}*/
+	}
 }

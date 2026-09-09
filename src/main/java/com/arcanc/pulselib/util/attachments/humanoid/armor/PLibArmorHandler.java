@@ -12,23 +12,19 @@ package com.arcanc.pulselib.util.attachments.humanoid.armor;
 
 import com.arcanc.pulselib.util.attachments.PLivingAttachmentLayer;
 import com.arcanc.pulselib.util.attachments.humanoid.PHumanoidAttachmentLayer;
-import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
+import com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimatedAttachmentLayer;
 import com.google.common.reflect.TypeToken;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
-import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.PlayerModelType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.client.event.RenderArmEvent;
 import net.neoforged.neoforge.client.renderstate.RegisterRenderStateModifiersEvent;
-import net.neoforged.neoforge.common.NeoForge;
 
 import java.util.List;
 
@@ -38,7 +34,6 @@ public class PLibArmorHandler
 	{
 		modEventBus.addListener(PLibArmorHandler :: addArmorLayers);
 		modEventBus.addListener(PLibArmorHandler :: registerRenderStateModifiers);
-		NeoForge.EVENT_BUS.addListener(PLibArmorHandler :: renderFirstPersonArmor);
 	}
 	
 	@SuppressWarnings({"rawtypes", "unchecked"})
@@ -48,7 +43,10 @@ public class PLibArmorHandler
 		{
 			AvatarRenderer<?> renderer = event.getPlayerRenderer(skin);
 			if (renderer != null)
+			{
 				renderer.addLayer(new PHumanoidAttachmentLayer(renderer));
+				renderer.addLayer(new PPlayerAnimatedAttachmentLayer(renderer));
+			}
 		}
 		
 		for (var entityType : event.getEntityTypes())
@@ -76,22 +74,4 @@ public class PLibArmorHandler
 		state.setRenderData(PLivingAttachmentLayer.RENDER_DATA, entries.isEmpty() ? null : entries);
 	}
 	
-	private static void renderFirstPersonArmor(final RenderArmEvent event)
-	{
-		Minecraft mc = PLibRenderHelper.mc();
-		EntityRenderer<?, ?> renderer = mc.getEntityRenderDispatcher().getRenderer(event.getPlayer());
-		if (!(renderer instanceof AvatarRenderer<?> playerRenderer))
-			return;
-		
-		HumanoidModel<?> model = playerRenderer.getModel();
-		float partialTick = mc.isPaused() ? 0 : mc.getDeltaTracker().getGameTimeDeltaPartialTick(false);
-		
-		PHumanoidAttachmentLayer.renderFirstPersonArm(
-				event.getPoseStack(),
-				event.getPackedLight(),
-				event.getPlayer(),
-				event.getArm(),
-				event.getArm() == HumanoidArm.RIGHT ? model.rightArm : model.leftArm,
-				partialTick);
-	}
 }

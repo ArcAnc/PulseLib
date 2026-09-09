@@ -1,0 +1,13 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "pulselib:item/test_armor",
+    "model": {
+      "type": "pulselib:test_armor",
+      "model_location": "pulselib:glmodels/entity/armor/test_armor.glb",
+      "textures": [
+        "pulselib:entity/armor/test_armor/0"
+      ]
+    }
+  }
+}

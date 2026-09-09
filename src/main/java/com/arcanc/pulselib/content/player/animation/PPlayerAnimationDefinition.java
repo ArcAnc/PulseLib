@@ -11,21 +11,16 @@ package com.arcanc.pulselib.content.player.animation;
 
 import com.arcanc.pulselib.content.animatable.PAnimationController;
 import com.arcanc.pulselib.content.animatable.PAnimationManager;
-import com.arcanc.pulselib.content.model.deformer.PDeformerStack;
-import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import com.arcanc.pulselib.content.model.animation.PPoseEasing;
 import com.arcanc.pulselib.content.model.animation.PTransitionInterruptionPolicy;
+import com.arcanc.pulselib.content.model.deformer.PDeformerStack;
+import com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonSettings;
+import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import com.arcanc.pulselib.data.gecko.MolangParser;
 import net.minecraft.world.entity.player.Player;
 import org.joml.Vector3f;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 
 public final class PPlayerAnimationDefinition
@@ -48,6 +43,9 @@ public final class PPlayerAnimationDefinition
 	private final String syncGroup;
 	private final ControllerRegistrar controllerRegistrar;
 	private final MolangContextProvider molangContextProvider;
+	
+	private final Map<PPlayerAnimationAnchor, String> anchors;
+	private final PPlayerFirstPersonSettings firstPersonSettings;
 
 	private PPlayerAnimationDefinition(Builder builder)
 	{
@@ -69,6 +67,8 @@ public final class PPlayerAnimationDefinition
 		this.syncGroup = builder.syncGroup;
 		this.controllerRegistrar = builder.controllerRegistrar;
 		this.molangContextProvider = builder.molangContextProvider;
+		this.anchors = Map.copyOf(builder.anchors);
+		this.firstPersonSettings = builder.firstPersonSettings.copy();
 	}
 
 	public static Builder builder(PModelData modelData)
@@ -162,7 +162,17 @@ public final class PPlayerAnimationDefinition
 	{
 		return this.syncGroup;
 	}
+	
+	public Map<PPlayerAnimationAnchor, String> anchors()
+	{
+		return this.anchors;
+	}
 
+	public PPlayerFirstPersonSettings firstPersonSettings()
+	{
+		return this.firstPersonSettings.copy();
+	}
+	
 	void registerControllers(PAnimationManager.PAnimationRegistrar<PPlayerAnimationInstance> registrar)
 	{
 		this.controllerRegistrar.register(registrar);
@@ -217,6 +227,9 @@ public final class PPlayerAnimationDefinition
 		private String syncGroup = "";
 		private ControllerRegistrar controllerRegistrar = ControllerRegistrar.EMPTY;
 		private MolangContextProvider molangContextProvider = MolangContextProvider.EMPTY;
+		
+		private final Map<PPlayerAnimationAnchor, String> anchors = new HashMap<>();
+		private PPlayerFirstPersonSettings firstPersonSettings = PPlayerFirstPersonSettings.ENABLED;
 
 		private Builder(PModelData modelData)
 		{
@@ -344,6 +357,20 @@ public final class PPlayerAnimationDefinition
 		public Builder populateMolangContext(MolangContextProvider provider)
 		{
 			this.molangContextProvider = Objects.requireNonNull(provider);
+			return this;
+		}
+		
+		public Builder anchor(PPlayerAnimationAnchor playerAnimationAnchor, String boneName)
+		{
+			Objects.requireNonNull(playerAnimationAnchor);
+			Objects.requireNonNull(boneName);
+			this.anchors.put(playerAnimationAnchor, boneName);
+			return this;
+		}
+		
+		public Builder firstPerson(PPlayerFirstPersonSettings settings)
+		{
+			this.firstPersonSettings = Objects.requireNonNull(settings);
 			return this;
 		}
 

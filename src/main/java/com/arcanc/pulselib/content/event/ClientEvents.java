@@ -15,6 +15,12 @@ import com.arcanc.pulselib.content.animatable.instance.InstanceAnimationManager;
 import com.arcanc.pulselib.content.animatable.singleton.SingletonAnimationManager;
 import com.arcanc.pulselib.content.model.textures.atlas.RuntimeLoader;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
+import com.arcanc.pulselib.content.registration.PLibRegistration;
+import com.arcanc.pulselib.content.registration.player.PPlayerBallDemo;
+import com.arcanc.pulselib.content.registration.block.block_entity.ber.TestBlockEntityRenderer;
+import com.arcanc.pulselib.content.registration.entity.renderer.TestEntityRender;
+import com.arcanc.pulselib.content.registration.item.TestArmorItem;
+import com.arcanc.pulselib.content.registration.item.renderer.TestBlockItemRenderer;
 import com.arcanc.pulselib.content.renderer.PRenderQueue;
 import com.arcanc.pulselib.content.renderer.PRenderStagesHandler;
 import com.arcanc.pulselib.util.PLibDatabase;
@@ -32,6 +38,8 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModLoader;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent;
 import net.neoforged.neoforge.client.event.RegisterSpriteSourcesEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
@@ -46,9 +54,9 @@ public class ClientEvents
 	{
 		ModLoader.postEvent(new PulseLibEvents.TypeRegistrationEvent());
 		
-		//modEventBus.addListener(ClientEvents :: registerRenderers);
-		//modEventBus.addListener(ClientEvents :: registerCustomTextures);
-		//modEventBus.addListener(ClientEvents :: registerSpecialModels);
+		modEventBus.addListener(ClientEvents :: registerRenderers);
+		modEventBus.addListener(ClientEvents :: registerCustomTextures);
+		modEventBus.addListener(ClientEvents :: registerSpecialModels);
 		
 		PAttachmentAnchorResolvers.init(modEventBus);
 		modEventBus.addListener(EventPriority.HIGHEST, ClientEvents :: registerSpriteSources);
@@ -62,7 +70,7 @@ public class ClientEvents
 		PTextureCache.register(modEventBus);
 		PLibArmorHandler.register(modEventBus);
 		
-		//PPlayerAcrobaticDemo.register(modEventBus);
+		PPlayerBallDemo.register(modEventBus);
 	}
 	
 	private static void registerReloadListeners(final AddClientReloadListenersEvent event)
@@ -84,6 +92,8 @@ public class ClientEvents
 		ModLoader.postEvent(registrationEvent);
 		PulseLibEvents.PlayerAnimationRegistrationEvent playerAnimationRegistrationEvent = new PulseLibEvents.PlayerAnimationRegistrationEvent();
 		ModLoader.postEvent(playerAnimationRegistrationEvent);
+		PulseLibEvents.PlayerAnimatedAttachmentRegistrationEvent animatedAttachmentRegistrationEvent = new PulseLibEvents.PlayerAnimatedAttachmentRegistrationEvent();
+		ModLoader.postEvent(animatedAttachmentRegistrationEvent);
 		
 		/*registrationEvent.registration().registerLiving(PLibRegistration.ItemReg.TEST_HAT.get(),
 				new PLivingAttachmentDefinition(
@@ -111,6 +121,7 @@ public class ClientEvents
 		
 		registrationEvent.registration().apply();
 		playerAnimationRegistrationEvent.registration().apply();
+		animatedAttachmentRegistrationEvent.registration().apply();
 		pulseClientContentRegistered = true;
 	}
 	
@@ -149,7 +160,7 @@ public class ClientEvents
 		event.register(PLibDatabase.rl("runtime_loader"), RuntimeLoader.CODEC);
 	}
 	
-	/*private static void registerSpecialModels(final RegisterSpecialModelRendererEvent event)
+	private static void registerSpecialModels(final RegisterSpecialModelRendererEvent event)
 	{
 		event.register(PLibDatabase.rl("test_block"), TestBlockItemRenderer.Unbaked.MAP_CODEC);
 	}
@@ -174,5 +185,5 @@ public class ClientEvents
 		event.addTextureLocation(TestBlockItemRenderer.PYRAMID).
 				addTextureLocation(TestBlockItemRenderer.CIRCLE);
 		event.addTextureLocation(TestArmorItem.TEXTURE);
-	}*/
+	}
 }
