@@ -55,7 +55,7 @@ The queue has a few stages:
 * `FIRST_PERSON` for items rendered in either first-person hand.
 * `GUI` for GUI rendering.
 
-Normal renderers submit into these stages for you. [`PRenderStagesHandler`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java) flushes the level stages, while PulseLib flushes `FIRST_PERSON` immediately after Minecraft renders hands and held items. `PItemRenderer` selects `FIRST_PERSON` automatically for `FIRST_PERSON_LEFT_HAND` and `FIRST_PERSON_RIGHT_HAND`; no special renderer code is needed.
+Normal renderers submit into these stages for you. [`PRenderStagesHandler`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java) flushes the level stages, while PulseLib flushes `FIRST_PERSON` immediately after the hand pass. When an enabled player first-person animation is active, that pass is PulseLib's replacement renderer rather than Minecraft's vanilla hands-and-items renderer. `PItemRenderer` selects `FIRST_PERSON` automatically for `FIRST_PERSON_LEFT_HAND` and `FIRST_PERSON_RIGHT_HAND`; no special renderer code is needed.
 
 ## When to submit manually
 

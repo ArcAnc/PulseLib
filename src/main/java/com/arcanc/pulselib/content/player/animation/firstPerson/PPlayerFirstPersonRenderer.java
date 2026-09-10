@@ -37,9 +37,13 @@ public class PPlayerFirstPersonRenderer
 	{
 		ItemInHandRenderer renderer = PLibRenderHelper.mc().gameRenderer.itemInHandRenderer;
 		boolean mainIsRight = player.getMainArm() == HumanoidArm.RIGHT;
-		renderItem(renderer, player, player.getMainHandItem(), InteractionHand.MAIN_HAND, mainIsRight ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND,
+		ItemStack mainHandItem = player.getMainHandItem();
+		if (!pose.hidesItem(player, InteractionHand.MAIN_HAND, mainHandItem))
+			renderItem(renderer, player, mainHandItem, InteractionHand.MAIN_HAND, mainIsRight ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND,
 				mainIsRight ? pose.rightItem() : pose.leftItem(), poseStack, submitNodeCollector, packedLight);
-		renderItem(renderer, player, player.getOffhandItem(), InteractionHand.OFF_HAND, mainIsRight ? ItemDisplayContext.FIRST_PERSON_LEFT_HAND : ItemDisplayContext.FIRST_PERSON_RIGHT_HAND,
+		ItemStack offHandItem = player.getOffhandItem();
+		if (!pose.hidesItem(player, InteractionHand.OFF_HAND, offHandItem))
+			renderItem(renderer, player, offHandItem, InteractionHand.OFF_HAND, mainIsRight ? ItemDisplayContext.FIRST_PERSON_LEFT_HAND : ItemDisplayContext.FIRST_PERSON_RIGHT_HAND,
 				mainIsRight ? pose.leftItem() : pose.rightItem(), poseStack, submitNodeCollector, packedLight);
 	}
 

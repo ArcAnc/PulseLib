@@ -17,7 +17,10 @@ import com.arcanc.pulselib.content.model.deformer.PDeformerStack;
 import com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonSettings;
 import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import com.arcanc.pulselib.data.gecko.MolangParser;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import org.joml.Vector3f;
 
 import java.util.*;
@@ -46,6 +49,7 @@ public final class PPlayerAnimationDefinition
 
 	private final Map<PPlayerAnimationAnchor, String> anchors;
 	private final PPlayerFirstPersonSettings firstPersonSettings;
+	private final FPItemHider itemHider;
 
 	private PPlayerAnimationDefinition(Builder builder)
 	{
@@ -69,6 +73,7 @@ public final class PPlayerAnimationDefinition
 		this.molangContextProvider = builder.molangContextProvider;
 		this.anchors = Map.copyOf(builder.anchors);
 		this.firstPersonSettings = builder.firstPersonSettings.copy();
+		this.itemHider = builder.itemHider;
 	}
 
 	public static Builder builder(PModelData modelData)
@@ -132,7 +137,7 @@ public final class PPlayerAnimationDefinition
 	{
 		return this.deformers;
 	}
-	
+
 	public Vector3f rootPivot()
 	{
 		return new Vector3f(this.rootPivot);
@@ -172,6 +177,11 @@ public final class PPlayerAnimationDefinition
 	{
 		return this.firstPersonSettings.copy();
 	}
+
+	public FPItemHider itemHider()
+	{
+		return this.itemHider;
+	}
 	
 	void registerControllers(PAnimationManager.PAnimationRegistrar<PPlayerAnimationInstance> registrar)
 	{
@@ -207,6 +217,16 @@ public final class PPlayerAnimationDefinition
 		              float partialTick);
 	}
 
+	@FunctionalInterface
+	public interface FPItemHider
+	{
+		FPItemHider NEVER = (player, hand, stack) -> false;
+		FPItemHider ALWAYS = (player, hand, stack) -> true;
+		boolean hide(LocalPlayer player,
+			          InteractionHand hand,
+			          ItemStack stack);
+	}
+
 	public static final class Builder
 	{
 		private final PModelData modelData;
@@ -229,7 +249,8 @@ public final class PPlayerAnimationDefinition
 		private MolangContextProvider molangContextProvider = MolangContextProvider.EMPTY;
 
 		private final Map<PPlayerAnimationAnchor, String> anchors = new HashMap<>();
-		private PPlayerFirstPersonSettings firstPersonSettings = PPlayerFirstPersonSettings.ENABLED;
+		private PPlayerFirstPersonSettings firstPersonSettings = PPlayerFirstPersonSettings.DISABLED;
+		private FPItemHider itemHider = FPItemHider.ALWAYS;
 
 		private Builder(PModelData modelData)
 		{
@@ -241,7 +262,7 @@ public final class PPlayerAnimationDefinition
 			this.predicate = Objects.requireNonNull(predicate);
 			return this;
 		}
-		
+
 		public Builder bind(PPlayerPart part, String boneName)
 		{
 			if (boneName == null || boneName.isBlank())
@@ -371,6 +392,12 @@ public final class PPlayerAnimationDefinition
 		public Builder firstPerson(PPlayerFirstPersonSettings settings)
 		{
 			this.firstPersonSettings = Objects.requireNonNull(settings);
+			return this;
+		}
+
+		public Builder hideItemInHands(FPItemHider itemHider)
+		{
+			this.itemHider = Objects.requireNonNull(itemHider);
 			return this;
 		}
 

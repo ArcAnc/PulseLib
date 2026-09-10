@@ -132,6 +132,7 @@ public final class PPlayerAnimations
 			pose.addArm(PPlayerPart.LEFT_ARM, frame, definition, player, partialTick, activationWeight);
 			pose.addItem(PPlayerAnimationAnchors.RIGHT_ITEM, frame, definition, activationWeight);
 			pose.addItem(PPlayerAnimationAnchors.LEFT_ITEM, frame, definition, activationWeight);
+			pose.addItemHider(definition);
 			pose.addAnimationAnchors(entry.getKey(), frame, definition, activationWeight);
 			pose.addMeshAttachments(entry.getKey(), frame, definition, activationWeight);
 			pose.enabled = true;
@@ -469,6 +470,7 @@ public final class PPlayerAnimations
 		private Matrix4f leftArm;
 		private Matrix4f rightItem;
 		private Matrix4f leftItem;
+		private PPlayerAnimationDefinition.FPItemHider itemHider;
 		private final List<PPlayerFirstPersonAnchorPose> animationAnchors = new ArrayList<>();
 		private final List<PPlayerFirstPersonMeshAttachmentPose> meshAttachments = new ArrayList<>();
 		private boolean enabled;
@@ -498,6 +500,11 @@ public final class PPlayerAnimations
 			Matrix4f transform = frame.firstPersonTransform(anchor);
 			if (transform != null)
 				set(anchor.equals(PPlayerAnimationAnchors.RIGHT_ITEM), PPlayerAnimationSpace.toFirstPersonSpace(transform, definition), definition.blendMode(), weight, true);
+		}
+
+		private void addItemHider(PPlayerAnimationDefinition definition)
+		{
+			this.itemHider = definition.itemHider();
 		}
 
 		private void addAnimationAnchors(Identifier id,
@@ -579,6 +586,7 @@ public final class PPlayerAnimations
 		private PPlayerFirstPersonPose build()
 		{
 			return new PPlayerFirstPersonPose(this.rightArm, this.leftArm, this.rightItem, this.leftItem,
+					this.itemHider,
 					List.copyOf(this.animationAnchors), List.copyOf(this.meshAttachments));
 		}
 	}

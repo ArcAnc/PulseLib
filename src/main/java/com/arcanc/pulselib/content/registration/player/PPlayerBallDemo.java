@@ -13,6 +13,8 @@ import com.arcanc.pulselib.content.animatable.ControllerState;
 import com.arcanc.pulselib.content.event.PulseLibEvents;
 import com.arcanc.pulselib.content.model.animation.PRawAnimation;
 import com.arcanc.pulselib.content.player.animation.*;
+import com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonSettings;
+import com.arcanc.pulselib.content.registration.PLibRegistration;
 import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
 import com.arcanc.pulselib.util.PLibDatabase;
@@ -20,6 +22,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.loading.FMLLoader;
@@ -70,6 +73,10 @@ public final class PPlayerBallDemo
 						anchor(PPlayerAnimationAnchors.FIRST_PERSON_CAMERA, "fp_camera").
 						anchor(PPlayerAnimationAnchors.RIGHT_ITEM, "right_hand").
 						anchor(PPlayerAnimationAnchors.LEFT_ITEM, "left_hand").
+						firstPerson(PPlayerFirstPersonSettings.ENABLED).
+						hideItemInHands((player, hand, stack) ->
+								hand == InteractionHand.MAIN_HAND &&
+								stack.getItem() == PLibRegistration.ItemReg.TEST_ITEM.get()).
 						controllers(registrar -> registrar.add("ball_toss", () -> state ->
 								state.controller().isStopped() ? ControllerState.STOP : ControllerState.PLAY)).
 				build());
