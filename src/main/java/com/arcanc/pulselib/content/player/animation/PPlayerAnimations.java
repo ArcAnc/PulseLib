@@ -20,6 +20,7 @@ import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -115,7 +116,7 @@ public final class PPlayerAnimations
 		for (Map.Entry<Identifier, PPlayerAnimationDefinition> entry : definitions)
 		{
 			PPlayerAnimationDefinition definition = entry.getValue();
-			if (!definition.firstPersonSettings().enable() || INVALID_FIRST_PERSON_DEFINITIONS.contains(entry.getKey()))
+			if (!definition.firstPersonSettings().enabled() || INVALID_FIRST_PERSON_DEFINITIONS.contains(entry.getKey()))
 				continue;
 
 			float definitionWeight = definition.weight(player, partialTick);
@@ -123,14 +124,14 @@ public final class PPlayerAnimations
 				continue;
 
 			PPlayerAnimationInstance instance = instance(player, entry.getKey(), definition);
-			if (!instance.isContributing() || !instance.hasActiveController())
+			if (!instance.isFirstPersonContributing())
 				continue;
 
 			PPlayerAnimationFrame frame = instance.sampleFrame(partialTick);
 			if (frame == null)
 				continue;
 
-			float activationWeight = definitionWeight * instance.activationWeight(partialTick);
+			float activationWeight = definitionWeight * instance.firstPersonActivationWeight(partialTick);
 			if (activationWeight <= 0.0f)
 				continue;
 
@@ -141,10 +142,10 @@ public final class PPlayerAnimations
 			pose.addItemHider(definition);
 			pose.addAnimationAnchors(entry.getKey(), frame, definition, activationWeight);
 			pose.addMeshAttachments(entry.getKey(), frame, definition, activationWeight);
-			pose.enabled = true;
+			pose.hasContributingAnimation = true;
 		}
 
-		return pose.enabled ? pose.build() : null;
+		return pose.hasContributingAnimation ? pose.build() : null;
 	}
 	
 	@ApiStatus.Internal
@@ -227,12 +228,12 @@ public final class PPlayerAnimations
 	public static @Nullable PPlayerCameraPose cameraPose(Player player, float partialTick)
 	{
 		PPlayerCameraPose cameraPose = new PPlayerCameraPose();
-		applyDefinitions(player, partialTick, Set.of(PPlayerPart.ROOT), (part, pose, definition, weight) ->
+		applyFirstPersonDefinitions(player, partialTick, Set.of(PPlayerPart.ROOT), (part, pose, definition, weight) ->
 				cameraPose.addRoot(
 						PPlayerAnimationSpace.toPlayerSpace(pose, definition),
 						PPlayerAnimationSpace.toPlayerSpace(definition.rootPivot(), definition),
 						weight));
-		applyDefinitions(player, partialTick, Set.of(PPlayerPart.HEAD), (part, pose, definition, weight) ->
+		applyFirstPersonDefinitions(player, partialTick, Set.of(PPlayerPart.HEAD), (part, pose, definition, weight) ->
 				cameraPose.addHead(PPlayerAnimationSpace.toPlayerSpace(pose, definition), definition.blendMode(), weight));
 		return cameraPose.isEmpty() ? null : cameraPose;
 	}
@@ -320,6 +321,49 @@ public final class PPlayerAnimations
 					continue;
 
 				consumer.apply(part, pose, definition, weight);
+			}
+		}
+	}
+
+	private static void applyFirstPersonDefinitions(Player player,
+	                                                float partialTick,
+	                                                Set<PPlayerPart> allowedParts,
+	                                                PoseConsumer consumer)
+	{
+		List<Map.Entry<Identifier, PPlayerAnimationDefinition>> definitions = new ArrayList<>(DEFINITIONS.entrySet());
+		definitions.sort(Comparator.
+				comparingInt((Map.Entry<Identifier, PPlayerAnimationDefinition> entry) -> entry.getValue().priority()).
+				thenComparing(Map.Entry :: getKey));
+
+		for (Map.Entry<Identifier, PPlayerAnimationDefinition> entry : definitions)
+		{
+			PPlayerAnimationDefinition definition = entry.getValue();
+			if (!definition.firstPersonSettings().enabled() ||
+					definition.firstPersonSettings().cameraMode() != PFirstPersonCameraMode.ANIMATED)
+				continue;
+			float definitionWeight = definition.weight(player, partialTick);
+			if (definitionWeight <= 0.0f)
+				continue;
+
+			PPlayerAnimationInstance instance = instance(player, entry.getKey(), definition);
+			if (!instance.isFirstPersonContributing())
+				continue;
+			PPlayerAnimationFrame frame = instance.sampleFrame(partialTick);
+			if (frame == null)
+				continue;
+
+			for (Map.Entry<PPlayerPart, String> binding : definition.bindings().entrySet())
+			{
+				PPlayerPart part = binding.getKey();
+				if (!allowedParts.contains(part) || !definition.appliesTo(player, part, partialTick))
+					continue;
+				float weight = definitionWeight * instance.firstPersonActivationWeight(partialTick) *
+						definition.partWeight(player, part, partialTick) * definition.boneWeight(player, binding.getValue(), partialTick);
+				if (weight <= 0.0f)
+					continue;
+				PPlayerBonePose pose = frame.animationDelta(binding.getValue());
+				if (pose != null)
+					consumer.apply(part, pose, definition, weight);
 			}
 		}
 	}
@@ -472,14 +516,16 @@ public final class PPlayerAnimations
 
 	private static final class FirstPersonPoseBuilder
 	{
-		private PFirstPersonArmPose rightArm = PFirstPersonArmPose.vanilla();
-		private PFirstPersonArmPose leftArm = PFirstPersonArmPose.vanilla();
-		private PFirstPersonItemPose rightItem = PFirstPersonItemPose.vanilla();
-		private PFirstPersonItemPose leftItem = PFirstPersonItemPose.vanilla();
+		private PFirstPersonArmPose rightArm = PFirstPersonArmPose.animated(PFirstPersonRestPose.arm(HumanoidArm.RIGHT));
+		private PFirstPersonArmPose leftArm = PFirstPersonArmPose.animated(PFirstPersonRestPose.arm(HumanoidArm.LEFT));
+		private boolean rightArmContributed;
+		private boolean leftArmContributed;
+		private Matrix4f rightItemOffset = new Matrix4f();
+		private Matrix4f leftItemOffset = new Matrix4f();
 		private PPlayerAnimationDefinition.FPItemHider itemHider = PPlayerAnimationDefinition.FPItemHider.NEVER;
 		private final List<PPlayerFirstPersonAnchorPose> animationAnchors = new ArrayList<>();
 		private final List<PPlayerFirstPersonMeshAttachmentPose> meshAttachments = new ArrayList<>();
-		private boolean enabled;
+		private boolean hasContributingAnimation;
 
 		private void addArm(PPlayerPart part,
 		                    PPlayerAnimationFrame frame,
@@ -575,15 +621,27 @@ public final class PPlayerAnimations
 		private void setArm(boolean right, Matrix4f transform, PPlayerAnimationBlendMode blendMode, float weight)
 		{
 			PFirstPersonArmPose current = right ? this.rightArm : this.leftArm;
-			Matrix4f blended = blend(current.transform(), transform, blendMode, weight);
-			if (right) this.rightArm = PFirstPersonArmPose.animated(blended); else this.leftArm = PFirstPersonArmPose.animated(blended);
+			boolean contributed = right ? this.rightArmContributed : this.leftArmContributed;
+			Matrix4f blended = contributed ?
+					blend(current.transform(), transform, blendMode, weight) :
+					interpolate(current.transform(), transform, weight);
+			if (right)
+			{
+				this.rightArm = PFirstPersonArmPose.animated(blended);
+				this.rightArmContributed = true;
+			}
+			else
+			{
+				this.leftArm = PFirstPersonArmPose.animated(blended);
+				this.leftArmContributed = true;
+			}
 		}
 
 		private void setItem(boolean right, Matrix4f transform, PPlayerAnimationBlendMode blendMode, float weight)
 		{
-			PFirstPersonItemPose current = right ? this.rightItem : this.leftItem;
-			Matrix4f blended = blend(current.transform(), transform, blendMode, weight);
-			if (right) this.rightItem = PFirstPersonItemPose.animated(blended); else this.leftItem = PFirstPersonItemPose.animated(blended);
+			Matrix4f current = right ? this.rightItemOffset : this.leftItemOffset;
+			Matrix4f blended = blend(current, transform, blendMode, weight);
+			if (right) this.rightItemOffset = blended; else this.leftItemOffset = blended;
 		}
 
 		private static Matrix4f blend(@Nullable Matrix4f current, Matrix4f target, PPlayerAnimationBlendMode blendMode, float weight)
@@ -607,7 +665,9 @@ public final class PPlayerAnimations
 
 		private PPlayerFirstPersonPose build()
 		{
-			return new PPlayerFirstPersonPose(this.rightArm, this.leftArm, this.rightItem, this.leftItem,
+			return new PPlayerFirstPersonPose(this.rightArm, this.leftArm,
+					PFirstPersonItemPose.animated(PFirstPersonRestPose.item(HumanoidArm.RIGHT).mul(this.rightItemOffset)),
+					PFirstPersonItemPose.animated(PFirstPersonRestPose.item(HumanoidArm.LEFT).mul(this.leftItemOffset)),
 					this.itemHider,
 					List.copyOf(this.animationAnchors), List.copyOf(this.meshAttachments));
 		}
