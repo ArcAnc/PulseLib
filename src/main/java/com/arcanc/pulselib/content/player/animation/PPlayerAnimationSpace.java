@@ -15,6 +15,7 @@ import org.joml.*;
 
 public final class PPlayerAnimationSpace
 {
+	/** Converts glTF coordinate values to Minecraft's player-model coordinates. */
 	private static final Matrix4f GLTF_TO_PLAYER = new Matrix4f().
 			scaling(-1.0f, -1.0f, 1.0f);
 	
@@ -22,8 +23,19 @@ public final class PPlayerAnimationSpace
 			new Matrix4f(GLTF_TO_PLAYER).
 					invert();
 
+	/**
+	 * Converts a vanilla player-model local coordinate into the coordinate
+	 * convention used by the first-person replacement renderer.
+	 *
+	 * <p>The matrix currently has the same values as {@link #GLTF_TO_PLAYER},
+	 * because that conversion is its own inverse. The two constants express
+	 * different contracts, however: this one is a player-model-to-view
+	 * conversion and must be derived from the first-person renderer if its
+	 * coordinate convention changes.</p>
+	 */
 	private static final Matrix4f PLAYER_MODEL_TO_FIRST_PERSON =
-			new Matrix4f(GLTF_TO_PLAYER);
+			new Matrix4f().
+					scaling(-1.0f, -1.0f, 1.0f);
 	
 	private PPlayerAnimationSpace()
 	{
@@ -60,6 +72,10 @@ public final class PPlayerAnimationSpace
 				result.w);
 	}
 	
+	/**
+	 * Changes both the source and destination bases of a model transform to
+	 * Minecraft player-model space. For glTF, this is {@code C * M * C^-1}.
+	 */
 	public static Matrix4f toPlayerSpace(
 			Matrix4fc matrix,
 			PPlayerAnimationDefinition definition)
@@ -81,6 +97,18 @@ public final class PPlayerAnimationSpace
 		return new Matrix4f(GLTF_TO_PLAYER).mul(matrix);
 	}
 	
+	/**
+	 * Converts a camera-relative bone or item transform for the first-person
+	 * replacement renderer. The returned transform maps vanilla player-model
+	 * local coordinates into first-person camera coordinates.
+	 *
+	 * <p>For glTF input this becomes {@code M * C}: {@code toPlayerSpace}
+	 * first converts the transform into player-model space, then
+	 * {@link #PLAYER_MODEL_TO_FIRST_PERSON} converts its output into view
+	 * space. Consequently an identity bone transform returns {@code C}; that
+	 * is required to orient vanilla arms and items, whose source coordinates
+	 * are still player-model coordinates.</p>
+	 */
 	public static Matrix4f toFirstPersonSpace(
 			Matrix4fc matrix,
 			PPlayerAnimationDefinition definition)
@@ -89,6 +117,11 @@ public final class PPlayerAnimationSpace
 				mul(toPlayerSpace(matrix, definition));
 	}
 
+	/**
+	 * Converts a camera-relative transform for a mesh attached to the animated
+	 * model. Unlike vanilla arms and items, glTF mesh vertices already use the
+	 * glTF source basis, so a glTF transform reduces to {@code M} here.
+	 */
 	public static Matrix4f toFirstPersonGeometrySpace(
 			Matrix4fc matrix,
 			PPlayerAnimationDefinition definition)

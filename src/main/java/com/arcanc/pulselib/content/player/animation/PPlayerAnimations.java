@@ -117,7 +117,7 @@ public final class PPlayerAnimations
 				continue;
 
 			PPlayerAnimationInstance instance = instance(player, entry.getKey(), definition);
-			if (!instance.isContributing() || !instance.hasActiveController())
+			if (!instance.isContributing())
 				continue;
 
 			PPlayerAnimationFrame frame = instance.sampleFrame(partialTick);
@@ -130,8 +130,8 @@ public final class PPlayerAnimations
 
 			pose.addArm(PPlayerPart.RIGHT_ARM, frame, definition, player, partialTick, activationWeight);
 			pose.addArm(PPlayerPart.LEFT_ARM, frame, definition, player, partialTick, activationWeight);
-			pose.addItem(PPlayerAnimationAnchors.RIGHT_ITEM, frame, definition, activationWeight);
-			pose.addItem(PPlayerAnimationAnchors.LEFT_ITEM, frame, definition, activationWeight);
+			pose.addItem(PPlayerAnimationAnchors.RIGHT_ITEM, frame, definition, player, partialTick, activationWeight);
+			pose.addItem(PPlayerAnimationAnchors.LEFT_ITEM, frame, definition, player, partialTick, activationWeight);
 			pose.addItemHider(definition);
 			pose.addAnimationAnchors(entry.getKey(), frame, definition, activationWeight);
 			pose.addMeshAttachments(entry.getKey(), frame, definition, activationWeight);
@@ -484,7 +484,11 @@ public final class PPlayerAnimations
 		{
 			if (!definition.appliesTo(player, part, partialTick))
 				return;
-			float weight = activationWeight * definition.partWeight(player, part, partialTick);
+			String boneName = definition.bindings().get(part);
+			if (boneName == null)
+				return;
+			float weight = activationWeight * definition.partWeight(player, part, partialTick) *
+					definition.boneWeight(player, boneName, partialTick);
 			if (weight <= 0.0f)
 				return;
 			Matrix4f transform = frame.firstPersonTransform(part);
@@ -495,8 +499,16 @@ public final class PPlayerAnimations
 		private void addItem(PPlayerAnimationAnchor anchor,
 		                     PPlayerAnimationFrame frame,
 		                     PPlayerAnimationDefinition definition,
-		                     float weight)
+		                     Player player,
+		                     float partialTick,
+		                     float activationWeight)
 		{
+			String boneName = definition.anchors().get(anchor);
+			if (boneName == null)
+				return;
+			float weight = activationWeight * definition.boneWeight(player, boneName, partialTick);
+			if (weight <= 0.0f)
+				return;
 			Matrix4f transform = frame.firstPersonTransform(anchor);
 			if (transform != null)
 				set(anchor.equals(PPlayerAnimationAnchors.RIGHT_ITEM), PPlayerAnimationSpace.toFirstPersonSpace(transform, definition), definition.blendMode(), weight, true);

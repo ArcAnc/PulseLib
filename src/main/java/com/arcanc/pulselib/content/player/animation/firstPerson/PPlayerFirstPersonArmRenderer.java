@@ -71,7 +71,6 @@ public final class PPlayerFirstPersonArmRenderer
 		try
 		{
 			poseStack.mulPose(transform);
-			poseStack.mulPose(PPlayerFirstPersonArmTransform.correction(arm));
 			
 			geometry.sleeve().visible = isSleeveVisible(player, arm);
 			armCollector.submitModelPart(
@@ -102,7 +101,6 @@ public final class PPlayerFirstPersonArmRenderer
 		try
 		{
 			poseStack.mulPose(transform);
-			poseStack.mulPose(PPlayerFirstPersonArmTransform.correction(arm));
 			PHumanoidAttachmentLayer.renderFirstPersonArm(poseStack, packedLight, player, arm, armPart, partialTick);
 		}
 		finally

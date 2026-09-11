@@ -51,6 +51,7 @@ public abstract class ItemInHandRendererMixin
 				pose,
 				poseStack,
 				submitNodeCollector,
-				packedLight);
+				packedLight,
+				partialTick);
 	}
 }

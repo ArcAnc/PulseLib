@@ -121,7 +121,7 @@ Definitions with the same non-empty `syncGroup` keep similarly named looping con
 .syncGroup("combat")
 ```
 
-Use this for layered models whose walk, idle, or other cyclic animations must stay aligned. `boneWeight(boneName, weight)` can additionally scale one bound bone independently of its semantic player-part weight.
+Use this for layered models whose walk, idle, or other cyclic animations must stay aligned. `boneWeight(boneName, weight)` can additionally scale one bound bone independently of its semantic player-part weight. It also scales first-person arms and item anchors that use that bone.
 
 ## Mesh deformers
 
@@ -158,6 +158,14 @@ First-person hand rendering is opt-in. `PPlayerFirstPersonSettings.DISABLED` is 
 
 For its arms, items, meshes, or custom anchors to appear, an enabled definition needs a `FIRST_PERSON_CAMERA` anchor. It defines the origin used to convert those bones into first-person space. It does **not** move the Minecraft camera; bind `ROOT` and `HEAD` when the animation itself should move or rotate the local camera.
 
+The first-person transform has two coordinate boundaries. PulseLib first expresses the camera-relative bone transform in Minecraft player-model coordinates. It then converts the result into the first-person renderer's view coordinates. For a glTF arm or item transform `M`, the resulting matrix is `M * C`, where `C = diag(-1, -1, 1)`. This is intentional: the transform receives vanilla arm or item geometry in player-model coordinates, so even an identity bone transform needs `C` to orient that geometry in view space. Animated glTF mesh attachments already have glTF vertex coordinates and therefore reduce to `M`. `C` currently has the same numeric values as the glTF-to-player conversion because it is self-inverse, but it is a separate player-model-to-first-person-view contract.
+
+### PulseLib Player Action Rig
+
+Use [`player_model_template.gltf`](../src/main/resources/assets/pulselib/template/player/player_model_template.gltf) or [`player_model_template.bbmodel`](../src/main/resources/assets/pulselib/template/player/player_model_template.bbmodel) as the starting skeleton for player actions. It contains `body`, `head`, `right_arm`, `left_arm`, and `fp_camera`, plus `right_hand` and `left_hand` item anchors. The file is intentionally skeleton-only: add preview meshes in Blockbench if they help authoring, but keep the named bone origins unchanged.
+
+`right_arm` and `left_arm` have a fixed rig contract. Each bone origin must equal the local origin of the geometry-only vanilla `ModelPart` used by the first-person renderer. In particular, it is the arm pivot, not the player-model root, the center of the cuboid, or the hand grip. The template matches the normal 4×12×4 vanilla arms exactly after glTF conversion. PulseLib applies no per-arm correction matrix; a rig that moves either origin will move the rendered vanilla arm and its persistent attachments by the same offset.
+
 ```java
 PPlayerAnimationDefinition.builder(MODEL)
         .bind(PPlayerPart.HEAD, "head")       // optional: drives the camera
@@ -171,7 +179,9 @@ PPlayerAnimationDefinition.builder(MODEL)
         .build();
 ```
 
-`RIGHT_ARM` and `LEFT_ARM` supply the physical arms to draw. An arm without a sampled transform is absent from the replacement pass. `RIGHT_ITEM` and `LEFT_ITEM` supply the physical hand positions for held items; without the relevant item anchor the item is absent too. Minecraft maps the player's logical main/off hand to these physical left/right anchors according to the player's main-arm setting.
+`RIGHT_ARM` and `LEFT_ARM` supply the physical arms to draw. An arm without a sampled transform is absent from the replacement pass. `RIGHT_ITEM` and `LEFT_ITEM` supply the physical first-person item-renderer origins; without the relevant item anchor the item is absent too. Minecraft maps the player's logical main/off hand to these physical left/right anchors according to the player's main-arm setting.
+
+An item anchor is applied before Minecraft renders the item with `FIRST_PERSON_RIGHT_HAND` or `FIRST_PERSON_LEFT_HAND`. It therefore controls the container transform, not the absolute transform of the item mesh or its final grip. Minecraft then applies the item's own first-person display transform, including any transform supplied by an item model or resource pack. This keeps animated items compatible with vanilla and custom first-person item models.
 
 Keep `firstPerson` disabled for ordinary third-person animations. An active enabled definition starts the replacement pass even if its model has no valid arm or item transform, which would leave those elements invisible. Definitions are processed by ascending `priority` and then identifier; arm and item transforms blend in that same order.
 
