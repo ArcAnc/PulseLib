@@ -35,7 +35,11 @@ public final class PPlayerAnimationSpace
 	 */
 	private static final Matrix4f PLAYER_MODEL_TO_FIRST_PERSON =
 			new Matrix4f().
-					scaling(-1.0f, -1.0f, 1.0f);
+				scaling(-1.0f, -1.0f, 1.0f);
+
+	/** Item origins after vanilla's steady first-person hand-grip transform. */
+	private static final Vector3f RIGHT_VANILLA_ITEM_GRIP = new Vector3f(0.56f, -0.52f, -0.72f);
+	private static final Vector3f LEFT_VANILLA_ITEM_GRIP = new Vector3f(-0.56f, -0.52f, -0.72f);
 	
 	private PPlayerAnimationSpace()
 	{
@@ -115,6 +119,26 @@ public final class PPlayerAnimationSpace
 	{
 		return new Matrix4f(PLAYER_MODEL_TO_FIRST_PERSON).
 				mul(toPlayerSpace(matrix, definition));
+	}
+
+	/**
+	 * Converts an item anchor into an offset from vanilla's item-grip origin.
+	 *
+	 * <p>First-person item anchors intentionally control position only. Their
+	 * rotation belongs to the animated skeleton's coordinate system, whereas
+	 * the vanilla renderer applies the item model in its own grip coordinate
+	 * system. Passing that rotation through would rotate the item around the
+	 * wrong axes.</p>
+	 */
+	public static Matrix4f toFirstPersonItemOffsetSpace(
+			Matrix4fc matrix,
+			PPlayerAnimationDefinition definition,
+			boolean rightHand)
+	{
+		Vector3f anchorPosition = toFirstPersonSpace(matrix, definition).
+				getTranslation(new Vector3f());
+		Vector3f vanillaGrip = rightHand ? RIGHT_VANILLA_ITEM_GRIP : LEFT_VANILLA_ITEM_GRIP;
+		return new Matrix4f().translation(anchorPosition.sub(vanillaGrip));
 	}
 
 	/**

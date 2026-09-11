@@ -425,7 +425,7 @@
 				"properties": {},
 				"temp_data": {}
 			},
-			"origin": [6, 13, 0],
+			"origin": [6, 12, -2],
 			"rotation": [0, 0, 0],
 			"color": 0,
 			"children": [],
@@ -448,7 +448,7 @@
 				"properties": {},
 				"temp_data": {}
 			},
-			"origin": [-6, 13, 0],
+			"origin": [-6, 12, -2],
 			"rotation": [0, 0, 0],
 			"color": 0,
 			"children": [],

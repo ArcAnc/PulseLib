@@ -250,7 +250,7 @@ public final class PPlayerAnimationDefinition
 
 		private final Map<PPlayerAnimationAnchor, String> anchors = new HashMap<>();
 		private PPlayerFirstPersonSettings firstPersonSettings = PPlayerFirstPersonSettings.DISABLED;
-		private FPItemHider itemHider = FPItemHider.ALWAYS;
+		private FPItemHider itemHider = FPItemHider.NEVER;
 
 		private Builder(PModelData modelData)
 		{

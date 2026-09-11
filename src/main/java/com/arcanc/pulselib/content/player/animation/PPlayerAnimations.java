@@ -12,9 +12,8 @@ package com.arcanc.pulselib.content.player.animation;
 import com.arcanc.pulselib.content.model.animation.PPoseBlendMode;
 import com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimationMeshAttachmentPose;
 import com.arcanc.pulselib.content.player.animation.attachment.PPlayerAutomaticMeshAttachments;
-import com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonAnchorPose;
-import com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonMeshAttachmentPose;
-import com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonPose;
+import com.arcanc.pulselib.content.player.animation.firstPerson.*;
+import com.arcanc.pulselib.util.PLibDatabase;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.player.PlayerModel;
@@ -34,6 +33,7 @@ public final class PPlayerAnimations
 {
 	private static final Map<Identifier, PPlayerAnimationDefinition> DEFINITIONS = new HashMap<>();
 	private static final Map<UUID, Map<Identifier, PPlayerAnimationInstance>> INSTANCES = new HashMap<>();
+	private static final Set<Identifier> INVALID_FIRST_PERSON_DEFINITIONS = new HashSet<>();
 
 	private PPlayerAnimations()
 	{
@@ -43,6 +43,12 @@ public final class PPlayerAnimations
 	{
 		if (DEFINITIONS.putIfAbsent(id, definition) != null)
 			throw new IllegalArgumentException("Duplicate player animation definition: " + id);
+		if (definition.firstPersonSettings().enable() &&
+				!definition.anchors().containsKey(PPlayerAnimationAnchors.FIRST_PERSON_CAMERA))
+		{
+			INVALID_FIRST_PERSON_DEFINITIONS.add(id);
+			PLibDatabase.LOGGER.error("Player animation definition {} enables first-person rendering but has no {} anchor; vanilla first-person rendering will be used", id, PPlayerAnimationAnchors.FIRST_PERSON_CAMERA.id());
+		}
 	}
 
 	public static @Nullable PPlayerAnimationDefinition get(Identifier id)
@@ -109,7 +115,7 @@ public final class PPlayerAnimations
 		for (Map.Entry<Identifier, PPlayerAnimationDefinition> entry : definitions)
 		{
 			PPlayerAnimationDefinition definition = entry.getValue();
-			if (!definition.firstPersonSettings().enable())
+			if (!definition.firstPersonSettings().enable() || INVALID_FIRST_PERSON_DEFINITIONS.contains(entry.getKey()))
 				continue;
 
 			float definitionWeight = definition.weight(player, partialTick);
@@ -117,7 +123,7 @@ public final class PPlayerAnimations
 				continue;
 
 			PPlayerAnimationInstance instance = instance(player, entry.getKey(), definition);
-			if (!instance.isContributing())
+			if (!instance.isContributing() || !instance.hasActiveController())
 				continue;
 
 			PPlayerAnimationFrame frame = instance.sampleFrame(partialTick);
@@ -466,11 +472,11 @@ public final class PPlayerAnimations
 
 	private static final class FirstPersonPoseBuilder
 	{
-		private Matrix4f rightArm;
-		private Matrix4f leftArm;
-		private Matrix4f rightItem;
-		private Matrix4f leftItem;
-		private PPlayerAnimationDefinition.FPItemHider itemHider;
+		private PFirstPersonArmPose rightArm = PFirstPersonArmPose.vanilla();
+		private PFirstPersonArmPose leftArm = PFirstPersonArmPose.vanilla();
+		private PFirstPersonItemPose rightItem = PFirstPersonItemPose.vanilla();
+		private PFirstPersonItemPose leftItem = PFirstPersonItemPose.vanilla();
+		private PPlayerAnimationDefinition.FPItemHider itemHider = PPlayerAnimationDefinition.FPItemHider.NEVER;
 		private final List<PPlayerFirstPersonAnchorPose> animationAnchors = new ArrayList<>();
 		private final List<PPlayerFirstPersonMeshAttachmentPose> meshAttachments = new ArrayList<>();
 		private boolean enabled;
@@ -493,7 +499,7 @@ public final class PPlayerAnimations
 				return;
 			Matrix4f transform = frame.firstPersonTransform(part);
 			if (transform != null)
-				set(part == PPlayerPart.RIGHT_ARM, PPlayerAnimationSpace.toFirstPersonSpace(transform, definition), definition.blendMode(), weight, false);
+				setArm(part == PPlayerPart.RIGHT_ARM, PPlayerAnimationSpace.toFirstPersonSpace(transform, definition), definition.blendMode(), weight);
 		}
 
 		private void addItem(PPlayerAnimationAnchor anchor,
@@ -509,9 +515,10 @@ public final class PPlayerAnimations
 			float weight = activationWeight * definition.boneWeight(player, boneName, partialTick);
 			if (weight <= 0.0f)
 				return;
+			boolean rightHand = anchor.equals(PPlayerAnimationAnchors.RIGHT_ITEM);
 			Matrix4f transform = frame.firstPersonTransform(anchor);
 			if (transform != null)
-				set(anchor.equals(PPlayerAnimationAnchors.RIGHT_ITEM), PPlayerAnimationSpace.toFirstPersonSpace(transform, definition), definition.blendMode(), weight, true);
+				setItem(rightHand, PPlayerAnimationSpace.toFirstPersonItemOffsetSpace(transform, definition, rightHand), definition.blendMode(), weight);
 		}
 
 		private void addItemHider(PPlayerAnimationDefinition definition)
@@ -565,15 +572,18 @@ public final class PPlayerAnimations
 			}
 		}
 
-		private void set(boolean right, Matrix4f transform, PPlayerAnimationBlendMode blendMode, float weight, boolean item)
+		private void setArm(boolean right, Matrix4f transform, PPlayerAnimationBlendMode blendMode, float weight)
 		{
-			Matrix4f current = item ? (right ? this.rightItem : this.leftItem) : (right ? this.rightArm : this.leftArm);
-			Matrix4f blended = blend(current, transform, blendMode, weight);
-			if (item)
-			{
-				if (right) this.rightItem = blended; else this.leftItem = blended;
-			}
-			else if (right) this.rightArm = blended; else this.leftArm = blended;
+			PFirstPersonArmPose current = right ? this.rightArm : this.leftArm;
+			Matrix4f blended = blend(current.transform(), transform, blendMode, weight);
+			if (right) this.rightArm = PFirstPersonArmPose.animated(blended); else this.leftArm = PFirstPersonArmPose.animated(blended);
+		}
+
+		private void setItem(boolean right, Matrix4f transform, PPlayerAnimationBlendMode blendMode, float weight)
+		{
+			PFirstPersonItemPose current = right ? this.rightItem : this.leftItem;
+			Matrix4f blended = blend(current.transform(), transform, blendMode, weight);
+			if (right) this.rightItem = PFirstPersonItemPose.animated(blended); else this.leftItem = PFirstPersonItemPose.animated(blended);
 		}
 
 		private static Matrix4f blend(@Nullable Matrix4f current, Matrix4f target, PPlayerAnimationBlendMode blendMode, float weight)

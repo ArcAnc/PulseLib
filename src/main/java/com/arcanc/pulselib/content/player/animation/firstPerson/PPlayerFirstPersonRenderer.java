@@ -12,72 +12,32 @@ package com.arcanc.pulselib.content.player.animation.firstPerson;
 
 import com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimatedAttachments;
 import com.arcanc.pulselib.content.player.animation.attachment.PPlayerAutomaticMeshAttachments;
-import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
-import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
 import org.joml.Matrix4f;
 
 public class PPlayerFirstPersonRenderer
 {
 	private static final int ARM_RENDER_ORDER = 10;
 	
-	private static void renderItems(
-			LocalPlayer player,
-			PPlayerFirstPersonPose pose,
-			PoseStack poseStack,
-			SubmitNodeCollector submitNodeCollector,
-			int packedLight)
-	{
-		ItemInHandRenderer renderer = PLibRenderHelper.mc().gameRenderer.itemInHandRenderer;
-		boolean mainIsRight = player.getMainArm() == HumanoidArm.RIGHT;
-		ItemStack mainHandItem = player.getMainHandItem();
-		if (!pose.hidesItem(player, InteractionHand.MAIN_HAND, mainHandItem))
-			renderItem(renderer, player, mainHandItem, mainIsRight ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND,
-				mainIsRight ? pose.rightItem() : pose.leftItem(), poseStack, submitNodeCollector, packedLight);
-		ItemStack offHandItem = player.getOffhandItem();
-		if (!pose.hidesItem(player, InteractionHand.OFF_HAND, offHandItem))
-			renderItem(renderer, player, offHandItem, mainIsRight ? ItemDisplayContext.FIRST_PERSON_LEFT_HAND : ItemDisplayContext.FIRST_PERSON_RIGHT_HAND,
-				mainIsRight ? pose.leftItem() : pose.rightItem(), poseStack, submitNodeCollector, packedLight);
-	}
-
-	private static void renderItem(ItemInHandRenderer renderer, LocalPlayer player, ItemStack stack, ItemDisplayContext context, Matrix4f transform, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight)
-	{
-		if (transform == null || stack.isEmpty())
-			return;
-		poseStack.pushPose();
-		try
-		{
-			poseStack.mulPose(transform);
-			renderer.renderItem(player, stack, context, poseStack, submitNodeCollector, packedLight);
-		}
-		finally
-		{
-			poseStack.popPose();
-		}
-	}
-
 	private static void renderPersistentAttachments(LocalPlayer player, PPlayerFirstPersonPose pose, PoseStack poseStack, int packedLight, float partialTick)
 	{
-		if (pose.rightArm() != null)
+		if (pose.rightArm().mode() == PFirstPersonRenderMode.ANIMATED)
 			PPlayerFirstPersonArmRenderer.renderAttachments(
 					player,
 					HumanoidArm.RIGHT,
-					pose.rightArm(),
+					pose.rightArm().transform(),
 					poseStack,
 					packedLight,
 					partialTick);
-		if (pose.leftArm() != null)
+		if (pose.leftArm().mode() == PFirstPersonRenderMode.ANIMATED)
 			PPlayerFirstPersonArmRenderer.renderAttachments(
 					player,
 					HumanoidArm.LEFT,
-					pose.leftArm(),
+					pose.leftArm().transform(),
 					poseStack,
 					packedLight,
 					partialTick);
@@ -92,9 +52,9 @@ public class PPlayerFirstPersonRenderer
 	{
 		OrderedSubmitNodeCollector armCollector = submitNodeCollector.order(ARM_RENDER_ORDER);
 		
-		Matrix4f rightArm = pose.rightArm();
+		Matrix4f rightArm = pose.rightArm().transform();
 		
-		if (rightArm != null)
+		if (pose.rightArm().mode() == PFirstPersonRenderMode.ANIMATED)
 		{
 			PPlayerFirstPersonArmRenderer.render(
 					player,
@@ -105,9 +65,9 @@ public class PPlayerFirstPersonRenderer
 					packedLight);
 		}
 		
-		Matrix4f leftArm = pose.leftArm();
+		Matrix4f leftArm = pose.leftArm().transform();
 		
-		if (leftArm != null)
+		if (pose.leftArm().mode() == PFirstPersonRenderMode.ANIMATED)
 		{
 			PPlayerFirstPersonArmRenderer.render(
 					player,
@@ -119,7 +79,7 @@ public class PPlayerFirstPersonRenderer
 		}
 	}
 	
-	public static void render(
+	public static void renderAdditional(
 			LocalPlayer player,
 			PPlayerFirstPersonPose pose,
 			PoseStack poseStack,
@@ -130,30 +90,11 @@ public class PPlayerFirstPersonRenderer
 		poseStack.pushPose();
 		try
 		{
-			Matrix4f firstPersonPose = new Matrix4f(poseStack.last().pose());
-			poseStack.mulPose(new Matrix4f(firstPersonPose).invert());
-
-			renderItems(
-				player,
-				pose,
-				poseStack,
-				submitNodeCollector,
-				packedLight);
-
-			poseStack.pushPose();
-			try
-			{
-				poseStack.mulPose(firstPersonPose);
-				PPlayerAutomaticMeshAttachments.renderFirstPerson(
-						pose.meshAttachments(),
-						poseStack,
-						submitNodeCollector,
-						packedLight);
-			}
-			finally
-			{
-				poseStack.popPose();
-			}
+			PPlayerAutomaticMeshAttachments.renderFirstPerson(
+					pose.meshAttachments(),
+					poseStack,
+					submitNodeCollector,
+					packedLight);
 
 			PPlayerAnimatedAttachments.renderFirstPerson(
 					player,

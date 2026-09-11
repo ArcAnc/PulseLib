@@ -14,21 +14,25 @@ import com.arcanc.pulselib.content.player.animation.PPlayerAnimationDefinition;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
-import org.joml.Matrix4f;
-
 import java.util.List;
+import java.util.Objects;
 
 public record PPlayerFirstPersonPose(
-		Matrix4f rightArm,
-		Matrix4f leftArm,
-		Matrix4f rightItem,
-		Matrix4f leftItem,
+		PFirstPersonArmPose rightArm,
+		PFirstPersonArmPose leftArm,
+		PFirstPersonItemPose rightItem,
+		PFirstPersonItemPose leftItem,
 		PPlayerAnimationDefinition.FPItemHider itemHider,
 		List<PPlayerFirstPersonAnchorPose> animationAnchors,
 		List<PPlayerFirstPersonMeshAttachmentPose> meshAttachments)
 {
 	public PPlayerFirstPersonPose
 	{
+		rightArm = Objects.requireNonNull(rightArm);
+		leftArm = Objects.requireNonNull(leftArm);
+		rightItem = Objects.requireNonNull(rightItem);
+		leftItem = Objects.requireNonNull(leftItem);
+		itemHider = Objects.requireNonNull(itemHider);
 		animationAnchors = List.copyOf(animationAnchors);
 		meshAttachments = List.copyOf(meshAttachments);
 	}
