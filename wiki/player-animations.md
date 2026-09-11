@@ -187,21 +187,21 @@ Keep `firstPerson` disabled for ordinary third-person animations. An active enab
 
 ## Hiding first-person held items
 
-`hideItemInHands(...)` supplies a predicate for the first-person replacement pass. It is evaluated immediately before drawing each non-empty item and receives the local player, its logical hand, and current `ItemStack`:
+`itemRenderPolicy(...)` supplies a predicate for each first-person item channel. It is evaluated immediately before drawing each non-empty item and receives the local player, its logical hand, and current `ItemStack`:
 
 ```java
 .firstPerson(PPlayerFirstPersonSettings.ENABLED)
-.hideItemInHands((player, hand, stack) ->
+.itemRenderPolicy((player, hand, stack) ->
         hand == InteractionHand.MAIN_HAND && stack.is(MyItems.KATANA.get()))
 ```
 
-Return `true` to suppress that item's local first-person draw. `FPItemHider.ALWAYS` hides both hands and `FPItemHider.NEVER` keeps them visible. The default hider is `FPItemHider.ALWAYS`, so an enabled definition must call `hideItemInHands(FPItemHider.NEVER)` to retain both items or provide its own predicate. Hiders are not combined: the hider from the last contributing first-person definition in priority/identifier order is the one that is evaluated. The inventory and third-person renderer are unaffected.
+Return `true` to suppress that item's local first-person draw. `ItemRenderPolicy.HIDE` hides an item and `ItemRenderPolicy.RENDER` keeps it visible; rendering is the default. The policy is attached to each physical left/right item channel only when that definition contributes the matching item anchor. Definitions are processed by ascending `priority` and identifier, so the highest ordered contributor for each channel owns its discrete policy while its transform is blended normally. The inventory and third-person renderer are unaffected.
 
 ## Animation anchors and mesh attachments
 
 `anchor(PPlayerAnimationAnchor, boneName)` exposes a model bone as a named attachment point. PulseLib reserves `FIRST_PERSON_CAMERA`, `RIGHT_ITEM`, and `LEFT_ITEM`; use a custom `PPlayerAnimationAnchor` for equipment or effects that follow an animation bone. Register a `PPlayerAnimatedAttachmentRenderer` through `PulseLibEvents.PlayerAnimatedAttachmentRegistrationEvent`. Its context contains the player, animation id, anchor, sampled transform, blend weight, render stack, collector, and whether it is rendering in first person.
 
-The player-animation model may also contain mesh branches that are not bound to a vanilla player part. PulseLib automatically renders an animated mesh branch when it has an active animated bone, both in third person and in the enabled first-person replacement pass. This lets a model carry animated props or effects without writing an attachment renderer. Skeleton-only models remain valid.
+The player-animation model may also contain mesh branches that are not bound to a vanilla player part. PulseLib automatically renders an animated mesh branch when it has an active animated bone, both in third person and in the enabled first-person replacement pass. Its transform is blended from identity by the animation activation weight before rendering, so activation and crossfade transitions also move mesh attachments smoothly. This lets a model carry animated props or effects without writing an attachment renderer. Skeleton-only models remain valid.
 
 `populateMolangContext(...)` can add player-specific Molang queries:
 

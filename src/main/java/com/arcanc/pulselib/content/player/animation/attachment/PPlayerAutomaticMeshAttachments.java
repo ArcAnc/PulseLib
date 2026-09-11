@@ -7,6 +7,7 @@
 package com.arcanc.pulselib.content.player.animation.attachment;
 
 import com.arcanc.pulselib.content.model.animation.BoneFrame;
+import com.arcanc.pulselib.content.model.animation.PTransform;
 import com.arcanc.pulselib.content.model.baked.PBakedBone;
 import com.arcanc.pulselib.content.model.baked.PMeshRenderContext;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationDefinition;
@@ -16,7 +17,6 @@ import com.arcanc.pulselib.util.PRenderTypes;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import org.joml.Matrix4f;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -95,7 +95,7 @@ public final class PPlayerAutomaticMeshAttachments
 
 	private static void render(PBakedBone root,
 	                           PPlayerAnimationFrame frame,
-	                           Matrix4f transform,
+	                           PTransform transform,
 	                           PoseStack poseStack,
 	                           int packedLight)
 	{
@@ -103,13 +103,13 @@ public final class PPlayerAutomaticMeshAttachments
 		if (local == null)
 			return;
 
-		Matrix4f localMatrix = new Matrix4f().translationRotateScale(
-				local.translation(), local.rotation(), local.scale());
 		poseStack.pushPose();
 		try
 		{
-			poseStack.mulPose(transform);
-			poseStack.mulPose(localMatrix.invert());
+			poseStack.mulPose(transform.matrix());
+			poseStack.scale(safeInverse(local.scale().x), safeInverse(local.scale().y), safeInverse(local.scale().z));
+			poseStack.mulPose(new org.joml.Quaternionf(local.rotation()).invert());
+			poseStack.translate(-local.translation().x, -local.translation().y, -local.translation().z);
 			root.instantDraw(
 					poseStack,
 					frame.resolver(),
@@ -124,5 +124,10 @@ public final class PPlayerAutomaticMeshAttachments
 		{
 			poseStack.popPose();
 		}
+	}
+
+	private static float safeInverse(float value)
+	{
+		return Math.abs(value) < 1.0e-6f ? 0.0f : 1.0f / value;
 	}
 }

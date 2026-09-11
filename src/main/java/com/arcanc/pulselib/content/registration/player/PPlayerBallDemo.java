@@ -74,7 +74,7 @@ public final class PPlayerBallDemo
 						anchor(PPlayerAnimationAnchors.RIGHT_ITEM, "right_hand").
 						anchor(PPlayerAnimationAnchors.LEFT_ITEM, "left_hand").
 						firstPerson(PPlayerFirstPersonSettings.ENABLED).
-						hideItemInHands((player, hand, stack) ->
+						itemRenderPolicy((player, hand, stack) ->
 								hand == InteractionHand.MAIN_HAND &&
 								stack.getItem() == PLibRegistration.ItemReg.TEST_ITEM.get()).
 						controllers(registrar -> registrar.add("ball_toss", () -> state ->

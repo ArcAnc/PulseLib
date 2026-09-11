@@ -10,18 +10,18 @@
 package com.arcanc.pulselib.content.player.animation;
 
 
+import com.arcanc.pulselib.content.model.animation.PTransform;
 import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
-import org.joml.*;
+import org.joml.Quaternionf;
+import org.joml.Quaternionfc;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 public final class PPlayerAnimationSpace
 {
 	/** Converts glTF coordinate values to Minecraft's player-model coordinates. */
-	private static final Matrix4f GLTF_TO_PLAYER = new Matrix4f().
-			scaling(-1.0f, -1.0f, 1.0f);
-	
-	private static final Matrix4f PLAYER_TO_GLTF =
-			new Matrix4f(GLTF_TO_PLAYER).
-					invert();
+	private static final Quaternionf GLTF_TO_PLAYER_ROTATION =
+			new Quaternionf().rotationZ((float)Math.PI);
 
 	/**
 	 * Converts a vanilla player-model local coordinate into the coordinate
@@ -33,14 +33,9 @@ public final class PPlayerAnimationSpace
 	 * conversion and must be derived from the first-person renderer if its
 	 * coordinate convention changes.</p>
 	 */
-	private static final Matrix4f PLAYER_MODEL_TO_FIRST_PERSON =
-			new Matrix4f().
-				scaling(-1.0f, -1.0f, 1.0f);
+	private static final PTransform PLAYER_MODEL_TO_FIRST_PERSON =
+			PTransform.rotation(GLTF_TO_PLAYER_ROTATION);
 
-	/** Item origins after vanilla's steady first-person hand-grip transform. */
-	private static final Vector3f RIGHT_VANILLA_ITEM_GRIP = new Vector3f(0.56f, -0.52f, -0.72f);
-	private static final Vector3f LEFT_VANILLA_ITEM_GRIP = new Vector3f(-0.56f, -0.52f, -0.72f);
-	
 	private PPlayerAnimationSpace()
 	{
 	}
@@ -80,25 +75,25 @@ public final class PPlayerAnimationSpace
 	 * Changes both the source and destination bases of a model transform to
 	 * Minecraft player-model space. For glTF, this is {@code C * M * C^-1}.
 	 */
-	public static Matrix4f toPlayerSpace(
-			Matrix4fc matrix,
+	public static PTransform toPlayerSpace(
+			PTransform transform,
 			PPlayerAnimationDefinition definition)
 	{
 		if (!usesGltfCoordinates(definition))
-			return new Matrix4f(matrix);
-		
-		return new Matrix4f(GLTF_TO_PLAYER).
-				mul(matrix).
-				mul(PLAYER_TO_GLTF);
+			return transform;
+		return new PTransform(
+				toPlayerSpace(transform.translation(), definition),
+				toPlayerSpace(transform.rotation(), definition),
+				transform.scale());
 	}
 	
-	public static Matrix4f toPlayerGeometrySpace(
-			Matrix4fc matrix,
+	public static PTransform toPlayerGeometrySpace(
+			PTransform transform,
 			PPlayerAnimationDefinition definition)
 	{
 		if (!usesGltfCoordinates(definition))
-			return new Matrix4f(matrix);
-		return new Matrix4f(GLTF_TO_PLAYER).mul(matrix);
+			return transform;
+		return PLAYER_MODEL_TO_FIRST_PERSON.compose(transform);
 	}
 	
 	/**
@@ -110,35 +105,26 @@ public final class PPlayerAnimationSpace
 	 * first converts the transform into player-model space, then
 	 * {@link #PLAYER_MODEL_TO_FIRST_PERSON} converts its output into view
 	 * space. Consequently an identity bone transform returns {@code C}; that
-	 * is required to orient vanilla arms and items, whose source coordinates
-	 * are still player-model coordinates.</p>
+	 * is required to orient vanilla arms and convert attachment positions from
+	 * player-model coordinates.</p>
 	 */
-	public static Matrix4f toFirstPersonSpace(
-			Matrix4fc matrix,
+	public static PTransform toFirstPersonSpace(
+			PTransform transform,
 			PPlayerAnimationDefinition definition)
 	{
-		return new Matrix4f(PLAYER_MODEL_TO_FIRST_PERSON).
-				mul(toPlayerSpace(matrix, definition));
+		return PLAYER_MODEL_TO_FIRST_PERSON.compose(toPlayerSpace(transform, definition));
 	}
 
 	/**
-	 * Converts an item anchor into an offset from vanilla's item-grip origin.
-	 *
-	 * <p>First-person item anchors intentionally control position only. Their
-	 * rotation belongs to the animated skeleton's coordinate system, whereas
-	 * the vanilla renderer applies the item model in its own grip coordinate
-	 * system. Passing that rotation through would rotate the item around the
-	 * wrong axes.</p>
+	 * Converts a hand-bone transform into a first-person item attachment point.
+	 * The anchor contributes only its position: item orientation and scale come
+	 * from the item's {@code FIRST_PERSON_*_HAND} JSON display transform.
 	 */
-	public static Matrix4f toFirstPersonItemOffsetSpace(
-			Matrix4fc matrix,
-			PPlayerAnimationDefinition definition,
-			boolean rightHand)
+	public static PTransform toFirstPersonItemAnchorSpace(
+			PTransform transform,
+			PPlayerAnimationDefinition definition)
 	{
-		Vector3f anchorPosition = toFirstPersonSpace(matrix, definition).
-				getTranslation(new Vector3f());
-		Vector3f vanillaGrip = rightHand ? RIGHT_VANILLA_ITEM_GRIP : LEFT_VANILLA_ITEM_GRIP;
-		return new Matrix4f().translation(anchorPosition.sub(vanillaGrip));
+		return PTransform.translation(toFirstPersonSpace(transform, definition).translation());
 	}
 
 	/**
@@ -146,12 +132,11 @@ public final class PPlayerAnimationSpace
 	 * model. Unlike vanilla arms and items, glTF mesh vertices already use the
 	 * glTF source basis, so a glTF transform reduces to {@code M} here.
 	 */
-	public static Matrix4f toFirstPersonGeometrySpace(
-			Matrix4fc matrix,
+	public static PTransform toFirstPersonGeometrySpace(
+			PTransform transform,
 			PPlayerAnimationDefinition definition)
 	{
-		return new Matrix4f(PLAYER_MODEL_TO_FIRST_PERSON).
-				mul(toPlayerGeometrySpace(matrix, definition));
+		return PLAYER_MODEL_TO_FIRST_PERSON.compose(toPlayerGeometrySpace(transform, definition));
 	}
 	
 	static PPlayerBonePose toPlayerSpace(

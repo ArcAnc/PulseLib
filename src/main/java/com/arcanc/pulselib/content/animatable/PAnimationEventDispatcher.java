@@ -122,7 +122,7 @@ public final class PAnimationEventDispatcher
 		PPose localPose = model.evaluate(controllers, Map.of(), 1f);
 		PModelPose modelPose = new PModelPose(model.boneCount());
 		modelPose.update(model, localPose);
-		modelPose.transform(boneIndex).getTranslation(result);
+		result.set(modelPose.transform(boneIndex).translation());
 		return true;
 	}
 

@@ -9,17 +9,13 @@
 
 package com.arcanc.pulselib.content.player.animation;
 
+import com.arcanc.pulselib.content.model.animation.PTransform;
 import net.minecraft.resources.Identifier;
-import org.joml.Matrix4f;
 
 public record PPlayerAnimationAnchorPose(
 		Identifier animation,
 		PPlayerAnimationAnchor anchor,
-		Matrix4f transform,
+		PTransform transform,
 		float weight)
 {
-	public PPlayerAnimationAnchorPose
-	{
-		transform = new Matrix4f(transform);
-	}
 }

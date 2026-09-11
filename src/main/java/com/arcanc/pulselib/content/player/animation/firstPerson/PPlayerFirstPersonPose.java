@@ -9,10 +9,9 @@
 
 package com.arcanc.pulselib.content.player.animation.firstPerson;
 
-
-import com.arcanc.pulselib.content.player.animation.PPlayerAnimationDefinition;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.item.ItemStack;
 import java.util.List;
 import java.util.Objects;
@@ -22,7 +21,6 @@ public record PPlayerFirstPersonPose(
 		PFirstPersonArmPose leftArm,
 		PFirstPersonItemPose rightItem,
 		PFirstPersonItemPose leftItem,
-		PPlayerAnimationDefinition.FPItemHider itemHider,
 		List<PPlayerFirstPersonAnchorPose> animationAnchors,
 		List<PPlayerFirstPersonMeshAttachmentPose> meshAttachments)
 {
@@ -32,13 +30,15 @@ public record PPlayerFirstPersonPose(
 		leftArm = Objects.requireNonNull(leftArm);
 		rightItem = Objects.requireNonNull(rightItem);
 		leftItem = Objects.requireNonNull(leftItem);
-		itemHider = Objects.requireNonNull(itemHider);
 		animationAnchors = List.copyOf(animationAnchors);
 		meshAttachments = List.copyOf(meshAttachments);
 	}
 
 	public boolean hidesItem(LocalPlayer player, InteractionHand hand, ItemStack stack)
 	{
-		return this.itemHider.hide(player, hand, stack);
+		PFirstPersonItemPose itemPose = hand == InteractionHand.MAIN_HAND ?
+				(player.getMainArm() == HumanoidArm.RIGHT ? this.rightItem : this.leftItem) :
+				(player.getMainArm() == HumanoidArm.RIGHT ? this.leftItem : this.rightItem);
+		return itemPose.renderPolicy().hide(player, hand, stack);
 	}
 }

@@ -9,9 +9,10 @@
 
 package com.arcanc.pulselib.content.player.animation.firstPerson;
 
+import com.arcanc.pulselib.content.model.animation.PTransform;
 import com.arcanc.pulselib.content.player.deformer.PModelPartCubes;
-import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
 import com.arcanc.pulselib.util.attachments.humanoid.PHumanoidAttachmentLayer;
+import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelPart;
@@ -25,7 +26,6 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.PlayerModelPart;
-import org.joml.Matrix4f;
 
 import java.util.EnumMap;
 import java.util.List;
@@ -44,7 +44,7 @@ public final class PPlayerFirstPersonArmRenderer
 	public static void render(
 			AbstractClientPlayer player,
 			HumanoidArm arm,
-			Matrix4f transform,
+			PTransform transform,
 			PoseStack poseStack,
 			OrderedSubmitNodeCollector armCollector,
 			int packedLight)
@@ -70,7 +70,7 @@ public final class PPlayerFirstPersonArmRenderer
 		
 		try
 		{
-			poseStack.mulPose(transform);
+			poseStack.mulPose(transform.matrix());
 			
 			geometry.sleeve().visible = isSleeveVisible(player, arm);
 			armCollector.submitModelPart(
@@ -90,7 +90,7 @@ public final class PPlayerFirstPersonArmRenderer
 	public static void renderAttachments(
 			AbstractClientPlayer player,
 			HumanoidArm arm,
-			Matrix4f transform,
+			PTransform transform,
 			PoseStack poseStack,
 			int packedLight,
 			float partialTick)
@@ -100,7 +100,7 @@ public final class PPlayerFirstPersonArmRenderer
 		poseStack.pushPose();
 		try
 		{
-			poseStack.mulPose(transform);
+			poseStack.mulPose(transform.matrix());
 			PHumanoidAttachmentLayer.renderFirstPersonArm(poseStack, packedLight, player, arm, armPart, partialTick);
 		}
 		finally

@@ -49,7 +49,7 @@ public final class PPlayerAnimationDefinition
 
 	private final Map<PPlayerAnimationAnchor, String> anchors;
 	private final PPlayerFirstPersonSettings firstPersonSettings;
-	private final FPItemHider itemHider;
+	private final ItemRenderPolicy itemRenderPolicy;
 
 	private PPlayerAnimationDefinition(Builder builder)
 	{
@@ -73,7 +73,7 @@ public final class PPlayerAnimationDefinition
 		this.molangContextProvider = builder.molangContextProvider;
 		this.anchors = Map.copyOf(builder.anchors);
 		this.firstPersonSettings = builder.firstPersonSettings.copy();
-		this.itemHider = builder.itemHider;
+		this.itemRenderPolicy = builder.itemRenderPolicy;
 	}
 
 	public static Builder builder(PModelData modelData)
@@ -167,7 +167,7 @@ public final class PPlayerAnimationDefinition
 	{
 		return this.syncGroup;
 	}
-	
+
 	public Map<PPlayerAnimationAnchor, String> anchors()
 	{
 		return this.anchors;
@@ -178,9 +178,9 @@ public final class PPlayerAnimationDefinition
 		return this.firstPersonSettings.copy();
 	}
 
-	public FPItemHider itemHider()
+	public ItemRenderPolicy itemRenderPolicy()
 	{
-		return this.itemHider;
+		return this.itemRenderPolicy;
 	}
 	
 	void registerControllers(PAnimationManager.PAnimationRegistrar<PPlayerAnimationInstance> registrar)
@@ -218,13 +218,14 @@ public final class PPlayerAnimationDefinition
 	}
 
 	@FunctionalInterface
-	public interface FPItemHider
+	public interface ItemRenderPolicy
 	{
-		FPItemHider NEVER = (player, hand, stack) -> false;
-		FPItemHider ALWAYS = (player, hand, stack) -> true;
+		ItemRenderPolicy RENDER = (player, hand, stack) -> false;
+		ItemRenderPolicy HIDE = (player, hand, stack) -> true;
+
 		boolean hide(LocalPlayer player,
-			          InteractionHand hand,
-			          ItemStack stack);
+		             InteractionHand hand,
+		             ItemStack stack);
 	}
 
 	public static final class Builder
@@ -250,7 +251,7 @@ public final class PPlayerAnimationDefinition
 
 		private final Map<PPlayerAnimationAnchor, String> anchors = new HashMap<>();
 		private PPlayerFirstPersonSettings firstPersonSettings = PPlayerFirstPersonSettings.DISABLED;
-		private FPItemHider itemHider = FPItemHider.NEVER;
+		private ItemRenderPolicy itemRenderPolicy = ItemRenderPolicy.RENDER;
 
 		private Builder(PModelData modelData)
 		{
@@ -395,9 +396,9 @@ public final class PPlayerAnimationDefinition
 			return this;
 		}
 
-		public Builder hideItemInHands(FPItemHider itemHider)
+		public Builder itemRenderPolicy(ItemRenderPolicy itemRenderPolicy)
 		{
-			this.itemHider = Objects.requireNonNull(itemHider);
+			this.itemRenderPolicy = Objects.requireNonNull(itemRenderPolicy);
 			return this;
 		}
 

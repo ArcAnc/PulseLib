@@ -9,18 +9,18 @@
 
 package com.arcanc.pulselib.content.player.animation.attachment;
 
+import com.arcanc.pulselib.content.model.animation.PTransform;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationAnchor;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.resources.Identifier;
-import org.joml.Matrix4f;
 
 public record PPlayerAnimatedAttachmentContext(
 		AbstractClientPlayer player,
 		Identifier animation,
 		PPlayerAnimationAnchor anchor,
-		Matrix4f transform,
+		PTransform transform,
 		float weight,
 		boolean firstPerson,
 		PoseStack poseStack,
@@ -28,8 +28,4 @@ public record PPlayerAnimatedAttachmentContext(
 		int packedLight,
 		float partialTick)
 {
-	public PPlayerAnimatedAttachmentContext
-	{
-		transform = new Matrix4f(transform);
-	}
 }

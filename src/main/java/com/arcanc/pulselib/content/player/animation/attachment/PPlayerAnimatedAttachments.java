@@ -9,8 +9,9 @@
 
 package com.arcanc.pulselib.content.player.animation.attachment;
 
-import com.arcanc.pulselib.content.player.animation.PPlayerAnimationAnchorPose;
+import com.arcanc.pulselib.content.model.animation.PTransform;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationAnchor;
+import com.arcanc.pulselib.content.player.animation.PPlayerAnimationAnchorPose;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
 import com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonAnchorPose;
 import com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonPose;
@@ -18,14 +19,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.resources.Identifier;
-import org.joml.Matrix4f;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public final class PPlayerAnimatedAttachments
 {
@@ -65,7 +60,7 @@ public final class PPlayerAnimatedAttachments
 	private static void render(AbstractClientPlayer player,
 	                           Identifier animation,
 	                           PPlayerAnimationAnchor anchor,
-	                           Matrix4f transform,
+	                           PTransform transform,
 	                           float weight,
 	                           boolean firstPerson,
 	                           PoseStack poseStack,
@@ -81,7 +76,7 @@ public final class PPlayerAnimatedAttachments
 			poseStack.pushPose();
 			try
 			{
-				poseStack.mulPose(transform);
+				poseStack.mulPose(transform.matrix());
 				renderer.render(new PPlayerAnimatedAttachmentContext(player, animation, anchor, transform, weight, firstPerson, poseStack, submitNodeCollector, packedLight, partialTick));
 			}
 			finally

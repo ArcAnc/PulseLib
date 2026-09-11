@@ -16,7 +16,6 @@ import com.arcanc.pulselib.content.model.baked.PBakedModel;
 import com.arcanc.pulselib.content.registration.PLibRegistration;
 import com.arcanc.pulselib.data.gecko.MolangParser;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -69,8 +68,8 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 		return new BonePose(
 				new BoneFrame(new Vector3f(localTranslation).sub(baseTranslation), new Quaternionf(baseRotation).invert().premul(localRotation), new Vector3f(localScale)),
 				new BoneFrame(new Vector3f(localTranslation), new Quaternionf(localRotation), new Vector3f(localScale)),
-				new Matrix4f(this.bindModelPose.transform(index)),
-				new Matrix4f(this.modelPose.transform(index)),
+				this.bindModelPose.transform(index),
+				this.modelPose.transform(index),
 				animated,
 				animated,
 				animated);
@@ -149,8 +148,8 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 		if (boneIndex < 0)
 			return null;
 		
-		Matrix4f current;
-		Matrix4f bind;
+		PTransform current;
+		PTransform bind;
 		
 		if (rootBoneName == null || boneName.equals(rootBoneName))
 		{
@@ -173,31 +172,22 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 					rootIndex);
 		}
 		
-		Vector3f currentTranslation =
-				current.getTranslation(new Vector3f());
-		
-		Vector3f bindTranslation =
-				bind.getTranslation(new Vector3f());
+		Vector3f currentTranslation = current.translation();
+		Vector3f bindTranslation = bind.translation();
 		
 		Vector3f translation =
 				currentTranslation.sub(bindTranslation);
 		
-		Quaternionf currentRotation =
-				current.getUnnormalizedRotation(new Quaternionf());
-		
-		Quaternionf bindRotation =
-				bind.getUnnormalizedRotation(new Quaternionf());
+		Quaternionf currentRotation = current.rotation();
+		Quaternionf bindRotation = bind.rotation();
 		
 		Quaternionf rotation =
 				new Quaternionf(bindRotation).
 						invert().
 						premul(currentRotation);
 		
-		Vector3f currentScale =
-				current.getScale(new Vector3f());
-		
-		Vector3f bindScale =
-				bind.getScale(new Vector3f());
+		Vector3f currentScale = current.scale();
+		Vector3f bindScale = bind.scale();
 		
 		Vector3f scale = new Vector3f(
 				ratio(currentScale.x, bindScale.x),
@@ -215,39 +205,39 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 						Math.abs(scale.z - 1.0f) > 1.0e-5f);
 	}
 	
-	public @Nullable Matrix4f modelTransform(String boneName)
+	public @Nullable PTransform modelTransform(String boneName)
 	{
 		int index = this.model.boneIndex(boneName);
 		return index < 0 ? null : modelTransform(index);
 	}
 	
-	public Matrix4f modelTransform(PBakedBone bone)
+	public PTransform modelTransform(PBakedBone bone)
 	{
 		return modelTransform(this.model.boneIndex(bone));
 	}
 	
-	public Matrix4f modelTransform(int boneIndex)
+	public PTransform modelTransform(int boneIndex)
 	{
-		return new Matrix4f(this.modelPose.transform(boneIndex));
+		return this.modelPose.transform(boneIndex);
 	}
 	
-	public @Nullable Matrix4f bindModelTransform(String boneName)
+	public @Nullable PTransform bindModelTransform(String boneName)
 	{
 		int index = this.model.boneIndex(boneName);
 		return index < 0 ? null : bindModelTransform(index);
 	}
 	
-	public Matrix4f bindModelTransform(PBakedBone bone)
+	public PTransform bindModelTransform(PBakedBone bone)
 	{
 		return bindModelTransform(this.model.boneIndex(bone));
 	}
 	
-	public Matrix4f bindModelTransform(int boneIndex)
+	public PTransform bindModelTransform(int boneIndex)
 	{
-		return new Matrix4f(this.bindModelPose.transform(boneIndex));
+		return this.bindModelPose.transform(boneIndex);
 	}
 	
-	public @Nullable Matrix4f relativeTransform(String boneName, String referenceBoneName)
+	public @Nullable PTransform relativeTransform(String boneName, String referenceBoneName)
 	{
 		int boneIndex = this.model.boneIndex(boneName);
 		int referenceIndex = this.model.boneIndex(referenceBoneName);
@@ -258,14 +248,12 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 		return relativeTransform(boneIndex, referenceIndex);
 	}
 	
-	public Matrix4f relativeTransform(int boneIndex, int referenceIndex)
+	public PTransform relativeTransform(int boneIndex, int referenceIndex)
 	{
-		return new Matrix4f(this.modelPose.transform(referenceIndex)).
-				invert().
-				mul(this.modelPose.transform(boneIndex));
+		return this.modelPose.transform(referenceIndex).inverse().compose(this.modelPose.transform(boneIndex));
 	}
 	
-	public @Nullable Matrix4f relativeBindTransform(String boneName, String referenceBoneName)
+	public @Nullable PTransform relativeBindTransform(String boneName, String referenceBoneName)
 	{
 		int boneIndex = this.model.boneIndex(boneName);
 		int referenceIndex = this.model.boneIndex(referenceBoneName);
@@ -276,11 +264,9 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 		return relativeBindTransform(boneIndex, referenceIndex);
 	}
 	
-	public Matrix4f relativeBindTransform(int boneIndex, int referenceIndex)
+	public PTransform relativeBindTransform(int boneIndex, int referenceIndex)
 	{
-		return new Matrix4f(this.bindModelPose.transform(referenceIndex)).
-				invert().
-				mul(this.bindModelPose.transform(boneIndex));
+		return this.bindModelPose.transform(referenceIndex).inverse().compose(this.bindModelPose.transform(boneIndex));
 	}
 	
 	public static <T extends PAnimatable<T>> LocalPose resolveLocal(PBakedBone bone,
@@ -357,11 +343,6 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 				randomSeed(0L);
 	}
 
-	private static void apply(Matrix4f matrix, BoneFrame frame)
-	{
-		matrix.translate(frame.translation()).rotate(frame.rotation()).scale(frame.scale());
-	}
-
 	private static float ratio(float value, float base)
 	{
 		return Math.abs(base) < 1.0e-6f ? value : value / base;
@@ -383,8 +364,8 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 
 	public record BonePose(BoneFrame animationTransform,
 	                       BoneFrame localTransform,
-	                       Matrix4f bindTransform,
-	                       Matrix4f modelTransform,
+	                       PTransform bindTransform,
+	                       PTransform modelTransform,
 	                       boolean hasTranslation,
 	                       boolean hasRotation,
 	                       boolean hasScale)

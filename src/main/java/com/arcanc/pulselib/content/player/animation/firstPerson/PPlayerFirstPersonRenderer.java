@@ -14,13 +14,11 @@ import com.arcanc.pulselib.content.mixin.ItemInHandRendererAccessor;
 import com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimatedAttachments;
 import com.arcanc.pulselib.content.player.animation.attachment.PPlayerAutomaticMeshAttachments;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -68,7 +66,7 @@ public class PPlayerFirstPersonRenderer
 		poseStack.pushPose();
 		try
 		{
-			poseStack.mulPose(itemPose.transform());
+			poseStack.mulPose(itemPose.transform().matrix());
 			ItemInHandRenderer renderer = Minecraft.getInstance().gameRenderer.itemInHandRenderer;
 			ItemDisplayContext displayContext = arm == HumanoidArm.RIGHT ?
 					ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND;
@@ -99,11 +97,6 @@ public class PPlayerFirstPersonRenderer
 		poseStack.pushPose();
 		try
 		{
-			float xBob = Mth.lerp(partialTick, player.xBobO, player.xBob);
-			float yBob = Mth.lerp(partialTick, player.yBobO, player.yBob);
-			poseStack.mulPose(Axis.XP.rotationDegrees((player.getViewXRot(partialTick) - xBob) * 0.1f));
-			poseStack.mulPose(Axis.YP.rotationDegrees((player.getViewYRot(partialTick) - yBob) * 0.1f));
-
 			PPlayerAutomaticMeshAttachments.renderFirstPerson(
 					pose.meshAttachments(),
 					poseStack,
@@ -117,13 +110,13 @@ public class PPlayerFirstPersonRenderer
 					submitNodeCollector,
 					packedLight,
 					partialTick);
-		
+
 			renderArms(
-				player,
-				pose,
-				poseStack,
-				submitNodeCollector,
-				packedLight);
+					player,
+					pose,
+					poseStack,
+					submitNodeCollector,
+					packedLight);
 
 			HumanoidArm mainArm = player.getMainArm();
 			renderItem(player, pose, InteractionHand.MAIN_HAND, mainArm, itemPose(pose, mainArm), poseStack, submitNodeCollector, packedLight);

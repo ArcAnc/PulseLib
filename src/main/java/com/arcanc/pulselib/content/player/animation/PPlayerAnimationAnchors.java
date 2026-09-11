@@ -17,9 +17,17 @@ public final class PPlayerAnimationAnchors
 	public static final PPlayerAnimationAnchor FIRST_PERSON_CAMERA =
 			of("first_person_camera");
 	
+	/**
+	 * Binds the main-hand item to a camera-space hand-bone attachment point.
+	 * First-person definitions normally map this anchor to {@code right_hand}.
+	 */
 	public static final PPlayerAnimationAnchor RIGHT_ITEM =
 			of("right_item");
 	
+	/**
+	 * Binds the off-hand item to a camera-space hand-bone attachment point.
+	 * First-person definitions normally map this anchor to {@code left_hand}.
+	 */
 	public static final PPlayerAnimationAnchor LEFT_ITEM =
 			of("left_item");
 	

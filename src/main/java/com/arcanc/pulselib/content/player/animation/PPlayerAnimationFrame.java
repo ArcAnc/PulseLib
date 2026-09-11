@@ -12,8 +12,8 @@ package com.arcanc.pulselib.content.player.animation;
 
 import com.arcanc.pulselib.content.model.animation.BoneFrame;
 import com.arcanc.pulselib.content.model.animation.PAnimationPoseResolver;
+import com.arcanc.pulselib.content.model.animation.PTransform;
 import org.jetbrains.annotations.ApiStatus;
-import org.joml.Matrix4f;
 import org.jspecify.annotations.Nullable;
 
 import java.util.*;
@@ -25,12 +25,12 @@ public final class PPlayerAnimationFrame
 	
 	@Nullable
 	private final String rootBone;
-	private final Map<String, Matrix4f> fullTransforms = new HashMap<>();
+	private final Map<String, PTransform> fullTransforms = new HashMap<>();
 	private final Set<String> missingFullTransforms = new HashSet<>();
-	private final Map<String, Matrix4f> firstPersonTransforms = new HashMap<>();
+	private final Map<String, PTransform> firstPersonTransforms = new HashMap<>();
 	private final Set<String> missingFirstPersonTransforms = new HashSet<>();
 	@Nullable
-	private Matrix4f firstPersonCameraInverse;
+	private PTransform firstPersonCameraInverse;
 	private boolean firstPersonCameraResolved;
 	
 	PPlayerAnimationFrame(PPlayerAnimationDefinition definition,
@@ -90,16 +90,15 @@ public final class PPlayerAnimationFrame
 	}
 	
 	@Nullable
-	public Matrix4f modelTransform(String boneName)
+	public PTransform modelTransform(String boneName)
 	{
-		Matrix4f transform = fullTransform(boneName);
-		return transform == null ? null : new Matrix4f(transform);
+		return fullTransform(boneName);
 	}
 
 	@Nullable
-	public Matrix4f rootRelativeTransform(String boneName)
+	public PTransform rootRelativeTransform(String boneName)
 	{
-		Matrix4f transform = fullTransform(boneName);
+		PTransform transform = fullTransform(boneName);
 		if (transform == null)
 			return null;
 
@@ -107,16 +106,16 @@ public final class PPlayerAnimationFrame
 				this.definition.bindings().get(PPlayerPart.HEAD) :
 				this.rootBone;
 		if (referenceBone == null)
-			return new Matrix4f(transform);
+			return transform;
 
-		Matrix4f rootBind = bindTransform(referenceBone);
-		return rootBind == null ? new Matrix4f(transform) : rootBind.invert().mul(transform);
+		PTransform rootBind = bindTransform(referenceBone);
+		return rootBind == null ? transform : rootBind.inverse().compose(transform);
 	}
 	
 	@Nullable
-	private Matrix4f fullTransform(String boneName)
+	private PTransform fullTransform(String boneName)
 	{
-		Matrix4f cached = this.fullTransforms.get(boneName);
+		PTransform cached = this.fullTransforms.get(boneName);
 		if (cached != null)
 			return cached;
 		if (this.missingFullTransforms.contains(boneName))
@@ -130,13 +129,13 @@ public final class PPlayerAnimationFrame
 			return null;
 		}
 
-		Matrix4f transform = new Matrix4f(pose.modelTransform());
+		PTransform transform = pose.modelTransform();
 		this.fullTransforms.put(boneName, transform);
 		return transform;
 	}
 	
 	@Nullable
-	public Matrix4f modelTransform(PPlayerPart part)
+	public PTransform modelTransform(PPlayerPart part)
 	{
 		String boneName = this.definition.bindings().get(part);
 		
@@ -146,7 +145,7 @@ public final class PPlayerAnimationFrame
 	}
 	
 	@Nullable
-	public Matrix4f modelTransform(
+	public PTransform modelTransform(
 			PPlayerAnimationAnchor anchor)
 	{
 		String boneName =
@@ -158,87 +157,86 @@ public final class PPlayerAnimationFrame
 	}
 	
 	@Nullable
-	public Matrix4f actionTransform(PPlayerAnimationAnchor anchor)
+	public PTransform actionTransform(PPlayerAnimationAnchor anchor)
 	{
 		return modelTransform(anchor);
 	}
 	
 	@Nullable
-	public Matrix4f firstPersonTransform(PPlayerPart part)
+	public PTransform firstPersonTransform(PPlayerPart part)
 	{
 		String boneName = this.definition.bindings().get(part);
 		return boneName == null ? null : copyFirstPersonTransform(boneName);
 	}
 	
 	@Nullable
-	public Matrix4f firstPersonTransform(PPlayerAnimationAnchor anchor)
+	public PTransform firstPersonTransform(PPlayerAnimationAnchor anchor)
 	{
 		String boneName = this.definition.anchors().get(anchor);
 		return boneName == null ? null : copyFirstPersonTransform(boneName);
 	}
 
 	@Nullable
-	public Matrix4f firstPersonTransform(String boneName)
+	public PTransform firstPersonTransform(String boneName)
 	{
 		return copyFirstPersonTransform(boneName);
 	}
 
 	@Nullable
-	private Matrix4f copyFirstPersonTransform(String boneName)
+	private PTransform copyFirstPersonTransform(String boneName)
 	{
-		Matrix4f transform = cachedFirstPersonTransform(boneName);
-		return transform == null ? null : new Matrix4f(transform);
+		return cachedFirstPersonTransform(boneName);
 	}
 
 	@Nullable
-	private Matrix4f cachedFirstPersonTransform(String boneName)
+	private PTransform cachedFirstPersonTransform(String boneName)
 	{
-		Matrix4f cached = this.firstPersonTransforms.get(boneName);
+		PTransform cached = this.firstPersonTransforms.get(boneName);
 		if (cached != null)
 			return cached;
 		if (this.missingFirstPersonTransforms.contains(boneName))
 			return null;
 
-		Matrix4f cameraInverse = firstPersonCameraInverse();
-		Matrix4f bone = fullTransform(boneName);
+		PTransform cameraInverse = firstPersonCameraInverse();
+		PTransform bone = fullTransform(boneName);
 		if (cameraInverse == null || bone == null)
 		{
 			this.missingFirstPersonTransforms.add(boneName);
 			return null;
 		}
 
-		Matrix4f transform = new Matrix4f(cameraInverse).mul(bone);
+		PTransform transform = cameraInverse.compose(bone);
 		this.firstPersonTransforms.put(boneName, transform);
 		return transform;
 	}
 
 	@Nullable
-	private Matrix4f firstPersonCameraInverse()
+	private PTransform firstPersonCameraInverse()
 	{
 		if (!this.firstPersonCameraResolved)
 		{
 			this.firstPersonCameraResolved = true;
 			String cameraBone = this.definition.anchors().get(PPlayerAnimationAnchors.FIRST_PERSON_CAMERA);
-			Matrix4f camera = cameraBone == null ? null : fullTransform(cameraBone);
+			PTransform camera = cameraBone == null ? null : fullTransform(cameraBone);
 			if (camera != null)
-				this.firstPersonCameraInverse = new Matrix4f(camera).invert();
+				this.firstPersonCameraInverse = camera.inverse();
 		}
 		return this.firstPersonCameraInverse;
 	}
 	
 	@Nullable
-	public Matrix4f bindTransform(String boneName)
+	public PTransform bindTransform(String boneName)
 	{
 		PAnimationPoseResolver.BonePose pose =
 				this.resolver.resolve(boneName);
 		
 		return pose == null ?
 				null :
-				new Matrix4f(pose.bindTransform());
+			pose.bindTransform();
 	}
 	
 	@Nullable
-	public Matrix4f bindTransform(PPlayerPart part)
+	public PTransform bindTransform(PPlayerPart part)
 	{
 		String boneName = this.definition.bindings().get(part);
 		
@@ -248,23 +246,21 @@ public final class PPlayerAnimationFrame
 	}
 	
 	@Nullable
-	public Matrix4f relativeTransform(
+	public PTransform relativeTransform(
 			String boneName,
 			String referenceBoneName)
 	{
-		Matrix4f bone = fullTransform(boneName);
-		Matrix4f reference = fullTransform(referenceBoneName);
+		PTransform bone = fullTransform(boneName);
+		PTransform reference = fullTransform(referenceBoneName);
 		
 		if (bone == null || reference == null)
 			return null;
 		
-		return new Matrix4f(reference).
-				invert().
-				mul(bone);
+		return reference.inverse().compose(bone);
 	}
 	
 	@Nullable
-	public Matrix4f relativeTransform(
+	public PTransform relativeTransform(
 			PPlayerAnimationAnchor bone,
 			PPlayerAnimationAnchor reference)
 	{
@@ -284,7 +280,7 @@ public final class PPlayerAnimationFrame
 	}
 	
 	@Nullable
-	public Matrix4f relativeTransform(
+	public PTransform relativeTransform(
 			PPlayerPart part,
 			PPlayerAnimationAnchor reference)
 	{

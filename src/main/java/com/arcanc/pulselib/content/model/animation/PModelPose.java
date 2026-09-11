@@ -10,23 +10,21 @@
 package com.arcanc.pulselib.content.model.animation;
 
 import com.arcanc.pulselib.content.model.baked.PBakedModel;
-import org.joml.Matrix4f;
-
 import java.util.BitSet;
 
 public final class PModelPose
 {
-	private final Matrix4f[] transforms;
+	private final PTransform[] transforms;
 	private final BitSet validBones = new BitSet();
 
 	public PModelPose(int boneCount)
 	{
-		this.transforms = new Matrix4f[boneCount];
+		this.transforms = new PTransform[boneCount];
 		for (int index = 0; index < boneCount; index++)
-			this.transforms[index] = new Matrix4f();
+			this.transforms[index] = PTransform.IDENTITY;
 	}
 
-	public Matrix4f transform(int boneIndex)
+	public PTransform transform(int boneIndex)
 	{
 		return this.transforms[boneIndex];
 	}
@@ -47,8 +45,9 @@ public final class PModelPose
 	private void updateBone(PBakedModel model, PPose pose, int index)
 	{
 		int parent = model.parentIndex(index);
-		Matrix4f transform = parent < 0 ? this.transforms[index].identity() : this.transforms[index].set(this.transforms[parent]);
-		transform.translate(pose.translation(index)).rotate(pose.rotation(index)).scale(pose.scale(index));
+		PTransform local = new PTransform(
+				pose.translation(index), pose.rotation(index), pose.scale(index));
+		this.transforms[index] = parent < 0 ? local : this.transforms[parent].compose(local);
 		this.validBones.set(index);
 	}
 }
