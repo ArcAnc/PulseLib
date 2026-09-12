@@ -17,6 +17,7 @@ public record PPlayerFirstPersonMeshAttachmentPose(
 		PModelData modelData,
 		PBakedBone root,
 		PPlayerAnimationFrame frame,
-		PTransform transform)
+		PTransform transform,
+		float weight)
 {
 }

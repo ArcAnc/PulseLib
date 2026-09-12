@@ -15,7 +15,15 @@ import com.arcanc.pulselib.util.PLibDatabase;
 public final class PPlayerAnimationAnchors
 {
 	public static final PPlayerAnimationAnchor FIRST_PERSON_CAMERA =
-			of("first_person_camera");
+				of("first_person_camera");
+
+	/** Semantic camera-space socket for the right palm. */
+	public static final PPlayerAnimationAnchor RIGHT_HAND =
+				of("right_hand");
+
+	/** Semantic camera-space socket for the left palm. */
+	public static final PPlayerAnimationAnchor LEFT_HAND =
+				of("left_hand");
 	
 	/**
 	 * Binds the main-hand item to a camera-space hand-bone attachment point.

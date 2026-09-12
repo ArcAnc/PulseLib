@@ -31,6 +31,8 @@ public final class PPlayerAnimationFrame
 	private final Set<String> missingFirstPersonTransforms = new HashSet<>();
 	@Nullable
 	private PTransform firstPersonCameraInverse;
+	@Nullable
+	private PTransform firstPersonBindCameraInverse;
 	private boolean firstPersonCameraResolved;
 	
 	PPlayerAnimationFrame(PPlayerAnimationDefinition definition,
@@ -182,6 +184,58 @@ public final class PPlayerAnimationFrame
 		return copyFirstPersonTransform(boneName);
 	}
 
+	/** Current transform of a semantic socket relative to FIRST_PERSON_CAMERA. */
+	@Nullable
+	public PTransform firstPersonSocketTransform(PPlayerAnimationAnchor socket)
+	{
+		return firstPersonTransform(socket);
+	}
+
+	/** Bind transform of a semantic socket relative to FIRST_PERSON_CAMERA. */
+	@Nullable
+	public PTransform firstPersonBindSocketTransform(PPlayerAnimationAnchor socket)
+	{
+		String boneName = this.definition.anchors().get(socket);
+		if (boneName == null)
+			return null;
+		PTransform cameraInverse = firstPersonBindCameraInverse();
+		PTransform bone = bindTransform(boneName);
+		return cameraInverse == null || bone == null ? null : cameraInverse.compose(bone);
+	}
+
+	@Nullable
+	public PTransform firstPersonBindTransform(PPlayerPart part)
+	{
+		String boneName = this.definition.bindings().get(part);
+		PTransform cameraInverse = firstPersonBindCameraInverse();
+		PTransform bone = boneName == null ? null : bindTransform(boneName);
+		return cameraInverse == null || bone == null ? null : cameraInverse.compose(bone);
+	}
+
+	/**
+	 * Returns {@code currentSocket * bindSocket^-1}. In the rest frame this is
+	 * identity and is therefore independent from GLTF pivots and bind offsets.
+	 */
+	@Nullable
+	public PTransform firstPersonSocketDelta(PPlayerAnimationAnchor socket)
+	{
+		PTransform current = firstPersonSocketTransform(socket);
+		PTransform bind = firstPersonBindSocketTransform(socket);
+		return current == null || bind == null ? null : current.compose(bind.inverse());
+	}
+
+	/** The FIRST_PERSON_CAMERA anchor delta in model space. */
+	@Nullable
+	public PTransform firstPersonCameraDelta()
+	{
+		String cameraBone = this.definition.anchors().get(PPlayerAnimationAnchors.FIRST_PERSON_CAMERA);
+		if (cameraBone == null)
+			return null;
+		PTransform current = fullTransform(cameraBone);
+		PTransform bind = bindTransform(cameraBone);
+		return current == null || bind == null ? null : current.compose(bind.inverse());
+	}
+
 	@Nullable
 	private PTransform copyFirstPersonTransform(String boneName)
 	{
@@ -222,6 +276,21 @@ public final class PPlayerAnimationFrame
 				this.firstPersonCameraInverse = camera.inverse();
 		}
 		return this.firstPersonCameraInverse;
+	}
+
+	@Nullable
+	private PTransform firstPersonBindCameraInverse()
+	{
+		if (!this.firstPersonCameraResolved)
+			firstPersonCameraInverse();
+		if (this.firstPersonBindCameraInverse == null)
+		{
+			String cameraBone = this.definition.anchors().get(PPlayerAnimationAnchors.FIRST_PERSON_CAMERA);
+			PTransform camera = cameraBone == null ? null : bindTransform(cameraBone);
+			if (camera != null)
+				this.firstPersonBindCameraInverse = camera.inverse();
+		}
+		return this.firstPersonBindCameraInverse;
 	}
 	
 	@Nullable

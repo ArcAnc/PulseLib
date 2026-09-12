@@ -71,6 +71,8 @@ public final class PPlayerBallDemo
 						bind(PPlayerPart.LEFT_ARM, "left_arm").
 						mask(PPlayerPart.RIGHT_ARM, PPlayerPart.LEFT_ARM).
 						anchor(PPlayerAnimationAnchors.FIRST_PERSON_CAMERA, "fp_camera").
+						anchor(PPlayerAnimationAnchors.RIGHT_HAND, "right_hand").
+						anchor(PPlayerAnimationAnchors.LEFT_HAND, "left_hand").
 						anchor(PPlayerAnimationAnchors.RIGHT_ITEM, "right_hand").
 						anchor(PPlayerAnimationAnchors.LEFT_ITEM, "left_hand").
 						firstPerson(PPlayerFirstPersonSettings.ENABLED).

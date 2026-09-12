@@ -15,16 +15,58 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 /**
- * Canonical first-person rest transforms. They match Minecraft's steady hand
- * grips, allowing the PulseLib renderer to own both ends of an animation fade.
+ * Canonical camera-space sockets at animation delta identity.
  */
-public final class PFirstPersonRestPose
+public record PFirstPersonRestPose(
+        PTransform rightHand,
+        PTransform leftHand,
+        PTransform rightItem,
+        PTransform leftItem)
 {
-	private PFirstPersonRestPose()
+	public static final PFirstPersonRestPose VANILLA = new PFirstPersonRestPose(
+				handTransform(HumanoidArm.RIGHT), handTransform(HumanoidArm.LEFT),
+				itemTransform(HumanoidArm.RIGHT), itemTransform(HumanoidArm.LEFT));
+
+	public static PTransform hand(HumanoidArm arm)
 	{
+		return arm == HumanoidArm.RIGHT ? VANILLA.rightHand : VANILLA.leftHand;
 	}
 
+	public static PTransform item(HumanoidArm arm)
+	{
+		return arm == HumanoidArm.RIGHT ? VANILLA.rightItem : VANILLA.leftItem;
+	}
+
+	/** Kept for source compatibility; arms are authored through the hand socket. */
 	public static PTransform arm(HumanoidArm arm)
+	{
+		return hand(arm);
+	}
+
+	/** Pose expected by AvatarRenderer immediately before it applies PlayerModel's arm part. */
+	public static PTransform armOrigin(HumanoidArm arm)
+	{
+		return armTransform(arm);
+	}
+
+	public static PFirstPersonArmRig armRig(HumanoidArm arm)
+	{
+		/*
+		 * AvatarRenderer receives the pose before PlayerModel's arm ModelPart is
+		 * applied. The palm therefore sits at the arm pivot plus its 12-pixel
+		 * cube length: (-/+6, 12, 0) / 16 for regular player arms.
+		 */
+		float side = arm == HumanoidArm.RIGHT ? -1.0f : 1.0f;
+		return new PFirstPersonArmRig(PTransform.IDENTITY,
+				PTransform.translation(new Vector3f(side * 0.375f, 0.75f, 0.0f)));
+	}
+
+	public static PFirstPersonItemRig itemRig(HumanoidArm arm)
+	{
+		return new PFirstPersonItemRig(PTransform.IDENTITY, PTransform.IDENTITY);
+	}
+
+	private static PTransform armTransform(HumanoidArm arm)
 	{
 		float side = arm == HumanoidArm.RIGHT ? 1.0f : -1.0f;
 		return PTransform.IDENTITY.
@@ -37,7 +79,13 @@ public final class PFirstPersonRestPose
 				compose(PTransform.translation(new Vector3f(side * 5.6f, 0.0f, 0.0f)));
 	}
 
-	public static PTransform item(HumanoidArm arm)
+	private static PTransform handTransform(HumanoidArm arm)
+	{
+		PFirstPersonArmRig rig = armRig(arm);
+		return armTransform(arm).compose(rig.armToHand());
+	}
+
+	private static PTransform itemTransform(HumanoidArm arm)
 	{
 		float side = arm == HumanoidArm.RIGHT ? 1.0f : -1.0f;
 		return PTransform.translation(new Vector3f(side * 0.56f, -0.52f, -0.72f));

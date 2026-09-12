@@ -17,29 +17,42 @@ import java.util.Objects;
 
 public record PFirstPersonArmPose(
 		PFirstPersonRenderMode mode,
-		@Nullable PTransform transform)
+		@Nullable PTransform transform,
+		PFirstPersonTransformMode transformMode)
 {
 	public PFirstPersonArmPose
 	{
 		Objects.requireNonNull(mode);
+		transformMode = Objects.requireNonNull(transformMode);
 		if (mode == PFirstPersonRenderMode.ANIMATED && transform == null)
 			throw new IllegalArgumentException("An animated first-person arm needs a transform");
 		if (mode != PFirstPersonRenderMode.ANIMATED && transform != null)
 			throw new IllegalArgumentException("Only an animated first-person arm may have a transform");
 	}
 
+	/** Retained for source compatibility; new callers should state the transform mode. */
+	public PFirstPersonArmPose(PFirstPersonRenderMode mode, @Nullable PTransform transform)
+	{
+		this(mode, transform, PFirstPersonTransformMode.OVERRIDE);
+	}
+
 	public static PFirstPersonArmPose vanilla()
 	{
-		return new PFirstPersonArmPose(PFirstPersonRenderMode.VANILLA, null);
+		return new PFirstPersonArmPose(PFirstPersonRenderMode.VANILLA, null, PFirstPersonTransformMode.OVERRIDE);
 	}
 
 	public static PFirstPersonArmPose animated(PTransform transform)
 	{
-		return new PFirstPersonArmPose(PFirstPersonRenderMode.ANIMATED, transform);
+		return new PFirstPersonArmPose(PFirstPersonRenderMode.ANIMATED, transform, PFirstPersonTransformMode.OVERRIDE);
+	}
+
+	public static PFirstPersonArmPose animated(PTransform transform, PFirstPersonTransformMode transformMode)
+	{
+		return new PFirstPersonArmPose(PFirstPersonRenderMode.ANIMATED, transform, transformMode);
 	}
 
 	public static PFirstPersonArmPose hidden()
 	{
-		return new PFirstPersonArmPose(PFirstPersonRenderMode.HIDDEN, null);
+		return new PFirstPersonArmPose(PFirstPersonRenderMode.HIDDEN, null, PFirstPersonTransformMode.OVERRIDE);
 	}
 }

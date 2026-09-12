@@ -11,6 +11,7 @@ package com.arcanc.pulselib.content.player.animation;
 
 
 import com.arcanc.pulselib.content.model.animation.PTransform;
+import com.arcanc.pulselib.content.player.animation.firstPerson.PFirstPersonBasis;
 import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
@@ -22,22 +23,25 @@ public final class PPlayerAnimationSpace
 	/** Converts glTF coordinate values to Minecraft's player-model coordinates. */
 	private static final Quaternionf GLTF_TO_PLAYER_ROTATION =
 			new Quaternionf().rotationZ((float)Math.PI);
-
 	/**
-	 * Converts a vanilla player-model local coordinate into the coordinate
-	 * convention used by the first-person replacement renderer.
-	 *
-	 * <p>The matrix currently has the same values as {@link #GLTF_TO_PLAYER},
-	 * because that conversion is its own inverse. The two constants express
-	 * different contracts, however: this one is a player-model-to-view
-	 * conversion and must be derived from the first-person renderer if its
-	 * coordinate convention changes.</p>
+	 * Vertex space used by the baked first-person mesh pass. GLTF mesh vertices
+	 * remain in their source basis; only sockets use {@link #firstPersonBasis}.
 	 */
 	private static final PTransform PLAYER_MODEL_TO_FIRST_PERSON =
 			PTransform.rotation(GLTF_TO_PLAYER_ROTATION);
 
 	private PPlayerAnimationSpace()
 	{
+	}
+
+	/**
+	 * GLTF first-person camera axes already equal Pulse first-person axes:
+	 * +Y is up and -Z is forward. The 180-degree Z conversion is needed only
+	 * by Minecraft's third-person ModelPart space, whose Y axis is downward.
+	 */
+	public static PFirstPersonBasis firstPersonBasis(PPlayerAnimationDefinition definition)
+	{
+		return PFirstPersonBasis.IDENTITY;
 	}
 	
 	public static Vector3f toPlayerSpace(
@@ -101,18 +105,14 @@ public final class PPlayerAnimationSpace
 	 * replacement renderer. The returned transform maps vanilla player-model
 	 * local coordinates into first-person camera coordinates.
 	 *
-	 * <p>For glTF input this becomes {@code M * C}: {@code toPlayerSpace}
-	 * first converts the transform into player-model space, then
-	 * {@link #PLAYER_MODEL_TO_FIRST_PERSON} converts its output into view
-	 * space. Consequently an identity bone transform returns {@code C}; that
-	 * is required to orient vanilla arms and convert attachment positions from
-	 * player-model coordinates.</p>
+	 * <p>All source-to-runtime conversion is a full change of basis,
+	 * {@code C * M * C^-1}; renderer integration never adds corrective axes.
 	 */
 	public static PTransform toFirstPersonSpace(
 			PTransform transform,
 			PPlayerAnimationDefinition definition)
 	{
-		return PLAYER_MODEL_TO_FIRST_PERSON.compose(toPlayerSpace(transform, definition));
+		return firstPersonBasis(definition).convert(transform);
 	}
 
 	/**

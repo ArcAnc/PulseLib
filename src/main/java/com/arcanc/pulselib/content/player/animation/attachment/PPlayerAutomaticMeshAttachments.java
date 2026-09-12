@@ -81,7 +81,8 @@ public final class PPlayerAutomaticMeshAttachments
 	                                     int packedLight)
 	{
 		for (PPlayerAnimationMeshAttachmentPose pose : poses)
-			render(pose.root(), pose.frame(), pose.transform(), poseStack, packedLight);
+			if (pose.weight() > 1.0e-4f)
+				render(pose.root(), pose.frame(), pose.transform(), poseStack, packedLight);
 	}
 
 	public static void renderFirstPerson(List<PPlayerFirstPersonMeshAttachmentPose> poses,
@@ -90,7 +91,8 @@ public final class PPlayerAutomaticMeshAttachments
 	                                    int packedLight)
 	{
 		for (PPlayerFirstPersonMeshAttachmentPose pose : poses)
-			render(pose.root(), pose.frame(), pose.transform(), poseStack, packedLight);
+			if (pose.weight() > 1.0e-4f)
+				render(pose.root(), pose.frame(), pose.transform(), poseStack, packedLight);
 	}
 
 	private static void render(PBakedBone root,

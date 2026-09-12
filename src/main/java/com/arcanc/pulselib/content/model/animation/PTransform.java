@@ -53,6 +53,20 @@ public record PTransform(Vector3f translation, Quaternionf rotation, Vector3f sc
 				this.translation, this.rotation, this.scale);
 	}
 
+	/**
+	 * Decomposes a matrix at a boundary where a transform must change bases.
+	 * Animation transforms are TRS, therefore this deliberately does not try to
+	 * preserve shearing matrices.
+	 */
+	public static PTransform fromMatrix(Matrix4f matrix)
+	{
+		Objects.requireNonNull(matrix);
+		return new PTransform(
+				matrix.getTranslation(new Vector3f()),
+				matrix.getUnnormalizedRotation(new Quaternionf()).normalize(),
+				matrix.getScale(new Vector3f()));
+	}
+
 	public PTransform interpolate(PTransform target, float weight)
 	{
 		Objects.requireNonNull(target);

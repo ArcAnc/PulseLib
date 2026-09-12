@@ -19,41 +19,59 @@ import java.util.Objects;
 public record PFirstPersonItemPose(
 		PFirstPersonRenderMode mode,
 		@Nullable PTransform transform,
-		ItemRenderPolicy renderPolicy)
+		PFirstPersonTransformMode transformMode)
 {
 	/**
-	 * {@code transform} places the item at the camera-space point of the bone
-	 * bound to {@code RIGHT_ITEM} or {@code LEFT_ITEM}. ItemInHandRenderer
-	 * applies the item's FIRST_PERSON_*_HAND JSON display transform, including
-	 * item orientation and scale, after this transform.
+	 * {@code transform} places the resolved camera-space item socket. Minecraft
+	 * still applies the item's FIRST_PERSON_*_HAND display transform and submits
+	 * the model through its normal item renderer.
 	 */
 	public PFirstPersonItemPose
 	{
 		Objects.requireNonNull(mode);
-		renderPolicy = Objects.requireNonNull(renderPolicy);
+		transformMode = Objects.requireNonNull(transformMode);
 		if (mode == PFirstPersonRenderMode.ANIMATED && transform == null)
 			throw new IllegalArgumentException("An animated first-person item needs a transform");
 		if (mode != PFirstPersonRenderMode.ANIMATED && transform != null)
 			throw new IllegalArgumentException("Only an animated first-person item may have a transform");
 	}
 
-	public static PFirstPersonItemPose vanilla()
+	/**
+	 * Retained for source compatibility. Item policies are resolved by the pose
+	 * builder before this immutable render snapshot reaches the renderer.
+	 */
+	@Deprecated
+	public PFirstPersonItemPose(PFirstPersonRenderMode mode,
+	                            @Nullable PTransform transform,
+	                            ItemRenderPolicy ignoredPolicy)
 	{
-		return new PFirstPersonItemPose(PFirstPersonRenderMode.VANILLA, null, ItemRenderPolicy.RENDER);
+		this(mode, transform, PFirstPersonTransformMode.OVERRIDE);
 	}
 
-	public static PFirstPersonItemPose animated(PTransform transform, ItemRenderPolicy renderPolicy)
+	public static PFirstPersonItemPose vanilla()
 	{
-		return new PFirstPersonItemPose(PFirstPersonRenderMode.ANIMATED, transform, renderPolicy);
+		return new PFirstPersonItemPose(PFirstPersonRenderMode.VANILLA, null, PFirstPersonTransformMode.OVERRIDE);
 	}
 
 	public static PFirstPersonItemPose animated(PTransform transform)
 	{
-		return animated(transform, ItemRenderPolicy.RENDER);
+		return new PFirstPersonItemPose(PFirstPersonRenderMode.ANIMATED, transform, PFirstPersonTransformMode.OVERRIDE);
+	}
+
+	public static PFirstPersonItemPose animated(PTransform transform, PFirstPersonTransformMode transformMode)
+	{
+		return new PFirstPersonItemPose(PFirstPersonRenderMode.ANIMATED, transform, transformMode);
+	}
+
+	/** @deprecated Resolve item policy in {@code PPlayerAnimations} instead. */
+	@Deprecated
+	public static PFirstPersonItemPose animated(PTransform transform, ItemRenderPolicy ignoredPolicy)
+	{
+		return animated(transform);
 	}
 
 	public static PFirstPersonItemPose hidden()
 	{
-		return new PFirstPersonItemPose(PFirstPersonRenderMode.HIDDEN, null, ItemRenderPolicy.HIDE);
+		return new PFirstPersonItemPose(PFirstPersonRenderMode.HIDDEN, null, PFirstPersonTransformMode.OVERRIDE);
 	}
 }

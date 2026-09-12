@@ -19,7 +19,6 @@
 	"GlBufferAccessor",
 	"HumanoidArmorLayerMixin",
 	"ItemInHandRendererMixin",
-	"ItemInHandRendererAccessor",
 	"ItemModelResolverAccessor",
 	"ItemStackRenderStateAccessor",
 	"LivingEntityRendererMixin",
