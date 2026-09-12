@@ -14,6 +14,8 @@ import com.arcanc.pulselib.content.model.animation.BoneFrame;
 import com.arcanc.pulselib.content.model.animation.PAnimationPoseResolver;
 import com.arcanc.pulselib.content.model.animation.PTransform;
 import org.jetbrains.annotations.ApiStatus;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.jspecify.annotations.Nullable;
 
 import java.util.*;
@@ -383,5 +385,53 @@ public final class PPlayerAnimationFrame
 		return pose == null ?
 				null :
 				pose.animationTransform();
+	}
+	
+	@Nullable
+	public Vector3f firstPersonAnimationTranslation(
+			PPlayerPart part)
+	{
+		String boneName =
+				this.definition.bindings().get(part);
+		
+		if (boneName == null)
+			return null;
+		
+		PAnimationPoseResolver.BonePose pose =
+				this.resolver.resolve(boneName);
+		
+		if (pose == null)
+			return null;
+		
+		PTransform parentBind =
+				this.resolver.bindParentTransform(boneName);
+		
+		PTransform cameraInverse =
+				firstPersonBindCameraInverse();
+		
+		if (parentBind == null ||
+				cameraInverse == null)
+		{
+			return null;
+		}
+		
+		Vector3f localDelta =
+				pose.animationTransform().
+						translation();
+		
+		/*
+		 * glTF node.translation is expressed in parent-local
+		 * coordinates.
+		 *
+		 * Convert that vector into FIRST_PERSON_CAMERA space
+		 * using the parent's bind linear transform.
+		 */
+		Matrix4f parentToCamera =
+				cameraInverse.matrix().
+						mul(parentBind.matrix());
+		
+		return parentToCamera.
+				transformDirection(
+				new Vector3f(localDelta));
 	}
 }

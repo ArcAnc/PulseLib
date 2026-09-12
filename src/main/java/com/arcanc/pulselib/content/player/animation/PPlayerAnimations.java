@@ -609,31 +609,32 @@ public final class PPlayerAnimations
 			PTransform vanillaBind =
 					PFirstPersonRestPose.armOrigin(arm);
 			
-			BoneFrame animationTransform =
-					frame.animationTransform(part);
-			
 			
 			/*
 			 * TRANSLATION
 			 *
-			 * IMPORTANT:
-			 * This is the authored glTF POSITION-channel delta.
+			 * Authored glTF translation is parent-local.
+			 * Convert it through the parent bind transform into
+			 * FIRST_PERSON_CAMERA space.
 			 *
-			 * Do not derive it from modelTransform/fullTransform,
-			 * otherwise parent/bind rotations will change its axes.
+			 * The arm's own bind rotation MUST NOT participate here.
 			 */
+			Vector3f sourceTranslationDelta =
+					frame.firstPersonAnimationTranslation(part);
+			
+			if (sourceTranslationDelta == null)
+				return null;
+			
 			Vector3f translationDelta =
 					basis.convert(
 							PTransform.translation(
-									animationTransform.translation()
+									sourceTranslationDelta
 							)
 					).translation();
 			
 			
 			/*
 			 * ROTATION
-			 *
-			 * Rotation still uses the actual arm bind/current orientation.
 			 */
 			Quaternionf sourceRotationDelta =
 					bindArm.rotation().
@@ -682,7 +683,8 @@ public final class PPlayerAnimations
 					targetTranslation,
 					targetRotation,
 					targetScale
-			);		}
+			);
+		}
 		
 		private static float ratio(float value, float base)
 		{
