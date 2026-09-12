@@ -38,6 +38,46 @@ final class PPlayerFirstPersonVanillaRenderer
 	{
 	}
 
+	static boolean rendersTwoHandedMap()
+	{
+		ItemInHandRendererAccessor renderer = renderer();
+		return renderer.pulselib$mainHandItem().getItem() instanceof MapItem && renderer.pulselib$offHandItem().isEmpty();
+	}
+
+	static void renderVanillaHand(
+			LocalPlayer player,
+			InteractionHand hand,
+			PoseStack poseStack,
+			SubmitNodeCollector submitNodeCollector,
+			int packedLight,
+			float partialTick)
+	{
+		if (player.isScoping() || !shouldRenderHand(player, hand))
+			return;
+
+		VanillaHandState state = state(player, hand, partialTick);
+		poseStack.pushPose();
+		try
+		{
+			applyViewBobbing(player, poseStack, partialTick);
+			renderer().pulselib$renderArmWithItem(
+					player,
+					partialTick,
+					player.getXRot(partialTick),
+					hand,
+					state.attack(),
+					state.stack(),
+					state.inverseArmHeight(),
+					poseStack,
+					submitNodeCollector,
+					packedLight);
+		}
+		finally
+		{
+			poseStack.popPose();
+		}
+	}
+
 	static void renderVanillaArm(
 			LocalPlayer player,
 			InteractionHand hand,

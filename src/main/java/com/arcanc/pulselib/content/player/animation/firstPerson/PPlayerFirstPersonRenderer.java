@@ -59,13 +59,14 @@ public class PPlayerFirstPersonRenderer
 		if (player.isInvisible())
 			return;
 		InteractionHand rightHand = player.getMainArm() == HumanoidArm.RIGHT ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
-		renderArm(player, rightHand, HumanoidArm.RIGHT, pose.rightArm(), poseStack, armCollector, submitNodeCollector, packedLight, partialTick);
-		renderArm(player, rightHand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND,
+		renderArm(player, pose, rightHand, HumanoidArm.RIGHT, pose.rightArm(), poseStack, armCollector, submitNodeCollector, packedLight, partialTick);
+		renderArm(player, pose, rightHand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND,
 				HumanoidArm.LEFT, pose.leftArm(), poseStack, armCollector, submitNodeCollector, packedLight, partialTick);
 	}
 
 	private static void renderArm(
 			LocalPlayer player,
+			PPlayerFirstPersonPose pose,
 			InteractionHand hand,
 			HumanoidArm arm,
 			PFirstPersonArmPose armPose,
@@ -75,6 +76,9 @@ public class PPlayerFirstPersonRenderer
 			int packedLight,
 			float partialTick)
 	{
+		if (usesCompleteVanillaHandPath(player, pose, hand, arm))
+			return;
+
 		switch (armPose.mode())
 		{
 			case HIDDEN ->
@@ -97,6 +101,9 @@ public class PPlayerFirstPersonRenderer
 	                               int packedLight,
 	                               float partialTick)
 	{
+		if (usesCompleteVanillaHandPath(player, pose, hand, arm))
+			return;
+
 		var stack = player.getItemInHand(hand);
 		switch (itemPose.mode())
 		{
@@ -149,6 +156,51 @@ public class PPlayerFirstPersonRenderer
 		return arm == HumanoidArm.RIGHT ? pose.rightItem() : pose.leftItem();
 	}
 
+	private static void renderCompleteVanillaHands(
+			LocalPlayer player,
+			PPlayerFirstPersonPose pose,
+			PoseStack poseStack,
+			SubmitNodeCollector submitNodeCollector,
+			int packedLight,
+			float partialTick)
+	{
+		HumanoidArm mainArm = player.getMainArm();
+		if (usesCompleteVanillaHandPath(player, pose, InteractionHand.MAIN_HAND, mainArm))
+			PPlayerFirstPersonVanillaRenderer.renderVanillaHand(
+					player, InteractionHand.MAIN_HAND, poseStack, submitNodeCollector, packedLight, partialTick);
+
+		HumanoidArm offArm = mainArm.getOpposite();
+		if (usesCompleteVanillaHandPath(player, pose, InteractionHand.OFF_HAND, offArm))
+			PPlayerFirstPersonVanillaRenderer.renderVanillaHand(
+					player, InteractionHand.OFF_HAND, poseStack, submitNodeCollector, packedLight, partialTick);
+	}
+
+	private static boolean usesCompleteVanillaHandPath(
+			LocalPlayer player,
+			PPlayerFirstPersonPose pose,
+			InteractionHand hand,
+			HumanoidArm arm)
+	{
+		if (!hasVanillaHandChannels(player, pose, hand, arm))
+			return false;
+
+		if (hand != InteractionHand.MAIN_HAND || !PPlayerFirstPersonVanillaRenderer.rendersTwoHandedMap())
+			return true;
+
+		return hasVanillaHandChannels(player, pose, InteractionHand.OFF_HAND, arm.getOpposite());
+	}
+
+	private static boolean hasVanillaHandChannels(
+			LocalPlayer player,
+			PPlayerFirstPersonPose pose,
+			InteractionHand hand,
+			HumanoidArm arm)
+	{
+		return (arm == HumanoidArm.RIGHT ? pose.rightArm() : pose.leftArm()).mode() == PFirstPersonRenderMode.VANILLA &&
+				itemPose(pose, arm).mode() == PFirstPersonRenderMode.VANILLA &&
+				!pose.hidesItem(player, hand, player.getItemInHand(hand));
+	}
+
 	public static void render(
 			LocalPlayer player,
 			PPlayerFirstPersonPose pose,
@@ -167,6 +219,14 @@ public class PPlayerFirstPersonRenderer
 					packedLight);
 
 			PPlayerAnimatedAttachments.renderFirstPerson(
+					player,
+					pose,
+					poseStack,
+					submitNodeCollector,
+					packedLight,
+					partialTick);
+
+			renderCompleteVanillaHands(
 					player,
 					pose,
 					poseStack,

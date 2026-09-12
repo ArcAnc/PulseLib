@@ -22,6 +22,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Vector3f;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -50,6 +51,10 @@ public final class PPlayerAnimationDefinition
 	private final Map<PPlayerAnimationAnchor, String> anchors;
 	private final PPlayerFirstPersonSettings firstPersonSettings;
 	private final ItemRenderPolicy itemRenderPolicy;
+	@Nullable
+	private final String itemVisibilityController;
+	@Nullable
+	private final ItemVisibilityPolicy itemVisibilityPolicy;
 
 	private PPlayerAnimationDefinition(Builder builder)
 	{
@@ -74,6 +79,8 @@ public final class PPlayerAnimationDefinition
 		this.anchors = Map.copyOf(builder.anchors);
 		this.firstPersonSettings = builder.firstPersonSettings.copy();
 		this.itemRenderPolicy = builder.itemRenderPolicy;
+		this.itemVisibilityController = builder.itemVisibilityController;
+		this.itemVisibilityPolicy = builder.itemVisibilityPolicy;
 	}
 
 	public static Builder builder(PModelData modelData)
@@ -182,6 +189,24 @@ public final class PPlayerAnimationDefinition
 	{
 		return this.itemRenderPolicy;
 	}
+
+	/**
+	 * The controller that supplies {@link #itemVisibilityPolicy()}'s timeline, if configured.
+	 * Its sampled time is expressed in seconds.
+	 */
+	public @Nullable String itemVisibilityController()
+	{
+		return this.itemVisibilityController;
+	}
+
+	/**
+	 * A phase-based first-person item visibility policy, if configured.
+	 * It supplements {@link #itemRenderPolicy()} rather than replacing it.
+	 */
+	public @Nullable ItemVisibilityPolicy itemVisibilityPolicy()
+	{
+		return this.itemVisibilityPolicy;
+	}
 	
 	void registerControllers(PAnimationManager.PAnimationRegistrar<PPlayerAnimationInstance> registrar)
 	{
@@ -228,6 +253,24 @@ public final class PPlayerAnimationDefinition
 		             ItemStack stack);
 	}
 
+	public enum ItemVisibility
+	{
+		VISIBLE,
+		HIDDEN
+	}
+
+	@FunctionalInterface
+	public interface ItemVisibilityPolicy
+	{
+		ItemVisibilityPolicy VISIBLE = (player, hand, animationTime, stack) -> ItemVisibility.VISIBLE;
+		ItemVisibilityPolicy HIDDEN = (player, hand, animationTime, stack) -> ItemVisibility.HIDDEN;
+
+		ItemVisibility visibility(LocalPlayer player,
+		                          InteractionHand hand,
+		                          float animationTime,
+		                          ItemStack stack);
+	}
+
 	public static final class Builder
 	{
 		private final PModelData modelData;
@@ -252,6 +295,10 @@ public final class PPlayerAnimationDefinition
 		private final Map<PPlayerAnimationAnchor, String> anchors = new HashMap<>();
 		private PPlayerFirstPersonSettings firstPersonSettings = PPlayerFirstPersonSettings.DISABLED;
 		private ItemRenderPolicy itemRenderPolicy = ItemRenderPolicy.RENDER;
+		@Nullable
+		private String itemVisibilityController;
+		@Nullable
+		private ItemVisibilityPolicy itemVisibilityPolicy;
 
 		private Builder(PModelData modelData)
 		{
@@ -399,6 +446,21 @@ public final class PPlayerAnimationDefinition
 		public Builder itemRenderPolicy(ItemRenderPolicy itemRenderPolicy)
 		{
 			this.itemRenderPolicy = Objects.requireNonNull(itemRenderPolicy);
+			return this;
+		}
+
+		/**
+		 * Controls item visibility at a particular phase of a named controller's timeline.
+		 * The supplied time is interpolated and expressed in seconds, independently of
+		 * activation crossfade weight. A hidden result is combined with
+		 * {@link #itemRenderPolicy(ItemRenderPolicy)}.
+		 */
+		public Builder itemVisibility(String controllerName, ItemVisibilityPolicy itemVisibilityPolicy)
+		{
+			if (controllerName == null || controllerName.isBlank())
+				throw new IllegalArgumentException("Item visibility controller name cannot be blank");
+			this.itemVisibilityController = controllerName;
+			this.itemVisibilityPolicy = Objects.requireNonNull(itemVisibilityPolicy);
 			return this;
 		}
 

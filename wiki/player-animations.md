@@ -199,6 +199,17 @@ Keep `firstPerson` disabled for ordinary third-person animations. If an enabled 
 
 Return `true` to suppress that item's local first-person draw. `ItemRenderPolicy.HIDE` hides an item and `ItemRenderPolicy.RENDER` keeps it visible; rendering is the default. The policy is attached to each physical left/right item channel only when that definition contributes the matching item anchor. Definitions are processed by ascending `priority` and identifier, so the highest ordered contributor for each channel owns its discrete policy while its transform is blended normally. The inventory and third-person renderer are unaffected.
 
+For a moment that belongs to an animation sequence, use `itemVisibility(controllerName, ...)` instead. It samples the named controller's interpolated timeline in seconds, independently of the definition's activation crossfade. The resulting visibility is captured for the current render frame; it therefore remains consistent while Minecraft draws both hands.
+
+```java
+.itemVisibility("bandage", (player, hand, animationTime, stack) ->
+        animationTime > 0.2f
+                ? PPlayerAnimationDefinition.ItemVisibility.HIDDEN
+                : PPlayerAnimationDefinition.ItemVisibility.VISIBLE)
+```
+
+This phase policy supplements `itemRenderPolicy(...)`: either policy may hide the item. If several definitions contribute the same physical item channel, the last definition by priority and identifier owns both policies, just as it does for the item transform.
+
 ## Animation anchors and mesh attachments
 
 `anchor(PPlayerAnimationAnchor, boneName)` exposes a model bone as a named attachment point. PulseLib reserves `FIRST_PERSON_CAMERA`, `RIGHT_ITEM`, and `LEFT_ITEM`; use a custom `PPlayerAnimationAnchor` for equipment or effects that follow an animation bone. Register a `PPlayerAnimatedAttachmentRenderer` through `PulseLibEvents.PlayerAnimatedAttachmentRegistrationEvent`. Its context contains the player, animation id, anchor, sampled transform, blend weight, render stack, collector, and whether it is rendering in first person.

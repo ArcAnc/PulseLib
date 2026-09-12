@@ -159,6 +159,12 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 		return Mth.lerp(partialTick, this.previousFirstPersonActivation, this.firstPersonActivation);
 	}
 
+	float controllerAnimationTime(String controllerName, float partialTick)
+	{
+		PAnimationController<PPlayerAnimationInstance> controller = controller(controllerName);
+		return controller == null ? 0.0f : controller.getInterpolatedTime(partialTick) / 20.0f;
+	}
+
 	private void updateActivation(boolean shouldApply)
 	{
 		this.previousActivation = this.activation;

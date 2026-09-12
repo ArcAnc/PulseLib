@@ -11,9 +11,11 @@ package com.arcanc.pulselib.content.mixin;
 
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -58,6 +60,19 @@ public interface ItemInHandRendererAccessor
 	                              float inverseArmHeight,
 	                              float attack,
 	                              HumanoidArm arm);
+
+	@Invoker("renderArmWithItem")
+	void pulselib$renderArmWithItem(
+			AbstractClientPlayer player,
+			float partialTick,
+			float xRot,
+			InteractionHand hand,
+			float attack,
+			ItemStack stack,
+			float inverseArmHeight,
+			PoseStack poseStack,
+			SubmitNodeCollector submitNodeCollector,
+			int packedLight);
 
 	@Invoker("applyItemArmTransform")
 	void pulselib$applyItemArmTransform(PoseStack poseStack, HumanoidArm arm, float inverseArmHeight);

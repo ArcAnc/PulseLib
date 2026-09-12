@@ -137,8 +137,8 @@ public final class PPlayerAnimations
 
 			pose.addArm(PPlayerPart.RIGHT_ARM, frame, definition, player, partialTick, activationWeight);
 			pose.addArm(PPlayerPart.LEFT_ARM, frame, definition, player, partialTick, activationWeight);
-			pose.addItem(PPlayerAnimationAnchors.RIGHT_ITEM, frame, definition, player, partialTick, activationWeight);
-			pose.addItem(PPlayerAnimationAnchors.LEFT_ITEM, frame, definition, player, partialTick, activationWeight);
+			pose.addItem(PPlayerAnimationAnchors.RIGHT_ITEM, frame, definition, instance, player, partialTick, activationWeight);
+			pose.addItem(PPlayerAnimationAnchors.LEFT_ITEM, frame, definition, instance, player, partialTick, activationWeight);
 			pose.addAnimationAnchors(entry.getKey(), frame, definition, activationWeight);
 			pose.addMeshAttachments(entry.getKey(), frame, definition, activationWeight);
 			pose.hasContributingAnimation = true;
@@ -552,6 +552,7 @@ public final class PPlayerAnimations
 		private void addItem(PPlayerAnimationAnchor anchor,
 		                     PPlayerAnimationFrame frame,
 		                     PPlayerAnimationDefinition definition,
+		                     PPlayerAnimationInstance instance,
 		                     Player player,
 		                     float partialTick,
 		                     float activationWeight)
@@ -566,7 +567,22 @@ public final class PPlayerAnimations
 			PTransform transform = frame.firstPersonTransform(anchor);
 			if (transform != null)
 				setItem(rightHand, PPlayerAnimationSpace.toFirstPersonItemAnchorSpace(transform, definition),
-						definition.itemRenderPolicy(), definition.blendMode(), weight);
+						itemRenderPolicy(definition, instance, partialTick), definition.blendMode(), weight);
+		}
+
+		private static PPlayerAnimationDefinition.ItemRenderPolicy itemRenderPolicy(PPlayerAnimationDefinition definition,
+		                                                                             PPlayerAnimationInstance instance,
+		                                                                             float partialTick)
+		{
+			PPlayerAnimationDefinition.ItemRenderPolicy renderPolicy = definition.itemRenderPolicy();
+			PPlayerAnimationDefinition.ItemVisibilityPolicy visibilityPolicy = definition.itemVisibilityPolicy();
+			String controllerName = definition.itemVisibilityController();
+			if (visibilityPolicy == null || controllerName == null)
+				return renderPolicy;
+
+			float animationTime = instance.controllerAnimationTime(controllerName, partialTick);
+			return (player, hand, stack) -> renderPolicy.hide(player, hand, stack) ||
+					visibilityPolicy.visibility(player, hand, animationTime, stack) == PPlayerAnimationDefinition.ItemVisibility.HIDDEN;
 		}
 
 		private void addAnimationAnchors(Identifier id,
