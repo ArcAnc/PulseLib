@@ -34,7 +34,7 @@ public abstract class ItemInHandRendererMixin
 			CallbackInfo ci)
 	{
 		PPlayerFirstPersonPose pose = PPlayerAnimations.firstPersonPose(player, partialTick);
-		if (pose == null)
+		if (pose == null || pose.usesVanillaRenderPass())
 			return;
 
 		PPlayerFirstPersonRenderer.render(player, pose, poseStack, submitNodeCollector, packedLight, partialTick);

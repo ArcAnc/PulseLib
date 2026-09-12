@@ -41,4 +41,20 @@ public record PPlayerFirstPersonPose(
 				(player.getMainArm() == HumanoidArm.RIGHT ? this.leftItem : this.rightItem);
 		return itemPose.renderPolicy().hide(player, hand, stack);
 	}
+
+	/**
+	 * Whether the complete vanilla first-person pass can run unchanged.
+	 *
+	 * <p>Anchors and mesh attachments also require PulseLib's replacement pass,
+	 * even if both hands themselves use vanilla rendering.
+	 */
+	public boolean usesVanillaRenderPass()
+	{
+		return this.rightArm.mode() == PFirstPersonRenderMode.VANILLA &&
+				this.leftArm.mode() == PFirstPersonRenderMode.VANILLA &&
+				this.rightItem.mode() == PFirstPersonRenderMode.VANILLA &&
+				this.leftItem.mode() == PFirstPersonRenderMode.VANILLA &&
+				this.animationAnchors.isEmpty() &&
+				this.meshAttachments.isEmpty();
+	}
 }

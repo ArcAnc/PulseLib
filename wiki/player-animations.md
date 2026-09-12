@@ -179,11 +179,13 @@ PPlayerAnimationDefinition.builder(MODEL)
         .build();
 ```
 
-`RIGHT_ARM` and `LEFT_ARM` supply the physical arms to draw. An arm without a sampled transform is absent from the replacement pass. `RIGHT_ITEM` and `LEFT_ITEM` supply the physical first-person item-renderer origins; without the relevant item anchor the item is absent too. Minecraft maps the player's logical main/off hand to these physical left/right anchors according to the player's main-arm setting.
+`RIGHT_ARM` and `LEFT_ARM` supply the physical arms to draw; `RIGHT_ITEM` and `LEFT_ITEM` supply the physical first-person item-renderer origins. Minecraft maps its logical main/off hand to these physical left/right channels according to the player's main-arm setting.
+
+Each channel has a `PFirstPersonRenderMode`. A channel without a sampled transform remains `VANILLA`, so Minecraft's per-hand swing, equip, use, map, and item-model transforms still apply even though PulseLib owns the outer first-person render call. A sampled arm or item channel becomes `ANIMATED` and PulseLib applies its camera-space transform. `HIDDEN` draws nothing. `PFirstPersonArmPose` and `PFirstPersonItemPose` enforce this boundary: only `ANIMATED` has a non-null transform.
 
 An item anchor is applied before Minecraft renders the item with `FIRST_PERSON_RIGHT_HAND` or `FIRST_PERSON_LEFT_HAND`. It therefore controls the container transform, not the absolute transform of the item mesh or its final grip. Minecraft then applies the item's own first-person display transform, including any transform supplied by an item model or resource pack. This keeps animated items compatible with vanilla and custom first-person item models.
 
-Keep `firstPerson` disabled for ordinary third-person animations. An active enabled definition starts the replacement pass even if its model has no valid arm or item transform, which would leave those elements invisible. Definitions are processed by ascending `priority` and then identifier; arm and item transforms blend in that same order.
+Keep `firstPerson` disabled for ordinary third-person animations. If an enabled definition contributes no animated hand channel, custom anchor, or mesh attachment, PulseLib leaves Minecraft's complete first-person pass intact. Definitions are processed by ascending `priority` and then identifier; arm and item transforms blend in that same order.
 
 ## Hiding first-person held items
 

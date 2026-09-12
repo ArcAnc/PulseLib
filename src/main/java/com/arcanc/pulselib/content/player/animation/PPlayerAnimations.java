@@ -514,12 +514,14 @@ public final class PPlayerAnimations
 
 	private static final class FirstPersonPoseBuilder
 	{
-		private PFirstPersonArmPose rightArm = PFirstPersonArmPose.animated(PFirstPersonRestPose.arm(HumanoidArm.RIGHT));
-		private PFirstPersonArmPose leftArm = PFirstPersonArmPose.animated(PFirstPersonRestPose.arm(HumanoidArm.LEFT));
+		private PFirstPersonArmPose rightArm = PFirstPersonArmPose.vanilla();
+		private PFirstPersonArmPose leftArm = PFirstPersonArmPose.vanilla();
 		private boolean rightArmContributed;
 		private boolean leftArmContributed;
-		private PTransform rightItem = PFirstPersonRestPose.item(HumanoidArm.RIGHT);
-		private PTransform leftItem = PFirstPersonRestPose.item(HumanoidArm.LEFT);
+		private PTransform rightItem;
+		private PTransform leftItem;
+		private boolean rightItemContributed;
+		private boolean leftItemContributed;
 		private PPlayerAnimationDefinition.ItemRenderPolicy rightItemRenderPolicy = PPlayerAnimationDefinition.ItemRenderPolicy.RENDER;
 		private PPlayerAnimationDefinition.ItemRenderPolicy leftItemRenderPolicy = PPlayerAnimationDefinition.ItemRenderPolicy.RENDER;
 		private final List<PPlayerFirstPersonAnchorPose> animationAnchors = new ArrayList<>();
@@ -616,9 +618,10 @@ public final class PPlayerAnimations
 		{
 			PFirstPersonArmPose current = right ? this.rightArm : this.leftArm;
 			boolean contributed = right ? this.rightArmContributed : this.leftArmContributed;
+			PTransform rest = PFirstPersonRestPose.arm(right ? HumanoidArm.RIGHT : HumanoidArm.LEFT);
 			PTransform blended = contributed ?
 					blend(current.transform(), transform, blendMode, weight) :
-					interpolate(current.transform(), transform, weight);
+					interpolate(rest, transform, weight);
 			if (right)
 			{
 				this.rightArm = PFirstPersonArmPose.animated(blended);
@@ -637,17 +640,22 @@ public final class PPlayerAnimations
 		                     PPlayerAnimationBlendMode blendMode,
 		                     float weight)
 		{
-			PTransform current = right ? this.rightItem : this.leftItem;
+			boolean contributed = right ? this.rightItemContributed : this.leftItemContributed;
+			PTransform current = contributed ?
+					(right ? this.rightItem : this.leftItem) :
+					PFirstPersonRestPose.item(right ? HumanoidArm.RIGHT : HumanoidArm.LEFT);
 			PTransform blended = blend(current, transform, blendMode, weight);
 			if (right)
 			{
 				this.rightItem = blended;
 				this.rightItemRenderPolicy = renderPolicy;
+				this.rightItemContributed = true;
 			}
 			else
 			{
 				this.leftItem = blended;
 				this.leftItemRenderPolicy = renderPolicy;
+				this.leftItemContributed = true;
 			}
 		}
 
@@ -692,8 +700,8 @@ public final class PPlayerAnimations
 		private PPlayerFirstPersonPose build()
 		{
 			return new PPlayerFirstPersonPose(this.rightArm, this.leftArm,
-					PFirstPersonItemPose.animated(this.rightItem, this.rightItemRenderPolicy),
-					PFirstPersonItemPose.animated(this.leftItem, this.leftItemRenderPolicy),
+					this.rightItemContributed ? PFirstPersonItemPose.animated(this.rightItem, this.rightItemRenderPolicy) : PFirstPersonItemPose.vanilla(),
+					this.leftItemContributed ? PFirstPersonItemPose.animated(this.leftItem, this.leftItemRenderPolicy) : PFirstPersonItemPose.vanilla(),
 					List.copyOf(this.animationAnchors), List.copyOf(this.meshAttachments));
 		}
 	}

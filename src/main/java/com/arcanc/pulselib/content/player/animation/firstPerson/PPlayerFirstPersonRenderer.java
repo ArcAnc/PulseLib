@@ -29,10 +29,21 @@ public class PPlayerFirstPersonRenderer
 
 	private static void renderPersistentAttachments(LocalPlayer player, PPlayerFirstPersonPose pose, PoseStack poseStack, int packedLight, float partialTick)
 	{
-		PPlayerFirstPersonArmRenderer.renderAttachments(
-				player, HumanoidArm.RIGHT, pose.rightArm().transform(), poseStack, packedLight, partialTick);
-		PPlayerFirstPersonArmRenderer.renderAttachments(
-				player, HumanoidArm.LEFT, pose.leftArm().transform(), poseStack, packedLight, partialTick);
+		renderPersistentAttachments(player, HumanoidArm.RIGHT, pose.rightArm(), poseStack, packedLight, partialTick);
+		renderPersistentAttachments(player, HumanoidArm.LEFT, pose.leftArm(), poseStack, packedLight, partialTick);
+	}
+
+	private static void renderPersistentAttachments(
+			LocalPlayer player,
+			HumanoidArm arm,
+			PFirstPersonArmPose armPose,
+			PoseStack poseStack,
+			int packedLight,
+			float partialTick)
+	{
+		if (armPose.mode() == PFirstPersonRenderMode.ANIMATED)
+			PPlayerFirstPersonArmRenderer.renderAttachments(
+					player, arm, armPose.transform(), poseStack, packedLight, partialTick);
 	}
 
 	private static void renderArms(
@@ -40,14 +51,40 @@ public class PPlayerFirstPersonRenderer
 			PPlayerFirstPersonPose pose,
 			PoseStack poseStack,
 			SubmitNodeCollector submitNodeCollector,
-			int packedLight)
+			int packedLight,
+			float partialTick)
 	{
 		OrderedSubmitNodeCollector armCollector = submitNodeCollector.order(ARM_RENDER_ORDER);
 
 		if (player.isInvisible())
 			return;
-		PPlayerFirstPersonArmRenderer.render(player, HumanoidArm.RIGHT, pose.rightArm().transform(), poseStack, armCollector, packedLight);
-		PPlayerFirstPersonArmRenderer.render(player, HumanoidArm.LEFT, pose.leftArm().transform(), poseStack, armCollector, packedLight);
+		InteractionHand rightHand = player.getMainArm() == HumanoidArm.RIGHT ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
+		renderArm(player, rightHand, HumanoidArm.RIGHT, pose.rightArm(), poseStack, armCollector, submitNodeCollector, packedLight, partialTick);
+		renderArm(player, rightHand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND,
+				HumanoidArm.LEFT, pose.leftArm(), poseStack, armCollector, submitNodeCollector, packedLight, partialTick);
+	}
+
+	private static void renderArm(
+			LocalPlayer player,
+			InteractionHand hand,
+			HumanoidArm arm,
+			PFirstPersonArmPose armPose,
+			PoseStack poseStack,
+			OrderedSubmitNodeCollector armCollector,
+			SubmitNodeCollector submitNodeCollector,
+			int packedLight,
+			float partialTick)
+	{
+		switch (armPose.mode())
+		{
+			case HIDDEN ->
+			{
+			}
+			case ANIMATED -> PPlayerFirstPersonArmRenderer.render(
+					player, arm, armPose.transform(), poseStack, armCollector, packedLight);
+			case VANILLA -> PPlayerFirstPersonVanillaRenderer.renderVanillaArm(
+					player, hand, arm, poseStack, submitNodeCollector, packedLight, partialTick);
+		}
 	}
 
 	private static void renderItem(LocalPlayer player,
@@ -57,12 +94,38 @@ public class PPlayerFirstPersonRenderer
 	                               PFirstPersonItemPose itemPose,
 	                               PoseStack poseStack,
 	                               SubmitNodeCollector submitNodeCollector,
-	                               int packedLight)
+	                               int packedLight,
+	                               float partialTick)
 	{
 		var stack = player.getItemInHand(hand);
-		if (stack.isEmpty() || pose.hidesItem(player, hand, stack))
-			return;
+		switch (itemPose.mode())
+		{
+			case HIDDEN ->
+			{
+			}
+			case VANILLA ->
+			{
+				if (!pose.hidesItem(player, hand, stack))
+					PPlayerFirstPersonVanillaRenderer.renderVanillaItem(
+							player, hand, arm, poseStack, submitNodeCollector, packedLight, partialTick);
+			}
+			case ANIMATED ->
+			{
+				if (!stack.isEmpty() && !pose.hidesItem(player, hand, stack))
+					renderAnimatedItem(player, arm, itemPose, stack, poseStack, submitNodeCollector, packedLight);
+			}
+		}
+	}
 
+	private static void renderAnimatedItem(
+			LocalPlayer player,
+			HumanoidArm arm,
+			PFirstPersonItemPose itemPose,
+			net.minecraft.world.item.ItemStack stack,
+			PoseStack poseStack,
+			SubmitNodeCollector submitNodeCollector,
+			int packedLight)
+	{
 		poseStack.pushPose();
 		try
 		{
@@ -116,12 +179,13 @@ public class PPlayerFirstPersonRenderer
 					pose,
 					poseStack,
 					submitNodeCollector,
-					packedLight);
+					packedLight,
+					partialTick);
 
 			HumanoidArm mainArm = player.getMainArm();
-			renderItem(player, pose, InteractionHand.MAIN_HAND, mainArm, itemPose(pose, mainArm), poseStack, submitNodeCollector, packedLight);
+			renderItem(player, pose, InteractionHand.MAIN_HAND, mainArm, itemPose(pose, mainArm), poseStack, submitNodeCollector, packedLight, partialTick);
 			HumanoidArm offArm = mainArm.getOpposite();
-			renderItem(player, pose, InteractionHand.OFF_HAND, offArm, itemPose(pose, offArm), poseStack, submitNodeCollector, packedLight);
+			renderItem(player, pose, InteractionHand.OFF_HAND, offArm, itemPose(pose, offArm), poseStack, submitNodeCollector, packedLight, partialTick);
 
 			renderPersistentAttachments(
 					player,
