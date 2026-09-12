@@ -367,4 +367,21 @@ public final class PPlayerAnimationFrame
 				referenceName
 		);
 	}
+	
+	@Nullable
+	public BoneFrame animationTransform(PPlayerPart part)
+	{
+		String boneName =
+				this.definition.bindings().get(part);
+		
+		if (boneName == null)
+			return null;
+		
+		PAnimationPoseResolver.BonePose pose =
+				this.resolver.resolve(boneName);
+		
+		return pose == null ?
+				null :
+				pose.animationTransform();
+	}
 }

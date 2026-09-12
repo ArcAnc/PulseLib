@@ -9,6 +9,7 @@
 
 package com.arcanc.pulselib.content.player.animation;
 
+import com.arcanc.pulselib.content.model.animation.BoneFrame;
 import com.arcanc.pulselib.content.model.animation.PPoseBlendMode;
 import com.arcanc.pulselib.content.model.animation.PTransform;
 import com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimationMeshAttachmentPose;
@@ -608,49 +609,36 @@ public final class PPlayerAnimations
 			PTransform vanillaBind =
 					PFirstPersonRestPose.armOrigin(arm);
 			
+			BoneFrame animationTransform =
+					frame.animationTransform(part);
+			
 			
 			/*
 			 * TRANSLATION
 			 *
-			 * Direction stays in camera space.
-			 * Bind scale is removed separately so that authored model units
-			 * are converted into the vanilla first-person arm space without
-			 * rotating the translation into the arm-local basis.
+			 * IMPORTANT:
+			 * This is the authored glTF POSITION-channel delta.
+			 *
+			 * Do not derive it from modelTransform/fullTransform,
+			 * otherwise parent/bind rotations will change its axes.
 			 */
-			Vector3f bindScale =
-					bindArm.scale();
-			
 			Vector3f translationDelta =
-					currentArm.translation().
-							sub(bindArm.translation());
-			
-			float translationScale =
-					(bindScale.x + bindScale.y + bindScale.z) / 3.0f;
-			
-			if (Math.abs(translationScale) > 1.0e-6f)
-				translationDelta.div(translationScale);
+					basis.convert(
+							PTransform.translation(
+									animationTransform.translation()
+							)
+					).translation();
 			
 			
 			/*
 			 * ROTATION
 			 *
-			 * Rotation still needs to be relative to the source arm bind pose.
+			 * Rotation still uses the actual arm bind/current orientation.
 			 */
 			Quaternionf sourceRotationDelta =
 					bindArm.rotation().
 							invert().
 							mul(currentArm.rotation()).
-							normalize();
-			
-			
-			/*
-			 * Convert the source arm-local rotation axes into
-			 * vanilla arm-local axes.
-			 */
-			Quaternionf sourceToVanilla =
-					vanillaBind.rotation().
-							invert().
-							mul(bindArm.rotation()).
 							normalize();
 			
 			Quaternionf vanillaRotationDelta =
@@ -663,24 +651,20 @@ public final class PPlayerAnimations
 			/*
 			 * SCALE
 			 */
-			Vector3f currentScale = currentArm.scale();
+			Vector3f bindScale =
+					bindArm.scale();
 			
-			Vector3f scaleDelta = new Vector3f(
-					ratio(currentScale.x, bindScale.x),
-					ratio(currentScale.y, bindScale.y),
-					ratio(currentScale.z, bindScale.z)
-			);
+			Vector3f currentScale =
+					currentArm.scale();
+			
+			Vector3f scaleDelta =
+					new Vector3f(
+							ratio(currentScale.x, bindScale.x),
+							ratio(currentScale.y, bindScale.y),
+							ratio(currentScale.z, bindScale.z)
+					);
 			
 			
-			/*
-			 * IMPORTANT:
-			 *
-			 * Do NOT vanillaBind.compose(delta) here,
-			 * because compose() would rotate translationDelta
-			 * through vanillaBind.rotation().
-			 *
-			 * Assemble the final channels explicitly.
-			 */
 			Vector3f targetTranslation =
 					vanillaBind.translation().
 							add(translationDelta);
@@ -698,8 +682,7 @@ public final class PPlayerAnimations
 					targetTranslation,
 					targetRotation,
 					targetScale
-			);
-		}
+			);		}
 		
 		private static float ratio(float value, float base)
 		{

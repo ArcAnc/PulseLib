@@ -10,7 +10,6 @@ import org.joml.Vector3f;
  */
 public final class PFirstPersonArmAnimationSpace
 {
-	private static final Vector3f CAMERA_FORWARD = new Vector3f(0.0f, 0.0f, -1.0f);
 
 	private PFirstPersonArmAnimationSpace()
 	{
@@ -27,9 +26,13 @@ public final class PFirstPersonArmAnimationSpace
 						mul(sourceBind.rotation()).
 						normalize();
 		
-		return sourceToVanilla.
+		Quaternionf vanillaToSource =
+				new Quaternionf(sourceToVanilla).
+						invert();
+		
+		return new Quaternionf(sourceToVanilla).
 				mul(sourceDelta).
-				mul(new Quaternionf(sourceToVanilla).invert()).
+				mul(vanillaToSource).
 				normalize();
 	}
 }
