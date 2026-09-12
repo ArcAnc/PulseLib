@@ -1,8 +1,6 @@
 package com.arcanc.pulselib.content.player.animation.firstPerson;
 
 import com.arcanc.pulselib.content.model.animation.PTransform;
-import net.minecraft.world.entity.HumanoidArm;
-import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -18,24 +16,20 @@ public final class PFirstPersonArmAnimationSpace
 	{
 	}
 	
-	public static PTransform convert(
+	public static Quaternionf convertRotation(
 			PTransform sourceBind,
 			PTransform vanillaBind,
-			PTransform sourceLocalDelta)
+			Quaternionf sourceDelta)
 	{
 		Quaternionf sourceToVanilla =
-				new Quaternionf(vanillaBind.rotation()).
+				vanillaBind.rotation().
 						invert().
 						mul(sourceBind.rotation()).
 						normalize();
 		
-		return new PFirstPersonBasis(
-				new Matrix4f().rotate(sourceToVanilla)
-		).convert(sourceLocalDelta);
-	}
-
-	private static Vector3f projectOntoPlane(Vector3f vector, Vector3f normal)
-	{
-		return new Vector3f(vector).fma(-vector.dot(normal), normal);
+		return sourceToVanilla.
+				mul(sourceDelta).
+				mul(new Quaternionf(sourceToVanilla).invert()).
+				normalize();
 	}
 }

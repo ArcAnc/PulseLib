@@ -612,12 +612,23 @@ public final class PPlayerAnimations
 			/*
 			 * TRANSLATION
 			 *
-			 * firstPersonTransform is already relative to FIRST_PERSON_CAMERA,
-			 * therefore this delta must remain in camera space.
+			 * Direction stays in camera space.
+			 * Bind scale is removed separately so that authored model units
+			 * are converted into the vanilla first-person arm space without
+			 * rotating the translation into the arm-local basis.
 			 */
+			Vector3f bindScale =
+					bindArm.scale();
+			
 			Vector3f translationDelta =
 					currentArm.translation().
 							sub(bindArm.translation());
+			
+			float translationScale =
+					(bindScale.x + bindScale.y + bindScale.z) / 3.0f;
+			
+			if (Math.abs(translationScale) > 1.0e-6f)
+				translationDelta.div(translationScale);
 			
 			
 			/*
@@ -643,16 +654,15 @@ public final class PPlayerAnimations
 							normalize();
 			
 			Quaternionf vanillaRotationDelta =
-					new Quaternionf(sourceToVanilla).
-							mul(sourceRotationDelta).
-							mul(new Quaternionf(sourceToVanilla).invert()).
-							normalize();
+					PFirstPersonArmAnimationSpace.convertRotation(
+							bindArm,
+							vanillaBind,
+							sourceRotationDelta);
 			
 			
 			/*
 			 * SCALE
 			 */
-			Vector3f bindScale = bindArm.scale();
 			Vector3f currentScale = currentArm.scale();
 			
 			Vector3f scaleDelta = new Vector3f(
