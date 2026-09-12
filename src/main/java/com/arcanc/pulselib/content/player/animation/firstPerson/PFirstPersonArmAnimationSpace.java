@@ -17,22 +17,21 @@ public final class PFirstPersonArmAnimationSpace
 	private PFirstPersonArmAnimationSpace()
 	{
 	}
-
-	public static PTransform convert(HumanoidArm arm, PTransform sourceLocalDelta)
+	
+	public static PTransform convert(
+			PTransform sourceBind,
+			PTransform vanillaBind,
+			PTransform sourceLocalDelta)
 	{
-		PTransform armOrigin = PFirstPersonRestPose.armOrigin(arm);
-		Vector3f armToHand = PFirstPersonRestPose.armRig(arm).armToHand().translation();
-		Vector3f handDirection = armOrigin.rotation().transform(armToHand).normalize();
-		Vector3f forwardTangent = projectOntoPlane(CAMERA_FORWARD, handDirection);
-		if (forwardTangent.lengthSquared() < 1.0e-10f)
-			return sourceLocalDelta;
-		forwardTangent.normalize();
-
-		/* axis × handDirection = forwardTangent */
-		Vector3f cameraAxis = handDirection.cross(forwardTangent).normalize();
-		Vector3f localAxis = armOrigin.rotation().invert().transform(cameraAxis).normalize();
-		Quaternionf sourceToVanilla = new Quaternionf().rotationTo(new Vector3f(1.0f, 0.0f, 0.0f), localAxis);
-		return new PFirstPersonBasis(new Matrix4f().rotate(sourceToVanilla)).convert(sourceLocalDelta);
+		Quaternionf sourceToVanilla =
+				new Quaternionf(vanillaBind.rotation()).
+						invert().
+						mul(sourceBind.rotation()).
+						normalize();
+		
+		return new PFirstPersonBasis(
+				new Matrix4f().rotate(sourceToVanilla)
+		).convert(sourceLocalDelta);
 	}
 
 	private static Vector3f projectOntoPlane(Vector3f vector, Vector3f normal)

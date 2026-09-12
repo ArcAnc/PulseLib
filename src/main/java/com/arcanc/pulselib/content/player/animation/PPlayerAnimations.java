@@ -576,29 +576,128 @@ public final class PPlayerAnimations
 				setArm(right, handTarget, definition.blendMode(), weight);
 			}
 		}
-
-		/**
-		 * Retargets the source arm origin to the vanilla rigid-arm origin. At bind
-		 * pose this is exactly the canonical vanilla arm transform; at runtime the
-		 * source arm's local animation remains rooted at that origin.
-		 */
-		private static @Nullable PTransform calibratedArmOrigin(PPlayerPart part,
-		                                                       PPlayerAnimationFrame frame,
-		                                                       PPlayerAnimationDefinition definition)
+		
+		private static @Nullable PTransform calibratedArmOrigin(
+				PPlayerPart part,
+				PPlayerAnimationFrame frame,
+				PPlayerAnimationDefinition definition)
 		{
-			PFirstPersonBasis basis = PPlayerAnimationSpace.firstPersonBasis(definition);
-			PTransform sourceCurrent = frame.firstPersonTransform(part);
-			PTransform sourceBind = frame.firstPersonBindTransform(part);
+			PFirstPersonBasis basis =
+					PPlayerAnimationSpace.firstPersonBasis(definition);
+			
+			PTransform sourceCurrent =
+					frame.firstPersonTransform(part);
+			
+			PTransform sourceBind =
+					frame.firstPersonBindTransform(part);
+			
 			if (sourceCurrent == null || sourceBind == null)
 				return null;
-			HumanoidArm arm = part == PPlayerPart.RIGHT_ARM ? HumanoidArm.RIGHT : HumanoidArm.LEFT;
-			PTransform bindArm = basis.convert(sourceBind);
-			PTransform currentArm = basis.convert(sourceCurrent);
-			PTransform localDelta = bindArm.inverse().compose(currentArm);
-			return PFirstPersonRestPose.armOrigin(arm).
-					compose(PFirstPersonArmAnimationSpace.convert(arm, localDelta));
+			
+			HumanoidArm arm =
+					part == PPlayerPart.RIGHT_ARM ?
+							HumanoidArm.RIGHT :
+							HumanoidArm.LEFT;
+			
+			PTransform bindArm =
+					basis.convert(sourceBind);
+			
+			PTransform currentArm =
+					basis.convert(sourceCurrent);
+			
+			PTransform vanillaBind =
+					PFirstPersonRestPose.armOrigin(arm);
+			
+			
+			/*
+			 * TRANSLATION
+			 *
+			 * firstPersonTransform is already relative to FIRST_PERSON_CAMERA,
+			 * therefore this delta must remain in camera space.
+			 */
+			Vector3f translationDelta =
+					currentArm.translation().
+							sub(bindArm.translation());
+			
+			
+			/*
+			 * ROTATION
+			 *
+			 * Rotation still needs to be relative to the source arm bind pose.
+			 */
+			Quaternionf sourceRotationDelta =
+					bindArm.rotation().
+							invert().
+							mul(currentArm.rotation()).
+							normalize();
+			
+			
+			/*
+			 * Convert the source arm-local rotation axes into
+			 * vanilla arm-local axes.
+			 */
+			Quaternionf sourceToVanilla =
+					vanillaBind.rotation().
+							invert().
+							mul(bindArm.rotation()).
+							normalize();
+			
+			Quaternionf vanillaRotationDelta =
+					new Quaternionf(sourceToVanilla).
+							mul(sourceRotationDelta).
+							mul(new Quaternionf(sourceToVanilla).invert()).
+							normalize();
+			
+			
+			/*
+			 * SCALE
+			 */
+			Vector3f bindScale = bindArm.scale();
+			Vector3f currentScale = currentArm.scale();
+			
+			Vector3f scaleDelta = new Vector3f(
+					ratio(currentScale.x, bindScale.x),
+					ratio(currentScale.y, bindScale.y),
+					ratio(currentScale.z, bindScale.z)
+			);
+			
+			
+			/*
+			 * IMPORTANT:
+			 *
+			 * Do NOT vanillaBind.compose(delta) here,
+			 * because compose() would rotate translationDelta
+			 * through vanillaBind.rotation().
+			 *
+			 * Assemble the final channels explicitly.
+			 */
+			Vector3f targetTranslation =
+					vanillaBind.translation().
+							add(translationDelta);
+			
+			Quaternionf targetRotation =
+					vanillaBind.rotation().
+							mul(vanillaRotationDelta).
+							normalize();
+			
+			Vector3f targetScale =
+					vanillaBind.scale().
+							mul(scaleDelta);
+			
+			return new PTransform(
+					targetTranslation,
+					targetRotation,
+					targetScale
+			);
 		}
-
+		
+		private static float ratio(float value, float base)
+		{
+			return Math.abs(base) < 1.0e-6f ?
+					value :
+					value / base;
+		}
+		
 		private void addItem(PPlayerAnimationAnchor anchor,
 		                     PPlayerAnimationFrame frame,
 		                     PPlayerAnimationDefinition definition,
