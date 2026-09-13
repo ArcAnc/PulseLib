@@ -13,16 +13,8 @@ package com.arcanc.pulselib.content.event;
 import com.arcanc.pulselib.content.animatable.PLibAnimationTicker;
 import com.arcanc.pulselib.content.animatable.instance.InstanceAnimationManager;
 import com.arcanc.pulselib.content.animatable.singleton.SingletonAnimationManager;
-import com.arcanc.pulselib.content.model.resource.PModelResource;
 import com.arcanc.pulselib.content.model.textures.atlas.RuntimeLoader;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
-import com.arcanc.pulselib.content.registration.PLibRegistration;
-import com.arcanc.pulselib.content.registration.block.block_entity.ber.TestBlockEntityRenderer;
-import com.arcanc.pulselib.content.registration.entity.renderer.TestEntityRender;
-import com.arcanc.pulselib.content.registration.item.TestArmorItem;
-import com.arcanc.pulselib.content.registration.item.renderer.TestBlockItemRenderer;
-import com.arcanc.pulselib.content.registration.player.PPlayerAcrobaticDemo;
-import com.arcanc.pulselib.content.registration.player.PPlayerBallDemo;
 import com.arcanc.pulselib.content.renderer.PRenderQueue;
 import com.arcanc.pulselib.content.renderer.PRenderStagesHandler;
 import com.arcanc.pulselib.util.PLibDatabase;
@@ -40,8 +32,6 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModLoader;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent;
 import net.neoforged.neoforge.client.event.RegisterSpriteSourcesEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
@@ -63,10 +53,10 @@ public class ClientEvents
 	{
 		ModLoader.postEvent(new PulseLibEvents.TypeRegistrationEvent());
 		
-		modEventBus.addListener(ClientEvents :: registerRenderers);
+		/*modEventBus.addListener(ClientEvents :: registerRenderers);
 		modEventBus.addListener(ClientEvents :: registerCustomTextures);
 		modEventBus.addListener(ClientEvents :: registerSpecialModels);
-		
+		*/
 		PAttachmentAnchorResolvers.init(modEventBus);
 		modEventBus.addListener(EventPriority.HIGHEST, ClientEvents :: registerSpriteSources);
 		modEventBus.addListener(ClientEvents :: registerReloadListeners);
@@ -79,8 +69,8 @@ public class ClientEvents
 		PResourceCache.register(modEventBus);
 		PLibArmorHandler.register(modEventBus);
 		
-		PPlayerBallDemo.register(modEventBus);
-		PPlayerAcrobaticDemo.register(modEventBus);
+		//PPlayerBallDemo.register(modEventBus);
+		//PPlayerAcrobaticDemo.register(modEventBus);
 	}
 	
 	/**
@@ -202,26 +192,26 @@ public class ClientEvents
 	 * Registers the special models.
 	 * @param event the event to use.
 	 */
-	private static void registerSpecialModels(final RegisterSpecialModelRendererEvent event)
+	/*private static void registerSpecialModels(final RegisterSpecialModelRendererEvent event)
 	{
 		event.register(PLibDatabase.rl("test_block"), TestBlockItemRenderer.Unbaked.MAP_CODEC);
-	}
+	}*/
 	
 	/**
 	 * Registers the renderers.
 	 * @param event the event to use.
 	 */
-	private static void registerRenderers(final EntityRenderersEvent.RegisterRenderers event)
+	/*private static void registerRenderers(final EntityRenderersEvent.RegisterRenderers event)
 	{
 		event.registerBlockEntityRenderer(PLibRegistration.BETypeReg.TEST_BLOCK_ENTITY.get(), TestBlockEntityRenderer :: new);
 		event.registerEntityRenderer(PLibRegistration.EntityTypeReg.TEST_ENTITY.get(), TestEntityRender :: new);
-	}
+	}/*
 	
 	/**
 	 * Registers the custom textures.
 	 * @param event the event to use.
 	 */
-	private static void registerCustomTextures(final PulseLibEvents.RegisterResourceEvent event)
+	/*private static void registerCustomTextures(final PulseLibEvents.RegisterResourceEvent event)
 	{
 		event.register(PModelResource.builder(PLibDatabase.rl("entity/test_entity")).
 						texture("tube", TestEntityRender.TUBE).
@@ -243,5 +233,5 @@ public class ClientEvents
 						texture("0", TestArmorItem.TEXTURE));
 		event.register(PModelResource.builder(PLibDatabase.rl("player/demo/test_ball_model")).
 						texture("0", PPlayerBallDemo.TEXTURE));
-	}
+	}*/
 }
