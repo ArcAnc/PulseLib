@@ -11,4 +11,5 @@
 * removed the obsolete `PItemAnimatable` interface; animated items now implement `PAnimatable` directly
 * moved animation channel, animation event, and mesh deformer types to PulseLib's internal registries
 * added a type-registration event for external animation channels, animation events, and mesh deformers
+* rewrite whole first person animations
 * replaced `PTextureCache` with `PResourceCache` and `PModelResource`; only registered models are loaded, and material texture references resolve per model
