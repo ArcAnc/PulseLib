@@ -15,7 +15,7 @@ import com.arcanc.pulselib.content.renderer.PRenderQueue;
 import com.arcanc.pulselib.content.renderer.plan.PDrawGroup;
 import com.arcanc.pulselib.content.renderer.plan.PRenderPlan;
 import com.arcanc.pulselib.util.PRenderTypes;
-import com.arcanc.pulselib.util.PTextureCache;
+import com.arcanc.pulselib.util.PResourceCache;
 import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.opengl.GlStateManager;
@@ -44,6 +44,9 @@ import java.util.Map;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 
+/**
+ * Provides support for gl multi draw executor.
+ */
 public final class PGlMultiDrawExecutor
 {
 	private final PGlGeometryArena geometry = new PGlGeometryArena();
@@ -259,7 +262,7 @@ public final class PGlMultiDrawExecutor
 		Draw first = batch.getFirst();
 		RenderType type = first.type();
 		Minecraft mc = PLibRenderHelper.mc();
-		TextureAtlas atlas = PTextureCache.getTextureAtlas();
+		TextureAtlas atlas = PResourceCache.getTextureAtlas();
 		GpuTextureView lightTexture = mc.gameRenderer.levelLightmap();
 		OverlayTexture overlayTexture = mc.gameRenderer.overlayTexture();
 		PGpuDeformerBuffers.Bindings deformerBuffers = PGpuDeformerBuffers.upload();
@@ -393,15 +396,24 @@ public final class PGlMultiDrawExecutor
 			pass.disableScissor();
 	}
 
+/**
+ * Immutable value object representing draw.
+ */
 	private record Draw(RenderType type, PBakedMesh mesh, PGlGeometryArena.Slice slice,
 	                    int instanceCount, int baseInstance, boolean writeDepth)
 	{
 	}
 
+/**
+ * Immutable value object representing arena key.
+ */
 	private record ArenaKey(PGlGeometryArena.Page page, int indexType)
 	{
 	}
 
+/**
+ * Enumerates the available oit pass values.
+ */
 	private enum OitPass
 	{
 		NONE,
@@ -419,6 +431,9 @@ public final class PGlMultiDrawExecutor
 		}
 	}
 
+/**
+ * Immutable value object representing render target attachments.
+ */
 	private record RenderTargetAttachments(GpuTextureView color, GpuTextureView depth)
 	{
 	}

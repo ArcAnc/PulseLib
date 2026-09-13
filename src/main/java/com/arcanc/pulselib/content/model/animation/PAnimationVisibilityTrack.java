@@ -13,6 +13,9 @@ package com.arcanc.pulselib.content.model.animation;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Immutable value object representing animation visibility track.
+ */
 public record PAnimationVisibilityTrack(List<Keyframe> keyframes)
 {
 	/**
@@ -43,6 +46,9 @@ public record PAnimationVisibilityTrack(List<Keyframe> keyframes)
 		return visible;
 	}
 
+/**
+ * Immutable value object representing keyframe.
+ */
 	public record Keyframe(float time, boolean visible)
 	{
 	}

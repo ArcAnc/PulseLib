@@ -22,6 +22,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.function.Supplier;
 
+/**
+ * Provides support for lib helper.
+ */
 public class PLibHelper
 {
 	/**

@@ -17,6 +17,9 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.function.Function;
 
+/**
+ * Immutable value object representing mesh render context.
+ */
 public record PMeshRenderContext(
 		Function<Identifier, RenderType> renderType,
 		int color,

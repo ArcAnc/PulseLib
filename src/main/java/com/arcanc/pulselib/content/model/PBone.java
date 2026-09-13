@@ -18,6 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Provides support for bone.
+ */
 public class PBone
 {
 	private final UUID uuid;

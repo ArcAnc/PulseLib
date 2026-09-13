@@ -9,7 +9,6 @@
 
 package com.arcanc.pulselib.content.player.animation;
 
-import com.arcanc.pulselib.content.model.animation.BoneFrame;
 import com.arcanc.pulselib.content.model.animation.PPoseBlendMode;
 import com.arcanc.pulselib.content.model.animation.PTransform;
 import com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimationMeshAttachmentPose;
@@ -17,10 +16,10 @@ import com.arcanc.pulselib.content.player.animation.attachment.PPlayerAutomaticM
 import com.arcanc.pulselib.content.player.animation.firstPerson.*;
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -28,12 +27,15 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Quaternionf;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.*;
 
+/**
+ * Provides support for player animations.
+ */
 public final class PPlayerAnimations
 {
 	private static final Map<Identifier, PPlayerAnimationDefinition> DEFINITIONS = new HashMap<>();
@@ -594,6 +596,9 @@ public final class PPlayerAnimations
 	}
 
 	@FunctionalInterface
+/**
+ * Defines the contract for pose consumer.
+ */
 	private interface PoseConsumer
 	{
 		/**
@@ -610,6 +615,9 @@ public final class PPlayerAnimations
 	}
 
 	@FunctionalInterface
+/**
+ * Defines the contract for active frame consumer.
+ */
 	private interface ActiveFrameConsumer
 	{
 		/**
@@ -622,6 +630,9 @@ public final class PPlayerAnimations
 		void accept(Identifier id, PPlayerAnimationFrame frame, PPlayerAnimationDefinition definition, float weight);
 	}
 
+/**
+ * Builds first person presentation.
+ */
 	private static final class FirstPersonPresentationBuilder
 	{
 		private PFirstPersonArmPose rightArm = PFirstPersonArmPose.vanilla();
@@ -936,6 +947,9 @@ public final class PPlayerAnimations
 	}
 
 	@ApiStatus.Internal
+/**
+ * Provides support for player camera pose.
+ */
 	public static final class PPlayerCameraPose
 	{
 		private static final float VANILLA_MODEL_ORIGIN_HEIGHT = 1.501f;
@@ -1100,12 +1114,18 @@ public final class PPlayerAnimations
 			return eyePosition.sub(initialEyePosition);
 		}
 
+/**
+ * Immutable value object representing root transform.
+ */
 		private record RootTransform(Vector3f pivot, Vector3f translation, Quaternionf rotation, Vector3f scale)
 		{
 		}
 	}
 
 	@ApiStatus.Internal
+/**
+ * Provides support for player model pose.
+ */
 	public static final class PPlayerModelPose
 	{
 		private final Map<ModelPart, PartPose> parts;
@@ -1152,6 +1172,9 @@ public final class PPlayerAnimations
 			this.parts.forEach((part, pose) -> pose.restore(part));
 		}
 
+/**
+ * Provides support for part pose.
+ */
 		private static final class PartPose
 		{
 			private final float x;

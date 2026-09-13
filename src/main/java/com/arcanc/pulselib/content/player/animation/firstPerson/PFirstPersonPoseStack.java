@@ -1,10 +1,8 @@
 package com.arcanc.pulselib.content.player.animation.firstPerson;
-
 import com.arcanc.pulselib.content.model.animation.PTransform;
 import com.mojang.blaze3d.vertex.PoseStack;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
-
 /** Replaces an overridden local pose without deriving anything from vanilla's transient pose. */
 public final class PFirstPersonPoseStack
 {

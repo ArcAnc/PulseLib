@@ -28,6 +28,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 
+/**
+ * Provides support for player mesh deformers.
+ */
 public final class PPlayerMeshDeformers
 {
 	private static final Map<Identifier, Binding> BINDINGS = new LinkedHashMap<>();
@@ -217,6 +220,9 @@ public final class PPlayerMeshDeformers
 		return position;
 	}
 
+/**
+ * Immutable value object representing binding.
+ */
 	private record Binding(PPlayerPart part, Predicate<Player> applies, PDeformerStack stack, PPlayerDeformerValueSource values)
 	{
 		/**
@@ -235,6 +241,9 @@ public final class PPlayerMeshDeformers
 		}
 	}
 
+/**
+ * Immutable value object representing active binding.
+ */
 	private record ActiveBinding(PDeformerStack stack, PPlayerDeformerValueSource values)
 	{
 	}

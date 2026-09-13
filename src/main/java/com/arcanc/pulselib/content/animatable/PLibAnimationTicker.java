@@ -19,6 +19,9 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
+/**
+ * Provides support for lib animation ticker.
+ */
 public class PLibAnimationTicker
 {
 	/**

@@ -11,6 +11,9 @@ package com.arcanc.pulselib.content.model.animation;
 
 import java.util.List;
 
+/**
+ * Immutable value object representing animation track.
+ */
 public record PAnimationTrack<T>(PAnimationChannelType<T> channel, List<PKeyframe<T>> keyframes)
 {
 	/**

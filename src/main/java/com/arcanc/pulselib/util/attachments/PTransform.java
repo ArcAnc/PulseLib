@@ -15,6 +15,9 @@ import org.joml.Vector3f;
 
 import java.util.Objects;
 
+/**
+ * Immutable value object representing transform.
+ */
 public record PTransform(Vector3f offset, Quaternionf rotation, Vector3f scale)
 {
 	public static final PTransform IDENTITY = new PTransform(

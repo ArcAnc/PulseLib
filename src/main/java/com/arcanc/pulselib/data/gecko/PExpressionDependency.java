@@ -9,6 +9,9 @@
 
 package com.arcanc.pulselib.data.gecko;
 
+/**
+ * Enumerates the available expression dependency values.
+ */
 public enum PExpressionDependency
 {
 	CONSTANT,

@@ -18,6 +18,9 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
+/**
+ * Provides support for gpu deformer buffers.
+ */
 public final class PGpuDeformerBuffers
 {
 	public static final Submission NONE = new Submission(-1, -1, 0);
@@ -118,16 +121,25 @@ public final class PGpuDeformerBuffers
 		STREAM.clearDefinitions();
 	}
 
+/**
+ * Immutable value object representing submission.
+ */
 	public record Submission(int operationOffset, int valueOffset, int operationCount)
 	{
 	}
 
+/**
+ * Immutable value object representing bindings.
+ */
 	public record Bindings(GpuBuffer operations, GpuBuffer values)
 	{
 	}
 
 	private static final UploadBuffers UPLOAD_BUFFERS = new UploadBuffers();
 
+/**
+ * Provides support for upload buffers.
+ */
 	private static final class UploadBuffers
 	{
 		private static final int MINIMUM_SIZE = Float.BYTES * 4;

@@ -14,6 +14,9 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.resources.Identifier;
 import org.joml.Vector3f;
 
+/**
+ * Deforms stretch.
+ */
 public final class PStretchDeformer implements PMeshDeformer<PStretchDefinition>
 {
 	public static final PStretchDeformer INSTANCE = new PStretchDeformer();
@@ -70,6 +73,9 @@ public final class PStretchDeformer implements PMeshDeformer<PStretchDefinition>
 		return result.normalize();
 	}
 
+/**
+ * Immutable value object representing operation.
+ */
 	private record Operation(Vector3f origin, Vector3f axis, PChannelReference<Float> scale) implements PPreparedDeformer
 	{
 		/**

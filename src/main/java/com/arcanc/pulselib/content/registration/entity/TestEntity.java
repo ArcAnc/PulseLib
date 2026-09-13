@@ -15,7 +15,6 @@ import com.arcanc.pulselib.content.animatable.ControllerState;
 import com.arcanc.pulselib.content.animatable.PAnimatable;
 import com.arcanc.pulselib.content.animatable.PAnimationManager;
 import com.arcanc.pulselib.content.model.animation.PRawAnimation;
-import com.arcanc.pulselib.util.PLibDatabase;
 import com.arcanc.pulselib.util.helpers.PLibHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -28,11 +27,13 @@ import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
-import net.minecraft.world.entity.animal.equine.AbstractHorse;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.NonNull;
 
+/**
+ * Provides support for test entity.
+ */
 public class TestEntity extends PathfinderMob implements PAnimatable<TestEntity>
 {
 	private static final PRawAnimation ANIMATION = PRawAnimation.begin().

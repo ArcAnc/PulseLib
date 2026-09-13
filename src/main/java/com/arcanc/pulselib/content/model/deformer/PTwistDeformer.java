@@ -1,11 +1,9 @@
 package com.arcanc.pulselib.content.model.deformer;
-
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.resources.Identifier;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-
 /** Built-in linear twist implementation. */
 public final class PTwistDeformer implements PMeshDeformer<PTwistDefinition>
 {
@@ -53,6 +51,9 @@ public final class PTwistDeformer implements PMeshDeformer<PTwistDefinition>
 		context.add(new Operation(new Vector3f(definition.origin()), length.normalize(), definition.positiveExtent(), definition.negativeExtent(), definition.angle()));
 	}
 
+/**
+ * Immutable value object representing operation.
+ */
 	private record Operation(Vector3f origin, Vector3f length, float positiveExtent, float negativeExtent,
 							 PChannelReference<Float> angle) implements PPreparedDeformer
 	{

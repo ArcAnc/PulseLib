@@ -14,6 +14,9 @@ import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Provides support for lib database.
+ */
 public class PLibDatabase
 {
 	public static final String MOD_ID = "pulselib";

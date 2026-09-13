@@ -23,6 +23,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
 
+/**
+ * Streams gl instance.
+ */
 public final class PGlInstanceStream
 {
 	public static final int STRIDE = 96;
@@ -169,6 +172,9 @@ public final class PGlInstanceStream
 		target.putInt(0);
 	}
 
+/**
+ * Immutable value object representing upload.
+ */
 	public record Upload(int buffer, long offset)
 	{
 	}

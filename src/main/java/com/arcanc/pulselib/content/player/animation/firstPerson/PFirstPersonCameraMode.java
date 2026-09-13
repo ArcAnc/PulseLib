@@ -9,6 +9,9 @@
 
 package com.arcanc.pulselib.content.player.animation.firstPerson;
 
+/**
+ * Enumerates the available first person camera mode values.
+ */
 public enum PFirstPersonCameraMode
 {
 	ANIMATED,

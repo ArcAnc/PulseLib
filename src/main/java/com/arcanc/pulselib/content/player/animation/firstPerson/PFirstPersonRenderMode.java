@@ -9,6 +9,9 @@
 
 package com.arcanc.pulselib.content.player.animation.firstPerson;
 
+/**
+ * Enumerates the available first person render mode values.
+ */
 public enum PFirstPersonRenderMode
 {
 	VANILLA,

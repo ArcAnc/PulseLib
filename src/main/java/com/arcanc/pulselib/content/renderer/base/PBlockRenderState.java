@@ -20,6 +20,9 @@ import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jspecify.annotations.Nullable;
 
+/**
+ * Defines the contract for block render state.
+ */
 public interface PBlockRenderState<T extends BlockEntity & PAnimatable<T>> extends PRenderState<T>
 {
 	/**
@@ -33,6 +36,9 @@ public interface PBlockRenderState<T extends BlockEntity & PAnimatable<T>> exten
 			PBlockRenderer<T, RS> renderer,
 			ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress);
 	
+/**
+ * Provides support for impl.
+ */
 	class Impl<T extends BlockEntity & PAnimatable<T>> extends BlockEntityRenderState implements PBlockRenderState<T>
 	{
 		private float partialTicks;

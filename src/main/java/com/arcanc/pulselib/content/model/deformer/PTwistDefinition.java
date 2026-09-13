@@ -15,6 +15,9 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.joml.Vector3f;
 
+/**
+ * Immutable value object representing twist definition.
+ */
 public record PTwistDefinition(Vector3f origin,
 							  Vector3f lengthAxis,
 							  float positiveExtent,

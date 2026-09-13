@@ -11,6 +11,9 @@ package com.arcanc.pulselib.content.model.animation;
 
 import java.util.BitSet;
 
+/**
+ * Provides support for compiled animation.
+ */
 public final class PCompiledAnimation
 {
 	private final PAnimation animation;

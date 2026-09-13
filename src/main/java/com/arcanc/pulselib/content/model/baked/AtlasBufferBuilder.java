@@ -16,6 +16,9 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
+/**
+ * Builds atlas buffer.
+ */
 public class AtlasBufferBuilder extends BufferBuilder
 {
 	private final TextureAtlasSprite sprite;

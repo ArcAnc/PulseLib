@@ -12,6 +12,9 @@ package com.arcanc.pulselib.content.model.animation;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.resources.Identifier;
 
+/**
+ * Defines the contract for animation event type.
+ */
 public interface PAnimationEventType<T>
 {
 	/**

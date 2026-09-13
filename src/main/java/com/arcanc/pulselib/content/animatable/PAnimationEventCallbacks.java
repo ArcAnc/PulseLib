@@ -15,6 +15,9 @@ import net.minecraft.resources.Identifier;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Provides support for animation event callbacks.
+ */
 public final class PAnimationEventCallbacks
 {
 	private static final Map<Identifier, LocatorCallback> CALLBACKS = new ConcurrentHashMap<>();
@@ -55,6 +58,9 @@ public final class PAnimationEventCallbacks
 	}
 
 	@FunctionalInterface
+/**
+ * Defines the contract for locator callback.
+ */
 	public interface LocatorCallback
 	{
 		/**

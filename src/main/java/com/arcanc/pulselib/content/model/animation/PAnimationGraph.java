@@ -12,6 +12,9 @@ package com.arcanc.pulselib.content.model.animation;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Immutable value object representing animation graph.
+ */
 public record PAnimationGraph(List<PAnimationState> states, List<PAnimationTransition> transitions)
 {
 	/**

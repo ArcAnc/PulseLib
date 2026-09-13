@@ -26,6 +26,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+/**
+ * Applies PulseLib integration to {@code Camera}.
+ */
 @Mixin(Camera.class)
 public abstract class CameraMixin
 {

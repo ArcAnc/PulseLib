@@ -13,6 +13,9 @@ package com.arcanc.pulselib.content.registration.renderer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 
+/**
+ * Provides support for test day time color.
+ */
 public final class TestDayTimeColor
 {
 	/**

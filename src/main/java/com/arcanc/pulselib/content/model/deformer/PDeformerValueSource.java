@@ -12,6 +12,9 @@ package com.arcanc.pulselib.content.model.deformer;
 import com.arcanc.pulselib.content.model.animation.PAnimationParameters;
 
 @FunctionalInterface
+/**
+ * Defines the contract for deformer value source.
+ */
 public interface PDeformerValueSource
 {
 	PDeformerValueSource DEFAULTS = PChannelReference :: defaultValue;

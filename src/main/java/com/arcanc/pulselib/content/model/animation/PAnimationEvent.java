@@ -7,9 +7,10 @@
  * Details can be found in the license file in the root folder of this project
  */
 package com.arcanc.pulselib.content.model.animation;
-
 import java.util.Objects;
-
+/**
+ * Immutable value object representing animation event.
+ */
 public record PAnimationEvent<T>(float time, PAnimationEventType<T> type, T data)
 {
 	/**

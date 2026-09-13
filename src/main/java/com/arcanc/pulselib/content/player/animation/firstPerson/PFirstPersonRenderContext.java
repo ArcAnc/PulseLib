@@ -1,10 +1,8 @@
 package com.arcanc.pulselib.content.player.animation.firstPerson;
-
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
-
 /** Immutable per-renderArmWithItem state. Matrices are copied at capture time. */
 public record PFirstPersonRenderContext(
         InteractionHand hand,

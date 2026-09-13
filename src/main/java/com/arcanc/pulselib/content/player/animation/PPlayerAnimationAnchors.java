@@ -12,6 +12,9 @@ package com.arcanc.pulselib.content.player.animation;
 
 import com.arcanc.pulselib.util.PLibDatabase;
 
+/**
+ * Provides support for player animation anchors.
+ */
 public final class PPlayerAnimationAnchors
 {
 	public static final PPlayerAnimationAnchor FIRST_PERSON_CAMERA =

@@ -17,6 +17,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Provides support for animation graph runtime.
+ */
 public final class PAnimationGraphRuntime
 {
 	private final PAnimationGraph graph;
@@ -406,12 +409,21 @@ public final class PAnimationGraphRuntime
 				tracks.add(new EventTrack(sample.animation(), from, to, state.animationType()));
 	}
 
+/**
+ * Immutable value object representing layer.
+ */
 	public record Layer(String animation, float time, PInterpolationType interpolation, float weight, boolean overlay)
 	{
 	}
 	
+/**
+ * Immutable value object representing event track.
+ */
 	public record EventTrack(String animation, float from, float to, PAnimationType animationType) { }
 
+/**
+ * Provides support for playback.
+ */
 	private static final class Playback
 	{
 		private final int stateIndex;
@@ -428,10 +440,16 @@ public final class PAnimationGraphRuntime
 		}
 	}
 
+/**
+ * Immutable value object representing weighted playback.
+ */
 	private record WeightedPlayback(Playback playback, float weight)
 	{
 	}
 
+/**
+ * Provides support for transition.
+ */
 	private static final class Transition
 	{
 		private final List<WeightedPlayback> sources;
@@ -456,6 +474,9 @@ public final class PAnimationGraphRuntime
 		}
 	}
 
+/**
+ * Immutable value object representing overlay playback.
+ */
 	private record OverlayPlayback(Playback playback, PAnimationState.OneShotOverlay overlay)
 	{
 	}

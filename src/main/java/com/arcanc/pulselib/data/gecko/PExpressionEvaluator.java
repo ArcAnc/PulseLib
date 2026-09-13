@@ -12,6 +12,9 @@ package com.arcanc.pulselib.data.gecko;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Provides support for expression evaluator.
+ */
 public final class PExpressionEvaluator
 {
 	public static final PExpressionEvaluator SHARED = new PExpressionEvaluator();
@@ -79,6 +82,9 @@ public final class PExpressionEvaluator
 		return value;
 	}
 
+/**
+ * Immutable value object representing timed value.
+ */
 	private record TimedValue(int timeStep, float value)
 	{
 	}

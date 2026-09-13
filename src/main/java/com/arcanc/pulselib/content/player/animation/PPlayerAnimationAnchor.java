@@ -12,6 +12,9 @@ package com.arcanc.pulselib.content.player.animation;
 
 import net.minecraft.resources.Identifier;
 
+/**
+ * Immutable value object representing player animation anchor.
+ */
 public record PPlayerAnimationAnchor(Identifier id)
 {
 }

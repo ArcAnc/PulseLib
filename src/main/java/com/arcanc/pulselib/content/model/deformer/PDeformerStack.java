@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Provides support for deformer stack.
+ */
 public final class PDeformerStack
 {
 	public static final PDeformerStack EMPTY = new PDeformerStack(List.of());

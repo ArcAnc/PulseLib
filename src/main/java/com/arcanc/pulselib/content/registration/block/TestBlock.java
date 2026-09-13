@@ -24,6 +24,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+/**
+ * Provides support for test block.
+ */
 public class TestBlock extends Block implements EntityBlock
 {
 	/**

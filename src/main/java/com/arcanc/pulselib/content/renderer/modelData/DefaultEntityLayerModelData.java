@@ -12,6 +12,9 @@ package com.arcanc.pulselib.content.renderer.modelData;
 
 import net.minecraft.resources.Identifier;
 
+/**
+ * Provides support for default entity layer model data.
+ */
 public class DefaultEntityLayerModelData extends PModelData
 {
 	/**
@@ -23,6 +26,9 @@ public class DefaultEntityLayerModelData extends PModelData
 		super(builder);
 	}
 	
+/**
+ * Builds default entity layer model data.
+ */
 	public static class DefaultEntityLayerModelDataBuilder extends Builder
 	{
 		private final Identifier shortModelLocation;
@@ -49,18 +55,6 @@ public class DefaultEntityLayerModelData extends PModelData
 			this.shortModelLocation = shortModelLocation.withPrefix(entityType.getPath() + "/");
 			this.modelFormat = modelFormat;
 			this.modelLocation = PModelData.generateDefaultModelLocation(this.shortModelLocation, this.modelType, this.modelFormat);
-		}
-		
-		/**
-		 * Adds the texture.
-		 * @param texturePath the texture path to use.
-		 * @return the value produced by this operation.
-		 */
-		@Override
-		public DefaultEntityLayerModelDataBuilder addTexture(Identifier texturePath)
-		{
-			super.addTexture(PModelData.generateDefaultTextureLocation(texturePath, this.shortModelLocation, this.modelType, this.modelFormat));
-			return this;
 		}
 		
 		/**

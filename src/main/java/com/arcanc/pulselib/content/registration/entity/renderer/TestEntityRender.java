@@ -13,14 +13,8 @@ package com.arcanc.pulselib.content.registration.entity.renderer;
 import com.arcanc.pulselib.content.model.baked.PBakedBone;
 import com.arcanc.pulselib.content.model.baked.PBakedMesh;
 import com.arcanc.pulselib.content.model.baked.PMeshRenderContext;
-import com.arcanc.pulselib.content.model.deformer.PChannelReference;
-import com.arcanc.pulselib.content.model.deformer.PDeformerInstance;
-import com.arcanc.pulselib.content.model.deformer.PDeformerStack;
-import com.arcanc.pulselib.content.model.deformer.PHingeDefinition;
-import com.arcanc.pulselib.content.model.deformer.PHingeDeformer;
-import com.arcanc.pulselib.content.model.deformer.PMeshDeformation;
+import com.arcanc.pulselib.content.model.deformer.*;
 import com.arcanc.pulselib.content.registration.entity.TestEntity;
-import com.arcanc.pulselib.content.registration.renderer.TestDayTimeColor;
 import com.arcanc.pulselib.content.renderer.PEntityRenderer;
 import com.arcanc.pulselib.content.renderer.base.PEntityRenderState;
 import com.arcanc.pulselib.content.renderer.modelData.DefaultEntityModelData;
@@ -33,6 +27,9 @@ import org.joml.Vector3f;
 
 import java.util.List;
 
+/**
+ * Provides support for test entity render.
+ */
 public class TestEntityRender extends PEntityRenderer<TestEntity, PEntityRenderState.LivingImpl<TestEntity>>
 {
 	public static final Identifier TUBE = PLibDatabase.rl("entity/test_entity/tube");

@@ -10,6 +10,9 @@
 package com.arcanc.pulselib.content.model.animation;
 
 @FunctionalInterface
+/**
+ * Defines the contract for animation value.
+ */
 public interface PAnimationValue<T>
 {
 	/**

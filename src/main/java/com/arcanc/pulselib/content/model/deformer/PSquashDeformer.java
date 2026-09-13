@@ -1,10 +1,8 @@
 package com.arcanc.pulselib.content.model.deformer;
-
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.resources.Identifier;
 import org.joml.Vector3f;
-
 /** Scales one axis and compensates the two perpendicular axes to preserve local volume. */
 public final class PSquashDeformer implements PMeshDeformer<PSquashDefinition>
 {
@@ -52,6 +50,9 @@ public final class PSquashDeformer implements PMeshDeformer<PSquashDefinition>
 		context.add(new Operation(new Vector3f(definition.origin()), axis.normalize(), definition.scale()));
 	}
 
+/**
+ * Immutable value object representing operation.
+ */
 	private record Operation(Vector3f origin, Vector3f axis, PChannelReference<Float> scale) implements PPreparedDeformer
 	{
 		/**

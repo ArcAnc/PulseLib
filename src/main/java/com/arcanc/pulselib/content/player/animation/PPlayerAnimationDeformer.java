@@ -13,6 +13,9 @@ import com.arcanc.pulselib.content.model.deformer.PDeformerStack;
 
 import java.util.Objects;
 
+/**
+ * Immutable value object representing player animation deformer.
+ */
 public record PPlayerAnimationDeformer(
 		PPlayerPart part,
 		PDeformerStack stack,

@@ -13,21 +13,22 @@ package com.arcanc.pulselib.content.event;
 import com.arcanc.pulselib.content.animatable.PLibAnimationTicker;
 import com.arcanc.pulselib.content.animatable.instance.InstanceAnimationManager;
 import com.arcanc.pulselib.content.animatable.singleton.SingletonAnimationManager;
+import com.arcanc.pulselib.content.model.resource.PModelResource;
 import com.arcanc.pulselib.content.model.textures.atlas.RuntimeLoader;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
 import com.arcanc.pulselib.content.registration.PLibRegistration;
-import com.arcanc.pulselib.content.registration.player.PPlayerAcrobaticDemo;
-import com.arcanc.pulselib.content.registration.player.PPlayerBallDemo;
 import com.arcanc.pulselib.content.registration.block.block_entity.ber.TestBlockEntityRenderer;
 import com.arcanc.pulselib.content.registration.entity.renderer.TestEntityRender;
 import com.arcanc.pulselib.content.registration.item.TestArmorItem;
 import com.arcanc.pulselib.content.registration.item.renderer.TestBlockItemRenderer;
+import com.arcanc.pulselib.content.registration.player.PPlayerAcrobaticDemo;
+import com.arcanc.pulselib.content.registration.player.PPlayerBallDemo;
 import com.arcanc.pulselib.content.renderer.PRenderQueue;
 import com.arcanc.pulselib.content.renderer.PRenderStagesHandler;
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.arcanc.pulselib.util.PModelCache;
 import com.arcanc.pulselib.util.PRenderTypes;
-import com.arcanc.pulselib.util.PTextureCache;
+import com.arcanc.pulselib.util.PResourceCache;
 import com.arcanc.pulselib.util.attachments.PAttachmentAnchorResolvers;
 import com.arcanc.pulselib.util.attachments.PLivingAttachments;
 import com.arcanc.pulselib.util.attachments.humanoid.armor.PArmorClientExtensions;
@@ -47,6 +48,9 @@ import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsE
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.LevelEvent;
 
+/**
+ * Provides support for client events.
+ */
 public class ClientEvents
 {
 	private static boolean pulseClientContentRegistered;
@@ -72,7 +76,7 @@ public class ClientEvents
 		PRenderTypes.register(modEventBus);
 		PLibAnimationTicker.register(modEventBus);
 		PRenderStagesHandler.register(modEventBus);
-		PTextureCache.register(modEventBus);
+		PResourceCache.register(modEventBus);
 		PLibArmorHandler.register(modEventBus);
 		
 		PPlayerBallDemo.register(modEventBus);
@@ -217,20 +221,27 @@ public class ClientEvents
 	 * Registers the custom textures.
 	 * @param event the event to use.
 	 */
-	private static void registerCustomTextures(final PulseLibEvents.RegisterTextureEvent event)
+	private static void registerCustomTextures(final PulseLibEvents.RegisterResourceEvent event)
 	{
-		event.addTextureLocation(TestEntityRender.SPHERE).
-				addTextureLocation(TestEntityRender.TUBE).
-				addTextureLocation(TestEntityRender.TORUS).
-				addTextureLocation(TestEntityRender.ZERO).
-				addTextureLocation(TestEntityRender.ARMOR);
-		event.addTextureLocation(TestBlockEntityRenderer.CUBE).
-				addTextureLocation(TestBlockEntityRenderer.TORUS).
-				addTextureLocation(TestBlockEntityRenderer.TUBE).
-				addTextureLocation(TestBlockEntityRenderer.PYRAMID);
-		event.addTextureLocation(TestBlockItemRenderer.PYRAMID).
-				addTextureLocation(TestBlockItemRenderer.CIRCLE);
-		event.addTextureLocation(TestArmorItem.TEXTURE);
-		event.addTextureLocation(PPlayerBallDemo.TEXTURE);
+		event.register(PModelResource.builder(PLibDatabase.rl("entity/test_entity")).
+						texture("tube", TestEntityRender.TUBE).
+						texture("sphere", TestEntityRender.SPHERE).
+						texture("torus", TestEntityRender.TORUS).
+						texture("0", TestEntityRender.ZERO).
+						texture("armor/0", TestEntityRender.ARMOR));
+		event.register(PModelResource.builder(PLibDatabase.rl("entity/test_entity/armor")).
+						texture("0", TestEntityRender.ARMOR));
+		event.register(PModelResource.builder(PLibDatabase.rl("block/test_block")).
+						texture("cube_texture", TestBlockEntityRenderer.CUBE).
+						texture("torus_texture", TestBlockEntityRenderer.TORUS).
+						texture("tube_texture", TestBlockEntityRenderer.TUBE).
+						texture("pyramid_texture", TestBlockEntityRenderer.PYRAMID));
+		event.register(PModelResource.builder(PLibDatabase.rl("item/test_block")).
+						texture("pyramid", TestBlockItemRenderer.PYRAMID).
+						texture("circle", TestBlockItemRenderer.CIRCLE));
+		event.register(PModelResource.builder(PLibDatabase.rl("entity/armor/test_armor")).
+						texture("0", TestArmorItem.TEXTURE));
+		event.register(PModelResource.builder(PLibDatabase.rl("player/demo/test_ball_model")).
+						texture("0", PPlayerBallDemo.TEXTURE));
 	}
 }

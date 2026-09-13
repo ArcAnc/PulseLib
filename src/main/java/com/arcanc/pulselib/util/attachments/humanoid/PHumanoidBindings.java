@@ -16,6 +16,9 @@ import com.arcanc.pulselib.util.attachments.PTransform;
 
 import java.util.Objects;
 
+/**
+ * Provides support for humanoid bindings.
+ */
 public final class PHumanoidBindings
 {
 	/**
@@ -108,6 +111,9 @@ public final class PHumanoidBindings
 		return bind(PHumanoidAnchors.LEFT_LEG, bone);
 	}
 	
+/**
+ * Immutable value object representing binding.
+ */
 	private record Binding(PAttachmentAnchor anchor, String bone, PTransform transform) implements PAttachmentBinding
 	{
 		/**

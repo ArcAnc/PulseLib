@@ -15,6 +15,9 @@ import net.minecraft.resources.Identifier;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+/**
+ * Deforms bend.
+ */
 public final class PBendDeformer implements PMeshDeformer<PBendDefinition>
 {
 	public static final PBendDeformer INSTANCE = new PBendDeformer();
@@ -79,6 +82,9 @@ public final class PBendDeformer implements PMeshDeformer<PBendDefinition>
 		return result.normalize();
 	}
 
+/**
+ * Immutable value object representing operation.
+ */
 	private record Operation(Vector3f origin, Vector3f length, Vector3f axis, Vector3f radial,
 							 float positiveExtent, float negativeExtent, PChannelReference<Float> angle)
 			implements PPreparedDeformer

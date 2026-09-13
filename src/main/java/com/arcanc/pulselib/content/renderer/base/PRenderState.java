@@ -15,6 +15,9 @@ import com.arcanc.pulselib.content.animatable.PAnimatable;
 import com.arcanc.pulselib.content.model.baked.PBakedModel;
 import org.jspecify.annotations.Nullable;
 
+/**
+ * Defines the contract for render state.
+ */
 public interface PRenderState<T extends PAnimatable<T>>
 {
 	/**

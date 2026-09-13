@@ -18,6 +18,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
+/**
+ * Parses gltf animation event sidecar.
+ */
 public class PGltfAnimationEventSidecarParser
 {
 	/**

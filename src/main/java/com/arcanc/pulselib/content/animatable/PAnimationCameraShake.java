@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Provides support for animation camera shake.
+ */
 public final class PAnimationCameraShake
 {
 	private static final List<Shake> SHAKES = new ArrayList<>();
@@ -64,6 +67,9 @@ public final class PAnimationCameraShake
 		}
 	}
 
+/**
+ * Provides support for shake.
+ */
 	private static final class Shake
 	{
 		private final float strength, duration, frequency;

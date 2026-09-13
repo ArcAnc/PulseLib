@@ -24,6 +24,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Parses gecko animation event.
+ */
 public class PGeckoAnimationEventParser
 {
 	private static final float SECONDS_TO_TICKS = 20f;
@@ -332,6 +335,9 @@ public class PGeckoAnimationEventParser
 		return element != null && element.isJsonArray();
 	}
 	
+/**
+ * Defines the contract for event factory.
+ */
 	private interface EventFactory
 	{
 		/**

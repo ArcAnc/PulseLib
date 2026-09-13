@@ -18,6 +18,9 @@ import com.arcanc.pulselib.content.renderer.modelData.DefaultEntityLayerModelDat
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.arcanc.pulselib.util.PRenderTypes;
 
+/**
+ * Provides support for test armor.
+ */
 public class PTestArmor extends PEntityRenderLayer<TestEntity, PEntityRenderState.LivingImpl<TestEntity>>
 {
 	/**

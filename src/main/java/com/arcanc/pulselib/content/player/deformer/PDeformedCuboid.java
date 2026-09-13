@@ -20,6 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Provides support for deformed cuboid.
+ */
 public final class PDeformedCuboid extends ModelPart.Cube
 {
 	private static final float MODEL_SCALE = 1.0f / 16.0f;
@@ -129,6 +132,9 @@ public final class PDeformedCuboid extends ModelPart.Cube
 		return faces;
 	}
 
+/**
+ * Immutable value object representing face.
+ */
 	private record Face(Vector3f p00, Vector3f p10, Vector3f p11, Vector3f p01,
 						float u0, float v0, float u1, float v1, float textureWidth, float textureHeight)
 	{

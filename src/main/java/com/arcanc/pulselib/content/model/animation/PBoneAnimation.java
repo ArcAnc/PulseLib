@@ -15,6 +15,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Immutable value object representing bone animation.
+ */
 public record PBoneAnimation(UUID boneUuid, Map<String, PAnimationTrack<?>> tracks)
 {
 	/**

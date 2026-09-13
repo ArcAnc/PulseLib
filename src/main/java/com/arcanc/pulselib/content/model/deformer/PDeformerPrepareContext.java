@@ -12,6 +12,9 @@ package com.arcanc.pulselib.content.model.deformer;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Carries deformer prepare context.
+ */
 public final class PDeformerPrepareContext
 {
 	private final List<PPreparedDeformer> operations = new ArrayList<>();

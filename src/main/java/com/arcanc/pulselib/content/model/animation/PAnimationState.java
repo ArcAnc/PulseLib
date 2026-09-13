@@ -14,6 +14,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Defines the contract for animation state.
+ */
 public sealed interface PAnimationState permits PAnimationState.Clip, PAnimationState.BlendSpace1D,
 		PAnimationState.BlendSpace2D, PAnimationState.OneShotOverlay
 {
@@ -63,6 +66,9 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 		return false;
 	}
 
+/**
+ * Immutable value object representing clip.
+ */
 	record Clip(String name, String animation, PAnimationType animationType, PInterpolationType interpolation,
 	            float speed, boolean synchronizedCycle) implements PAnimationState
 	{
@@ -103,6 +109,9 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 		}
 	}
 
+/**
+ * Immutable value object representing blend space1 d.
+ */
 	record BlendSpace1D(String name, String parameter, List<Point> points, PAnimationType animationType,
 	                  PInterpolationType interpolation, float speed, boolean synchronizedCycle) implements PAnimationState
 	{
@@ -160,6 +169,9 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 			return List.of();
 		}
 
+/**
+ * Immutable value object representing point.
+ */
 		public record Point(float coordinate, String animation)
 		{
 			/**
@@ -174,6 +186,9 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 		}
 	}
 
+/**
+ * Immutable value object representing blend space2 d.
+ */
 	record BlendSpace2D(String name, String xParameter, String yParameter, List<Point> points,
 	                  PAnimationType animationType, PInterpolationType interpolation, float speed,
 	                  boolean synchronizedCycle) implements PAnimationState
@@ -236,6 +251,9 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 			return result.stream().map(sample -> new PAnimationSample(sample.animation(), sample.weight() * inverse)).toList();
 		}
 
+/**
+ * Immutable value object representing point.
+ */
 		public record Point(float x, float y, String animation)
 		{
 			/**
@@ -251,6 +269,9 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 		}
 	}
 	
+/**
+ * Immutable value object representing one shot overlay.
+ */
 	record OneShotOverlay(String name, String trigger, String animation, float fadeInDuration, float fadeOutDuration,
 	                     PInterpolationType interpolation, float speed, boolean synchronizedCycle) implements PAnimationState
 	{

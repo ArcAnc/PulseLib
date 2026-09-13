@@ -25,7 +25,7 @@ import com.arcanc.pulselib.content.renderer.base.PBlockRenderState;
 import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import com.arcanc.pulselib.data.gecko.MolangParser;
 import com.arcanc.pulselib.util.PRenderTypes;
-import com.arcanc.pulselib.util.PTextureCache;
+import com.arcanc.pulselib.util.PResourceCache;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -49,6 +49,9 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * Renders block.
+ */
 public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS extends BlockEntityRenderState & PBlockRenderState<T>>
 		implements PRenderer<T, RS>, BlockEntityRenderer<T, RS>
 {
@@ -288,7 +291,7 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 		
 		bone.meshes().forEach(mesh ->
 		{
-			if (mesh.textureName().isEmpty())
+			if (mesh.textureReference().isEmpty())
 				return;
 			
 			PMeshRenderContext inherited = new PMeshRenderContext(
@@ -299,7 +302,7 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 			PMeshRenderContext meshContext = resolveMeshRender(renderState, bone, mesh, inherited);
 			PMeshRenderMaterial material = PMeshRenderMaterial.resolve(mesh, meshContext);
 			
-			RenderType type = material.resolveRenderType(meshContext, PTextureCache.ATLAS_LOCATION);
+			RenderType type = material.resolveRenderType(meshContext, PResourceCache.ATLAS_LOCATION);
 			
 			if (PRenderTypes.isTransparent(type))
 				PRenderQueue.submitBlockEntityTranslucentMesh(type, material.mesh(), meshContext.deformation(), new PRenderQueue.InstanceData(matrix4fstack, meshContext.color(), material.packedLight(), meshContext.packedOverlay()));

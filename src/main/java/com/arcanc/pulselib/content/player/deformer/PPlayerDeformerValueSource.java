@@ -13,6 +13,9 @@ import com.arcanc.pulselib.content.model.deformer.PChannelReference;
 import net.minecraft.world.entity.player.Player;
 
 @FunctionalInterface
+/**
+ * Defines the contract for player deformer value source.
+ */
 public interface PPlayerDeformerValueSource
 {
 	/**

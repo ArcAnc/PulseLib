@@ -11,6 +11,8 @@ package com.arcanc.pulselib.data.gecko;
 
 import com.arcanc.pulselib.content.model.PBone;
 import com.arcanc.pulselib.content.model.PMesh;
+import com.arcanc.pulselib.content.model.PMaterial;
+import com.arcanc.pulselib.content.model.PMeshPrimitive;
 import com.arcanc.pulselib.content.model.PModel;
 import com.arcanc.pulselib.content.model.animation.*;
 import com.arcanc.pulselib.content.registration.PLibRegistration;
@@ -36,6 +38,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Parses gecko model.
+ */
 public class PGeckoModelParser
 {
 	private static final float MODEL_SCALE = 1f / 16f;
@@ -420,8 +425,7 @@ public class PGeckoModelParser
 		appendCube(buffers, min, max, cubeUv(cubeNode, rawSize, mirror, textureSize));
 		
 		UUID uuid = UUID.randomUUID();
-		return new PMesh(
-				uuid,
+		return new PMesh(uuid, List.of(new PMeshPrimitive(
 				buffers.vertexCount(),
 				buffers.positions(),
 				buffers.normals(),
@@ -429,7 +433,7 @@ public class PGeckoModelParser
 				buffers.indexCount(),
 				buffers.indices(),
 				GltfConstants.GL_UNSIGNED_INT,
-				textureName);
+				new PMaterial(textureName))));
 	}
 	
 	/**
@@ -985,30 +989,51 @@ public class PGeckoModelParser
 		return element != null && element.isJsonArray();
 	}
 	
+/**
+ * Immutable value object representing bone link.
+ */
 	private record BoneLink(String childName, String parentName)
 	{
 	}
 	
+/**
+ * Immutable value object representing raw bone.
+ */
 	private record RawBone(String name, String parentName, Vector3f absolutePivot, Vector3f rotation, JsonElement cubes, JsonElement locators)
 	{
 	}
 	
+/**
+ * Immutable value object representing locator transform.
+ */
 	private record LocatorTransform(Vector3f position, Quaternionf rotation)
 	{
 	}
 	
+/**
+ * Immutable value object representing cube uv.
+ */
 	private record CubeUv(FaceUv north, FaceUv south, FaceUv east, FaceUv west, FaceUv up, FaceUv down)
 	{
 	}
 	
+/**
+ * Immutable value object representing face uv.
+ */
 	private record FaceUv(Vector2f min, Vector2f max)
 	{
 	}
 	
+/**
+ * Immutable value object representing texture size.
+ */
 	private record TextureSize(float width, float height)
 	{
 	}
 
+/**
+ * Immutable value object representing vector expression.
+ */
 	private record VectorExpression(MolangParser.Expression x, MolangParser.Expression y, MolangParser.Expression z)
 	{
 		/**
@@ -1039,6 +1064,9 @@ public class PGeckoModelParser
 		}
 	}
 	
+/**
+ * Provides support for geometry buffers.
+ */
 	private static class GeometryBuffers
 	{
 		private final List<Float> positions = new ArrayList<>();

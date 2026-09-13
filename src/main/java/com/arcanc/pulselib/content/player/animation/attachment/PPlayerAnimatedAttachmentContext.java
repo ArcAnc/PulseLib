@@ -16,6 +16,9 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.resources.Identifier;
 
+/**
+ * Immutable value object representing player animated attachment context.
+ */
 public record PPlayerAnimatedAttachmentContext(
 		AbstractClientPlayer player,
 		Identifier animation,

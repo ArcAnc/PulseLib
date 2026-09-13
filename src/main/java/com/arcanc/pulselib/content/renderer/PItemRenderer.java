@@ -22,7 +22,7 @@ import com.arcanc.pulselib.data.PModelLoader;
 import com.arcanc.pulselib.data.gecko.MolangParser;
 import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
 import com.arcanc.pulselib.util.PModelCache;
-import com.arcanc.pulselib.util.PTextureCache;
+import com.arcanc.pulselib.util.PResourceCache;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -43,6 +43,9 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/**
+ * Renders item.
+ */
 public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends PItemRenderState<T>> implements SpecialModelRenderer<RS>, PRenderer<T, RS>
 {
 	private final PModelData modelData;
@@ -194,7 +197,7 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 			model.bones().forEach(bone -> perBoneSubmit(renderState, poseStack, bone, controllers, molangContexts, renderType, -1, renderState.lightCoords(), renderState.overlayCoords(), context));
 			submitNodeCollector.submitCustomGeometry(
 					poseStack,
-					this.renderType.apply(PTextureCache.ATLAS_LOCATION),
+					this.renderType.apply(PResourceCache.ATLAS_LOCATION),
 					(_, _) -> PRenderQueue.flush(PRenderQueue.RenderStage.GUI));
 			return;
 		}
@@ -321,7 +324,7 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 		
 		bone.meshes().forEach(mesh ->
 		{
-			if (mesh.textureName().isEmpty())
+			if (mesh.textureReference().isEmpty())
 				return;
 			
 			PMeshRenderContext inherited = new PMeshRenderContext(
@@ -332,7 +335,7 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 			PMeshRenderContext meshContext = resolveMeshRender(renderState, context, bone, mesh, inherited);
 			PMeshRenderMaterial material = PMeshRenderMaterial.resolve(mesh, meshContext);
 			
-			RenderType type = material.resolveRenderType(meshContext, PTextureCache.ATLAS_LOCATION);
+			RenderType type = material.resolveRenderType(meshContext, PResourceCache.ATLAS_LOCATION);
 			
 			PRenderQueue.submitItem(context, type, material.mesh(), meshContext.deformation(), new PRenderQueue.InstanceData(matrix4fstack, meshContext.color(), material.packedLight(), meshContext.packedOverlay()));
 		});

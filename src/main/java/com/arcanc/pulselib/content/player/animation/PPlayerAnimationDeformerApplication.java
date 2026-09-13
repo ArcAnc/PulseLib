@@ -12,6 +12,9 @@ package com.arcanc.pulselib.content.player.animation;
 import com.arcanc.pulselib.content.model.deformer.PDeformerStack;
 import com.arcanc.pulselib.content.player.deformer.PPlayerDeformerValueSource;
 
+/**
+ * Immutable value object representing player animation deformer application.
+ */
 public record PPlayerAnimationDeformerApplication(PDeformerStack stack, PPlayerDeformerValueSource values)
 {
 }

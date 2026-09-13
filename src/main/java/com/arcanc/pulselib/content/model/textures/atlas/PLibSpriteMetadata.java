@@ -16,6 +16,9 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.server.packs.metadata.MetadataSectionType;
 
+/**
+ * Immutable value object representing lib sprite metadata.
+ */
 public record PLibSpriteMetadata (boolean emissive, PAlphaMode alphaMode)
 {
 	public static final Codec<PLibSpriteMetadata> CODEC = RecordCodecBuilder.create(instance -> instance.

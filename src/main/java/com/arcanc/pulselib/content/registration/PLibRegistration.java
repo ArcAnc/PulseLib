@@ -36,8 +36,14 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+/**
+ * Provides support for lib registration.
+ */
 public class PLibRegistration
 {
+/**
+ * Provides support for animation channel reg.
+ */
 	public static class AnimationChannelReg
 	{
 		public static final PRegistry<PAnimationChannelType<?>> CHANNEL_TYPES = new PRegistry<>();
@@ -57,6 +63,9 @@ public class PLibRegistration
 		}
 	}
 
+/**
+ * Provides support for animation event reg.
+ */
 	public static class AnimationEventReg
 	{
 		public static final PRegistry<PAnimationEventType<?>> EVENT_TYPES = new PRegistry<>();
@@ -80,6 +89,9 @@ public class PLibRegistration
 		}
 	}
 	
+/**
+ * Provides support for mesh deformer reg.
+ */
 	public static class MeshDeformerReg
 	{
 		public static final PRegistry<PMeshDeformer<?>> DEFORMERS = new PRegistry<>();
@@ -100,6 +112,9 @@ public class PLibRegistration
 		}
 	}
 
+/**
+ * Provides support for block reg.
+ */
 	public static class BlockReg
 	{
 		public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(PLibDatabase.MOD_ID);
@@ -119,6 +134,9 @@ public class PLibRegistration
 		}
 	}
 	
+/**
+ * Provides support for be type reg.
+ */
 	public static class BETypeReg
 	{
 		public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(
@@ -137,6 +155,9 @@ public class PLibRegistration
 		}
 	}
 	
+/**
+ * Provides support for item reg.
+ */
 	public static class ItemReg
 	{
 		public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(PLibDatabase.MOD_ID);
@@ -168,6 +189,9 @@ public class PLibRegistration
 		}
 	}
 	
+/**
+ * Provides support for entity type reg.
+ */
 	public static class EntityTypeReg
 	{
 		public static final DeferredRegister.Entities ENTITIES = DeferredRegister.createEntities(PLibDatabase.MOD_ID);

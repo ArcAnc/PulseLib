@@ -17,6 +17,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * Registers registry.
+ */
 public final class PRegistry<T>
 {
 	private final Map<Identifier, T> values = new Object2ObjectOpenHashMap<>();

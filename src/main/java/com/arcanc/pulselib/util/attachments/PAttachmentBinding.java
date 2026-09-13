@@ -10,6 +10,9 @@
 package com.arcanc.pulselib.util.attachments;
 
 
+/**
+ * Defines the contract for attachment binding.
+ */
 public interface PAttachmentBinding
 {
 	/**

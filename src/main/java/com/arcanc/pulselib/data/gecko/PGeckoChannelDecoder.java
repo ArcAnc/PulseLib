@@ -15,6 +15,9 @@ import com.google.gson.JsonElement;
 
 import java.util.Set;
 
+/**
+ * Defines the contract for gecko channel decoder.
+ */
 public interface PGeckoChannelDecoder<T>
 {
 	/**

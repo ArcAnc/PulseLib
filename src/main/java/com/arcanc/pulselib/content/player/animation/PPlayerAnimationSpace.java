@@ -17,6 +17,9 @@ import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
+/**
+ * Provides support for player animation space.
+ */
 public final class PPlayerAnimationSpace
 {
 	/** Converts glTF coordinate values to Minecraft's player-model coordinates. */

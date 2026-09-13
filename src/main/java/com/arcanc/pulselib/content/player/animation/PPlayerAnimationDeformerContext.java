@@ -15,6 +15,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
+/**
+ * Carries player animation deformer context.
+ */
 public final class PPlayerAnimationDeformerContext
 {
 	private final Player player;

@@ -20,6 +20,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Provides support for pose mixer.
+ */
 public final class PPoseMixer
 {
 	private static final float EPSILON = 1.0e-6f;
@@ -435,6 +438,9 @@ public final class PPoseMixer
 	}
 
 	@FunctionalInterface
+/**
+ * Defines the contract for bone weight.
+ */
 	public interface BoneWeight
 	{
 		BoneWeight FULL = boneIndex -> 1.0f;
@@ -447,6 +453,9 @@ public final class PPoseMixer
 		float weight(int boneIndex);
 	}
 
+/**
+ * Immutable value object representing layer.
+ */
 	public record Layer(PPose pose,
 	                    @Nullable PPose referencePose,
 	                    BitSet mask,

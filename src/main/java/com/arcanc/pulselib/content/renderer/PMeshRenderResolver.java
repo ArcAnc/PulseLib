@@ -17,6 +17,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 
 @FunctionalInterface
+/**
+ * Defines the contract for mesh render resolver.
+ */
 public interface PMeshRenderResolver
 {
 	/**

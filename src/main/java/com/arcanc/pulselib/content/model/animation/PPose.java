@@ -14,6 +14,9 @@ import org.joml.Vector3f;
 
 import java.util.BitSet;
 
+/**
+ * Provides support for pose.
+ */
 public final class PPose implements PPoseWriter
 {
 	private final Vector3f[] translations;

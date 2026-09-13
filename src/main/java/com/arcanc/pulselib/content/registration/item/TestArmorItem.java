@@ -21,6 +21,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
+/**
+ * Provides support for test armor item.
+ */
 public class TestArmorItem extends Item
 {
 	public static final Identifier TEXTURE = PLibDatabase.rl("entity/armor/test_armor/0");

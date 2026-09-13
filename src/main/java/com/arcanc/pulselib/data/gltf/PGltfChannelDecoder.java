@@ -15,6 +15,9 @@ import com.arcanc.pulselib.content.model.animation.PAnimationValue;
 import java.nio.ByteBuffer;
 import java.util.Set;
 
+/**
+ * Defines the contract for gltf channel decoder.
+ */
 public interface PGltfChannelDecoder<T>
 {
 	/**

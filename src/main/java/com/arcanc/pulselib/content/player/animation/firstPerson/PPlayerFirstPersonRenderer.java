@@ -1,5 +1,4 @@
 package com.arcanc.pulselib.content.player.animation.firstPerson;
-
 import com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimatedAttachments;
 import com.arcanc.pulselib.content.player.animation.attachment.PPlayerAutomaticMeshAttachments;
 import com.arcanc.pulselib.util.attachments.humanoid.PHumanoidAttachmentLayer;
@@ -10,7 +9,6 @@ import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.world.entity.HumanoidArm;
-
 /** PulseLib-owned extra first-person geometry; vanilla arms and items stay vanilla. */
 public final class PPlayerFirstPersonRenderer
 {

@@ -15,6 +15,9 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.joml.Vector3f;
 
+/**
+ * Immutable value object representing taper definition.
+ */
 public record PTaperDefinition(Vector3f origin, Vector3f lengthAxis, float positiveExtent, float negativeExtent,
 								PChannelReference<Float> tipScale)
 {

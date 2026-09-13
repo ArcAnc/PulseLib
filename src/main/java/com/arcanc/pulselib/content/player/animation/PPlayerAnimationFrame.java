@@ -21,6 +21,9 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
+/**
+ * Provides support for player animation frame.
+ */
 public final class PPlayerAnimationFrame
 {
 	private final PPlayerAnimationDefinition definition;

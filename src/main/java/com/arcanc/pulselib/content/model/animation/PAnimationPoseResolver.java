@@ -25,6 +25,9 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * Resolves animation pose.
+ */
 public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 {
 	private final PBakedModel model;
@@ -478,6 +481,9 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	}
 
 	@FunctionalInterface
+/**
+ * Defines the contract for molang context provider.
+ */
 	public interface MolangContextProvider<T extends PAnimatable<T>>
 	{
 		/**
@@ -489,6 +495,9 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 		MolangParser.Context context(PAnimationController<T> controller, float partialTick);
 	}
 
+/**
+ * Immutable value object representing local pose.
+ */
 	public record LocalPose(BoneFrame animationTransform,
 	                        BoneFrame localTransform,
 	                        boolean hasTranslation,
@@ -497,6 +506,9 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	{
 	}
 
+/**
+ * Immutable value object representing bone pose.
+ */
 	public record BonePose(BoneFrame animationTransform,
 	                       BoneFrame localTransform,
 	                       PTransform bindTransform,
@@ -515,6 +527,9 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 		}
 	}
 
+/**
+ * Immutable value object representing animation delta.
+ */
 	public record AnimationDelta(Vector3f translation,
 	                             Quaternionf rotation,
 	                             Vector3f scale,

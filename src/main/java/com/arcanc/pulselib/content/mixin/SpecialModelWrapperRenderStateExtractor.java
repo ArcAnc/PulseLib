@@ -13,7 +13,6 @@ package com.arcanc.pulselib.content.mixin;
 import com.arcanc.pulselib.content.renderer.base.PItemRenderState;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.item.SpecialModelWrapper;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
@@ -22,6 +21,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin (SpecialModelWrapper.class)
+/**
+ * Provides support for special model wrapper render state extractor.
+ */
 public class SpecialModelWrapperRenderStateExtractor<T>
 {
 	/**

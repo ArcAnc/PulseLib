@@ -13,6 +13,9 @@ package com.arcanc.pulselib.content.registration.item.renderer.renderState;
 import com.arcanc.pulselib.content.registration.item.TestBlockItem;
 import com.arcanc.pulselib.content.renderer.base.PItemRenderState;
 
+/**
+ * Stores the test block item render state.
+ */
 public class TestBlockItemRenderState extends PItemRenderState.Impl<TestBlockItem>
 {
 }

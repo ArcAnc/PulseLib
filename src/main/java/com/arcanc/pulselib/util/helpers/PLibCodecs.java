@@ -22,6 +22,9 @@ import java.util.List;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+/**
+ * Provides support for lib codecs.
+ */
 public class PLibCodecs
 {
 	public static final Codec<UUID> UUID_CODEC = UUIDUtil.CODEC;

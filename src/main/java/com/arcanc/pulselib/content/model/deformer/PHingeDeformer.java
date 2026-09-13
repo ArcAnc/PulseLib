@@ -15,6 +15,9 @@ import net.minecraft.resources.Identifier;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+/**
+ * Deforms hinge.
+ */
 public final class PHingeDeformer implements PMeshDeformer<PHingeDefinition>
 {
 	public static final PHingeDeformer INSTANCE = new PHingeDeformer();
@@ -76,6 +79,9 @@ public final class PHingeDeformer implements PMeshDeformer<PHingeDefinition>
 		return result.normalize();
 	}
 
+/**
+ * Immutable value object representing operation.
+ */
 	private record Operation(Vector3f origin, Vector3f length, Vector3f hinge,
 	                         PChannelReference<Float> angle) implements PPreparedDeformer
 	{

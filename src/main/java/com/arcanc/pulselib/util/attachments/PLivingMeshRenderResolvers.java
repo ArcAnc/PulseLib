@@ -10,6 +10,9 @@
 package com.arcanc.pulselib.util.attachments;
 
 
+/**
+ * Provides support for living mesh render resolvers.
+ */
 public final class PLivingMeshRenderResolvers
 {
 	/**

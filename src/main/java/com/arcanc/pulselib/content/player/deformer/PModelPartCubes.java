@@ -13,6 +13,9 @@ import net.minecraft.client.model.geom.ModelPart;
 
 import java.util.List;
 
+/**
+ * Defines the contract for model part cubes.
+ */
 public interface PModelPartCubes
 {
 	/**

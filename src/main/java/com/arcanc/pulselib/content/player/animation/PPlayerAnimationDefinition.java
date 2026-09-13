@@ -27,6 +27,9 @@ import org.jspecify.annotations.Nullable;
 import java.util.*;
 import java.util.function.Predicate;
 
+/**
+ * Describes player animation.
+ */
 public final class PPlayerAnimationDefinition
 {
 	private final PModelData modelData;
@@ -316,6 +319,9 @@ public final class PPlayerAnimationDefinition
 	}
 
 	@FunctionalInterface
+/**
+ * Defines the contract for controller registrar.
+ */
 	public interface ControllerRegistrar
 	{
 		ControllerRegistrar EMPTY = registrar -> {};
@@ -328,6 +334,9 @@ public final class PPlayerAnimationDefinition
 	}
 
 	@FunctionalInterface
+/**
+ * Defines the contract for molang context provider.
+ */
 	public interface MolangContextProvider
 	{
 		MolangContextProvider EMPTY = (player, instance, controller, context, partialTick) -> {};
@@ -348,6 +357,9 @@ public final class PPlayerAnimationDefinition
 	}
 
 	@FunctionalInterface
+/**
+ * Defines the contract for item render policy.
+ */
 	public interface ItemRenderPolicy
 	{
 		ItemRenderPolicy RENDER = (player, hand, stack) -> false;
@@ -365,6 +377,9 @@ public final class PPlayerAnimationDefinition
 		             ItemStack stack);
 	}
 
+/**
+ * Enumerates the available item visibility values.
+ */
 	public enum ItemVisibility
 	{
 		VISIBLE,
@@ -372,6 +387,9 @@ public final class PPlayerAnimationDefinition
 	}
 
 	@FunctionalInterface
+/**
+ * Defines the contract for item visibility policy.
+ */
 	public interface ItemVisibilityPolicy
 	{
 		ItemVisibilityPolicy VISIBLE = (player, hand, animationTime, stack) -> ItemVisibility.VISIBLE;
@@ -391,6 +409,9 @@ public final class PPlayerAnimationDefinition
 		                          ItemStack stack);
 	}
 
+/**
+ * Builds builder.
+ */
 	public static final class Builder
 	{
 		private final PModelData modelData;

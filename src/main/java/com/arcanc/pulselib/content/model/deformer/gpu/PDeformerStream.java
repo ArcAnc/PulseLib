@@ -19,6 +19,9 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Streams deformer.
+ */
 final class PDeformerStream
 {
 	private final Map<PDeformerStack, @Nullable PGpuDeformerStack> stacks = new IdentityHashMap<>();

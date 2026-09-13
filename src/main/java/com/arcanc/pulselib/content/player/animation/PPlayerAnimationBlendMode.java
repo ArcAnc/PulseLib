@@ -11,6 +11,9 @@ package com.arcanc.pulselib.content.player.animation;
 
 import com.arcanc.pulselib.content.model.animation.PPoseBlendMode;
 
+/**
+ * Enumerates the available player animation blend mode values.
+ */
 public enum PPlayerAnimationBlendMode
 {
 	OVERRIDE(PPoseBlendMode.OVERRIDE),

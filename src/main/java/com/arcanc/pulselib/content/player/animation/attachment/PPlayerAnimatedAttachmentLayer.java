@@ -19,6 +19,9 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 
+/**
+ * Provides support for player animated attachment layer.
+ */
 public final class PPlayerAnimatedAttachmentLayer extends RenderLayer<AvatarRenderState, PlayerModel>
 {
 	/**

@@ -14,6 +14,9 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.resources.Identifier;
 import org.joml.Vector3f;
 
+/**
+ * Deforms wave.
+ */
 public final class PWaveDeformer implements PMeshDeformer<PWaveDefinition>
 {
 	public static final PWaveDeformer INSTANCE = new PWaveDeformer();
@@ -76,6 +79,9 @@ public final class PWaveDeformer implements PMeshDeformer<PWaveDefinition>
 		return result.normalize();
 	}
 
+/**
+ * Immutable value object representing operation.
+ */
 	private record Operation(Vector3f origin, Vector3f length, Vector3f displacement, float positiveExtent,
 								 float negativeExtent, float wavelength, PChannelReference<Float> amplitude,
 								 PChannelReference<Float> phase) implements PPreparedDeformer

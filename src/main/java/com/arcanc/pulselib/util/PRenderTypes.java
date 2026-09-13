@@ -35,8 +35,14 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
 
+/**
+ * Provides support for render types.
+ */
 public class PRenderTypes
 {
+/**
+ * Provides render pipelines.
+ */
 	public static class RenderPipelinesProvider
 	{
 		private static final Set<RenderPipeline> PIPELINES = new HashSet<>();
@@ -221,6 +227,9 @@ public class PRenderTypes
 		}
 	}
 	
+/**
+ * Provides vertex format.
+ */
 	public static class VertexFormatProvider
 	{
 		public static final VertexFormat POSITION_TEX_NORMAL = VertexFormat.builder().
@@ -231,6 +240,9 @@ public class PRenderTypes
 				build();
 	}
 	
+/**
+ * Provides render type.
+ */
 	public static class RenderTypeProvider
 	{
 		private static final Function<Identifier, RenderType> TRIANGLES_SOLID = Util.memoize(RenderTypeProvider :: createTrianglesSolid);

@@ -10,6 +10,9 @@
 package com.arcanc.pulselib.content.model.animation;
 
 
+/**
+ * Enumerates the available animation type values.
+ */
 public enum PAnimationType
 {
 	PLAY_ONCE,

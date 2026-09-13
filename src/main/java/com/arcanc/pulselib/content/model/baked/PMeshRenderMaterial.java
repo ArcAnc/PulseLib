@@ -15,6 +15,9 @@ import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.LightCoordsUtil;
 
+/**
+ * Immutable value object representing mesh render material.
+ */
 public record PMeshRenderMaterial(PBakedMesh mesh, boolean emissive, int packedLight)
 {
 	/**

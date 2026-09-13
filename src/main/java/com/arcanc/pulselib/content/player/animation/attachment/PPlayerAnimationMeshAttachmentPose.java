@@ -12,6 +12,9 @@ import com.arcanc.pulselib.content.player.animation.PPlayerAnimationFrame;
 import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import net.minecraft.resources.Identifier;
 
+/**
+ * Immutable value object representing player animation mesh attachment pose.
+ */
 public record PPlayerAnimationMeshAttachmentPose(
 		Identifier animation,
 		PModelData modelData,

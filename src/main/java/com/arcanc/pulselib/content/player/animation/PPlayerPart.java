@@ -14,6 +14,9 @@ import net.minecraft.client.model.player.PlayerModel;
 
 import java.util.List;
 
+/**
+ * Enumerates the available player part values.
+ */
 public enum PPlayerPart
 {
 	ROOT,

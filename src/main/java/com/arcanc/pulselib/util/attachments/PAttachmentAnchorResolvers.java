@@ -21,6 +21,9 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 
+/**
+ * Provides support for attachment anchor resolvers.
+ */
 public class PAttachmentAnchorResolvers
 {
 	private static final Map<Class<?>, Map<PAttachmentAnchor, AnchorResolver>> RESOLVERS = new Object2ObjectLinkedOpenHashMap<>();
@@ -74,6 +77,9 @@ public class PAttachmentAnchorResolvers
 	}
 	
 	@FunctionalInterface
+/**
+ * Defines the contract for anchor resolver.
+ */
 	public interface AnchorResolver
 	{
 		/**

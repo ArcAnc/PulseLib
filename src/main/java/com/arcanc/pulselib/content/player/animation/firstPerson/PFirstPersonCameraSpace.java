@@ -1,8 +1,6 @@
 package com.arcanc.pulselib.content.player.animation.firstPerson;
-
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-
 /** Boundary conversion from Pulse first-person space to Minecraft camera space. */
 public final class PFirstPersonCameraSpace
 {

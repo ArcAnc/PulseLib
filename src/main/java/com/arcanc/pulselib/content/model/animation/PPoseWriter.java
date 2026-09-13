@@ -12,6 +12,9 @@ package com.arcanc.pulselib.content.model.animation;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+/**
+ * Defines the contract for pose writer.
+ */
 public interface PPoseWriter
 {
 	/**

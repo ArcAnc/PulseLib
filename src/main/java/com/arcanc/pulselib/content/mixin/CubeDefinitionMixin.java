@@ -26,6 +26,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Set;
 
+/**
+ * Applies PulseLib integration to {@code CubeDefinition}.
+ */
 @Mixin(CubeDefinition.class)
 public class CubeDefinitionMixin
 {

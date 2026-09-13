@@ -12,6 +12,9 @@ package com.arcanc.pulselib.content.player.deformer;
 import org.joml.Vector3f;
 
 @FunctionalInterface
+/**
+ * Defines the contract for player vertex deformer.
+ */
 interface PPlayerVertexDeformer
 {
 	PPlayerVertexDeformer IDENTITY = position -> {};

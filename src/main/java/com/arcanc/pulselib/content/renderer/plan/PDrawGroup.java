@@ -11,6 +11,9 @@ package com.arcanc.pulselib.content.renderer.plan;
 
 import java.util.List;
 
+/**
+ * Immutable value object representing draw group.
+ */
 public record PDrawGroup<P, M, I>(P pipeline, M mesh, boolean writeDepth, List<I> instances)
 {
 	/**

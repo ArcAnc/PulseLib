@@ -12,6 +12,9 @@ package com.arcanc.pulselib.util.helpers;
 
 import net.minecraft.client.Minecraft;
 
+/**
+ * Provides support for lib render helper.
+ */
 public class PLibRenderHelper
 {
 	/**

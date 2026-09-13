@@ -11,6 +11,9 @@ package com.arcanc.pulselib.content.model.deformer;
 
 import java.util.Objects;
 
+/**
+ * Immutable value object representing deformer instance.
+ */
 public record PDeformerInstance<D>(PMeshDeformer<D> type, D definition)
 {
 	/**

@@ -12,6 +12,9 @@ package com.arcanc.pulselib.content.model.deformer;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+/**
+ * Immutable value object representing deformer frame.
+ */
 public record PDeformerFrame(Vector3f position, Vector3f right, Vector3f up, Vector3f forward)
 {
 	/**

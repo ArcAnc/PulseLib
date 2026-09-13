@@ -12,6 +12,9 @@ package com.arcanc.pulselib.content.renderer.modelData;
 
 import net.minecraft.resources.Identifier;
 
+/**
+ * Provides support for default block model data.
+ */
 public class DefaultBlockModelData extends PModelData
 {
 	/**
@@ -23,6 +26,9 @@ public class DefaultBlockModelData extends PModelData
 		super(builder);
 	}
 	
+/**
+ * Builds default block model data.
+ */
 	public static class DefaultBlockModelDataBuilder extends Builder
 	{
 		private final Identifier shortModelLocation;
@@ -47,18 +53,6 @@ public class DefaultBlockModelData extends PModelData
 			this.shortModelLocation = modelLocation;
 			this.modelFormat = modelFormat;
 			this.modelLocation = PModelData.generateDefaultModelLocation(modelLocation, this.modelType, this.modelFormat);
-		}
-		
-		/**
-		 * Adds the texture.
-		 * @param texturePath the texture path to use.
-		 * @return the value produced by this operation.
-		 */
-		@Override
-		public DefaultBlockModelDataBuilder addTexture(Identifier texturePath)
-		{
-			super.addTexture(PModelData.generateDefaultTextureLocation(texturePath, this.shortModelLocation, this.modelType, this.modelFormat));
-			return this;
 		}
 		
 		/**

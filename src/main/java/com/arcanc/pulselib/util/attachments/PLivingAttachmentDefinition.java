@@ -20,6 +20,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Immutable value object representing living attachment definition.
+ */
 public record PLivingAttachmentDefinition(
 		PModelData model,
 		PLivingAttachmentSource source,
@@ -86,6 +89,9 @@ public record PLivingAttachmentDefinition(
 	}
 	
 	@FunctionalInterface
+/**
+ * Defines the contract for controller provider.
+ */
 	public interface ControllerProvider
 	{
 		ControllerProvider EMPTY = (entity, stack, model, partialTick) -> List.of();

@@ -15,6 +15,9 @@ import com.arcanc.pulselib.util.attachments.PAttachmentAnchorResolvers;
 import net.minecraft.client.model.HumanoidModel;
 import org.jetbrains.annotations.ApiStatus;
 
+/**
+ * Provides support for humanoid anchors.
+ */
 public class PHumanoidAnchors
 {
 	public static final PAttachmentAnchor HEAD = PAttachmentAnchor.minecraft("head");

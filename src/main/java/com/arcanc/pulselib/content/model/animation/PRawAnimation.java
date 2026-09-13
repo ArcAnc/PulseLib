@@ -14,6 +14,9 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import java.util.List;
 
+/**
+ * Provides support for raw animation.
+ */
 public class PRawAnimation
 {
 	private final List<AnimationStage> stages;
@@ -45,6 +48,9 @@ public class PRawAnimation
 		return this.stages;
 	}
 	
+/**
+ * Builds builder.
+ */
 	public static class Builder
 	{
 		private final List<AnimationStage> stages = new ObjectArrayList<>();
@@ -187,6 +193,9 @@ public class PRawAnimation
 		}
 	}
 	
+/**
+ * Immutable value object representing animation stage.
+ */
 	public record AnimationStage(
 			String animationName,
 			PAnimationType animationType,

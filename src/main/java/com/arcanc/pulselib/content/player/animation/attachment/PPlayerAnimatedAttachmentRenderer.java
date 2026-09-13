@@ -11,6 +11,9 @@ package com.arcanc.pulselib.content.player.animation.attachment;
 
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationAnchor;
 
+/**
+ * Defines the contract for player animated attachment renderer.
+ */
 public interface PPlayerAnimatedAttachmentRenderer
 {
 	/**

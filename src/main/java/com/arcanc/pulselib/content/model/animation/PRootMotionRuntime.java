@@ -11,6 +11,9 @@ package com.arcanc.pulselib.content.model.animation;
 
 import java.util.Objects;
 
+/**
+ * Provides support for root motion runtime.
+ */
 public final class PRootMotionRuntime
 {
 	private final PAnimation animation;

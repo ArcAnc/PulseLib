@@ -15,6 +15,9 @@ import com.arcanc.pulselib.content.registration.entity.TestEntity;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 
+/**
+ * Provides support for common events.
+ */
 public class CommonEvents
 {
 	/**

@@ -25,6 +25,9 @@ import org.jspecify.annotations.Nullable;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Provides support for animation controller.
+ */
 public class PAnimationController<T extends PAnimatable<T>>
 {
 	protected final String name;
@@ -642,6 +645,9 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 	
 	@FunctionalInterface
+/**
+ * Defines the contract for state handler.
+ */
 	public interface StateHandler<T extends PAnimatable<T>>
 	{
 		/**
@@ -661,6 +667,9 @@ public class PAnimationController<T extends PAnimatable<T>>
 		return this.name;
 	}
 	
+/**
+ * Immutable value object representing animatable state.
+ */
 	public record AnimatableState<T extends PAnimatable<T>>(T animatable, PAnimationController<T> controller)
 	{
 	}

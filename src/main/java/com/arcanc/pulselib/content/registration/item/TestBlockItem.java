@@ -20,6 +20,9 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
 import org.jspecify.annotations.NonNull;
 
+/**
+ * Provides support for test block item.
+ */
 public class TestBlockItem extends BlockItem implements PAnimatable<TestBlockItem>
 {
 	private final PRawAnimation idle = PRawAnimation.begin().

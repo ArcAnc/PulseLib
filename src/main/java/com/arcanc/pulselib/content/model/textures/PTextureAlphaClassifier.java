@@ -16,6 +16,9 @@ import net.minecraft.client.renderer.texture.SpriteContents;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+/**
+ * Provides support for texture alpha classifier.
+ */
 public final class PTextureAlphaClassifier
 {
 	private static final Map<SpriteContents, PAlphaMode> CACHE = new WeakHashMap<>();

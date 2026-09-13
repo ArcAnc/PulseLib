@@ -3,7 +3,6 @@
  * Created at: 30.07.2026
  */
 package com.arcanc.pulselib.content.mixin;
-
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
@@ -18,7 +17,9 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
+/**
+ * Applies the player root-transform integration to {@code LivingEntityRenderer}.
+ */
 @Mixin(LivingEntityRenderer.class)
 public abstract class PlayerRootTransformMixin
 {

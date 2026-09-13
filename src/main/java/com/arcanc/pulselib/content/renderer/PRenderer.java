@@ -21,6 +21,9 @@ import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.Nullable;
 
+/**
+ * Defines the contract for renderer.
+ */
 public interface PRenderer<T extends PAnimatable<T>, RS extends PRenderState<T>>
 {
 	/**

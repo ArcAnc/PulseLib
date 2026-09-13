@@ -12,6 +12,9 @@ package com.arcanc.pulselib.content.player.animation;
 import net.minecraft.world.entity.player.Player;
 
 @FunctionalInterface
+/**
+ * Defines the contract for player animation weight.
+ */
 public interface PPlayerAnimationWeight
 {
 	PPlayerAnimationWeight FULL = (player, partialTick) -> 1.0f;

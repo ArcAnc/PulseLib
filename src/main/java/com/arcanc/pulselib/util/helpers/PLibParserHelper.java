@@ -20,6 +20,9 @@ import de.javagl.jgltf.model.v2.MaterialModelV2;
 
 import java.nio.*;
 
+/**
+ * Provides support for lib parser helper.
+ */
 public class PLibParserHelper
 {
 	/**

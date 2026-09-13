@@ -22,6 +22,9 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Provides support for animation runtime.
+ */
 public final class PAnimationRuntime
 {
 	/**
@@ -231,6 +234,9 @@ public final class PAnimationRuntime
 		return new BoneFrame(translation, rotation, scale);
 	}
 
+/**
+ * Immutable value object representing graph frame.
+ */
 	private record GraphFrame(PAnimationGraphRuntime.Layer layer, BoneFrame frame)
 	{
 	}

@@ -1,8 +1,9 @@
 package com.arcanc.pulselib.content.model.animation;
-
 import java.util.Objects;
-
 @FunctionalInterface
+/**
+ * Defines the contract for condition.
+ */
 public interface PCondition
 {
 	PCondition ALWAYS = parameters -> true;

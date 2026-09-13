@@ -26,6 +26,9 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import org.joml.Vector3f;
 
+/**
+ * Provides support for animation event types.
+ */
 public final class PAnimationEventTypes
 {
 	/**
@@ -152,6 +155,9 @@ public final class PAnimationEventTypes
 	}
 
 	@FunctionalInterface
+/**
+ * Defines the contract for event executor.
+ */
 	private interface EventExecutor<T>
 	{
 		/**
@@ -162,9 +168,24 @@ public final class PAnimationEventTypes
 		void execute(PAnimationEventContext context, T data);
 	}
 
+/**
+ * Immutable value object representing sound data.
+ */
 	public record SoundData(Identifier sound, String locator, float volume, float pitch) { }
+/**
+ * Immutable value object representing particle data.
+ */
 	public record ParticleData(Identifier particle, String locator, Vector3f offset, Vector3f motion) { }
+/**
+ * Immutable value object representing camera shake data.
+ */
 	public record CameraShakeData(float strength, float duration, float frequency) { }
+/**
+ * Immutable value object representing locator callback data.
+ */
 	public record LocatorCallbackData(Identifier callback, String locator) { }
+/**
+ * Immutable value object representing animation parameter data.
+ */
 	public record AnimationParameterData(String controller, String parameter, float value, boolean trigger) { }
 }

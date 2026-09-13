@@ -11,6 +11,9 @@ package com.arcanc.pulselib.content.model.deformer;
 
 import java.util.Objects;
 
+/**
+ * Immutable value object representing mesh deformation.
+ */
 public record PMeshDeformation(PDeformerStack stack, PDeformerValueSource values, Object cacheKey, int subdivisionLevel)
 {
 	public static final int DEFAULT_SUBDIVISION_LEVEL = 2;

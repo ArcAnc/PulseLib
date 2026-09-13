@@ -14,6 +14,9 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.resources.Identifier;
 import org.joml.Vector3f;
 
+/**
+ * Deforms taper.
+ */
 public final class PTaperDeformer implements PMeshDeformer<PTaperDefinition>
 {
 	public static final PTaperDeformer INSTANCE = new PTaperDeformer();
@@ -61,6 +64,9 @@ public final class PTaperDeformer implements PMeshDeformer<PTaperDefinition>
 				definition.negativeExtent(), definition.tipScale()));
 	}
 
+/**
+ * Immutable value object representing operation.
+ */
 	private record Operation(Vector3f origin, Vector3f axis, float positiveExtent, float negativeExtent,
 								 PChannelReference<Float> tipScale) implements PPreparedDeformer
 	{

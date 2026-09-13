@@ -9,7 +9,7 @@
 
 package com.arcanc.pulselib.content.model.deformer;
 
-import com.arcanc.pulselib.content.model.PMesh;
+import com.arcanc.pulselib.content.model.PMeshPrimitive;
 import de.javagl.jgltf.model.GltfConstants;
 
 import java.nio.ByteBuffer;
@@ -18,6 +18,9 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Provides support for mesh tessellator.
+ */
 public final class PMeshTessellator
 {
 	public static final int MAX_SUBDIVISION_LEVEL = 4;
@@ -35,7 +38,7 @@ public final class PMeshTessellator
 	 * @param level the level to use.
 	 * @return the value produced by this operation.
 	 */
-	public static PMesh subdivide(PMesh source, int level)
+	public static PMeshPrimitive subdivide(PMeshPrimitive source, int level)
 	{
 		if (level == 0)
 			return source;
@@ -87,8 +90,8 @@ public final class PMeshTessellator
 
 		int vertexCount = positions.size() / 3;
 		int indexType = vertexCount <= 0xFFFF ? GltfConstants.GL_UNSIGNED_SHORT : GltfConstants.GL_UNSIGNED_INT;
-		return new PMesh(source.uuid(), vertexCount, floatBuffer(positions), floatBuffer(normals), floatBuffer(uvs),
-				indices.size(), indexBuffer(indices, indexType), indexType, source.texture());
+		return new PMeshPrimitive(vertexCount, floatBuffer(positions), floatBuffer(normals), floatBuffer(uvs),
+				indices.size(), indexBuffer(indices, indexType), indexType, source.material());
 	}
 
 	/**
@@ -115,7 +118,7 @@ public final class PMeshTessellator
 	 * @param normals the normals to use.
 	 * @param uvs the uvs to use.
 	 */
-	private static void appendVertex(PMesh source, int a, int b, int c, float bWeight, float cWeight,
+	private static void appendVertex(PMeshPrimitive source, int a, int b, int c, float bWeight, float cWeight,
 									 List<Float> positions, List<Float> normals, List<Float> uvs)
 	{
 		float aWeight = 1.0f - bWeight - cWeight;
@@ -165,7 +168,7 @@ public final class PMeshTessellator
 	 * @param index the index to use.
 	 * @return the value produced by this operation.
 	 */
-	private static int indexAt(PMesh source, int index)
+	private static int indexAt(PMeshPrimitive source, int index)
 	{
 		ByteBuffer indices = source.indices().duplicate().order(source.indices().order());
 		return switch (source.glIndexType())
@@ -182,7 +185,7 @@ public final class PMeshTessellator
 	 * @param source the source to use.
 	 * @param index the index to use.
 	 */
-	private static void validateVertexIndex(PMesh source, int index)
+	private static void validateVertexIndex(PMeshPrimitive source, int index)
 	{
 		if (index < 0 || index >= source.vertexCount())
 			throw new IllegalArgumentException("Mesh index is outside its vertex array: " + index);

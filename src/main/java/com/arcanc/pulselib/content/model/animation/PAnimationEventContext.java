@@ -19,6 +19,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Carries animation event context.
+ */
 public final class PAnimationEventContext
 {
 	private final PAnimatable<?> animatable;
@@ -111,6 +114,9 @@ public final class PAnimationEventContext
 		return this.positions.position(locator);
 	}
 	
+/**
+ * Defines the contract for animation event dispatcher bridge.
+ */
 	public interface PAnimationEventDispatcherBridge
 	{
 		/**
@@ -122,6 +128,9 @@ public final class PAnimationEventContext
 		record Position(Level level, double x, double y, double z) { }
 	}
 
+/**
+ * Provides support for list copy.
+ */
 	private static final class ListCopy
 	{
 		/**

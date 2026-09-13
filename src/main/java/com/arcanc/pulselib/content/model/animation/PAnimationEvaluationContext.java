@@ -16,6 +16,9 @@ import org.joml.Vector3f;
 
 import java.util.Objects;
 
+/**
+ * Carries animation evaluation context.
+ */
 public final class PAnimationEvaluationContext
 {
 	private final MolangParser.Context molang;

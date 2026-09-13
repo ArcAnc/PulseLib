@@ -20,6 +20,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.BiConsumer;
 
+/**
+ * Defines the contract for model loader.
+ */
 public interface PModelLoader
 {
 	/**
@@ -52,26 +55,29 @@ public interface PModelLoader
 	 * @return the value produced by this operation.
 	 */
 	Identifier defaultModelLocation(Identifier modelLocation, String modelType);
-	
+
 	/**
-	 * Performs the default texture location operation.
-	 * @param textureLocation the texture location to use.
-	 * @param modelLocation the model location to use.
-	 * @param modelType the model type to use.
-	 * @return the value produced by this operation.
+	 * Resolves a loader-relative model id to its resource-pack location.
+	 * @param modelLocation the loader-relative model id.
+	 * @return the resource-pack model location.
 	 */
-	default Identifier defaultTextureLocation(Identifier textureLocation, Identifier modelLocation, String modelType)
+	default Identifier modelResourceLocation(Identifier modelLocation)
 	{
-		return textureLocation.withPrefix(modelType + "/" + modelLocation.getPath() + "/");
+		return modelLocation;
 	}
-	
+
 	/**
-	 * Performs the texture location operation.
-	 * @param modelPath the model path to use.
-	 * @param textureName the texture name to use.
-	 * @return the value produced by this operation.
+	 * Normalizes a loader-relative model id to the exact resource-pack location.
+	 * Implementations add their default model extension when the id has none while
+	 * preserving extensions they support explicitly.
+	 *
+	 * @param modelLocation the loader-relative model id.
+	 * @return the normalized resource-pack model location.
 	 */
-	Identifier textureLocation(Identifier modelPath, String textureName);
+	default Identifier normalizeModelResourceLocation(Identifier modelLocation)
+	{
+		return modelResourceLocation(modelLocation);
+	}
 	
 	/**
 	 * Loads the models.

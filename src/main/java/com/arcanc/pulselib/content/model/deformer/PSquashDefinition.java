@@ -14,6 +14,9 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.joml.Vector3f;
 
+/**
+ * Immutable value object representing squash definition.
+ */
 public record PSquashDefinition(Vector3f origin, Vector3f axis, PChannelReference<Float> scale)
 {
 	public static final MapCodec<PSquashDefinition> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.

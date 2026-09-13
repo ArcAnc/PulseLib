@@ -17,6 +17,9 @@ import org.spongepowered.asm.mixin.Shadow;
 
 import java.util.List;
 
+/**
+ * Applies PulseLib integration to {@code ModelPart}.
+ */
 @Mixin(ModelPart.class)
 public class ModelPartCubesMixin implements PModelPartCubes
 {

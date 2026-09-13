@@ -33,6 +33,9 @@ import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import org.lwjgl.glfw.GLFW;
 
+/**
+ * Provides support for player acrobatic demo.
+ */
 public final class PPlayerAcrobaticDemo
 {
 	private static final Identifier ID = PLibDatabase.rl("demo/player_acrobatic");

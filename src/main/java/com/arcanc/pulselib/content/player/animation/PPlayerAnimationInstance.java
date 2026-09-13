@@ -27,6 +27,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Provides support for player animation instance.
+ */
 public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimationInstance>
 {
 	private Player player;

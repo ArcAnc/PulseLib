@@ -9,6 +9,9 @@
 
 package com.arcanc.pulselib.content.player.deformer;
 
+/**
+ * Provides support for deformable cube bake scope.
+ */
 public final class PDeformableCubeBakeScope
 {
 	/*
@@ -44,6 +47,9 @@ public final class PDeformableCubeBakeScope
 		return DEPTH.get() > 0;
 	}
 
+/**
+ * Provides support for scope.
+ */
 	public static final class Scope implements AutoCloseable
 	{
 		/**

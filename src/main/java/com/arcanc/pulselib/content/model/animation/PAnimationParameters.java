@@ -15,6 +15,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Provides support for animation parameters.
+ */
 public final class PAnimationParameters
 {
 	private final Map<String, Float> numbers = new HashMap<>();

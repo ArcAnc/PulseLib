@@ -12,6 +12,9 @@ package com.arcanc.pulselib.content.model.deformer;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.resources.Identifier;
 
+/**
+ * Defines the contract for mesh deformer.
+ */
 public interface PMeshDeformer<D>
 {
 	/**

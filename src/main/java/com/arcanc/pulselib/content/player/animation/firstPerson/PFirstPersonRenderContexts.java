@@ -1,5 +1,4 @@
 package com.arcanc.pulselib.content.player.animation.firstPerson;
-
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.player.LocalPlayer;
@@ -12,7 +11,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Optional;
-
 /** Render-thread scopes; nested calls are supported and never use a global hand field. */
 public final class PFirstPersonRenderContexts
 {

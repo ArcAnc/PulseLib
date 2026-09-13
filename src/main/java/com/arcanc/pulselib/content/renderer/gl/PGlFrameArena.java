@@ -11,6 +11,9 @@ package com.arcanc.pulselib.content.renderer.gl;
 
 import org.lwjgl.opengl.GL32;
 
+/**
+ * Manages gl frame allocations.
+ */
 final class PGlFrameArena
 {
 	private static final long MAX_REUSE_WAIT_NANOS = 1_000_000L;

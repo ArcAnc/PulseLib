@@ -11,6 +11,9 @@ package com.arcanc.pulselib.content.model.baked;
 
 
 @FunctionalInterface
+/**
+ * Defines the contract for mesh render resolver.
+ */
 public interface PMeshRenderResolver
 {
 	/**

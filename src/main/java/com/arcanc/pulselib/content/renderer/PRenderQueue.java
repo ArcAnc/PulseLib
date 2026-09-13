@@ -28,6 +28,9 @@ import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Provides support for render queue.
+ */
 public class PRenderQueue
 {
 	private static final PFrameCompiler<RenderStage, RenderType, PBakedMesh, InstanceData> COMPILER = new PFrameCompiler<>(
@@ -186,6 +189,9 @@ public class PRenderQueue
 		PGpuDeformerBuffers.cleanup();
 	}
 	
+/**
+ * Provides support for render stage.
+ */
 	public static class RenderStage
 	{
 		public static final RenderStage SOLID_BLOCKS = new RenderStage("solid_blocks");
@@ -233,6 +239,9 @@ public class PRenderQueue
 		}
 	}
 	
+/**
+ * Immutable value object representing instance data.
+ */
 	public record InstanceData(
 			Matrix4f posMatrix,
 			int packedColor,

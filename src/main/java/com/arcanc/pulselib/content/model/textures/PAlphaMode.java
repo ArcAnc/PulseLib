@@ -14,6 +14,9 @@ import com.mojang.serialization.DataResult;
 
 import java.util.Locale;
 
+/**
+ * Enumerates the available alpha mode values.
+ */
 public enum PAlphaMode
 {
 	AUTO,

@@ -119,6 +119,9 @@ public class PAnimationManager<T extends PAnimatable<T>>
 			controller.tick(this.animatable, 1, this.model, this.controllers.values());
 	}
 	
+/**
+ * Immutable value object representing animation registrar.
+ */
 	public record PAnimationRegistrar<T extends PAnimatable<T>>(List<Entry<T>> entries, List<GraphEntry> graphEntries)
 	{
 		/**
@@ -185,11 +188,17 @@ public class PAnimationManager<T extends PAnimatable<T>>
 			return this;
 		}
 		
+/**
+ * Immutable value object representing entry.
+ */
 		public record Entry<T extends PAnimatable<T>>(String name, Supplier<PAnimationController.StateHandler<T>> factory)
 		{
 		
 		}
 
+/**
+ * Immutable value object representing graph entry.
+ */
 		public record GraphEntry(String name, Supplier<PAnimationGraph> factory)
 		{
 		}

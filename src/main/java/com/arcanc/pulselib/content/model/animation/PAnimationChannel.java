@@ -14,8 +14,14 @@ import net.minecraft.resources.Identifier;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+/**
+ * Provides support for animation channel.
+ */
 public class PAnimationChannel
 {
+/**
+ * Immutable value object representing vector3f channel type.
+ */
 	public record Vector3fChannelType(Identifier id, Vector3f defaultValue, boolean multiplicativeBlend)
 			implements PAnimationChannelType<Vector3f>
 	{
@@ -94,6 +100,9 @@ public class PAnimationChannel
 		}
 	}
 
+/**
+ * Immutable value object representing quaternion channel type.
+ */
 	public record QuaternionChannelType(Identifier id) implements PAnimationChannelType<Quaternionf>
 	{
 		/**

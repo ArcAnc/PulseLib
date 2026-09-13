@@ -9,6 +9,9 @@
 
 package com.arcanc.pulselib.content.model.animation;
 
+/**
+ * Defines the contract for animation decode context.
+ */
 public interface PAnimationDecodeContext
 {
 }

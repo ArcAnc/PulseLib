@@ -13,6 +13,9 @@ import com.arcanc.pulselib.content.model.animation.PTransform;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationAnchor;
 import net.minecraft.resources.Identifier;
 
+/**
+ * Immutable value object representing player first person anchor pose.
+ */
 public record PPlayerFirstPersonAnchorPose(
 		Identifier animation,
 		PPlayerAnimationAnchor anchor,

@@ -10,6 +10,9 @@
 package com.arcanc.pulselib.content.model.animation;
 
 @FunctionalInterface
+/**
+ * Defines the contract for interpolation.
+ */
 public interface PInterpolation
 {
 	/**

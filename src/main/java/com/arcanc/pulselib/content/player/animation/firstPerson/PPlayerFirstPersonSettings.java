@@ -12,6 +12,9 @@ package com.arcanc.pulselib.content.player.animation.firstPerson;
 
 import java.util.Objects;
 
+/**
+ * Immutable value object representing player first person settings.
+ */
 public record PPlayerFirstPersonSettings(
 		boolean enabled,
 		float transitionIn,

@@ -23,6 +23,9 @@ import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Provides support for armor client extensions.
+ */
 public class PArmorClientExtensions implements IClientItemExtensions
 {
 	private static final Model<Unit> EMPTY_ARMOR_MODEL = new Model.Simple(new ModelPart(List.of(), Map.of()), RenderTypes :: armorCutoutNoCull);

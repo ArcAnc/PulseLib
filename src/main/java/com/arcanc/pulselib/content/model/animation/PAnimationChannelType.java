@@ -12,6 +12,9 @@ package com.arcanc.pulselib.content.model.animation;
 
 import net.minecraft.resources.Identifier;
 
+/**
+ * Defines the contract for animation channel type.
+ */
 public interface PAnimationChannelType<T>
 {
 	/**

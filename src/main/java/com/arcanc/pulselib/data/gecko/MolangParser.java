@@ -14,6 +14,9 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
+/**
+ * Parses molang.
+ */
 public final class MolangParser
 {
 	private static final int MAX_LOOP_ITERATIONS = 1_024;
@@ -49,6 +52,9 @@ public final class MolangParser
 	}
 
 	@FunctionalInterface
+/**
+ * Defines the contract for expression.
+ */
 	public interface Expression
 	{
 		/**
@@ -82,6 +88,9 @@ public final class MolangParser
 		}
 	}
 
+/**
+ * Carries context context.
+ */
 	public static final class Context
 	{
 		private final Map<String, Float> queryValues = new HashMap<>();
@@ -333,6 +342,9 @@ public final class MolangParser
 	}
 
 	@FunctionalInterface
+/**
+ * Defines the contract for query resolver.
+ */
 	public interface QueryResolver
 	{
 		/**
@@ -345,6 +357,9 @@ public final class MolangParser
 		Float resolve(String name, List<Float> arguments, Context context);
 	}
 
+/**
+ * Provides support for evaluation.
+ */
 	private static final class Evaluation
 	{
 		private final Context context;
@@ -362,8 +377,14 @@ public final class MolangParser
 		}
 	}
 
+/**
+ * Enumerates the available flow values.
+ */
 	private enum Flow { NONE, RETURN, BREAK, CONTINUE }
 
+/**
+ * Immutable value object representing value.
+ */
 	private record Value(@Nullable Float value)
 	{
 		private static final Value UNDEFINED = new Value(null);
@@ -408,6 +429,9 @@ public final class MolangParser
 	}
 
 	@FunctionalInterface
+/**
+ * Defines the contract for node.
+ */
 	private interface Node
 	{
 		/**
@@ -418,6 +442,9 @@ public final class MolangParser
 		Value evaluate(Evaluation evaluation);
 	}
 
+/**
+ * Immutable value object representing program.
+ */
 	private record Program(List<Node> statements, PExpressionDependency dependency, @Nullable Float constantValue) implements Expression
 	{
 		/**
@@ -444,6 +471,9 @@ public final class MolangParser
 		}
 	}
 
+/**
+ * Immutable value object representing literal.
+ */
 	private record Literal(float value) implements Node
 	{
 		/**
@@ -454,6 +484,9 @@ public final class MolangParser
 		@Override public Value evaluate(Evaluation evaluation) { return Value.of(this.value); }
 	}
 
+/**
+ * Immutable value object representing variable.
+ */
 	private record Variable(String name) implements Node
 	{
 		/**
@@ -464,6 +497,9 @@ public final class MolangParser
 		@Override public Value evaluate(Evaluation evaluation) { return evaluation.context.resolve(this.name, List.of(), evaluation); }
 	}
 	
+/**
+ * Immutable value object representing call.
+ */
 	private record Call(String name, List<Node> arguments) implements Node
 	{
 		/**
@@ -485,6 +521,9 @@ public final class MolangParser
 		}
 	}
 
+/**
+ * Immutable value object representing unary.
+ */
 	private record Unary(String operator, Node value) implements Node
 	{
 		/**
@@ -505,6 +544,9 @@ public final class MolangParser
 		}
 	}
 
+/**
+ * Immutable value object representing binary.
+ */
 	private record Binary(String operator, Node left, Node right) implements Node
 	{
 		/**
@@ -543,6 +585,9 @@ public final class MolangParser
 		}
 	}
 
+/**
+ * Immutable value object representing conditional.
+ */
 	private record Conditional(Node condition, Node yes, Node no) implements Node
 	{
 		/**
@@ -553,6 +598,9 @@ public final class MolangParser
 		@Override public Value evaluate(Evaluation evaluation) { return this.condition.evaluate(evaluation).truthy() ? this.yes.evaluate(evaluation) : this.no.evaluate(evaluation); }
 	}
 
+/**
+ * Immutable value object representing assignment.
+ */
 	private record Assignment(String operator, Variable target, Node value) implements Node
 	{
 		/**
@@ -580,6 +628,9 @@ public final class MolangParser
 		}
 	}
 
+/**
+ * Immutable value object representing block.
+ */
 	private record Block(List<Node> statements) implements Node
 	{
 		/**
@@ -601,6 +652,9 @@ public final class MolangParser
 		}
 	}
 
+/**
+ * Immutable value object representing return.
+ */
 	private record Return(Node value) implements Node
 	{
 		/**
@@ -611,6 +665,9 @@ public final class MolangParser
 		@Override public Value evaluate(Evaluation evaluation) { evaluation.result = this.value.evaluate(evaluation); evaluation.flow = Flow.RETURN; return evaluation.result; }
 	}
 
+/**
+ * Immutable value object representing flow node.
+ */
 	private record FlowNode(Flow flow) implements Node
 	{
 		/**
@@ -621,6 +678,9 @@ public final class MolangParser
 		@Override public Value evaluate(Evaluation evaluation) { evaluation.flow = this.flow; return Value.of(0f); }
 	}
 
+/**
+ * Immutable value object representing loop.
+ */
 	private record Loop(Node count, Node body) implements Node
 	{
 		/**
@@ -776,6 +836,9 @@ public final class MolangParser
 	}
 
 	@FunctionalInterface
+/**
+ * Defines the contract for random provider.
+ */
 	private interface RandomProvider
 	{
 		/**
@@ -971,6 +1034,9 @@ public final class MolangParser
 				name;
 	}
 
+/**
+ * Parses parser.
+ */
 	private static final class Parser
 	{
 		private final Lexer lexer;
@@ -1378,9 +1444,18 @@ public final class MolangParser
 		}
 	}
 
+/**
+ * Enumerates the available token type values.
+ */
 	private enum TokenType { NUMBER, IDENTIFIER, OPERATOR, BRACE_CLOSE, END }
+/**
+ * Immutable value object representing token.
+ */
 	private record Token(TokenType type, String text, int position) { }
 
+/**
+ * Provides support for lexer.
+ */
 	private static final class Lexer
 	{
 		private final String source;

@@ -14,6 +14,9 @@ import com.arcanc.pulselib.content.model.animation.PAnimationValue;
 import com.arcanc.pulselib.content.model.animation.PVectorConversion;
 import org.joml.Vector3f;
 
+/**
+ * Provides support for molang vector value.
+ */
 public final class PMolangVectorValue implements PAnimationValue<Vector3f>
 {
 	private final MolangParser.Expression x;

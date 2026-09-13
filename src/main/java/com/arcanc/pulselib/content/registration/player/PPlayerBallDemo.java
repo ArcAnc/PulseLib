@@ -18,9 +18,11 @@ import com.arcanc.pulselib.content.registration.PLibRegistration;
 import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
 import com.arcanc.pulselib.util.PLibDatabase;
+import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
@@ -33,6 +35,9 @@ import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import org.lwjgl.glfw.GLFW;
 
+/**
+ * Provides support for player ball demo.
+ */
 public final class PPlayerBallDemo
 {
 	private static final Identifier ID = PLibDatabase.rl("demo/player_ball_toss");
@@ -46,17 +51,10 @@ public final class PPlayerBallDemo
 			GLFW.GLFW_KEY_V,
 			KeyMapping.Category.MISC);
 
-	/**
-	 * Creates an instance of the enclosing type.
-	 */
 	private PPlayerBallDemo()
 	{
 	}
-
-	/**
-	 * Performs the register operation.
-	 * @param modEventBus the mod event bus to use.
-	 */
+	
 	public static void register(IEventBus modEventBus)
 	{
 		if (FMLLoader.getCurrent().isProduction())
@@ -65,25 +63,23 @@ public final class PPlayerBallDemo
 		modEventBus.addListener(PPlayerBallDemo::registerAnimation);
 		NeoForge.EVENT_BUS.addListener(PPlayerBallDemo::clientTick);
 	}
-
-	/**
-	 * Registers the key mapping.
-	 * @param event the event to use.
-	 */
+	
 	private static void registerKeyMapping(RegisterKeyMappingsEvent event)
 	{
 		event.register(KEY);
 	}
-
-	/**
-	 * Registers the animation.
-	 * @param event the event to use.
-	 */
+	
 	private static void registerAnimation(PulseLibEvents.PlayerAnimationRegistrationEvent event)
 	{
 		event.registration().register(ID, PPlayerAnimationDefinition.builder(MODEL).
 						when(player ->
 						{
+							Minecraft mc = PLibRenderHelper.mc();
+							LocalPlayer localPlayer = mc.player;
+							if (localPlayer == null)
+								return false;
+							if (!mc.player.getUUID().equals(player.getUUID()))
+								return false;
 							HumanoidArm hand = player.getMainArm();
 							ItemStack stack = player.getItemHeldByArm(hand);
 							return stack.is(PLibRegistration.ItemReg.TEST_ITEM);
@@ -105,11 +101,7 @@ public final class PPlayerBallDemo
 								state.controller().isStopped() ? ControllerState.STOP : ControllerState.PLAY)).
 				build());
 	}
-
-	/**
-	 * Performs the client tick operation.
-	 * @param event the event to use.
-	 */
+	
 	private static void clientTick(ClientTickEvent.Post event)
 	{
 		Player player = Minecraft.getInstance().player;

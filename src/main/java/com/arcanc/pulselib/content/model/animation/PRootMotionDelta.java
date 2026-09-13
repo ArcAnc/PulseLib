@@ -12,6 +12,9 @@ package com.arcanc.pulselib.content.model.animation;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+/**
+ * Immutable value object representing root motion delta.
+ */
 public record PRootMotionDelta(
 		Vector3f translation,
 		Quaternionf rotation)

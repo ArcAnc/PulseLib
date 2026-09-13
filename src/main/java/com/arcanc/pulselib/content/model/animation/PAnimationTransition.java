@@ -11,6 +11,9 @@ package com.arcanc.pulselib.content.model.animation;
 
 import java.util.Objects;
 
+/**
+ * Immutable value object representing animation transition.
+ */
 public record PAnimationTransition(
 		int source,
 		int target,

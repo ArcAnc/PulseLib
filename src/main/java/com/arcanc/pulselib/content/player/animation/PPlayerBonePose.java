@@ -13,6 +13,9 @@ package com.arcanc.pulselib.content.player.animation;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+/**
+ * Immutable value object representing player bone pose.
+ */
 public record PPlayerBonePose(Vector3f translation,
                               Quaternionf rotation,
                               Vector3f scale,

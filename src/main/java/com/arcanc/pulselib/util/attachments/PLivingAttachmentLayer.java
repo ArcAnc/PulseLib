@@ -37,6 +37,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Provides support for living attachment layer.
+ */
 public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends EntityModel<? super S>> extends RenderLayer<S, M>
 {
 	public static final ContextKey<List<RenderEntry>> RENDER_DATA = new ContextKey<>(PLibDatabase.rl("living_attachments"));
@@ -291,6 +294,9 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 	}
 	
 	@FunctionalInterface
+/**
+ * Defines the contract for attachment part resolver.
+ */
 	private interface AttachmentPartResolver
 	{
 		/**
@@ -301,6 +307,9 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 		@Nullable ModelPart resolve(PAttachmentBinding binding);
 	}
 	
+/**
+ * Immutable value object representing render entry.
+ */
 	public record RenderEntry(
 			PLivingAttachmentDefinition definition,
 			LivingEntity entity,

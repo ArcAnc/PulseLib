@@ -19,6 +19,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.NonNull;
 
+/**
+ * Provides support for test block entity.
+ */
 public class TestBlockEntity extends BlockEntity implements PAnimatable<TestBlockEntity>
 {
 	private final PAnimationManager<TestBlockEntity> animationManager = PLibHelper.createManager(this);

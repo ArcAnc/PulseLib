@@ -11,6 +11,9 @@ package com.arcanc.pulselib.content.renderer.plan;
 
 import java.util.List;
 
+/**
+ * Immutable value object representing render plan.
+ */
 public record PRenderPlan<P, M, I>(List<PDrawGroup<P, M, I>> groups)
 {
 	public static final PRenderPlan<?, ?, ?> EMPTY = new PRenderPlan<>(List.of());

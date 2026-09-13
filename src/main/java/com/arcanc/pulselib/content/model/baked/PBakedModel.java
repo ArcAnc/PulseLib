@@ -28,6 +28,9 @@ import org.joml.Vector3f;
 import java.util.*;
 import java.util.function.Function;
 
+/**
+ * Provides support for baked model.
+ */
 public final class PBakedModel
 {
 	private final List<PBakedBone> bones;

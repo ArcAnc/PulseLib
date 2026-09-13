@@ -23,6 +23,9 @@ import com.arcanc.pulselib.util.PRenderTypes;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.resources.Identifier;
 
+/**
+ * Renders test block entity.
+ */
 public class TestBlockEntityRenderer extends PBlockRenderer<TestBlockEntity, TestBlockEntityRenderState>
 {
 	public static final Identifier TUBE = PLibDatabase.rl("block/test_block/tube_texture");
@@ -37,7 +40,7 @@ public class TestBlockEntityRenderer extends PBlockRenderer<TestBlockEntity, Tes
 	public TestBlockEntityRenderer(final BlockEntityRendererProvider.Context ctx)
 	{
 		super(new DefaultBlockModelData.DefaultBlockModelDataBuilder(PLibDatabase.rl("test_block")).
-				build(), PRenderTypes.RenderTypeProvider :: trianglesTranslucent);
+				build(), PRenderTypes.RenderTypeProvider :: trianglesCutout);
 	}
 	
 	/**

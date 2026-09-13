@@ -15,6 +15,9 @@ import net.minecraft.world.entity.LivingEntity;
 
 import java.util.function.Predicate;
 
+/**
+ * Provides support for living attachment sources.
+ */
 public final class PLivingAttachmentSources
 {
 	/**

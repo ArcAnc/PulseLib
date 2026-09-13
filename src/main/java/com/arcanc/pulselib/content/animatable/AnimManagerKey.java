@@ -17,6 +17,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.Objects;
 
+/**
+ * Immutable value object representing anim manager key.
+ */
 public record AnimManagerKey(long key)
 {
 	/**

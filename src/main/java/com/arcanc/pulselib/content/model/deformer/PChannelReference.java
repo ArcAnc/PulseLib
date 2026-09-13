@@ -13,6 +13,9 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+/**
+ * Immutable value object representing channel reference.
+ */
 public record PChannelReference<T>(String name, T defaultValue)
 {
 	public static final MapCodec<PChannelReference<Float>> FLOAT_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.

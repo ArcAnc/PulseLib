@@ -9,6 +9,9 @@
 
 package com.arcanc.pulselib.content.animatable;
 
+/**
+ * Enumerates the available controller state values.
+ */
 public enum ControllerState
 {
 	PLAY,

@@ -1,9 +1,10 @@
 package com.arcanc.pulselib.content.model.animation;
-
 import com.google.gson.JsonElement;
 
 import java.util.Map;
-
+/**
+ * Defines the contract for animation format decoder.
+ */
 public interface PAnimationFormatDecoder
 {
 	/**

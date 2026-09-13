@@ -21,6 +21,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Provides support for living attachments.
+ */
 public class PLivingAttachments
 {
 	private static final Map<Item, List<PLivingAttachmentDefinition>> ITEM_ATTACHMENTS = new Reference2ObjectLinkedOpenHashMap<>();

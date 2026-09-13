@@ -20,6 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Manages gl geometry allocations.
+ */
 public final class PGlGeometryArena
 {
 	private static final int PAGE_BYTES = 4 * 1024 * 1024;
@@ -66,10 +69,16 @@ public final class PGlGeometryArena
 		return page.append(mesh, vertexBytes, indexBytes);
 	}
 
+/**
+ * Immutable value object representing slice.
+ */
 	public record Slice(Page page, long indexOffset, int baseVertex, int indexCount, int indexType)
 	{
 	}
 
+/**
+ * Provides support for page.
+ */
 	public static final class Page
 	{
 		private final int vertexBuffer;

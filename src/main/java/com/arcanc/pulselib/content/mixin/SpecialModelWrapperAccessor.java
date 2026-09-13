@@ -16,6 +16,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin (SpecialModelWrapper.class)
+/**
+ * Defines the contract for special model wrapper accessor.
+ */
 public interface SpecialModelWrapperAccessor<T>
 {
 	/**

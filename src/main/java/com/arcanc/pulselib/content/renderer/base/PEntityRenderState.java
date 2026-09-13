@@ -19,9 +19,11 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Pose;
 import org.jspecify.annotations.Nullable;
 
+/**
+ * Defines the contract for entity render state.
+ */
 public interface PEntityRenderState<T extends Entity & PAnimatable<T>> extends PRenderState<T>
 {
 	/**
@@ -33,6 +35,9 @@ public interface PEntityRenderState<T extends Entity & PAnimatable<T>> extends P
 			T entity,
 			PEntityRenderer<T, RS> renderer);
 	
+/**
+ * Provides support for impl.
+ */
 	class Impl<T extends Entity & PAnimatable<T>> extends EntityRenderState implements PEntityRenderState<T>
 	{
 		private @Nullable PBakedModel model;
@@ -105,6 +110,9 @@ public interface PEntityRenderState<T extends Entity & PAnimatable<T>> extends P
 		}
 	}
 	
+/**
+ * Provides support for living impl.
+ */
 	class LivingImpl<T extends LivingEntity & PAnimatable<T>> extends LivingEntityRenderState implements PEntityRenderState<T>
 	{
 		private @Nullable PBakedModel model;

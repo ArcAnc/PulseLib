@@ -20,6 +20,9 @@ import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 
+/**
+ * Provides support for humanoid attachment layer.
+ */
 public class PHumanoidAttachmentLayer<S extends HumanoidRenderState, M extends HumanoidModel<S>> extends PLivingAttachmentLayer<S, M>
 {
 	/**

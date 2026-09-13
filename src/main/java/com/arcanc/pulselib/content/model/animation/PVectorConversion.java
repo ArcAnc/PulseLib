@@ -12,6 +12,9 @@ package com.arcanc.pulselib.content.model.animation;
 import org.joml.Vector3f;
 
 @FunctionalInterface
+/**
+ * Defines the contract for vector conversion.
+ */
 public interface PVectorConversion
 {
 	PVectorConversion IDENTITY = value -> {};

@@ -19,6 +19,9 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 @FunctionalInterface
+/**
+ * Defines the contract for living mesh render resolver.
+ */
 public interface PLivingMeshRenderResolver extends PMeshRenderResolver
 {
 	/**

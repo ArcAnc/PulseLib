@@ -35,6 +35,9 @@ import org.lwjgl.opengl.GL40;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 
+/**
+ * Provides support for gl weighted blended oit.
+ */
 final class PGlWeightedBlendedOit
 {
 	static final int LAYER_COUNT = 4;
@@ -641,6 +644,9 @@ final class PGlWeightedBlendedOit
 		}
 	}
 
+/**
+ * Enumerates the available pass values.
+ */
 	private enum Pass
 	{
 		NONE,
@@ -681,6 +687,9 @@ final class PGlWeightedBlendedOit
 		}
 	}
 
+/**
+ * Provides support for external gl texture.
+ */
 	private static final class ExternalGlTexture extends GlTexture
 	{
 		/**
@@ -698,6 +707,9 @@ final class PGlWeightedBlendedOit
 		}
 	}
 
+/**
+ * Provides support for external gl texture view.
+ */
 	private static final class ExternalGlTextureView extends GlTextureView
 	{
 		/**
@@ -710,6 +722,9 @@ final class PGlWeightedBlendedOit
 		}
 	}
 
+/**
+ * Provides support for gl state snapshot.
+ */
 	private static final class GlStateSnapshot
 	{
 		private final int drawFramebuffer;
@@ -776,6 +791,9 @@ final class PGlWeightedBlendedOit
 		}
 	}
 
+/**
+ * Immutable value object representing blend state.
+ */
 	private record BlendState(boolean enabled, int equationRgb, int equationAlpha,
 	                          int sourceRgb, int destinationRgb, int sourceAlpha, int destinationAlpha)
 	{

@@ -14,6 +14,9 @@ import com.arcanc.pulselib.content.model.animation.PAnimationValue;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+/**
+ * Provides support for molang euler rotation value.
+ */
 public final class PMolangEulerRotationValue implements PAnimationValue<Quaternionf>
 {
 	private final PMolangVectorValue eulerDegrees;

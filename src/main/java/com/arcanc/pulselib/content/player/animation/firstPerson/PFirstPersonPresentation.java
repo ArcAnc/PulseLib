@@ -1,11 +1,7 @@
 package com.arcanc.pulselib.content.player.animation.firstPerson;
 
 import com.arcanc.pulselib.content.model.animation.PTransform;
-import com.arcanc.pulselib.content.player.animation.PPlayerAnimationAnchor;
-import com.arcanc.pulselib.content.player.animation.PPlayerAnimationAnchors;
-import com.arcanc.pulselib.content.player.animation.PPlayerAnimationFrame;
-import com.arcanc.pulselib.content.player.animation.PPlayerAnimationSpace;
-import com.arcanc.pulselib.content.player.animation.PPlayerPart;
+import com.arcanc.pulselib.content.player.animation.*;
 import net.minecraft.world.entity.HumanoidArm;
 import org.joml.Matrix4f;
 import org.jspecify.annotations.Nullable;

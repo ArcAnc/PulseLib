@@ -18,6 +18,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
+/**
+ * Provides support for player animation handle.
+ */
 public final class PPlayerAnimationHandle
 {
 	private final Player player;

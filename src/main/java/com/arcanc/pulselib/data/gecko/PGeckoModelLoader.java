@@ -14,8 +14,8 @@ import com.arcanc.pulselib.content.model.PModel;
 import com.arcanc.pulselib.data.PAnimationSidecarParser;
 import com.arcanc.pulselib.data.PModelLoader;
 import com.arcanc.pulselib.util.PLibDatabase;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import com.mojang.blaze3d.vertex.PoseStack;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 
@@ -28,6 +28,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.BiConsumer;
 
+/**
+ * Loads gecko model.
+ */
 public class PGeckoModelLoader implements PModelLoader
 {
 	public static final PGeckoModelLoader INSTANCE = new PGeckoModelLoader();
@@ -92,25 +95,30 @@ public class PGeckoModelLoader implements PModelLoader
 	{
 		return modelLocation.withPrefix(MODEL_ROOT + "/" + modelType + "/").withSuffix(MODEL_EXTENSION);
 	}
-	
+
 	/**
-	 * Performs the texture location operation.
-	 * @param modelPath the model path to use.
-	 * @param textureName the texture name to use.
-	 * @return the value produced by this operation.
+	 * Performs the model resource location operation.
+	 * @param modelLocation the loader-relative model id.
+	 * @return the resource-pack model location.
 	 */
 	@Override
-	public Identifier textureLocation(Identifier modelPath, String textureName)
+	public Identifier modelResourceLocation(Identifier modelLocation)
 	{
-		String modelName = modelName(modelPath);
-		String[] divided = modelName.split("/");
-		
-		Identifier loc = modelPath.withPath(divided[0] + "/" + divided[1] + "/");
-		
-		if (divided.length > 2)
-			for (int q = 2; q < divided.length; q++)
-				loc = loc.withSuffix(divided[q] + "/");
-		return loc.withSuffix(textureName);
+		return modelLocation.getPath().startsWith(MODEL_ROOT + "/") ? modelLocation : modelLocation.withPrefix(MODEL_ROOT + "/");
+	}
+
+	/**
+	 * Normalizes a GeckoLib resource id, using {@code .geo.json} when no JSON extension was supplied.
+	 *
+	 * @param modelLocation the loader-relative model id.
+	 * @return the normalized GeckoLib resource location.
+	 */
+	@Override
+	public Identifier normalizeModelResourceLocation(Identifier modelLocation)
+	{
+		Identifier resourceLocation = modelResourceLocation(modelLocation);
+		return resourceLocation.getPath().endsWith(JSON_EXTENSION) ?
+				resourceLocation : resourceLocation.withSuffix(MODEL_EXTENSION);
 	}
 	
 	/**

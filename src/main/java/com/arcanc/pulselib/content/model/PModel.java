@@ -15,6 +15,9 @@ import com.mojang.datafixers.util.Pair;
 
 import java.util.*;
 
+/**
+ * Provides support for model.
+ */
 public class PModel
 {
 	public final Map<UUID, PBone> bones = new LinkedHashMap<>();

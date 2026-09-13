@@ -16,6 +16,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(BlockEntityRenderState.class)
+/**
+ * Defines the contract for block entity render state accessor.
+ */
 public interface BlockEntityRenderStateAccessor
 {
 	/**

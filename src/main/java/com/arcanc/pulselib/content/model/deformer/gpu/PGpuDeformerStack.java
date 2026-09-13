@@ -14,6 +14,9 @@ import org.joml.Vector3f;
 
 import java.util.*;
 
+/**
+ * Provides support for gpu deformer stack.
+ */
 public final class PGpuDeformerStack
 {
 	public static final int MAX_OPERATIONS = 8;

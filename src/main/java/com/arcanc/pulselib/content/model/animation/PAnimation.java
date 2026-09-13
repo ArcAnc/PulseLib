@@ -19,6 +19,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Immutable value object representing animation.
+ */
 public record PAnimation(String name,
                          float length,
                          Map<String, PBoneAnimation> boneAnimations,

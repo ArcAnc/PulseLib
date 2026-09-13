@@ -7,7 +7,6 @@
  * Details can be found in the license file in the root folder of this project
  */
 package com.arcanc.pulselib.content.animatable;
-
 import com.arcanc.pulselib.content.model.animation.*;
 import com.arcanc.pulselib.content.model.baked.PBakedModel;
 import net.minecraft.core.BlockPos;
@@ -24,7 +23,9 @@ import org.joml.Vector3f;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
+/**
+ * Provides support for animation event dispatcher.
+ */
 public final class PAnimationEventDispatcher
 {
 	/**
@@ -202,5 +203,8 @@ public final class PAnimationEventDispatcher
 		return null;
 	}
 
+/**
+ * Immutable value object representing position context.
+ */
 	private record PositionContext(Level level, double x, double y, double z) { }
 }

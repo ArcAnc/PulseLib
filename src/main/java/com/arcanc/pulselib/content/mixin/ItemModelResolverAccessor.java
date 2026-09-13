@@ -16,6 +16,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin (ItemModelResolver.class)
+/**
+ * Defines the contract for item model resolver accessor.
+ */
 public interface ItemModelResolverAccessor
 {
 	/**

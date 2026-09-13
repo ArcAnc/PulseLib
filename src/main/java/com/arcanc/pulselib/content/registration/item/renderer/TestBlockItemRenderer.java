@@ -20,6 +20,9 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.resources.Identifier;
 
+/**
+ * Renders test block item.
+ */
 public class TestBlockItemRenderer extends PItemRenderer<TestBlockItem, TestBlockItemRenderState>
 {
 	public static final Identifier CIRCLE = PLibDatabase.rl("item/test_block/circle");
@@ -44,6 +47,9 @@ public class TestBlockItemRenderer extends PItemRenderer<TestBlockItem, TestBloc
 		return new TestBlockItemRenderState();
 	}
 	
+/**
+ * Immutable value object representing unbaked.
+ */
 	public record Unbaked(PModelData data) implements SpecialModelRenderer.Unbaked<TestBlockItemRenderState>
 	{
 		public static final MapCodec<Unbaked> MAP_CODEC = PModelData.CODEC.

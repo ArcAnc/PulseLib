@@ -20,6 +20,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
 
+/**
+ * Streams gl indirect.
+ */
 public final class PGlIndirectStream
 {
 	public static final int STRIDE = Integer.BYTES * 5;
@@ -165,10 +168,16 @@ public final class PGlIndirectStream
 					putInt(command.baseVertex()).putInt(command.baseInstance());
 	}
 
+/**
+ * Immutable value object representing command.
+ */
 	public record Command(int indexCount, int instanceCount, int firstIndex, int baseVertex, int baseInstance)
 	{
 	}
 
+/**
+ * Immutable value object representing upload.
+ */
 	public record Upload(int buffer, long offset)
 	{
 	}

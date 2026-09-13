@@ -15,6 +15,9 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
+/**
+ * Immutable value object representing first person item pose.
+ */
 public record PFirstPersonItemPose(
 		PFirstPersonRenderMode mode,
 		@Nullable PTransform transform,

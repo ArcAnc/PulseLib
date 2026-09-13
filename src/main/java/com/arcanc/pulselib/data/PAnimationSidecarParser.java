@@ -30,6 +30,9 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+/**
+ * Parses animation sidecar.
+ */
 public final class PAnimationSidecarParser
 {
 	private static final float SECONDS_TO_TICKS = 20f;

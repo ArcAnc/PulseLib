@@ -36,6 +36,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * Provides support for entity render layer.
+ */
 public abstract class PEntityRenderLayer<T extends Entity & PAnimatable<T>, RS extends EntityRenderState & PEntityRenderState<T>>
 {
 	private final PModelData modelData;

@@ -12,6 +12,9 @@ package com.arcanc.pulselib.util.attachments;
 
 import net.minecraft.resources.Identifier;
 
+/**
+ * Immutable value object representing attachment anchor.
+ */
 public record PAttachmentAnchor(Identifier id)
 {
 	/**

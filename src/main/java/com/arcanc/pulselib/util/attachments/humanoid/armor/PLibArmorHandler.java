@@ -28,6 +28,9 @@ import net.neoforged.neoforge.client.renderstate.RegisterRenderStateModifiersEve
 
 import java.util.List;
 
+/**
+ * Handles lib armor.
+ */
 public class PLibArmorHandler
 {
 	/**

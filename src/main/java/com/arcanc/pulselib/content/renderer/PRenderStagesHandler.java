@@ -15,6 +15,9 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.common.NeoForge;
 
+/**
+ * Handles render stages.
+ */
 public class PRenderStagesHandler
 {
 	/**

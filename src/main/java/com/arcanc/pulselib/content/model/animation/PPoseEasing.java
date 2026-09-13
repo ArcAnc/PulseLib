@@ -9,6 +9,9 @@
 
 package com.arcanc.pulselib.content.model.animation;
 
+/**
+ * Enumerates the available pose easing values.
+ */
 public enum PPoseEasing
 {
 	LINEAR

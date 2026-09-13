@@ -22,6 +22,9 @@ import net.minecraft.resources.Identifier;
 
 import java.util.*;
 
+/**
+ * Provides support for player animated attachments.
+ */
 public final class PPlayerAnimatedAttachments
 {
 	private static final Map<PPlayerAnimationAnchor, List<PPlayerAnimatedAttachmentRenderer>> RENDERERS = new HashMap<>();

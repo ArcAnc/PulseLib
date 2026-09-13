@@ -21,6 +21,9 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
 
+/**
+ * Defines the contract for item render state.
+ */
 public interface PItemRenderState<T extends Item & PAnimatable<T>> extends PRenderState<T>
 {
 	/**
@@ -81,6 +84,9 @@ public interface PItemRenderState<T extends Item & PAnimatable<T>> extends PRend
 	 */
 	ItemStackRenderState itemRenderState();
 	
+/**
+ * Provides support for impl.
+ */
 	class Impl<T extends Item & PAnimatable<T>> implements PItemRenderState<T>
 	{
 		private @Nullable PBakedModel model;
