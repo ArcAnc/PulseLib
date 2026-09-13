@@ -217,6 +217,7 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 		return modelTransform(this.model.boneIndex(bone));
 	}
 	
+	/** Returns the canonical resolved MODEL-space transform for a bone. */
 	public PTransform modelTransform(int boneIndex)
 	{
 		return this.modelPose.transform(boneIndex);

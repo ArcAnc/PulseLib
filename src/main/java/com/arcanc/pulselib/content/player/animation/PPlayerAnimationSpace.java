@@ -11,7 +11,6 @@ package com.arcanc.pulselib.content.player.animation;
 
 
 import com.arcanc.pulselib.content.model.animation.PTransform;
-import com.arcanc.pulselib.content.player.animation.firstPerson.PFirstPersonBasis;
 import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
@@ -25,7 +24,8 @@ public final class PPlayerAnimationSpace
 			new Quaternionf().rotationZ((float)Math.PI);
 	/**
 	 * Vertex space used by the baked first-person mesh pass. GLTF mesh vertices
-	 * remain in their source basis; only sockets use {@link #firstPersonBasis}.
+	 * remain in their source basis. Bone and locator matrices are instead
+	 * converted once by {@code PFirstPersonPresentation}'s MODEL-to-VIEW root.
 	 */
 	private static final PTransform PLAYER_MODEL_TO_FIRST_PERSON =
 			PTransform.rotation(GLTF_TO_PLAYER_ROTATION);
@@ -34,16 +34,6 @@ public final class PPlayerAnimationSpace
 	{
 	}
 
-	/**
-	 * GLTF first-person camera axes already equal Pulse first-person axes:
-	 * +Y is up and -Z is forward. The 180-degree Z conversion is needed only
-	 * by Minecraft's third-person ModelPart space, whose Y axis is downward.
-	 */
-	public static PFirstPersonBasis firstPersonBasis(PPlayerAnimationDefinition definition)
-	{
-		return PFirstPersonBasis.IDENTITY;
-	}
-	
 	public static Vector3f toPlayerSpace(
 			Vector3fc vector,
 			PPlayerAnimationDefinition definition)
@@ -100,33 +90,6 @@ public final class PPlayerAnimationSpace
 		return PLAYER_MODEL_TO_FIRST_PERSON.compose(transform);
 	}
 	
-	/**
-	 * Converts a camera-relative bone or item transform for the first-person
-	 * replacement renderer. The returned transform maps vanilla player-model
-	 * local coordinates into first-person camera coordinates.
-	 *
-	 * <p>All source-to-runtime conversion is a full change of basis,
-	 * {@code C * M * C^-1}; renderer integration never adds corrective axes.
-	 */
-	public static PTransform toFirstPersonSpace(
-			PTransform transform,
-			PPlayerAnimationDefinition definition)
-	{
-		return firstPersonBasis(definition).convert(transform);
-	}
-
-	/**
-	 * Converts a hand-bone transform into a first-person item attachment point.
-	 * The anchor contributes only its position: item orientation and scale come
-	 * from the item's {@code FIRST_PERSON_*_HAND} JSON display transform.
-	 */
-	public static PTransform toFirstPersonItemAnchorSpace(
-			PTransform transform,
-			PPlayerAnimationDefinition definition)
-	{
-		return PTransform.translation(toFirstPersonSpace(transform, definition).translation());
-	}
-
 	/**
 	 * Converts a camera-relative transform for a mesh attached to the animated
 	 * model. Unlike vanilla arms and items, glTF mesh vertices already use the

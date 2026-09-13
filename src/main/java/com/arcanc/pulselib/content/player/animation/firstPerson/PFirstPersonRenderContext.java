@@ -11,7 +11,7 @@ public record PFirstPersonRenderContext(
         HumanoidArm arm,
         Matrix4f basePose,
         Matrix3f baseNormal,
-        PPlayerFirstPersonPose animationPose,
+	        PFirstPersonRenderPresentation presentation,
         boolean map)
 {
 	public PFirstPersonRenderContext

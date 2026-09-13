@@ -49,6 +49,7 @@ public final class PPlayerAnimationDefinition
 	private final MolangContextProvider molangContextProvider;
 
 	private final Map<PPlayerAnimationAnchor, String> anchors;
+	private final PBoneRenderMask firstPersonRenderMask;
 	private final PPlayerFirstPersonSettings firstPersonSettings;
 	private final ItemRenderPolicy itemRenderPolicy;
 	@Nullable
@@ -77,6 +78,14 @@ public final class PPlayerAnimationDefinition
 		this.controllerRegistrar = builder.controllerRegistrar;
 		this.molangContextProvider = builder.molangContextProvider;
 		this.anchors = Map.copyOf(builder.anchors);
+		Set<String> firstPersonRenderBones = new HashSet<>(this.anchors.values());
+		for (PPlayerPart part : List.of(PPlayerPart.RIGHT_ARM, PPlayerPart.LEFT_ARM))
+		{
+			String bone = this.bindings.get(part);
+			if (bone != null)
+				firstPersonRenderBones.add(bone);
+		}
+		this.firstPersonRenderMask = PBoneRenderMask.only(firstPersonRenderBones);
 		this.firstPersonSettings = builder.firstPersonSettings.copy();
 		this.itemRenderPolicy = builder.itemRenderPolicy;
 		this.itemVisibilityController = builder.itemVisibilityController;
@@ -178,6 +187,12 @@ public final class PPlayerAnimationDefinition
 	public Map<PPlayerAnimationAnchor, String> anchors()
 	{
 		return this.anchors;
+	}
+
+	/** Presentation-only first-person visibility; it never prunes pose evaluation. */
+	public PBoneRenderMask firstPersonRenderMask()
+	{
+		return this.firstPersonRenderMask;
 	}
 
 	public PPlayerFirstPersonSettings firstPersonSettings()

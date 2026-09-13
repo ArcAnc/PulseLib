@@ -12,6 +12,11 @@ package com.arcanc.pulselib.content.model.animation;
 import com.arcanc.pulselib.content.model.baked.PBakedModel;
 import java.util.BitSet;
 
+/**
+ * Resolved MODEL-space transforms.  {@link PPose} supplies LOCAL_BONE TRS;
+ * this cache applies the baked parent hierarchy once for consumers such as
+ * render presentations, locators and deformers.
+ */
 public final class PModelPose
 {
 	private final PTransform[] transforms;
@@ -24,6 +29,7 @@ public final class PModelPose
 			this.transforms[index] = PTransform.IDENTITY;
 	}
 
+	/** Returns a resolved MODEL-space bone transform. */
 	public PTransform transform(int boneIndex)
 	{
 		return this.transforms[boneIndex];

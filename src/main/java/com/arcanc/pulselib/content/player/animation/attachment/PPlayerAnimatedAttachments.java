@@ -14,7 +14,7 @@ import com.arcanc.pulselib.content.player.animation.PPlayerAnimationAnchor;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationAnchorPose;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
 import com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonAnchorPose;
-import com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonPose;
+import com.arcanc.pulselib.content.player.animation.firstPerson.PFirstPersonRenderPresentation;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -47,13 +47,13 @@ public final class PPlayerAnimatedAttachments
 	}
 
 	public static void renderFirstPerson(AbstractClientPlayer player,
-	                                    PPlayerFirstPersonPose firstPersonPose,
+	                                    PFirstPersonRenderPresentation firstPersonPresentation,
 	                                    PoseStack poseStack,
 	                                    SubmitNodeCollector submitNodeCollector,
 	                                    int packedLight,
 	                                    float partialTick)
 	{
-		for (PPlayerFirstPersonAnchorPose pose : firstPersonPose.animationAnchors())
+		for (PPlayerFirstPersonAnchorPose pose : firstPersonPresentation.animationAnchors())
 			render(player, pose.animation(), pose.anchor(), pose.transform(), pose.weight(), true, poseStack, submitNodeCollector, packedLight, partialTick);
 	}
 

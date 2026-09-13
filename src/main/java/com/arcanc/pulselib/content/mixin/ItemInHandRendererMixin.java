@@ -70,7 +70,7 @@ public abstract class ItemInHandRendererMixin
 	                                                     int packedLight,
 	                                                     CallbackInfo ci)
 	{
-		var pose = PFirstPersonRenderContexts.passPose();
+		var pose = PFirstPersonRenderContexts.passPresentation();
 		if (pose != null)
 			PPlayerFirstPersonRenderer.renderExtras(player, pose, poseStack, submitNodeCollector, packedLight, partialTick);
 	}
@@ -146,7 +146,7 @@ public abstract class ItemInHandRendererMixin
 			return;
 		}
 		PFirstPersonArmPose armPose = context.arm() == HumanoidArm.RIGHT ?
-				context.animationPose().rightArm() : context.animationPose().leftArm();
+				context.presentation().rightArm() : context.presentation().leftArm();
 		if (armPose.mode() == PFirstPersonRenderMode.HIDDEN)
 			return;
 		if (armPose.mode() == PFirstPersonRenderMode.VANILLA)
@@ -154,14 +154,15 @@ public abstract class ItemInHandRendererMixin
 			original.call(renderer, poseStack, submitNodeCollector, packedLight, skin, sleeve, player);
 			return;
 		}
+		if (armPose.transform() == null)
+			return;
 		poseStack.pushPose();
 		try
 		{
-			if (armPose.transformMode() == PFirstPersonTransformMode.ADDITIVE)
-				poseStack.mulPose(armPose.transform().matrix());
-			else
-				PFirstPersonPoseStack.replaceLocalPose(poseStack, context.basePose(), context.baseNormal(),
-						PVanillaFirstPersonArmResolver.resolveArmOrigin(context.arm(), armPose.transform()));
+			/* The arm render hook is only a bridge to Minecraft's geometry API.
+			 * The matrix came from PFirstPersonPresentation's canonical MODEL pose. */
+			PFirstPersonPoseStack.replaceLocalPose(poseStack, context.basePose(), context.baseNormal(),
+					PVanillaFirstPersonArmResolver.resolveArmOrigin(context.arm(), armPose.transform()));
 			original.call(renderer, poseStack, submitNodeCollector, packedLight, skin, sleeve, player);
 		}
 		finally
@@ -188,7 +189,7 @@ public abstract class ItemInHandRendererMixin
 			return;
 		}
 		PFirstPersonItemPose itemPose = context.arm() == HumanoidArm.RIGHT ?
-				context.animationPose().rightItem() : context.animationPose().leftItem();
+				context.presentation().rightItem() : context.presentation().leftItem();
 		renderHeldArm(entity, context, poseStack, submitNodeCollector, packedLight);
 		if (itemPose.mode() == PFirstPersonRenderMode.HIDDEN)
 			return;
@@ -227,12 +228,14 @@ public abstract class ItemInHandRendererMixin
 		if (context == null || !(entity instanceof AbstractClientPlayer player) || player.isInvisible())
 			return;
 		PFirstPersonArmPose armPose = context.arm() == HumanoidArm.RIGHT ?
-				context.animationPose().rightArm() : context.animationPose().leftArm();
+				context.presentation().rightArm() : context.presentation().leftArm();
 		if (armPose.mode() != PFirstPersonRenderMode.ANIMATED)
 			return;
 		poseStack.pushPose();
 		try
 		{
+			if (armPose.transform() == null)
+				return;
 			PFirstPersonPoseStack.replaceLocalPose(poseStack, context.basePose(), context.baseNormal(),
 					PVanillaFirstPersonArmResolver.resolveArmOrigin(context.arm(), armPose.transform()));
 			AvatarRenderer<AbstractClientPlayer> renderer = Minecraft.getInstance().

@@ -18,7 +18,7 @@ public final class PFirstPersonRenderContexts
 {
 	private static final ThreadLocal<Deque<PFirstPersonRenderContext>> CONTEXTS =
 			ThreadLocal.withInitial(ArrayDeque::new);
-	private static final ThreadLocal<Deque<Optional<PPlayerFirstPersonPose>>> PASSES =
+	private static final ThreadLocal<Deque<Optional<PFirstPersonRenderPresentation>>> PASSES =
 			ThreadLocal.withInitial(ArrayDeque::new);
 
 	private PFirstPersonRenderContexts()
@@ -27,12 +27,12 @@ public final class PFirstPersonRenderContexts
 
 	public static void beginPass(LocalPlayer player, float partialTick)
 	{
-		PASSES.get().push(Optional.ofNullable(PPlayerAnimations.firstPersonPose(player, partialTick)));
+		PASSES.get().push(Optional.ofNullable(PPlayerAnimations.firstPersonPresentation(player, partialTick)));
 	}
 
 	public static void endPass()
 	{
-		Deque<Optional<PPlayerFirstPersonPose>> passes = PASSES.get();
+		Deque<Optional<PFirstPersonRenderPresentation>> passes = PASSES.get();
 		if (!passes.isEmpty())
 			passes.pop();
 		if (passes.isEmpty())
@@ -42,9 +42,9 @@ public final class PFirstPersonRenderContexts
 		}
 	}
 
-	public static @Nullable PPlayerFirstPersonPose passPose()
+	public static @Nullable PFirstPersonRenderPresentation passPresentation()
 	{
-		Deque<Optional<PPlayerFirstPersonPose>> passes = PASSES.get();
+		Deque<Optional<PFirstPersonRenderPresentation>> passes = PASSES.get();
 		return passes.isEmpty() ? null : passes.peek().orElse(null);
 	}
 
@@ -53,7 +53,7 @@ public final class PFirstPersonRenderContexts
 	                        ItemStack stack,
 	                        PoseStack poseStack)
 	{
-		PPlayerFirstPersonPose pose = passPose();
+		PFirstPersonRenderPresentation pose = passPresentation();
 		if (pose == null)
 			return;
 		CONTEXTS.get().push(new PFirstPersonRenderContext(hand, arm,

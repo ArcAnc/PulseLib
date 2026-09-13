@@ -19,7 +19,7 @@ public final class PPlayerFirstPersonRenderer
 	}
 
 	public static void renderExtras(LocalPlayer player,
-	                                PPlayerFirstPersonPose pose,
+	                                PFirstPersonRenderPresentation pose,
 	                                PoseStack poseStack,
 	                                SubmitNodeCollector submitNodeCollector,
 	                                int packedLight,
@@ -33,7 +33,7 @@ public final class PPlayerFirstPersonRenderer
 	}
 
 	private static void renderPersistentAttachments(LocalPlayer player,
-	                                                PPlayerFirstPersonPose pose,
+	                                                PFirstPersonRenderPresentation pose,
 	                                                PoseStack poseStack,
 	                                                int packedLight,
 	                                                float partialTick)

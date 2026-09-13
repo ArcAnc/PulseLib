@@ -28,6 +28,7 @@ import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.util.*;
@@ -107,9 +108,9 @@ public final class PPlayerAnimations
 	}
 	
 	@ApiStatus.Internal
-	public static @Nullable PPlayerFirstPersonPose firstPersonPose(Player player, float partialTick)
+	public static @Nullable PFirstPersonRenderPresentation firstPersonPresentation(Player player, float partialTick)
 	{
-		FirstPersonPoseBuilder pose = new FirstPersonPoseBuilder();
+		FirstPersonPresentationBuilder pose = new FirstPersonPresentationBuilder();
 		List<Map.Entry<Identifier, PPlayerAnimationDefinition>> definitions = new ArrayList<>(DEFINITIONS.entrySet());
 		definitions.sort(Comparator.
 				comparingInt((Map.Entry<Identifier, PPlayerAnimationDefinition> entry) -> entry.getValue().priority()).
@@ -137,14 +138,18 @@ public final class PPlayerAnimations
 			if (activationWeight <= 0.0f)
 				continue;
 
-			pose.addArm(PPlayerPart.RIGHT_ARM, frame, definition, player, partialTick, activationWeight);
-			pose.addArm(PPlayerPart.LEFT_ARM, frame, definition, player, partialTick, activationWeight);
-			pose.addItem(PPlayerAnimationAnchors.RIGHT_ITEM, frame, definition, instance, player, partialTick, activationWeight);
-			pose.addItem(PPlayerAnimationAnchors.LEFT_ITEM, frame, definition, instance, player, partialTick, activationWeight);
+			PFirstPersonPresentation presentation = PFirstPersonPresentation.create(frame);
+			if (presentation == null)
+				continue;
+
+			pose.addArm(PPlayerPart.RIGHT_ARM, presentation, definition, player, partialTick, activationWeight);
+			pose.addArm(PPlayerPart.LEFT_ARM, presentation, definition, player, partialTick, activationWeight);
+			pose.addItem(PPlayerAnimationAnchors.RIGHT_ITEM, presentation, definition, instance, player, partialTick, activationWeight);
+			pose.addItem(PPlayerAnimationAnchors.LEFT_ITEM, presentation, definition, instance, player, partialTick, activationWeight);
 			pose.resolveItemVisibility(true, definition, instance, player, partialTick);
 			pose.resolveItemVisibility(false, definition, instance, player, partialTick);
-			pose.addAnimationAnchors(entry.getKey(), frame, definition, activationWeight);
-			pose.addMeshAttachments(entry.getKey(), frame, definition, activationWeight);
+			pose.addAnimationAnchors(entry.getKey(), frame, presentation, definition, activationWeight);
+			pose.addMeshAttachments(entry.getKey(), frame, presentation, definition, activationWeight);
 			pose.hasContributingAnimation = true;
 		}
 
@@ -247,9 +252,9 @@ public final class PPlayerAnimations
 			if (!instance.isFirstPersonContributing())
 				continue;
 			PPlayerAnimationFrame frame = instance.sampleFrame(partialTick);
-			PTransform delta = frame == null ? null : frame.firstPersonCameraDelta();
+			PTransform delta = frame == null ? null : frame.cameraAnchorModelDelta();
 			if (delta != null)
-				cameraPose.addCamera(PPlayerAnimationSpace.firstPersonBasis(definition).convert(delta),
+				cameraPose.addCamera(delta,
 						definition.blendMode(), weight * instance.firstPersonActivationWeight(partialTick));
 		}
 		return cameraPose.isEmpty() ? null : cameraPose;
@@ -333,54 +338,11 @@ public final class PPlayerAnimations
 				if (weight <= 0.0f)
 					continue;
 					
-				PPlayerBonePose pose = frame.animationDelta(binding.getValue());
+				PPlayerBonePose pose = frame.canonicalModelDelta(binding.getValue());
 				if (pose == null)
 					continue;
 
 				consumer.apply(part, pose, definition, weight);
-			}
-		}
-	}
-
-	private static void applyFirstPersonDefinitions(Player player,
-	                                                float partialTick,
-	                                                Set<PPlayerPart> allowedParts,
-	                                                PoseConsumer consumer)
-	{
-		List<Map.Entry<Identifier, PPlayerAnimationDefinition>> definitions = new ArrayList<>(DEFINITIONS.entrySet());
-		definitions.sort(Comparator.
-				comparingInt((Map.Entry<Identifier, PPlayerAnimationDefinition> entry) -> entry.getValue().priority()).
-				thenComparing(Map.Entry :: getKey));
-
-		for (Map.Entry<Identifier, PPlayerAnimationDefinition> entry : definitions)
-		{
-			PPlayerAnimationDefinition definition = entry.getValue();
-			if (!definition.firstPersonSettings().enabled() ||
-					definition.firstPersonSettings().cameraMode() != PFirstPersonCameraMode.ANIMATED)
-				continue;
-			float definitionWeight = definition.weight(player, partialTick);
-			if (definitionWeight <= 0.0f)
-				continue;
-
-			PPlayerAnimationInstance instance = instance(player, entry.getKey(), definition);
-			if (!instance.isFirstPersonContributing())
-				continue;
-			PPlayerAnimationFrame frame = instance.sampleFrame(partialTick);
-			if (frame == null)
-				continue;
-
-			for (Map.Entry<PPlayerPart, String> binding : definition.bindings().entrySet())
-			{
-				PPlayerPart part = binding.getKey();
-				if (!allowedParts.contains(part) || !definition.appliesTo(player, part, partialTick))
-					continue;
-				float weight = definitionWeight * instance.firstPersonActivationWeight(partialTick) *
-						definition.partWeight(player, part, partialTick) * definition.boneWeight(player, binding.getValue(), partialTick);
-				if (weight <= 0.0f)
-					continue;
-				PPlayerBonePose pose = frame.animationDelta(binding.getValue());
-				if (pose != null)
-					consumer.apply(part, pose, definition, weight);
 			}
 		}
 	}
@@ -531,7 +493,7 @@ public final class PPlayerAnimations
 		void accept(Identifier id, PPlayerAnimationFrame frame, PPlayerAnimationDefinition definition, float weight);
 	}
 
-	private static final class FirstPersonPoseBuilder
+	private static final class FirstPersonPresentationBuilder
 	{
 		private PFirstPersonArmPose rightArm = PFirstPersonArmPose.vanilla();
 		private PFirstPersonArmPose leftArm = PFirstPersonArmPose.vanilla();
@@ -545,10 +507,12 @@ public final class PPlayerAnimations
 		private boolean leftItemHidden;
 		private final List<PPlayerFirstPersonAnchorPose> animationAnchors = new ArrayList<>();
 		private final List<PPlayerFirstPersonMeshAttachmentPose> meshAttachments = new ArrayList<>();
+		/** Reused while converting canonical matrices into immutable render commands. */
+		private final Matrix4f presentationMatrix = new Matrix4f();
 		private boolean hasContributingAnimation;
 
 		private void addArm(PPlayerPart part,
-		                    PPlayerAnimationFrame frame,
+		                    PFirstPersonPresentation presentation,
 		                    PPlayerAnimationDefinition definition,
 		                    Player player,
 		                    float partialTick,
@@ -563,7 +527,8 @@ public final class PPlayerAnimations
 					definition.boneWeight(player, boneName, partialTick);
 			if (weight <= 0.0f)
 				return;
-			PTransform armOrigin = calibratedArmOrigin(part, frame, definition);
+			PTransform armOrigin = presentation.armPreModelPartMatrix(part, this.presentationMatrix) ?
+					PTransform.fromMatrix(this.presentationMatrix) : null;
 			if (armOrigin != null)
 			{
 				boolean right = part == PPlayerPart.RIGHT_ARM;
@@ -578,123 +543,8 @@ public final class PPlayerAnimations
 			}
 		}
 		
-		private static @Nullable PTransform calibratedArmOrigin(
-				PPlayerPart part,
-				PPlayerAnimationFrame frame,
-				PPlayerAnimationDefinition definition)
-		{
-			PFirstPersonBasis basis =
-					PPlayerAnimationSpace.firstPersonBasis(definition);
-			
-			PTransform sourceCurrent =
-					frame.firstPersonTransform(part);
-			
-			PTransform sourceBind =
-					frame.firstPersonBindTransform(part);
-			
-			if (sourceCurrent == null || sourceBind == null)
-				return null;
-			
-			HumanoidArm arm =
-					part == PPlayerPart.RIGHT_ARM ?
-							HumanoidArm.RIGHT :
-							HumanoidArm.LEFT;
-			
-			PTransform bindArm =
-					basis.convert(sourceBind);
-			
-			PTransform currentArm =
-					basis.convert(sourceCurrent);
-			
-			PTransform vanillaBind =
-					PFirstPersonRestPose.armOrigin(arm);
-			
-			
-			/*
-			 * TRANSLATION
-			 *
-			 * Authored glTF translation is parent-local.
-			 * Convert it through the parent bind transform into
-			 * FIRST_PERSON_CAMERA space.
-			 *
-			 * The arm's own bind rotation MUST NOT participate here.
-			 */
-			Vector3f sourceTranslationDelta =
-					frame.firstPersonAnimationTranslation(part);
-			
-			if (sourceTranslationDelta == null)
-				return null;
-			
-			Vector3f translationDelta =
-					basis.convert(
-							PTransform.translation(
-									sourceTranslationDelta
-							)
-					).translation();
-			
-			
-			/*
-			 * ROTATION
-			 */
-			Quaternionf sourceRotationDelta =
-					bindArm.rotation().
-							invert().
-							mul(currentArm.rotation()).
-							normalize();
-			
-			Quaternionf vanillaRotationDelta =
-					PFirstPersonArmAnimationSpace.convertRotation(
-							bindArm,
-							vanillaBind,
-							sourceRotationDelta);
-			
-			
-			/*
-			 * SCALE
-			 */
-			Vector3f bindScale =
-					bindArm.scale();
-			
-			Vector3f currentScale =
-					currentArm.scale();
-			
-			Vector3f scaleDelta =
-					new Vector3f(
-							ratio(currentScale.x, bindScale.x),
-							ratio(currentScale.y, bindScale.y),
-							ratio(currentScale.z, bindScale.z)
-					);
-			
-			
-			Vector3f targetTranslation =
-					vanillaBind.translation().
-							add(translationDelta);
-			
-			Quaternionf targetRotation =
-					vanillaBind.rotation().
-							mul(vanillaRotationDelta).
-							normalize();
-			
-			Vector3f targetScale =
-					vanillaBind.scale().
-							mul(scaleDelta);
-			
-			return new PTransform(
-					targetTranslation,
-					targetRotation,
-					targetScale
-			);
-		}
-		
-		private static float ratio(float value, float base)
-		{
-			return Math.abs(base) < 1.0e-6f ?
-					value :
-					value / base;
-		}
-
 		private void addItem(PPlayerAnimationAnchor anchor,
-		                     PPlayerAnimationFrame frame,
+		                     PFirstPersonPresentation presentation,
 		                     PPlayerAnimationDefinition definition,
 		                     PPlayerAnimationInstance instance,
 		                     Player player,
@@ -708,35 +558,8 @@ public final class PPlayerAnimations
 			if (weight <= 0.0f)
 				return;
 			boolean rightHand = anchor.equals(PPlayerAnimationAnchors.RIGHT_ITEM);
-			PPlayerPart armPart = rightHand ? PPlayerPart.RIGHT_ARM : PPlayerPart.LEFT_ARM;
-			PTransform armOrigin = calibratedArmOrigin(armPart, frame, definition);
-			PTransform localSocket = localArmSocketTransform(armPart, anchor, frame, definition);
-			if (armOrigin != null && localSocket != null)
-			{
-				HumanoidArm arm = rightHand ? HumanoidArm.RIGHT : HumanoidArm.LEFT;
-				PTransform itemAtRest = PFirstPersonRestPose.armOrigin(arm).inverse().
-						compose(PFirstPersonRestPose.item(arm));
-				PTransform target = armOrigin.compose(itemAtRest).compose(localSocket);
-				setItem(rightHand, target, definition.blendMode(), weight);
-			}
-		}
-
-		/** Returns a hand/item socket delta expressed in its parent arm's local coordinates. */
-		private static @Nullable PTransform localArmSocketTransform(PPlayerPart armPart,
-		                                                            PPlayerAnimationAnchor socket,
-		                                                            PPlayerAnimationFrame frame,
-		                                                            PPlayerAnimationDefinition definition)
-		{
-			PTransform armCurrent = frame.firstPersonTransform(armPart);
-			PTransform armBind = frame.firstPersonBindTransform(armPart);
-			PTransform socketCurrent = frame.firstPersonSocketTransform(socket);
-			PTransform socketBind = frame.firstPersonBindSocketTransform(socket);
-			if (armCurrent == null || armBind == null || socketCurrent == null || socketBind == null)
-				return null;
-			PFirstPersonBasis basis = PPlayerAnimationSpace.firstPersonBasis(definition);
-			PTransform currentLocal = basis.convert(armCurrent.inverse().compose(socketCurrent));
-			PTransform bindLocal = basis.convert(armBind.inverse().compose(socketBind));
-			return bindLocal.inverse().compose(currentLocal);
+			if (presentation.itemMatrix(anchor, this.presentationMatrix))
+				setItem(rightHand, PTransform.fromMatrix(this.presentationMatrix), definition.blendMode(), weight);
 		}
 
 		private void resolveItemVisibility(boolean right,
@@ -764,6 +587,7 @@ public final class PPlayerAnimations
 
 		private void addAnimationAnchors(Identifier id,
 		                                 PPlayerAnimationFrame frame,
+		                                 PFirstPersonPresentation presentation,
 		                                 PPlayerAnimationDefinition definition,
 		                                 float weight)
 		{
@@ -773,35 +597,32 @@ public final class PPlayerAnimations
 						anchor.equals(PPlayerAnimationAnchors.RIGHT_ITEM) ||
 						anchor.equals(PPlayerAnimationAnchors.LEFT_ITEM))
 					continue;
-				PTransform transform = frame.firstPersonTransform(anchor);
-				if (transform != null)
+				if (presentation.anchorMatrix(anchor, this.presentationMatrix))
 					this.animationAnchors.add(
 							new PPlayerFirstPersonAnchorPose(
 									id,
 									anchor,
-									PPlayerAnimationSpace.toFirstPersonSpace(
-											transform,
-											definition),
+							PTransform.fromMatrix(this.presentationMatrix),
 									weight));
 			}
 		}
 
 		private void addMeshAttachments(Identifier id,
 		                                PPlayerAnimationFrame frame,
+		                                PFirstPersonPresentation presentation,
 		                                PPlayerAnimationDefinition definition,
 		                                float weight)
 		{
 			for (var root : PPlayerAutomaticMeshAttachments.roots(frame))
 			{
-				PTransform transform = frame.firstPersonTransform(root.name());
-				if (transform != null)
+				if (presentation.boneMatrix(root.name(), this.presentationMatrix))
 					this.meshAttachments.add(
 							new PPlayerFirstPersonMeshAttachmentPose(
 									id,
 									definition.modelData(),
 									root,
 									frame,
-									PPlayerAnimationSpace.toFirstPersonGeometrySpace(transform, definition),
+							PPlayerAnimationSpace.toFirstPersonGeometrySpace(PTransform.fromMatrix(this.presentationMatrix), definition),
 									weight));
 			}
 		}
@@ -886,9 +707,9 @@ public final class PPlayerAnimations
 			return Math.abs(divisor) < 1.0e-6f ? 0.0f : dividend / divisor;
 		}
 
-		private PPlayerFirstPersonPose build()
+		private PFirstPersonRenderPresentation build()
 		{
-			return new PPlayerFirstPersonPose(this.rightArm, this.leftArm,
+			return new PFirstPersonRenderPresentation(this.rightArm, this.leftArm,
 					this.rightItemHidden ? PFirstPersonItemPose.hidden() :
 							(this.rightItemContributed ? PFirstPersonItemPose.animated(this.rightItem) : PFirstPersonItemPose.vanilla()),
 					this.leftItemHidden ? PFirstPersonItemPose.hidden() :

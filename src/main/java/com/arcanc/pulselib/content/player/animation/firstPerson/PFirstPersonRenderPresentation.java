@@ -12,7 +12,12 @@ package com.arcanc.pulselib.content.player.animation.firstPerson;
 import java.util.List;
 import java.util.Objects;
 
-public record PPlayerFirstPersonPose(
+/**
+ * Render commands for the first-person bridge.  These are VIEW-space outputs
+ * of {@link PFirstPersonPresentation}; this type deliberately owns no
+ * alternative skeletal pose or animation channels.
+ */
+public record PFirstPersonRenderPresentation(
 		PFirstPersonArmPose rightArm,
 		PFirstPersonArmPose leftArm,
 		PFirstPersonItemPose rightItem,
@@ -20,7 +25,7 @@ public record PPlayerFirstPersonPose(
 		List<PPlayerFirstPersonAnchorPose> animationAnchors,
 		List<PPlayerFirstPersonMeshAttachmentPose> meshAttachments)
 {
-	public PPlayerFirstPersonPose
+	public PFirstPersonRenderPresentation
 	{
 		rightArm = Objects.requireNonNull(rightArm);
 		leftArm = Objects.requireNonNull(leftArm);

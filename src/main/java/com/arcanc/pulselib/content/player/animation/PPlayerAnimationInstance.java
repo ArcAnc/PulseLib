@@ -46,6 +46,9 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 	private float firstPersonTransitionTarget;
 	private float firstPersonTransitionElapsed;
 	private float firstPersonTransitionDuration;
+	@Nullable
+	private PPlayerAnimationFrame cachedFrame;
+	private int cachedFramePartialTickBits;
 
 	PPlayerAnimationInstance(Player player, Identifier id, PPlayerAnimationDefinition definition)
 	{
@@ -122,6 +125,7 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 
 	void tick(boolean shouldApply)
 	{
+		this.cachedFrame = null;
 		PBakedModel model = this.definition.modelData().getModel();
 		if (model == null)
 			return;
@@ -233,6 +237,10 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 
 	public @Nullable PPlayerAnimationFrame sampleFrame(float partialTick)
 	{
+		int partialTickBits = Float.floatToIntBits(partialTick);
+		if (this.cachedFrame != null && this.cachedFramePartialTickBits == partialTickBits)
+			return this.cachedFrame;
+
 		PBakedModel model =
 				this.definition.modelData().getModel();
 		
@@ -268,10 +276,12 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 						partialTick
 				);
 		
-		return new PPlayerAnimationFrame(
+		this.cachedFrame = new PPlayerAnimationFrame(
 				this.definition,
 				resolver
 		);
+		this.cachedFramePartialTickBits = partialTickBits;
+		return this.cachedFrame;
 		
 	}
 }

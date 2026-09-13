@@ -49,8 +49,16 @@ public record PTransform(Vector3f translation, Quaternionf rotation, Vector3f sc
 	/** Materializes this transform at the rendering boundary. */
 	public Matrix4f matrix()
 	{
-		return new Matrix4f().translationRotateScale(
-				this.translation, this.rotation, this.scale);
+		return matrix(new Matrix4f());
+	}
+
+	/**
+	 * Writes this LOCAL_BONE or MODEL-space TRS transform into {@code destination}.
+	 * This overload is for render hot paths that already own a matrix scratch buffer.
+	 */
+	public Matrix4f matrix(Matrix4f destination)
+	{
+		return destination.translationRotateScale(this.translation, this.rotation, this.scale);
 	}
 
 	/**
