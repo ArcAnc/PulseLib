@@ -34,6 +34,11 @@ public class PLibCodecs
 			values -> new Quaternionf(values.getFirst(), values.get(1), values.get(2), values.get(3)),
 			value -> List.of(value.x(), value.y(), value.z(), value.w()));
 
+	/**
+	 * Performs the fixed size float list codec operation.
+	 * @param size the size to use.
+	 * @return the value produced by this operation.
+	 */
 	private static Codec<List<Float>> fixedSizeFloatListCodec(int size)
 	{
 		return Codec.FLOAT.listOf().comapFlatMap(values -> values.size() == size ?

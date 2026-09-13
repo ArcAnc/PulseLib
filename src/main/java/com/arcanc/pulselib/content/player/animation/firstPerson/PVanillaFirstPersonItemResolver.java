@@ -6,10 +6,19 @@ import net.minecraft.world.entity.HumanoidArm;
 /** Resolves the origin expected by ItemInHandRenderer's final item draw call. */
 public final class PVanillaFirstPersonItemResolver
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PVanillaFirstPersonItemResolver()
 	{
 	}
 
+	/**
+	 * Resolves the item origin.
+	 * @param arm the arm to use.
+	 * @param itemTarget the item target to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PTransform resolveItemOrigin(HumanoidArm arm, PTransform itemTarget)
 	{
 		PFirstPersonItemRig rig = PFirstPersonRestPose.itemRig(arm);

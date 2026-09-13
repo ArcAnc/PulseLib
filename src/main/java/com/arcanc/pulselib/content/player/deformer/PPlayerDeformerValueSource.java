@@ -15,5 +15,11 @@ import net.minecraft.world.entity.player.Player;
 @FunctionalInterface
 public interface PPlayerDeformerValueSource
 {
+	/**
+	 * Performs the resolve operation.
+	 * @param player the player to use.
+	 * @param reference the reference to use.
+	 * @return the value produced by this operation.
+	 */
 	float resolve(Player player, PChannelReference<Float> reference);
 }

@@ -24,6 +24,11 @@ public class RuntimeLoader implements SpriteSource
 {
 	public static final MapCodec<RuntimeLoader> CODEC = MapCodec.unit(RuntimeLoader ::new);
 	
+	/**
+	 * Performs the run operation.
+	 * @param resourceManager the resource manager to use.
+	 * @param output the output to use.
+	 */
 	@Override
 	public void run(ResourceManager resourceManager, Output output)
 	{
@@ -40,6 +45,10 @@ public class RuntimeLoader implements SpriteSource
 		});
 	}
 	
+	/**
+	 * Performs the codec operation.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public MapCodec<? extends SpriteSource> codec()
 	{

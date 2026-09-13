@@ -11,9 +11,18 @@ public record PFirstPersonRenderContext(
         HumanoidArm arm,
         Matrix4f basePose,
         Matrix3f baseNormal,
-        PPlayerFirstPersonPose animationPose,
+	        PFirstPersonRenderPresentation presentation,
         boolean map)
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param hand the hand to use.
+	 * @param arm the arm to use.
+	 * @param basePose the base pose to use.
+	 * @param baseNormal the base normal to use.
+	 * @param presentation the presentation to use.
+	 * @param map the map to use.
+	 */
 	public PFirstPersonRenderContext
 	{
 		basePose = new Matrix4f(basePose);

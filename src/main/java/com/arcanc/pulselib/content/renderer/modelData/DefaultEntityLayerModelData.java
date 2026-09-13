@@ -14,6 +14,10 @@ import net.minecraft.resources.Identifier;
 
 public class DefaultEntityLayerModelData extends PModelData
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param builder the builder to use.
+	 */
 	public DefaultEntityLayerModelData(DefaultEntityLayerModelDataBuilder builder)
 	{
 		super(builder);
@@ -23,11 +27,22 @@ public class DefaultEntityLayerModelData extends PModelData
 	{
 		private final Identifier shortModelLocation;
 		
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param entityType the entity type to use.
+		 * @param shortModelLocation the short model location to use.
+		 */
 		public DefaultEntityLayerModelDataBuilder(Identifier entityType, Identifier shortModelLocation)
 		{
 			this(entityType, shortModelLocation, PModelData.DEFAULT_MODEL_FORMAT);
 		}
 		
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param entityType the entity type to use.
+		 * @param shortModelLocation the short model location to use.
+		 * @param modelFormat the model format to use.
+		 */
 		public DefaultEntityLayerModelDataBuilder(Identifier entityType, Identifier shortModelLocation, Identifier modelFormat)
 		{
 			super(shortModelLocation, "entity");
@@ -36,6 +51,11 @@ public class DefaultEntityLayerModelData extends PModelData
 			this.modelLocation = PModelData.generateDefaultModelLocation(this.shortModelLocation, this.modelType, this.modelFormat);
 		}
 		
+		/**
+		 * Adds the texture.
+		 * @param texturePath the texture path to use.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public DefaultEntityLayerModelDataBuilder addTexture(Identifier texturePath)
 		{
@@ -43,6 +63,10 @@ public class DefaultEntityLayerModelData extends PModelData
 			return this;
 		}
 		
+		/**
+		 * Performs the build operation.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public DefaultEntityLayerModelData build()
 		{

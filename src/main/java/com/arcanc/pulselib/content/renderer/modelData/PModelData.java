@@ -51,6 +51,10 @@ public class PModelData
 	private final Identifier modelFormat;
 	private final Map<String, Identifier> textures;
 	
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param builder the builder to use.
+	 */
 	public PModelData(Builder builder)
 	{
 		this.modelLocation = builder.modelLocation;
@@ -61,11 +65,24 @@ public class PModelData
 			this.textures.put(texture.getFirst(), texture.getSecond());
 	}
 	
+	/**
+	 * Performs the generate default model location operation.
+	 * @param modelLocation the model location to use.
+	 * @param type the type to use.
+	 * @return the value produced by this operation.
+	 */
 	protected static Identifier generateDefaultModelLocation(Identifier modelLocation, String type)
 	{
 		return generateDefaultModelLocation(modelLocation, type, DEFAULT_MODEL_FORMAT);
 	}
 	
+	/**
+	 * Performs the generate default model location operation.
+	 * @param modelLocation the model location to use.
+	 * @param type the type to use.
+	 * @param modelFormat the model format to use.
+	 * @return the value produced by this operation.
+	 */
 	protected static Identifier generateDefaultModelLocation(Identifier modelLocation, String type, Identifier modelFormat)
 	{
 		return PModelCache.getModelLoader(modelFormat).
@@ -73,11 +90,26 @@ public class PModelData
 				orElseGet(() -> PGltfModelLoader.INSTANCE.defaultModelLocation(modelLocation, type));
 	}
 	
+	/**
+	 * Performs the generate default texture location operation.
+	 * @param textureLocation the texture location to use.
+	 * @param modelLocation the model location to use.
+	 * @param type the type to use.
+	 * @return the value produced by this operation.
+	 */
 	protected static Identifier generateDefaultTextureLocation(Identifier textureLocation, String modelLocation, String type)
 	{
 		return generateDefaultTextureLocation(textureLocation, Identifier.withDefaultNamespace(modelLocation), type, DEFAULT_MODEL_FORMAT);
 	}
 	
+	/**
+	 * Performs the generate default texture location operation.
+	 * @param textureLocation the texture location to use.
+	 * @param modelLocation the model location to use.
+	 * @param type the type to use.
+	 * @param modelFormat the model format to use.
+	 * @return the value produced by this operation.
+	 */
 	protected static Identifier generateDefaultTextureLocation(Identifier textureLocation, Identifier modelLocation, String type, Identifier modelFormat)
 	{
 		return PModelCache.getModelLoader(modelFormat).
@@ -85,21 +117,38 @@ public class PModelData
 				orElseGet(() -> PGltfModelLoader.INSTANCE.defaultTextureLocation(textureLocation, modelLocation, type));
 	}
 	
+	/**
+	 * Returns the model location.
+	 * @return the value produced by this operation.
+	 */
 	public Identifier getModelLocation()
 	{
 		return this.modelLocation;
 	}
 	
+	/**
+	 * Returns the model type.
+	 * @return the value produced by this operation.
+	 */
 	public String getModelType()
 	{
 		return this.modelType;
 	}
 	
+	/**
+	 * Returns the model format.
+	 * @return the value produced by this operation.
+	 */
 	public Identifier getModelFormat()
 	{
 		return this.modelFormat;
 	}
 	
+	/**
+	 * Returns the texture by name.
+	 * @param name the name to use.
+	 * @return the value produced by this operation.
+	 */
 	public Identifier getTextureByName(String name)
 	{
 		if (this.textures.get(name) == null)
@@ -110,6 +159,10 @@ public class PModelData
 		return this.textures.getOrDefault(name, TextureManager.INTENTIONAL_MISSING_TEXTURE);
 	}
 	
+	/**
+	 * Returns the model.
+	 * @return the value produced by this operation.
+	 */
 	public @Nullable PBakedModel getModel()
 	{
 		if (PModelCache.getModels() == null)
@@ -124,11 +177,22 @@ public class PModelData
 		protected Identifier modelFormat;
 		protected List<Pair<String, Identifier>> textures;
 		
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param modelLocation the model location to use.
+		 * @param modelType the model type to use.
+		 */
 		public Builder(Identifier modelLocation, String modelType)
 		{
 			this(modelLocation, modelType, DEFAULT_MODEL_FORMAT);
 		}
 		
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param modelLocation the model location to use.
+		 * @param modelType the model type to use.
+		 * @param modelFormat the model format to use.
+		 */
 		public Builder(Identifier modelLocation, String modelType, Identifier modelFormat)
 		{
 			this.modelType = modelType;
@@ -137,6 +201,11 @@ public class PModelData
 			this.textures = new ArrayList<>();
 		}
 		
+		/**
+		 * Adds the texture.
+		 * @param texturePath the texture path to use.
+		 * @return the value produced by this operation.
+		 */
 		public Builder addTexture(Identifier texturePath)
 		{
 			String[] parsedName = texturePath.getPath().split("/");
@@ -144,17 +213,34 @@ public class PModelData
 			return this.addTexture(textureName.contains(".png") ? textureName.substring(0, textureName.length() - 4): textureName, texturePath);
 		}
 		
+		/**
+		 * Adds the texture.
+		 * @param textureName the texture name to use.
+		 * @param textureLocation the texture location to use.
+		 * @return the value produced by this operation.
+		 */
 		public Builder addTexture(String textureName, Identifier textureLocation)
 		{
 			this.textures.add(new Pair<>(textureName, textureLocation));
 			return this;
 		}
 		
+		/**
+		 * Performs the build operation.
+		 * @return the value produced by this operation.
+		 */
 		public PModelData build()
 		{
 			return new PModelData(this);
 		}
 		
+		/**
+		 * Performs the normalize model location operation.
+		 * @param modelLocation the model location to use.
+		 * @param modelType the model type to use.
+		 * @param modelFormat the model format to use.
+		 * @return the value produced by this operation.
+		 */
 		private static Identifier normalizeModelLocation(Identifier modelLocation, String modelType, Identifier modelFormat)
 		{
 			if (modelType.isEmpty())

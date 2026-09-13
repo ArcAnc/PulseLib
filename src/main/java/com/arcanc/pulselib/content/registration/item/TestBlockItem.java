@@ -26,17 +26,31 @@ public class TestBlockItem extends BlockItem implements PAnimatable<TestBlockIte
 			thenLoop("idle").
 			build();
 	
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param block the block to use.
+	 * @param properties the properties to use.
+	 */
 	public TestBlockItem(Block block, Properties properties)
 	{
 		super(block, properties);
 	}
 	
+	/**
+	 * Returns the animation manager.
+	 * @param key the key to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public PAnimationManager<TestBlockItem> getAnimationManager(AnimManagerKey key)
 	{
 		return SingletonAnimationManager.getManager(key, this);
 	}
 	
+	/**
+	 * Registers the animation controllers.
+	 * @param registrar the registrar to use.
+	 */
 	@Override
 	public void registerAnimationControllers(PAnimationManager.@NonNull PAnimationRegistrar<TestBlockItem> registrar)
 	{

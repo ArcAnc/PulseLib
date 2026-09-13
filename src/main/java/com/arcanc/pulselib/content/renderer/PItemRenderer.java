@@ -48,14 +48,33 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 	private final PModelData modelData;
 	private final Function<Identifier, RenderType> renderType;
 	
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param modelData the model data to use.
+	 * @param renderType the render type to use.
+	 */
 	public PItemRenderer(PModelData modelData, Function<Identifier, RenderType> renderType)
 	{
 		this.modelData = modelData;
 		this.renderType = renderType;
 	}
 	
+	/**
+	 * Creates the render state.
+	 * @return the value produced by this operation.
+	 */
 	protected abstract RS createRenderState();
 	
+	/**
+	 * Performs the submit operation.
+	 * @param renderState the render state to use.
+	 * @param poseStack the pose stack to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 * @param lightCoords the light coords to use.
+	 * @param overlayCoords the overlay coords to use.
+	 * @param hasFoil the has foil to use.
+	 * @param outlineColor the outline color to use.
+	 */
 	@Override
 	public void submit(@Nullable RS renderState,
 	                   PoseStack poseStack,
@@ -80,12 +99,21 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 		poseStack.popPose();
 	}
 	
+	/**
+	 * Returns the extents.
+	 * @param output the output to use.
+	 */
 	@Override
 	public void getExtents(Consumer<Vector3fc> output)
 	{
 		output.accept(new Vector3f());
 	}
 	
+	/**
+	 * Extracts the argument.
+	 * @param stack the stack to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public @Nullable RS extractArgument(ItemStack stack)
 	{
@@ -94,29 +122,58 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 		return state;
 	}
 	
+	/**
+	 * Returns the model data.
+	 * @param renderState the render state to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public PModelData getModelData(RS renderState)
 	{
 		return this.modelData;
 	}
 	
+	/**
+	 * Returns the model.
+	 * @param renderState the render state to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public @Nullable PBakedModel getModel(RS renderState)
 	{
 		return getModelData(renderState).getModel();
 	}
 	
+	/**
+	 * Returns the render type.
+	 * @param texture the texture to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public RenderType getRenderType(Identifier texture)
 	{
 		return this.renderType.apply(texture);
 	}
 	
+	/**
+	 * Performs the pre submit operation.
+	 * @param poseStack the pose stack to use.
+	 * @param renderState the render state to use.
+	 * @param cameraRenderState the camera render state to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 */
 	@Override
 	public void preSubmit(PoseStack poseStack, RS renderState, CameraRenderState cameraRenderState, SubmitNodeCollector submitNodeCollector)
 	{
 	}
 	
+	/**
+	 * Performs the true submit operation.
+	 * @param poseStack the pose stack to use.
+	 * @param renderState the render state to use.
+	 * @param cameraRenderState the camera render state to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 */
 	@Override
 	public void trueSubmit(PoseStack poseStack, RS renderState, CameraRenderState cameraRenderState, SubmitNodeCollector submitNodeCollector)
 	{
@@ -144,11 +201,31 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 		model.bones().forEach(bone -> perBoneSubmit(renderState, poseStack, bone, controllers, molangContexts, renderType, -1, renderState.lightCoords(), renderState.overlayCoords(), context));
 	}
 	
+	/**
+	 * Performs the post submit operation.
+	 * @param poseStack the pose stack to use.
+	 * @param renderState the render state to use.
+	 * @param cameraRenderState the camera render state to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 */
 	@Override
 	public void postSubmit(PoseStack poseStack, RS renderState, CameraRenderState cameraRenderState, SubmitNodeCollector submitNodeCollector)
 	{
 	}
 	
+	/**
+	 * Performs the per bone submit operation.
+	 * @param renderState the render state to use.
+	 * @param poseStack the pose stack to use.
+	 * @param bone the bone to use.
+	 * @param controllers the controllers to use.
+	 * @param molangContexts the molang contexts to use.
+	 * @param renderType the render type to use.
+	 * @param packedColor the packed color to use.
+	 * @param packedLight the packed light to use.
+	 * @param packedOverlay the packed overlay to use.
+	 * @param context the context to use.
+	 */
 	protected void perBoneSubmit(RS renderState, PoseStack poseStack, PBakedBone bone, Collection<PAnimationController<T>> controllers, Map<PAnimationController<T>, MolangParser.Context> molangContexts, Function<Identifier, RenderType> renderType, int packedColor, int packedLight, int packedOverlay, ItemDisplayContext context)
 	{
 		PModelData data = this.getModelData(renderState);
@@ -177,6 +254,14 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 		poseStack.popPose();
 	}
 
+	/**
+	 * Prepares the molang contexts.
+	 * @param animatable the animatable to use.
+	 * @param manager the manager to use.
+	 * @param controllers the controllers to use.
+	 * @param partialTick the partial tick to use.
+	 * @return the value produced by this operation.
+	 */
 	private Map<PAnimationController<T>, MolangParser.Context> prepareMolangContexts(T animatable,
 	                                                                                   PAnimationManager<T> manager,
 	                                                                                   Collection<PAnimationController<T>> controllers,
@@ -194,6 +279,13 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 		return contexts;
 	}
 
+	/**
+	 * Performs the populate molang context operation.
+	 * @param animatable the animatable to use.
+	 * @param controller the controller to use.
+	 * @param context the context to use.
+	 * @param partialTick the partial tick to use.
+	 */
 	protected void populateMolangContext(T animatable,
 	                                    PAnimationController<T> controller,
 	                                    MolangParser.Context context,
@@ -201,6 +293,19 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 	{
 	}
 	
+	/**
+	 * Performs the submit bone operation.
+	 * @param renderState the render state to use.
+	 * @param bone the bone to use.
+	 * @param poseStack the pose stack to use.
+	 * @param modelData the model data to use.
+	 * @param controllers the controllers to use.
+	 * @param renderType the render type to use.
+	 * @param color the color to use.
+	 * @param packedLight the packed light to use.
+	 * @param packedOverlay the packed overlay to use.
+	 * @param context the context to use.
+	 */
 	protected void submitBone(RS renderState,
 	                          PBakedBone bone,
 	                          PoseStack poseStack,
@@ -233,6 +338,15 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 		});
 	}
 	
+	/**
+	 * Resolves the mesh render.
+	 * @param renderState the render state to use.
+	 * @param context the context to use.
+	 * @param bone the bone to use.
+	 * @param mesh the mesh to use.
+	 * @param inherited the inherited to use.
+	 * @return the value produced by this operation.
+	 */
 	protected PMeshRenderContext resolveMeshRender(RS renderState,
 	                                               ItemDisplayContext context,
 	                                               PBakedBone bone,

@@ -49,6 +49,9 @@ public class PLibRegistration
 		public static final PAnimationChannelType<Vector3f> SCALE = CHANNEL_TYPES.register(
 				PLibDatabase.rl("scale"), new PAnimationChannel.Vector3fChannelType(PLibDatabase.rl("scale"), new Vector3f(1f), true));
 
+		/**
+		 * Performs the init operation.
+		 */
 		private static void init()
 		{
 		}
@@ -69,6 +72,9 @@ public class PLibRegistration
 		public static final PAnimationEventType<PAnimationEventTypes.AnimationParameterData> ANIMATION_PARAMETER =
 				EVENT_TYPES.register(PAnimationEventTypes.ANIMATION_PARAMETER.id(), PAnimationEventTypes.ANIMATION_PARAMETER);
 
+		/**
+		 * Performs the init operation.
+		 */
 		private static void init()
 		{
 		}
@@ -86,6 +92,9 @@ public class PLibRegistration
 		public static final PMeshDeformer<PTaperDefinition> TAPER = DEFORMERS.register(PTaperDeformer.INSTANCE.id(), PTaperDeformer.INSTANCE);
 		public static final PMeshDeformer<PWaveDefinition> WAVE = DEFORMERS.register(PWaveDeformer.INSTANCE.id(), PWaveDeformer.INSTANCE);
 
+		/**
+		 * Performs the init operation.
+		 */
 		private static void init()
 		{
 		}
@@ -100,6 +109,10 @@ public class PLibRegistration
 						ResourceKey.create(Registries.BLOCK, PLibDatabase.rl("test_block"))).
 						noOcclusion()));
 		
+		/**
+		 * Performs the init operation.
+		 * @param bus the bus to use.
+		 */
 		private static void init (@NotNull final IEventBus bus)
 		{
 			BLOCKS.register(bus);
@@ -114,6 +127,10 @@ public class PLibRegistration
 		public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TestBlockEntity>> TEST_BLOCK_ENTITY = BLOCK_ENTITIES.register("test_block_entity", () ->
 				new BlockEntityType<>(TestBlockEntity :: new, BlockReg.TEST_BLOCK.get()));
 		
+		/**
+		 * Performs the init operation.
+		 * @param bus the bus to use.
+		 */
 		private static void init (@NotNull final IEventBus bus)
 		{
 			BLOCK_ENTITIES.register(bus);
@@ -141,6 +158,10 @@ public class PLibRegistration
 				TestArmorItem :: new,
 				() -> new Item.Properties().humanoidArmor(ArmorMaterials.DIAMOND, ArmorType.LEGGINGS));
 		*/
+		/**
+		 * Performs the init operation.
+		 * @param bus the bus to use.
+		 */
 		private static void init (@NotNull final IEventBus bus)
 		{
 			ITEMS.register(bus);
@@ -158,12 +179,20 @@ public class PLibRegistration
 						sized(1, 1).
 						clientTrackingRange(5));
 		
+		/**
+		 * Performs the init operation.
+		 * @param bus the bus to use.
+		 */
 		private static void init (@NotNull final IEventBus bus)
 		{
 			ENTITIES.register(bus);
 		}
 	}
 
+	/**
+	 * Performs the init operation.
+	 * @param bus the bus to use.
+	 */
 	public static void init(@NotNull final IEventBus bus)
 	{
 		AnimationChannelReg.init();

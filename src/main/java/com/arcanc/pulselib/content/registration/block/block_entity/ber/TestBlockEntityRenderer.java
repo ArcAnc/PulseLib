@@ -30,18 +30,34 @@ public class TestBlockEntityRenderer extends PBlockRenderer<TestBlockEntity, Tes
 	public static final Identifier PYRAMID = PLibDatabase.rl("block/test_block/pyramid_texture");
 	public static final Identifier CUBE = PLibDatabase.rl("block/test_block/cube_texture");
 	
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param ctx the ctx to use.
+	 */
 	public TestBlockEntityRenderer(final BlockEntityRendererProvider.Context ctx)
 	{
 		super(new DefaultBlockModelData.DefaultBlockModelDataBuilder(PLibDatabase.rl("test_block")).
 				build(), PRenderTypes.RenderTypeProvider :: trianglesTranslucent);
 	}
 	
+	/**
+	 * Creates the render state.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public TestBlockEntityRenderState createRenderState()
 	{
 		return new TestBlockEntityRenderState();
 	}
 	
+	/**
+	 * Resolves the mesh render.
+	 * @param renderState the render state to use.
+	 * @param bone the bone to use.
+	 * @param mesh the mesh to use.
+	 * @param inherited the inherited to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	protected PMeshRenderContext resolveMeshRender(TestBlockEntityRenderState renderState, PBakedBone bone, PBakedMesh mesh, PMeshRenderContext inherited)
 	{

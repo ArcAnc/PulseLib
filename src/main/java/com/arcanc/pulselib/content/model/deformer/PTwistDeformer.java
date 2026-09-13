@@ -12,22 +12,38 @@ public final class PTwistDeformer implements PMeshDeformer<PTwistDefinition>
 	public static final PTwistDeformer INSTANCE = new PTwistDeformer();
 	private static final float EPSILON = 1.0e-5f;
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PTwistDeformer()
 	{
 	}
 
+	/**
+	 * Performs the id operation.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public Identifier id()
 	{
 		return PLibDatabase.rl("twist");
 	}
 
+	/**
+	 * Performs the codec operation.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public MapCodec<PTwistDefinition> codec()
 	{
 		return PTwistDefinition.CODEC;
 	}
 
+	/**
+	 * Performs the prepare operation.
+	 * @param context the context to use.
+	 * @param definition the definition to use.
+	 */
 	@Override
 	public void prepare(PDeformerPrepareContext context, PTwistDefinition definition)
 	{
@@ -40,6 +56,11 @@ public final class PTwistDeformer implements PMeshDeformer<PTwistDefinition>
 	private record Operation(Vector3f origin, Vector3f length, float positiveExtent, float negativeExtent,
 							 PChannelReference<Float> angle) implements PPreparedDeformer
 	{
+		/**
+		 * Performs the deform operation.
+		 * @param position the position to use.
+		 * @param values the values to use.
+		 */
 		@Override
 		public void deform(Vector3f position, PDeformerValueSource values)
 		{

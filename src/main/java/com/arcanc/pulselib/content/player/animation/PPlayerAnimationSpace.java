@@ -11,7 +11,6 @@ package com.arcanc.pulselib.content.player.animation;
 
 
 import com.arcanc.pulselib.content.model.animation.PTransform;
-import com.arcanc.pulselib.content.player.animation.firstPerson.PFirstPersonBasis;
 import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
@@ -25,25 +24,25 @@ public final class PPlayerAnimationSpace
 			new Quaternionf().rotationZ((float)Math.PI);
 	/**
 	 * Vertex space used by the baked first-person mesh pass. GLTF mesh vertices
-	 * remain in their source basis; only sockets use {@link #firstPersonBasis}.
+	 * remain in their source basis. Bone and locator matrices are instead
+	 * converted once by {@code PFirstPersonPresentation}'s MODEL-to-VIEW root.
 	 */
 	private static final PTransform PLAYER_MODEL_TO_FIRST_PERSON =
 			PTransform.rotation(GLTF_TO_PLAYER_ROTATION);
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PPlayerAnimationSpace()
 	{
 	}
 
 	/**
-	 * GLTF first-person camera axes already equal Pulse first-person axes:
-	 * +Y is up and -Z is forward. The 180-degree Z conversion is needed only
-	 * by Minecraft's third-person ModelPart space, whose Y axis is downward.
+	 * Performs the to player space operation.
+	 * @param vector the vector to use.
+	 * @param definition the definition to use.
+	 * @return the value produced by this operation.
 	 */
-	public static PFirstPersonBasis firstPersonBasis(PPlayerAnimationDefinition definition)
-	{
-		return PFirstPersonBasis.IDENTITY;
-	}
-	
 	public static Vector3f toPlayerSpace(
 			Vector3fc vector,
 			PPlayerAnimationDefinition definition)
@@ -59,6 +58,12 @@ public final class PPlayerAnimationSpace
 				1.0f);
 	}
 	
+	/**
+	 * Performs the to player space operation.
+	 * @param rotation the rotation to use.
+	 * @param definition the definition to use.
+	 * @return the value produced by this operation.
+	 */
 	public static Quaternionf toPlayerSpace(
 			Quaternionfc rotation,
 			PPlayerAnimationDefinition definition)
@@ -91,6 +96,12 @@ public final class PPlayerAnimationSpace
 				transform.scale());
 	}
 	
+	/**
+	 * Performs the to player geometry space operation.
+	 * @param transform the transform to use.
+	 * @param definition the definition to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PTransform toPlayerGeometrySpace(
 			PTransform transform,
 			PPlayerAnimationDefinition definition)
@@ -100,33 +111,6 @@ public final class PPlayerAnimationSpace
 		return PLAYER_MODEL_TO_FIRST_PERSON.compose(transform);
 	}
 	
-	/**
-	 * Converts a camera-relative bone or item transform for the first-person
-	 * replacement renderer. The returned transform maps vanilla player-model
-	 * local coordinates into first-person camera coordinates.
-	 *
-	 * <p>All source-to-runtime conversion is a full change of basis,
-	 * {@code C * M * C^-1}; renderer integration never adds corrective axes.
-	 */
-	public static PTransform toFirstPersonSpace(
-			PTransform transform,
-			PPlayerAnimationDefinition definition)
-	{
-		return firstPersonBasis(definition).convert(transform);
-	}
-
-	/**
-	 * Converts a hand-bone transform into a first-person item attachment point.
-	 * The anchor contributes only its position: item orientation and scale come
-	 * from the item's {@code FIRST_PERSON_*_HAND} JSON display transform.
-	 */
-	public static PTransform toFirstPersonItemAnchorSpace(
-			PTransform transform,
-			PPlayerAnimationDefinition definition)
-	{
-		return PTransform.translation(toFirstPersonSpace(transform, definition).translation());
-	}
-
 	/**
 	 * Converts a camera-relative transform for a mesh attached to the animated
 	 * model. Unlike vanilla arms and items, glTF mesh vertices already use the
@@ -139,6 +123,12 @@ public final class PPlayerAnimationSpace
 		return PLAYER_MODEL_TO_FIRST_PERSON.compose(toPlayerGeometrySpace(transform, definition));
 	}
 	
+	/**
+	 * Performs the to player space operation.
+	 * @param pose the pose to use.
+	 * @param definition the definition to use.
+	 * @return the value produced by this operation.
+	 */
 	static PPlayerBonePose toPlayerSpace(
 			PPlayerBonePose pose,
 			PPlayerAnimationDefinition definition)
@@ -156,6 +146,11 @@ public final class PPlayerAnimationSpace
 				pose.hasScale());
 	}
 	
+	/**
+	 * Performs the uses gltf coordinates operation.
+	 * @param definition the definition to use.
+	 * @return the value produced by this operation.
+	 */
 	private static boolean usesGltfCoordinates(
 			PPlayerAnimationDefinition definition)
 	{

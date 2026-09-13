@@ -14,26 +14,46 @@ import net.minecraft.world.entity.HumanoidArm;
 /** PulseLib-owned extra first-person geometry; vanilla arms and items stay vanilla. */
 public final class PPlayerFirstPersonRenderer
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PPlayerFirstPersonRenderer()
 	{
 	}
 
+	/**
+	 * Renders the extras.
+	 * @param player the player to use.
+	 * @param pose the pose to use.
+	 * @param poseStack the pose stack to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 * @param packedLight the packed light to use.
+	 * @param partialTick the partial tick to use.
+	 */
 	public static void renderExtras(LocalPlayer player,
-	                                PPlayerFirstPersonPose pose,
+	                                PFirstPersonRenderPresentation pose,
 	                                PoseStack poseStack,
 	                                SubmitNodeCollector submitNodeCollector,
 	                                int packedLight,
 	                                float partialTick)
 	{
 		PPlayerAutomaticMeshAttachments.renderFirstPerson(
-				pose.meshAttachments(), poseStack, submitNodeCollector, packedLight);
+				pose.meshAttachments(), poseStack, packedLight);
 		PPlayerAnimatedAttachments.renderFirstPerson(
 				player, pose, poseStack, submitNodeCollector, packedLight, partialTick);
 		renderPersistentAttachments(player, pose, poseStack, packedLight, partialTick);
 	}
 
+	/**
+	 * Renders the persistent attachments.
+	 * @param player the player to use.
+	 * @param pose the pose to use.
+	 * @param poseStack the pose stack to use.
+	 * @param packedLight the packed light to use.
+	 * @param partialTick the partial tick to use.
+	 */
 	private static void renderPersistentAttachments(LocalPlayer player,
-	                                                PPlayerFirstPersonPose pose,
+	                                                PFirstPersonRenderPresentation pose,
 	                                                PoseStack poseStack,
 	                                                int packedLight,
 	                                                float partialTick)
@@ -42,6 +62,15 @@ public final class PPlayerFirstPersonRenderer
 		renderPersistentAttachments(player, HumanoidArm.LEFT, pose.leftArm(), poseStack, packedLight, partialTick);
 	}
 
+	/**
+	 * Renders the persistent attachments.
+	 * @param player the player to use.
+	 * @param arm the arm to use.
+	 * @param armPose the arm pose to use.
+	 * @param poseStack the pose stack to use.
+	 * @param packedLight the packed light to use.
+	 * @param partialTick the partial tick to use.
+	 */
 	private static void renderPersistentAttachments(LocalPlayer player,
 	                                                HumanoidArm arm,
 	                                                PFirstPersonArmPose armPose,

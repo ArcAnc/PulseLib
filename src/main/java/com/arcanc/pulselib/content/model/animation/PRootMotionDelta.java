@@ -16,6 +16,10 @@ public record PRootMotionDelta(
 		Vector3f translation,
 		Quaternionf rotation)
 {
+	/**
+	 * Performs the identity operation.
+	 * @return the value produced by this operation.
+	 */
 	public static PRootMotionDelta identity()
 	{
 		return new PRootMotionDelta(new Vector3f(), new Quaternionf());

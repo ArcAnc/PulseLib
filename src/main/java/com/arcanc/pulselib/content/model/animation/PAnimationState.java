@@ -17,18 +17,47 @@ import java.util.Objects;
 public sealed interface PAnimationState permits PAnimationState.Clip, PAnimationState.BlendSpace1D,
 		PAnimationState.BlendSpace2D, PAnimationState.OneShotOverlay
 {
+	/**
+	 * Performs the name operation.
+	 * @return the value produced by this operation.
+	 */
 	String name();
 
+	/**
+	 * Performs the samples operation.
+	 * @param parameters the parameters to use.
+	 * @return the value produced by this operation.
+	 */
 	List<PAnimationSample> samples(PAnimationParameters parameters);
 
+	/**
+	 * Performs the animation type operation.
+	 * @return the value produced by this operation.
+	 */
 	PAnimationType animationType();
 
+	/**
+	 * Performs the interpolation operation.
+	 * @return the value produced by this operation.
+	 */
 	PInterpolationType interpolation();
 
+	/**
+	 * Performs the speed operation.
+	 * @return the value produced by this operation.
+	 */
 	float speed();
 
+	/**
+	 * Performs the synchronized cycle operation.
+	 * @return the value produced by this operation.
+	 */
 	boolean synchronizedCycle();
 
+	/**
+	 * Determines whether overlay.
+	 * @return the value produced by this operation.
+	 */
 	default boolean isOverlay()
 	{
 		return false;
@@ -37,17 +66,36 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 	record Clip(String name, String animation, PAnimationType animationType, PInterpolationType interpolation,
 	            float speed, boolean synchronizedCycle) implements PAnimationState
 	{
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param name the name to use.
+		 * @param animation the animation to use.
+		 */
 		public Clip(String name, String animation)
 		{
 			this(name, animation, PAnimationType.CYCLE, PInterpolationType.LINEAR, 1.0f, false);
 		}
 
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param name the name to use.
+		 * @param animation the animation to use.
+		 * @param animationType the animation type to use.
+		 * @param interpolation the interpolation to use.
+		 * @param speed the speed to use.
+		 * @param synchronizedCycle the synchronized cycle to use.
+		 */
 		public Clip
 		{
 			validate(name, animationType, interpolation, speed);
 			animation = require(animation, "Animation name");
 		}
 
+		/**
+		 * Performs the samples operation.
+		 * @param parameters the parameters to use.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public List<PAnimationSample> samples(PAnimationParameters parameters)
 		{
@@ -58,11 +106,27 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 	record BlendSpace1D(String name, String parameter, List<Point> points, PAnimationType animationType,
 	                  PInterpolationType interpolation, float speed, boolean synchronizedCycle) implements PAnimationState
 	{
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param name the name to use.
+		 * @param parameter the parameter to use.
+		 * @param points the points to use.
+		 */
 		public BlendSpace1D(String name, String parameter, List<Point> points)
 		{
 			this(name, parameter, points, PAnimationType.CYCLE, PInterpolationType.LINEAR, 1.0f, true);
 		}
 
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param name the name to use.
+		 * @param parameter the parameter to use.
+		 * @param points the points to use.
+		 * @param animationType the animation type to use.
+		 * @param interpolation the interpolation to use.
+		 * @param speed the speed to use.
+		 * @param synchronizedCycle the synchronized cycle to use.
+		 */
 		public BlendSpace1D
 		{
 			validate(name, animationType, interpolation, speed);
@@ -70,6 +134,11 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 			points = sortedPoints(points);
 		}
 
+		/**
+		 * Performs the samples operation.
+		 * @param parameters the parameters to use.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public List<PAnimationSample> samples(PAnimationParameters parameters)
 		{
@@ -93,6 +162,11 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 
 		public record Point(float coordinate, String animation)
 		{
+			/**
+			 * Creates an instance of the enclosing type.
+			 * @param coordinate the coordinate to use.
+			 * @param animation the animation to use.
+			 */
 			public Point
 			{
 				animation = require(animation, "Animation name");
@@ -104,11 +178,29 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 	                  PAnimationType animationType, PInterpolationType interpolation, float speed,
 	                  boolean synchronizedCycle) implements PAnimationState
 	{
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param name the name to use.
+		 * @param xParameter the x parameter to use.
+		 * @param yParameter the y parameter to use.
+		 * @param points the points to use.
+		 */
 		public BlendSpace2D(String name, String xParameter, String yParameter, List<Point> points)
 		{
 			this(name, xParameter, yParameter, points, PAnimationType.CYCLE, PInterpolationType.LINEAR, 1.0f, true);
 		}
 
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param name the name to use.
+		 * @param xParameter the x parameter to use.
+		 * @param yParameter the y parameter to use.
+		 * @param points the points to use.
+		 * @param animationType the animation type to use.
+		 * @param interpolation the interpolation to use.
+		 * @param speed the speed to use.
+		 * @param synchronizedCycle the synchronized cycle to use.
+		 */
 		public BlendSpace2D
 		{
 			validate(name, animationType, interpolation, speed);
@@ -119,6 +211,11 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 			points = List.copyOf(points);
 		}
 
+		/**
+		 * Performs the samples operation.
+		 * @param parameters the parameters to use.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public List<PAnimationSample> samples(PAnimationParameters parameters)
 		{
@@ -141,6 +238,12 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 
 		public record Point(float x, float y, String animation)
 		{
+			/**
+			 * Creates an instance of the enclosing type.
+			 * @param x the x to use.
+			 * @param y the y to use.
+			 * @param animation the animation to use.
+			 */
 			public Point
 			{
 				animation = require(animation, "Animation name");
@@ -151,11 +254,28 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 	record OneShotOverlay(String name, String trigger, String animation, float fadeInDuration, float fadeOutDuration,
 	                     PInterpolationType interpolation, float speed, boolean synchronizedCycle) implements PAnimationState
 	{
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param name the name to use.
+		 * @param trigger the trigger to use.
+		 * @param animation the animation to use.
+		 */
 		public OneShotOverlay(String name, String trigger, String animation)
 		{
 			this(name, trigger, animation, 0.0f, 0.0f, PInterpolationType.LINEAR, 1.0f, false);
 		}
 
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param name the name to use.
+		 * @param trigger the trigger to use.
+		 * @param animation the animation to use.
+		 * @param fadeInDuration the fade in duration to use.
+		 * @param fadeOutDuration the fade out duration to use.
+		 * @param interpolation the interpolation to use.
+		 * @param speed the speed to use.
+		 * @param synchronizedCycle the synchronized cycle to use.
+		 */
 		public OneShotOverlay
 		{
 			validate(name, PAnimationType.PLAY_ONCE, interpolation, speed);
@@ -165,18 +285,31 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 				throw new IllegalArgumentException("Overlay fade durations must be non-negative");
 		}
 
+		/**
+		 * Performs the samples operation.
+		 * @param parameters the parameters to use.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public List<PAnimationSample> samples(PAnimationParameters parameters)
 		{
 			return List.of(new PAnimationSample(this.animation, 1.0f));
 		}
 
+		/**
+		 * Performs the animation type operation.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public PAnimationType animationType()
 		{
 			return PAnimationType.PLAY_ONCE;
 		}
 
+		/**
+		 * Determines whether overlay.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public boolean isOverlay()
 		{
@@ -184,6 +317,11 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 		}
 	}
 
+	/**
+	 * Performs the sorted points operation.
+	 * @param points the points to use.
+	 * @return the value produced by this operation.
+	 */
 	private static List<BlendSpace1D.Point> sortedPoints(List<BlendSpace1D.Point> points)
 	{
 		if (points == null || points.isEmpty())
@@ -195,6 +333,13 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 		return sorted;
 	}
 
+	/**
+	 * Performs the validate operation.
+	 * @param name the name to use.
+	 * @param type the type to use.
+	 * @param interpolation the interpolation to use.
+	 * @param speed the speed to use.
+	 */
 	private static void validate(String name, PAnimationType type, PInterpolationType interpolation, float speed)
 	{
 		require(name, "State name");
@@ -204,6 +349,12 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 			throw new IllegalArgumentException("Animation state speed must be non-negative");
 	}
 
+	/**
+	 * Performs the require operation.
+	 * @param value the value to use.
+	 * @param what the what to use.
+	 * @return the value produced by this operation.
+	 */
 	private static String require(String value, String what)
 	{
 		if (value == null || value.isBlank())
@@ -211,6 +362,11 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 		return value;
 	}
 
+	/**
+	 * Performs the square operation.
+	 * @param value the value to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float square(float value)
 	{
 		return value * value;

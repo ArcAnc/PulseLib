@@ -34,10 +34,18 @@ public final class PAnimationSidecarParser
 {
 	private static final float SECONDS_TO_TICKS = 20f;
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PAnimationSidecarParser()
 	{
 	}
 
+	/**
+	 * Parses the json.
+	 * @param stream the stream to use.
+	 * @return the value produced by this operation.
+	 */
 	public static JsonElement parseJson(InputStream stream) throws IOException
 	{
 		try (InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8))
@@ -46,6 +54,11 @@ public final class PAnimationSidecarParser
 		}
 	}
 
+	/**
+	 * Merges the sidecar.
+	 * @param root the root to use.
+	 * @param animations the animations to use.
+	 */
 	public static void mergeSidecar(JsonElement root, Map<String, PAnimation> animations)
 	{
 		JsonElement animationsNode = member(root, "animations");
@@ -77,6 +90,11 @@ public final class PAnimationSidecarParser
 		}
 	}
 
+	/**
+	 * Parses the animation events.
+	 * @param animationNode the animation node to use.
+	 * @return the value produced by this operation.
+	 */
 	private static List<PAnimationEvent<?>> parseAnimationEvents(JsonElement animationNode)
 	{
 		List<PAnimationEvent<?>> events = new ArrayList<>();
@@ -85,6 +103,11 @@ public final class PAnimationSidecarParser
 		return events;
 	}
 
+	/**
+	 * Parses the visibility tracks.
+	 * @param animationNode the animation node to use.
+	 * @return the value produced by this operation.
+	 */
 	private static Map<String, PAnimationVisibilityTrack> parseVisibilityTracks(JsonElement animationNode)
 	{
 		JsonElement visibilityNode = member(animationNode, "visibility");
@@ -101,6 +124,11 @@ public final class PAnimationSidecarParser
 		return tracks;
 	}
 
+	/**
+	 * Parses the visibility keyframes.
+	 * @param node the node to use.
+	 * @return the value produced by this operation.
+	 */
 	private static List<PAnimationVisibilityTrack.Keyframe> parseVisibilityKeyframes(JsonElement node)
 	{
 		List<PAnimationVisibilityTrack.Keyframe> keyframes = new ArrayList<>();
@@ -113,6 +141,11 @@ public final class PAnimationSidecarParser
 		return keyframes;
 	}
 
+	/**
+	 * Adds the visibility keyframe.
+	 * @param keyframes the keyframes to use.
+	 * @param node the node to use.
+	 */
 	private static void addVisibilityKeyframe(List<PAnimationVisibilityTrack.Keyframe> keyframes, JsonElement node)
 	{
 		float seconds = floatValue(member(node, "time"), Float.NaN);
@@ -122,6 +155,12 @@ public final class PAnimationSidecarParser
 		keyframes.add(new PAnimationVisibilityTrack.Keyframe(secondsToTicks(seconds), visible));
 	}
 
+	/**
+	 * Adds the visibility keyframe.
+	 * @param keyframes the keyframes to use.
+	 * @param rawTime the raw time to use.
+	 * @param node the node to use.
+	 */
 	private static void addVisibilityKeyframe(List<PAnimationVisibilityTrack.Keyframe> keyframes,
 	                                           String rawTime,
 	                                           JsonElement node)
@@ -133,6 +172,11 @@ public final class PAnimationSidecarParser
 		keyframes.add(new PAnimationVisibilityTrack.Keyframe(secondsToTicks(seconds), visible));
 	}
 
+	/**
+	 * Performs the max event time operation.
+	 * @param events the events to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float maxEventTime(List<PAnimationEvent<?>> events)
 	{
 		float maxTime = 0f;
@@ -141,6 +185,11 @@ public final class PAnimationSidecarParser
 		return maxTime;
 	}
 
+	/**
+	 * Performs the max visibility time operation.
+	 * @param tracks the tracks to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float maxVisibilityTime(Map<String, PAnimationVisibilityTrack> tracks)
 	{
 		float maxTime = 0f;
@@ -150,6 +199,11 @@ public final class PAnimationSidecarParser
 		return maxTime;
 	}
 
+	/**
+	 * Parses the event array.
+	 * @param node the node to use.
+	 * @param events the events to use.
+	 */
 	private static void parseEventArray(JsonElement node, List<PAnimationEvent<?>> events)
 	{
 		if (!isArray(node))
@@ -165,6 +219,13 @@ public final class PAnimationSidecarParser
 		}
 	}
 
+	/**
+	 * Performs the typed event operation.
+	 * @param time the time to use.
+	 * @param rawType the raw type to use.
+	 * @param node the node to use.
+	 * @return the value produced by this operation.
+	 */
 	private static @Nullable PAnimationEvent<?> typedEvent(float time, String rawType, JsonElement node)
 	{
 		if (rawType.isBlank())
@@ -184,17 +245,35 @@ public final class PAnimationSidecarParser
 		return decode(time, type, node);
 	}
 
+	/**
+	 * Performs the decode operation.
+	 * @param time the time to use.
+	 * @param type the type to use.
+	 * @param node the node to use.
+	 * @return the value produced by this operation.
+	 */
 	private static <T> @Nullable PAnimationEvent<T> decode(float time, PAnimationEventType<T> type, JsonElement node)
 	{
 		return type.codec().codec().parse(JsonOps.INSTANCE, node).resultOrPartial(error ->
 				PLibDatabase.LOGGER.warn("Invalid animation event {}: {}", type.id(), error)).map(data -> new PAnimationEvent<>(time, type, data)).orElse(null);
 	}
 
+	/**
+	 * Performs the seconds to ticks operation.
+	 * @param seconds the seconds to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float secondsToTicks(float seconds)
 	{
 		return seconds * SECONDS_TO_TICKS;
 	}
 
+	/**
+	 * Performs the float value operation.
+	 * @param node the node to use.
+	 * @param fallback the fallback to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float floatValue(JsonElement node, float fallback)
 	{
 		if (isMissing(node) || !node.isJsonPrimitive() || !node.getAsJsonPrimitive().isNumber())
@@ -202,6 +281,12 @@ public final class PAnimationSidecarParser
 		return node.getAsFloat();
 	}
 
+	/**
+	 * Parses the float.
+	 * @param value the value to use.
+	 * @param fallback the fallback to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float parseFloat(String value, float fallback)
 	{
 		try
@@ -214,6 +299,11 @@ public final class PAnimationSidecarParser
 		}
 	}
 
+	/**
+	 * Performs the boolean value operation.
+	 * @param node the node to use.
+	 * @return the value produced by this operation.
+	 */
 	private static @Nullable Boolean booleanValue(JsonElement node)
 	{
 		if (isMissing(node) || !node.isJsonPrimitive() || !node.getAsJsonPrimitive().isBoolean())
@@ -221,6 +311,12 @@ public final class PAnimationSidecarParser
 		return node.getAsBoolean();
 	}
 
+	/**
+	 * Performs the string value operation.
+	 * @param node the node to use.
+	 * @param fallback the fallback to use.
+	 * @return the value produced by this operation.
+	 */
 	private static String stringValue(JsonElement node, String fallback)
 	{
 		if (isMissing(node) || !node.isJsonPrimitive() || !node.getAsJsonPrimitive().isString())
@@ -228,6 +324,12 @@ public final class PAnimationSidecarParser
 		return node.getAsString();
 	}
 
+	/**
+	 * Performs the member operation.
+	 * @param element the element to use.
+	 * @param name the name to use.
+	 * @return the value produced by this operation.
+	 */
 	private static JsonElement member(JsonElement element, String name)
 	{
 		if (!isObject(element))
@@ -238,16 +340,31 @@ public final class PAnimationSidecarParser
 		return value == null ? JsonNull.INSTANCE : value;
 	}
 
+	/**
+	 * Determines whether missing.
+	 * @param element the element to use.
+	 * @return the value produced by this operation.
+	 */
 	private static boolean isMissing(@Nullable JsonElement element)
 	{
 		return element == null || element.isJsonNull();
 	}
 
+	/**
+	 * Determines whether object.
+	 * @param element the element to use.
+	 * @return the value produced by this operation.
+	 */
 	private static boolean isObject(@Nullable JsonElement element)
 	{
 		return element != null && element.isJsonObject();
 	}
 
+	/**
+	 * Determines whether array.
+	 * @param element the element to use.
+	 * @return the value produced by this operation.
+	 */
 	private static boolean isArray(@Nullable JsonElement element)
 	{
 		return element != null && element.isJsonArray();

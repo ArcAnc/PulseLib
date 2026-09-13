@@ -16,5 +16,9 @@ interface PPlayerVertexDeformer
 {
 	PPlayerVertexDeformer IDENTITY = position -> {};
 
+	/**
+	 * Performs the deform operation.
+	 * @param position the position to use.
+	 */
 	void deform(Vector3f position);
 }

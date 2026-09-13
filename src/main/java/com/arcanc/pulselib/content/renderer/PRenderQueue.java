@@ -37,6 +37,13 @@ public class PRenderQueue
 					data.posMatrix().m32() * data.posMatrix().m32());
 	private static final PGlMultiDrawExecutor EXECUTOR = new PGlMultiDrawExecutor();
 	
+	/**
+	 * Performs the submit block entity mesh operation.
+	 * @param renderType the render type to use.
+	 * @param mesh the mesh to use.
+	 * @param deformation the deformation to use.
+	 * @param data the data to use.
+	 */
 	public static void submitBlockEntityMesh(RenderType renderType,
 	                                         PBakedMesh mesh,
 	                                         @Nullable PMeshDeformation deformation,
@@ -46,6 +53,13 @@ public class PRenderQueue
 				renderType, mesh, deformation, data);
 	}
 	
+	/**
+	 * Performs the submit block entity translucent mesh operation.
+	 * @param renderType the render type to use.
+	 * @param mesh the mesh to use.
+	 * @param deformation the deformation to use.
+	 * @param data the data to use.
+	 */
 	public static void submitBlockEntityTranslucentMesh(RenderType renderType,
 	                                                    PBakedMesh mesh,
 	                                                    @Nullable PMeshDeformation deformation,
@@ -54,6 +68,14 @@ public class PRenderQueue
 		submit(RenderStage.TRANSLUCENT_BLOCKS, renderType, mesh, deformation, data, true);
 	}
 	
+	/**
+	 * Performs the submit item operation.
+	 * @param context the context to use.
+	 * @param renderType the render type to use.
+	 * @param mesh the mesh to use.
+	 * @param deformation the deformation to use.
+	 * @param data the data to use.
+	 */
 	public static void submitItem(ItemDisplayContext context,
 	                              RenderType renderType,
 	                              PBakedMesh mesh,
@@ -70,6 +92,13 @@ public class PRenderQueue
 		submit(stage, renderType, mesh, deformation, data, PRenderTypes.isTransparent(renderType));
 	}
 	
+	/**
+	 * Performs the submit entity mesh operation.
+	 * @param renderType the render type to use.
+	 * @param mesh the mesh to use.
+	 * @param deformation the deformation to use.
+	 * @param data the data to use.
+	 */
 	public static void submitEntityMesh(RenderType renderType,
 	                                    PBakedMesh mesh,
 	                                    @Nullable PMeshDeformation deformation,
@@ -78,6 +107,14 @@ public class PRenderQueue
 		submit(RenderStage.ENTITIES, renderType, mesh, deformation, data, PRenderTypes.isTransparent(renderType));
 	}
 	
+	/**
+	 * Performs the submit operation.
+	 * @param stage the stage to use.
+	 * @param type the type to use.
+	 * @param mesh the mesh to use.
+	 * @param deformation the deformation to use.
+	 * @param data the data to use.
+	 */
 	public static void submit(RenderStage stage,
 	                          RenderType type,
 	                          PBakedMesh mesh,
@@ -87,6 +124,15 @@ public class PRenderQueue
 		submit(stage, type, mesh, deformation, data, PRenderTypes.isTransparent(type));
 	}
 
+	/**
+	 * Performs the submit operation.
+	 * @param stage the stage to use.
+	 * @param type the type to use.
+	 * @param mesh the mesh to use.
+	 * @param deformation the deformation to use.
+	 * @param data the data to use.
+	 * @param transparent the transparent to use.
+	 */
 	private static void submit(RenderStage stage,
 	                           RenderType type,
 	                           PBakedMesh mesh,
@@ -99,12 +145,20 @@ public class PRenderQueue
 		COMPILER.submit(stage, type, subdividedMesh, data.withDeformer(deformer), transparent);
 	}
 	
+	/**
+	 * Performs the flush operation.
+	 * @param stage the stage to use.
+	 */
 	public static void flush(RenderStage stage)
 	{
 		PRenderPlan<RenderType, PBakedMesh, InstanceData> plan = COMPILER.compile(stage);
 		EXECUTOR.execute(plan);
 	}
 
+	/**
+	 * Performs the flush combined operation.
+	 * @param stages the stages to use.
+	 */
 	public static void flushCombined(RenderStage... stages)
 	{
 		List<PDrawGroup<RenderType, PBakedMesh, InstanceData>> groups = new ArrayList<>();
@@ -114,11 +168,17 @@ public class PRenderQueue
 			EXECUTOR.execute(new PRenderPlan<>(groups));
 	}
 
+	/**
+	 * Performs the composite translucency operation.
+	 */
 	public static void compositeTranslucency()
 	{
 		EXECUTOR.compositeOit();
 	}
 
+	/**
+	 * Performs the clean up operation.
+	 */
 	public static void cleanUp()
 	{
 		COMPILER.clear();
@@ -136,17 +196,30 @@ public class PRenderQueue
 		
 		private final String name;
 		
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param name the name to use.
+		 */
 		public RenderStage(String name)
 		{
 			this.name = name;
 		}
 		
+		/**
+		 * Performs the hash code operation.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public int hashCode()
 		{
 			return this.name.hashCode();
 		}
 		
+		/**
+		 * Performs the equals operation.
+		 * @param obj the obj to use.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public boolean equals(Object obj)
 		{
@@ -169,16 +242,38 @@ public class PRenderQueue
 			int deformerValueOffset,
 			int deformerOperationCount)
 	{
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param posMatrix the pos matrix to use.
+		 * @param packedColor the packed color to use.
+		 * @param packedLight the packed light to use.
+		 * @param packedOverlay the packed overlay to use.
+		 * @param deformerOperationOffset the deformer operation offset to use.
+		 * @param deformerValueOffset the deformer value offset to use.
+		 * @param deformerOperationCount the deformer operation count to use.
+		 */
 		public InstanceData
 		{
 			posMatrix = new Matrix4f(posMatrix);
 		}
 
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param posMatrix the pos matrix to use.
+		 * @param packedColor the packed color to use.
+		 * @param packedLight the packed light to use.
+		 * @param packedOverlay the packed overlay to use.
+		 */
 		public InstanceData(Matrix4f posMatrix, int packedColor, int packedLight, int packedOverlay)
 		{
 			this(posMatrix, packedColor, packedLight, packedOverlay, -1, -1, 0);
 		}
 
+		/**
+		 * Performs the with deformer operation.
+		 * @param deformer the deformer to use.
+		 * @return the value produced by this operation.
+		 */
 		private InstanceData withDeformer(PGpuDeformerBuffers.Submission deformer)
 		{
 			return new InstanceData(this.posMatrix, this.packedColor, this.packedLight, this.packedOverlay,

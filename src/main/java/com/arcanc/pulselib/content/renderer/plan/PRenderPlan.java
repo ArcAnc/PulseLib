@@ -15,16 +15,28 @@ public record PRenderPlan<P, M, I>(List<PDrawGroup<P, M, I>> groups)
 {
 	public static final PRenderPlan<?, ?, ?> EMPTY = new PRenderPlan<>(List.of());
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param groups the groups to use.
+	 */
 	public PRenderPlan
 	{
 		groups = List.copyOf(groups);
 	}
 
+	/**
+	 * Determines whether empty.
+	 * @return the value produced by this operation.
+	 */
 	public boolean isEmpty()
 	{
 		return this.groups.isEmpty();
 	}
 
+	/**
+	 * Performs the empty operation.
+	 * @return the value produced by this operation.
+	 */
 	@SuppressWarnings("unchecked")
 	public static <P, M, I> PRenderPlan<P, M, I> empty()
 	{

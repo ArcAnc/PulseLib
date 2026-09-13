@@ -16,8 +16,18 @@ public interface PDeformerValueSource
 {
 	PDeformerValueSource DEFAULTS = PChannelReference :: defaultValue;
 
+	/**
+	 * Performs the resolve operation.
+	 * @param reference the reference to use.
+	 * @return the value produced by this operation.
+	 */
 	float resolve(PChannelReference<Float> reference);
 
+	/**
+	 * Performs the parameters operation.
+	 * @param parameters the parameters to use.
+	 * @return the value produced by this operation.
+	 */
 	static PDeformerValueSource parameters(PAnimationParameters parameters)
 	{
 		return reference -> reference.name().isEmpty() ? reference.defaultValue() :

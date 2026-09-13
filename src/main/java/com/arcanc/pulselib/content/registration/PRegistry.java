@@ -21,6 +21,12 @@ public final class PRegistry<T>
 {
 	private final Map<Identifier, T> values = new Object2ObjectOpenHashMap<>();
 
+	/**
+	 * Performs the register operation.
+	 * @param id the id to use.
+	 * @param value the value to use.
+	 * @return the value produced by this operation.
+	 */
 	public <V extends T> V register(Identifier id, V value)
 	{
 		Objects.requireNonNull(id, "id");
@@ -30,6 +36,11 @@ public final class PRegistry<T>
 		return value;
 	}
 
+	/**
+	 * Performs the get operation.
+	 * @param id the id to use.
+	 * @return the value produced by this operation.
+	 */
 	public Optional<T> get(Identifier id)
 	{
 		return Optional.ofNullable(this.values.get(id));

@@ -32,6 +32,12 @@ public final class PGpuDeformerStack
 	private final List<PChannelReference<Float>> channels;
 	private final int operationCount;
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param operationData the operation data to use.
+	 * @param channels the channels to use.
+	 * @param operationCount the operation count to use.
+	 */
 	private PGpuDeformerStack(float[] operationData, List<PChannelReference<Float>> channels, int operationCount)
 	{
 		this.operationData = operationData;
@@ -39,21 +45,38 @@ public final class PGpuDeformerStack
 		this.operationCount = operationCount;
 	}
 
+	/**
+	 * Performs the operation data operation.
+	 * @return the value produced by this operation.
+	 */
 	public float[] operationData()
 	{
 		return this.operationData;
 	}
 
+	/**
+	 * Performs the channels operation.
+	 * @return the value produced by this operation.
+	 */
 	public List<PChannelReference<Float>> channels()
 	{
 		return this.channels;
 	}
 
+	/**
+	 * Performs the operation count operation.
+	 * @return the value produced by this operation.
+	 */
 	public int operationCount()
 	{
 		return this.operationCount;
 	}
 
+	/**
+	 * Performs the compile operation.
+	 * @param stack the stack to use.
+	 * @return the value produced by this operation.
+	 */
 	public static Optional<PGpuDeformerStack> compile(PDeformerStack stack)
 	{
 		if (stack.isEmpty())
@@ -86,6 +109,13 @@ public final class PGpuDeformerStack
 		return Optional.of(new PGpuDeformerStack(packed, channels, stack.definitions().size()));
 	}
 
+	/**
+	 * Performs the stretch operation.
+	 * @param data the data to use.
+	 * @param channels the channels to use.
+	 * @param names the names to use.
+	 * @param d the d to use.
+	 */
 	private static void stretch(List<Float> data, List<PChannelReference<Float>> channels, Map<String, Integer> names, PStretchDefinition d)
 	{
 		vec4(data, STRETCH, channel(channels, names, d.scale()), -1, 0);
@@ -94,6 +124,13 @@ public final class PGpuDeformerStack
 		vec4(data, 0, 0, 0, 0);
 	}
 
+	/**
+	 * Performs the squash operation.
+	 * @param data the data to use.
+	 * @param channels the channels to use.
+	 * @param names the names to use.
+	 * @param d the d to use.
+	 */
 	private static void squash(List<Float> data, List<PChannelReference<Float>> channels, Map<String, Integer> names, PSquashDefinition d)
 	{
 		vec4(data, SQUASH, channel(channels, names, d.scale()), -1, 0);
@@ -102,6 +139,13 @@ public final class PGpuDeformerStack
 		vec4(data, 0, 0, 0, 0);
 	}
 
+	/**
+	 * Performs the taper operation.
+	 * @param data the data to use.
+	 * @param channels the channels to use.
+	 * @param names the names to use.
+	 * @param d the d to use.
+	 */
 	private static void taper(List<Float> data, List<PChannelReference<Float>> channels, Map<String, Integer> names, PTaperDefinition d)
 	{
 		vec4(data, TAPER, channel(channels, names, d.tipScale()), -1, 0);
@@ -110,6 +154,13 @@ public final class PGpuDeformerStack
 		vec4(data, 0, 0, 0, 0);
 	}
 
+	/**
+	 * Performs the twist operation.
+	 * @param data the data to use.
+	 * @param channels the channels to use.
+	 * @param names the names to use.
+	 * @param d the d to use.
+	 */
 	private static void twist(List<Float> data, List<PChannelReference<Float>> channels, Map<String, Integer> names, PTwistDefinition d)
 	{
 		vec4(data, TWIST, channel(channels, names, d.angle()), -1, 0);
@@ -118,6 +169,13 @@ public final class PGpuDeformerStack
 		vec4(data, 0, 0, 0, 0);
 	}
 
+	/**
+	 * Performs the bend operation.
+	 * @param data the data to use.
+	 * @param channels the channels to use.
+	 * @param names the names to use.
+	 * @param d the d to use.
+	 */
 	private static void bend(List<Float> data, List<PChannelReference<Float>> channels, Map<String, Integer> names, PBendDefinition d)
 	{
 		Vector3f length = unit(d.lengthAxis());
@@ -131,6 +189,13 @@ public final class PGpuDeformerStack
 		vec4(data, axis, 0);
 	}
 
+	/**
+	 * Performs the wave operation.
+	 * @param data the data to use.
+	 * @param channels the channels to use.
+	 * @param names the names to use.
+	 * @param d the d to use.
+	 */
 	private static void wave(List<Float> data, List<PChannelReference<Float>> channels, Map<String, Integer> names, PWaveDefinition d)
 	{
 		Vector3f length = unit(d.lengthAxis());
@@ -144,6 +209,13 @@ public final class PGpuDeformerStack
 		vec4(data, displacement, d.wavelength());
 	}
 
+	/**
+	 * Performs the hinge operation.
+	 * @param data the data to use.
+	 * @param channels the channels to use.
+	 * @param names the names to use.
+	 * @param d the d to use.
+	 */
 	private static void hinge(List<Float> data, List<PChannelReference<Float>> channels, Map<String, Integer> names, PHingeDefinition d)
 	{
 		Vector3f length = unit(d.lengthAxis());
@@ -156,6 +228,13 @@ public final class PGpuDeformerStack
 		vec4(data, hinge.normalize(), 0);
 	}
 
+	/**
+	 * Performs the channel operation.
+	 * @param channels the channels to use.
+	 * @param names the names to use.
+	 * @param reference the reference to use.
+	 * @return the value produced by this operation.
+	 */
 	private static int channel(List<PChannelReference<Float>> channels, Map<String, Integer> names, PChannelReference<Float> reference)
 	{
 		if (reference.name().isEmpty())
@@ -172,6 +251,11 @@ public final class PGpuDeformerStack
 		return result;
 	}
 
+	/**
+	 * Performs the unit operation.
+	 * @param axis the axis to use.
+	 * @return the value produced by this operation.
+	 */
 	private static Vector3f unit(Vector3f axis)
 	{
 		Vector3f result = new Vector3f(axis);
@@ -180,11 +264,25 @@ public final class PGpuDeformerStack
 		return result.normalize();
 	}
 
+	/**
+	 * Performs the vec4 operation.
+	 * @param data the data to use.
+	 * @param value the value to use.
+	 * @param w the w to use.
+	 */
 	private static void vec4(List<Float> data, Vector3f value, float w)
 	{
 		vec4(data, value.x, value.y, value.z, w);
 	}
 
+	/**
+	 * Performs the vec4 operation.
+	 * @param data the data to use.
+	 * @param x the x to use.
+	 * @param y the y to use.
+	 * @param z the z to use.
+	 * @param w the w to use.
+	 */
 	private static void vec4(List<Float> data, float x, float y, float z, float w)
 	{
 		data.add(x);

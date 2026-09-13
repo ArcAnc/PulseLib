@@ -64,6 +64,12 @@ final class PGlWeightedBlendedOit
 	private Pass pass = Pass.NONE;
 	private int activeLayer = -1;
 
+	/**
+	 * Performs the begin operation.
+	 * @param colorAttachment the color attachment to use.
+	 * @param depthAttachment the depth attachment to use.
+	 * @return the value produced by this operation.
+	 */
 	public boolean begin(GpuTextureView colorAttachment, @Nullable GpuTextureView depthAttachment)
 	{
 		if (this.disabled || !isSupported())
@@ -102,16 +108,27 @@ final class PGlWeightedBlendedOit
 		}
 	}
 
+	/**
+	 * Performs the begin depth pass operation.
+	 * @param layer the layer to use.
+	 */
 	public void beginDepthPass(int layer)
 	{
 		beginPass(Pass.DEPTH, layer);
 	}
 
+	/**
+	 * Performs the begin accumulation pass operation.
+	 * @param layer the layer to use.
+	 */
 	public void beginAccumulationPass(int layer)
 	{
 		beginPass(Pass.ACCUMULATION, layer);
 	}
 
+	/**
+	 * Binds the for draw.
+	 */
 	public void bindForDraw()
 	{
 		if (this.pass == Pass.NONE)
@@ -122,6 +139,9 @@ final class PGlWeightedBlendedOit
 			configureAccumulationPass(false);
 	}
 
+	/**
+	 * Performs the end pass operation.
+	 */
 	public void endPass()
 	{
 		if (this.pass == Pass.NONE)
@@ -134,6 +154,11 @@ final class PGlWeightedBlendedOit
 			state.restore();
 	}
 
+	/**
+	 * Performs the layer depth view operation.
+	 * @param layer the layer to use.
+	 * @return the value produced by this operation.
+	 */
 	public GpuTextureView layerDepthView(int layer)
 	{
 		ExternalGlTextureView view = this.layerDepthViews[layer];
@@ -142,6 +167,10 @@ final class PGlWeightedBlendedOit
 		return view;
 	}
 
+	/**
+	 * Performs the active layer depth view operation.
+	 * @return the value produced by this operation.
+	 */
 	public GpuTextureView activeLayerDepthView()
 	{
 		if (this.activeLayer < 0)
@@ -149,6 +178,10 @@ final class PGlWeightedBlendedOit
 		return layerDepthView(this.activeLayer);
 	}
 
+	/**
+	 * Performs the previous layer depth view operation.
+	 * @return the value produced by this operation.
+	 */
 	public GpuTextureView previousLayerDepthView()
 	{
 		if (this.activeLayer <= 0)
@@ -156,11 +189,20 @@ final class PGlWeightedBlendedOit
 		return layerDepthView(this.activeLayer - 1);
 	}
 
+	/**
+	 * Performs the mark content operation.
+	 * @param layer the layer to use.
+	 */
 	public void markContent(int layer)
 	{
 		this.hasContent[layer] = true;
 	}
 
+	/**
+	 * Performs the begin pass operation.
+	 * @param nextPass the next pass to use.
+	 * @param layer the layer to use.
+	 */
 	private void beginPass(Pass nextPass, int layer)
 	{
 		if (!this.frameOpen || layer < 0 || layer >= LAYER_COUNT)
@@ -176,6 +218,10 @@ final class PGlWeightedBlendedOit
 			configureAccumulationPass(true);
 	}
 
+	/**
+	 * Performs the configure depth pass operation.
+	 * @param clear the clear to use.
+	 */
 	private void configureDepthPass(boolean clear)
 	{
 		GlStateManager._glBindFramebuffer(GL30.GL_FRAMEBUFFER, this.framebuffer);
@@ -199,6 +245,10 @@ final class PGlWeightedBlendedOit
 		ensureFramebufferComplete();
 	}
 
+	/**
+	 * Performs the configure accumulation pass operation.
+	 * @param clear the clear to use.
+	 */
 	private void configureAccumulationPass(boolean clear)
 	{
 		GlStateManager._glBindFramebuffer(GL30.GL_FRAMEBUFFER, this.framebuffer);
@@ -223,6 +273,9 @@ final class PGlWeightedBlendedOit
 		ensureFramebufferComplete();
 	}
 
+	/**
+	 * Performs the composite operation.
+	 */
 	public void composite()
 	{
 		if (!this.frameOpen)
@@ -262,6 +315,9 @@ final class PGlWeightedBlendedOit
 		}
 	}
 
+	/**
+	 * Performs the close operation.
+	 */
 	public void close()
 	{
 		this.endPass();
@@ -270,6 +326,9 @@ final class PGlWeightedBlendedOit
 		this.disabled = false;
 	}
 
+	/**
+	 * Performs the finish frame operation.
+	 */
 	private void finishFrame()
 	{
 		this.frameOpen = false;
@@ -287,11 +346,20 @@ final class PGlWeightedBlendedOit
 		this.destinationDepth = null;
 	}
 
+	/**
+	 * Determines whether supported.
+	 * @return the value produced by this operation.
+	 */
 	private static boolean isSupported()
 	{
 		return GL.getCapabilities().OpenGL40 || GL.getCapabilities().GL_ARB_draw_buffers_blend;
 	}
 
+	/**
+	 * Performs the ensure buffers operation.
+	 * @param colorAttachment the color attachment to use.
+	 * @param depthAttachment the depth attachment to use.
+	 */
 	private void ensureBuffers(GpuTextureView colorAttachment, @Nullable GpuTextureView depthAttachment)
 	{
 		if (matchesBuffers(colorAttachment, depthAttachment))
@@ -321,6 +389,12 @@ final class PGlWeightedBlendedOit
 		this.framebuffer = GlStateManager.glGenFramebuffers();
 	}
 
+	/**
+	 * Performs the matches buffers operation.
+	 * @param colorAttachment the color attachment to use.
+	 * @param depthAttachment the depth attachment to use.
+	 * @return the value produced by this operation.
+	 */
 	private boolean matchesBuffers(GpuTextureView colorAttachment, @Nullable GpuTextureView depthAttachment)
 	{
 		return this.framebuffer >= 0 && this.width == colorAttachment.getWidth(0) &&
@@ -328,27 +402,51 @@ final class PGlWeightedBlendedOit
 				this.depthStencil == hasDepthStencil(depthAttachment);
 	}
 
+	/**
+	 * Performs the matches frame operation.
+	 * @param colorAttachment the color attachment to use.
+	 * @param depthAttachment the depth attachment to use.
+	 * @return the value produced by this operation.
+	 */
 	private boolean matchesFrame(GpuTextureView colorAttachment, @Nullable GpuTextureView depthAttachment)
 	{
 		return matchesBuffers(colorAttachment, depthAttachment) &&
 				this.destinationColorTexture == colorTexture(colorAttachment);
 	}
 
+	/**
+	 * Performs the color texture operation.
+	 * @param colorAttachment the color attachment to use.
+	 * @return the value produced by this operation.
+	 */
 	private static int colorTexture(GpuTextureView colorAttachment)
 	{
 		return ((GlTexture)colorAttachment.texture()).glId();
 	}
 
+	/**
+	 * Performs the depth texture operation.
+	 * @param depthAttachment the depth attachment to use.
+	 * @return the value produced by this operation.
+	 */
 	private static int depthTexture(@Nullable GpuTextureView depthAttachment)
 	{
 		return depthAttachment == null ? 0 : ((GlTexture)depthAttachment.texture()).glId();
 	}
 
+	/**
+	 * Determines whether the object has depth stencil.
+	 * @param depthAttachment the depth attachment to use.
+	 * @return the value produced by this operation.
+	 */
 	private static boolean hasDepthStencil(@Nullable GpuTextureView depthAttachment)
 	{
 		return depthAttachment != null && depthAttachment.texture().getFormat().hasStencilAspect();
 	}
 
+	/**
+	 * Closes the buffers.
+	 */
 	private void closeBuffers()
 	{
 		for (int layer = 0; layer < LAYER_COUNT; layer++)
@@ -375,31 +473,63 @@ final class PGlWeightedBlendedOit
 		this.depthStencil = false;
 	}
 
+	/**
+	 * Performs the accumulation texture operation.
+	 * @param layer the layer to use.
+	 * @return the value produced by this operation.
+	 */
 	private ExternalGlTexture accumulationTexture(int layer)
 	{
 		return requireTexture(this.accumulationTextures[layer], "accumulation", layer);
 	}
 
+	/**
+	 * Performs the revealage texture operation.
+	 * @param layer the layer to use.
+	 * @return the value produced by this operation.
+	 */
 	private ExternalGlTexture revealageTexture(int layer)
 	{
 		return requireTexture(this.revealageTextures[layer], "revealage", layer);
 	}
 
+	/**
+	 * Performs the layer depth texture operation.
+	 * @param layer the layer to use.
+	 * @return the value produced by this operation.
+	 */
 	private ExternalGlTexture layerDepthTexture(int layer)
 	{
 		return requireTexture(this.layerDepthTextures[layer], "depth", layer);
 	}
 
+	/**
+	 * Performs the accumulation view operation.
+	 * @param layer the layer to use.
+	 * @return the value produced by this operation.
+	 */
 	private GpuTextureView accumulationView(int layer)
 	{
 		return requireView(this.accumulationViews[layer], "accumulation", layer);
 	}
 
+	/**
+	 * Performs the revealage view operation.
+	 * @param layer the layer to use.
+	 * @return the value produced by this operation.
+	 */
 	private GpuTextureView revealageView(int layer)
 	{
 		return requireView(this.revealageViews[layer], "revealage", layer);
 	}
 
+	/**
+	 * Performs the require texture operation.
+	 * @param texture the texture to use.
+	 * @param name the name to use.
+	 * @param layer the layer to use.
+	 * @return the value produced by this operation.
+	 */
 	private static ExternalGlTexture requireTexture(@Nullable ExternalGlTexture texture, String name, int layer)
 	{
 		if (texture == null)
@@ -407,6 +537,13 @@ final class PGlWeightedBlendedOit
 		return texture;
 	}
 
+	/**
+	 * Performs the require view operation.
+	 * @param view the view to use.
+	 * @param name the name to use.
+	 * @param layer the layer to use.
+	 * @return the value produced by this operation.
+	 */
 	private static GpuTextureView requireView(@Nullable ExternalGlTextureView view, String name, int layer)
 	{
 		if (view == null)
@@ -414,11 +551,21 @@ final class PGlWeightedBlendedOit
 		return view;
 	}
 
+	/**
+	 * Performs the attach color operation.
+	 * @param index the index to use.
+	 * @param texture the texture to use.
+	 */
 	private void attachColor(int index, @Nullable ExternalGlTexture texture)
 	{
 		GL32.glFramebufferTexture(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0 + index, texture == null ? 0 : texture.glId(), 0);
 	}
 
+	/**
+	 * Performs the attach depth operation.
+	 * @param texture the texture to use.
+	 * @param stencil the stencil to use.
+	 */
 	private void attachDepth(int texture, boolean stencil)
 	{
 		GL32.glFramebufferTexture(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT, 0, 0);
@@ -428,6 +575,9 @@ final class PGlWeightedBlendedOit
 					stencil ? GL30.GL_DEPTH_STENCIL_ATTACHMENT : GL30.GL_DEPTH_ATTACHMENT, texture, 0);
 	}
 
+	/**
+	 * Performs the ensure framebuffer complete operation.
+	 */
 	private void ensureFramebufferComplete()
 	{
 		int status = GL30.glCheckFramebufferStatus(GL30.GL_FRAMEBUFFER);
@@ -435,6 +585,10 @@ final class PGlWeightedBlendedOit
 			throw new IllegalStateException("Unable to create weighted OIT framebuffer: 0x" + Integer.toHexString(status));
 	}
 
+	/**
+	 * Performs the configure additive blend operation.
+	 * @param target the target to use.
+	 */
 	private static void configureAdditiveBlend(int target)
 	{
 		GL30.glEnablei(GL11.GL_BLEND, target);
@@ -450,6 +604,10 @@ final class PGlWeightedBlendedOit
 		}
 	}
 
+	/**
+	 * Performs the configure minimum blend operation.
+	 * @param target the target to use.
+	 */
 	private static void configureMinimumBlend(int target)
 	{
 		GL30.glEnablei(GL11.GL_BLEND, target);
@@ -465,6 +623,10 @@ final class PGlWeightedBlendedOit
 		}
 	}
 
+	/**
+	 * Performs the close operation.
+	 * @param resource the resource to use.
+	 */
 	private static void close(@Nullable AutoCloseable resource)
 	{
 		if (resource == null)
@@ -486,6 +648,16 @@ final class PGlWeightedBlendedOit
 		ACCUMULATION
 	}
 
+	/**
+	 * Creates the texture.
+	 * @param label the label to use.
+	 * @param declaredFormat the declared format to use.
+	 * @param internalFormat the internal format to use.
+	 * @param format the format to use.
+	 * @param width the width to use.
+	 * @param height the height to use.
+	 * @return the value produced by this operation.
+	 */
 	private static ExternalGlTexture createTexture(String label, TextureFormat declaredFormat,
 	                                               int internalFormat, int format, int width, int height)
 	{
@@ -511,6 +683,14 @@ final class PGlWeightedBlendedOit
 
 	private static final class ExternalGlTexture extends GlTexture
 	{
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param label the label to use.
+		 * @param format the format to use.
+		 * @param width the width to use.
+		 * @param height the height to use.
+		 * @param id the id to use.
+		 */
 		private ExternalGlTexture(String label, TextureFormat format, int width, int height, int id)
 		{
 			super(GpuTexture.USAGE_TEXTURE_BINDING | GpuTexture.USAGE_RENDER_ATTACHMENT,
@@ -520,6 +700,10 @@ final class PGlWeightedBlendedOit
 
 	private static final class ExternalGlTextureView extends GlTextureView
 	{
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param texture the texture to use.
+		 */
 		private ExternalGlTextureView(ExternalGlTexture texture)
 		{
 			super(texture, 0, 1);
@@ -540,6 +724,9 @@ final class PGlWeightedBlendedOit
 		private final BlendState blend1;
 		private final BlendState blend2;
 
+		/**
+		 * Creates an instance of the enclosing type.
+		 */
 		private GlStateSnapshot()
 		{
 			this.drawFramebuffer = GL11.glGetInteger(GL30.GL_DRAW_FRAMEBUFFER_BINDING);
@@ -555,11 +742,18 @@ final class PGlWeightedBlendedOit
 			this.blend2 = BlendState.capture(2);
 		}
 
+		/**
+		 * Performs the capture operation.
+		 * @return the value produced by this operation.
+		 */
 		private static GlStateSnapshot capture()
 		{
 			return new GlStateSnapshot();
 		}
 
+		/**
+		 * Performs the restore operation.
+		 */
 		private void restore()
 		{
 			GlStateManager._glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, this.drawFramebuffer);
@@ -585,6 +779,11 @@ final class PGlWeightedBlendedOit
 	private record BlendState(boolean enabled, int equationRgb, int equationAlpha,
 	                          int sourceRgb, int destinationRgb, int sourceAlpha, int destinationAlpha)
 	{
+		/**
+		 * Performs the capture operation.
+		 * @param target the target to use.
+		 * @return the value produced by this operation.
+		 */
 		private static BlendState capture(int target)
 		{
 			return new BlendState(
@@ -597,6 +796,9 @@ final class PGlWeightedBlendedOit
 					GL30.glGetIntegeri(GL14.GL_BLEND_DST_ALPHA, target));
 		}
 
+		/**
+		 * Performs the restore primary operation.
+		 */
 		private void restorePrimary()
 		{
 			if (this.enabled)
@@ -607,6 +809,10 @@ final class PGlWeightedBlendedOit
 			GlStateManager._blendFuncSeparate(this.sourceRgb, this.destinationRgb, this.sourceAlpha, this.destinationAlpha);
 		}
 
+		/**
+		 * Performs the restore indexed operation.
+		 * @param target the target to use.
+		 */
 		private void restoreIndexed(int target)
 		{
 			if (this.enabled)
@@ -617,6 +823,12 @@ final class PGlWeightedBlendedOit
 			restoreFunction(target, this.sourceRgb, this.destinationRgb, this.sourceAlpha, this.destinationAlpha);
 		}
 
+		/**
+		 * Performs the restore equation operation.
+		 * @param target the target to use.
+		 * @param rgb the rgb to use.
+		 * @param alpha the alpha to use.
+		 */
 		private static void restoreEquation(int target, int rgb, int alpha)
 		{
 			if (GL.getCapabilities().OpenGL40)
@@ -625,6 +837,14 @@ final class PGlWeightedBlendedOit
 				ARBDrawBuffersBlend.glBlendEquationSeparateiARB(target, rgb, alpha);
 		}
 
+		/**
+		 * Performs the restore function operation.
+		 * @param target the target to use.
+		 * @param sourceRgb the source rgb to use.
+		 * @param destinationRgb the destination rgb to use.
+		 * @param sourceAlpha the source alpha to use.
+		 * @param destinationAlpha the destination alpha to use.
+		 */
 		private static void restoreFunction(int target, int sourceRgb, int destinationRgb,
 		                                    int sourceAlpha, int destinationAlpha)
 		{

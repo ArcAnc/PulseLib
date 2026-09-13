@@ -13,5 +13,10 @@ import org.joml.Vector3f;
 
 public interface PPreparedDeformer
 {
+	/**
+	 * Performs the deform operation.
+	 * @param position the position to use.
+	 * @param values the values to use.
+	 */
 	void deform(Vector3f position, PDeformerValueSource values);
 }

@@ -20,12 +20,25 @@ public class AtlasBufferBuilder extends BufferBuilder
 {
 	private final TextureAtlasSprite sprite;
 	
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param buffer the buffer to use.
+	 * @param mode the mode to use.
+	 * @param format the format to use.
+	 * @param sprite the sprite to use.
+	 */
 	public AtlasBufferBuilder(ByteBufferBuilder buffer, VertexFormat.Mode mode, VertexFormat format, TextureAtlasSprite sprite)
 	{
 		super(buffer, mode, format);
 		this.sprite = sprite;
 	}
 	
+	/**
+	 * Sets the uv.
+	 * @param u the u to use.
+	 * @param v the v to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public VertexConsumer setUv(float u, float v)
 	{

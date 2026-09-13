@@ -39,6 +39,11 @@ public final class PPlayerAnimationAnchors
 	public static final PPlayerAnimationAnchor LEFT_ITEM =
 			of("left_item");
 	
+	/**
+	 * Performs the of operation.
+	 * @param path the path to use.
+	 * @return the value produced by this operation.
+	 */
 	private static PPlayerAnimationAnchor of(String path)
 	{
 		return new PPlayerAnimationAnchor(PLibDatabase.rl(path));

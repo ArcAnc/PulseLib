@@ -22,6 +22,11 @@ import java.nio.*;
 
 public class PLibParserHelper
 {
+	/**
+	 * Extracts the texture name.
+	 * @param material the material to use.
+	 * @return the value produced by this operation.
+	 */
 	public static String extractTextureName(MaterialModel material)
 	{
 		if (!(material instanceof MaterialModelV2 v2))
@@ -43,6 +48,11 @@ public class PLibParserHelper
 		return textureName == null ? "" : textureName;
 	}
 
+	/**
+	 * Returns the float buffer.
+	 * @param accessor the accessor to use.
+	 * @return the value produced by this operation.
+	 */
 	public static FloatBuffer getFloatBuffer(AccessorModel accessor)
 	{
 		if (accessor == null)
@@ -64,6 +74,11 @@ public class PLibParserHelper
 		return floatBuffer;
 	}
 	
+	/**
+	 * Returns the byte buffer.
+	 * @param accessor the accessor to use.
+	 * @return the value produced by this operation.
+	 */
 	public static ByteBuffer getByteBuffer(AccessorModel accessor)
 	{
 		if (accessor == null)

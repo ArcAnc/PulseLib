@@ -25,6 +25,9 @@ public class PHumanoidAnchors
 	public static final PAttachmentAnchor RIGHT_LEG = PAttachmentAnchor.minecraft("right_leg");
 	public static final PAttachmentAnchor LEFT_LEG = PAttachmentAnchor.minecraft("left_leg");
 	
+	/**
+	 * Registers the defaults.
+	 */
 	@ApiStatus.Internal
 	public static void registerDefaults()
 	{

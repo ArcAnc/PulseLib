@@ -21,11 +21,24 @@ import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 
 public final class PPlayerAnimatedAttachmentLayer extends RenderLayer<AvatarRenderState, PlayerModel>
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param parent the parent to use.
+	 */
 	public PPlayerAnimatedAttachmentLayer(RenderLayerParent<AvatarRenderState, PlayerModel> parent)
 	{
 		super(parent);
 	}
 
+	/**
+	 * Performs the submit operation.
+	 * @param poseStack the pose stack to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 * @param packedLight the packed light to use.
+	 * @param state the state to use.
+	 * @param yRot the y rot to use.
+	 * @param xRot the x rot to use.
+	 */
 	@Override
 	public void submit(PoseStack poseStack,
 	                   SubmitNodeCollector submitNodeCollector,
@@ -40,7 +53,6 @@ public final class PPlayerAnimatedAttachmentLayer extends RenderLayer<AvatarRend
 		PPlayerAutomaticMeshAttachments.renderThirdPerson(
 				PPlayerAnimations.automaticMeshAttachmentPoses(player, state.partialTick),
 				poseStack,
-				submitNodeCollector,
 				packedLight);
 		PPlayerAnimatedAttachments.renderThirdPerson(player, poseStack, submitNodeCollector, packedLight, state.partialTick);
 	}

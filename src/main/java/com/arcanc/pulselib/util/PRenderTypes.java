@@ -199,12 +199,21 @@ public class PRenderTypes
 				withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT)).
 				build());
 		
+		/**
+		 * Registers the pipeline.
+		 * @param pipeline the pipeline to use.
+		 * @return the value produced by this operation.
+		 */
 		private static RenderPipeline registerPipeline(RenderPipeline pipeline)
 		{
 			PIPELINES.add(pipeline);
 			return pipeline;
 		}
 		
+		/**
+		 * Registers the custom pipelines.
+		 * @param event the event to use.
+		 */
 		private static void registerCustomPipelines(final RegisterRenderPipelinesEvent event)
 		{
 			PIPELINES.forEach(event :: registerPipeline);
@@ -237,6 +246,11 @@ public class PRenderTypes
 		private static final Function<Identifier, RenderType> TRIANGLES_INSTANT_EMISSIVE_CUTOUT = Util.memoize(RenderTypeProvider :: createTrianglesInstantEmissiveCutout);
 		private static final Function<Identifier, RenderType> TRIANGLES_INSTANT_EMISSIVE_TRANSLUCENT = Util.memoize(RenderTypeProvider :: createTrianglesInstantEmissiveTranslucent);
 		
+		/**
+		 * Creates the triangles solid.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		private static RenderType createTrianglesSolid(Identifier texture)
 		{
 			RenderSetup setup = RenderSetup.builder(RenderPipelinesProvider.TRIANGLES_SOLID).
@@ -250,6 +264,11 @@ public class PRenderTypes
 			return RenderType.create(PLibDatabase.rl("triangles_solid").toString(), setup);
 		}
 		
+		/**
+		 * Creates the triangles cutout.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		private static RenderType createTrianglesCutout(Identifier texture)
 		{
 			RenderSetup setup = RenderSetup.builder(RenderPipelinesProvider.TRIANGLES_CUTOUT).
@@ -263,6 +282,11 @@ public class PRenderTypes
 			return RenderType.create(PLibDatabase.rl("triangles_cutout").toString(), setup);
 		}
 		
+		/**
+		 * Creates the triangles translucent.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		private static RenderType createTrianglesTranslucent(Identifier texture)
 		{
 			RenderSetup setup = RenderSetup.builder(RenderPipelinesProvider.TRIANGLES_TRANSLUCENT).
@@ -277,6 +301,11 @@ public class PRenderTypes
 			return RenderType.create(PLibDatabase.rl("triangles_translucent").toString(), setup);
 		}
 
+		/**
+		 * Creates the triangles emissive solid.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		private static RenderType createTrianglesEmissiveSolid(Identifier texture)
 		{
 			RenderSetup setup = RenderSetup.builder(RenderPipelinesProvider.TRIANGLES_EMISSIVE_SOLID).
@@ -289,6 +318,11 @@ public class PRenderTypes
 			return RenderType.create(PLibDatabase.rl("triangles_emissive_solid").toString(), setup);
 		}
 
+		/**
+		 * Creates the triangles emissive cutout.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		private static RenderType createTrianglesEmissiveCutout(Identifier texture)
 		{
 			RenderSetup setup = RenderSetup.builder(RenderPipelinesProvider.TRIANGLES_EMISSIVE_CUTOUT).
@@ -301,6 +335,11 @@ public class PRenderTypes
 			return RenderType.create(PLibDatabase.rl("triangles_emissive_cutout").toString(), setup);
 		}
 
+		/**
+		 * Creates the triangles emissive translucent.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		private static RenderType createTrianglesEmissiveTranslucent(Identifier texture)
 		{
 			RenderSetup setup = RenderSetup.builder(RenderPipelinesProvider.TRIANGLES_EMISSIVE_TRANSLUCENT).
@@ -314,6 +353,11 @@ public class PRenderTypes
 			return RenderType.create(PLibDatabase.rl("triangles_emissive_translucent").toString(), setup);
 		}
 
+		/**
+		 * Creates the triangles instant solid.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		private static RenderType createTrianglesInstantSolid(Identifier texture)
 		{
 			RenderSetup setup = RenderSetup.builder(RenderPipelinesProvider.TRIANGLES_INSTANT_SOLID).
@@ -326,6 +370,11 @@ public class PRenderTypes
 			return RenderType.create(PLibDatabase.rl("triangles_instant_solid").toString(), setup);
 		}
 		
+		/**
+		 * Creates the triangles instant cutout.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		private static RenderType createTrianglesInstantCutout(Identifier texture)
 		{
 			RenderSetup setup = RenderSetup.builder(RenderPipelinesProvider.TRIANGLES_INSTANT_CUTOUT).
@@ -338,6 +387,11 @@ public class PRenderTypes
 			return RenderType.create(PLibDatabase.rl("triangles_instant_cutout").toString(), setup);
 		}
 
+		/**
+		 * Creates the triangles instant translucent.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		private static RenderType createTrianglesInstantTranslucent(Identifier texture)
 		{
 			RenderSetup setup = RenderSetup.builder(RenderPipelinesProvider.TRIANGLES_INSTANT_TRANSLUCENT).
@@ -350,6 +404,11 @@ public class PRenderTypes
 			return RenderType.create(PLibDatabase.rl("triangles_instant_translucent").toString(), setup);
 		}
 
+		/**
+		 * Creates the triangles instant emissive solid.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		private static RenderType createTrianglesInstantEmissiveSolid(Identifier texture)
 		{
 			RenderSetup setup = RenderSetup.builder(RenderPipelinesProvider.TRIANGLES_INSTANT_EMISSIVE_SOLID).
@@ -361,6 +420,11 @@ public class PRenderTypes
 			return RenderType.create(PLibDatabase.rl("triangles_instant_emissive_solid").toString(), setup);
 		}
 
+		/**
+		 * Creates the triangles instant emissive cutout.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		private static RenderType createTrianglesInstantEmissiveCutout(Identifier texture)
 		{
 			RenderSetup setup = RenderSetup.builder(RenderPipelinesProvider.TRIANGLES_INSTANT_EMISSIVE_CUTOUT).
@@ -372,6 +436,11 @@ public class PRenderTypes
 			return RenderType.create(PLibDatabase.rl("triangles_instant_emissive_cutout").toString(), setup);
 		}
 
+		/**
+		 * Creates the triangles instant emissive translucent.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		private static RenderType createTrianglesInstantEmissiveTranslucent(Identifier texture)
 		{
 			RenderSetup setup = RenderSetup.builder(RenderPipelinesProvider.TRIANGLES_INSTANT_EMISSIVE_TRANSLUCENT).
@@ -383,71 +452,142 @@ public class PRenderTypes
 			return RenderType.create(PLibDatabase.rl("triangles_instant_emissive_translucent").toString(), setup);
 		}
 		
+		/**
+		 * Performs the triangles solid operation.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		public static RenderType trianglesSolid(Identifier texture)
 		{
 			return TRIANGLES_SOLID.apply(texture);
 		}
 		
+		/**
+		 * Performs the triangles cutout operation.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		public static RenderType trianglesCutout(Identifier texture)
 		{
 			return TRIANGLES_CUTOUT.apply(texture);
 		}
 		
+		/**
+		 * Performs the triangles translucent operation.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		public static RenderType trianglesTranslucent(Identifier texture)
 		{
 			return TRIANGLES_TRANSLUCENT.apply(texture);
 		}
 
+		/**
+		 * Performs the triangles emissive solid operation.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		public static RenderType trianglesEmissiveSolid(Identifier texture)
 		{
 			return TRIANGLES_EMISSIVE_SOLID.apply(texture);
 		}
 
+		/**
+		 * Performs the triangles emissive cutout operation.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		public static RenderType trianglesEmissiveCutout(Identifier texture)
 		{
 			return TRIANGLES_EMISSIVE_CUTOUT.apply(texture);
 		}
 
+		/**
+		 * Performs the triangles emissive translucent operation.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		public static RenderType trianglesEmissiveTranslucent(Identifier texture)
 		{
 			return TRIANGLES_EMISSIVE_TRANSLUCENT.apply(texture);
 		}
 		
+		/**
+		 * Performs the triangles gui operation.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		public static RenderType trianglesGui(Identifier texture)
 		{
 			return trianglesInstantTranslucent(texture);
 		}
 
+		/**
+		 * Performs the triangles instant solid operation.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		public static RenderType trianglesInstantSolid(Identifier texture)
 		{
 			return TRIANGLES_INSTANT_SOLID.apply(texture);
 		}
 
+		/**
+		 * Performs the triangles instant cutout operation.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		public static RenderType trianglesInstantCutout(Identifier texture)
 		{
 			return TRIANGLES_INSTANT_CUTOUT.apply(texture);
 		}
 
+		/**
+		 * Performs the triangles instant translucent operation.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		public static RenderType trianglesInstantTranslucent(Identifier texture)
 		{
 			return TRIANGLES_INSTANT_TRANSLUCENT.apply(texture);
 		}
 
+		/**
+		 * Performs the triangles instant emissive cutout operation.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		public static RenderType trianglesInstantEmissiveCutout(Identifier texture)
 		{
 			return TRIANGLES_INSTANT_EMISSIVE_CUTOUT.apply(texture);
 		}
 
+		/**
+		 * Performs the triangles instant emissive solid operation.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		public static RenderType trianglesInstantEmissiveSolid(Identifier texture)
 		{
 			return TRIANGLES_INSTANT_EMISSIVE_SOLID.apply(texture);
 		}
 
+		/**
+		 * Performs the triangles instant emissive translucent operation.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		public static RenderType trianglesInstantEmissiveTranslucent(Identifier texture)
 		{
 			return TRIANGLES_INSTANT_EMISSIVE_TRANSLUCENT.apply(texture);
 		}
 
+		/**
+		 * Performs the emissive variant operation.
+		 * @param baseType the base type to use.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		public static RenderType emissiveVariant(RenderType baseType, Identifier texture)
 		{
 			if (baseType.pipeline() == RenderPipelinesProvider.TRIANGLES_SOLID)
@@ -455,6 +595,12 @@ public class PRenderTypes
 			return isTransparent(baseType) ? trianglesEmissiveTranslucent(texture) : trianglesEmissiveCutout(texture);
 		}
 
+		/**
+		 * Performs the instant variant operation.
+		 * @param baseType the base type to use.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		public static RenderType instantVariant(RenderType baseType, Identifier texture)
 		{
 			if (baseType.pipeline() == RenderPipelinesProvider.TRIANGLES_SOLID ||
@@ -463,6 +609,12 @@ public class PRenderTypes
 			return isTransparent(baseType) ? trianglesInstantTranslucent(texture) : trianglesInstantCutout(texture);
 		}
 
+		/**
+		 * Performs the instant emissive variant operation.
+		 * @param baseType the base type to use.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		public static RenderType instantEmissiveVariant(RenderType baseType, Identifier texture)
 		{
 			if (baseType.pipeline() == RenderPipelinesProvider.TRIANGLES_SOLID ||
@@ -471,6 +623,12 @@ public class PRenderTypes
 			return isTransparent(baseType) ? trianglesInstantEmissiveTranslucent(texture) : trianglesInstantEmissiveCutout(texture);
 		}
 
+		/**
+		 * Performs the for alpha mode operation.
+		 * @param alphaMode the alpha mode to use.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		public static RenderType forAlphaMode(PAlphaMode alphaMode, Identifier texture)
 		{
 			return switch (alphaMode)
@@ -482,6 +640,12 @@ public class PRenderTypes
 			};
 		}
 
+		/**
+		 * Performs the for instant alpha mode operation.
+		 * @param alphaMode the alpha mode to use.
+		 * @param texture the texture to use.
+		 * @return the value produced by this operation.
+		 */
 		public static RenderType forInstantAlphaMode(PAlphaMode alphaMode, Identifier texture)
 		{
 			return switch (alphaMode)
@@ -494,17 +658,31 @@ public class PRenderTypes
 		}
 	}
 	
+	/**
+	 * Performs the register operation.
+	 * @param modEventBus the mod event bus to use.
+	 */
 	public static void register(IEventBus modEventBus)
 	{
 		modEventBus.addListener(RenderPipelinesProvider :: registerCustomPipelines);
 	}
 	
+	/**
+	 * Determines whether transparent.
+	 * @param renderType the render type to use.
+	 * @return the value produced by this operation.
+	 */
 	@ApiStatus.Internal
 	public static boolean isTransparent(RenderType renderType)
 	{
 		return renderType.pipeline().getColorTargetState().blendFunction().isPresent();
 	}
 
+	/**
+	 * Performs the uses oit operation.
+	 * @param renderType the render type to use.
+	 * @return the value produced by this operation.
+	 */
 	@ApiStatus.Internal
 	public static boolean usesOit(RenderType renderType)
 	{
@@ -513,6 +691,11 @@ public class PRenderTypes
 				pipeline == RenderPipelinesProvider.TRIANGLES_EMISSIVE_TRANSLUCENT;
 	}
 
+	/**
+	 * Performs the oit pipeline operation.
+	 * @param renderType the render type to use.
+	 * @return the value produced by this operation.
+	 */
 	@ApiStatus.Internal
 	public static RenderPipeline oitPipeline(RenderType renderType)
 	{

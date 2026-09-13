@@ -14,9 +14,24 @@ import org.joml.Vector3f;
 
 public interface PPoseWriter
 {
+	/**
+	 * Performs the translation operation.
+	 * @param boneIndex the bone index to use.
+	 * @param value the value to use.
+	 */
 	void translation(int boneIndex, Vector3f value);
 
+	/**
+	 * Performs the rotation operation.
+	 * @param boneIndex the bone index to use.
+	 * @param value the value to use.
+	 */
 	void rotation(int boneIndex, Quaternionf value);
 
+	/**
+	 * Performs the scale operation.
+	 * @param boneIndex the bone index to use.
+	 * @param value the value to use.
+	 */
 	void scale(int boneIndex, Vector3f value);
 }

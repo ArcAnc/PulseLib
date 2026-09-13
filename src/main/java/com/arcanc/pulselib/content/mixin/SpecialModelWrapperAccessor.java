@@ -18,6 +18,10 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin (SpecialModelWrapper.class)
 public interface SpecialModelWrapperAccessor<T>
 {
+	/**
+	 * Performs the pulselib$get special renderer operation.
+	 * @return the value produced by this operation.
+	 */
 	@Accessor (value = "specialRenderer")
 	SpecialModelRenderer<T> pulselib$getSpecialRenderer();
 }

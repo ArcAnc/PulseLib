@@ -6,15 +6,28 @@ import org.joml.Vector3f;
 /** Boundary conversion from Pulse first-person space to Minecraft camera space. */
 public final class PFirstPersonCameraSpace
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PFirstPersonCameraSpace()
 	{
 	}
 
+	/**
+	 * Performs the to minecraft offset operation.
+	 * @param value the value to use.
+	 * @return the value produced by this operation.
+	 */
 	public static Vector3f toMinecraftOffset(Vector3f value)
 	{
 		return value.set(-value.x, -value.y, value.z);
 	}
 
+	/**
+	 * Performs the to minecraft rotation operation.
+	 * @param value the value to use.
+	 * @return the value produced by this operation.
+	 */
 	public static Quaternionf toMinecraftRotation(Quaternionf value)
 	{
 		return value.set(-value.x, -value.y, value.z, value.w);

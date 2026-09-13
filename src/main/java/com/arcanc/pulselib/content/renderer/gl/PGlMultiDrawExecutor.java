@@ -53,6 +53,10 @@ public final class PGlMultiDrawExecutor
 	private final Map<RenderTarget, PGlWeightedBlendedOit> weightedBlendedOits = new IdentityHashMap<>();
 	private @Nullable PGlWeightedBlendedOit activeWeightedBlendedOit;
 
+	/**
+	 * Performs the execute operation.
+	 * @param plan the plan to use.
+	 */
 	public void execute(PRenderPlan<RenderType, PBakedMesh, PRenderQueue.InstanceData> plan)
 	{
 		if (plan.isEmpty())
@@ -146,11 +150,17 @@ public final class PGlMultiDrawExecutor
 		}
 	}
 
+	/**
+	 * Performs the composite oit operation.
+	 */
 	public void compositeOit()
 	{
 		this.weightedBlendedOits.values().forEach(PGlWeightedBlendedOit :: composite);
 	}
 
+	/**
+	 * Performs the cleanup operation.
+	 */
 	public void cleanup()
 	{
 		this.frameArena.awaitAll();
@@ -162,6 +172,13 @@ public final class PGlMultiDrawExecutor
 		this.activeWeightedBlendedOit = null;
 	}
 
+	/**
+	 * Draws the groups.
+	 * @param draws the draws to use.
+	 * @param instanceStream the instance stream to use.
+	 * @param multiDraw the multi draw to use.
+	 * @param oitPass the oit pass to use.
+	 */
 	private void drawGroups(List<Draw> draws, PGlInstanceStream.Upload instanceStream, boolean multiDraw, OitPass oitPass)
 	{
 		for (int start = 0; start < draws.size();)
@@ -179,6 +196,12 @@ public final class PGlMultiDrawExecutor
 		}
 	}
 
+	/**
+	 * Finds the batch end.
+	 * @param draws the draws to use.
+	 * @param start the start to use.
+	 * @return the value produced by this operation.
+	 */
 	private static int findBatchEnd(List<Draw> draws, int start)
 	{
 		Draw first = draws.get(start);
@@ -194,6 +217,12 @@ public final class PGlMultiDrawExecutor
 		return end;
 	}
 
+	/**
+	 * Finds the opaque pipeline end.
+	 * @param draws the draws to use.
+	 * @param start the start to use.
+	 * @return the value produced by this operation.
+	 */
 	private static int findOpaquePipelineEnd(List<Draw> draws, int start)
 	{
 		RenderType type = draws.get(start).type();
@@ -203,6 +232,12 @@ public final class PGlMultiDrawExecutor
 		return end;
 	}
 
+	/**
+	 * Draws the opaque pipeline.
+	 * @param draws the draws to use.
+	 * @param instanceStream the instance stream to use.
+	 * @param multiDraw the multi draw to use.
+	 */
 	private void drawOpaquePipeline(List<Draw> draws, PGlInstanceStream.Upload instanceStream, boolean multiDraw)
 	{
 		Map<ArenaKey, List<Draw>> batches = new LinkedHashMap<>();
@@ -212,6 +247,13 @@ public final class PGlMultiDrawExecutor
 			draw(batch, instanceStream, multiDraw && batch.size() > 1, OitPass.NONE);
 	}
 
+	/**
+	 * Performs the draw operation.
+	 * @param batch the batch to use.
+	 * @param instanceStream the instance stream to use.
+	 * @param multiDraw the multi draw to use.
+	 * @param oitPass the oit pass to use.
+	 */
 	private void draw(List<Draw> batch, PGlInstanceStream.Upload instanceStream, boolean multiDraw, OitPass oitPass)
 	{
 		Draw first = batch.getFirst();
@@ -280,6 +322,10 @@ public final class PGlMultiDrawExecutor
 		}
 	}
 
+	/**
+	 * Performs the active oit operation.
+	 * @return the value produced by this operation.
+	 */
 	private PGlWeightedBlendedOit activeOit()
 	{
 		if (this.activeWeightedBlendedOit == null)
@@ -287,6 +333,12 @@ public final class PGlMultiDrawExecutor
 		return this.activeWeightedBlendedOit;
 	}
 
+	/**
+	 * Resolves the pipeline.
+	 * @param type the type to use.
+	 * @param oitPass the oit pass to use.
+	 * @return the value produced by this operation.
+	 */
 	private RenderPipeline resolvePipeline(RenderType type, OitPass oitPass)
 	{
 		return switch (oitPass)
@@ -298,6 +350,11 @@ public final class PGlMultiDrawExecutor
 		};
 	}
 
+	/**
+	 * Performs the attachments operation.
+	 * @param type the type to use.
+	 * @return the value produced by this operation.
+	 */
 	private static RenderTargetAttachments attachments(RenderType type)
 	{
 		RenderTarget target = type.outputTarget().getRenderTarget();
@@ -310,6 +367,11 @@ public final class PGlMultiDrawExecutor
 		return new RenderTargetAttachments(color, depth);
 	}
 
+	/**
+	 * Performs the command operation.
+	 * @param draw the draw to use.
+	 * @return the value produced by this operation.
+	 */
 	private static PGlIndirectStream.Command command(Draw draw)
 	{
 		PGlGeometryArena.Slice slice = draw.slice();
@@ -318,6 +380,10 @@ public final class PGlMultiDrawExecutor
 				slice.baseVertex(), draw.baseInstance());
 	}
 
+	/**
+	 * Applies the active scissor.
+	 * @param pass the pass to use.
+	 */
 	private static void applyActiveScissor(RenderPass pass)
 	{
 		ScissorState scissor = RenderSystem.getScissorStateForRenderTypeDraws();
@@ -343,6 +409,10 @@ public final class PGlMultiDrawExecutor
 		DEPTH_PEEL,
 		ACCUMULATION;
 
+		/**
+		 * Performs the uses layer depth operation.
+		 * @return the value produced by this operation.
+		 */
 		private boolean usesLayerDepth()
 		{
 			return this == DEPTH_PEEL || this == ACCUMULATION;

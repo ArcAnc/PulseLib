@@ -30,12 +30,20 @@ import java.util.List;
 
 public class PLibArmorHandler
 {
+	/**
+	 * Performs the register operation.
+	 * @param modEventBus the mod event bus to use.
+	 */
 	public static void register(IEventBus modEventBus)
 	{
 		modEventBus.addListener(PLibArmorHandler :: addArmorLayers);
 		modEventBus.addListener(PLibArmorHandler :: registerRenderStateModifiers);
 	}
 	
+	/**
+	 * Adds the armor layers.
+	 * @param event the event to use.
+	 */
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	private static void addArmorLayers(final EntityRenderersEvent.AddLayers event)
 	{
@@ -61,6 +69,10 @@ public class PLibArmorHandler
 		}
 	}
 	
+	/**
+	 * Registers the render state modifiers.
+	 * @param event the event to use.
+	 */
 	private static void registerRenderStateModifiers(final RegisterRenderStateModifiersEvent event)
 	{
 		event.registerEntityModifier(
@@ -68,6 +80,11 @@ public class PLibArmorHandler
 				PLibArmorHandler :: extractAttachmentRenderData);
 	}
 	
+	/**
+	 * Extracts the attachment render data.
+	 * @param entity the entity to use.
+	 * @param state the state to use.
+	 */
 	private static void extractAttachmentRenderData(LivingEntity entity, LivingEntityRenderState state)
 	{
 		List<PLivingAttachmentLayer.RenderEntry> entries = PLivingAttachmentLayer.extractRenderEntries(entity, state.partialTick);

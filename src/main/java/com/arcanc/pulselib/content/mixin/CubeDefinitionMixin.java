@@ -44,6 +44,12 @@ public class CubeDefinitionMixin
 	@Shadow @Final
 	private Set<Direction> visibleFaces;
 
+	/**
+	 * Performs the pulselib$bake player deformed cube operation.
+	 * @param textureWidth the texture width to use.
+	 * @param textureHeight the texture height to use.
+	 * @param callback the callback to use.
+	 */
 	@Inject(method = "bake", at = @At("HEAD"), cancellable = true)
 	private void pulselib$bakePlayerDeformedCube(int textureWidth, int textureHeight,
 												CallbackInfoReturnable<ModelPart.Cube> callback)

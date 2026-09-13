@@ -60,6 +60,15 @@ public class PBakedBone
 	private @Nullable MappableRingBuffer colorLightOverlay;
 	private static final int FULL_BRIGHT = 0x00F000F0;
 	
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param name the name to use.
+	 * @param basePosition the base position to use.
+	 * @param baseRotation the base rotation to use.
+	 * @param children the children to use.
+	 * @param parent the parent to use.
+	 * @param meshes the meshes to use.
+	 */
 	public PBakedBone(String name,
 	                  Vector3f basePosition,
 	                  Quaternionf baseRotation,
@@ -75,6 +84,9 @@ public class PBakedBone
 		this.meshes = meshes;
 	}
 	
+	/**
+	 * Performs the ensure buffer initialized operation.
+	 */
 	@ApiStatus.Internal
 	public void ensureBufferInitialized()
 	{
@@ -91,6 +103,16 @@ public class PBakedBone
 						get());
 	}
 	
+	/**
+	 * Performs the instant draw operation.
+	 * @param poseStack the pose stack to use.
+	 * @param modelData the model data to use.
+	 * @param controllers the controllers to use.
+	 * @param renderType the render type to use.
+	 * @param color the color to use.
+	 * @param packedOverlay the packed overlay to use.
+	 * @param partialTick the partial tick to use.
+	 */
 	public <T extends PAnimatable<T>>void instantDraw(PoseStack poseStack,
 	                                                  PModelData modelData,
 	                                                  Collection<PAnimationController<T>> controllers,
@@ -102,6 +124,17 @@ public class PBakedBone
 		instantDraw(poseStack, modelData, controllers, renderType, color, FULL_BRIGHT, packedOverlay, partialTick);
 	}
 
+	/**
+	 * Performs the instant draw operation.
+	 * @param poseStack the pose stack to use.
+	 * @param modelData the model data to use.
+	 * @param controllers the controllers to use.
+	 * @param renderType the render type to use.
+	 * @param color the color to use.
+	 * @param packedLight the packed light to use.
+	 * @param packedOverlay the packed overlay to use.
+	 * @param partialTick the partial tick to use.
+	 */
 	public <T extends PAnimatable<T>>void instantDraw(PoseStack poseStack,
 	                                                  PModelData modelData,
 	                                                  Collection<PAnimationController<T>> controllers,
@@ -119,6 +152,15 @@ public class PBakedBone
 		instantDraw(poseStack, modelData, controllers, (bone, mesh, inherited) -> inherited, context, partialTick);
 	}
 	
+	/**
+	 * Performs the instant draw operation.
+	 * @param poseStack the pose stack to use.
+	 * @param modelData the model data to use.
+	 * @param controllers the controllers to use.
+	 * @param resolver the resolver to use.
+	 * @param inherited the inherited to use.
+	 * @param partialTick the partial tick to use.
+	 */
 	public <T extends PAnimatable<T>>void instantDraw(PoseStack poseStack,
 	                                                  PModelData modelData,
 	                                                  Collection<PAnimationController<T>> controllers,
@@ -134,6 +176,13 @@ public class PBakedBone
 		instantDraw(poseStack, poseResolver, resolver, inherited);
 	}
 	
+	/**
+	 * Performs the instant draw operation.
+	 * @param poseStack the pose stack to use.
+	 * @param poseResolver the pose resolver to use.
+	 * @param resolver the resolver to use.
+	 * @param inherited the inherited to use.
+	 */
 	public void instantDraw(PoseStack poseStack,
 	                        PAnimationPoseResolver<?> poseResolver,
 	                        PMeshRenderResolver resolver,
@@ -223,6 +272,13 @@ public class PBakedBone
 		poseStack.popPose();
 	}
 	
+	/**
+	 * Performs the mix bone operation.
+	 * @param model the model to use.
+	 * @param controllers the controllers to use.
+	 * @param partialTick the partial tick to use.
+	 * @return the value produced by this operation.
+	 */
 	public <T extends PAnimatable<T>>@Nullable BoneFrame mixBone(
 			PBakedModel model,
 			Collection<PAnimationController<T>> controllers,
@@ -231,6 +287,14 @@ public class PBakedBone
 		return mixBone(model, controllers, Map.of(), partialTick);
 	}
 
+	/**
+	 * Performs the mix bone operation.
+	 * @param model the model to use.
+	 * @param controllers the controllers to use.
+	 * @param molangContexts the molang contexts to use.
+	 * @param partialTick the partial tick to use.
+	 * @return the value produced by this operation.
+	 */
 	public <T extends PAnimatable<T>>@Nullable BoneFrame mixBone(
 			PBakedModel model,
 			Collection<PAnimationController<T>> controllers,
@@ -247,32 +311,56 @@ public class PBakedBone
 		return pose.isAnimated() ? pose.localTransform() : null;
 	}
 	
+	/**
+	 * Performs the name operation.
+	 * @return the value produced by this operation.
+	 */
 	public String name()
 	{
 		return this.name;
 	}
 	
+	/**
+	 * Performs the base position operation.
+	 * @return the value produced by this operation.
+	 */
 	public Vector3f basePosition()
 	{
 		return this.basePosition;
 	}
 	
+	/**
+	 * Performs the base rotation operation.
+	 * @return the value produced by this operation.
+	 */
 	public Quaternionf baseRotation()
 	{
 		return this.baseRotation;
 	}
 	
+	/**
+	 * Performs the children operation.
+	 * @return the value produced by this operation.
+	 */
 	public List<PBakedBone> children()
 	{
 		return this.children;
 	}
 	
+	/**
+	 * Performs the parent operation.
+	 * @return the value produced by this operation.
+	 */
 	@Nullable
 	public PBakedBone parent()
 	{
 		return this.parent;
 	}
 	
+	/**
+	 * Performs the meshes operation.
+	 * @return the value produced by this operation.
+	 */
 	public List<PBakedMesh> meshes()
 	{
 		return this.meshes;
@@ -289,6 +377,13 @@ public class PBakedBone
 		public final List<PBakedBoneBuilder> children = new ArrayList<>();
 		public final List<PBakedMesh> meshes = new ArrayList<>();
 		
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param uuid the uuid to use.
+		 * @param name the name to use.
+		 * @param basePosition the base position to use.
+		 * @param baseRotation the base rotation to use.
+		 */
 		public PBakedBoneBuilder(
 				UUID uuid,
 				String name,

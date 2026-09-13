@@ -19,28 +19,49 @@ public final class PStretchDeformer implements PMeshDeformer<PStretchDefinition>
 	public static final PStretchDeformer INSTANCE = new PStretchDeformer();
 	private static final float EPSILON = 1.0e-5f;
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PStretchDeformer()
 	{
 	}
 
+	/**
+	 * Performs the id operation.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public Identifier id()
 	{
 		return PLibDatabase.rl("stretch");
 	}
 
+	/**
+	 * Performs the codec operation.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public MapCodec<PStretchDefinition> codec()
 	{
 		return PStretchDefinition.CODEC;
 	}
 
+	/**
+	 * Performs the prepare operation.
+	 * @param context the context to use.
+	 * @param definition the definition to use.
+	 */
 	@Override
 	public void prepare(PDeformerPrepareContext context, PStretchDefinition definition)
 	{
 		context.add(new Operation(new Vector3f(definition.origin()), unit(definition.axis()), definition.scale()));
 	}
 
+	/**
+	 * Performs the unit operation.
+	 * @param axis the axis to use.
+	 * @return the value produced by this operation.
+	 */
 	private static Vector3f unit(Vector3f axis)
 	{
 		Vector3f result = new Vector3f(axis);
@@ -51,6 +72,11 @@ public final class PStretchDeformer implements PMeshDeformer<PStretchDefinition>
 
 	private record Operation(Vector3f origin, Vector3f axis, PChannelReference<Float> scale) implements PPreparedDeformer
 	{
+		/**
+		 * Performs the deform operation.
+		 * @param position the position to use.
+		 * @param values the values to use.
+		 */
 		@Override
 		public void deform(Vector3f position, PDeformerValueSource values)
 		{

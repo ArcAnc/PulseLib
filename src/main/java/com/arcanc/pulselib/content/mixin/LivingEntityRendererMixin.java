@@ -22,6 +22,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(PlayerModel.class)
 public abstract class LivingEntityRendererMixin
 {
+	/**
+	 * Performs the pulselib$apply player animations operation.
+	 * @param state the state to use.
+	 * @param ci the ci to use.
+	 */
 	@Inject(method = "setupAnim", at = @At("TAIL"))
 	private void pulselib$applyPlayerAnimations(AvatarRenderState state, CallbackInfo ci)
 	{

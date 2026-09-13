@@ -22,11 +22,24 @@ import net.minecraft.world.entity.LivingEntity;
 
 public class PHumanoidAttachmentLayer<S extends HumanoidRenderState, M extends HumanoidModel<S>> extends PLivingAttachmentLayer<S, M>
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param parent the parent to use.
+	 */
 	public PHumanoidAttachmentLayer(RenderLayerParent<S, M> parent)
 	{
 		super(parent);
 	}
 	
+	/**
+	 * Renders the first person arm.
+	 * @param poseStack the pose stack to use.
+	 * @param light the light to use.
+	 * @param entity the entity to use.
+	 * @param arm the arm to use.
+	 * @param armPart the arm part to use.
+	 * @param partialTick the partial tick to use.
+	 */
 	public static void renderFirstPersonArm(PoseStack poseStack,
 	                                        int light,
 	                                        LivingEntity entity,

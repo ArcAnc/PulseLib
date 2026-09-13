@@ -15,9 +15,10 @@ import com.arcanc.pulselib.content.model.baked.PBakedBone;
 import com.arcanc.pulselib.content.model.baked.PBakedModel;
 import com.arcanc.pulselib.content.registration.PLibRegistration;
 import com.arcanc.pulselib.data.gecko.MolangParser;
-import org.jetbrains.annotations.Nullable;
+
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -34,6 +35,13 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	private final PModelPose modelPose;
 	private final PModelPose bindModelPose;
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param model the model to use.
+	 * @param controllers the controllers to use.
+	 * @param molangContexts the molang contexts to use.
+	 * @param partialTick the partial tick to use.
+	 */
 	public PAnimationPoseResolver(PBakedModel model,
 	                              Collection<PAnimationController<T>> controllers,
 	                              MolangContextProvider<T> molangContexts,
@@ -50,12 +58,22 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 		this.bindModelPose.update(this.model, this.model.bindPose());
 	}
 
+	/**
+	 * Performs the resolve operation.
+	 * @param boneName the bone name to use.
+	 * @return the value produced by this operation.
+	 */
 	public @Nullable BonePose resolve(String boneName)
 	{
 		int index = this.model.boneIndex(boneName);
 		return index < 0 ? null : resolve(this.model.bone(index));
 	}
 
+	/**
+	 * Performs the resolve operation.
+	 * @param bone the bone to use.
+	 * @return the value produced by this operation.
+	 */
 	public BonePose resolve(PBakedBone bone)
 	{
 		int index = this.model.boneIndex(bone);
@@ -75,6 +93,11 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 				animated);
 	}
 
+	/**
+	 * Determines whether visible.
+	 * @param bone the bone to use.
+	 * @return the value produced by this operation.
+	 */
 	public boolean isVisible(PBakedBone bone)
 	{
 		for (PAnimationController<T> controller : this.controllers)
@@ -106,6 +129,10 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 		return true;
 	}
 
+	/**
+	 * Performs the active animation bones operation.
+	 * @return the value produced by this operation.
+	 */
 	public Set<String> activeAnimationBones()
 	{
 		Set<String> result = new HashSet<>();
@@ -133,6 +160,11 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 		return Set.copyOf(result);
 	}
 
+	/**
+	 * Adds the animation bones.
+	 * @param destination the destination to use.
+	 * @param animation the animation to use.
+	 */
 	private static void addAnimationBones(Set<String> destination, @Nullable PAnimation animation)
 	{
 		if (animation == null)
@@ -141,6 +173,12 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 		destination.addAll(animation.visibilityTracks().keySet());
 	}
 	
+	/**
+	 * Performs the animation delta operation.
+	 * @param boneName the bone name to use.
+	 * @param rootBoneName the root bone name to use.
+	 * @return the value produced by this operation.
+	 */
 	public @Nullable AnimationDelta animationDelta(String boneName, @Nullable String rootBoneName)
 	{
 		int boneIndex = this.model.boneIndex(boneName);
@@ -205,38 +243,70 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 						Math.abs(scale.z - 1.0f) > 1.0e-5f);
 	}
 	
+	/**
+	 * Performs the model transform operation.
+	 * @param boneName the bone name to use.
+	 * @return the value produced by this operation.
+	 */
 	public @Nullable PTransform modelTransform(String boneName)
 	{
 		int index = this.model.boneIndex(boneName);
 		return index < 0 ? null : modelTransform(index);
 	}
 	
+	/**
+	 * Performs the model transform operation.
+	 * @param bone the bone to use.
+	 * @return the value produced by this operation.
+	 */
 	public PTransform modelTransform(PBakedBone bone)
 	{
 		return modelTransform(this.model.boneIndex(bone));
 	}
 	
+	/** Returns the canonical resolved MODEL-space transform for a bone. */
 	public PTransform modelTransform(int boneIndex)
 	{
 		return this.modelPose.transform(boneIndex);
 	}
 	
+	/**
+	 * Binds the model transform.
+	 * @param boneName the bone name to use.
+	 * @return the value produced by this operation.
+	 */
 	public @Nullable PTransform bindModelTransform(String boneName)
 	{
 		int index = this.model.boneIndex(boneName);
 		return index < 0 ? null : bindModelTransform(index);
 	}
 	
+	/**
+	 * Binds the model transform.
+	 * @param bone the bone to use.
+	 * @return the value produced by this operation.
+	 */
 	public PTransform bindModelTransform(PBakedBone bone)
 	{
 		return bindModelTransform(this.model.boneIndex(bone));
 	}
 	
+	/**
+	 * Binds the model transform.
+	 * @param boneIndex the bone index to use.
+	 * @return the value produced by this operation.
+	 */
 	public PTransform bindModelTransform(int boneIndex)
 	{
 		return this.bindModelPose.transform(boneIndex);
 	}
 	
+	/**
+	 * Performs the relative transform operation.
+	 * @param boneName the bone name to use.
+	 * @param referenceBoneName the reference bone name to use.
+	 * @return the value produced by this operation.
+	 */
 	public @Nullable PTransform relativeTransform(String boneName, String referenceBoneName)
 	{
 		int boneIndex = this.model.boneIndex(boneName);
@@ -248,11 +318,23 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 		return relativeTransform(boneIndex, referenceIndex);
 	}
 	
+	/**
+	 * Performs the relative transform operation.
+	 * @param boneIndex the bone index to use.
+	 * @param referenceIndex the reference index to use.
+	 * @return the value produced by this operation.
+	 */
 	public PTransform relativeTransform(int boneIndex, int referenceIndex)
 	{
 		return this.modelPose.transform(referenceIndex).inverse().compose(this.modelPose.transform(boneIndex));
 	}
 	
+	/**
+	 * Performs the relative bind transform operation.
+	 * @param boneName the bone name to use.
+	 * @param referenceBoneName the reference bone name to use.
+	 * @return the value produced by this operation.
+	 */
 	public @Nullable PTransform relativeBindTransform(String boneName, String referenceBoneName)
 	{
 		int boneIndex = this.model.boneIndex(boneName);
@@ -264,11 +346,48 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 		return relativeBindTransform(boneIndex, referenceIndex);
 	}
 	
+	/**
+	 * Performs the relative bind transform operation.
+	 * @param boneIndex the bone index to use.
+	 * @param referenceIndex the reference index to use.
+	 * @return the value produced by this operation.
+	 */
 	public PTransform relativeBindTransform(int boneIndex, int referenceIndex)
 	{
 		return this.bindModelPose.transform(referenceIndex).inverse().compose(this.bindModelPose.transform(boneIndex));
 	}
 	
+	/**
+	 * Binds the parent transform.
+	 * @param boneName the bone name to use.
+	 * @return the value produced by this operation.
+	 */
+	@Nullable
+	public PTransform bindParentTransform(String boneName)
+	{
+		int boneIndex =
+				this.model.boneIndex(boneName);
+		
+		if (boneIndex < 0)
+			return null;
+		
+		int parentIndex =
+				this.model.parentIndex(boneIndex);
+		
+		return parentIndex < 0 ?
+				PTransform.IDENTITY :
+				this.bindModelPose.transform(parentIndex);
+	}
+	
+	/**
+	 * Resolves the local.
+	 * @param bone the bone to use.
+	 * @param model the model to use.
+	 * @param controllers the controllers to use.
+	 * @param molangContexts the molang contexts to use.
+	 * @param partialTick the partial tick to use.
+	 * @return the value produced by this operation.
+	 */
 	public static <T extends PAnimatable<T>> LocalPose resolveLocal(PBakedBone bone,
 	                                                                PBakedModel model,
 	                                                                Collection<PAnimationController<T>> controllers,
@@ -336,6 +455,10 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 			hasScale);
 	}
 
+	/**
+	 * Performs the default contexts operation.
+	 * @return the value produced by this operation.
+	 */
 	public static <T extends PAnimatable<T>> MolangContextProvider<T> defaultContexts()
 	{
 		return (controller, partialTick) -> new MolangParser.Context().
@@ -343,6 +466,12 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 				randomSeed(0L);
 	}
 
+	/**
+	 * Performs the ratio operation.
+	 * @param value the value to use.
+	 * @param base the base to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float ratio(float value, float base)
 	{
 		return Math.abs(base) < 1.0e-6f ? value : value / base;
@@ -351,6 +480,12 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	@FunctionalInterface
 	public interface MolangContextProvider<T extends PAnimatable<T>>
 	{
+		/**
+		 * Performs the context operation.
+		 * @param controller the controller to use.
+		 * @param partialTick the partial tick to use.
+		 * @return the value produced by this operation.
+		 */
 		MolangParser.Context context(PAnimationController<T> controller, float partialTick);
 	}
 
@@ -370,6 +505,10 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	                       boolean hasRotation,
 	                       boolean hasScale)
 	{
+		/**
+		 * Determines whether animated.
+		 * @return the value produced by this operation.
+		 */
 		public boolean isAnimated()
 		{
 			return this.hasTranslation || this.hasRotation || this.hasScale;
@@ -383,6 +522,10 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	                             boolean hasRotation,
 	                             boolean hasScale)
 	{
+		/**
+		 * Determines whether animated.
+		 * @return the value produced by this operation.
+		 */
 		public boolean isAnimated()
 		{
 			return this.hasTranslation || this.hasRotation || this.hasScale;

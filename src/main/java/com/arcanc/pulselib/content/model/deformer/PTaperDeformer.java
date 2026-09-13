@@ -19,22 +19,38 @@ public final class PTaperDeformer implements PMeshDeformer<PTaperDefinition>
 	public static final PTaperDeformer INSTANCE = new PTaperDeformer();
 	private static final float EPSILON = 1.0e-5f;
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PTaperDeformer()
 	{
 	}
 
+	/**
+	 * Performs the id operation.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public Identifier id()
 	{
 		return PLibDatabase.rl("taper");
 	}
 
+	/**
+	 * Performs the codec operation.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public MapCodec<PTaperDefinition> codec()
 	{
 		return PTaperDefinition.CODEC;
 	}
 
+	/**
+	 * Performs the prepare operation.
+	 * @param context the context to use.
+	 * @param definition the definition to use.
+	 */
 	@Override
 	public void prepare(PDeformerPrepareContext context, PTaperDefinition definition)
 	{
@@ -48,6 +64,11 @@ public final class PTaperDeformer implements PMeshDeformer<PTaperDefinition>
 	private record Operation(Vector3f origin, Vector3f axis, float positiveExtent, float negativeExtent,
 								 PChannelReference<Float> tipScale) implements PPreparedDeformer
 	{
+		/**
+		 * Performs the deform operation.
+		 * @param position the position to use.
+		 * @param values the values to use.
+		 */
 		@Override
 		public void deform(Vector3f position, PDeformerValueSource values)
 		{

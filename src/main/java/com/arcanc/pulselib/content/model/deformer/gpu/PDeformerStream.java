@@ -28,6 +28,11 @@ final class PDeformerStream
 	private boolean operationsDirty;
 	private boolean valuesDirty;
 
+	/**
+	 * Performs the submit operation.
+	 * @param deformation the deformation to use.
+	 * @return the value produced by this operation.
+	 */
 	public PGpuDeformerBuffers.Submission submit(@Nullable PMeshDeformation deformation)
 	{
 		if (deformation == null || deformation.stack().isEmpty())
@@ -48,42 +53,70 @@ final class PDeformerStream
 		return new PGpuDeformerBuffers.Submission(operationOffset, valueOffset, stack.operationCount());
 	}
 
+	/**
+	 * Performs the operations operation.
+	 * @return the value produced by this operation.
+	 */
 	public List<Float> operations()
 	{
 		return this.operations;
 	}
 
+	/**
+	 * Performs the values operation.
+	 * @return the value produced by this operation.
+	 */
 	public List<Float> values()
 	{
 		return this.values;
 	}
 
+	/**
+	 * Performs the operations dirty operation.
+	 * @return the value produced by this operation.
+	 */
 	public boolean operationsDirty()
 	{
 		return this.operationsDirty;
 	}
 
+	/**
+	 * Performs the values dirty operation.
+	 * @return the value produced by this operation.
+	 */
 	public boolean valuesDirty()
 	{
 		return this.valuesDirty;
 	}
 
+	/**
+	 * Performs the mark operations uploaded operation.
+	 */
 	public void markOperationsUploaded()
 	{
 		this.operationsDirty = false;
 	}
 
+	/**
+	 * Performs the mark values uploaded operation.
+	 */
 	public void markValuesUploaded()
 	{
 		this.valuesDirty = false;
 	}
 
+	/**
+	 * Performs the finish frame operation.
+	 */
 	public void finishFrame()
 	{
 		this.values.clear();
 		this.valuesDirty = true;
 	}
 
+	/**
+	 * Clears the definitions.
+	 */
 	public void clearDefinitions()
 	{
 		this.stacks.clear();
@@ -94,6 +127,11 @@ final class PDeformerStream
 		this.valuesDirty = true;
 	}
 
+	/**
+	 * Performs the resolve operation.
+	 * @param stack the stack to use.
+	 * @return the value produced by this operation.
+	 */
 	private @Nullable PGpuDeformerStack resolve(PDeformerStack stack)
 	{
 		if (this.stacks.containsKey(stack))
@@ -103,6 +141,11 @@ final class PDeformerStream
 		return result;
 	}
 
+	/**
+	 * Performs the append operations operation.
+	 * @param stack the stack to use.
+	 * @return the value produced by this operation.
+	 */
 	private int appendOperations(PGpuDeformerStack stack)
 	{
 		int result = this.operations.size() / 4;

@@ -66,11 +66,19 @@ public class PModelCache
 					},
 					Object2ObjectOpenHashMap :: new));
 	
+	/**
+	 * Returns the models.
+	 * @return the value produced by this operation.
+	 */
 	public static @Nullable Map<Identifier, PBakedModel> getModels()
 	{
 		return MODELS;
 	}
 	
+	/**
+	 * Registers the model loader.
+	 * @param modelLoader the model loader to use.
+	 */
 	public static void registerModelLoader(PModelLoader modelLoader)
 	{
 		if (MODEL_LOADERS.containsKey(modelLoader.id()))
@@ -79,21 +87,42 @@ public class PModelCache
 		MODEL_LOADERS.put(modelLoader.id(), modelLoader);
 	}
 	
+	/**
+	 * Unregisters the model loader.
+	 * @param loaderId the loader id to use.
+	 */
 	public static void unregisterModelLoader(Identifier loaderId)
 	{
 		MODEL_LOADERS.remove(loaderId);
 	}
 	
+	/**
+	 * Returns the model loaders.
+	 * @return the value produced by this operation.
+	 */
 	public static List<PModelLoader> getModelLoaders()
 	{
 		return List.copyOf(MODEL_LOADERS.values());
 	}
 	
+	/**
+	 * Returns the model loader.
+	 * @param loaderId the loader id to use.
+	 * @return the value produced by this operation.
+	 */
 	public static Optional<PModelLoader> getModelLoader(Identifier loaderId)
 	{
 		return Optional.ofNullable(MODEL_LOADERS.get(loaderId));
 	}
 	
+	/**
+	 * Performs the reload operation.
+	 * @param sharedState the shared state to use.
+	 * @param backgroundExecutor the background executor to use.
+	 * @param preparationBarrier the preparation barrier to use.
+	 * @param gameExecutor the game executor to use.
+	 * @return the value produced by this operation.
+	 */
 	@ApiStatus.Internal
 	public static CompletableFuture<Void> reload(PreparableReloadListener.SharedState sharedState,
 	                                             Executor backgroundExecutor,
@@ -112,6 +141,9 @@ public class PModelCache
 				gameExecutor);
 	}
 	
+	/**
+	 * Clears the caches.
+	 */
 	private static void clearCaches()
 	{
 		PTextureAlphaClassifier.clear();
@@ -125,6 +157,10 @@ public class PModelCache
 		}
 	}
 	
+	/**
+	 * Clears the bone cache.
+	 * @param bone the bone to use.
+	 */
 	private static void clearBoneCache(PBakedBone bone)
 	{
 		bone.meshes().forEach(mesh ->
@@ -136,6 +172,11 @@ public class PModelCache
 		bone.children().forEach(PModelCache :: clearBoneCache);
 	}
 	
+	/**
+	 * Performs the bake models operation.
+	 * @param rawModels the raw models to use.
+	 * @return the value produced by this operation.
+	 */
 	private static Map<Identifier, PBakedModel> bakeModels(Map<Identifier, PModel> rawModels)
 	{
 		Map<Identifier, PBakedModel> bakedModelMap = new Object2ObjectOpenHashMap<>();
@@ -270,6 +311,12 @@ public class PModelCache
 		return bakedModelMap;
 	}
 	
+	/**
+	 * Performs the bake bone operation.
+	 * @param builder the builder to use.
+	 * @param bakedParent the baked parent to use.
+	 * @return the value produced by this operation.
+	 */
 	private static PBakedBone bakeBone(
 			PBakedBone.PBakedBoneBuilder builder,
 			@Nullable PBakedBone bakedParent)
@@ -298,6 +345,12 @@ public class PModelCache
 		);
 	}
 	
+	/**
+	 * Resolves the texture location.
+	 * @param modelPath the model path to use.
+	 * @param textureName the texture name to use.
+	 * @return the value produced by this operation.
+	 */
 	public static Identifier resolveTextureLocation(Identifier modelPath, String textureName)
 	{
 		for (PModelLoader modelLoader : PModelCache.getModelLoaders())
@@ -307,11 +360,24 @@ public class PModelCache
 		return modelPath.withPath(textureName);
 	}
 	
+	/**
+	 * Performs the texture location operation.
+	 * @param modelPath the model path to use.
+	 * @param textureName the texture name to use.
+	 * @return the value produced by this operation.
+	 */
 	private static Identifier textureLocation(Identifier modelPath, String textureName)
 	{
 		return resolveTextureLocation(modelPath, textureName);
 	}
 	
+	/**
+	 * Loads the models.
+	 * @param backgroundExecutor the background executor to use.
+	 * @param resourceManager the resource manager to use.
+	 * @param elementConsumer the element consumer to use.
+	 * @return the value produced by this operation.
+	 */
 	private static CompletableFuture<?> loadModels(Executor backgroundExecutor,
 	                                               ResourceManager resourceManager,
 	                                               BiConsumer<Identifier, PModel> elementConsumer)

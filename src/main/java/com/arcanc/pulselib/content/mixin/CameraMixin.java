@@ -31,10 +31,25 @@ public abstract class CameraMixin
 {
 	@Shadow private boolean detached;
 
+	/**
+	 * Sets the position.
+	 * @param pos the pos to use.
+	 */
 	@Shadow protected abstract void setPosition(Vec3 pos);
 
+	/**
+	 * Sets the rotation.
+	 * @param yRot the y rot to use.
+	 * @param xRot the x rot to use.
+	 * @param roll the roll to use.
+	 */
 	@Shadow protected abstract void setRotation(float yRot, float xRot, float roll);
 
+	/**
+	 * Performs the pulselib$follow animated head operation.
+	 * @param partialTick the partial tick to use.
+	 * @param ci the ci to use.
+	 */
 	@Inject(method = "alignWithEntity", at = @At("TAIL"))
 	private void pulselib$followAnimatedHead(float partialTick, CallbackInfo ci)
 	{

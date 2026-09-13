@@ -14,6 +14,10 @@ import net.minecraft.resources.Identifier;
 
 public class DefaultItemModelData extends PModelData
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param builder the builder to use.
+	 */
 	public DefaultItemModelData(DefaultItemModelDataBuilder builder)
 	{
 		super(builder);
@@ -23,11 +27,20 @@ public class DefaultItemModelData extends PModelData
 	{
 		private final Identifier shortModelLocation;
 		
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param modelLocation the model location to use.
+		 */
 		public DefaultItemModelDataBuilder(Identifier modelLocation)
 		{
 			this(modelLocation, PModelData.DEFAULT_MODEL_FORMAT);
 		}
 		
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param modelLocation the model location to use.
+		 * @param modelFormat the model format to use.
+		 */
 		public DefaultItemModelDataBuilder(Identifier modelLocation, Identifier modelFormat)
 		{
 			super(modelLocation, "item");
@@ -36,6 +49,11 @@ public class DefaultItemModelData extends PModelData
 			this.modelLocation = PModelData.generateDefaultModelLocation(modelLocation, this.modelType, this.modelFormat);
 		}
 		
+		/**
+		 * Adds the texture.
+		 * @param texturePath the texture path to use.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public DefaultItemModelDataBuilder addTexture(Identifier texturePath)
 		{
@@ -43,6 +61,10 @@ public class DefaultItemModelData extends PModelData
 			return this;
 		}
 		
+		/**
+		 * Performs the build operation.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public DefaultItemModelData build()
 		{

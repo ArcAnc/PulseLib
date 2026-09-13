@@ -20,20 +20,36 @@ public final class PTextureAlphaClassifier
 {
 	private static final Map<SpriteContents, PAlphaMode> CACHE = new WeakHashMap<>();
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PTextureAlphaClassifier()
 	{
 	}
 
+	/**
+	 * Performs the resolve operation.
+	 * @param contents the contents to use.
+	 * @return the value produced by this operation.
+	 */
 	public static synchronized PAlphaMode resolve(SpriteContents contents)
 	{
 		return CACHE.computeIfAbsent(contents, PTextureAlphaClassifier :: classify);
 	}
 
+	/**
+	 * Performs the clear operation.
+	 */
 	public static synchronized void clear()
 	{
 		CACHE.clear();
 	}
 
+	/**
+	 * Performs the classify operation.
+	 * @param contents the contents to use.
+	 * @return the value produced by this operation.
+	 */
 	private static PAlphaMode classify(SpriteContents contents)
 	{
 		PAlphaMode configured = contents.getAdditionalMetadata(PLibSpriteMetadata.TYPE).

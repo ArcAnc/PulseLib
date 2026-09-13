@@ -8,10 +8,20 @@ import org.joml.Matrix4f;
 /** Replaces an overridden local pose without deriving anything from vanilla's transient pose. */
 public final class PFirstPersonPoseStack
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PFirstPersonPoseStack()
 	{
 	}
 
+	/**
+	 * Replaces the local pose.
+	 * @param poseStack the pose stack to use.
+	 * @param basePose the base pose to use.
+	 * @param baseNormal the base normal to use.
+	 * @param localTransform the local transform to use.
+	 */
 	public static void replaceLocalPose(PoseStack poseStack,
 	                                    Matrix4f basePose,
 	                                    Matrix3f baseNormal,

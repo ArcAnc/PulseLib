@@ -15,44 +15,42 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
+/** VIEW-space arm render command produced from the canonical skeleton. */
 public record PFirstPersonArmPose(
 		PFirstPersonRenderMode mode,
-		@Nullable PTransform transform,
-		PFirstPersonTransformMode transformMode)
+		@Nullable PTransform transform)
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param mode the mode to use.
+	 * @param transform the transform to use.
+	 */
 	public PFirstPersonArmPose
 	{
 		Objects.requireNonNull(mode);
-		transformMode = Objects.requireNonNull(transformMode);
 		if (mode == PFirstPersonRenderMode.ANIMATED && transform == null)
 			throw new IllegalArgumentException("An animated first-person arm needs a transform");
 		if (mode != PFirstPersonRenderMode.ANIMATED && transform != null)
 			throw new IllegalArgumentException("Only an animated first-person arm may have a transform");
 	}
 
-	/** Retained for source compatibility; new callers should state the transform mode. */
-	public PFirstPersonArmPose(PFirstPersonRenderMode mode, @Nullable PTransform transform)
-	{
-		this(mode, transform, PFirstPersonTransformMode.OVERRIDE);
-	}
-
+	/**
+	 * Performs the vanilla operation.
+	 * @return the value produced by this operation.
+	 */
 	public static PFirstPersonArmPose vanilla()
 	{
-		return new PFirstPersonArmPose(PFirstPersonRenderMode.VANILLA, null, PFirstPersonTransformMode.OVERRIDE);
+		return new PFirstPersonArmPose(PFirstPersonRenderMode.VANILLA, null);
 	}
 
+	/**
+	 * Performs the animated operation.
+	 * @param transform the transform to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PFirstPersonArmPose animated(PTransform transform)
 	{
-		return new PFirstPersonArmPose(PFirstPersonRenderMode.ANIMATED, transform, PFirstPersonTransformMode.OVERRIDE);
+		return new PFirstPersonArmPose(PFirstPersonRenderMode.ANIMATED, transform);
 	}
 
-	public static PFirstPersonArmPose animated(PTransform transform, PFirstPersonTransformMode transformMode)
-	{
-		return new PFirstPersonArmPose(PFirstPersonRenderMode.ANIMATED, transform, transformMode);
-	}
-
-	public static PFirstPersonArmPose hidden()
-	{
-		return new PFirstPersonArmPose(PFirstPersonRenderMode.HIDDEN, null, PFirstPersonTransformMode.OVERRIDE);
-	}
 }

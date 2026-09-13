@@ -12,9 +12,21 @@ package com.arcanc.pulselib.util.attachments;
 
 public interface PAttachmentBinding
 {
+	/**
+	 * Performs the anchor operation.
+	 * @return the value produced by this operation.
+	 */
 	PAttachmentAnchor anchor();
 	
+	/**
+	 * Performs the bone operation.
+	 * @return the value produced by this operation.
+	 */
 	String bone();
 	
+	/**
+	 * Performs the transform operation.
+	 * @return the value produced by this operation.
+	 */
 	PTransform transform();
 }

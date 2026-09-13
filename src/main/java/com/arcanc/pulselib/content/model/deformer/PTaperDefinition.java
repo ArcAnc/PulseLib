@@ -27,6 +27,14 @@ public record PTaperDefinition(Vector3f origin, Vector3f lengthAxis, float posit
 					PChannelReference.FLOAT.fieldOf("tip_scale").forGetter(PTaperDefinition::tipScale)).
 			apply(instance, PTaperDefinition::new));
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param origin the origin to use.
+	 * @param lengthAxis the length axis to use.
+	 * @param positiveExtent the positive extent to use.
+	 * @param negativeExtent the negative extent to use.
+	 * @param tipScale the tip scale to use.
+	 */
 	public PTaperDefinition
 	{
 		origin = new Vector3f(origin);

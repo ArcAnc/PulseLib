@@ -51,6 +51,10 @@ public class ClientEvents
 {
 	private static boolean pulseClientContentRegistered;
 	
+	/**
+	 * Registers the client events.
+	 * @param modEventBus the mod event bus to use.
+	 */
 	public static void registerClientEvents(final IEventBus modEventBus)
 	{
 		ModLoader.postEvent(new PulseLibEvents.TypeRegistrationEvent());
@@ -75,16 +79,27 @@ public class ClientEvents
 		PPlayerAcrobaticDemo.register(modEventBus);
 	}
 	
+	/**
+	 * Registers the reload listeners.
+	 * @param event the event to use.
+	 */
 	private static void registerReloadListeners(final AddClientReloadListenersEvent event)
 	{
 		event.addListener(PLibDatabase.RELOAD_LISTENER_ID, PModelCache :: reload);
 	}
 	
+	/**
+	 * Registers the pulse client content.
+	 * @param event the event to use.
+	 */
 	private static void registerPulseClientContent(final FMLClientSetupEvent event)
 	{
 		ensurePulseClientContentRegistered();
 	}
 	
+	/**
+	 * Performs the ensure pulse client content registered operation.
+	 */
 	private static void ensurePulseClientContentRegistered()
 	{
 		if (pulseClientContentRegistered)
@@ -127,6 +142,10 @@ public class ClientEvents
 		pulseClientContentRegistered = true;
 	}
 	
+	/**
+	 * Registers the client extensions.
+	 * @param event the event to use.
+	 */
 	private static void registerClientExtensions(final RegisterClientExtensionsEvent event)
 	{
 		ensurePulseClientContentRegistered();
@@ -136,6 +155,11 @@ public class ClientEvents
 				forEach(item -> registerClientExtensionWithItem(event, item));
 	}
 	
+	/**
+	 * Registers the client extension with item.
+	 * @param event the event to use.
+	 * @param item the item to use.
+	 */
 	private static void registerClientExtensionWithItem(final RegisterClientExtensionsEvent event, final Item item)
 	{
 		if (event.isItemRegistered(item))
@@ -147,6 +171,10 @@ public class ClientEvents
 			event.registerItem(extension, item);
 	}
 	
+	/**
+	 * Performs the player disconnected operation.
+	 * @param event the event to use.
+	 */
 	private static void playerDisconnected(final LevelEvent.Unload event)
 	{
 		if (!event.getLevel().isClientSide())
@@ -157,22 +185,38 @@ public class ClientEvents
 		PPlayerAnimations.cleanUp();
 	}
 	
+	/**
+	 * Registers the sprite sources.
+	 * @param event the event to use.
+	 */
 	private static void registerSpriteSources(final RegisterSpriteSourcesEvent event)
 	{
 		event.register(PLibDatabase.rl("runtime_loader"), RuntimeLoader.CODEC);
 	}
 	
+	/**
+	 * Registers the special models.
+	 * @param event the event to use.
+	 */
 	private static void registerSpecialModels(final RegisterSpecialModelRendererEvent event)
 	{
 		event.register(PLibDatabase.rl("test_block"), TestBlockItemRenderer.Unbaked.MAP_CODEC);
 	}
 	
+	/**
+	 * Registers the renderers.
+	 * @param event the event to use.
+	 */
 	private static void registerRenderers(final EntityRenderersEvent.RegisterRenderers event)
 	{
 		event.registerBlockEntityRenderer(PLibRegistration.BETypeReg.TEST_BLOCK_ENTITY.get(), TestBlockEntityRenderer :: new);
 		event.registerEntityRenderer(PLibRegistration.EntityTypeReg.TEST_ENTITY.get(), TestEntityRender :: new);
 	}
 	
+	/**
+	 * Registers the custom textures.
+	 * @param event the event to use.
+	 */
 	private static void registerCustomTextures(final PulseLibEvents.RegisterTextureEvent event)
 	{
 		event.addTextureLocation(TestEntityRender.SPHERE).

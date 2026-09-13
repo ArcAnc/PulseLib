@@ -14,6 +14,9 @@ import com.arcanc.pulselib.content.model.animation.BoneFrame;
 import com.arcanc.pulselib.content.model.animation.PAnimationPoseResolver;
 import com.arcanc.pulselib.content.model.animation.PTransform;
 import org.jetbrains.annotations.ApiStatus;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.jspecify.annotations.Nullable;
 
 import java.util.*;
@@ -27,14 +30,12 @@ public final class PPlayerAnimationFrame
 	private final String rootBone;
 	private final Map<String, PTransform> fullTransforms = new HashMap<>();
 	private final Set<String> missingFullTransforms = new HashSet<>();
-	private final Map<String, PTransform> firstPersonTransforms = new HashMap<>();
-	private final Set<String> missingFirstPersonTransforms = new HashSet<>();
-	@Nullable
-	private PTransform firstPersonCameraInverse;
-	@Nullable
-	private PTransform firstPersonBindCameraInverse;
-	private boolean firstPersonCameraResolved;
 	
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param definition the definition to use.
+	 * @param resolver the resolver to use.
+	 */
 	PPlayerAnimationFrame(PPlayerAnimationDefinition definition,
 	                             PAnimationPoseResolver<PPlayerAnimationInstance> resolver)
 	{
@@ -43,17 +44,30 @@ public final class PPlayerAnimationFrame
 		this.rootBone = definition.bindings().get(PPlayerPart.ROOT);
 	}
 	
+	/**
+	 * Performs the definition operation.
+	 * @return the value produced by this operation.
+	 */
 	public PPlayerAnimationDefinition definition()
 	{
 		return this.definition;
 	}
 	
+	/**
+	 * Performs the resolver operation.
+	 * @return the value produced by this operation.
+	 */
 	@ApiStatus.Internal
 	public PAnimationPoseResolver<PPlayerAnimationInstance> resolver()
 	{
 		return this.resolver;
 	}
 
+	/**
+	 * Performs the local transform operation.
+	 * @param boneName the bone name to use.
+	 * @return the value produced by this operation.
+	 */
 	@Nullable
 	public BoneFrame localTransform(String boneName)
 	{
@@ -61,42 +75,87 @@ public final class PPlayerAnimationFrame
 		return pose == null ? null : pose.localTransform();
 	}
 	
-	public @Nullable PPlayerBonePose animationDelta(String boneName)
+	/**
+	 * Delta for Minecraft's third-person ModelPart bridge, derived from the same
+	 * canonical MODEL-space pose exposed by {@link #modelMatrix(String, Matrix4f)}.
+	 */
+	public @Nullable PPlayerBonePose canonicalModelDelta(String boneName)
 	{
-		PAnimationPoseResolver.AnimationDelta pose =
-				this.resolver.animationDelta(
-						boneName,
-						this.rootBone
-				);
-		
-		if (pose == null || !pose.isAnimated())
+		PTransform current = fullTransform(boneName);
+		PTransform bind = bindTransform(boneName);
+		if (current == null || bind == null)
+			return null;
+
+		if (this.rootBone != null && !boneName.equals(this.rootBone))
+		{
+			PTransform rootCurrent = fullTransform(this.rootBone);
+			PTransform rootBind = bindTransform(this.rootBone);
+			if (rootCurrent == null || rootBind == null)
+				return null;
+			current = rootCurrent.inverse().compose(current);
+			bind = rootBind.inverse().compose(bind);
+		}
+
+		Vector3f translation = current.translation().sub(bind.translation());
+		Quaternionf currentRotation = current.rotation();
+		Quaternionf bindRotation = bind.rotation();
+		Quaternionf rotation = new Quaternionf(bindRotation).invert().premul(currentRotation);
+		Vector3f currentScale = current.scale();
+		Vector3f bindScale = bind.scale();
+		Vector3f scale = new Vector3f(
+				ratio(currentScale.x, bindScale.x),
+				ratio(currentScale.y, bindScale.y),
+				ratio(currentScale.z, bindScale.z));
+		boolean hasTranslation = translation.lengthSquared() > 1.0e-10f;
+		boolean hasRotation = Math.abs(currentRotation.dot(bindRotation)) < 0.999999f;
+		boolean hasScale = Math.abs(scale.x - 1.0f) > 1.0e-5f ||
+				Math.abs(scale.y - 1.0f) > 1.0e-5f ||
+				Math.abs(scale.z - 1.0f) > 1.0e-5f;
+		if (!hasTranslation && !hasRotation && !hasScale)
 			return null;
 		
 		return new PPlayerBonePose(
-				pose.translation(),
-				pose.rotation(),
-				pose.scale(),
-				pose.hasTranslation(),
-				pose.hasRotation(),
-				pose.hasScale()
+				translation,
+				rotation,
+				scale,
+				hasTranslation,
+				hasRotation,
+				hasScale
 		);
 	}
 	
-	public @Nullable PPlayerBonePose animationDelta(PPlayerPart part)
-	{
-		String boneName = this.definition.bindings().get(part);
-		
-		return boneName == null ?
-				null :
-				animationDelta(boneName);
-	}
-	
+	/**
+	 * Performs the model transform operation.
+	 * @param boneName the bone name to use.
+	 * @return the value produced by this operation.
+	 */
 	@Nullable
 	public PTransform modelTransform(String boneName)
 	{
 		return fullTransform(boneName);
 	}
 
+	/**
+	 * Writes this bone's resolved canonical MODEL-space matrix.  It includes the
+	 * evaluated local TRS, every parent bone and the imported model hierarchy.
+	 * Presentation code must consume this matrix rather than reinterpreting
+	 * animation channels.
+	 */
+	public boolean modelMatrix(String boneName, Matrix4f destination)
+	{
+		Objects.requireNonNull(destination);
+		PTransform transform = fullTransform(boneName);
+		if (transform == null)
+			return false;
+		transform.matrix(destination);
+		return true;
+	}
+
+	/**
+	 * Performs the root relative transform operation.
+	 * @param boneName the bone name to use.
+	 * @return the value produced by this operation.
+	 */
 	@Nullable
 	public PTransform rootRelativeTransform(String boneName)
 	{
@@ -114,6 +173,11 @@ public final class PPlayerAnimationFrame
 		return rootBind == null ? transform : rootBind.inverse().compose(transform);
 	}
 	
+	/**
+	 * Performs the full transform operation.
+	 * @param boneName the bone name to use.
+	 * @return the value produced by this operation.
+	 */
 	@Nullable
 	private PTransform fullTransform(String boneName)
 	{
@@ -136,97 +200,21 @@ public final class PPlayerAnimationFrame
 		return transform;
 	}
 	
-	@Nullable
-	public PTransform modelTransform(PPlayerPart part)
-	{
-		String boneName = this.definition.bindings().get(part);
-		
-		return boneName == null ?
-				null :
-				modelTransform(boneName);
-	}
-	
-	@Nullable
-	public PTransform modelTransform(
-			PPlayerAnimationAnchor anchor)
-	{
-		String boneName =
-				this.definition.anchors().get(anchor);
-		
-		return boneName == null ?
-				null :
-				modelTransform(boneName);
-	}
-	
+	/**
+	 * Performs the action transform operation.
+	 * @param anchor the anchor to use.
+	 * @return the value produced by this operation.
+	 */
 	@Nullable
 	public PTransform actionTransform(PPlayerAnimationAnchor anchor)
 	{
-		return modelTransform(anchor);
-	}
-	
-	@Nullable
-	public PTransform firstPersonTransform(PPlayerPart part)
-	{
-		String boneName = this.definition.bindings().get(part);
-		return boneName == null ? null : copyFirstPersonTransform(boneName);
-	}
-	
-	@Nullable
-	public PTransform firstPersonTransform(PPlayerAnimationAnchor anchor)
-	{
 		String boneName = this.definition.anchors().get(anchor);
-		return boneName == null ? null : copyFirstPersonTransform(boneName);
+		return boneName == null ? null : modelTransform(boneName);
 	}
-
+	
+	/** The FIRST_PERSON_CAMERA anchor delta in canonical MODEL space. */
 	@Nullable
-	public PTransform firstPersonTransform(String boneName)
-	{
-		return copyFirstPersonTransform(boneName);
-	}
-
-	/** Current transform of a semantic socket relative to FIRST_PERSON_CAMERA. */
-	@Nullable
-	public PTransform firstPersonSocketTransform(PPlayerAnimationAnchor socket)
-	{
-		return firstPersonTransform(socket);
-	}
-
-	/** Bind transform of a semantic socket relative to FIRST_PERSON_CAMERA. */
-	@Nullable
-	public PTransform firstPersonBindSocketTransform(PPlayerAnimationAnchor socket)
-	{
-		String boneName = this.definition.anchors().get(socket);
-		if (boneName == null)
-			return null;
-		PTransform cameraInverse = firstPersonBindCameraInverse();
-		PTransform bone = bindTransform(boneName);
-		return cameraInverse == null || bone == null ? null : cameraInverse.compose(bone);
-	}
-
-	@Nullable
-	public PTransform firstPersonBindTransform(PPlayerPart part)
-	{
-		String boneName = this.definition.bindings().get(part);
-		PTransform cameraInverse = firstPersonBindCameraInverse();
-		PTransform bone = boneName == null ? null : bindTransform(boneName);
-		return cameraInverse == null || bone == null ? null : cameraInverse.compose(bone);
-	}
-
-	/**
-	 * Returns {@code currentSocket * bindSocket^-1}. In the rest frame this is
-	 * identity and is therefore independent from GLTF pivots and bind offsets.
-	 */
-	@Nullable
-	public PTransform firstPersonSocketDelta(PPlayerAnimationAnchor socket)
-	{
-		PTransform current = firstPersonSocketTransform(socket);
-		PTransform bind = firstPersonBindSocketTransform(socket);
-		return current == null || bind == null ? null : current.compose(bind.inverse());
-	}
-
-	/** The FIRST_PERSON_CAMERA anchor delta in model space. */
-	@Nullable
-	public PTransform firstPersonCameraDelta()
+	public PTransform cameraAnchorModelDelta()
 	{
 		String cameraBone = this.definition.anchors().get(PPlayerAnimationAnchors.FIRST_PERSON_CAMERA);
 		if (cameraBone == null)
@@ -236,63 +224,11 @@ public final class PPlayerAnimationFrame
 		return current == null || bind == null ? null : current.compose(bind.inverse());
 	}
 
-	@Nullable
-	private PTransform copyFirstPersonTransform(String boneName)
-	{
-		return cachedFirstPersonTransform(boneName);
-	}
-
-	@Nullable
-	private PTransform cachedFirstPersonTransform(String boneName)
-	{
-		PTransform cached = this.firstPersonTransforms.get(boneName);
-		if (cached != null)
-			return cached;
-		if (this.missingFirstPersonTransforms.contains(boneName))
-			return null;
-
-		PTransform cameraInverse = firstPersonCameraInverse();
-		PTransform bone = fullTransform(boneName);
-		if (cameraInverse == null || bone == null)
-		{
-			this.missingFirstPersonTransforms.add(boneName);
-			return null;
-		}
-
-		PTransform transform = cameraInverse.compose(bone);
-		this.firstPersonTransforms.put(boneName, transform);
-		return transform;
-	}
-
-	@Nullable
-	private PTransform firstPersonCameraInverse()
-	{
-		if (!this.firstPersonCameraResolved)
-		{
-			this.firstPersonCameraResolved = true;
-			String cameraBone = this.definition.anchors().get(PPlayerAnimationAnchors.FIRST_PERSON_CAMERA);
-			PTransform camera = cameraBone == null ? null : fullTransform(cameraBone);
-			if (camera != null)
-				this.firstPersonCameraInverse = camera.inverse();
-		}
-		return this.firstPersonCameraInverse;
-	}
-
-	@Nullable
-	private PTransform firstPersonBindCameraInverse()
-	{
-		if (!this.firstPersonCameraResolved)
-			firstPersonCameraInverse();
-		if (this.firstPersonBindCameraInverse == null)
-		{
-			String cameraBone = this.definition.anchors().get(PPlayerAnimationAnchors.FIRST_PERSON_CAMERA);
-			PTransform camera = cameraBone == null ? null : bindTransform(cameraBone);
-			if (camera != null)
-				this.firstPersonBindCameraInverse = camera.inverse();
-		}
-		return this.firstPersonBindCameraInverse;
-	}
-	
+	/**
+	 * Binds the transform.
+	 * @param boneName the bone name to use.
+	 * @return the value produced by this operation.
+	 */
 	@Nullable
 	public PTransform bindTransform(String boneName)
 	{
@@ -304,67 +240,15 @@ public final class PPlayerAnimationFrame
 			pose.bindTransform();
 	}
 	
-	@Nullable
-	public PTransform bindTransform(PPlayerPart part)
+	/**
+	 * Performs the ratio operation.
+	 * @param value the value to use.
+	 * @param base the base to use.
+	 * @return the value produced by this operation.
+	 */
+	private static float ratio(float value, float base)
 	{
-		String boneName = this.definition.bindings().get(part);
-		
-		return boneName == null ?
-				null :
-				bindTransform(boneName);
+		return Math.abs(base) < 1.0e-6f ? value : value / base;
 	}
 	
-	@Nullable
-	public PTransform relativeTransform(
-			String boneName,
-			String referenceBoneName)
-	{
-		PTransform bone = fullTransform(boneName);
-		PTransform reference = fullTransform(referenceBoneName);
-		
-		if (bone == null || reference == null)
-			return null;
-		
-		return reference.inverse().compose(bone);
-	}
-	
-	@Nullable
-	public PTransform relativeTransform(
-			PPlayerAnimationAnchor bone,
-			PPlayerAnimationAnchor reference)
-	{
-		String boneName =
-				this.definition.anchors().get(bone);
-		
-		String referenceName =
-				this.definition.anchors().get(reference);
-		
-		if (boneName == null || referenceName == null)
-			return null;
-		
-		return relativeTransform(
-				boneName,
-				referenceName
-		);
-	}
-	
-	@Nullable
-	public PTransform relativeTransform(
-			PPlayerPart part,
-			PPlayerAnimationAnchor reference)
-	{
-		String boneName =
-				this.definition.bindings().get(part);
-		
-		String referenceName =
-				this.definition.anchors().get(reference);
-		
-		if (boneName == null || referenceName == null)
-			return null;
-		
-		return relativeTransform(
-				boneName,
-				referenceName
-		);
-	}
 }

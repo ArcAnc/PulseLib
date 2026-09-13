@@ -25,11 +25,19 @@ public class TestBlockItemRenderer extends PItemRenderer<TestBlockItem, TestBloc
 	public static final Identifier CIRCLE = PLibDatabase.rl("item/test_block/circle");
 	public static final Identifier PYRAMID = PLibDatabase.rl("item/test_block/pyramid");
 	
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param modelData the model data to use.
+	 */
 	public TestBlockItemRenderer(PModelData modelData)
 	{
 		super(modelData, PRenderTypes.RenderTypeProvider :: trianglesSolid);
 	}
 	
+	/**
+	 * Creates the render state.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	protected TestBlockItemRenderState createRenderState()
 	{
@@ -41,12 +49,21 @@ public class TestBlockItemRenderer extends PItemRenderer<TestBlockItem, TestBloc
 		public static final MapCodec<Unbaked> MAP_CODEC = PModelData.CODEC.
 				xmap(Unbaked :: new, Unbaked :: data);
 		
+		/**
+		 * Performs the bake operation.
+		 * @param context the context to use.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public TestBlockItemRenderer bake(BakingContext context)
 		{
 			return new TestBlockItemRenderer(this.data);
 		}
 		
+		/**
+		 * Performs the type operation.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public MapCodec<Unbaked> type()
 		{

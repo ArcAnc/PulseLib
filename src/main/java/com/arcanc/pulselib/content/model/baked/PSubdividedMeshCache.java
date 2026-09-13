@@ -31,10 +31,19 @@ public final class PSubdividedMeshCache
 {
 	private static final Map<PBakedMesh, Map<Integer, PBakedMesh>> MESHES = new IdentityHashMap<>();
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PSubdividedMeshCache()
 	{
 	}
 
+	/**
+	 * Performs the resolve operation.
+	 * @param mesh the mesh to use.
+	 * @param subdivisionLevel the subdivision level to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PBakedMesh resolve(PBakedMesh mesh, int subdivisionLevel)
 	{
 		if (subdivisionLevel == 0)
@@ -43,6 +52,10 @@ public final class PSubdividedMeshCache
 				level -> bake(mesh, level));
 	}
 
+	/**
+	 * Performs the close operation.
+	 * @param mesh the mesh to use.
+	 */
 	public static void close(PBakedMesh mesh)
 	{
 		Map<Integer, PBakedMesh> variants = MESHES.remove(mesh);
@@ -50,12 +63,21 @@ public final class PSubdividedMeshCache
 			variants.values().forEach(PSubdividedMeshCache :: closeBuffers);
 	}
 
+	/**
+	 * Performs the cleanup operation.
+	 */
 	public static void cleanup()
 	{
 		MESHES.values().forEach(variants -> variants.values().forEach(PSubdividedMeshCache :: closeBuffers));
 		MESHES.clear();
 	}
 
+	/**
+	 * Performs the bake operation.
+	 * @param base the base to use.
+	 * @param subdivisionLevel the subdivision level to use.
+	 * @return the value produced by this operation.
+	 */
 	private static PBakedMesh bake(PBakedMesh base, int subdivisionLevel)
 	{
 		PMesh source = PMeshTessellator.subdivide(base.source(), subdivisionLevel);
@@ -86,6 +108,11 @@ public final class PSubdividedMeshCache
 		}
 	}
 
+	/**
+	 * Performs the index type operation.
+	 * @param mesh the mesh to use.
+	 * @return the value produced by this operation.
+	 */
 	private static VertexFormat.IndexType indexType(PMesh mesh)
 	{
 		return switch (mesh.glIndexType())
@@ -96,6 +123,10 @@ public final class PSubdividedMeshCache
 		};
 	}
 
+	/**
+	 * Closes the buffers.
+	 * @param mesh the mesh to use.
+	 */
 	private static void closeBuffers(PBakedMesh mesh)
 	{
 		mesh.vbo().close();

@@ -27,28 +27,21 @@ public record PFirstPersonRestPose(
 				handTransform(HumanoidArm.RIGHT), handTransform(HumanoidArm.LEFT),
 				itemTransform(HumanoidArm.RIGHT), itemTransform(HumanoidArm.LEFT));
 
-	public static PTransform hand(HumanoidArm arm)
-	{
-		return arm == HumanoidArm.RIGHT ? VANILLA.rightHand : VANILLA.leftHand;
-	}
-
+	/**
+	 * Performs the item operation.
+	 * @param arm the arm to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PTransform item(HumanoidArm arm)
 	{
 		return arm == HumanoidArm.RIGHT ? VANILLA.rightItem : VANILLA.leftItem;
 	}
 
-	/** Kept for source compatibility; arms are authored through the hand socket. */
-	public static PTransform arm(HumanoidArm arm)
-	{
-		return hand(arm);
-	}
-
-	/** Pose expected by AvatarRenderer immediately before it applies PlayerModel's arm part. */
-	public static PTransform armOrigin(HumanoidArm arm)
-	{
-		return armTransform(arm);
-	}
-
+	/**
+	 * Performs the arm rig operation.
+	 * @param arm the arm to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PFirstPersonArmRig armRig(HumanoidArm arm)
 	{
 		/*
@@ -61,11 +54,21 @@ public record PFirstPersonRestPose(
 				PTransform.translation(new Vector3f(side * 0.375f, 0.75f, 0.0f)));
 	}
 
+	/**
+	 * Performs the item rig operation.
+	 * @param arm the arm to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PFirstPersonItemRig itemRig(HumanoidArm arm)
 	{
 		return new PFirstPersonItemRig(PTransform.IDENTITY, PTransform.IDENTITY);
 	}
 
+	/**
+	 * Performs the arm transform operation.
+	 * @param arm the arm to use.
+	 * @return the value produced by this operation.
+	 */
 	private static PTransform armTransform(HumanoidArm arm)
 	{
 		float side = arm == HumanoidArm.RIGHT ? 1.0f : -1.0f;
@@ -79,15 +82,32 @@ public record PFirstPersonRestPose(
 				compose(PTransform.translation(new Vector3f(side * 5.6f, 0.0f, 0.0f)));
 	}
 
+	/**
+	 * Performs the hand transform operation.
+	 * @param arm the arm to use.
+	 * @return the value produced by this operation.
+	 */
 	private static PTransform handTransform(HumanoidArm arm)
 	{
 		PFirstPersonArmRig rig = armRig(arm);
 		return armTransform(arm).compose(rig.armToHand());
 	}
 
+	/**
+	 * Performs the item transform operation.
+	 * @param arm the arm to use.
+	 * @return the value produced by this operation.
+	 */
 	private static PTransform itemTransform(HumanoidArm arm)
 	{
 		float side = arm == HumanoidArm.RIGHT ? 1.0f : -1.0f;
 		return PTransform.translation(new Vector3f(side * 0.56f, -0.52f, -0.72f));
+	}
+
+	/** Bind transform applied by the vanilla arm ModelPart after AvatarRenderer receives the PoseStack. */
+	public static PTransform armModelPartBind(HumanoidArm arm)
+	{
+		float side = arm == HumanoidArm.RIGHT ? -1.0f : 1.0f;
+		return PTransform.translation(new Vector3f(side * (5.0f / 16.0f), 2.0f / 16.0f, 0.0f));
 	}
 }

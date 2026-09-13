@@ -18,6 +18,10 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin (ItemModelResolver.class)
 public interface ItemModelResolverAccessor
 {
+	/**
+	 * Performs the pulselib$get model manager operation.
+	 * @return the value produced by this operation.
+	 */
 	@Accessor (value = "modelManager")
 	ModelManager pulselib$getModelManager();
 }

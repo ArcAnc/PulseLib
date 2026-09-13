@@ -20,11 +20,21 @@ import java.util.Map;
 
 public class PGltfAnimationEventSidecarParser
 {
+	/**
+	 * Parses the json.
+	 * @param stream the stream to use.
+	 * @return the value produced by this operation.
+	 */
 	public static JsonElement parseJson(InputStream stream) throws IOException
 	{
 		return PAnimationSidecarParser.parseJson(stream);
 	}
 	
+	/**
+	 * Merges the sidecar.
+	 * @param root the root to use.
+	 * @param animations the animations to use.
+	 */
 	public static void mergeSidecar(JsonElement root, Map<String, PAnimation> animations)
 	{
 		PAnimationSidecarParser.mergeSidecar(root, animations);

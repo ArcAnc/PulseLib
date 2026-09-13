@@ -29,11 +29,25 @@ public class TestArmorItem extends Item
 			thenLoop("swing").
 			build();
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param properties the properties to use.
+	 */
 	public TestArmorItem(Properties properties)
 	{
 		super(properties);
 	}
 	
+	/**
+	 * Resolves the armor render.
+	 * @param entity the entity to use.
+	 * @param stack the stack to use.
+	 * @param bone the bone to use.
+	 * @param mesh the mesh to use.
+	 * @param inherited the inherited to use.
+	 * @param partialTick the partial tick to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PMeshRenderContext resolveArmorRender(LivingEntity entity,
 	                                                    ItemStack stack,
 	                                                    PBakedBone bone,
@@ -44,6 +58,12 @@ public class TestArmorItem extends Item
 		return inherited.withColor(dayTimeColor(entity, partialTick));
 	}
 	
+	/**
+	 * Performs the day time color operation.
+	 * @param entity the entity to use.
+	 * @param partialTick the partial tick to use.
+	 * @return the value produced by this operation.
+	 */
 	private static int dayTimeColor(LivingEntity entity, float partialTick)
 	{
 		float time = ((entity.level().getOverworldClockTime() % 24000L) + partialTick) / 24000f;
@@ -57,6 +77,13 @@ public class TestArmorItem extends Item
 		return lerpColor(0xFF5E7CFF, 0xFFFFD36A, (time - 0.75f) / 0.25f);
 	}
 	
+	/**
+	 * Performs the lerp color operation.
+	 * @param from the from to use.
+	 * @param to the to to use.
+	 * @param delta the delta to use.
+	 * @return the value produced by this operation.
+	 */
 	private static int lerpColor(int from, int to, float delta)
 	{
 		int alpha = lerp((from >>> 24) & 0xFF, (to >>> 24) & 0xFF, delta);
@@ -67,6 +94,13 @@ public class TestArmorItem extends Item
 		return alpha << 24 | red << 16 | green << 8 | blue;
 	}
 	
+	/**
+	 * Performs the lerp operation.
+	 * @param from the from to use.
+	 * @param to the to to use.
+	 * @param delta the delta to use.
+	 * @return the value produced by this operation.
+	 */
 	private static int lerp(int from, int to, float delta)
 	{
 		return (int)(from + (to - from) * delta);

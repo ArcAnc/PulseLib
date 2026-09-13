@@ -12,5 +12,10 @@ package com.arcanc.pulselib.content.model.animation;
 @FunctionalInterface
 public interface PInterpolation
 {
+	/**
+	 * Builds the transformer.
+	 * @param strength the strength to use.
+	 * @return the value produced by this operation.
+	 */
 	double buildTransformer(double strength);
 }
