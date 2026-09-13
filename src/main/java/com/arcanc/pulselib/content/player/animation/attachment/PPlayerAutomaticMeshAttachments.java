@@ -15,8 +15,8 @@ import com.arcanc.pulselib.content.player.animation.PPlayerAnimationFrame;
 import com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonMeshAttachmentPose;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import org.joml.Quaternionf;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -25,10 +25,18 @@ import java.util.Set;
 
 public final class PPlayerAutomaticMeshAttachments
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PPlayerAutomaticMeshAttachments()
 	{
 	}
 
+	/**
+	 * Performs the roots operation.
+	 * @param frame the frame to use.
+	 * @return the value produced by this operation.
+	 */
 	public static List<PBakedBone> roots(PPlayerAnimationFrame frame)
 	{
 		PPlayerAnimationDefinition definition = frame.definition();
@@ -43,6 +51,13 @@ public final class PPlayerAutomaticMeshAttachments
 		return List.copyOf(roots);
 	}
 
+	/**
+	 * Finds the roots.
+	 * @param bone the bone to use.
+	 * @param skeletonBones the skeleton bones to use.
+	 * @param animatedBones the animated bones to use.
+	 * @param roots the roots to use.
+	 */
 	private static void findRoots(PBakedBone bone,
 	                              Set<String> skeletonBones,
 	                              Set<String> animatedBones,
@@ -61,6 +76,12 @@ public final class PPlayerAutomaticMeshAttachments
 			findRoots(child, skeletonBones, animatedBones, roots);
 	}
 
+	/**
+	 * Performs the contains animated bone operation.
+	 * @param bone the bone to use.
+	 * @param animatedBones the animated bones to use.
+	 * @return the value produced by this operation.
+	 */
 	private static boolean containsAnimatedBone(PBakedBone bone, Set<String> animatedBones)
 	{
 		if (animatedBones.contains(bone.name()))
@@ -68,6 +89,11 @@ public final class PPlayerAutomaticMeshAttachments
 		return bone.children().stream().anyMatch(child -> containsAnimatedBone(child, animatedBones));
 	}
 
+	/**
+	 * Performs the contains mesh operation.
+	 * @param bone the bone to use.
+	 * @return the value produced by this operation.
+	 */
 	private static boolean containsMesh(PBakedBone bone)
 	{
 		if (!bone.meshes().isEmpty())
@@ -75,9 +101,14 @@ public final class PPlayerAutomaticMeshAttachments
 		return bone.children().stream().anyMatch(PPlayerAutomaticMeshAttachments::containsMesh);
 	}
 
+	/**
+	 * Renders the third person.
+	 * @param poses the poses to use.
+	 * @param poseStack the pose stack to use.
+	 * @param packedLight the packed light to use.
+	 */
 	public static void renderThirdPerson(List<PPlayerAnimationMeshAttachmentPose> poses,
 	                                     PoseStack poseStack,
-	                                     SubmitNodeCollector submitNodeCollector,
 	                                     int packedLight)
 	{
 		for (PPlayerAnimationMeshAttachmentPose pose : poses)
@@ -85,9 +116,14 @@ public final class PPlayerAutomaticMeshAttachments
 				render(pose.root(), pose.frame(), pose.transform(), poseStack, packedLight);
 	}
 
+	/**
+	 * Renders the first person.
+	 * @param poses the poses to use.
+	 * @param poseStack the pose stack to use.
+	 * @param packedLight the packed light to use.
+	 */
 	public static void renderFirstPerson(List<PPlayerFirstPersonMeshAttachmentPose> poses,
 	                                    PoseStack poseStack,
-	                                    SubmitNodeCollector submitNodeCollector,
 	                                    int packedLight)
 	{
 		for (PPlayerFirstPersonMeshAttachmentPose pose : poses)
@@ -95,6 +131,14 @@ public final class PPlayerAutomaticMeshAttachments
 				render(pose.root(), pose.frame(), pose.transform(), poseStack, packedLight);
 	}
 
+	/**
+	 * Performs the render operation.
+	 * @param root the root to use.
+	 * @param frame the frame to use.
+	 * @param transform the transform to use.
+	 * @param poseStack the pose stack to use.
+	 * @param packedLight the packed light to use.
+	 */
 	private static void render(PBakedBone root,
 	                           PPlayerAnimationFrame frame,
 	                           PTransform transform,
@@ -110,7 +154,7 @@ public final class PPlayerAutomaticMeshAttachments
 		{
 			poseStack.mulPose(transform.matrix());
 			poseStack.scale(safeInverse(local.scale().x), safeInverse(local.scale().y), safeInverse(local.scale().z));
-			poseStack.mulPose(new org.joml.Quaternionf(local.rotation()).invert());
+			poseStack.mulPose(new Quaternionf(local.rotation()).invert());
 			poseStack.translate(-local.translation().x, -local.translation().y, -local.translation().z);
 			root.instantDraw(
 					poseStack,
@@ -128,6 +172,11 @@ public final class PPlayerAutomaticMeshAttachments
 		}
 	}
 
+	/**
+	 * Performs the safe inverse operation.
+	 * @param value the value to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float safeInverse(float value)
 	{
 		return Math.abs(value) < 1.0e-6f ? 0.0f : 1.0f / value;

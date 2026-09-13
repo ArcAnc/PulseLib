@@ -24,6 +24,14 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin (SpecialModelWrapper.class)
 public class SpecialModelWrapperRenderStateExtractor<T>
 {
+	/**
+	 * Performs the pulselib$extract render state operation.
+	 * @param renderer the renderer to use.
+	 * @param itemStack the item stack to use.
+	 * @param original the original to use.
+	 * @param output the output to use.
+	 * @return the value produced by this operation.
+	 */
 	@WrapOperation (method = "update",
 			at = @At (value = "INVOKE",
 					target = "Lnet/minecraft/client/renderer/special/SpecialModelRenderer;extractArgument(Lnet/minecraft/world/item/ItemStack;)Ljava/lang/Object;"))

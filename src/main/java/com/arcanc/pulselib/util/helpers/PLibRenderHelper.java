@@ -14,6 +14,10 @@ import net.minecraft.client.Minecraft;
 
 public class PLibRenderHelper
 {
+	/**
+	 * Performs the mc operation.
+	 * @return the value produced by this operation.
+	 */
 	public static Minecraft mc()
 	{
 		return Minecraft.getInstance();

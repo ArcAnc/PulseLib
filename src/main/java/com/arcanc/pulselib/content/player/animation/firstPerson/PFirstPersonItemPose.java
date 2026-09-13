@@ -11,7 +11,6 @@ package com.arcanc.pulselib.content.player.animation.firstPerson;
 
 
 import com.arcanc.pulselib.content.model.animation.PTransform;
-import com.arcanc.pulselib.content.player.animation.PPlayerAnimationDefinition.ItemRenderPolicy;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
@@ -37,39 +36,39 @@ public record PFirstPersonItemPose(
 	}
 
 	/**
-	 * Retained for source compatibility. Item policies are resolved by the pose
-	 * builder before this immutable render snapshot reaches the renderer.
+	 * Performs the vanilla operation.
+	 * @return the value produced by this operation.
 	 */
-	@Deprecated
-	public PFirstPersonItemPose(PFirstPersonRenderMode mode,
-	                            @Nullable PTransform transform,
-	                            ItemRenderPolicy ignoredPolicy)
-	{
-		this(mode, transform, PFirstPersonTransformMode.OVERRIDE);
-	}
-
 	public static PFirstPersonItemPose vanilla()
 	{
 		return new PFirstPersonItemPose(PFirstPersonRenderMode.VANILLA, null, PFirstPersonTransformMode.OVERRIDE);
 	}
 
+	/**
+	 * Performs the animated operation.
+	 * @param transform the transform to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PFirstPersonItemPose animated(PTransform transform)
 	{
 		return new PFirstPersonItemPose(PFirstPersonRenderMode.ANIMATED, transform, PFirstPersonTransformMode.OVERRIDE);
 	}
 
+	/**
+	 * Performs the animated operation.
+	 * @param transform the transform to use.
+	 * @param transformMode the transform mode to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PFirstPersonItemPose animated(PTransform transform, PFirstPersonTransformMode transformMode)
 	{
 		return new PFirstPersonItemPose(PFirstPersonRenderMode.ANIMATED, transform, transformMode);
 	}
 
-	/** @deprecated Resolve item policy in {@code PPlayerAnimations} instead. */
-	@Deprecated
-	public static PFirstPersonItemPose animated(PTransform transform, ItemRenderPolicy ignoredPolicy)
-	{
-		return animated(transform);
-	}
-
+	/**
+	 * Performs the hidden operation.
+	 * @return the value produced by this operation.
+	 */
 	public static PFirstPersonItemPose hidden()
 	{
 		return new PFirstPersonItemPose(PFirstPersonRenderMode.HIDDEN, null, PFirstPersonTransformMode.OVERRIDE);

@@ -20,6 +20,15 @@ public record PPlayerBonePose(Vector3f translation,
                               boolean hasRotation,
                               boolean hasScale)
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param translation the translation to use.
+	 * @param rotation the rotation to use.
+	 * @param scale the scale to use.
+	 * @param hasTranslation the has translation to use.
+	 * @param hasRotation the has rotation to use.
+	 * @param hasScale the has scale to use.
+	 */
 	public PPlayerBonePose(Vector3f translation,
 	                       Quaternionf rotation,
 	                       Vector3f scale,
@@ -35,24 +44,40 @@ public record PPlayerBonePose(Vector3f translation,
 		this.hasScale = hasScale;
 	}
 	
+	/**
+	 * Performs the translation operation.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public Vector3f translation()
 	{
 		return new Vector3f(this.translation);
 	}
 	
+	/**
+	 * Performs the rotation operation.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public Quaternionf rotation()
 	{
 		return new Quaternionf(this.rotation);
 	}
 	
+	/**
+	 * Performs the scale operation.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public Vector3f scale()
 	{
 		return new Vector3f(this.scale);
 	}
 	
+	/**
+	 * Determines whether animated.
+	 * @return the value produced by this operation.
+	 */
 	public boolean isAnimated()
 	{
 		return this.hasTranslation ||

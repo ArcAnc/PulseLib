@@ -22,6 +22,10 @@ public final class PModelPose
 	private final PTransform[] transforms;
 	private final BitSet validBones = new BitSet();
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param boneCount the bone count to use.
+	 */
 	public PModelPose(int boneCount)
 	{
 		this.transforms = new PTransform[boneCount];
@@ -35,6 +39,11 @@ public final class PModelPose
 		return this.transforms[boneIndex];
 	}
 	
+	/**
+	 * Performs the update operation.
+	 * @param model the model to use.
+	 * @param localPose the local pose to use.
+	 */
 	public void update(PBakedModel model, PPose localPose)
 	{
 		BitSet update = localPose.dirtyBones();
@@ -48,6 +57,12 @@ public final class PModelPose
 			updateBone(model, localPose, index);
 	}
 
+	/**
+	 * Updates the bone.
+	 * @param model the model to use.
+	 * @param pose the pose to use.
+	 * @param index the index to use.
+	 */
 	private void updateBone(PBakedModel model, PPose pose, int index)
 	{
 		int parent = model.parentIndex(index);

@@ -21,6 +21,13 @@ public final class PMolangVectorValue implements PAnimationValue<Vector3f>
 	private final MolangParser.Expression z;
 	private final PVectorConversion conversion;
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param x the x to use.
+	 * @param y the y to use.
+	 * @param z the z to use.
+	 * @param conversion the conversion to use.
+	 */
 	public PMolangVectorValue(MolangParser.Expression x, MolangParser.Expression y, MolangParser.Expression z, PVectorConversion conversion)
 	{
 		this.x = x;
@@ -29,6 +36,11 @@ public final class PMolangVectorValue implements PAnimationValue<Vector3f>
 		this.conversion = conversion;
 	}
 
+	/**
+	 * Performs the evaluate operation.
+	 * @param context the context to use.
+	 * @param destination the destination to use.
+	 */
 	@Override
 	public void evaluate(PAnimationEvaluationContext context, Vector3f destination)
 	{
@@ -39,6 +51,13 @@ public final class PMolangVectorValue implements PAnimationValue<Vector3f>
 		this.conversion.apply(destination);
 	}
 
+	/**
+	 * Performs the evaluate component operation.
+	 * @param expression the expression to use.
+	 * @param context the context to use.
+	 * @param component the component to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float evaluateComponent(MolangParser.Expression expression, PAnimationEvaluationContext context, int component)
 	{
 		context.molang().thisValue(context.molang().thisComponent(component));

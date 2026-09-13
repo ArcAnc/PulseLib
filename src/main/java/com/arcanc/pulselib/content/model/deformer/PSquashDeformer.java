@@ -11,22 +11,38 @@ public final class PSquashDeformer implements PMeshDeformer<PSquashDefinition>
 	public static final PSquashDeformer INSTANCE = new PSquashDeformer();
 	private static final float EPSILON = 1.0e-5f;
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PSquashDeformer()
 	{
 	}
 
+	/**
+	 * Performs the id operation.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public Identifier id()
 	{
 		return PLibDatabase.rl("squash");
 	}
 
+	/**
+	 * Performs the codec operation.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public MapCodec<PSquashDefinition> codec()
 	{
 		return PSquashDefinition.CODEC;
 	}
 
+	/**
+	 * Performs the prepare operation.
+	 * @param context the context to use.
+	 * @param definition the definition to use.
+	 */
 	@Override
 	public void prepare(PDeformerPrepareContext context, PSquashDefinition definition)
 	{
@@ -38,6 +54,11 @@ public final class PSquashDeformer implements PMeshDeformer<PSquashDefinition>
 
 	private record Operation(Vector3f origin, Vector3f axis, PChannelReference<Float> scale) implements PPreparedDeformer
 	{
+		/**
+		 * Performs the deform operation.
+		 * @param position the position to use.
+		 * @param values the values to use.
+		 */
 		@Override
 		public void deform(Vector3f position, PDeformerValueSource values)
 		{

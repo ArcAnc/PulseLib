@@ -17,6 +17,11 @@ import java.util.UUID;
 
 public record PBoneAnimation(UUID boneUuid, Map<String, PAnimationTrack<?>> tracks)
 {
+	/**
+	 * Performs the track operation.
+	 * @param type the type to use.
+	 * @return the value produced by this operation.
+	 */
 	@SuppressWarnings("unchecked")
 	public @Nullable <T> PAnimationTrack<T> track(PAnimationChannelType<T> type)
 	{
@@ -26,6 +31,11 @@ public record PBoneAnimation(UUID boneUuid, Map<String, PAnimationTrack<?>> trac
 		return null;
 	}
 
+	/**
+	 * Determines whether the object has channel.
+	 * @param type the type to use.
+	 * @return the value produced by this operation.
+	 */
 	public boolean hasChannel(PAnimationChannelType<?> type)
 	{
 		return track(type) != null;

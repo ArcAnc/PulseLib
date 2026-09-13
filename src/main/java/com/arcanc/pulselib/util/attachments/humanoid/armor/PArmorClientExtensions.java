@@ -27,6 +27,11 @@ public class PArmorClientExtensions implements IClientItemExtensions
 {
 	private static final Model<Unit> EMPTY_ARMOR_MODEL = new Model.Simple(new ModelPart(List.of(), Map.of()), RenderTypes :: armorCutoutNoCull);
 
+	/**
+	 * Builds the for.
+	 * @param item the item to use.
+	 * @return the value produced by this operation.
+	 */
 	public static IClientItemExtensions buildFor(Item item)
 	{
 		if (!PLivingAttachments.contains(item))
@@ -34,6 +39,13 @@ public class PArmorClientExtensions implements IClientItemExtensions
 		return new PArmorClientExtensions();
 	}
 	
+	/**
+	 * Returns the generic armor model.
+	 * @param itemStack the item stack to use.
+	 * @param layerType the layer type to use.
+	 * @param original the original to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public Model<?> getGenericArmorModel(ItemStack itemStack, EquipmentClientInfo.LayerType layerType, Model original)
 	{
@@ -43,6 +55,14 @@ public class PArmorClientExtensions implements IClientItemExtensions
 		return original;
 	}
 	
+	/**
+	 * Returns the armor layer tint color.
+	 * @param stack the stack to use.
+	 * @param layer the layer to use.
+	 * @param layerIdx the layer idx to use.
+	 * @param fallbackColor the fallback color to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public int getArmorLayerTintColor(ItemStack stack, EquipmentClientInfo.Layer layer, int layerIdx, int fallbackColor)
 	{

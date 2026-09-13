@@ -20,6 +20,11 @@ public record PFirstPersonArmPose(
 		PFirstPersonRenderMode mode,
 		@Nullable PTransform transform)
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param mode the mode to use.
+	 * @param transform the transform to use.
+	 */
 	public PFirstPersonArmPose
 	{
 		Objects.requireNonNull(mode);
@@ -29,18 +34,23 @@ public record PFirstPersonArmPose(
 			throw new IllegalArgumentException("Only an animated first-person arm may have a transform");
 	}
 
+	/**
+	 * Performs the vanilla operation.
+	 * @return the value produced by this operation.
+	 */
 	public static PFirstPersonArmPose vanilla()
 	{
 		return new PFirstPersonArmPose(PFirstPersonRenderMode.VANILLA, null);
 	}
 
+	/**
+	 * Performs the animated operation.
+	 * @param transform the transform to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PFirstPersonArmPose animated(PTransform transform)
 	{
 		return new PFirstPersonArmPose(PFirstPersonRenderMode.ANIMATED, transform);
 	}
 
-	public static PFirstPersonArmPose hidden()
-	{
-		return new PFirstPersonArmPose(PFirstPersonRenderMode.HIDDEN, null);
-	}
 }

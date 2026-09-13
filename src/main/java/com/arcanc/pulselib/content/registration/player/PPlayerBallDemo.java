@@ -23,7 +23,9 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
@@ -44,10 +46,17 @@ public final class PPlayerBallDemo
 			GLFW.GLFW_KEY_V,
 			KeyMapping.Category.MISC);
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PPlayerBallDemo()
 	{
 	}
 
+	/**
+	 * Performs the register operation.
+	 * @param modEventBus the mod event bus to use.
+	 */
 	public static void register(IEventBus modEventBus)
 	{
 		if (FMLLoader.getCurrent().isProduction())
@@ -57,15 +66,28 @@ public final class PPlayerBallDemo
 		NeoForge.EVENT_BUS.addListener(PPlayerBallDemo::clientTick);
 	}
 
+	/**
+	 * Registers the key mapping.
+	 * @param event the event to use.
+	 */
 	private static void registerKeyMapping(RegisterKeyMappingsEvent event)
 	{
 		event.register(KEY);
 	}
 
+	/**
+	 * Registers the animation.
+	 * @param event the event to use.
+	 */
 	private static void registerAnimation(PulseLibEvents.PlayerAnimationRegistrationEvent event)
 	{
 		event.registration().register(ID, PPlayerAnimationDefinition.builder(MODEL).
-						when(player -> player == Minecraft.getInstance().player).
+						when(player ->
+						{
+							HumanoidArm hand = player.getMainArm();
+							ItemStack stack = player.getItemHeldByArm(hand);
+							return stack.is(PLibRegistration.ItemReg.TEST_ITEM);
+						}).
 						bind(PPlayerPart.HEAD, "head").
 						bind(PPlayerPart.RIGHT_ARM, "right_arm").
 						bind(PPlayerPart.LEFT_ARM, "left_arm").
@@ -84,6 +106,10 @@ public final class PPlayerBallDemo
 				build());
 	}
 
+	/**
+	 * Performs the client tick operation.
+	 * @param event the event to use.
+	 */
 	private static void clientTick(ClientTickEvent.Post event)
 	{
 		Player player = Minecraft.getInstance().player;

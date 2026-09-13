@@ -13,6 +13,13 @@ import java.util.List;
 
 public record PDrawGroup<P, M, I>(P pipeline, M mesh, boolean writeDepth, List<I> instances)
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param pipeline the pipeline to use.
+	 * @param mesh the mesh to use.
+	 * @param writeDepth the write depth to use.
+	 * @param instances the instances to use.
+	 */
 	public PDrawGroup
 	{
 		instances = List.copyOf(instances);

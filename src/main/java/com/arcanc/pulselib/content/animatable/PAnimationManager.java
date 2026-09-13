@@ -35,21 +35,38 @@ public class PAnimationManager<T extends PAnimatable<T>>
 	protected final Map<String, Supplier<PAnimationGraph>> graphFactories = new Object2ObjectArrayMap<>();
 	protected final Map<String, PAnimationController<T>> controllers = new Object2ObjectArrayMap<>();
 	
+	/**
+	 * Returns the controllers.
+	 * @return the value produced by this operation.
+	 */
 	public Map<String, PAnimationController<T>> getControllers()
 	{
 		return this.controllers;
 	}
 	
+	/**
+	 * Returns the animatable.
+	 * @return the value produced by this operation.
+	 */
 	public T getAnimatable()
 	{
 		return this.animatable;
 	}
 	
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param animatable the animatable to use.
+	 */
 	public PAnimationManager(final T animatable)
 	{
 		this(animatable, AnimManagerKey.ofObject(animatable));
 	}
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param animatable the animatable to use.
+	 * @param key the key to use.
+	 */
 	public PAnimationManager(final T animatable, final AnimManagerKey key)
 	{
 		this.animatable = animatable;
@@ -63,6 +80,9 @@ public class PAnimationManager<T extends PAnimatable<T>>
 		registrar.graphEntries.forEach(entry -> this.graphFactories.put(entry.name(), entry.factory()));
 	}
 
+	/**
+	 * Creates the controllers.
+	 */
 	protected final void createControllers()
 	{
 		this.factories.forEach((name, supplier) -> this.controllers.put(name,
@@ -71,17 +91,28 @@ public class PAnimationManager<T extends PAnimatable<T>>
 				new PAnimationController<>(name, supplier.get())));
 	}
 
+	/**
+	 * Performs the key operation.
+	 * @return the value produced by this operation.
+	 */
 	public AnimManagerKey key()
 	{
 		return this.key;
 	}
 	
+	/**
+	 * Binds the model.
+	 * @param model the model to use.
+	 */
 	public void bindModel(PBakedModel model)
 	{
 		if (model != this.model)
 			this.model = model;
 	}
 	
+	/**
+	 * Performs the tick operation.
+	 */
 	public void tick()
 	{
 		for (PAnimationController<T> controller : this.controllers.values())
@@ -90,32 +121,64 @@ public class PAnimationManager<T extends PAnimatable<T>>
 	
 	public record PAnimationRegistrar<T extends PAnimatable<T>>(List<Entry<T>> entries, List<GraphEntry> graphEntries)
 	{
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param entries the entries to use.
+		 */
 		public PAnimationRegistrar(List<Entry<T>> entries)
 		{
 			this(entries, new ObjectArrayList<>());
 		}
 
+		/**
+		 * Performs the add operation.
+		 * @param factory the factory to use.
+		 * @return the value produced by this operation.
+		 */
 		public PAnimationRegistrar<T> add(Supplier<PAnimationController.StateHandler<T>> factory)
 		{
 			return add("default", factory);
 		}
 		
+		/**
+		 * Performs the add operation.
+		 * @param name the name to use.
+		 * @param factory the factory to use.
+		 * @return the value produced by this operation.
+		 */
 		public PAnimationRegistrar<T> add(String name, Supplier<PAnimationController.StateHandler<T>> factory)
 		{
 			this.entries.add(new Entry<>(name, factory));
 			return this;
 		}
 
+		/**
+		 * Adds the graph.
+		 * @param graph the graph to use.
+		 * @return the value produced by this operation.
+		 */
 		public PAnimationRegistrar<T> addGraph(PAnimationGraph graph)
 		{
 			return addGraph("default", () -> graph);
 		}
 
+		/**
+		 * Adds the graph.
+		 * @param name the name to use.
+		 * @param graph the graph to use.
+		 * @return the value produced by this operation.
+		 */
 		public PAnimationRegistrar<T> addGraph(String name, PAnimationGraph graph)
 		{
 			return addGraph(name, () -> graph);
 		}
 
+		/**
+		 * Adds the graph.
+		 * @param name the name to use.
+		 * @param factory the factory to use.
+		 * @return the value produced by this operation.
+		 */
 		public PAnimationRegistrar<T> addGraph(String name, Supplier<PAnimationGraph> factory)
 		{
 			this.graphEntries.add(new GraphEntry(name, factory));

@@ -29,28 +29,49 @@ public class TestBlockEntity extends BlockEntity implements PAnimatable<TestBloc
 			build();
 	private boolean playAnimation = false;
 	
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param pos the pos to use.
+	 * @param blockState the block state to use.
+	 */
 	public TestBlockEntity(BlockPos pos, BlockState blockState)
 	{
 		super(PLibRegistration.BETypeReg.TEST_BLOCK_ENTITY.get(), pos, blockState);
 	}
 	
+	/**
+	 * Performs the change play animation operation.
+	 */
 	public void changePlayAnimation()
 	{
 		this.playAnimation = !playAnimation;
 		this.setChanged();
 	}
 	
+	/**
+	 * Determines whether play animation.
+	 * @return the value produced by this operation.
+	 */
 	public boolean isPlayAnimation()
 	{
 		return this.playAnimation;
 	}
 	
+	/**
+	 * Returns the animation manager.
+	 * @param key the key to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public PAnimationManager<TestBlockEntity> getAnimationManager(AnimManagerKey key)
 	{
 		return this.animationManager;
 	}
 	
+	/**
+	 * Registers the animation controllers.
+	 * @param registrar the registrar to use.
+	 */
 	@Override
 	public void registerAnimationControllers(PAnimationManager.@NonNull PAnimationRegistrar<TestBlockEntity> registrar)
 	{

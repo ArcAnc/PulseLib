@@ -24,6 +24,13 @@ public record PHingeDefinition(Vector3f origin, Vector3f lengthAxis, Vector3f hi
 			PChannelReference.FLOAT_CODEC.forGetter(PHingeDefinition::angle)
 	).apply(instance, PHingeDefinition::new));
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param origin the origin to use.
+	 * @param lengthAxis the length axis to use.
+	 * @param hingeAxis the hinge axis to use.
+	 * @param angle the angle to use.
+	 */
 	public PHingeDefinition
 	{
 		origin = new Vector3f(origin);

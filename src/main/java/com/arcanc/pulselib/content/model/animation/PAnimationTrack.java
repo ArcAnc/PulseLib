@@ -13,6 +13,11 @@ import java.util.List;
 
 public record PAnimationTrack<T>(PAnimationChannelType<T> channel, List<PKeyframe<T>> keyframes)
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param channel the channel to use.
+	 * @param keyframes the keyframes to use.
+	 */
 	public PAnimationTrack
 	{
 		keyframes = List.copyOf(keyframes);

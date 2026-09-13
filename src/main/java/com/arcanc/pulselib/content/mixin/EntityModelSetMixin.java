@@ -21,6 +21,12 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(EntityModelSet.class)
 public class EntityModelSetMixin
 {
+	/**
+	 * Performs the pulselib$bake player layer with deformable cubes operation.
+	 * @param definition the definition to use.
+	 * @param location the location to use.
+	 * @return the value produced by this operation.
+	 */
 	@Redirect(method = "bakeLayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/geom/builders/LayerDefinition;bakeRoot()Lnet/minecraft/client/model/geom/ModelPart;"))
 	private ModelPart pulselib$bakePlayerLayerWithDeformableCubes(LayerDefinition definition, ModelLayerLocation location)
 	{

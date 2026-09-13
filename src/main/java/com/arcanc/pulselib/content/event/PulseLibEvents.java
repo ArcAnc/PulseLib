@@ -33,16 +33,31 @@ public class PulseLibEvents
 {
 	public static class TypeRegistrationEvent extends Event implements IModBusEvent
 	{
+		/**
+		 * Registers the animation channel.
+		 * @param type the type to use.
+		 * @return the value produced by this operation.
+		 */
 		public <T> PAnimationChannelType<T> registerAnimationChannel(PAnimationChannelType<T> type)
 		{
 			return PLibRegistration.AnimationChannelReg.CHANNEL_TYPES.register(type.id(), type);
 		}
 
+		/**
+		 * Registers the animation event.
+		 * @param type the type to use.
+		 * @return the value produced by this operation.
+		 */
 		public <T> PAnimationEventType<T> registerAnimationEvent(PAnimationEventType<T> type)
 		{
 			return PLibRegistration.AnimationEventReg.EVENT_TYPES.register(type.id(), type);
 		}
 
+		/**
+		 * Registers the mesh deformer.
+		 * @param type the type to use.
+		 * @return the value produced by this operation.
+		 */
 		public <T> PMeshDeformer<T> registerMeshDeformer(PMeshDeformer<T> type)
 		{
 			return PLibRegistration.MeshDeformerReg.DEFORMERS.register(type.id(), type);
@@ -53,11 +68,20 @@ public class PulseLibEvents
 	{
 		private final Set<Identifier> registeredTextures;
 		
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param registeredTextures the registered textures to use.
+		 */
 		public RegisterTextureEvent(Set<Identifier> registeredTextures)
 		{
 			this.registeredTextures = registeredTextures;
 		}
 		
+		/**
+		 * Adds the texture location.
+		 * @param textureLocation the texture location to use.
+		 * @return the value produced by this operation.
+		 */
 		public RegisterTextureEvent addTextureLocation(Identifier textureLocation)
 		{
 			this.registeredTextures.add(textureLocation);
@@ -69,6 +93,10 @@ public class PulseLibEvents
 	{
 		private final AttachmentRegistration registration = new AttachmentRegistration();
 		
+		/**
+		 * Performs the registration operation.
+		 * @return the value produced by this operation.
+		 */
 		public AttachmentRegistration registration()
 		{
 			return this.registration;
@@ -78,16 +106,28 @@ public class PulseLibEvents
 		{
 			private final List<Runnable> actions = new ArrayList<>();
 			
+			/**
+			 * Registers the living.
+			 * @param item the item to use.
+			 * @param definition the definition to use.
+			 */
 			public void registerLiving(ItemLike item, PLivingAttachmentDefinition definition)
 			{
 				this.actions.add(() -> PLivingAttachments.register(item.asItem(), definition));
 			}
 			
+			/**
+			 * Registers the global living.
+			 * @param definition the definition to use.
+			 */
 			public void registerGlobalLiving(PLivingAttachmentDefinition definition)
 			{
 				this.actions.add(() -> PLivingAttachments.registerGlobal(definition));
 			}
 			
+			/**
+			 * Performs the apply operation.
+			 */
 			public void apply()
 			{
 				this.actions.forEach(Runnable :: run);
@@ -99,6 +139,10 @@ public class PulseLibEvents
 	{
 		private final PlayerAnimationRegistration registration = new PlayerAnimationRegistration();
 
+		/**
+		 * Performs the registration operation.
+		 * @return the value produced by this operation.
+		 */
 		public PlayerAnimationRegistration registration()
 		{
 			return this.registration;
@@ -108,11 +152,19 @@ public class PulseLibEvents
 		{
 			private final List<Runnable> actions = new ArrayList<>();
 
+			/**
+			 * Performs the register operation.
+			 * @param id the id to use.
+			 * @param definition the definition to use.
+			 */
 			public void register(Identifier id, PPlayerAnimationDefinition definition)
 			{
 				this.actions.add(() -> PPlayerAnimations.register(id, definition));
 			}
 
+			/**
+			 * Performs the apply operation.
+			 */
 			public void apply()
 			{
 				this.actions.forEach(Runnable :: run);
@@ -124,6 +176,10 @@ public class PulseLibEvents
 	{
 		private final PlayerAnimatedAttachmentRegistration registration = new PlayerAnimatedAttachmentRegistration();
 
+		/**
+		 * Performs the registration operation.
+		 * @return the value produced by this operation.
+		 */
 		public PlayerAnimatedAttachmentRegistration registration()
 		{
 			return this.registration;
@@ -133,11 +189,18 @@ public class PulseLibEvents
 		{
 			private final List<Runnable> actions = new ArrayList<>();
 
+			/**
+			 * Performs the register operation.
+			 * @param renderer the renderer to use.
+			 */
 			public void register(PPlayerAnimatedAttachmentRenderer renderer)
 			{
 				this.actions.add(() -> PPlayerAnimatedAttachments.register(renderer));
 			}
 
+			/**
+			 * Performs the apply operation.
+			 */
 			public void apply()
 			{
 				this.actions.forEach(Runnable :: run);

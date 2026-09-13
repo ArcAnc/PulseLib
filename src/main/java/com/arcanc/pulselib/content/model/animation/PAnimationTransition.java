@@ -22,6 +22,15 @@ public record PAnimationTransition(
 )
 {
 	
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param source the source to use.
+	 * @param target the target to use.
+	 * @param condition the condition to use.
+	 * @param blendDuration the blend duration to use.
+	 * @param priority the priority to use.
+	 * @param interruption the interruption to use.
+	 */
 	public PAnimationTransition(int source,
 	                            int target,
 	                            PCondition condition,
@@ -32,6 +41,16 @@ public record PAnimationTransition(
 		this(source, target, condition, -1.0f, blendDuration, priority, interruption);
 	}
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param source the source to use.
+	 * @param target the target to use.
+	 * @param condition the condition to use.
+	 * @param exitTime the exit time to use.
+	 * @param blendDuration the blend duration to use.
+	 * @param priority the priority to use.
+	 * @param interruption the interruption to use.
+	 */
 	public PAnimationTransition
 	{
 		Objects.requireNonNull(condition);

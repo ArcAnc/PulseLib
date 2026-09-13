@@ -21,6 +21,12 @@ public record PTransform(Vector3f translation, Quaternionf rotation, Vector3f sc
 	public static final PTransform IDENTITY = new PTransform(
 			new Vector3f(), new Quaternionf(), new Vector3f(1.0f));
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param translation the translation to use.
+	 * @param rotation the rotation to use.
+	 * @param scale the scale to use.
+	 */
 	public PTransform
 	{
 		translation = new Vector3f(Objects.requireNonNull(translation));
@@ -28,18 +34,30 @@ public record PTransform(Vector3f translation, Quaternionf rotation, Vector3f sc
 		scale = new Vector3f(Objects.requireNonNull(scale));
 	}
 
+	/**
+	 * Performs the translation operation.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public Vector3f translation()
 	{
 		return new Vector3f(this.translation);
 	}
 
+	/**
+	 * Performs the rotation operation.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public Quaternionf rotation()
 	{
 		return new Quaternionf(this.rotation);
 	}
 
+	/**
+	 * Performs the scale operation.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public Vector3f scale()
 	{
@@ -75,6 +93,12 @@ public record PTransform(Vector3f translation, Quaternionf rotation, Vector3f sc
 				matrix.getScale(new Vector3f()));
 	}
 
+	/**
+	 * Performs the interpolate operation.
+	 * @param target the target to use.
+	 * @param weight the weight to use.
+	 * @return the value produced by this operation.
+	 */
 	public PTransform interpolate(PTransform target, float weight)
 	{
 		Objects.requireNonNull(target);
@@ -106,16 +130,31 @@ public record PTransform(Vector3f translation, Quaternionf rotation, Vector3f sc
 				inverseScale);
 	}
 
+	/**
+	 * Performs the translation operation.
+	 * @param translation the translation to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PTransform translation(Vector3f translation)
 	{
 		return new PTransform(translation, new Quaternionf(), new Vector3f(1.0f));
 	}
 
+	/**
+	 * Performs the rotation operation.
+	 * @param rotation the rotation to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PTransform rotation(Quaternionf rotation)
 	{
 		return new PTransform(new Vector3f(), rotation, new Vector3f(1.0f));
 	}
 
+	/**
+	 * Performs the safe inverse operation.
+	 * @param value the value to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float safeInverse(float value)
 	{
 		return Math.abs(value) < 1.0e-6f ? 0.0f : 1.0f / value;

@@ -24,6 +24,13 @@ public record PPlayerFirstPersonSettings(
 	public static final PPlayerFirstPersonSettings ENABLED =
 			new PPlayerFirstPersonSettings(true, 3.0f, 3.0f, PFirstPersonCameraMode.ANIMATED);
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param enabled the enabled to use.
+	 * @param transitionIn the transition in to use.
+	 * @param transitionOut the transition out to use.
+	 * @param cameraMode the camera mode to use.
+	 */
 	public PPlayerFirstPersonSettings
 	{
 		if (!Float.isFinite(transitionIn) || !Float.isFinite(transitionOut) || transitionIn < 0.0f || transitionOut < 0.0f)
@@ -31,16 +38,4 @@ public record PPlayerFirstPersonSettings(
 		cameraMode = Objects.requireNonNull(cameraMode);
 	}
 
-	/**
-	 * Retained for source compatibility with the original settings record.
-	 */
-	public boolean enable()
-	{
-		return this.enabled;
-	}
-	
-	public PPlayerFirstPersonSettings copy()
-	{
-		return new PPlayerFirstPersonSettings(this.enabled, this.transitionIn, this.transitionOut, this.cameraMode);
-	}
 }

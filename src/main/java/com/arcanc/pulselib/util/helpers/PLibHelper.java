@@ -24,6 +24,11 @@ import java.util.function.Supplier;
 
 public class PLibHelper
 {
+	/**
+	 * Creates the manager.
+	 * @param animatable the animatable to use.
+	 * @return the value produced by this operation.
+	 */
 	public static <T extends PAnimatable<T>> PAnimationManager<T> createManager(T animatable)
 	{
 		if (animatable instanceof BlockEntity || animatable instanceof Entity)
@@ -31,6 +36,12 @@ public class PLibHelper
 		return createManager(animatable, true);
 	}
 	
+	/**
+	 * Creates the manager.
+	 * @param animatable the animatable to use.
+	 * @param singleton the singleton to use.
+	 * @return the value produced by this operation.
+	 */
 	public static <T extends PAnimatable<T>> PAnimationManager<T> createManager(T animatable, boolean singleton)
 	{
 		AnimManagerKey key = AnimManagerKey.ofObject(animatable);
@@ -42,21 +53,39 @@ public class PLibHelper
 		return singleton ? SingletonAnimationManager.getManager(key, animatable) : new InstanceAnimationManager<>(animatable);
 	}
 	
+	/**
+	 * Performs the living render state operation.
+	 * @param factory the factory to use.
+	 * @return the value produced by this operation.
+	 */
 	public static <T extends LivingEntity & PAnimatable<T>, RS extends PEntityRenderState<T>> RS livingRenderState(Supplier<RS> factory)
 	{
 		return factory.get();
 	}
 
+	/**
+	 * Performs the living render state operation.
+	 * @return the value produced by this operation.
+	 */
 	public static <T extends LivingEntity & PAnimatable<T>> PEntityRenderState.LivingImpl<T> livingRenderState()
 	{
 		return livingRenderState(PEntityRenderState.LivingImpl::new);
 	}
 	
+	/**
+	 * Performs the entity render state operation.
+	 * @param factory the factory to use.
+	 * @return the value produced by this operation.
+	 */
 	public static <T extends Entity & PAnimatable<T>, RS extends PEntityRenderState<T>> RS entityRenderState(Supplier<RS> factory)
 	{
 		return factory.get();
 	}
 
+	/**
+	 * Performs the entity render state operation.
+	 * @return the value produced by this operation.
+	 */
 	public static <T extends Entity & PAnimatable<T>> PEntityRenderState.Impl<T> entityRenderState()
 	{
 		return entityRenderState(PEntityRenderState.Impl::new);

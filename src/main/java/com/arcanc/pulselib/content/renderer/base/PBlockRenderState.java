@@ -22,6 +22,12 @@ import org.jspecify.annotations.Nullable;
 
 public interface PBlockRenderState<T extends BlockEntity & PAnimatable<T>> extends PRenderState<T>
 {
+	/**
+	 * Extracts the block data.
+	 * @param blockEntity the block entity to use.
+	 * @param renderer the renderer to use.
+	 * @param breakProgress the break progress to use.
+	 */
 	<RS extends BlockEntityRenderState & PBlockRenderState<T>> void extractBlockData(
 			T blockEntity,
 			PBlockRenderer<T, RS> renderer,
@@ -34,12 +40,21 @@ public interface PBlockRenderState<T extends BlockEntity & PAnimatable<T>> exten
 		private T animatable;
 		private AnimManagerKey key;
 		
+		/**
+		 * Extracts the data.
+		 */
 		@Override
 		public void extractData()
 		{
 			this.partialTicks = PLibRenderHelper.mc().isPaused() ? 0 : PLibRenderHelper.mc().getDeltaTracker().getGameTimeDeltaPartialTick(true);
 		}
 		
+		/**
+		 * Extracts the block data.
+		 * @param blockEntity the block entity to use.
+		 * @param renderer the renderer to use.
+		 * @param breakProgress the break progress to use.
+		 */
 		public <RS extends BlockEntityRenderState & PBlockRenderState<T>> void extractBlockData(T blockEntity, PBlockRenderer<T, RS> renderer, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress)
 		{
 			this.extractData();
@@ -49,24 +64,40 @@ public interface PBlockRenderState<T extends BlockEntity & PAnimatable<T>> exten
 			this.key = AnimManagerKey.of(blockEntity);
 		}
 		
+		/**
+		 * Performs the partial tick operation.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public float partialTick()
 		{
 			return this.partialTicks;
 		}
 		
+		/**
+		 * Returns the baked model.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public @Nullable PBakedModel getBakedModel()
 		{
 			return this.model;
 		}
 		
+		/**
+		 * Returns the animatable.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public T getAnimatable()
 		{
 			return this.animatable;
 		}
 		
+		/**
+		 * Returns the anim key.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public AnimManagerKey getAnimKey()
 		{

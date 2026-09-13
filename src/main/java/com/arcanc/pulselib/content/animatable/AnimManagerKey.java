@@ -19,6 +19,11 @@ import java.util.Objects;
 
 public record AnimManagerKey(long key)
 {
+	/**
+	 * Performs the of object operation.
+	 * @param animatable the animatable to use.
+	 * @return the value produced by this operation.
+	 */
 	public static AnimManagerKey ofObject(Object animatable)
 	{
 		return switch (animatable)
@@ -30,6 +35,11 @@ public record AnimManagerKey(long key)
 		};
 	}
 	
+	/**
+	 * Performs the of operation.
+	 * @param stack the stack to use.
+	 * @return the value produced by this operation.
+	 */
 	public static AnimManagerKey of(ItemStack stack)
 	{
 		int itemId = Item.getId(stack.getItem());
@@ -38,11 +48,21 @@ public record AnimManagerKey(long key)
 		return new AnimManagerKey(Objects.hash(itemId, count, dataMap));
 	}
 	
+	/**
+	 * Performs the of operation.
+	 * @param entity the entity to use.
+	 * @return the value produced by this operation.
+	 */
 	public static AnimManagerKey of (Entity entity)
 	{
 		return new AnimManagerKey(entity.getUUID().hashCode());
 	}
 	
+	/**
+	 * Performs the of operation.
+	 * @param blockEntity the block entity to use.
+	 * @return the value produced by this operation.
+	 */
 	public static AnimManagerKey of(BlockEntity blockEntity)
 	{
 		int type = blockEntity.getType().hashCode();
@@ -52,6 +72,11 @@ public record AnimManagerKey(long key)
 		return new AnimManagerKey(Objects.hash(type, blockPos, levelId));
 	}
 	
+	/**
+	 * Performs the equals operation.
+	 * @param o the o to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public boolean equals(Object o)
 	{
@@ -60,6 +85,10 @@ public record AnimManagerKey(long key)
 		return key() == other;
 	}
 	
+	/**
+	 * Performs the hash code operation.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public int hashCode()
 	{

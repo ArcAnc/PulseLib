@@ -24,6 +24,11 @@ public enum PPlayerPart
 	RIGHT_LEG,
 	LEFT_LEG;
 
+	/**
+	 * Performs the resolve operation.
+	 * @param model the model to use.
+	 * @return the value produced by this operation.
+	 */
 	public List<ModelPart> resolve(PlayerModel model)
 	{
 		return switch (this)

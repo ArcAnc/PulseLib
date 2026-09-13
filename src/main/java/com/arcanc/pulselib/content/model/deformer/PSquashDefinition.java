@@ -23,6 +23,12 @@ public record PSquashDefinition(Vector3f origin, Vector3f axis, PChannelReferenc
 					PChannelReference.FLOAT.fieldOf("scale").forGetter(PSquashDefinition::scale)).
 			apply(instance, PSquashDefinition::new));
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param origin the origin to use.
+	 * @param axis the axis to use.
+	 * @param scale the scale to use.
+	 */
 	public PSquashDefinition
 	{
 		origin = new Vector3f(origin);

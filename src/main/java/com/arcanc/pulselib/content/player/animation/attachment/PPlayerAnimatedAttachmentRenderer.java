@@ -13,7 +13,15 @@ import com.arcanc.pulselib.content.player.animation.PPlayerAnimationAnchor;
 
 public interface PPlayerAnimatedAttachmentRenderer
 {
+	/**
+	 * Performs the anchor operation.
+	 * @return the value produced by this operation.
+	 */
 	PPlayerAnimationAnchor anchor();
 
+	/**
+	 * Performs the render operation.
+	 * @param context the context to use.
+	 */
 	void render(PPlayerAnimatedAttachmentContext context);
 }

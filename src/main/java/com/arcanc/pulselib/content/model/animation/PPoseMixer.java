@@ -27,11 +27,20 @@ public final class PPoseMixer
 	private final int boneCount;
 	private final int[] parents;
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param boneCount the bone count to use.
+	 */
 	public PPoseMixer(int boneCount)
 	{
 		this(boneCount, null);
 	}
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param boneCount the bone count to use.
+	 * @param parents the parents to use.
+	 */
 	public PPoseMixer(int boneCount, @Nullable int[] parents)
 	{
 		if (boneCount < 0)
@@ -42,6 +51,12 @@ public final class PPoseMixer
 		this.parents = parents == null ? null : parents.clone();
 	}
 
+	/**
+	 * Performs the mix operation.
+	 * @param referencePose the reference pose to use.
+	 * @param layers the layers to use.
+	 * @return the value produced by this operation.
+	 */
 	public PPose mix(PPose referencePose, Collection<Layer> layers)
 	{
 		Objects.requireNonNull(referencePose);
@@ -89,6 +104,10 @@ public final class PPoseMixer
 		private float duration;
 		private PPoseEasing easing;
 
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param initial the initial to use.
+		 */
 		public Transition(Layer initial)
 		{
 			this.sourceLayers = List.of(Objects.requireNonNull(initial));
@@ -98,6 +117,14 @@ public final class PPoseMixer
 			this.easing = PPoseEasing.LINEAR;
 		}
 
+		/**
+		 * Performs the transition to operation.
+		 * @param target the target to use.
+		 * @param duration the duration to use.
+		 * @param easing the easing to use.
+		 * @param interruptionPolicy the interruption policy to use.
+		 * @return the value produced by this operation.
+		 */
 		public boolean transitionTo(Layer target,
 		                            float duration,
 		                            PPoseEasing easing,
@@ -121,16 +148,28 @@ public final class PPoseMixer
 			return true;
 		}
 
+		/**
+		 * Performs the advance operation.
+		 * @param delta the delta to use.
+		 */
 		public void advance(float delta)
 		{
 			this.elapsed = Math.min(this.elapsed + Math.max(delta, 0.0f), this.duration);
 		}
 
+		/**
+		 * Determines whether transitioning.
+		 * @return the value produced by this operation.
+		 */
 		public boolean isTransitioning()
 		{
 			return this.elapsed < this.duration;
 		}
 
+		/**
+		 * Performs the layers operation.
+		 * @return the value produced by this operation.
+		 */
 		public List<Layer> layers()
 		{
 			if (!isTransitioning())
@@ -144,6 +183,12 @@ public final class PPoseMixer
 		}
 	}
 
+	/**
+	 * Performs the mix priority operation.
+	 * @param result the result to use.
+	 * @param reference the reference to use.
+	 * @param layers the layers to use.
+	 */
 	private void mixPriority(PPose result, PPose reference, List<Layer> layers)
 	{
 		for (int bone = 0; bone < this.boneCount; bone++)
@@ -161,6 +206,12 @@ public final class PPoseMixer
 		}
 	}
 
+	/**
+	 * Performs the mix overrides operation.
+	 * @param result the result to use.
+	 * @param layers the layers to use.
+	 * @param bone the bone to use.
+	 */
 	private void mixOverrides(PPose result, List<Layer> layers, int bone)
 	{
 		float totalWeight = 0.0f;
@@ -203,6 +254,14 @@ public final class PPoseMixer
 		shortestSlerp(result.rotation(bone), rotation, alpha);
 	}
 
+	/**
+	 * Performs the apply operation.
+	 * @param result the result to use.
+	 * @param reference the reference to use.
+	 * @param layer the layer to use.
+	 * @param bone the bone to use.
+	 * @param weight the weight to use.
+	 */
 	private void apply(PPose result, PPose reference, Layer layer, int bone, float weight)
 	{
 		PPose pose = layer.pose();
@@ -220,6 +279,16 @@ public final class PPoseMixer
 		}
 	}
 
+	/**
+	 * Adds the local.
+	 * @param result the result to use.
+	 * @param bone the bone to use.
+	 * @param translation the translation to use.
+	 * @param rotation the rotation to use.
+	 * @param scale the scale to use.
+	 * @param weight the weight to use.
+	 * @param inverse the inverse to use.
+	 */
 	private void addLocal(PPose result,
 	                      int bone,
 	                      Vector3f translation,
@@ -240,6 +309,15 @@ public final class PPoseMixer
 		result.scale(bone).mul(factor);
 	}
 
+	/**
+	 * Adds the mesh space.
+	 * @param result the result to use.
+	 * @param bone the bone to use.
+	 * @param translation the translation to use.
+	 * @param rotation the rotation to use.
+	 * @param scale the scale to use.
+	 * @param weight the weight to use.
+	 */
 	private void addMeshSpace(PPose result,
 	                          int bone,
 	                          Vector3f translation,
@@ -253,6 +331,12 @@ public final class PPoseMixer
 		addLocal(result, bone, localTranslation, localRotation, scale, weight, false);
 	}
 
+	/**
+	 * Performs the parent model rotation operation.
+	 * @param pose the pose to use.
+	 * @param bone the bone to use.
+	 * @return the value produced by this operation.
+	 */
 	private Quaternionf parentModelRotation(PPose pose, int bone)
 	{
 		Quaternionf result = new Quaternionf();
@@ -263,6 +347,11 @@ public final class PPoseMixer
 		return result.normalize();
 	}
 
+	/**
+	 * Performs the copy operation.
+	 * @param source the source to use.
+	 * @return the value produced by this operation.
+	 */
 	private static PPose copy(PPose source)
 	{
 		PPose copy = new PPose(source.boneCount());
@@ -271,6 +360,11 @@ public final class PPoseMixer
 		return copy;
 	}
 
+	/**
+	 * Performs the mark dirty operation.
+	 * @param reference the reference to use.
+	 * @param result the result to use.
+	 */
 	private static void markDirty(PPose reference, PPose result)
 	{
 		for (int bone = 0; bone < result.boneCount(); bone++)
@@ -280,6 +374,12 @@ public final class PPoseMixer
 				result.setAnimated(bone, result.translation(bone), result.rotation(bone), result.scale(bone));
 	}
 
+	/**
+	 * Performs the shortest slerp operation.
+	 * @param destination the destination to use.
+	 * @param target the target to use.
+	 * @param alpha the alpha to use.
+	 */
 	private static void shortestSlerp(Quaternionf destination, Quaternionf target, float alpha)
 	{
 		Quaternionf shortestTarget = new Quaternionf(target);
@@ -288,6 +388,12 @@ public final class PPoseMixer
 		destination.slerp(shortestTarget, alpha).normalize();
 	}
 
+	/**
+	 * Performs the weighted rotation operation.
+	 * @param rotation the rotation to use.
+	 * @param weight the weight to use.
+	 * @return the value produced by this operation.
+	 */
 	private static Quaternionf weightedRotation(Quaternionf rotation, float weight)
 	{
 		Quaternionf shortestRotation = new Quaternionf(rotation);
@@ -296,16 +402,33 @@ public final class PPoseMixer
 		return new Quaternionf().slerp(shortestRotation, Math.clamp(weight, 0.0f, 1.0f)).normalize();
 	}
 
+	/**
+	 * Performs the weighted scale operation.
+	 * @param scale the scale to use.
+	 * @param weight the weight to use.
+	 * @return the value produced by this operation.
+	 */
 	private static Vector3f weightedScale(Vector3f scale, float weight)
 	{
 		return new Vector3f(1.0f).lerp(scale, Math.clamp(weight, 0.0f, 1.0f));
 	}
 
+	/**
+	 * Performs the divide operation.
+	 * @param value the value to use.
+	 * @param divisor the divisor to use.
+	 * @return the value produced by this operation.
+	 */
 	private static Vector3f divide(Vector3f value, Vector3f divisor)
 	{
 		return new Vector3f(value.x * safeInverse(divisor.x), value.y * safeInverse(divisor.y), value.z * safeInverse(divisor.z));
 	}
 
+	/**
+	 * Performs the safe inverse operation.
+	 * @param value the value to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float safeInverse(float value)
 	{
 		return Math.abs(value) < EPSILON ? 1.0f : 1.0f / value;
@@ -316,6 +439,11 @@ public final class PPoseMixer
 	{
 		BoneWeight FULL = boneIndex -> 1.0f;
 
+		/**
+		 * Performs the weight operation.
+		 * @param boneIndex the bone index to use.
+		 * @return the value produced by this operation.
+		 */
 		float weight(int boneIndex);
 	}
 
@@ -327,6 +455,16 @@ public final class PPoseMixer
 	                    int priority,
 	                    float weight)
 	{
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param pose the pose to use.
+		 * @param referencePose the reference pose to use.
+		 * @param mask the mask to use.
+		 * @param boneWeight the bone weight to use.
+		 * @param mode the mode to use.
+		 * @param priority the priority to use.
+		 * @param weight the weight to use.
+		 */
 		public Layer
 		{
 			pose = Objects.requireNonNull(pose);
@@ -338,21 +476,43 @@ public final class PPoseMixer
 				throw new IllegalArgumentException("Layer and reference poses must have equal bone counts");
 		}
 
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param pose the pose to use.
+		 * @param mode the mode to use.
+		 * @param priority the priority to use.
+		 * @param weight the weight to use.
+		 */
 		public Layer(PPose pose, PPoseBlendMode mode, int priority, float weight)
 		{
 			this(pose, null, null, null, mode, priority, weight);
 		}
 
+		/**
+		 * Performs the bone weight operation.
+		 * @param boneIndex the bone index to use.
+		 * @return the value produced by this operation.
+		 */
 		public float boneWeight(int boneIndex)
 		{
 			return this.mask.get(boneIndex) ? Math.clamp(this.weight * this.boneWeight.weight(boneIndex), 0.0f, 1.0f) : 0.0f;
 		}
 
+		/**
+		 * Performs the with weight operation.
+		 * @param weight the weight to use.
+		 * @return the value produced by this operation.
+		 */
 		public Layer withWeight(float weight)
 		{
 			return new Layer(this.pose, this.referencePose, this.mask, this.boneWeight, this.mode, this.priority, weight);
 		}
 
+		/**
+		 * Performs the all bones operation.
+		 * @param boneCount the bone count to use.
+		 * @return the value produced by this operation.
+		 */
 		private static BitSet allBones(int boneCount)
 		{
 			BitSet result = new BitSet(boneCount);

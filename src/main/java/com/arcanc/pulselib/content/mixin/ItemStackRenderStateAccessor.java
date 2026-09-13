@@ -18,6 +18,10 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(ItemStackRenderState.class)
 public interface ItemStackRenderStateAccessor
 {
+	/**
+	 * Performs the pulselib$get display context operation.
+	 * @return the value produced by this operation.
+	 */
 	@Accessor ("displayContext")
 	ItemDisplayContext pulselib$getDisplayContext();
 }

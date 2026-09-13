@@ -33,6 +33,7 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 	private final Identifier id;
 	private final PPlayerAnimationDefinition definition;
 	private final PAnimationManager<PPlayerAnimationInstance> animationManager;
+	private boolean wasApplying;
 	private boolean targetActive;
 	private float activation;
 	private float previousActivation;
@@ -50,6 +51,12 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 	private PPlayerAnimationFrame cachedFrame;
 	private int cachedFramePartialTickBits;
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param player the player to use.
+	 * @param id the id to use.
+	 * @param definition the definition to use.
+	 */
 	PPlayerAnimationInstance(Player player, Identifier id, PPlayerAnimationDefinition definition)
 	{
 		this.player = Objects.requireNonNull(player);
@@ -59,48 +66,85 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 		this.animationManager = new InstanceAnimationManager<>(this, new AnimManagerKey(key));
 	}
 
+	/**
+	 * Performs the player operation.
+	 * @return the value produced by this operation.
+	 */
 	public Player player()
 	{
 		return this.player;
 	}
 
+	/**
+	 * Updates the player.
+	 * @param player the player to use.
+	 */
 	void updatePlayer(Player player)
 	{
 		this.player = Objects.requireNonNull(player);
 	}
 
+	/**
+	 * Performs the id operation.
+	 * @return the value produced by this operation.
+	 */
 	public Identifier id()
 	{
 		return this.id;
 	}
 
+	/**
+	 * Performs the definition operation.
+	 * @return the value produced by this operation.
+	 */
 	public PPlayerAnimationDefinition definition()
 	{
 		return this.definition;
 	}
 
+	/**
+	 * Returns the animation manager.
+	 * @param key the key to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public PAnimationManager<PPlayerAnimationInstance> getAnimationManager(AnimManagerKey key)
 	{
 		return this.animationManager;
 	}
 
+	/**
+	 * Registers the animation controllers.
+	 * @param registrar the registrar to use.
+	 */
 	@Override
 	public void registerAnimationControllers(PAnimationManager.PAnimationRegistrar<PPlayerAnimationInstance> registrar)
 	{
 		this.definition.registerControllers(registrar);
 	}
 
+	/**
+	 * Performs the controller operation.
+	 * @param controllerName the controller name to use.
+	 * @return the value produced by this operation.
+	 */
 	@Nullable PAnimationController<PPlayerAnimationInstance> controller(String controllerName)
 	{
 		return this.animationManager.getControllers().get(controllerName);
 	}
 
+	/**
+	 * Stops the all controllers.
+	 */
 	void stopAllControllers()
 	{
 		this.animationManager.getControllers().values().forEach(PAnimationController :: stop);
 	}
 
+	/**
+	 * Performs the synchronize operation.
+	 * @param instances the instances to use.
+	 */
 	static void synchronize(List<PPlayerAnimationInstance> instances)
 	{
 		PPlayerAnimationInstance leader = instances.getFirst();
@@ -123,6 +167,10 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 		}
 	}
 
+	/**
+	 * Performs the tick operation.
+	 * @param shouldApply the should apply to use.
+	 */
 	void tick(boolean shouldApply)
 	{
 		this.cachedFrame = null;
@@ -131,44 +179,79 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 			return;
 
 		this.animationManager.bindModel(model);
+		if (!shouldApply && this.wasApplying)
+			stopAllControllers();
+		this.wasApplying = shouldApply;
 		updateActivation(shouldApply);
 		updateFirstPersonActivation(shouldApply && hasActiveController());
 		if (shouldApply || this.activation > 0.0f)
 			this.animationManager.tick();
 	}
 
+	/**
+	 * Determines whether contributing.
+	 * @return the value produced by this operation.
+	 */
 	boolean isContributing()
 	{
 		return this.activation > 0.0f || this.previousActivation > 0.0f || this.targetActive;
 	}
 
+	/**
+	 * Determines whether the object has active controller.
+	 * @return the value produced by this operation.
+	 */
 	boolean hasActiveController()
 	{
 		return this.animationManager.getControllers().values().stream().anyMatch(controller ->
 				controller.isPlaying() || controller.isPaused());
 	}
 
+	/**
+	 * Performs the activation weight operation.
+	 * @param partialTick the partial tick to use.
+	 * @return the value produced by this operation.
+	 */
 	float activationWeight(float partialTick)
 	{
 		return Mth.lerp(partialTick, this.previousActivation, this.activation);
 	}
 
+	/**
+	 * Determines whether first person contributing.
+	 * @return the value produced by this operation.
+	 */
 	boolean isFirstPersonContributing()
 	{
 		return this.firstPersonActivation > 0.0f || this.previousFirstPersonActivation > 0.0f || this.firstPersonTargetActive;
 	}
 
+	/**
+	 * Performs the first person activation weight operation.
+	 * @param partialTick the partial tick to use.
+	 * @return the value produced by this operation.
+	 */
 	float firstPersonActivationWeight(float partialTick)
 	{
 		return Mth.lerp(partialTick, this.previousFirstPersonActivation, this.firstPersonActivation);
 	}
 
+	/**
+	 * Performs the controller animation time operation.
+	 * @param controllerName the controller name to use.
+	 * @param partialTick the partial tick to use.
+	 * @return the value produced by this operation.
+	 */
 	float controllerAnimationTime(String controllerName, float partialTick)
 	{
 		PAnimationController<PPlayerAnimationInstance> controller = controller(controllerName);
 		return controller == null ? 0.0f : controller.getInterpolatedTime(partialTick) / 20.0f;
 	}
 
+	/**
+	 * Updates the activation.
+	 * @param shouldApply the should apply to use.
+	 */
 	private void updateActivation(boolean shouldApply)
 	{
 		this.previousActivation = this.activation;
@@ -199,6 +282,10 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 		this.activation = Mth.lerp(alpha, this.transitionStart, this.transitionTarget);
 	}
 
+	/**
+	 * Updates the first person activation.
+	 * @param shouldApply the should apply to use.
+	 */
 	private void updateFirstPersonActivation(boolean shouldApply)
 	{
 		var settings = this.definition.firstPersonSettings();
@@ -235,6 +322,11 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 		this.firstPersonActivation = Mth.lerp(alpha, this.firstPersonTransitionStart, this.firstPersonTransitionTarget);
 	}
 
+	/**
+	 * Samples the frame.
+	 * @param partialTick the partial tick to use.
+	 * @return the value produced by this operation.
+	 */
 	public @Nullable PPlayerAnimationFrame sampleFrame(float partialTick)
 	{
 		int partialTickBits = Float.floatToIntBits(partialTick);

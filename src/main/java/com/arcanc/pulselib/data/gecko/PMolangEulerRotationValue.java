@@ -18,11 +18,20 @@ public final class PMolangEulerRotationValue implements PAnimationValue<Quaterni
 {
 	private final PMolangVectorValue eulerDegrees;
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param eulerDegrees the euler degrees to use.
+	 */
 	public PMolangEulerRotationValue(PMolangVectorValue eulerDegrees)
 	{
 		this.eulerDegrees = eulerDegrees;
 	}
 
+	/**
+	 * Performs the evaluate operation.
+	 * @param context the context to use.
+	 * @param destination the destination to use.
+	 */
 	@Override
 	public void evaluate(PAnimationEvaluationContext context, Quaternionf destination)
 	{

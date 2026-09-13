@@ -23,13 +23,49 @@ import org.jspecify.annotations.Nullable;
 
 public interface PRenderer<T extends PAnimatable<T>, RS extends PRenderState<T>>
 {
+	/**
+	 * Returns the model data.
+	 * @param renderState the render state to use.
+	 * @return the value produced by this operation.
+	 */
 	PModelData getModelData(RS renderState);
 	
+	/**
+	 * Returns the model.
+	 * @param renderState the render state to use.
+	 * @return the value produced by this operation.
+	 */
 	@Nullable PBakedModel getModel(RS renderState);
 	
+	/**
+	 * Returns the render type.
+	 * @param texture the texture to use.
+	 * @return the value produced by this operation.
+	 */
 	RenderType getRenderType(Identifier texture);
 	
+	/**
+	 * Performs the pre submit operation.
+	 * @param poseStack the pose stack to use.
+	 * @param renderState the render state to use.
+	 * @param cameraRenderState the camera render state to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 */
 	void preSubmit(PoseStack poseStack, RS renderState, CameraRenderState cameraRenderState, SubmitNodeCollector submitNodeCollector);
+	/**
+	 * Performs the true submit operation.
+	 * @param poseStack the pose stack to use.
+	 * @param renderState the render state to use.
+	 * @param cameraRenderState the camera render state to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 */
 	void trueSubmit(PoseStack poseStack, RS renderState, CameraRenderState cameraRenderState, SubmitNodeCollector submitNodeCollector);
+	/**
+	 * Performs the post submit operation.
+	 * @param poseStack the pose stack to use.
+	 * @param renderState the render state to use.
+	 * @param cameraRenderState the camera render state to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 */
 	void postSubmit(PoseStack poseStack, RS renderState, CameraRenderState cameraRenderState, SubmitNodeCollector submitNodeCollector);
 }

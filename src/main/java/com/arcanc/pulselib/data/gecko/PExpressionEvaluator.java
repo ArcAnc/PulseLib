@@ -19,11 +19,18 @@ public final class PExpressionEvaluator
 	private final Map<MolangParser.Expression, TimedValue> timeOnlyValues = new ConcurrentHashMap<>();
 	private final float timeQuantum;
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	public PExpressionEvaluator()
 	{
 		this(1f / 20f);
 	}
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param timeQuantum the time quantum to use.
+	 */
 	public PExpressionEvaluator(float timeQuantum)
 	{
 		if (timeQuantum <= 0f)
@@ -31,6 +38,13 @@ public final class PExpressionEvaluator
 		this.timeQuantum = timeQuantum;
 	}
 
+	/**
+	 * Performs the evaluate operation.
+	 * @param expression the expression to use.
+	 * @param context the context to use.
+	 * @param animationTime the animation time to use.
+	 * @return the value produced by this operation.
+	 */
 	public float evaluate(MolangParser.Expression expression, MolangParser.Context context, float animationTime)
 	{
 		return switch (expression.dependency())
@@ -40,11 +54,21 @@ public final class PExpressionEvaluator
 		};
 	}
 
+	/**
+	 * Clears the time cache.
+	 */
 	public void clearTimeCache()
 	{
 		this.timeOnlyValues.clear();
 	}
 
+	/**
+	 * Performs the time only operation.
+	 * @param expression the expression to use.
+	 * @param context the context to use.
+	 * @param timeStep the time step to use.
+	 * @return the value produced by this operation.
+	 */
 	private float timeOnly(MolangParser.Expression expression, MolangParser.Context context, int timeStep)
 	{
 		TimedValue cached = this.timeOnlyValues.get(expression);

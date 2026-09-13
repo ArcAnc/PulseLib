@@ -40,6 +40,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ItemInHandRenderer.class)
 public abstract class ItemInHandRendererMixin
 {
+	/**
+	 * Performs the pulselib$render hands with items operation.
+	 * @param partialTick the partial tick to use.
+	 * @param poseStack the pose stack to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 * @param player the player to use.
+	 * @param packedLight the packed light to use.
+	 * @param original the original to use.
+	 */
 	@WrapMethod(method = "renderHandsWithItems")
 	private void pulselib$renderHandsWithItems(float partialTick,
 	                                            PoseStack poseStack,
@@ -59,6 +68,15 @@ public abstract class ItemInHandRendererMixin
 		}
 	}
 
+	/**
+	 * Performs the pulselib$render extra first person geometry operation.
+	 * @param partialTick the partial tick to use.
+	 * @param poseStack the pose stack to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 * @param player the player to use.
+	 * @param packedLight the packed light to use.
+	 * @param ci the ci to use.
+	 */
 	@Inject(method = "renderHandsWithItems", at = @At(
 			value = "INVOKE",
 			target = "Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher;renderAllFeatures()V",
@@ -75,6 +93,20 @@ public abstract class ItemInHandRendererMixin
 			PPlayerFirstPersonRenderer.renderExtras(player, pose, poseStack, submitNodeCollector, packedLight, partialTick);
 	}
 
+	/**
+	 * Performs the pulselib$render arm with item operation.
+	 * @param player the player to use.
+	 * @param partialTick the partial tick to use.
+	 * @param xRot the x rot to use.
+	 * @param hand the hand to use.
+	 * @param attack the attack to use.
+	 * @param stack the stack to use.
+	 * @param inverseArmHeight the inverse arm height to use.
+	 * @param poseStack the pose stack to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 * @param packedLight the packed light to use.
+	 * @param original the original to use.
+	 */
 	@WrapMethod(method = "renderArmWithItem")
 	private void pulselib$renderArmWithItem(AbstractClientPlayer player,
 	                                        float partialTick,
@@ -102,6 +134,17 @@ public abstract class ItemInHandRendererMixin
 		}
 	}
 
+	/**
+	 * Performs the pulselib$render right hand operation.
+	 * @param renderer the renderer to use.
+	 * @param poseStack the pose stack to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 * @param packedLight the packed light to use.
+	 * @param skin the skin to use.
+	 * @param sleeve the sleeve to use.
+	 * @param player the player to use.
+	 * @param original the original to use.
+	 */
 	@WrapOperation(method = "renderPlayerArm", at = @At(value = "INVOKE", target =
 			"Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderRightHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;ZLnet/minecraft/client/player/AbstractClientPlayer;)V"))
 	private void pulselib$renderRightHand(AvatarRenderer<?> renderer,
@@ -116,6 +159,17 @@ public abstract class ItemInHandRendererMixin
 		renderArm(renderer, poseStack, submitNodeCollector, packedLight, skin, sleeve, player, original);
 	}
 
+	/**
+	 * Performs the pulselib$render left hand operation.
+	 * @param renderer the renderer to use.
+	 * @param poseStack the pose stack to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 * @param packedLight the packed light to use.
+	 * @param skin the skin to use.
+	 * @param sleeve the sleeve to use.
+	 * @param player the player to use.
+	 * @param original the original to use.
+	 */
 	@WrapOperation(method = "renderPlayerArm", at = @At(value = "INVOKE", target =
 			"Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderLeftHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;ZLnet/minecraft/client/player/AbstractClientPlayer;)V"))
 	private void pulselib$renderLeftHand(AvatarRenderer<?> renderer,
@@ -130,6 +184,17 @@ public abstract class ItemInHandRendererMixin
 		renderArm(renderer, poseStack, submitNodeCollector, packedLight, skin, sleeve, player, original);
 	}
 
+	/**
+	 * Renders the arm.
+	 * @param renderer the renderer to use.
+	 * @param poseStack the pose stack to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 * @param packedLight the packed light to use.
+	 * @param skin the skin to use.
+	 * @param sleeve the sleeve to use.
+	 * @param player the player to use.
+	 * @param original the original to use.
+	 */
 	private static void renderArm(AvatarRenderer<?> renderer,
 	                              PoseStack poseStack,
 	                              SubmitNodeCollector submitNodeCollector,
@@ -171,6 +236,17 @@ public abstract class ItemInHandRendererMixin
 		}
 	}
 
+	/**
+	 * Performs the pulselib$render item operation.
+	 * @param renderer the renderer to use.
+	 * @param entity the entity to use.
+	 * @param stack the stack to use.
+	 * @param displayContext the display context to use.
+	 * @param poseStack the pose stack to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 * @param packedLight the packed light to use.
+	 * @param original the original to use.
+	 */
 	@WrapOperation(method = "renderArmWithItem", at = @At(value = "INVOKE", target =
 			"Lnet/minecraft/client/renderer/ItemInHandRenderer;renderItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;I)V"))
 	private void pulselib$renderItem(ItemInHandRenderer renderer,

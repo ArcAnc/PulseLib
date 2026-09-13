@@ -17,14 +17,28 @@ public final class PAnimationCameraShake
 {
 	private static final List<Shake> SHAKES = new ArrayList<>();
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PAnimationCameraShake() { }
 
+	/**
+	 * Performs the add operation.
+	 * @param strength the strength to use.
+	 * @param duration the duration to use.
+	 * @param frequency the frequency to use.
+	 */
 	public static void add(float strength, float duration, float frequency)
 	{
 		if (Float.isFinite(strength) && Float.isFinite(duration) && Float.isFinite(frequency) && strength != 0.0f && duration > 0.0f)
 			SHAKES.add(new Shake(Math.abs(strength), duration, Math.max(frequency, 0.0f), 0.0f));
 	}
 
+	/**
+	 * Performs the sample operation.
+	 * @param partialTick the partial tick to use.
+	 * @return the value produced by this operation.
+	 */
 	public static synchronized float sample(float partialTick)
 	{
 		float result = 0.0f;
@@ -36,6 +50,9 @@ public final class PAnimationCameraShake
 		return result;
 	}
 
+	/**
+	 * Performs the tick operation.
+	 */
 	public static synchronized void tick()
 	{
 		for (Iterator<Shake> iterator = SHAKES.iterator(); iterator.hasNext(); )
@@ -51,6 +68,13 @@ public final class PAnimationCameraShake
 	{
 		private final float strength, duration, frequency;
 		private float age;
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param strength the strength to use.
+		 * @param duration the duration to use.
+		 * @param frequency the frequency to use.
+		 * @param age the age to use.
+		 */
 		private Shake(float strength, float duration, float frequency, float age)
 		{
 			this.strength = strength;

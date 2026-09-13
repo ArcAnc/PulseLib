@@ -23,6 +23,12 @@ public record PStretchDefinition(Vector3f origin, Vector3f axis, PChannelReferen
 					PChannelReference.FLOAT.fieldOf("scale").forGetter(PStretchDefinition::scale)).
 			apply(instance, PStretchDefinition::new));
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param origin the origin to use.
+	 * @param axis the axis to use.
+	 * @param scale the scale to use.
+	 */
 	public PStretchDefinition
 	{
 		origin = new Vector3f(origin);

@@ -21,6 +21,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin
 {
+	/**
+	 * Performs the pulselib$flush first person items operation.
+	 * @param cameraState the camera state to use.
+	 * @param deltaPartialTick the delta partial tick to use.
+	 * @param modelViewMatrix the model view matrix to use.
+	 * @param ci the ci to use.
+	 */
 	@Inject(method = "renderItemInHand", at = @At(
 			value = "INVOKE",
 			target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;renderHandsWithItems(FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/player/LocalPlayer;I)V",

@@ -15,5 +15,9 @@ import java.util.List;
 
 public interface PModelPartCubes
 {
+	/**
+	 * Performs the pulselib$cubes operation.
+	 * @return the value produced by this operation.
+	 */
 	List<ModelPart.Cube> pulselib$cubes();
 }

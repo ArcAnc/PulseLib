@@ -12,6 +12,12 @@ import java.util.Objects;
 
 public record PAnimationEvent<T>(float time, PAnimationEventType<T> type, T data)
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param time the time to use.
+	 * @param type the type to use.
+	 * @param data the data to use.
+	 */
 	public PAnimationEvent
 	{
 		if (!Float.isFinite(time) || time < 0.0f)

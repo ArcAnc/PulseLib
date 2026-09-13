@@ -34,6 +34,10 @@ public class PTextureCache
 	
 	private static final Set<Identifier> TEXTURE_CACHE = new HashSet<>();
 	
+	/**
+	 * Returns the texture atlas.
+	 * @return the value produced by this operation.
+	 */
 	public static TextureAtlas getTextureAtlas()
 	{
 		if (TEXTURES == null)
@@ -42,23 +46,38 @@ public class PTextureCache
 		return TEXTURES;
 	}
 	
+	/**
+	 * Performs the register operation.
+	 * @param modEventBus the mod event bus to use.
+	 */
 	public static void register(IEventBus modEventBus)
 	{
 		modEventBus.addListener(PTextureCache :: registerAtlas);
 	}
 	
+	/**
+	 * Registers the atlas.
+	 * @param event the event to use.
+	 */
 	private static void registerAtlas(final RegisterTextureAtlasesEvent event)
 	{
 		event.register(new AtlasManager.AtlasConfig(ATLAS_LOCATION, ATLAS_FILE_LOCATION, false));
 		event.addAdditionalMetadata(ATLAS_FILE_LOCATION, PLibSpriteMetadata.TYPE);
 	}
 	
+	/**
+	 * Returns the texture cache.
+	 * @return the value produced by this operation.
+	 */
 	@ApiStatus.Internal
 	public static Set<Identifier> getTextureCache()
 	{
 		return TEXTURE_CACHE;
 	}
 	
+	/**
+	 * Performs the post event operation.
+	 */
 	@ApiStatus.Internal
 	public static void postEvent()
 	{

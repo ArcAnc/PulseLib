@@ -13,26 +13,56 @@ public enum PPoseEasing
 {
 	LINEAR
 	{
+		/**
+		 * Performs the apply operation.
+		 * @param value the value to use.
+		 * @return the value produced by this operation.
+		 */
 		@Override public float apply(float value) { return value; }
 	},
 	EASE_IN_QUAD
 	{
+		/**
+		 * Performs the apply operation.
+		 * @param value the value to use.
+		 * @return the value produced by this operation.
+		 */
 		@Override public float apply(float value) { return value * value; }
 	},
 	EASE_OUT_QUAD
 	{
+		/**
+		 * Performs the apply operation.
+		 * @param value the value to use.
+		 * @return the value produced by this operation.
+		 */
 		@Override public float apply(float value) { return 1.0f - (1.0f - value) * (1.0f - value); }
 	},
 	EASE_IN_OUT_CUBIC
 	{
+		/**
+		 * Performs the apply operation.
+		 * @param value the value to use.
+		 * @return the value produced by this operation.
+		 */
 		@Override public float apply(float value)
 		{
 			return value < 0.5f ? 4.0f * value * value * value : 1.0f - (float) Math.pow(-2.0f * value + 2.0f, 3.0) * 0.5f;
 		}
 	};
 
+	/**
+	 * Performs the apply operation.
+	 * @param value the value to use.
+	 * @return the value produced by this operation.
+	 */
 	public abstract float apply(float value);
 
+	/**
+	 * Performs the transform operation.
+	 * @param value the value to use.
+	 * @return the value produced by this operation.
+	 */
 	public float transform(float value)
 	{
 		return apply(Math.clamp(value, 0.0f, 1.0f));

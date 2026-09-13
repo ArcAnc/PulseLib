@@ -17,13 +17,32 @@ import org.jspecify.annotations.Nullable;
 
 public interface PRenderState<T extends PAnimatable<T>>
 {
+	/**
+	 * Extracts the data.
+	 */
 	void extractData();
 	
+	/**
+	 * Performs the partial tick operation.
+	 * @return the value produced by this operation.
+	 */
 	float partialTick();
 	
+	/**
+	 * Returns the baked model.
+	 * @return the value produced by this operation.
+	 */
 	@Nullable PBakedModel getBakedModel();
 	
+	/**
+	 * Returns the animatable.
+	 * @return the value produced by this operation.
+	 */
 	T getAnimatable();
 	
+	/**
+	 * Returns the anim key.
+	 * @return the value produced by this operation.
+	 */
 	AnimManagerKey getAnimKey();
 }

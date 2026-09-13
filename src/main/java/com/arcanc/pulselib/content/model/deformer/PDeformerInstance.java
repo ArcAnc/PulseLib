@@ -13,12 +13,21 @@ import java.util.Objects;
 
 public record PDeformerInstance<D>(PMeshDeformer<D> type, D definition)
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param type the type to use.
+	 * @param definition the definition to use.
+	 */
 	public PDeformerInstance
 	{
 		Objects.requireNonNull(type);
 		Objects.requireNonNull(definition);
 	}
 
+	/**
+	 * Performs the prepare operation.
+	 * @param context the context to use.
+	 */
 	void prepare(PDeformerPrepareContext context)
 	{
 		this.type.prepare(context, this.definition);

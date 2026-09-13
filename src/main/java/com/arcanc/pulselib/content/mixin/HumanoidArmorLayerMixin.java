@@ -29,9 +29,25 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(HumanoidArmorLayer.class)
 public abstract class HumanoidArmorLayerMixin
 {
+	/**
+	 * Returns the armor model.
+	 * @param state the state to use.
+	 * @param slot the slot to use.
+	 * @return the value produced by this operation.
+	 */
 	@Shadow
 	protected abstract HumanoidModel<?> getArmorModel(HumanoidRenderState state, EquipmentSlot slot);
 
+	/**
+	 * Performs the pulselib$apply player deformers to armor operation.
+	 * @param poseStack the pose stack to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 * @param itemStack the item stack to use.
+	 * @param slot the slot to use.
+	 * @param packedLight the packed light to use.
+	 * @param state the state to use.
+	 * @param callback the callback to use.
+	 */
 	@Inject(method = "renderArmorPiece", at = @At("HEAD"))
 	private void pulselib$applyPlayerDeformersToArmor(PoseStack poseStack,
 	                                                  SubmitNodeCollector submitNodeCollector,

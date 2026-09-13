@@ -22,6 +22,11 @@ public class PLibDatabase
 	
 	public static final Identifier RELOAD_LISTENER_ID = rl("models_reload_listener");
 	
+	/**
+	 * Performs the rl operation.
+	 * @param name the name to use.
+	 * @return the value produced by this operation.
+	 */
 	public static Identifier rl(String name)
 	{
 		return Identifier.fromNamespaceAndPath(MOD_ID, name);

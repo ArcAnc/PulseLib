@@ -6,5 +6,11 @@ import java.util.Map;
 
 public interface PAnimationFormatDecoder
 {
+	/**
+	 * Decodes the bone tracks.
+	 * @param context the context to use.
+	 * @param boneNode the bone node to use.
+	 * @return the value produced by this operation.
+	 */
 	Map<String, PAnimationTrack<?>> decodeBoneTracks(PAnimationDecodeContext context, JsonElement boneNode);
 }

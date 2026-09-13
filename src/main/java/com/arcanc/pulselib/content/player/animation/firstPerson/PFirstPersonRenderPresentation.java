@@ -25,6 +25,15 @@ public record PFirstPersonRenderPresentation(
 		List<PPlayerFirstPersonAnchorPose> animationAnchors,
 		List<PPlayerFirstPersonMeshAttachmentPose> meshAttachments)
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param rightArm the right arm to use.
+	 * @param leftArm the left arm to use.
+	 * @param rightItem the right item to use.
+	 * @param leftItem the left item to use.
+	 * @param animationAnchors the animation anchors to use.
+	 * @param meshAttachments the mesh attachments to use.
+	 */
 	public PFirstPersonRenderPresentation
 	{
 		rightArm = Objects.requireNonNull(rightArm);

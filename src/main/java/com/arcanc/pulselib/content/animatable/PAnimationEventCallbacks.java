@@ -19,16 +19,34 @@ public final class PAnimationEventCallbacks
 {
 	private static final Map<Identifier, LocatorCallback> CALLBACKS = new ConcurrentHashMap<>();
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PAnimationEventCallbacks() { }
 
+	/**
+	 * Performs the register operation.
+	 * @param id the id to use.
+	 * @param callback the callback to use.
+	 */
 	public static void register(Identifier id, LocatorCallback callback)
 	{
 		if (CALLBACKS.putIfAbsent(id, callback) != null)
 			throw new IllegalArgumentException("Animation locator callback already registered: " + id);
 	}
 
+	/**
+	 * Performs the unregister operation.
+	 * @param id the id to use.
+	 */
 	public static void unregister(Identifier id) { CALLBACKS.remove(id); }
 
+	/**
+	 * Performs the dispatch operation.
+	 * @param id the id to use.
+	 * @param context the context to use.
+	 * @param locator the locator to use.
+	 */
 	public static void dispatch(Identifier id, PAnimationEventContext context, String locator)
 	{
 		LocatorCallback callback = CALLBACKS.get(id);
@@ -39,6 +57,11 @@ public final class PAnimationEventCallbacks
 	@FunctionalInterface
 	public interface LocatorCallback
 	{
+		/**
+		 * Performs the execute operation.
+		 * @param context the context to use.
+		 * @param position the position to use.
+		 */
 		void execute(PAnimationEventContext context, PAnimationEventContext.PAnimationEventDispatcherBridge.Position position);
 	}
 }

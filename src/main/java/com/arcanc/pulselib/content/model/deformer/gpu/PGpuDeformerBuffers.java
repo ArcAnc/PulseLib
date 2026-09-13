@@ -23,55 +23,95 @@ public final class PGpuDeformerBuffers
 	public static final Submission NONE = new Submission(-1, -1, 0);
 	private static final PDeformerStream STREAM = new PDeformerStream();
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PGpuDeformerBuffers()
 	{
 	}
 
+	/**
+	 * Performs the submit operation.
+	 * @param deformation the deformation to use.
+	 * @return the value produced by this operation.
+	 */
 	public static Submission submit(@Nullable PMeshDeformation deformation)
 	{
 		return STREAM.submit(deformation);
 	}
 
+	/**
+	 * Performs the operations operation.
+	 * @return the value produced by this operation.
+	 */
 	public static List<Float> operations()
 	{
 		return STREAM.operations();
 	}
 
+	/**
+	 * Performs the values operation.
+	 * @return the value produced by this operation.
+	 */
 	public static List<Float> values()
 	{
 		return STREAM.values();
 	}
 
+	/**
+	 * Performs the operations dirty operation.
+	 * @return the value produced by this operation.
+	 */
 	public static boolean operationsDirty()
 	{
 		return STREAM.operationsDirty();
 	}
 
+	/**
+	 * Performs the values dirty operation.
+	 * @return the value produced by this operation.
+	 */
 	public static boolean valuesDirty()
 	{
 		return STREAM.valuesDirty();
 	}
 
+	/**
+	 * Performs the mark operations uploaded operation.
+	 */
 	public static void markOperationsUploaded()
 	{
 		STREAM.markOperationsUploaded();
 	}
 
+	/**
+	 * Performs the mark values uploaded operation.
+	 */
 	public static void markValuesUploaded()
 	{
 		STREAM.markValuesUploaded();
 	}
 
+	/**
+	 * Performs the finish frame operation.
+	 */
 	public static void finishFrame()
 	{
 		STREAM.finishFrame();
 	}
 
+	/**
+	 * Performs the upload operation.
+	 * @return the value produced by this operation.
+	 */
 	public static Bindings upload()
 	{
 		return UPLOAD_BUFFERS.upload();
 	}
 
+	/**
+	 * Performs the cleanup operation.
+	 */
 	public static void cleanup()
 	{
 		UPLOAD_BUFFERS.close();
@@ -95,6 +135,10 @@ public final class PGpuDeformerBuffers
 		private @Nullable MappableRingBuffer operations;
 		private @Nullable MappableRingBuffer values;
 
+		/**
+		 * Performs the upload operation.
+		 * @return the value produced by this operation.
+		 */
 		private Bindings upload()
 		{
 			this.operations = upload(this.operations, PGpuDeformerBuffers.operations(), PGpuDeformerBuffers.operationsDirty(), "deformer_operations");
@@ -104,6 +148,9 @@ public final class PGpuDeformerBuffers
 			return new Bindings(this.operations.currentBuffer(), this.values.currentBuffer());
 		}
 
+		/**
+		 * Performs the close operation.
+		 */
 		private void close()
 		{
 			if (this.operations != null)
@@ -118,6 +165,14 @@ public final class PGpuDeformerBuffers
 			}
 		}
 
+		/**
+		 * Performs the upload operation.
+		 * @param buffer the buffer to use.
+		 * @param data the data to use.
+		 * @param dirty the dirty to use.
+		 * @param label the label to use.
+		 * @return the value produced by this operation.
+		 */
 		private static MappableRingBuffer upload(@Nullable MappableRingBuffer buffer,
 		                                         List<Float> data,
 		                                         boolean dirty,

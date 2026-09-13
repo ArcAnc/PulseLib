@@ -30,10 +30,19 @@ public final class PPlayerAnimationSpace
 	private static final PTransform PLAYER_MODEL_TO_FIRST_PERSON =
 			PTransform.rotation(GLTF_TO_PLAYER_ROTATION);
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PPlayerAnimationSpace()
 	{
 	}
 
+	/**
+	 * Performs the to player space operation.
+	 * @param vector the vector to use.
+	 * @param definition the definition to use.
+	 * @return the value produced by this operation.
+	 */
 	public static Vector3f toPlayerSpace(
 			Vector3fc vector,
 			PPlayerAnimationDefinition definition)
@@ -49,6 +58,12 @@ public final class PPlayerAnimationSpace
 				1.0f);
 	}
 	
+	/**
+	 * Performs the to player space operation.
+	 * @param rotation the rotation to use.
+	 * @param definition the definition to use.
+	 * @return the value produced by this operation.
+	 */
 	public static Quaternionf toPlayerSpace(
 			Quaternionfc rotation,
 			PPlayerAnimationDefinition definition)
@@ -81,6 +96,12 @@ public final class PPlayerAnimationSpace
 				transform.scale());
 	}
 	
+	/**
+	 * Performs the to player geometry space operation.
+	 * @param transform the transform to use.
+	 * @param definition the definition to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PTransform toPlayerGeometrySpace(
 			PTransform transform,
 			PPlayerAnimationDefinition definition)
@@ -102,6 +123,12 @@ public final class PPlayerAnimationSpace
 		return PLAYER_MODEL_TO_FIRST_PERSON.compose(toPlayerGeometrySpace(transform, definition));
 	}
 	
+	/**
+	 * Performs the to player space operation.
+	 * @param pose the pose to use.
+	 * @param definition the definition to use.
+	 * @return the value produced by this operation.
+	 */
 	static PPlayerBonePose toPlayerSpace(
 			PPlayerBonePose pose,
 			PPlayerAnimationDefinition definition)
@@ -119,6 +146,11 @@ public final class PPlayerAnimationSpace
 				pose.hasScale());
 	}
 	
+	/**
+	 * Performs the uses gltf coordinates operation.
+	 * @param definition the definition to use.
+	 * @return the value produced by this operation.
+	 */
 	private static boolean usesGltfCoordinates(
 			PPlayerAnimationDefinition definition)
 	{

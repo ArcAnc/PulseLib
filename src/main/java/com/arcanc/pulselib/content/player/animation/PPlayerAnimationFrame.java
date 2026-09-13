@@ -31,6 +31,11 @@ public final class PPlayerAnimationFrame
 	private final Map<String, PTransform> fullTransforms = new HashMap<>();
 	private final Set<String> missingFullTransforms = new HashSet<>();
 	
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param definition the definition to use.
+	 * @param resolver the resolver to use.
+	 */
 	PPlayerAnimationFrame(PPlayerAnimationDefinition definition,
 	                             PAnimationPoseResolver<PPlayerAnimationInstance> resolver)
 	{
@@ -39,17 +44,30 @@ public final class PPlayerAnimationFrame
 		this.rootBone = definition.bindings().get(PPlayerPart.ROOT);
 	}
 	
+	/**
+	 * Performs the definition operation.
+	 * @return the value produced by this operation.
+	 */
 	public PPlayerAnimationDefinition definition()
 	{
 		return this.definition;
 	}
 	
+	/**
+	 * Performs the resolver operation.
+	 * @return the value produced by this operation.
+	 */
 	@ApiStatus.Internal
 	public PAnimationPoseResolver<PPlayerAnimationInstance> resolver()
 	{
 		return this.resolver;
 	}
 
+	/**
+	 * Performs the local transform operation.
+	 * @param boneName the bone name to use.
+	 * @return the value produced by this operation.
+	 */
 	@Nullable
 	public BoneFrame localTransform(String boneName)
 	{
@@ -106,15 +124,11 @@ public final class PPlayerAnimationFrame
 		);
 	}
 	
-	public @Nullable PPlayerBonePose canonicalModelDelta(PPlayerPart part)
-	{
-		String boneName = this.definition.bindings().get(part);
-		
-		return boneName == null ?
-				null :
-			canonicalModelDelta(boneName);
-	}
-	
+	/**
+	 * Performs the model transform operation.
+	 * @param boneName the bone name to use.
+	 * @return the value produced by this operation.
+	 */
 	@Nullable
 	public PTransform modelTransform(String boneName)
 	{
@@ -137,17 +151,11 @@ public final class PPlayerAnimationFrame
 		return true;
 	}
 
-	/** Writes the bind-pose MODEL-space matrix for a bone. */
-	public boolean bindModelMatrix(String boneName, Matrix4f destination)
-	{
-		Objects.requireNonNull(destination);
-		PTransform transform = bindTransform(boneName);
-		if (transform == null)
-			return false;
-		transform.matrix(destination);
-		return true;
-	}
-
+	/**
+	 * Performs the root relative transform operation.
+	 * @param boneName the bone name to use.
+	 * @return the value produced by this operation.
+	 */
 	@Nullable
 	public PTransform rootRelativeTransform(String boneName)
 	{
@@ -165,6 +173,11 @@ public final class PPlayerAnimationFrame
 		return rootBind == null ? transform : rootBind.inverse().compose(transform);
 	}
 	
+	/**
+	 * Performs the full transform operation.
+	 * @param boneName the bone name to use.
+	 * @return the value produced by this operation.
+	 */
 	@Nullable
 	private PTransform fullTransform(String boneName)
 	{
@@ -187,44 +200,16 @@ public final class PPlayerAnimationFrame
 		return transform;
 	}
 	
-	@Nullable
-	public PTransform modelTransform(PPlayerPart part)
-	{
-		String boneName = this.definition.bindings().get(part);
-		
-		return boneName == null ?
-				null :
-				modelTransform(boneName);
-	}
-
-	public boolean modelMatrix(PPlayerPart part, Matrix4f destination)
-	{
-		String boneName = this.definition.bindings().get(part);
-		return boneName != null && modelMatrix(boneName, destination);
-	}
-	
-	@Nullable
-	public PTransform modelTransform(
-			PPlayerAnimationAnchor anchor)
-	{
-		String boneName =
-				this.definition.anchors().get(anchor);
-		
-		return boneName == null ?
-				null :
-				modelTransform(boneName);
-	}
-
-	public boolean modelMatrix(PPlayerAnimationAnchor anchor, Matrix4f destination)
-	{
-		String boneName = this.definition.anchors().get(anchor);
-		return boneName != null && modelMatrix(boneName, destination);
-	}
-	
+	/**
+	 * Performs the action transform operation.
+	 * @param anchor the anchor to use.
+	 * @return the value produced by this operation.
+	 */
 	@Nullable
 	public PTransform actionTransform(PPlayerAnimationAnchor anchor)
 	{
-		return modelTransform(anchor);
+		String boneName = this.definition.anchors().get(anchor);
+		return boneName == null ? null : modelTransform(boneName);
 	}
 	
 	/** The FIRST_PERSON_CAMERA anchor delta in canonical MODEL space. */
@@ -239,6 +224,11 @@ public final class PPlayerAnimationFrame
 		return current == null || bind == null ? null : current.compose(bind.inverse());
 	}
 
+	/**
+	 * Binds the transform.
+	 * @param boneName the bone name to use.
+	 * @return the value produced by this operation.
+	 */
 	@Nullable
 	public PTransform bindTransform(String boneName)
 	{
@@ -250,73 +240,15 @@ public final class PPlayerAnimationFrame
 			pose.bindTransform();
 	}
 	
-	@Nullable
-	public PTransform bindTransform(PPlayerPart part)
-	{
-		String boneName = this.definition.bindings().get(part);
-		
-		return boneName == null ?
-				null :
-				bindTransform(boneName);
-	}
-	
-	@Nullable
-	public PTransform relativeTransform(
-			String boneName,
-			String referenceBoneName)
-	{
-		PTransform bone = fullTransform(boneName);
-		PTransform reference = fullTransform(referenceBoneName);
-		
-		if (bone == null || reference == null)
-			return null;
-		
-		return reference.inverse().compose(bone);
-	}
-
+	/**
+	 * Performs the ratio operation.
+	 * @param value the value to use.
+	 * @param base the base to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float ratio(float value, float base)
 	{
 		return Math.abs(base) < 1.0e-6f ? value : value / base;
-	}
-	
-	@Nullable
-	public PTransform relativeTransform(
-			PPlayerAnimationAnchor bone,
-			PPlayerAnimationAnchor reference)
-	{
-		String boneName =
-				this.definition.anchors().get(bone);
-		
-		String referenceName =
-				this.definition.anchors().get(reference);
-		
-		if (boneName == null || referenceName == null)
-			return null;
-		
-		return relativeTransform(
-				boneName,
-				referenceName
-		);
-	}
-	
-	@Nullable
-	public PTransform relativeTransform(
-			PPlayerPart part,
-			PPlayerAnimationAnchor reference)
-	{
-		String boneName =
-				this.definition.bindings().get(part);
-		
-		String referenceName =
-				this.definition.anchors().get(reference);
-		
-		if (boneName == null || referenceName == null)
-			return null;
-		
-		return relativeTransform(
-				boneName,
-				referenceName
-		);
 	}
 	
 }

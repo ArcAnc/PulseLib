@@ -16,11 +16,19 @@ public final class PDeformerPrepareContext
 {
 	private final List<PPreparedDeformer> operations = new ArrayList<>();
 
+	/**
+	 * Performs the add operation.
+	 * @param operation the operation to use.
+	 */
 	public void add(PPreparedDeformer operation)
 	{
 		this.operations.add(operation);
 	}
 
+	/**
+	 * Performs the build operation.
+	 * @return the value produced by this operation.
+	 */
 	PDeformerStack build()
 	{
 		return new PDeformerStack(this.operations);

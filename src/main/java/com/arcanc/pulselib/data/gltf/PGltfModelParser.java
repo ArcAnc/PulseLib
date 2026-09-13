@@ -37,18 +37,33 @@ public class PGltfModelParser
 	private static final List<PGltfChannelDecoder<?>> CHANNEL_DECODERS = List.of(
 			new PGltfChannelDecoder<Vector3f>()
 			{
+				/**
+				 * Performs the field names operation.
+				 * @return the value produced by this operation.
+				 */
 				@Override
 				public Set<String> fieldNames()
 				{
 					return Set.of("translation");
 				}
 
+				/**
+				 * Performs the channel operation.
+				 * @return the value produced by this operation.
+				 */
 				@Override
 				public PAnimationChannelType<Vector3f> channel()
 				{
 					return PLibRegistration.AnimationChannelReg.POSITION;
 				}
 
+				/**
+				 * Decodes the value.
+				 * @param values the values to use.
+				 * @param keyframeIndex the keyframe index to use.
+				 * @param context the context to use.
+				 * @return the value produced by this operation.
+				 */
 				@Override
 				public PAnimationValue<Vector3f> decodeValue(ByteBuffer values, int keyframeIndex, PGltfDecodeContext context)
 				{
@@ -59,18 +74,33 @@ public class PGltfModelParser
 			},
 			new PGltfChannelDecoder<Quaternionf>()
 			{
+				/**
+				 * Performs the field names operation.
+				 * @return the value produced by this operation.
+				 */
 				@Override
 				public Set<String> fieldNames()
 				{
 					return Set.of("rotation");
 				}
 
+				/**
+				 * Performs the channel operation.
+				 * @return the value produced by this operation.
+				 */
 				@Override
 				public PAnimationChannelType<Quaternionf> channel()
 				{
 					return PLibRegistration.AnimationChannelReg.ROTATION;
 				}
 
+				/**
+				 * Decodes the value.
+				 * @param values the values to use.
+				 * @param keyframeIndex the keyframe index to use.
+				 * @param context the context to use.
+				 * @return the value produced by this operation.
+				 */
 				@Override
 				public PAnimationValue<Quaternionf> decodeValue(ByteBuffer values, int keyframeIndex, PGltfDecodeContext context)
 				{
@@ -84,18 +114,33 @@ public class PGltfModelParser
 			},
 			new PGltfChannelDecoder<Vector3f>()
 			{
+				/**
+				 * Performs the field names operation.
+				 * @return the value produced by this operation.
+				 */
 				@Override
 				public Set<String> fieldNames()
 				{
 					return Set.of("scale");
 				}
 
+				/**
+				 * Performs the channel operation.
+				 * @return the value produced by this operation.
+				 */
 				@Override
 				public PAnimationChannelType<Vector3f> channel()
 				{
 					return PLibRegistration.AnimationChannelReg.SCALE;
 				}
 
+				/**
+				 * Decodes the value.
+				 * @param values the values to use.
+				 * @param keyframeIndex the keyframe index to use.
+				 * @param context the context to use.
+				 * @return the value produced by this operation.
+				 */
 				@Override
 				public PAnimationValue<Vector3f> decodeValue(ByteBuffer values, int keyframeIndex, PGltfDecodeContext context)
 				{
@@ -104,6 +149,11 @@ public class PGltfModelParser
 				}
 			});
 
+	/**
+	 * Performs the parse operation.
+	 * @param stream the stream to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PModel parse(InputStream stream) throws IOException
 	{
 		GltfModel model = new GltfModelReader().readWithoutReferences(stream);
@@ -125,6 +175,13 @@ public class PGltfModelParser
 		
 	}
 	
+	/**
+	 * Parses the bones.
+	 * @param model the model to use.
+	 * @param uuidToBone the uuid to bone to use.
+	 * @param uuidToMesh the uuid to mesh to use.
+	 * @return the value produced by this operation.
+	 */
 	private static Map<NodeModel, PBone> parseBones(GltfModel model, Map<UUID, PBone> uuidToBone, Map<UUID, PMesh> uuidToMesh)
 	{
 		List<NodeModel> nodes = model.getNodeModels();
@@ -184,6 +241,12 @@ public class PGltfModelParser
 		return nodeToBone;
 	}
 	
+	/**
+	 * Parses the bone.
+	 * @param node the node to use.
+	 * @param nodeToBone the node to bone to use.
+	 * @param boneNames the bone names to use.
+	 */
 	private static void parseBone(NodeModel node, Map<NodeModel, PBone> nodeToBone, Set<String> boneNames)
 	{
 		float[] rawTranslation = node.getTranslation();
@@ -207,6 +270,12 @@ public class PGltfModelParser
 		nodeToBone.put(node, bone);
 	}
 
+	/**
+	 * Creates the local mesh bone.
+	 * @param node the node to use.
+	 * @param boneNames the bone names to use.
+	 * @return the value produced by this operation.
+	 */
 	private static PBone createLocalMeshBone(NodeModel node, Set<String> boneNames)
 	{
 		float[] rawTranslation = node.getTranslation();
@@ -226,6 +295,13 @@ public class PGltfModelParser
 				baseRotation);
 	}
 
+	/**
+	 * Performs the unique bone name operation.
+	 * @param requestedName the requested name to use.
+	 * @param fallback the fallback to use.
+	 * @param boneNames the bone names to use.
+	 * @return the value produced by this operation.
+	 */
 	private static String uniqueBoneName(String requestedName, UUID fallback, Set<String> boneNames)
 	{
 		String baseName = requestedName == null || requestedName.isBlank() ? fallback.toString() : requestedName;
@@ -235,6 +311,11 @@ public class PGltfModelParser
 		return name;
 	}
 
+	/**
+	 * Determines whether bone node.
+	 * @param node the node to use.
+	 * @return the value produced by this operation.
+	 */
 	private static boolean isBoneNode(NodeModel node)
 	{
 		if (isBlockbenchLocatorMarker(node))
@@ -243,6 +324,12 @@ public class PGltfModelParser
 		return meshes == null || meshes.isEmpty();
 	}
 
+	/**
+	 * Performs the nearest bone operation.
+	 * @param node the node to use.
+	 * @param nodeToBone the node to bone to use.
+	 * @return the value produced by this operation.
+	 */
 	private static PBone nearestBone(NodeModel node, Map<NodeModel, PBone> nodeToBone)
 	{
 		for (NodeModel current = node; current != null; current = current.getParent())
@@ -254,6 +341,11 @@ public class PGltfModelParser
 		return null;
 	}
 	
+	/**
+	 * Determines whether blockbench locator marker.
+	 * @param node the node to use.
+	 * @return the value produced by this operation.
+	 */
 	private static boolean isBlockbenchLocatorMarker(NodeModel node)
 	{
 		NodeModel parent = node.getParent();
@@ -276,6 +368,14 @@ public class PGltfModelParser
 		return scale != null && scale.length == 3 && scale[0] < 0.1f && scale[1] < 0.1f && scale[2] < 0.1f;
 	}
 	
+	/**
+	 * Parses the mesh.
+	 * @param mesh the mesh to use.
+	 * @param node the node to use.
+	 * @param uuidToMesh the uuid to mesh to use.
+	 * @param bakeNodePose the bake node pose to use.
+	 * @return the value produced by this operation.
+	 */
 	private static UUID parseMesh(MeshModel mesh,
 	                              NodeModel node,
 	                              Map<UUID, PMesh> uuidToMesh,
@@ -317,6 +417,12 @@ public class PGltfModelParser
 		return pMesh.uuid();
 	}
 
+	/**
+	 * Transforms the positions.
+	 * @param source the source to use.
+	 * @param transform the transform to use.
+	 * @return the value produced by this operation.
+	 */
 	private static FloatBuffer transformPositions(FloatBuffer source, Matrix4f transform)
 	{
 		FloatBuffer result = FloatBuffer.allocate(source.limit());
@@ -329,6 +435,12 @@ public class PGltfModelParser
 		return result.flip();
 	}
 
+	/**
+	 * Transforms the normals.
+	 * @param source the source to use.
+	 * @param transform the transform to use.
+	 * @return the value produced by this operation.
+	 */
 	private static FloatBuffer transformNormals(FloatBuffer source, Matrix4f transform)
 	{
 		Matrix3f normalTransform = new Matrix3f().set(transform).invert().transpose();
@@ -342,6 +454,12 @@ public class PGltfModelParser
 		return result.flip();
 	}
 
+	/**
+	 * Performs the mesh transform operation.
+	 * @param node the node to use.
+	 * @param bakeNodePose the bake node pose to use.
+	 * @return the value produced by this operation.
+	 */
 	private static Matrix4f meshTransform(NodeModel node, boolean bakeNodePose)
 	{
 		Matrix4f transform = new Matrix4f();
@@ -360,6 +478,12 @@ public class PGltfModelParser
 		return transform;
 	}
 	
+	/**
+	 * Parses the animations.
+	 * @param model the model to use.
+	 * @param nodeToBone the node to bone to use.
+	 * @return the value produced by this operation.
+	 */
 	private static Map<String, PAnimation> parseAnimations(GltfModel model, Map<NodeModel, PBone> nodeToBone)
 	{
 		Map<String, PAnimation> animations = new HashMap<>();
@@ -409,6 +533,11 @@ public class PGltfModelParser
 		return animations;
 	}
 	
+	/**
+	 * Performs the decoder operation.
+	 * @param path the path to use.
+	 * @return the value produced by this operation.
+	 */
 	private static PGltfChannelDecoder<?> decoder(String path)
 	{
 		for (PGltfChannelDecoder<?> decoder : CHANNEL_DECODERS)
@@ -417,6 +546,14 @@ public class PGltfModelParser
 		return null;
 	}
 
+	/**
+	 * Decodes the track.
+	 * @param decoder the decoder to use.
+	 * @param times the times to use.
+	 * @param values the values to use.
+	 * @param context the context to use.
+	 * @return the value produced by this operation.
+	 */
 	private static <T> PAnimationTrack<T> decodeTrack(PGltfChannelDecoder<T> decoder,
 	                                                  FloatBuffer times,
 	                                                  ByteBuffer values,
@@ -431,16 +568,30 @@ public class PGltfModelParser
 		return new PAnimationTrack<>(decoder.channel(), keyframes);
 	}
 
+	/**
+	 * Performs the constant vector operation.
+	 * @param value the value to use.
+	 * @return the value produced by this operation.
+	 */
 	private static PAnimationValue<Vector3f> constantVector(Vector3f value)
 	{
 		return new PAnimationValue<>()
 		{
+			/**
+			 * Performs the evaluate operation.
+			 * @param context the context to use.
+			 * @param destination the destination to use.
+			 */
 			@Override
 			public void evaluate(PAnimationEvaluationContext context, Vector3f destination)
 			{
 				destination.set(value);
 			}
 
+			/**
+			 * Determines whether constant.
+			 * @return the value produced by this operation.
+			 */
 			@Override
 			public boolean isConstant()
 			{
@@ -449,16 +600,30 @@ public class PGltfModelParser
 		};
 	}
 
+	/**
+	 * Performs the constant quaternion operation.
+	 * @param value the value to use.
+	 * @return the value produced by this operation.
+	 */
 	private static PAnimationValue<Quaternionf> constantQuaternion(Quaternionf value)
 	{
 		return new PAnimationValue<>()
 		{
+			/**
+			 * Performs the evaluate operation.
+			 * @param context the context to use.
+			 * @param destination the destination to use.
+			 */
 			@Override
 			public void evaluate(PAnimationEvaluationContext context, Quaternionf destination)
 			{
 				destination.set(value);
 			}
 
+			/**
+			 * Determines whether constant.
+			 * @return the value produced by this operation.
+			 */
 			@Override
 			public boolean isConstant()
 			{

@@ -28,6 +28,14 @@ public record PLivingAttachmentDefinition(
 		boolean hideVanilla,
 		ControllerProvider controllerProvider)
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param model the model to use.
+	 * @param source the source to use.
+	 * @param bindings the bindings to use.
+	 * @param renderResolver the render resolver to use.
+	 * @param hideVanilla the hide vanilla to use.
+	 */
 	public PLivingAttachmentDefinition(PModelData model,
 	                                   PLivingAttachmentSource source,
 	                                   List<PAttachmentBinding> bindings,
@@ -37,6 +45,15 @@ public record PLivingAttachmentDefinition(
 		this(model, source, bindings, renderResolver, hideVanilla, ControllerProvider.EMPTY);
 	}
 	
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param model the model to use.
+	 * @param source the source to use.
+	 * @param bindings the bindings to use.
+	 * @param renderResolver the render resolver to use.
+	 * @param hideVanilla the hide vanilla to use.
+	 * @param controllerProvider the controller provider to use.
+	 */
 	public PLivingAttachmentDefinition
 	{
 		Objects.requireNonNull(model);
@@ -46,11 +63,23 @@ public record PLivingAttachmentDefinition(
 		Objects.requireNonNull(controllerProvider);
 	}
 	
+	/**
+	 * Performs the model data operation.
+	 * @return the value produced by this operation.
+	 */
 	public PModelData modelData()
 	{
 		return this.model;
 	}
 	
+	/**
+	 * Performs the animation controllers operation.
+	 * @param entity the entity to use.
+	 * @param stack the stack to use.
+	 * @param model the model to use.
+	 * @param partialTick the partial tick to use.
+	 * @return the value produced by this operation.
+	 */
 	public Collection<PAnimationController<?>> animationControllers(LivingEntity entity, ItemStack stack, PBakedModel model, float partialTick)
 	{
 		return this.controllerProvider.controllers(entity, stack, model, partialTick);
@@ -61,6 +90,14 @@ public record PLivingAttachmentDefinition(
 	{
 		ControllerProvider EMPTY = (entity, stack, model, partialTick) -> List.of();
 		
+		/**
+		 * Performs the controllers operation.
+		 * @param entity the entity to use.
+		 * @param stack the stack to use.
+		 * @param model the model to use.
+		 * @param partialTick the partial tick to use.
+		 * @return the value produced by this operation.
+		 */
 		Collection<PAnimationController<?>> controllers(LivingEntity entity, ItemStack stack, PBakedModel model, float partialTick);
 	}
 }

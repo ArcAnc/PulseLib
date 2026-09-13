@@ -28,11 +28,19 @@ public final class PGlGeometryArena
 	private final Map<PBakedMesh, Slice> slices = new Object2ObjectOpenHashMap<>();
 	private final List<Page> pages = new ArrayList<>();
 
+	/**
+	 * Performs the resolve operation.
+	 * @param mesh the mesh to use.
+	 * @return the value produced by this operation.
+	 */
 	public Slice resolve(PBakedMesh mesh)
 	{
 		return this.slices.computeIfAbsent(mesh, this :: append);
 	}
 
+	/**
+	 * Performs the clear operation.
+	 */
 	public void clear()
 	{
 		this.pages.forEach(Page :: close);
@@ -40,6 +48,11 @@ public final class PGlGeometryArena
 		this.slices.clear();
 	}
 
+	/**
+	 * Performs the append operation.
+	 * @param mesh the mesh to use.
+	 * @return the value produced by this operation.
+	 */
 	private Slice append(PBakedMesh mesh)
 	{
 		int vertexBytes = mesh.vertexesAmount() * VERTEX_STRIDE;
@@ -68,6 +81,11 @@ public final class PGlGeometryArena
 		private int indices;
 		private int instanceBuffer = -1;
 
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param vertexCapacity the vertex capacity to use.
+		 * @param indexCapacity the index capacity to use.
+		 */
 		private Page(int vertexCapacity, int indexCapacity)
 		{
 			this.vertexCapacity = vertexCapacity;
@@ -92,6 +110,11 @@ public final class PGlGeometryArena
 			GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
 
+		/**
+		 * Performs the bind operation.
+		 * @param instanceBuffer the instance buffer to use.
+		 * @param instanceOffset the instance offset to use.
+		 */
 		public void bind(int instanceBuffer, long instanceOffset)
 		{
 			GL30.glBindVertexArray(this.vertexArray);
@@ -121,6 +144,10 @@ public final class PGlGeometryArena
 			this.setInstanceOffset(instanceOffset);
 		}
 
+		/**
+		 * Sets the instance offset.
+		 * @param instanceOffset the instance offset to use.
+		 */
 		public void setInstanceOffset(long instanceOffset)
 		{
 			for (int row = 0; row < 3; row++)
@@ -131,12 +158,26 @@ public final class PGlGeometryArena
 			GL30.glVertexAttribIPointer(10, 4, GL11.GL_INT, PGlInstanceStream.STRIDE, instanceOffset + 80L);
 		}
 
+		/**
+		 * Determines whether the object has space.
+		 * @param vertexBytes the vertex bytes to use.
+		 * @param indexBytes the index bytes to use.
+		 * @param alignment the alignment to use.
+		 * @return the value produced by this operation.
+		 */
 		private boolean hasSpace(int vertexBytes, int indexBytes, int alignment)
 		{
 			int indexOffset = align(this.indices, alignment);
 			return vertexBytes <= this.vertexCapacity - this.vertices && indexBytes <= this.indexCapacity - indexOffset;
 		}
 
+		/**
+		 * Performs the append operation.
+		 * @param mesh the mesh to use.
+		 * @param vertexBytes the vertex bytes to use.
+		 * @param indexBytes the index bytes to use.
+		 * @return the value produced by this operation.
+		 */
 		private Slice append(PBakedMesh mesh, int vertexBytes, int indexBytes)
 		{
 			int indexOffset = align(this.indices, mesh.indexType().bytes);
@@ -149,11 +190,24 @@ public final class PGlGeometryArena
 					mesh.indexType() == VertexFormat.IndexType.SHORT ? GL11.GL_UNSIGNED_SHORT : GL11.GL_UNSIGNED_INT);
 		}
 
+		/**
+		 * Performs the align operation.
+		 * @param value the value to use.
+		 * @param alignment the alignment to use.
+		 * @return the value produced by this operation.
+		 */
 		private static int align(int value, int alignment)
 		{
 			return (value + alignment - 1) & -alignment;
 		}
 
+		/**
+		 * Performs the copy operation.
+		 * @param source the source to use.
+		 * @param target the target to use.
+		 * @param targetOffset the target offset to use.
+		 * @param size the size to use.
+		 */
 		private static void copy(int source, int target, int targetOffset, int size)
 		{
 			GL15.glBindBuffer(GL31.GL_COPY_READ_BUFFER, source);
@@ -161,6 +215,9 @@ public final class PGlGeometryArena
 			GL31.glCopyBufferSubData(GL31.GL_COPY_READ_BUFFER, GL31.GL_COPY_WRITE_BUFFER, 0L, targetOffset, size);
 		}
 
+		/**
+		 * Performs the close operation.
+		 */
 		private void close()
 		{
 			GL30.glDeleteVertexArrays(this.vertexArray);

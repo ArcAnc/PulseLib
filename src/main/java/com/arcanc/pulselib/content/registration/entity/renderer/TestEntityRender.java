@@ -51,6 +51,10 @@ public class TestEntityRender extends PEntityRenderer<TestEntity, PEntityRenderS
 	private final Object leftArmHingeKey = new Object();
 	private final Object rightArmHingeKey = new Object();
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param context the context to use.
+	 */
 	public TestEntityRender(EntityRendererProvider.Context context)
 	{
 		super(context, new DefaultEntityModelData.DefaultEntityModelDataBuilder(
@@ -63,12 +67,24 @@ public class TestEntityRender extends PEntityRenderer<TestEntity, PEntityRenderS
 				bindBone("armor_left_hand", "hand_left"));
 	}
 	
+	/**
+	 * Creates the render state.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public PEntityRenderState.LivingImpl<TestEntity> createRenderState()
 	{
 		return PLibHelper.livingRenderState();
 	}
 	
+	/**
+	 * Resolves the mesh render.
+	 * @param renderState the render state to use.
+	 * @param bone the bone to use.
+	 * @param mesh the mesh to use.
+	 * @param inherited the inherited to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	protected PMeshRenderContext resolveMeshRender(PEntityRenderState.LivingImpl<TestEntity> renderState,
 	                                               PBakedBone bone,

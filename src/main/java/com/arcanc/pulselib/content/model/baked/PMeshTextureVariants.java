@@ -33,10 +33,19 @@ public final class PMeshTextureVariants
 {
 	private static final Map<PBakedMesh, Map<Identifier, PBakedMesh>> VARIANTS = new IdentityHashMap<>();
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PMeshTextureVariants()
 	{
 	}
 
+	/**
+	 * Performs the resolve operation.
+	 * @param mesh the mesh to use.
+	 * @param texture the texture to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PBakedMesh resolve(PBakedMesh mesh, @Nullable Identifier texture)
 	{
 		if (texture == null || texture.equals(mesh.textureLocation()))
@@ -45,6 +54,9 @@ public final class PMeshTextureVariants
 				location -> bake(mesh, location));
 	}
 
+	/**
+	 * Performs the clear operation.
+	 */
 	public static void clear()
 	{
 		for (Map<Identifier, PBakedMesh> variants : VARIANTS.values())
@@ -57,6 +69,12 @@ public final class PMeshTextureVariants
 		VARIANTS.clear();
 	}
 
+	/**
+	 * Performs the bake operation.
+	 * @param base the base to use.
+	 * @param texture the texture to use.
+	 * @return the value produced by this operation.
+	 */
 	private static PBakedMesh bake(PBakedMesh base, Identifier texture)
 	{
 		PMesh source = base.source();

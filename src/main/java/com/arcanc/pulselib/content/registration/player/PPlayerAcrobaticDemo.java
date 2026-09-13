@@ -45,10 +45,17 @@ public final class PPlayerAcrobaticDemo
 			GLFW.GLFW_KEY_B,
 			KeyMapping.Category.MISC);
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PPlayerAcrobaticDemo()
 	{
 	}
 
+	/**
+	 * Performs the register operation.
+	 * @param modEventBus the mod event bus to use.
+	 */
 	public static void register(IEventBus modEventBus)
 	{
 		if (FMLLoader.getCurrent().isProduction())
@@ -58,11 +65,19 @@ public final class PPlayerAcrobaticDemo
 		NeoForge.EVENT_BUS.addListener(PPlayerAcrobaticDemo::clientTick);
 	}
 
+	/**
+	 * Registers the key mapping.
+	 * @param event the event to use.
+	 */
 	private static void registerKeyMapping(RegisterKeyMappingsEvent event)
 	{
 		event.register(KEY);
 	}
 
+	/**
+	 * Registers the animation.
+	 * @param event the event to use.
+	 */
 	private static void registerAnimation(PulseLibEvents.PlayerAnimationRegistrationEvent event)
 	{
 		event.registration().register(ID, PPlayerAnimationDefinition.builder(MODEL).
@@ -80,6 +95,10 @@ public final class PPlayerAcrobaticDemo
 				build());
 	}
 
+	/**
+	 * Performs the client tick operation.
+	 * @param event the event to use.
+	 */
 	private static void clientTick(ClientTickEvent.Post event)
 	{
 		Player player = Minecraft.getInstance().player;

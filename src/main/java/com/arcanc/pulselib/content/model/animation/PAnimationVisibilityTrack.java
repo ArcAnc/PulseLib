@@ -15,6 +15,10 @@ import java.util.List;
 
 public record PAnimationVisibilityTrack(List<Keyframe> keyframes)
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param keyframes the keyframes to use.
+	 */
 	public PAnimationVisibilityTrack
 	{
 		keyframes = keyframes.stream().
@@ -22,6 +26,11 @@ public record PAnimationVisibilityTrack(List<Keyframe> keyframes)
 				toList();
 	}
 
+	/**
+	 * Performs the visible at operation.
+	 * @param time the time to use.
+	 * @return the value produced by this operation.
+	 */
 	public boolean visibleAt(float time)
 	{
 		boolean visible = true;

@@ -37,16 +37,28 @@ public class PGltfModelLoader implements PModelLoader
 	private static final String GLTF_EXTENSION = ".gltf";
 	private static final String EVENTS_EXTENSION = ".events.json";
 	private static final String ANIMATION_EVENTS_EXTENSION = ".animation_events.json";
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PGltfModelLoader()
 	{
 	}
 	
+	/**
+	 * Performs the id operation.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public Identifier id()
 	{
 		return ID;
 	}
 	
+	/**
+	 * Performs the supports operation.
+	 * @param modelPath the model path to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public boolean supports(Identifier modelPath)
 	{
@@ -54,12 +66,24 @@ public class PGltfModelLoader implements PModelLoader
 		return path.startsWith(ROOT + "/") && (path.endsWith(GLB_EXTENSION) || path.endsWith(GLTF_EXTENSION));
 	}
 	
+	/**
+	 * Performs the default model location operation.
+	 * @param modelLocation the model location to use.
+	 * @param modelType the model type to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public Identifier defaultModelLocation(Identifier modelLocation, String modelType)
 	{
 		return modelLocation.withPrefix(ROOT + "/" + modelType + "/").withSuffix(GLB_EXTENSION);
 	}
 	
+	/**
+	 * Performs the texture location operation.
+	 * @param modelPath the model path to use.
+	 * @param textureName the texture name to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public Identifier textureLocation(Identifier modelPath, String textureName)
 	{
@@ -74,6 +98,13 @@ public class PGltfModelLoader implements PModelLoader
 		return loc.withSuffix(stripTextureExtension(textureName));
 	}
 	
+	/**
+	 * Loads the models.
+	 * @param backgroundExecutor the background executor to use.
+	 * @param resourceManager the resource manager to use.
+	 * @param elementConsumer the element consumer to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public CompletableFuture<?> loadModels(Executor backgroundExecutor,
 	                                       ResourceManager resourceManager,
@@ -113,6 +144,12 @@ public class PGltfModelLoader implements PModelLoader
 				}, backgroundExecutor);
 	}
 	
+	/**
+	 * Loads the animation events.
+	 * @param resourceManager the resource manager to use.
+	 * @param modelResource the model resource to use.
+	 * @param model the model to use.
+	 */
 	private void loadAnimationEvents(ResourceManager resourceManager, Identifier modelResource, PModel model) throws IOException
 	{
 		Optional<Identifier> eventsResource = eventCandidates(modelResource).stream().
@@ -127,6 +164,11 @@ public class PGltfModelLoader implements PModelLoader
 				model.animations);
 	}
 	
+	/**
+	 * Performs the event candidates operation.
+	 * @param modelResource the model resource to use.
+	 * @return the value produced by this operation.
+	 */
 	private List<Identifier> eventCandidates(Identifier modelResource)
 	{
 		String modelName = stripModelExtension(modelResource.getPath()).substring(ROOT.length() + 1);
@@ -140,6 +182,11 @@ public class PGltfModelLoader implements PModelLoader
 		return candidates;
 	}
 	
+	/**
+	 * Performs the strip model extension operation.
+	 * @param path the path to use.
+	 * @return the value produced by this operation.
+	 */
 	private static String stripModelExtension(String path)
 	{
 		if (path.endsWith(GLB_EXTENSION))
@@ -149,6 +196,11 @@ public class PGltfModelLoader implements PModelLoader
 		return path;
 	}
 
+	/**
+	 * Performs the strip texture extension operation.
+	 * @param textureName the texture name to use.
+	 * @return the value produced by this operation.
+	 */
 	private static String stripTextureExtension(String textureName)
 	{
 		int extension = textureName.lastIndexOf('.');

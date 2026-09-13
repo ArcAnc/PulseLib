@@ -37,6 +37,11 @@ public final class PBakedModel
 	private final int[] parents;
 	private final Map<String, PCompiledAnimation> compiledAnimations;
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param bones the bones to use.
+	 * @param animations the animations to use.
+	 */
 	public PBakedModel(List<PBakedBone> bones, Map<String, PAnimation> animations)
 	{
 		this.bones = List.copyOf(bones);
@@ -56,16 +61,61 @@ public final class PBakedModel
 		this.compiledAnimations = compileAnimations();
 	}
 
+	/**
+	 * Performs the bones operation.
+	 * @return the value produced by this operation.
+	 */
 	public List<PBakedBone> bones() { return this.bones; }
+	/**
+	 * Performs the animations operation.
+	 * @return the value produced by this operation.
+	 */
 	public Map<String, PAnimation> animations() { return this.animations; }
+	/**
+	 * Performs the bone count operation.
+	 * @return the value produced by this operation.
+	 */
 	public int boneCount() { return this.indexedBones.length; }
+	/**
+	 * Performs the bone index operation.
+	 * @param name the name to use.
+	 * @return the value produced by this operation.
+	 */
 	public int boneIndex(String name) { return this.boneIndices.getOrDefault(name, -1); }
+	/**
+	 * Performs the bone index operation.
+	 * @param bone the bone to use.
+	 * @return the value produced by this operation.
+	 */
 	public int boneIndex(PBakedBone bone) { return boneIndex(bone.name()); }
+	/**
+	 * Performs the bone operation.
+	 * @param index the index to use.
+	 * @return the value produced by this operation.
+	 */
 	public PBakedBone bone(int index) { return this.indexedBones[index]; }
+	/**
+	 * Performs the parent index operation.
+	 * @param index the index to use.
+	 * @return the value produced by this operation.
+	 */
 	public int parentIndex(int index) { return this.parents[index]; }
+	/**
+	 * Performs the parent indices operation.
+	 * @return the value produced by this operation.
+	 */
 	public int[] parentIndices() { return this.parents.clone(); }
+	/**
+	 * Performs the compiled animation operation.
+	 * @param name the name to use.
+	 * @return the value produced by this operation.
+	 */
 	public PCompiledAnimation compiledAnimation(String name) { return this.compiledAnimations.get(name); }
 
+	/**
+	 * Binds the pose.
+	 * @return the value produced by this operation.
+	 */
 	public PPose bindPose()
 	{
 		PPose pose = new PPose(this.indexedBones.length);
@@ -76,6 +126,16 @@ public final class PBakedModel
 		}
 		return pose;
 	}
+	/**
+	 * Performs the instant draw operation.
+	 * @param poseStack the pose stack to use.
+	 * @param modelData the model data to use.
+	 * @param controllers the controllers to use.
+	 * @param renderType the render type to use.
+	 * @param color the color to use.
+	 * @param packedOverlay the packed overlay to use.
+	 * @param partialTick the partial tick to use.
+	 */
 	public <T extends PAnimatable<T>>void instantDraw(PoseStack poseStack,
 	                                                  PModelData modelData,
 	                                                  Collection<PAnimationController<T>> controllers,
@@ -94,6 +154,17 @@ public final class PBakedModel
 				partialTick));
 	}
 
+	/**
+	 * Performs the instant draw operation.
+	 * @param poseStack the pose stack to use.
+	 * @param modelData the model data to use.
+	 * @param controllers the controllers to use.
+	 * @param renderType the render type to use.
+	 * @param color the color to use.
+	 * @param packedLight the packed light to use.
+	 * @param packedOverlay the packed overlay to use.
+	 * @param partialTick the partial tick to use.
+	 */
 	public <T extends PAnimatable<T>>void instantDraw(PoseStack poseStack,
 	                                                  PModelData modelData,
 	                                                  Collection<PAnimationController<T>> controllers,
@@ -114,6 +185,13 @@ public final class PBakedModel
 				partialTick));
 	}
 
+	/**
+	 * Performs the evaluate operation.
+	 * @param controllers the controllers to use.
+	 * @param contexts the contexts to use.
+	 * @param partialTick the partial tick to use.
+	 * @return the value produced by this operation.
+	 */
 	public <T extends PAnimatable<T>> PPose evaluate(Collection<PAnimationController<T>> controllers,
 	                                                 Map<PAnimationController<T>, MolangParser.Context> contexts,
 	                                                 float partialTick)
@@ -123,6 +201,12 @@ public final class PBakedModel
 						PAnimationPoseResolver.<T>defaultContexts().context(controller, tick)), partialTick);
 	}
 
+	/**
+	 * Performs the index operation.
+	 * @param bone the bone to use.
+	 * @param target the target to use.
+	 * @param indices the indices to use.
+	 */
 	private static void index(PBakedBone bone, List<PBakedBone> target, Map<String, Integer> indices)
 	{
 		if (indices.putIfAbsent(bone.name(), target.size()) != null)
@@ -131,6 +215,10 @@ public final class PBakedModel
 		bone.children().forEach(child -> index(child, target, indices));
 	}
 
+	/**
+	 * Compiles the animations.
+	 * @return the value produced by this operation.
+	 */
 	private Map<String, PCompiledAnimation> compileAnimations()
 	{
 		Map<String, PCompiledAnimation> compiled = new HashMap<>();

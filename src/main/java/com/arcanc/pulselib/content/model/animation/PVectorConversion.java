@@ -16,5 +16,9 @@ public interface PVectorConversion
 {
 	PVectorConversion IDENTITY = value -> {};
 
+	/**
+	 * Performs the apply operation.
+	 * @param value the value to use.
+	 */
 	void apply(Vector3f value);
 }
