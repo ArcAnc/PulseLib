@@ -25,6 +25,8 @@ resolves to:
 assets/<namespace>/glmodels/entity/<path>.glb
 ```
 
+Model-resource registration can use either extension, or omit it. For an extension-less id, PulseLib checks `.glb` and then `.gltf`; when both files are present, `.glb` is selected. An explicit extension is preferred, with the other format used only as a fallback. `PModelData` must use the extension of the file that was loaded, so use a direct `PModelData` path for `.gltf` models rather than a default builder that generates `.glb`.
+
 The parser is [`PGltfModelParser`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/data/gltf/PGltfModelParser.java). glTF channels are decoded through the registered position, rotation, and scale channel types, so the loaded animation data now uses the same generic track API as other formats.
 
 ## Gecko loader
@@ -98,6 +100,6 @@ Register before client resource reload:
 PModelCache.registerModelLoader(MyModelLoader.INSTANCE);
 ```
 
-Register a model that uses this loader through `event.model(model, MyModelLoader.INSTANCE.id())`. The registration's model id is normalized with `normalizeModelResourceLocation(...)` and must be the same id that `loadModels(...)` passes to its consumer; only registered models are baked. Override `modelResourceLocation(...)` or `normalizeModelResourceLocation(...)` when the loader accepts a short model id but loads it from a resource-pack root or supplies a default extension.
+Register a model that uses this loader through `event.model(model, MyModelLoader.INSTANCE.id())`. The registration's model id is normalized with `normalizeModelResourceLocation(...)` and must be the same id that `loadModels(...)` passes to its consumer; only registered models are baked. Override `modelResourceLocation(...)` or `normalizeModelResourceLocation(...)` when the loader accepts a short model id but loads it from a resource-pack root or supplies a default extension. A loader that accepts several equivalent resource names can override `modelResourceCandidates(...)`; its first candidate is preferred, and the other candidates are fallback locations.
 
 `PModel` contains raw bones, meshes, bone-to-mesh mapping, and animations. `PModelCache` owns baking, vertex buffer creation, atlas UV conversion, emissive metadata, and cache cleanup.

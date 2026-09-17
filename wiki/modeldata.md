@@ -41,7 +41,7 @@ Available default builders:
 
 ## Model resources
 
-Register every model used by `PModelData` and every material reference through `PModelResource`; only registered models are loaded and baked. The selected loader normalizes both the model-data path and resource registration, so their resulting ids must match. A texture reference keeps its directories, while a final `.png` is normalized away. See [Textures and emissive](textures-and-emissive.md) for the registration API.
+Register every model used by `PModelData` and every material reference through `PModelResource`; only registered models are loaded and baked. For glTF, resource registration can fall back between `.glb` and `.gltf`, but `PModelData` must name the extension of the file that PulseLib loaded. A texture reference keeps its directories, while a final `.png` is normalized away. See [Resources](resources.md) for the registration API.
 
 ## Gecko model data
 

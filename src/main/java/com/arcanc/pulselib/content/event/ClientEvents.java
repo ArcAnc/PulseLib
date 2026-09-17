@@ -15,6 +15,7 @@ import com.arcanc.pulselib.content.animatable.instance.InstanceAnimationManager;
 import com.arcanc.pulselib.content.animatable.singleton.SingletonAnimationManager;
 import com.arcanc.pulselib.content.model.textures.atlas.RuntimeLoader;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
+import com.arcanc.pulselib.content.registration.player.PPlayerBallDemo;
 import com.arcanc.pulselib.content.renderer.PRenderQueue;
 import com.arcanc.pulselib.content.renderer.PRenderStagesHandler;
 import com.arcanc.pulselib.util.PLibDatabase;
@@ -53,10 +54,10 @@ public class ClientEvents
 	{
 		ModLoader.postEvent(new PulseLibEvents.TypeRegistrationEvent());
 		
-		/*modEventBus.addListener(ClientEvents :: registerRenderers);
+		//modEventBus.addListener(ClientEvents :: registerRenderers);
 		modEventBus.addListener(ClientEvents :: registerCustomTextures);
-		modEventBus.addListener(ClientEvents :: registerSpecialModels);
-		*/
+		//modEventBus.addListener(ClientEvents :: registerSpecialModels);
+		
 		PAttachmentAnchorResolvers.init(modEventBus);
 		modEventBus.addListener(EventPriority.HIGHEST, ClientEvents :: registerSpriteSources);
 		modEventBus.addListener(ClientEvents :: registerReloadListeners);
@@ -69,7 +70,7 @@ public class ClientEvents
 		PResourceCache.register(modEventBus);
 		PLibArmorHandler.register(modEventBus);
 		
-		//PPlayerBallDemo.register(modEventBus);
+		PPlayerBallDemo.register(modEventBus);
 		//PPlayerAcrobaticDemo.register(modEventBus);
 	}
 	
@@ -211,9 +212,9 @@ public class ClientEvents
 	 * Registers the custom textures.
 	 * @param event the event to use.
 	 */
-	/*private static void registerCustomTextures(final PulseLibEvents.RegisterResourceEvent event)
+	private static void registerCustomTextures(final PulseLibEvents.RegisterResourceEvent event)
 	{
-		event.model(PLibDatabase.rl("entity/test_entity")).
+		/*event.model(PLibDatabase.rl("entity/test_entity")).
 						texture("tube", TestEntityRender.TUBE).
 						texture("sphere", TestEntityRender.SPHERE).
 						texture("torus", TestEntityRender.TORUS).
@@ -230,8 +231,8 @@ public class ClientEvents
 						texture("pyramid", TestBlockItemRenderer.PYRAMID).
 						texture("circle", TestBlockItemRenderer.CIRCLE));
 		event.model(PLibDatabase.rl("entity/armor/test_armor")).
-						texture("0", TestArmorItem.TEXTURE));
+						texture("0", TestArmorItem.TEXTURE));*/
 		event.model(PLibDatabase.rl("player/demo/test_ball_model")).
-						texture("0", PPlayerBallDemo.TEXTURE));
-	}*/
+						texture("0", PPlayerBallDemo.TEXTURE);
+	}
 }

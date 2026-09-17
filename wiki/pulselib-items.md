@@ -100,7 +100,7 @@ Reference it from `assets/examplemod/items/wand.json`:
 }
 ```
 
-The `base` model is the normal `assets/examplemod/models/item/wand.json` file that supplies display transforms. `PModelData.CODEC` accepts `model_location`, optional `model_type`, and optional `model_format`; texture lists do not belong in this JSON. Register the model and its material texture references separately through `PulseLibEvents.RegisterResourceEvent`, as described in [Textures and emissive](textures-and-emissive.md#register-model-resources). PulseLib does not convert a legacy `builtin/entity` JSON into this renderer automatically.
+The `base` model is the normal `assets/examplemod/models/item/wand.json` file that supplies display transforms. `PModelData.CODEC` accepts `model_location`, optional `model_type`, and optional `model_format`; texture lists do not belong in this JSON. Register the model and its material texture references separately through `PulseLibEvents.RegisterResourceEvent`, as described in [Resources](resources.md#register-model-resources). PulseLib does not convert a legacy `builtin/entity` JSON into this renderer automatically.
 
 ## Stack-specific state
 

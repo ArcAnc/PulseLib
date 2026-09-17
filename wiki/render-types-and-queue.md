@@ -26,7 +26,7 @@ super(modelData, PRenderTypes.RenderTypeProvider::trianglesSolid);
 
 If a texture is marked as emissive, the default renderers automatically switch the mesh to the matching emissive variant. You normally do not need to select an emissive type yourself.
 
-Alpha-mode and emissive texture metadata is described on [Textures and Emissive](textures-and-emissive.md).
+Alpha-mode and emissive texture metadata is described on [Resources](resources.md).
 
 ## Why vanilla RenderType is not enough
 

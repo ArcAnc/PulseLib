@@ -15,6 +15,7 @@ import com.arcanc.pulselib.content.model.PMaterial;
 import com.arcanc.pulselib.content.model.PMesh;
 import com.arcanc.pulselib.content.model.PMeshPrimitive;
 import com.arcanc.pulselib.content.model.PModel;
+import com.arcanc.pulselib.content.model.resource.PModelResource;
 import com.arcanc.pulselib.content.model.baked.AtlasBufferBuilder;
 import com.arcanc.pulselib.content.model.baked.PBakedBone;
 import com.arcanc.pulselib.content.model.baked.PSubdividedMeshCache;
@@ -263,9 +264,14 @@ public class PModelCache
 	 */
 	private static void verifyModelsLoaded(Map<Identifier, PModel> models)
 	{
-		for (Identifier model : PResourceCache.getResourceCache().keySet())
-			if (!models.containsKey(model))
-				throw new IllegalStateException("Registered model was not loaded: " + model);
+		for (PModelResource resource : PResourceCache.getResourceCache().values())
+		{
+			PModelLoader loader = MODEL_LOADERS.get(resource.modelLoaderId());
+			List<Identifier> candidates = loader.modelResourceCandidates(resource.model());
+			if (candidates.stream().noneMatch(models :: containsKey))
+				throw new IllegalStateException("Registered model was not loaded; tried: " +
+						candidates.stream().map(Identifier :: toString).collect(Collectors.joining(", ")));
+		}
 	}
 
 	/**
@@ -377,8 +383,8 @@ public class PModelCache
 		for (PModelLoader modelLoader : getModelLoaders())
 			chain = chain.thenCompose(empty -> modelLoader.loadModels(backgroundExecutor, resourceManager, (model, parsed) ->
 			{
-				if (PResourceCache.getResourceCache().containsKey(model) &&
-						PResourceCache.getResourceCache().get(model).modelLoaderId().equals(modelLoader.id()))
+				if (PResourceCache.getModelResource(model, resourceManager).
+						filter(resource -> resource.modelLoaderId().equals(modelLoader.id())).isPresent())
 					elementConsumer.accept(model, parsed);
 			}));
 		

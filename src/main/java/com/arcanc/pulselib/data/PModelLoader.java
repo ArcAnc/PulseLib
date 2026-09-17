@@ -16,6 +16,7 @@ import com.mojang.math.Axis;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.BiConsumer;
@@ -77,6 +78,18 @@ public interface PModelLoader
 	default Identifier normalizeModelResourceLocation(Identifier modelLocation)
 	{
 		return modelResourceLocation(modelLocation);
+	}
+
+	/**
+	 * Returns the resource-pack locations that may satisfy a registered model.
+	 * The first location is the preferred one.
+	 *
+	 * @param modelLocation the loader-relative model id.
+	 * @return the candidate resource locations.
+	 */
+	default List<Identifier> modelResourceCandidates(Identifier modelLocation)
+	{
+		return List.of(normalizeModelResourceLocation(modelLocation));
 	}
 	
 	/**

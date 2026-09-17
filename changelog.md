@@ -13,3 +13,4 @@
 * added a type-registration event for external animation channels, animation events, and mesh deformers
 * rewrite whole first person animations
 * replaced `PTextureCache` with `PResourceCache` and `PModelResource`; only registered models are loaded, and material texture references resolve per model
+* glTF model-resource registration now falls back between `.glb` and `.gltf`, reporting both checked paths when neither file exists

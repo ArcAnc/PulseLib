@@ -24,7 +24,7 @@ Important classes:
 
 PulseLib adds attachment render layers for players and living entities automatically through [`PLibArmorHandler`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PLibArmorHandler.java). Attachment definitions should be contributed on the mod event bus through [`PulseLibEvents.AttachmentRegistrationEvent`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/event/PulseLibEvents.java).
 
-Before registering an attachment definition, register its model and material texture references through `PulseLibEvents.RegisterResourceEvent`; otherwise that model is not loaded. See [Textures and emissive](textures-and-emissive.md#register-model-resources).
+Before registering an attachment definition, register its model and material texture references through `PulseLibEvents.RegisterResourceEvent`; otherwise that model is not loaded. See [Resources](resources.md#register-model-resources).
 
 ## Armor item example
 

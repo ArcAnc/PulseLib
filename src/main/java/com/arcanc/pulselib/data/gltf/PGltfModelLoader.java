@@ -106,6 +106,28 @@ public class PGltfModelLoader implements PModelLoader
 		return path.endsWith(GLB_EXTENSION) || path.endsWith(GLTF_EXTENSION) ?
 				resourceLocation : resourceLocation.withSuffix(GLB_EXTENSION);
 	}
+
+	/**
+	 * Returns both supported glTF resource variants. The explicitly supplied
+	 * extension is preferred; an extension-less model id prefers {@code .glb}
+	 * for backwards compatibility.
+	 *
+	 * @param modelLocation the loader-relative model id.
+	 * @return the GLB and glTF resource candidates.
+	 */
+	@Override
+	public List<Identifier> modelResourceCandidates(Identifier modelLocation)
+	{
+		Identifier resourceLocation = modelResourceLocation(modelLocation);
+		String path = resourceLocation.getPath();
+		if (path.endsWith(GLTF_EXTENSION))
+			return List.of(resourceLocation, resourceLocation.withPath(
+					path.substring(0, path.length() - GLTF_EXTENSION.length()) + GLB_EXTENSION));
+		if (path.endsWith(GLB_EXTENSION))
+			return List.of(resourceLocation, resourceLocation.withPath(
+					path.substring(0, path.length() - GLB_EXTENSION.length()) + GLTF_EXTENSION));
+		return List.of(resourceLocation.withSuffix(GLB_EXTENSION), resourceLocation.withSuffix(GLTF_EXTENSION));
+	}
 	
 	/**
 	 * Loads the models.

@@ -18,6 +18,7 @@ import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.sprite.AtlasManager;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModLoader;
 import net.neoforged.neoforge.client.event.RegisterTextureAtlasesEvent;
@@ -79,6 +80,48 @@ public class PResourceCache
 	}
 
 	/**
+	 * Finds the registration for a loaded model resource. A loader may accept
+	 * more than one on-disk representation of the registered model.
+	 *
+	 * @param model the loaded model resource id.
+	 * @return the matching model resource registration, if any.
+	 */
+	@ApiStatus.Internal
+	public static Optional<PModelResource> getModelResource(Identifier model)
+	{
+		PModelResource exact = RESOURCE_CACHE.get(model);
+		if (exact != null)
+			return Optional.of(exact);
+
+		return RESOURCE_CACHE.values().stream().filter(resource ->
+				PModelCache.getModelLoader(resource.modelLoaderId()).
+						map(loader -> loader.modelResourceCandidates(resource.model()).contains(model)).
+						orElse(false)).findFirst();
+	}
+
+	/**
+	 * Finds the registration for a loaded model resource, using a fallback
+	 * representation only when the preferred resource is absent.
+	 *
+	 * @param model the loaded model resource id.
+	 * @param resourceManager the active resource manager.
+	 * @return the matching model resource registration, if any.
+	 */
+	@ApiStatus.Internal
+	public static Optional<PModelResource> getModelResource(Identifier model, ResourceManager resourceManager)
+	{
+		PModelResource exact = RESOURCE_CACHE.get(model);
+		if (exact != null)
+			return Optional.of(exact);
+
+		return RESOURCE_CACHE.values().stream().filter(resource ->
+				PModelCache.getModelLoader(resource.modelLoaderId()).
+						map(loader -> resourceManager.getResource(resource.model()).isEmpty() &&
+								loader.modelResourceCandidates(resource.model()).contains(model)).
+						orElse(false)).findFirst();
+	}
+
+	/**
 	 * Clears resources from the preceding reload.
 	 */
 	@ApiStatus.Internal
@@ -96,7 +139,7 @@ public class PResourceCache
 	 */
 	public static Identifier resolve(Identifier model, String textureReference)
 	{
-		PModelResource resource = Optional.ofNullable(RESOURCE_CACHE.get(model)).
+		PModelResource resource = getModelResource(model).
 				orElseThrow(() -> new IllegalStateException("No resources registered for model " + model));
 		Identifier texture = Optional.ofNullable(resource.textures().get(PTextureReference.normalize(textureReference))).
 				orElseThrow(() -> new IllegalStateException("No texture registered for model " + model + ": " + textureReference));

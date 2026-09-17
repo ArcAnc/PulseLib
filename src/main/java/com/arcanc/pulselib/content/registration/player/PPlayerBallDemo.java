@@ -72,18 +72,7 @@ public final class PPlayerBallDemo
 	private static void registerAnimation(PulseLibEvents.PlayerAnimationRegistrationEvent event)
 	{
 		event.registration().register(ID, PPlayerAnimationDefinition.builder(MODEL).
-						when(player ->
-						{
-							Minecraft mc = PLibRenderHelper.mc();
-							LocalPlayer localPlayer = mc.player;
-							if (localPlayer == null)
-								return false;
-							if (!mc.player.getUUID().equals(player.getUUID()))
-								return false;
-							HumanoidArm hand = player.getMainArm();
-							ItemStack stack = player.getItemHeldByArm(hand);
-							return stack.is(PLibRegistration.ItemReg.TEST_ITEM);
-						}).
+						when(player -> player == PLibRenderHelper.mc().player).
 						bind(PPlayerPart.HEAD, "head").
 						bind(PPlayerPart.RIGHT_ARM, "right_arm").
 						bind(PPlayerPart.LEFT_ARM, "left_arm").
@@ -94,9 +83,7 @@ public final class PPlayerBallDemo
 						anchor(PPlayerAnimationAnchors.RIGHT_ITEM, "right_hand").
 						anchor(PPlayerAnimationAnchors.LEFT_ITEM, "left_hand").
 						firstPerson(PPlayerFirstPersonSettings.ENABLED).
-						itemRenderPolicy((player, hand, stack) ->
-								hand == InteractionHand.MAIN_HAND &&
-								stack.getItem() == PLibRegistration.ItemReg.TEST_ITEM.get()).
+						itemRenderPolicy(PPlayerAnimationDefinition.ItemRenderPolicy.RENDER).
 						controllers(registrar -> registrar.add("ball_toss", () -> state ->
 								state.controller().isStopped() ? ControllerState.STOP : ControllerState.PLAY)).
 				build());
