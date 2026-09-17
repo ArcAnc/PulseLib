@@ -45,13 +45,51 @@ public final class PPlayerAutomaticMeshAttachments
 		PPlayerAnimationDefinition definition = frame.definition();
 		if (definition.modelData().getModel() == null)
 			return List.of();
+		Set<String> animatedBones = frame.resolver().activeAnimationBones();
+		if (animatedBones.isEmpty())
+			return List.of();
+		if (!definition.meshAttachmentRoots().isEmpty())
+			return explicitRoots(definition);
 
 		Set<String> skeletonBones = new HashSet<>(definition.bindings().values());
-		Set<String> animatedBones = frame.resolver().activeAnimationBones();
 		List<PBakedBone> roots = new ArrayList<>();
 		for (PBakedBone bone : definition.modelData().getModel().bones())
 			findRoots(bone, skeletonBones, animatedBones, roots);
 		return List.copyOf(roots);
+	}
+
+	/**
+	 * Resolves explicitly configured attachment roots. A descendant of another
+	 * configured root is omitted because rendering its ancestor already renders it.
+	 * @param definition the animation definition to use.
+	 * @return explicitly configured attachment roots.
+	 */
+	private static List<PBakedBone> explicitRoots(PPlayerAnimationDefinition definition)
+	{
+		Set<String> configuredRoots = definition.meshAttachmentRoots();
+		List<PBakedBone> roots = new ArrayList<>();
+		for (int index = 0; index < definition.modelData().getModel().boneCount(); index++)
+		{
+			PBakedBone bone = definition.modelData().getModel().bone(index);
+			if (!configuredRoots.contains(bone.name()) || hasConfiguredAncestor(bone, configuredRoots))
+				continue;
+			roots.add(bone);
+		}
+		return List.copyOf(roots);
+	}
+
+	/**
+	 * Determines whether this bone is already rendered by a configured ancestor.
+	 * @param bone the bone to use.
+	 * @param configuredRoots explicitly configured root names.
+	 * @return whether a configured ancestor exists.
+	 */
+	private static boolean hasConfiguredAncestor(PBakedBone bone, Set<String> configuredRoots)
+	{
+		for (PBakedBone parent = bone.parent(); parent != null; parent = parent.parent())
+			if (configuredRoots.contains(parent.name()))
+				return true;
+		return false;
 	}
 
 	/**

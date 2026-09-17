@@ -40,6 +40,7 @@ public final class PPlayerAnimationDefinition
 	private final PPlayerAnimationWeight weight;
 	private final Map<PPlayerPart, PPlayerAnimationWeight> partWeights;
 	private final Map<String, PPlayerAnimationWeight> boneWeights;
+	private final Set<String> meshAttachmentRoots;
 	private final List<PPlayerAnimationDeformer> deformers;
 	private final Vector3f rootPivot;
 	private final int priority;
@@ -72,6 +73,7 @@ public final class PPlayerAnimationDefinition
 		this.weight = builder.weight;
 		this.partWeights = Map.copyOf(builder.partWeights);
 		this.boneWeights = Map.copyOf(builder.boneWeights);
+		this.meshAttachmentRoots = Set.copyOf(builder.meshAttachmentRoots);
 		this.deformers = List.copyOf(builder.deformers);
 		this.rootPivot = new Vector3f(builder.rootPivot);
 		this.priority = builder.priority;
@@ -182,6 +184,16 @@ public final class PPlayerAnimationDefinition
 	{
 		PPlayerAnimationWeight boneWeight = this.boneWeights.getOrDefault(boneName, PPlayerAnimationWeight.FULL);
 		return Math.clamp(boneWeight.weight(player, partialTick), 0.0f, 1.0f);
+	}
+
+	/**
+	 * Returns explicitly configured roots for meshes attached to the player.
+	 * An empty set enables automatic root discovery.
+	 * @return explicitly configured mesh attachment roots.
+	 */
+	public Set<String> meshAttachmentRoots()
+	{
+		return this.meshAttachmentRoots;
 	}
 
 	/**
@@ -423,6 +435,7 @@ public final class PPlayerAnimationDefinition
 		private PPlayerAnimationWeight weight = PPlayerAnimationWeight.FULL;
 		private final Map<PPlayerPart, PPlayerAnimationWeight> partWeights = new LinkedHashMap<>();
 		private final Map<String, PPlayerAnimationWeight> boneWeights = new LinkedHashMap<>();
+		private final Set<String> meshAttachmentRoots = new LinkedHashSet<>();
 		private final List<PPlayerAnimationDeformer> deformers = new ArrayList<>();
 		private Vector3f rootPivot = new Vector3f();
 		private int priority;
@@ -578,6 +591,21 @@ public final class PPlayerAnimationDefinition
 			if (boneName == null || boneName.isBlank())
 				throw new IllegalArgumentException("Player animation bone name cannot be blank");
 			this.boneWeights.put(boneName, Objects.requireNonNull(weight));
+			return this;
+		}
+
+		/**
+		 * Attaches the meshes rooted at the specified bone to the player model.
+		 * Once at least one root is configured, automatic attachment discovery is disabled.
+		 * The meshes render only while this definition has an active animation.
+		 * @param boneName the root bone name.
+		 * @return this builder.
+		 */
+		public Builder meshAttachment(String boneName)
+		{
+			if (boneName == null || boneName.isBlank())
+				throw new IllegalArgumentException("Player mesh attachment bone name cannot be blank");
+			this.meshAttachmentRoots.add(boneName);
 			return this;
 		}
 

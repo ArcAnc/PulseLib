@@ -76,6 +76,7 @@ public final class PPlayerBallDemo
 						bind(PPlayerPart.HEAD, "head").
 						bind(PPlayerPart.RIGHT_ARM, "right_arm").
 						bind(PPlayerPart.LEFT_ARM, "left_arm").
+						meshAttachment("ball").
 						mask(PPlayerPart.RIGHT_ARM, PPlayerPart.LEFT_ARM).
 						anchor(PPlayerAnimationAnchors.FIRST_PERSON_CAMERA, "fp_camera").
 						anchor(PPlayerAnimationAnchors.RIGHT_HAND, "right_hand").
