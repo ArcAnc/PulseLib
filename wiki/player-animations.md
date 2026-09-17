@@ -214,7 +214,14 @@ This phase policy supplements `itemRenderPolicy(...)`: either policy may hide th
 
 `anchor(PPlayerAnimationAnchor, boneName)` exposes a model bone as a named attachment point. PulseLib reserves `FIRST_PERSON_CAMERA`, `RIGHT_ITEM`, and `LEFT_ITEM`; use a custom `PPlayerAnimationAnchor` for equipment or effects that follow an animation bone. Register a `PPlayerAnimatedAttachmentRenderer` through `PulseLibEvents.PlayerAnimatedAttachmentRegistrationEvent`. Its context contains the player, animation id, anchor, sampled transform, blend weight, render stack, collector, and whether it is rendering in first person.
 
-The player-animation model may also contain mesh branches that are not bound to a vanilla player part. PulseLib automatically renders an animated mesh branch when it has an active animated bone, both in third person and in the enabled first-person replacement pass. Its transform is blended from identity by the animation activation weight before rendering, so activation and crossfade transitions also move mesh attachments smoothly. This lets a model carry animated props or effects without writing an attachment renderer. Skeleton-only models remain valid.
+The player-animation model may also contain mesh branches that are not bound to a vanilla player part. By default, PulseLib automatically renders a mesh branch when it contains an active animated bone, both in third person and in the enabled first-person replacement pass. To render only known branches, declare their roots with `meshAttachment(boneName)`:
+
+```java
+.meshAttachment("ball")
+.meshAttachment("backpack")
+```
+
+Once at least one root is declared, PulseLib does not discover other free mesh branches. A selected root renders its complete descendant tree, so a prop can contain child bones and meshes without listing each one. Automatic and explicit attachments render only while the definition has an active animation, are blended from identity by its activation weight, and use the translucent render type. Skeleton-only models remain valid.
 
 `populateMolangContext(...)` can add player-specific Molang queries:
 

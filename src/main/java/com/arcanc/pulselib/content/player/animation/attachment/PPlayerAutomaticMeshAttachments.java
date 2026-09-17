@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Provides support for player automatic mesh attachments.
+ * Provides support for player mesh attachments selected automatically or explicitly.
  */
 public final class PPlayerAutomaticMeshAttachments
 {
@@ -36,7 +36,8 @@ public final class PPlayerAutomaticMeshAttachments
 	}
 
 	/**
-	 * Performs the roots operation.
+	 * Resolves mesh attachment roots for an active animation. Explicit roots take
+	 * precedence over automatic discovery.
 	 * @param frame the frame to use.
 	 * @return the value produced by this operation.
 	 */
@@ -202,7 +203,7 @@ public final class PPlayerAutomaticMeshAttachments
 					frame.resolver(),
 					(bone, mesh, inherited) -> inherited,
 					new PMeshRenderContext(
-							PRenderTypes.RenderTypeProvider::trianglesCutout,
+							PRenderTypes.RenderTypeProvider::trianglesTranslucent,
 							-1,
 							packedLight,
 							OverlayTexture.NO_OVERLAY));

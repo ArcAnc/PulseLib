@@ -597,7 +597,7 @@ public final class PPlayerAnimationDefinition
 		/**
 		 * Attaches the meshes rooted at the specified bone to the player model.
 		 * Once at least one root is configured, automatic attachment discovery is disabled.
-		 * The meshes render only while this definition has an active animation.
+		 * The root and every descendant mesh render only while this definition has an active animation.
 		 * @param boneName the root bone name.
 		 * @return this builder.
 		 */

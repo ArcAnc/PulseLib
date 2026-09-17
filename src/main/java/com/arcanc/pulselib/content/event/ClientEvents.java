@@ -54,9 +54,9 @@ public class ClientEvents
 	{
 		ModLoader.postEvent(new PulseLibEvents.TypeRegistrationEvent());
 		
-		//modEventBus.addListener(ClientEvents :: registerRenderers);
+		/*modEventBus.addListener(ClientEvents :: registerRenderers);
 		modEventBus.addListener(ClientEvents :: registerCustomTextures);
-		//modEventBus.addListener(ClientEvents :: registerSpecialModels);
+		modEventBus.addListener(ClientEvents :: registerSpecialModels);*/
 		
 		PAttachmentAnchorResolvers.init(modEventBus);
 		modEventBus.addListener(EventPriority.HIGHEST, ClientEvents :: registerSpriteSources);
@@ -212,9 +212,9 @@ public class ClientEvents
 	 * Registers the custom textures.
 	 * @param event the event to use.
 	 */
-	private static void registerCustomTextures(final PulseLibEvents.RegisterResourceEvent event)
+	/*private static void registerCustomTextures(final PulseLibEvents.RegisterResourceEvent event)
 	{
-		/*event.model(PLibDatabase.rl("entity/test_entity")).
+		event.model(PLibDatabase.rl("entity/test_entity")).
 						texture("tube", TestEntityRender.TUBE).
 						texture("sphere", TestEntityRender.SPHERE).
 						texture("torus", TestEntityRender.TORUS).
@@ -231,8 +231,8 @@ public class ClientEvents
 						texture("pyramid", TestBlockItemRenderer.PYRAMID).
 						texture("circle", TestBlockItemRenderer.CIRCLE));
 		event.model(PLibDatabase.rl("entity/armor/test_armor")).
-						texture("0", TestArmorItem.TEXTURE));*/
+						texture("0", TestArmorItem.TEXTURE));
 		event.model(PLibDatabase.rl("player/demo/test_ball_model")).
 						texture("0", PPlayerBallDemo.TEXTURE);
-	}
+	}*/
 }
