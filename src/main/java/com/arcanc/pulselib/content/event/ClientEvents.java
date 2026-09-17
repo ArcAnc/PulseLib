@@ -213,25 +213,25 @@ public class ClientEvents
 	 */
 	/*private static void registerCustomTextures(final PulseLibEvents.RegisterResourceEvent event)
 	{
-		event.register(PModelResource.builder(PLibDatabase.rl("entity/test_entity")).
+		event.model(PLibDatabase.rl("entity/test_entity")).
 						texture("tube", TestEntityRender.TUBE).
 						texture("sphere", TestEntityRender.SPHERE).
 						texture("torus", TestEntityRender.TORUS).
 						texture("0", TestEntityRender.ZERO).
 						texture("armor/0", TestEntityRender.ARMOR));
-		event.register(PModelResource.builder(PLibDatabase.rl("entity/test_entity/armor")).
+		event.model(PLibDatabase.rl("entity/test_entity/armor")).
 						texture("0", TestEntityRender.ARMOR));
-		event.register(PModelResource.builder(PLibDatabase.rl("block/test_block")).
+		event.model(PLibDatabase.rl("block/test_block")).
 						texture("cube_texture", TestBlockEntityRenderer.CUBE).
 						texture("torus_texture", TestBlockEntityRenderer.TORUS).
 						texture("tube_texture", TestBlockEntityRenderer.TUBE).
 						texture("pyramid_texture", TestBlockEntityRenderer.PYRAMID));
-		event.register(PModelResource.builder(PLibDatabase.rl("item/test_block")).
+		event.model(PLibDatabase.rl("item/test_block")).
 						texture("pyramid", TestBlockItemRenderer.PYRAMID).
 						texture("circle", TestBlockItemRenderer.CIRCLE));
-		event.register(PModelResource.builder(PLibDatabase.rl("entity/armor/test_armor")).
+		event.model(PLibDatabase.rl("entity/armor/test_armor")).
 						texture("0", TestArmorItem.TEXTURE));
-		event.register(PModelResource.builder(PLibDatabase.rl("player/demo/test_ball_model")).
+		event.model(PLibDatabase.rl("player/demo/test_ball_model")).
 						texture("0", PPlayerBallDemo.TEXTURE));
 	}*/
 }

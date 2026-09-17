@@ -98,6 +98,6 @@ Register before client resource reload:
 PModelCache.registerModelLoader(MyModelLoader.INSTANCE);
 ```
 
-Register a model that uses this loader through `PModelResource.builder(model).modelLoader(MyModelLoader.INSTANCE.id())`. The registration's model id is normalized with `normalizeModelResourceLocation(...)` and must be the same id that `loadModels(...)` passes to its consumer; only registered models are baked. Override `modelResourceLocation(...)` or `normalizeModelResourceLocation(...)` when the loader accepts a short model id but loads it from a resource-pack root or supplies a default extension.
+Register a model that uses this loader through `event.model(model, MyModelLoader.INSTANCE.id())`. The registration's model id is normalized with `normalizeModelResourceLocation(...)` and must be the same id that `loadModels(...)` passes to its consumer; only registered models are baked. Override `modelResourceLocation(...)` or `normalizeModelResourceLocation(...)` when the loader accepts a short model id but loads it from a resource-pack root or supplies a default extension.
 
 `PModel` contains raw bones, meshes, bone-to-mesh mapping, and animations. `PModelCache` owns baking, vertex buffer creation, atlas UV conversion, emissive metadata, and cache cleanup.

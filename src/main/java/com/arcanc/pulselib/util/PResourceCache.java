@@ -125,6 +125,8 @@ public class PResourceCache
 	@ApiStatus.Internal
 	public static void postEvent()
 	{
-		ModLoader.postEvent(new PulseLibEvents.RegisterResourceEvent(RESOURCE_CACHE));
+		PulseLibEvents.RegisterResourceEvent event = new PulseLibEvents.RegisterResourceEvent();
+		ModLoader.postEvent(event);
+		event.apply(RESOURCE_CACHE);
 	}
 }

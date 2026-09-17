@@ -13,17 +13,16 @@ Subscribe on the mod event bus and register every model together with its materi
 public final class ExampleClientEvents {
     @SubscribeEvent
     public static void registerPulseResources(PulseLibEvents.RegisterResourceEvent event) {
-        event.register(PModelResource.builder(
-                        Identifier.fromNamespaceAndPath(ExampleMod.MOD_ID, "entity/robot"))
+        event.model(Identifier.fromNamespaceAndPath(ExampleMod.MOD_ID, "entity/robot"))
                 .texture("textures/body", Identifier.fromNamespaceAndPath(
                         ExampleMod.MOD_ID, "entity/robot/body"))
                 .texture("textures/eyes", Identifier.fromNamespaceAndPath(
-                        ExampleMod.MOD_ID, "entity/robot/eyes")));
+                        ExampleMod.MOD_ID, "entity/robot/eyes"));
     }
 }
 ```
 
-`PModelResource.builder(...)` uses the glTF loader by default. The model id is relative to its loader root: the glTF loader adds `glmodels/`, and the Gecko loader adds `geckolib/models/`; call `.modelLoader(PGeckoModelLoader.INSTANCE.id())` when registering a Gecko model. A resource registration is also what makes PulseLib load and bake that model, so every `PModelData` path needs one matching registration.
+`event.model(...)` uses the glTF loader by default. The model id is relative to its loader root: the glTF loader adds `glmodels/`, and the Gecko loader adds `geckolib/models/`; call `event.model(model, PGeckoModelLoader.INSTANCE.id())` when registering a Gecko model. Repeated calls for one model extend the same registration. A resource registration is also what makes PulseLib load and bake that model, so every `PModelData` path needs one matching registration.
 
 Each `texture` key is the reference stored in the model material. It preserves its complete directory path, while a final `.png` is ignored: `body/claws.png` becomes `body/claws`, and remains distinct from `armor/claws`. The value is a Minecraft resource location relative to `textures` without `.png`:
 

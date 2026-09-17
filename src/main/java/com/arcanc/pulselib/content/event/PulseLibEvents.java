@@ -13,6 +13,7 @@ package com.arcanc.pulselib.content.event;
 import com.arcanc.pulselib.content.model.animation.PAnimationChannelType;
 import com.arcanc.pulselib.content.model.animation.PAnimationEventType;
 import com.arcanc.pulselib.content.model.deformer.PMeshDeformer;
+import com.arcanc.pulselib.content.model.PTextureReference;
 import com.arcanc.pulselib.content.model.resource.PModelResource;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationDefinition;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
@@ -20,6 +21,7 @@ import com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimatedAt
 import com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimatedAttachments;
 import com.arcanc.pulselib.content.registration.PLibRegistration;
 import com.arcanc.pulselib.data.PModelLoader;
+import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
 import com.arcanc.pulselib.util.PModelCache;
 import com.arcanc.pulselib.util.attachments.PLivingAttachmentDefinition;
 import com.arcanc.pulselib.util.attachments.PLivingAttachments;
@@ -29,6 +31,7 @@ import net.neoforged.bus.api.Event;
 import net.neoforged.fml.event.IModBusEvent;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -79,29 +82,97 @@ public class PulseLibEvents
  */
 	public static class RegisterResourceEvent extends Event implements IModBusEvent
 	{
-		private final Map<Identifier, PModelResource> registeredResources;
-		
-		public RegisterResourceEvent(Map<Identifier, PModelResource> registeredResources)
+		private final Map<Identifier, ModelRegistration> models = new LinkedHashMap<>();
+
+		/**
+		 * Gets or creates the registration for a glTF model.
+		 *
+		 * @param model the model id relative to the glTF loader root.
+		 * @return the model registration.
+		 */
+		public ModelRegistration model(Identifier model)
 		{
-			this.registeredResources = registeredResources;
-		}
-		
-		public RegisterResourceEvent register(PModelResource.Builder modelResource)
-		{
-			Objects.requireNonNull(modelResource);
-			return register(modelResource.build());
+			return model(model, PGltfModelLoader.INSTANCE.id());
 		}
 
-		public RegisterResourceEvent register(PModelResource modelResource)
+		/**
+		 * Gets or creates the registration for a model using the specified loader.
+		 *
+		 * @param model the model id relative to the selected loader root.
+		 * @param modelLoaderId the id of the loader for the model.
+		 * @return the model registration.
+		 */
+		public ModelRegistration model(Identifier model, Identifier modelLoaderId)
 		{
-			Objects.requireNonNull(modelResource);
-			PModelLoader loader = PModelCache.getModelLoader(modelResource.modelLoaderId()).
-					orElseThrow(() -> new IllegalStateException("No model loader registered for " + modelResource.modelLoaderId()));
-			PModelResource resolvedResource = modelResource.normalizeModelLocation(loader);
-			PModelResource previous = this.registeredResources.putIfAbsent(resolvedResource.model(), resolvedResource);
-			if (previous != null)
-				throw new IllegalStateException("Resources already registered for model " + resolvedResource.model());
-			return this;
+			Objects.requireNonNull(model);
+			Objects.requireNonNull(modelLoaderId);
+			PModelLoader loader = PModelCache.getModelLoader(modelLoaderId).
+					orElseThrow(() -> new IllegalStateException("No model loader registered for " + modelLoaderId));
+			Identifier normalizedModel = loader.normalizeModelResourceLocation(model);
+			ModelRegistration existing = this.models.get(normalizedModel);
+			if (existing == null)
+			{
+				existing = new ModelRegistration(normalizedModel, modelLoaderId);
+				this.models.put(normalizedModel, existing);
+			}
+			else if (!existing.modelLoaderId.equals(modelLoaderId))
+				throw new IllegalStateException("Conflicting model loaders registered for model " + normalizedModel + ": " +
+						existing.modelLoaderId + " and " + modelLoaderId);
+			return existing;
+		}
+
+		/**
+		 * Builds all model registrations into the supplied cache after event listeners
+		 * have added their texture references.
+		 *
+		 * @param registeredResources the cache receiving the completed resources.
+		 */
+		public void apply(Map<Identifier, PModelResource> registeredResources)
+		{
+			Objects.requireNonNull(registeredResources);
+			Map<Identifier, PModelResource> mergedResources = new LinkedHashMap<>();
+			this.models.forEach((model, registration) -> mergedResources.put(model, registration.build()));
+			registeredResources.putAll(mergedResources);
+		}
+
+		/**
+		 * Accumulates the material texture registrations for one model.
+		 */
+		public static final class ModelRegistration
+		{
+			private final Identifier model;
+			private final Identifier modelLoaderId;
+			private final Map<String, Identifier> textures = new LinkedHashMap<>();
+
+			private ModelRegistration(Identifier model, Identifier modelLoaderId)
+			{
+				this.model = model;
+				this.modelLoaderId = modelLoaderId;
+			}
+
+			/**
+			 * Adds a material texture reference to this model.
+			 *
+			 * @param reference the reference stored in the model material.
+			 * @param texture the texture resource id, relative to {@code textures} and without {@code .png}.
+			 * @return this registration.
+			 */
+			public ModelRegistration texture(String reference, Identifier texture)
+			{
+				Objects.requireNonNull(reference);
+				Objects.requireNonNull(texture);
+				String normalizedReference = PTextureReference.normalize(reference);
+				Identifier previous = this.textures.putIfAbsent(normalizedReference, texture);
+				if (previous != null && !previous.equals(texture))
+					throw new IllegalStateException("Conflicting textures registered for model " + this.model + ", reference " +
+							normalizedReference + ": " + previous + " and " + texture);
+				return this;
+			}
+
+			private PModelResource build()
+			{
+				return new PModelResource(this.model, this.modelLoaderId, this.textures);
+			}
 		}
 	}
 	
