@@ -14,6 +14,9 @@ import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Provides support for lib database.
+ */
 public class PLibDatabase
 {
 	public static final String MOD_ID = "pulselib";
@@ -22,6 +25,11 @@ public class PLibDatabase
 	
 	public static final Identifier RELOAD_LISTENER_ID = rl("models_reload_listener");
 	
+	/**
+	 * Performs the rl operation.
+	 * @param name the name to use.
+	 * @return the value produced by this operation.
+	 */
 	public static Identifier rl(String name)
 	{
 		return Identifier.fromNamespaceAndPath(MOD_ID, name);

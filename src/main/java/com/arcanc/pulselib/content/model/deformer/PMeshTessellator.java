@@ -9,7 +9,7 @@
 
 package com.arcanc.pulselib.content.model.deformer;
 
-import com.arcanc.pulselib.content.model.PMesh;
+import com.arcanc.pulselib.content.model.PMeshPrimitive;
 import de.javagl.jgltf.model.GltfConstants;
 
 import java.nio.ByteBuffer;
@@ -18,15 +18,27 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Provides support for mesh tessellator.
+ */
 public final class PMeshTessellator
 {
 	public static final int MAX_SUBDIVISION_LEVEL = 4;
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PMeshTessellator()
 	{
 	}
 	
-	public static PMesh subdivide(PMesh source, int level)
+	/**
+	 * Performs the subdivide operation.
+	 * @param source the source to use.
+	 * @param level the level to use.
+	 * @return the value produced by this operation.
+	 */
+	public static PMeshPrimitive subdivide(PMeshPrimitive source, int level)
 	{
 		if (level == 0)
 			return source;
@@ -78,16 +90,35 @@ public final class PMeshTessellator
 
 		int vertexCount = positions.size() / 3;
 		int indexType = vertexCount <= 0xFFFF ? GltfConstants.GL_UNSIGNED_SHORT : GltfConstants.GL_UNSIGNED_INT;
-		return new PMesh(source.uuid(), vertexCount, floatBuffer(positions), floatBuffer(normals), floatBuffer(uvs),
-				indices.size(), indexBuffer(indices, indexType), indexType, source.texture());
+		return new PMeshPrimitive(vertexCount, floatBuffer(positions), floatBuffer(normals), floatBuffer(uvs),
+				indices.size(), indexBuffer(indices, indexType), indexType, source.material());
 	}
 
+	/**
+	 * Performs the grid index operation.
+	 * @param i the i to use.
+	 * @param j the j to use.
+	 * @param segments the segments to use.
+	 * @return the value produced by this operation.
+	 */
 	private static int gridIndex(int i, int j, int segments)
 	{
 		return i * (segments + 1) - i * (i - 1) / 2 + j;
 	}
 
-	private static void appendVertex(PMesh source, int a, int b, int c, float bWeight, float cWeight,
+	/**
+	 * Performs the append vertex operation.
+	 * @param source the source to use.
+	 * @param a the a to use.
+	 * @param b the b to use.
+	 * @param c the c to use.
+	 * @param bWeight the b weight to use.
+	 * @param cWeight the c weight to use.
+	 * @param positions the positions to use.
+	 * @param normals the normals to use.
+	 * @param uvs the uvs to use.
+	 */
+	private static void appendVertex(PMeshPrimitive source, int a, int b, int c, float bWeight, float cWeight,
 									 List<Float> positions, List<Float> normals, List<Float> uvs)
 	{
 		float aWeight = 1.0f - bWeight - cWeight;
@@ -96,6 +127,19 @@ public final class PMeshTessellator
 		appendInterpolated(source.uvs(), a, b, c, aWeight, bWeight, cWeight, uvs, 2, false);
 	}
 
+	/**
+	 * Performs the append interpolated operation.
+	 * @param source the source to use.
+	 * @param a the a to use.
+	 * @param b the b to use.
+	 * @param c the c to use.
+	 * @param aWeight the a weight to use.
+	 * @param bWeight the b weight to use.
+	 * @param cWeight the c weight to use.
+	 * @param target the target to use.
+	 * @param components the components to use.
+	 * @param normalize the normalize to use.
+	 */
 	private static void appendInterpolated(FloatBuffer source, int a, int b, int c, float aWeight, float bWeight,
 									 float cWeight, List<Float> target, int components, boolean normalize)
 	{
@@ -118,7 +162,13 @@ public final class PMeshTessellator
 			target.add(z);
 	}
 
-	private static int indexAt(PMesh source, int index)
+	/**
+	 * Performs the index at operation.
+	 * @param source the source to use.
+	 * @param index the index to use.
+	 * @return the value produced by this operation.
+	 */
+	private static int indexAt(PMeshPrimitive source, int index)
 	{
 		ByteBuffer indices = source.indices().duplicate().order(source.indices().order());
 		return switch (source.glIndexType())
@@ -130,12 +180,22 @@ public final class PMeshTessellator
 		};
 	}
 
-	private static void validateVertexIndex(PMesh source, int index)
+	/**
+	 * Validates the vertex index.
+	 * @param source the source to use.
+	 * @param index the index to use.
+	 */
+	private static void validateVertexIndex(PMeshPrimitive source, int index)
 	{
 		if (index < 0 || index >= source.vertexCount())
 			throw new IllegalArgumentException("Mesh index is outside its vertex array: " + index);
 	}
 
+	/**
+	 * Performs the float buffer operation.
+	 * @param values the values to use.
+	 * @return the value produced by this operation.
+	 */
 	private static FloatBuffer floatBuffer(List<Float> values)
 	{
 		FloatBuffer result = FloatBuffer.allocate(values.size());
@@ -144,6 +204,12 @@ public final class PMeshTessellator
 		return result.flip();
 	}
 
+	/**
+	 * Performs the index buffer operation.
+	 * @param values the values to use.
+	 * @param indexType the index type to use.
+	 * @return the value produced by this operation.
+	 */
 	private static ByteBuffer indexBuffer(List<Integer> values, int indexType)
 	{
 		int size = indexType == GltfConstants.GL_UNSIGNED_SHORT ? Short.BYTES : Integer.BYTES;

@@ -13,6 +13,9 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+/**
+ * Immutable value object representing channel reference.
+ */
 public record PChannelReference<T>(String name, T defaultValue)
 {
 	public static final MapCodec<PChannelReference<Float>> FLOAT_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.
@@ -22,12 +25,22 @@ public record PChannelReference<T>(String name, T defaultValue)
 			apply(instance, PChannelReference::new));
 	public static final Codec<PChannelReference<Float>> FLOAT = FLOAT_CODEC.codec();
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param name the name to use.
+	 * @param defaultValue the default value to use.
+	 */
 	public PChannelReference
 	{
 		if (name == null)
 			throw new IllegalArgumentException("Channel name cannot be null");
 	}
 
+	/**
+	 * Performs the constant operation.
+	 * @param value the value to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PChannelReference<Float> constant(float value)
 	{
 		return new PChannelReference<>("", value);

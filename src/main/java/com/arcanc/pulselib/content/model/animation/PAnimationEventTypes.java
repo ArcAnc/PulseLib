@@ -26,8 +26,14 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import org.joml.Vector3f;
 
+/**
+ * Provides support for animation event types.
+ */
 public final class PAnimationEventTypes
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PAnimationEventTypes() { }
 
 	public static final PAnimationEventType<SoundData> SOUND = type("sound", PEventSide.PRESENTATION_ONLY,
@@ -110,25 +116,76 @@ public final class PAnimationEventTypes
 					target.setParameter(data.parameter(), data.value());
 			});
 
+	/**
+	 * Performs the type operation.
+	 * @param path the path to use.
+	 * @param side the side to use.
+	 * @param codec the codec to use.
+	 * @param executor the executor to use.
+	 * @return the value produced by this operation.
+	 */
 	private static <T> PAnimationEventType<T> type(String path, PEventSide side, MapCodec<T> codec,
 	                                                EventExecutor<T> executor)
 	{
 		return new PAnimationEventType<>()
 		{
 			private final Identifier id = PLibDatabase.rl(path);
+			/**
+			 * Performs the id operation.
+			 * @return the value produced by this operation.
+			 */
 			@Override public Identifier id() { return this.id; }
+			/**
+			 * Performs the codec operation.
+			 * @return the value produced by this operation.
+			 */
 			@Override public MapCodec<T> codec() { return codec; }
+			/**
+			 * Performs the side operation.
+			 * @return the value produced by this operation.
+			 */
 			@Override public PEventSide side() { return side; }
+			/**
+			 * Performs the execute operation.
+			 * @param context the context to use.
+			 * @param data the data to use.
+			 */
 			@Override public void execute(PAnimationEventContext context, T data) { executor.execute(context, data); }
 		};
 	}
 
 	@FunctionalInterface
-	private interface EventExecutor<T> { void execute(PAnimationEventContext context, T data); }
+/**
+ * Defines the contract for event executor.
+ */
+	private interface EventExecutor<T>
+	{
+		/**
+		 * Executes the event callback.
+		 * @param context the event context.
+		 * @param data the event payload.
+		 */
+		void execute(PAnimationEventContext context, T data);
+	}
 
+/**
+ * Immutable value object representing sound data.
+ */
 	public record SoundData(Identifier sound, String locator, float volume, float pitch) { }
+/**
+ * Immutable value object representing particle data.
+ */
 	public record ParticleData(Identifier particle, String locator, Vector3f offset, Vector3f motion) { }
+/**
+ * Immutable value object representing camera shake data.
+ */
 	public record CameraShakeData(float strength, float duration, float frequency) { }
+/**
+ * Immutable value object representing locator callback data.
+ */
 	public record LocatorCallbackData(Identifier callback, String locator) { }
+/**
+ * Immutable value object representing animation parameter data.
+ */
 	public record AnimationParameterData(String controller, String parameter, float value, boolean trigger) { }
 }

@@ -14,6 +14,9 @@ import com.mojang.serialization.DataResult;
 
 import java.util.Locale;
 
+/**
+ * Enumerates the available alpha mode values.
+ */
 public enum PAlphaMode
 {
 	AUTO,
@@ -23,11 +26,20 @@ public enum PAlphaMode
 
 	public static final Codec<PAlphaMode> CODEC = Codec.STRING.comapFlatMap(PAlphaMode :: decode, PAlphaMode :: serializedName);
 
+	/**
+	 * Performs the serialized name operation.
+	 * @return the value produced by this operation.
+	 */
 	public String serializedName()
 	{
 		return this.name().toLowerCase(Locale.ROOT);
 	}
 
+	/**
+	 * Performs the decode operation.
+	 * @param name the name to use.
+	 * @return the value produced by this operation.
+	 */
 	private static DataResult<PAlphaMode> decode(String name)
 	{
 		try

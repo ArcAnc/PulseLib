@@ -11,6 +11,9 @@ package com.arcanc.pulselib.data.gecko;
 
 import com.arcanc.pulselib.content.model.animation.PAnimationDecodeContext;
 
+/**
+ * Immutable value object representing gecko decode context.
+ */
 public record PGeckoDecodeContext(float modelScale) implements PAnimationDecodeContext
 {
 }

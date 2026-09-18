@@ -15,6 +15,9 @@ import com.arcanc.pulselib.util.attachments.PAttachmentAnchorResolvers;
 import net.minecraft.client.model.HumanoidModel;
 import org.jetbrains.annotations.ApiStatus;
 
+/**
+ * Provides support for humanoid anchors.
+ */
 public class PHumanoidAnchors
 {
 	public static final PAttachmentAnchor HEAD = PAttachmentAnchor.minecraft("head");
@@ -25,6 +28,9 @@ public class PHumanoidAnchors
 	public static final PAttachmentAnchor RIGHT_LEG = PAttachmentAnchor.minecraft("right_leg");
 	public static final PAttachmentAnchor LEFT_LEG = PAttachmentAnchor.minecraft("left_leg");
 	
+	/**
+	 * Registers the defaults.
+	 */
 	@ApiStatus.Internal
 	public static void registerDefaults()
 	{

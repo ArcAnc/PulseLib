@@ -37,6 +37,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Provides support for living attachment layer.
+ */
 public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends EntityModel<? super S>> extends RenderLayer<S, M>
 {
 	public static final ContextKey<List<RenderEntry>> RENDER_DATA = new ContextKey<>(PLibDatabase.rl("living_attachments"));
@@ -50,11 +53,24 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 			EquipmentSlot.MAINHAND,
 			EquipmentSlot.OFFHAND);
 	
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param parent the parent to use.
+	 */
 	public PLivingAttachmentLayer(RenderLayerParent<S, M> parent)
 	{
 		super(parent);
 	}
 	
+	/**
+	 * Performs the submit operation.
+	 * @param poseStack the pose stack to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 * @param light the light to use.
+	 * @param state the state to use.
+	 * @param yRot the y rot to use.
+	 * @param xRot the x rot to use.
+	 */
 	@Override
 	public void submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int light, S state, float yRot, float xRot)
 	{
@@ -67,6 +83,12 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 					binding -> PAttachmentAnchorResolvers.resolve(state, this.getParentModel(), binding.anchor()));
 	}
 	
+	/**
+	 * Extracts the render entries.
+	 * @param entity the entity to use.
+	 * @param partialTick the partial tick to use.
+	 * @return the value produced by this operation.
+	 */
 	public static List<RenderEntry> extractRenderEntries(LivingEntity entity, float partialTick)
 	{
 		List<RenderEntry> entries = new ArrayList<>();
@@ -83,6 +105,14 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 		return entries;
 	}
 	
+	/**
+	 * Adds the render entry.
+	 * @param entries the entries to use.
+	 * @param entity the entity to use.
+	 * @param stack the stack to use.
+	 * @param definition the definition to use.
+	 * @param partialTick the partial tick to use.
+	 */
 	private static void addRenderEntry(List<RenderEntry> entries,
 	                                   LivingEntity entity,
 	                                   ItemStack stack,
@@ -97,6 +127,15 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 		entries.add(new RenderEntry(definition, entity, stack.copy(), controllers));
 	}
 	
+	/**
+	 * Renders the first person anchor.
+	 * @param poseStack the pose stack to use.
+	 * @param light the light to use.
+	 * @param entity the entity to use.
+	 * @param targetAnchor the target anchor to use.
+	 * @param anchorPart the anchor part to use.
+	 * @param partialTick the partial tick to use.
+	 */
 	protected static void renderFirstPersonAnchor(PoseStack poseStack,
 	                                              int light,
 	                                              LivingEntity entity,
@@ -125,6 +164,14 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 		}
 	}
 	
+	/**
+	 * Renders the definition.
+	 * @param poseStack the pose stack to use.
+	 * @param light the light to use.
+	 * @param partialTick the partial tick to use.
+	 * @param entry the entry to use.
+	 * @param partResolver the part resolver to use.
+	 */
 	private static void renderDefinition(
 			PoseStack poseStack,
 			int light,
@@ -165,6 +212,17 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 		}
 	}
 	
+	/**
+	 * Draws the bone.
+	 * @param poseStack the pose stack to use.
+	 * @param definition the definition to use.
+	 * @param bone the bone to use.
+	 * @param entity the entity to use.
+	 * @param stack the stack to use.
+	 * @param controllers the controllers to use.
+	 * @param light the light to use.
+	 * @param partialTick the partial tick to use.
+	 */
 	private static void drawBone(PoseStack poseStack,
 	                             PLivingAttachmentDefinition definition,
 	                             PBakedBone bone,
@@ -177,6 +235,17 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 		drawBoneUnchecked(poseStack, definition, bone, entity, stack, controllers, light, partialTick);
 	}
 	
+	/**
+	 * Draws the bone unchecked.
+	 * @param poseStack the pose stack to use.
+	 * @param definition the definition to use.
+	 * @param bone the bone to use.
+	 * @param entity the entity to use.
+	 * @param stack the stack to use.
+	 * @param controllers the controllers to use.
+	 * @param light the light to use.
+	 * @param partialTick the partial tick to use.
+	 */
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	private static void drawBoneUnchecked(PoseStack poseStack,
 	                                      PLivingAttachmentDefinition definition,
@@ -203,6 +272,12 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 				partialTick);
 	}
 	
+	/**
+	 * Finds the bone.
+	 * @param bones the bones to use.
+	 * @param name the name to use.
+	 * @return the value produced by this operation.
+	 */
 	private static @Nullable PBakedBone findBone(List<PBakedBone> bones, String name)
 	{
 		for (PBakedBone bone : bones)
@@ -219,11 +294,22 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 	}
 	
 	@FunctionalInterface
+/**
+ * Defines the contract for attachment part resolver.
+ */
 	private interface AttachmentPartResolver
 	{
+		/**
+		 * Performs the resolve operation.
+		 * @param binding the binding to use.
+		 * @return the value produced by this operation.
+		 */
 		@Nullable ModelPart resolve(PAttachmentBinding binding);
 	}
 	
+/**
+ * Immutable value object representing render entry.
+ */
 	public record RenderEntry(
 			PLivingAttachmentDefinition definition,
 			LivingEntity entity,

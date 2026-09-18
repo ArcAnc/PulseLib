@@ -9,11 +9,11 @@
 
 package com.arcanc.pulselib.content.model.baked;
 
-import com.arcanc.pulselib.content.model.PMesh;
+import com.arcanc.pulselib.content.model.PMeshPrimitive;
 import com.arcanc.pulselib.content.model.textures.PTextureAlphaClassifier;
 import com.arcanc.pulselib.content.model.textures.atlas.PLibSpriteMetadata;
 import com.arcanc.pulselib.util.PRenderTypes;
-import com.arcanc.pulselib.util.PTextureCache;
+import com.arcanc.pulselib.util.PResourceCache;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
@@ -29,22 +29,40 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
+/**
+ * Provides support for mesh texture variants.
+ */
 public final class PMeshTextureVariants
 {
 	private static final Map<PBakedMesh, Map<Identifier, PBakedMesh>> VARIANTS = new IdentityHashMap<>();
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PMeshTextureVariants()
 	{
 	}
 
+	/**
+	 * Performs the resolve operation.
+	 * @param mesh the mesh to use.
+	 * @param texture the texture to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PBakedMesh resolve(PBakedMesh mesh, @Nullable Identifier texture)
 	{
-		if (texture == null || texture.equals(mesh.textureLocation()))
+		if (texture == null)
 			return mesh;
-		return VARIANTS.computeIfAbsent(mesh, ignored -> new HashMap<>()).computeIfAbsent(texture,
+		Identifier sprite = PResourceCache.spriteId(texture);
+		if (sprite.equals(mesh.textureLocation()))
+			return mesh;
+		return VARIANTS.computeIfAbsent(mesh, ignored -> new HashMap<>()).computeIfAbsent(sprite,
 				location -> bake(mesh, location));
 	}
 
+	/**
+	 * Performs the clear operation.
+	 */
 	public static void clear()
 	{
 		for (Map<Identifier, PBakedMesh> variants : VARIANTS.values())
@@ -57,10 +75,16 @@ public final class PMeshTextureVariants
 		VARIANTS.clear();
 	}
 
+	/**
+	 * Performs the bake operation.
+	 * @param base the base to use.
+	 * @param texture the texture to use.
+	 * @return the value produced by this operation.
+	 */
 	private static PBakedMesh bake(PBakedMesh base, Identifier texture)
 	{
-		PMesh source = base.source();
-		TextureAtlasSprite sprite = PTextureCache.getTextureAtlas().getSprite(texture);
+		PMeshPrimitive source = base.source();
+		TextureAtlasSprite sprite = PResourceCache.getTextureAtlas().getSprite(texture);
 		boolean emissive = sprite.contents().getAdditionalMetadata(PLibSpriteMetadata.TYPE).
 				map(PLibSpriteMetadata :: emissive).orElse(false);
 		ByteBufferBuilder bytes = ByteBufferBuilder.exactlySized(
@@ -81,7 +105,7 @@ public final class PMeshTextureVariants
 			GpuBuffer indexBuffer = RenderSystem.getDevice().createBuffer(
 					() -> base.uuid() + "_" + texture + "_indices", GpuBuffer.USAGE_INDEX, indices);
 			return new PBakedMesh(base.uuid(), vertices, source.vertexCount(), indexBuffer, source.indicesCount(),
-					base.indexType(), base.textureName(), emissive, PTextureAlphaClassifier.resolve(sprite.contents()), source, texture);
+					base.indexType(), base.textureReference(), emissive, PTextureAlphaClassifier.resolve(sprite.contents()), source, texture);
 		}
 	}
 }

@@ -15,8 +15,15 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.common.NeoForge;
 
+/**
+ * Handles render stages.
+ */
 public class PRenderStagesHandler
 {
+	/**
+	 * Performs the register operation.
+	 * @param modEventBus the mod event bus to use.
+	 */
 	public static void register(IEventBus modEventBus)
 	{
 		NeoForge.EVENT_BUS.addListener(PRenderStagesHandler :: renderSolid);
@@ -24,11 +31,19 @@ public class PRenderStagesHandler
 		NeoForge.EVENT_BUS.addListener(PRenderStagesHandler :: renderTranslucent);
 	}
 	
+	/**
+	 * Renders the solid.
+	 * @param event the event to use.
+	 */
 	private static void renderSolid(final RenderLevelStageEvent.AfterOpaqueFeatures event)
 	{
 		PRenderQueue.flush(PRenderQueue.RenderStage.SOLID_BLOCKS);
 	}
 	
+	/**
+	 * Renders the translucent.
+	 * @param event the event to use.
+	 */
 	private static void renderTranslucent(final RenderLevelStageEvent.AfterTranslucentFeatures event)
 	{
 		PRenderQueue.flushCombined(PRenderQueue.RenderStage.ENTITIES, PRenderQueue.RenderStage.TRANSLUCENT_BLOCKS);

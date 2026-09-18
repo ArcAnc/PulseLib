@@ -14,6 +14,9 @@ import org.joml.Vector3f;
 
 import java.util.BitSet;
 
+/**
+ * Provides support for pose.
+ */
 public final class PPose implements PPoseWriter
 {
 	private final Vector3f[] translations;
@@ -23,11 +26,20 @@ public final class PPose implements PPoseWriter
 	private final BitSet dirtyBones;
 	private final BitSet validBones;
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param boneCount the bone count to use.
+	 */
 	public PPose(int boneCount)
 	{
 		this(boneCount, 0);
 	}
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param boneCount the bone count to use.
+	 * @param scalarChannelCount the scalar channel count to use.
+	 */
 	public PPose(int boneCount, int scalarChannelCount)
 	{
 		if (boneCount < 0 || scalarChannelCount < 0)
@@ -46,56 +58,110 @@ public final class PPose implements PPoseWriter
 		this.validBones = new BitSet(boneCount);
 	}
 
+	/**
+	 * Performs the bone count operation.
+	 * @return the value produced by this operation.
+	 */
 	public int boneCount()
 	{
 		return this.translations.length;
 	}
 
+	/**
+	 * Performs the translation operation.
+	 * @param boneIndex the bone index to use.
+	 * @return the value produced by this operation.
+	 */
 	public Vector3f translation(int boneIndex)
 	{
 		return this.translations[boneIndex];
 	}
 
+	/**
+	 * Performs the rotation operation.
+	 * @param boneIndex the bone index to use.
+	 * @return the value produced by this operation.
+	 */
 	public Quaternionf rotation(int boneIndex)
 	{
 		return this.rotations[boneIndex];
 	}
 
+	/**
+	 * Performs the scale operation.
+	 * @param boneIndex the bone index to use.
+	 * @return the value produced by this operation.
+	 */
 	public Vector3f scale(int boneIndex)
 	{
 		return this.scales[boneIndex];
 	}
 
+	/**
+	 * Performs the scalar channel operation.
+	 * @param channelIndex the channel index to use.
+	 * @return the value produced by this operation.
+	 */
 	public float scalarChannel(int channelIndex)
 	{
 		return this.scalarChannels[channelIndex];
 	}
 
+	/**
+	 * Performs the scalar channel operation.
+	 * @param channelIndex the channel index to use.
+	 * @param value the value to use.
+	 */
 	public void scalarChannel(int channelIndex, float value)
 	{
 		this.scalarChannels[channelIndex] = value;
 	}
 
+	/**
+	 * Determines whether dirty.
+	 * @param boneIndex the bone index to use.
+	 * @return the value produced by this operation.
+	 */
 	public boolean isDirty(int boneIndex)
 	{
 		return this.dirtyBones.get(boneIndex);
 	}
 
+	/**
+	 * Determines whether valid.
+	 * @param boneIndex the bone index to use.
+	 * @return the value produced by this operation.
+	 */
 	public boolean isValid(int boneIndex)
 	{
 		return this.validBones.get(boneIndex);
 	}
 
+	/**
+	 * Performs the dirty bones operation.
+	 * @return the value produced by this operation.
+	 */
 	public BitSet dirtyBones()
 	{
 		return (BitSet) this.dirtyBones.clone();
 	}
 
+	/**
+	 * Performs the valid bones operation.
+	 * @return the value produced by this operation.
+	 */
 	public BitSet validBones()
 	{
 		return (BitSet) this.validBones.clone();
 	}
 
+	/**
+	 * Performs the set operation.
+	 * @param boneIndex the bone index to use.
+	 * @param translation the translation to use.
+	 * @param rotation the rotation to use.
+	 * @param scale the scale to use.
+	 */
 	public void set(int boneIndex, Vector3f translation, Quaternionf rotation, Vector3f scale)
 	{
 		this.translations[boneIndex].set(translation);
@@ -104,12 +170,24 @@ public final class PPose implements PPoseWriter
 		this.validBones.set(boneIndex);
 	}
 	
+	/**
+	 * Sets the animated.
+	 * @param boneIndex the bone index to use.
+	 * @param translation the translation to use.
+	 * @param rotation the rotation to use.
+	 * @param scale the scale to use.
+	 */
 	public void setAnimated(int boneIndex, Vector3f translation, Quaternionf rotation, Vector3f scale)
 	{
 		set(boneIndex, translation, rotation, scale);
 		this.dirtyBones.set(boneIndex);
 	}
 
+	/**
+	 * Performs the translation operation.
+	 * @param boneIndex the bone index to use.
+	 * @param value the value to use.
+	 */
 	@Override
 	public void translation(int boneIndex, Vector3f value)
 	{
@@ -118,6 +196,11 @@ public final class PPose implements PPoseWriter
 		this.dirtyBones.set(boneIndex);
 	}
 
+	/**
+	 * Performs the rotation operation.
+	 * @param boneIndex the bone index to use.
+	 * @param value the value to use.
+	 */
 	@Override
 	public void rotation(int boneIndex, Quaternionf value)
 	{
@@ -126,6 +209,11 @@ public final class PPose implements PPoseWriter
 		this.dirtyBones.set(boneIndex);
 	}
 
+	/**
+	 * Performs the scale operation.
+	 * @param boneIndex the bone index to use.
+	 * @param value the value to use.
+	 */
 	@Override
 	public void scale(int boneIndex, Vector3f value)
 	{

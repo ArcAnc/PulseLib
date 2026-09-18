@@ -1,0 +1,42 @@
+/**
+ * @author ArcAnc
+ * Created at: 13.09.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
+package com.arcanc.pulselib.content.model.resource;
+
+
+import com.arcanc.pulselib.content.model.PTextureReference;
+import net.minecraft.resources.Identifier;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+
+/**
+ * Immutable value object representing model resource.
+ */
+public record PModelResource(
+		Identifier model,
+		Identifier modelLoaderId,
+		Map<String, Identifier> textures)
+{
+	public PModelResource
+	{
+		Objects.requireNonNull(model);
+		Objects.requireNonNull(modelLoaderId);
+		Map<String, Identifier> normalizedTextures = new LinkedHashMap<>();
+		textures.forEach((reference, texture) ->
+		{
+			String normalizedReference = PTextureReference.normalize(reference);
+			if (normalizedTextures.putIfAbsent(normalizedReference, Objects.requireNonNull(texture)) != null)
+				throw new IllegalArgumentException("Duplicate texture reference for model " + model + ": " + normalizedReference);
+		});
+		textures = Collections.unmodifiableMap(normalizedTextures);
+	}
+}

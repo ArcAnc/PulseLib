@@ -11,6 +11,9 @@ package com.arcanc.pulselib.content.model.animation;
 
 import java.util.Objects;
 
+/**
+ * Provides support for root motion runtime.
+ */
 public final class PRootMotionRuntime
 {
 	private final PAnimation animation;
@@ -18,11 +21,24 @@ public final class PRootMotionRuntime
 	private final PInterpolationType interpolation;
 	private final Object data;
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param animation the animation to use.
+	 * @param rootBoneName the root bone name to use.
+	 * @param interpolation the interpolation to use.
+	 */
 	public PRootMotionRuntime(PAnimation animation, String rootBoneName, PInterpolationType interpolation)
 	{
 		this(animation, rootBoneName, interpolation, null);
 	}
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param animation the animation to use.
+	 * @param rootBoneName the root bone name to use.
+	 * @param interpolation the interpolation to use.
+	 * @param data the data to use.
+	 */
 	public PRootMotionRuntime(PAnimation animation, String rootBoneName, PInterpolationType interpolation, Object data)
 	{
 		this.animation = Objects.requireNonNull(animation, "animation");
@@ -31,6 +47,12 @@ public final class PRootMotionRuntime
 		this.data = data;
 	}
 	
+	/**
+	 * Extracts the root motion.
+	 * @param previousTime the previous time to use.
+	 * @param currentTime the current time to use.
+	 * @return the value produced by this operation.
+	 */
 	public PRootMotionDelta extractRootMotion(float previousTime, float currentTime)
 	{
 		return PAnimationRuntime.extractRootMotion(this.animation, this.rootBoneName,

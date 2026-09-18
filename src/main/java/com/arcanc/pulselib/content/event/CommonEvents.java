@@ -12,13 +12,24 @@ package com.arcanc.pulselib.content.event;
 
 import net.neoforged.bus.api.IEventBus;
 
+/**
+ * Provides support for common events.
+ */
 public class CommonEvents
 {
+	/**
+	 * Registers the common events.
+	 * @param modEventBus the mod event bus to use.
+	 */
 	public static void registerCommonEvents(final IEventBus modEventBus)
 	{
 		//modEventBus.addListener(CommonEvents :: registerAttributes);
 	}
 	
+	/**
+	 * Registers the attributes.
+	 * @param event the event to use.
+	 */
 	/*private static void registerAttributes(final EntityAttributeCreationEvent event)
 	{
 		event.put(PLibRegistration.EntityTypeReg.TEST_ENTITY.get(), TestEntity.createAttributes().build());

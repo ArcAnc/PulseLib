@@ -15,7 +15,17 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 
 @FunctionalInterface
+/**
+ * Defines the contract for living attachment source.
+ */
 public interface PLivingAttachmentSource
 {
+	/**
+	 * Performs the should render operation.
+	 * @param entity the entity to use.
+	 * @param slot the slot to use.
+	 * @param stack the stack to use.
+	 * @return the value produced by this operation.
+	 */
 	boolean shouldRender(LivingEntity entity, EquipmentSlot slot, ItemStack stack);
 }

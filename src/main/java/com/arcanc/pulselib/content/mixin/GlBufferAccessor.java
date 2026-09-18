@@ -14,8 +14,15 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(GlBuffer.class)
+/**
+ * Defines the contract for gl buffer accessor.
+ */
 public interface GlBufferAccessor
 {
+	/**
+	 * Performs the pulselib$get handle operation.
+	 * @return the value produced by this operation.
+	 */
 	@Accessor("handle")
 	int pulselib$getHandle();
 }

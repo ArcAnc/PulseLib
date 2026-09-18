@@ -10,6 +10,9 @@
 package com.arcanc.pulselib.content.model.animation;
 
 
+/**
+ * Enumerates the available blend mode values.
+ */
 public enum PBlendMode
 {
 	ADDITIVE,

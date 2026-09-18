@@ -8,7 +8,7 @@ All built-in renderers implement [`PRenderer`](https://github.com/ArcAnc/PulseLi
 * `trueSubmit(...)` - default PulseLib model submission.
 * `postSubmit(...)` - hook after model submission.
 
-Most custom renderers need a model-data constructor and a render-state implementation. Override `preSubmit` or `postSubmit` when you need to submit extra PulseLib geometry or collector nodes around the model.
+Most custom renderers need a model-data constructor and a render-state implementation. Each model used by the renderer must also be registered as a `PModelResource`, including all of its material texture references; resource registration controls which models PulseLib loads. See [Resources](resources.md#register-model-resources). Override `preSubmit` or `postSubmit` when you need to submit extra PulseLib geometry or collector nodes around the model.
 
 ## Molang context
 
@@ -67,7 +67,7 @@ public class WandRenderer extends PItemRenderer<WandItem, WandRenderState> {
 public class WandRenderState extends PItemRenderState.Impl<WandItem> {}
 ```
 
-In GUI context, `PItemRenderer` submits to the `GUI` queue and immediately flushes that stage through the collector. In `FIRST_PERSON_LEFT_HAND` and `FIRST_PERSON_RIGHT_HAND` contexts, it submits to the dedicated `FIRST_PERSON` stage, which PulseLib flushes and composites immediately after Minecraft's hand pass. It preserves the render type supplied to its constructor; use a render type compatible with the contexts in which the item is displayed.
+In GUI context, `PItemRenderer` submits to the `GUI` queue and immediately flushes that stage through the collector. In `FIRST_PERSON_LEFT_HAND` and `FIRST_PERSON_RIGHT_HAND` contexts, it submits to the dedicated `FIRST_PERSON` stage, which PulseLib flushes and composites immediately after the current hand pass. That pass is vanilla normally and PulseLib's replacement pass while an enabled player first-person animation is active. It preserves the render type supplied to its constructor; use a render type compatible with the contexts in which the item is displayed.
 
 ## Entity renderer
 

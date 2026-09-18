@@ -12,22 +12,41 @@ package com.arcanc.pulselib.content.renderer.modelData;
 
 import net.minecraft.resources.Identifier;
 
+/**
+ * Provides support for default entity model data.
+ */
 public class DefaultEntityModelData extends PModelData
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param builder the builder to use.
+	 */
 	public DefaultEntityModelData(DefaultEntityModelDataBuilder builder)
 	{
 		super(builder);
 	}
 	
+/**
+ * Builds default entity model data.
+ */
 	public static class DefaultEntityModelDataBuilder extends Builder
 	{
 		private final Identifier shortModelLocation;
 		
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param modelLocation the model location to use.
+		 */
 		public DefaultEntityModelDataBuilder(Identifier modelLocation)
 		{
 			this(modelLocation, PModelData.DEFAULT_MODEL_FORMAT);
 		}
 		
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param modelLocation the model location to use.
+		 * @param modelFormat the model format to use.
+		 */
 		public DefaultEntityModelDataBuilder(Identifier modelLocation, Identifier modelFormat)
 		{
 			super(modelLocation, "entity");
@@ -36,13 +55,10 @@ public class DefaultEntityModelData extends PModelData
 			this.modelLocation = PModelData.generateDefaultModelLocation(modelLocation, this.modelType, this.modelFormat);
 		}
 		
-		@Override
-		public DefaultEntityModelDataBuilder addTexture(Identifier texturePath)
-		{
-			super.addTexture(PModelData.generateDefaultTextureLocation(texturePath, this.shortModelLocation, this.modelType, this.modelFormat));
-			return this;
-		}
-		
+		/**
+		 * Performs the build operation.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public DefaultEntityModelData build()
 		{

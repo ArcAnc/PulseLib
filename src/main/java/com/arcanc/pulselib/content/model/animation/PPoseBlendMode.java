@@ -9,6 +9,9 @@
 
 package com.arcanc.pulselib.content.model.animation;
 
+/**
+ * Enumerates the available pose blend mode values.
+ */
 public enum PPoseBlendMode
 {
 	OVERRIDE,

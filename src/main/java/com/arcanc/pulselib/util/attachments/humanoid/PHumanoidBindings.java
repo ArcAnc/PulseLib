@@ -16,54 +16,112 @@ import com.arcanc.pulselib.util.attachments.PTransform;
 
 import java.util.Objects;
 
+/**
+ * Provides support for humanoid bindings.
+ */
 public final class PHumanoidBindings
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PHumanoidBindings()
 	{
 	}
 	
+	/**
+	 * Performs the bind operation.
+	 * @param anchor the anchor to use.
+	 * @param bone the bone to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PAttachmentBinding bind(PAttachmentAnchor anchor, String bone)
 	{
 		return new Binding(anchor, bone, PTransform.IDENTITY);
 	}
 	
+	/**
+	 * Performs the bind operation.
+	 * @param anchor the anchor to use.
+	 * @param bone the bone to use.
+	 * @param transform the transform to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PAttachmentBinding bind(PAttachmentAnchor anchor, String bone, PTransform transform)
 	{
 		return new Binding(anchor, bone, transform);
 	}
 	
+	/**
+	 * Performs the head operation.
+	 * @param bone the bone to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PAttachmentBinding head(String bone)
 	{
 		return bind(PHumanoidAnchors.HEAD, bone);
 	}
 	
+	/**
+	 * Performs the body operation.
+	 * @param bone the bone to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PAttachmentBinding body(String bone)
 	{
 		return bind(PHumanoidAnchors.BODY, bone);
 	}
 	
+	/**
+	 * Performs the right arm operation.
+	 * @param bone the bone to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PAttachmentBinding rightArm(String bone)
 	{
 		return bind(PHumanoidAnchors.RIGHT_ARM, bone);
 	}
 	
+	/**
+	 * Performs the left arm operation.
+	 * @param bone the bone to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PAttachmentBinding leftArm(String bone)
 	{
 		return bind(PHumanoidAnchors.LEFT_ARM, bone);
 	}
 	
+	/**
+	 * Performs the right leg operation.
+	 * @param bone the bone to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PAttachmentBinding rightLeg(String bone)
 	{
 		return bind(PHumanoidAnchors.RIGHT_LEG, bone);
 	}
 	
+	/**
+	 * Performs the left leg operation.
+	 * @param bone the bone to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PAttachmentBinding leftLeg(String bone)
 	{
 		return bind(PHumanoidAnchors.LEFT_LEG, bone);
 	}
 	
+/**
+ * Immutable value object representing binding.
+ */
 	private record Binding(PAttachmentAnchor anchor, String bone, PTransform transform) implements PAttachmentBinding
 	{
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param anchor the anchor to use.
+		 * @param bone the bone to use.
+		 * @param transform the transform to use.
+		 */
 		private Binding
 		{
 			Objects.requireNonNull(anchor);

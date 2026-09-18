@@ -11,6 +11,9 @@ package com.arcanc.pulselib.content.player.animation;
 
 import com.arcanc.pulselib.content.model.animation.PPoseBlendMode;
 
+/**
+ * Enumerates the available player animation blend mode values.
+ */
 public enum PPlayerAnimationBlendMode
 {
 	OVERRIDE(PPoseBlendMode.OVERRIDE),
@@ -21,11 +24,19 @@ public enum PPlayerAnimationBlendMode
 
 	private final PPoseBlendMode poseBlendMode;
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param poseBlendMode the pose blend mode to use.
+	 */
 	PPlayerAnimationBlendMode(PPoseBlendMode poseBlendMode)
 	{
 		this.poseBlendMode = poseBlendMode;
 	}
 
+	/**
+	 * Performs the pose blend mode operation.
+	 * @return the value produced by this operation.
+	 */
 	public PPoseBlendMode poseBlendMode()
 	{
 		return this.poseBlendMode;

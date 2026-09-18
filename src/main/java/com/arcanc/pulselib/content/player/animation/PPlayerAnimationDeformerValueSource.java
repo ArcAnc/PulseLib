@@ -12,7 +12,16 @@ package com.arcanc.pulselib.content.player.animation;
 import com.arcanc.pulselib.content.model.deformer.PChannelReference;
 
 @FunctionalInterface
+/**
+ * Defines the contract for player animation deformer value source.
+ */
 public interface PPlayerAnimationDeformerValueSource
 {
+	/**
+	 * Performs the resolve operation.
+	 * @param context the context to use.
+	 * @param reference the reference to use.
+	 * @return the value produced by this operation.
+	 */
 	float resolve(PPlayerAnimationDeformerContext context, PChannelReference<Float> reference);
 }

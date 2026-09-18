@@ -10,10 +10,22 @@
 package com.arcanc.pulselib.content.model.animation;
 
 @FunctionalInterface
+/**
+ * Defines the contract for animation value.
+ */
 public interface PAnimationValue<T>
 {
+	/**
+	 * Performs the evaluate operation.
+	 * @param context the context to use.
+	 * @param destination the destination to use.
+	 */
 	void evaluate(PAnimationEvaluationContext context, T destination);
 
+	/**
+	 * Determines whether constant.
+	 * @return the value produced by this operation.
+	 */
 	default boolean isConstant()
 	{
 		return false;

@@ -9,6 +9,9 @@
 
 package com.arcanc.pulselib.content.player.deformer;
 
+/**
+ * Provides support for deformable cube bake scope.
+ */
 public final class PDeformableCubeBakeScope
 {
 	/*
@@ -18,23 +21,40 @@ public final class PDeformableCubeBakeScope
 	 */
 	private static final ThreadLocal<Integer> DEPTH = ThreadLocal.withInitial(() -> 0);
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PDeformableCubeBakeScope()
 	{
 	}
 
+	/**
+	 * Performs the begin operation.
+	 * @return the value produced by this operation.
+	 */
 	public static Scope begin()
 	{
 		DEPTH.set(DEPTH.get() + 1);
 		return new Scope();
 	}
 
+	/**
+	 * Determines whether active.
+	 * @return the value produced by this operation.
+	 */
 	public static boolean isActive()
 	{
 		return DEPTH.get() > 0;
 	}
 
+/**
+ * Provides support for scope.
+ */
 	public static final class Scope implements AutoCloseable
 	{
+		/**
+		 * Performs the close operation.
+		 */
 		@Override
 		public void close()
 		{

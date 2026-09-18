@@ -14,27 +14,46 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.resources.Identifier;
 import org.joml.Vector3f;
 
+/**
+ * Deforms wave.
+ */
 public final class PWaveDeformer implements PMeshDeformer<PWaveDefinition>
 {
 	public static final PWaveDeformer INSTANCE = new PWaveDeformer();
 	private static final float EPSILON = 1.0e-5f;
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PWaveDeformer()
 	{
 	}
 
+	/**
+	 * Performs the id operation.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public Identifier id()
 	{
 		return PLibDatabase.rl("wave");
 	}
 
+	/**
+	 * Performs the codec operation.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public MapCodec<PWaveDefinition> codec()
 	{
 		return PWaveDefinition.CODEC;
 	}
 
+	/**
+	 * Performs the prepare operation.
+	 * @param context the context to use.
+	 * @param definition the definition to use.
+	 */
 	@Override
 	public void prepare(PDeformerPrepareContext context, PWaveDefinition definition)
 	{
@@ -46,6 +65,12 @@ public final class PWaveDeformer implements PMeshDeformer<PWaveDefinition>
 				definition.negativeExtent(), definition.wavelength(), definition.amplitude(), definition.phase()));
 	}
 
+	/**
+	 * Performs the unit operation.
+	 * @param axis the axis to use.
+	 * @param name the name to use.
+	 * @return the value produced by this operation.
+	 */
 	private static Vector3f unit(Vector3f axis, String name)
 	{
 		Vector3f result = new Vector3f(axis);
@@ -54,10 +79,18 @@ public final class PWaveDeformer implements PMeshDeformer<PWaveDefinition>
 		return result.normalize();
 	}
 
+/**
+ * Immutable value object representing operation.
+ */
 	private record Operation(Vector3f origin, Vector3f length, Vector3f displacement, float positiveExtent,
 								 float negativeExtent, float wavelength, PChannelReference<Float> amplitude,
 								 PChannelReference<Float> phase) implements PPreparedDeformer
 	{
+		/**
+		 * Performs the deform operation.
+		 * @param position the position to use.
+		 * @param values the values to use.
+		 */
 		@Override
 		public void deform(Vector3f position, PDeformerValueSource values)
 		{

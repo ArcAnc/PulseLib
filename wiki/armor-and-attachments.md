@@ -4,6 +4,8 @@ The attachment system is for cases where you do not want to replace the whole en
 
 This is useful for custom armor, tails, backpacks, masks, equipment on arms, or other accessories. Definitions can be tied to an item stack, registered globally for living entities, hide vanilla armor for a slot, and render first-person arm attachments.
 
+First-person arm attachments are rendered only by PulseLib's opt-in player-animation first-person pass. The local player needs an active definition with `firstPerson(PPlayerFirstPersonSettings.ENABLED)`, a `FIRST_PERSON_CAMERA` anchor, and a sampled transform for that arm. See [Player animations](player-animations.md#first-person-hands-items-and-camera-space) when an attachment must appear in first person.
+
 Important classes:
 
 * [`PLivingAttachmentDefinition`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentDefinition.java)
@@ -21,6 +23,8 @@ Important classes:
 * [`PArmorClientExtensions`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PArmorClientExtensions.java)
 
 PulseLib adds attachment render layers for players and living entities automatically through [`PLibArmorHandler`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PLibArmorHandler.java). Attachment definitions should be contributed on the mod event bus through [`PulseLibEvents.AttachmentRegistrationEvent`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/event/PulseLibEvents.java).
+
+Before registering an attachment definition, register its model and material texture references through `PulseLibEvents.RegisterResourceEvent`; otherwise that model is not loaded. See [Resources](resources.md#register-model-resources).
 
 ## Armor item example
 

@@ -19,41 +19,121 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Immutable value object representing animation.
+ */
 public record PAnimation(String name,
                          float length,
                          Map<String, PBoneAnimation> boneAnimations,
-                         List<PAnimationEvent<?>> events)
+                         List<PAnimationEvent<?>> events,
+                         Map<String, PAnimationVisibilityTrack> visibilityTracks)
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param name the name to use.
+	 * @param length the length to use.
+	 * @param boneAnimations the bone animations to use.
+	 */
 	public PAnimation(String name, float length, Map<String, PBoneAnimation> boneAnimations)
 	{
-		this(name, length, boneAnimations, List.of());
+		this(name, length, boneAnimations, List.of(), Map.of());
 	}
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param name the name to use.
+	 * @param length the length to use.
+	 * @param boneAnimations the bone animations to use.
+	 * @param events the events to use.
+	 */
+	public PAnimation(String name, float length, Map<String, PBoneAnimation> boneAnimations, List<PAnimationEvent<?>> events)
+	{
+		this(name, length, boneAnimations, events, Map.of());
+	}
+
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param name the name to use.
+	 * @param length the length to use.
+	 * @param boneAnimations the bone animations to use.
+	 * @param events the events to use.
+	 * @param visibilityTracks the visibility tracks to use.
+	 */
 	public PAnimation
 	{
 		events = List.copyOf(events);
+		visibilityTracks = Map.copyOf(visibilityTracks);
+	}
+
+	/**
+	 * Determines whether bone visible.
+	 * @param boneName the bone name to use.
+	 * @param time the time to use.
+	 * @return the value produced by this operation.
+	 */
+	public boolean isBoneVisible(String boneName, float time)
+	{
+		PAnimationVisibilityTrack track = this.visibilityTracks.get(boneName);
+		return track == null || track.visibleAt(time);
 	}
 	
+	/**
+	 * Performs the root motion operation.
+	 * @param rootBoneName the root bone name to use.
+	 * @param interpolation the interpolation to use.
+	 * @return the value produced by this operation.
+	 */
 	public PRootMotionRuntime rootMotion(String rootBoneName, PInterpolationType interpolation)
 	{
 		return new PRootMotionRuntime(this, rootBoneName, interpolation);
 	}
 	
+	/**
+	 * Performs the root motion operation.
+	 * @param rootBoneName the root bone name to use.
+	 * @param interpolation the interpolation to use.
+	 * @param data the data to use.
+	 * @return the value produced by this operation.
+	 */
 	public PRootMotionRuntime rootMotion(String rootBoneName, PInterpolationType interpolation, Object data)
 	{
 		return new PRootMotionRuntime(this, rootBoneName, interpolation, data);
 	}
 
+	/**
+	 * Calculates the bone transformations.
+	 * @param boneName the bone name to use.
+	 * @param time the time to use.
+	 * @param interpolation the interpolation to use.
+	 * @return the value produced by this operation.
+	 */
 	public @Nullable BoneFrame calculateBoneTransformations(String boneName, float time, PInterpolationType interpolation)
 	{
 		return calculateBoneTransformations(boneName, time, interpolation, null, null);
 	}
 
+	/**
+	 * Calculates the bone transformations.
+	 * @param boneName the bone name to use.
+	 * @param time the time to use.
+	 * @param interpolation the interpolation to use.
+	 * @param data the data to use.
+	 * @return the value produced by this operation.
+	 */
 	public @Nullable BoneFrame calculateBoneTransformations(String boneName, float time, PInterpolationType interpolation, Object data)
 	{
 		return calculateBoneTransformations(boneName, time, interpolation, data, null);
 	}
 
+	/**
+	 * Calculates the bone transformations.
+	 * @param boneName the bone name to use.
+	 * @param time the time to use.
+	 * @param interpolation the interpolation to use.
+	 * @param data the data to use.
+	 * @param accumulatedFrame the accumulated frame to use.
+	 * @return the value produced by this operation.
+	 */
 	public @Nullable BoneFrame calculateBoneTransformations(String boneName,
 	                                                        float time,
 	                                                        PInterpolationType interpolation,
@@ -64,6 +144,15 @@ public record PAnimation(String name,
 		return calculateBoneTransformations(boneAnimation, time, interpolation, data, accumulatedFrame);
 	}
 
+	/**
+	 * Calculates the bone transformations.
+	 * @param boneAnimation the bone animation to use.
+	 * @param time the time to use.
+	 * @param interpolation the interpolation to use.
+	 * @param data the data to use.
+	 * @param accumulatedFrame the accumulated frame to use.
+	 * @return the value produced by this operation.
+	 */
 	public @Nullable BoneFrame calculateBoneTransformations(@Nullable PBoneAnimation boneAnimation,
 	                                                        float time,
 	                                                        PInterpolationType interpolation,
@@ -91,6 +180,12 @@ public record PAnimation(String name,
 				scale == null ? new Vector3f(1f) : scale);
 	}
 
+	/**
+	 * Performs the events between operation.
+	 * @param from the from to use.
+	 * @param to the to to use.
+	 * @return the value produced by this operation.
+	 */
 	public List<PAnimationEvent<?>> eventsBetween(float from, float to)
 	{
 		if (this.events.isEmpty() || to < from)
@@ -98,6 +193,12 @@ public record PAnimation(String name,
 		return this.events.stream().filter(event -> (event.time() > from || (from == 0f && event.time() == 0f)) && event.time() <= to).toList();
 	}
 
+	/**
+	 * Performs the events between reverse operation.
+	 * @param from the from to use.
+	 * @param to the to to use.
+	 * @return the value produced by this operation.
+	 */
 	public List<PAnimationEvent<?>> eventsBetweenReverse(float from, float to)
 	{
 		if (this.events.isEmpty() || to > from)
@@ -106,6 +207,15 @@ public record PAnimation(String name,
 			sorted(Comparator.comparingDouble((PAnimationEvent<?> event) -> event.time()).reversed()).toList();
 	}
 
+	/**
+	 * Performs the sample operation.
+	 * @param boneAnimation the bone animation to use.
+	 * @param channel the channel to use.
+	 * @param time the time to use.
+	 * @param context the context to use.
+	 * @param thisValue the this value to use.
+	 * @return the value produced by this operation.
+	 */
 	private static <T> @Nullable T sample(PBoneAnimation boneAnimation,
 	                                      PAnimationChannelType<T> channel,
 	                                      float time,
@@ -145,6 +255,13 @@ public record PAnimation(String name,
 		return destination;
 	}
 
+	/**
+	 * Performs the evaluate operation.
+	 * @param value the value to use.
+	 * @param channel the channel to use.
+	 * @param context the context to use.
+	 * @return the value produced by this operation.
+	 */
 	private static <T> T evaluate(PAnimationValue<T> value, PAnimationChannelType<T> channel, PAnimationEvaluationContext context)
 	{
 		T destination = channel.defaultValue();

@@ -11,15 +11,31 @@ package com.arcanc.pulselib.content.model.deformer;
 
 import java.util.Objects;
 
+/**
+ * Immutable value object representing mesh deformation.
+ */
 public record PMeshDeformation(PDeformerStack stack, PDeformerValueSource values, Object cacheKey, int subdivisionLevel)
 {
 	public static final int DEFAULT_SUBDIVISION_LEVEL = 2;
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param stack the stack to use.
+	 * @param values the values to use.
+	 * @param cacheKey the cache key to use.
+	 */
 	public PMeshDeformation(PDeformerStack stack, PDeformerValueSource values, Object cacheKey)
 	{
 		this(stack, values, cacheKey, DEFAULT_SUBDIVISION_LEVEL);
 	}
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param stack the stack to use.
+	 * @param values the values to use.
+	 * @param cacheKey the cache key to use.
+	 * @param subdivisionLevel the subdivision level to use.
+	 */
 	public PMeshDeformation
 	{
 		Objects.requireNonNull(stack);

@@ -11,7 +11,7 @@ package com.arcanc.pulselib.content.model.textures.atlas;
 
 
 import com.arcanc.pulselib.util.PLibDatabase;
-import com.arcanc.pulselib.util.PTextureCache;
+import com.arcanc.pulselib.util.PResourceCache;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.client.renderer.texture.atlas.SpriteSource;
 import net.minecraft.resources.Identifier;
@@ -19,27 +19,44 @@ import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+/**
+ * Loads runtime.
+ */
 public class RuntimeLoader implements SpriteSource
 {
 	public static final MapCodec<RuntimeLoader> CODEC = MapCodec.unit(RuntimeLoader ::new);
 	
+	/**
+	 * Performs the run operation.
+	 * @param resourceManager the resource manager to use.
+	 * @param output the output to use.
+	 */
 	@Override
 	public void run(ResourceManager resourceManager, Output output)
 	{
-		PTextureCache.getTextureCache().clear();
-		PTextureCache.postEvent();
-		PTextureCache.getTextureCache().forEach(texture ->
+		PResourceCache.clear();
+		PResourceCache.postEvent();
+		Set<Identifier> textures = PResourceCache.getResourceCache().values().stream().
+				flatMap(resource -> resource.textures().values().stream()).
+				collect(Collectors.toSet());
+		textures.forEach(texture ->
 		{
 			Identifier fullResourceId = TEXTURE_ID_CONVERTER.idToFile(texture);
 			Optional<Resource> resource = resourceManager.getResource(fullResourceId);
 			if (resource.isPresent())
-				output.add(texture, resource.get());
+				output.add(PResourceCache.spriteId(texture), resource.get());
 			else
 				PLibDatabase.LOGGER.warn("Missing sprite: {}", fullResourceId);
 		});
 	}
 	
+	/**
+	 * Performs the codec operation.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public MapCodec<? extends SpriteSource> codec()
 	{

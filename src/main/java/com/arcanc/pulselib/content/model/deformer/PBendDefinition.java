@@ -15,6 +15,9 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.joml.Vector3f;
 
+/**
+ * Immutable value object representing bend definition.
+ */
 public record PBendDefinition(Vector3f origin,
 							 Vector3f lengthAxis,
 							 Vector3f bendAxis,
@@ -32,6 +35,15 @@ public record PBendDefinition(Vector3f origin,
 					PChannelReference.FLOAT_CODEC.forGetter(PBendDefinition::angle)).
 			apply(instance, PBendDefinition::new));
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param origin the origin to use.
+	 * @param lengthAxis the length axis to use.
+	 * @param bendAxis the bend axis to use.
+	 * @param positiveExtent the positive extent to use.
+	 * @param negativeExtent the negative extent to use.
+	 * @param angle the angle to use.
+	 */
 	public PBendDefinition
 	{
 		origin = new Vector3f(origin);

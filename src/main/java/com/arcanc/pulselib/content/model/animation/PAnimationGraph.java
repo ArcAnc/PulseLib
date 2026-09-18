@@ -12,8 +12,16 @@ package com.arcanc.pulselib.content.model.animation;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Immutable value object representing animation graph.
+ */
 public record PAnimationGraph(List<PAnimationState> states, List<PAnimationTransition> transitions)
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param states the states to use.
+	 * @param transitions the transitions to use.
+	 */
 	public PAnimationGraph
 	{
 		states = List.copyOf(states);
@@ -34,6 +42,10 @@ public record PAnimationGraph(List<PAnimationState> states, List<PAnimationTrans
 			throw new IllegalArgumentException("An animation graph needs one non-overlay state");
 	}
 
+	/**
+	 * Performs the initial state operation.
+	 * @return the value produced by this operation.
+	 */
 	public int initialState()
 	{
 		for (int index = 0; index < this.states.size(); index++)

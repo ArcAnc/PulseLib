@@ -11,17 +11,28 @@ package com.arcanc.pulselib.content.renderer.gl;
 
 import org.lwjgl.opengl.GL32;
 
+/**
+ * Manages gl frame allocations.
+ */
 final class PGlFrameArena
 {
 	private static final long MAX_REUSE_WAIT_NANOS = 1_000_000L;
 	private final long[] fences;
 	private long submissionIndex;
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param slots the slots to use.
+	 */
 	PGlFrameArena(int slots)
 	{
 		this.fences = new long[slots];
 	}
 
+	/**
+	 * Performs the begin operation.
+	 * @return the value produced by this operation.
+	 */
 	int begin()
 	{
 		for (int attempt = 0; attempt < this.fences.length; attempt++)
@@ -33,17 +44,29 @@ final class PGlFrameArena
 		return -1;
 	}
 
+	/**
+	 * Performs the finish operation.
+	 * @param slot the slot to use.
+	 */
 	void finish(int slot)
 	{
 		this.fences[slot] = GL32.glFenceSync(GL32.GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 	}
 
+	/**
+	 * Performs the await all operation.
+	 */
 	void awaitAll()
 	{
 		for (int slot = 0; slot < this.fences.length; slot++)
 			this.await(slot);
 	}
 
+	/**
+	 * Performs the try await operation.
+	 * @param slot the slot to use.
+	 * @return the value produced by this operation.
+	 */
 	private boolean tryAwait(int slot)
 	{
 		long fence = this.fences[slot];
@@ -59,6 +82,10 @@ final class PGlFrameArena
 		return true;
 	}
 
+	/**
+	 * Performs the await operation.
+	 * @param slot the slot to use.
+	 */
 	private void await(int slot)
 	{
 		long fence = this.fences[slot];

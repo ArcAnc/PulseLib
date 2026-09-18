@@ -13,14 +13,8 @@ package com.arcanc.pulselib.content.registration.entity.renderer;
 import com.arcanc.pulselib.content.model.baked.PBakedBone;
 import com.arcanc.pulselib.content.model.baked.PBakedMesh;
 import com.arcanc.pulselib.content.model.baked.PMeshRenderContext;
-import com.arcanc.pulselib.content.model.deformer.PChannelReference;
-import com.arcanc.pulselib.content.model.deformer.PDeformerInstance;
-import com.arcanc.pulselib.content.model.deformer.PDeformerStack;
-import com.arcanc.pulselib.content.model.deformer.PHingeDefinition;
-import com.arcanc.pulselib.content.model.deformer.PHingeDeformer;
-import com.arcanc.pulselib.content.model.deformer.PMeshDeformation;
+import com.arcanc.pulselib.content.model.deformer.*;
 import com.arcanc.pulselib.content.registration.entity.TestEntity;
-import com.arcanc.pulselib.content.registration.renderer.TestDayTimeColor;
 import com.arcanc.pulselib.content.renderer.PEntityRenderer;
 import com.arcanc.pulselib.content.renderer.base.PEntityRenderState;
 import com.arcanc.pulselib.content.renderer.modelData.DefaultEntityModelData;
@@ -33,6 +27,9 @@ import org.joml.Vector3f;
 
 import java.util.List;
 
+/**
+ * Provides support for test entity render.
+ */
 public class TestEntityRender extends PEntityRenderer<TestEntity, PEntityRenderState.LivingImpl<TestEntity>>
 {
 	public static final Identifier TUBE = PLibDatabase.rl("entity/test_entity/tube");
@@ -51,6 +48,10 @@ public class TestEntityRender extends PEntityRenderer<TestEntity, PEntityRenderS
 	private final Object leftArmHingeKey = new Object();
 	private final Object rightArmHingeKey = new Object();
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param context the context to use.
+	 */
 	public TestEntityRender(EntityRendererProvider.Context context)
 	{
 		super(context, new DefaultEntityModelData.DefaultEntityModelDataBuilder(
@@ -63,12 +64,24 @@ public class TestEntityRender extends PEntityRenderer<TestEntity, PEntityRenderS
 				bindBone("armor_left_hand", "hand_left"));
 	}
 	
+	/**
+	 * Creates the render state.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public PEntityRenderState.LivingImpl<TestEntity> createRenderState()
 	{
 		return PLibHelper.livingRenderState();
 	}
 	
+	/**
+	 * Resolves the mesh render.
+	 * @param renderState the render state to use.
+	 * @param bone the bone to use.
+	 * @param mesh the mesh to use.
+	 * @param inherited the inherited to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	protected PMeshRenderContext resolveMeshRender(PEntityRenderState.LivingImpl<TestEntity> renderState,
 	                                               PBakedBone bone,

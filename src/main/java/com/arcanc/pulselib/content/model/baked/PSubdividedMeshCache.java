@@ -9,10 +9,10 @@
 
 package com.arcanc.pulselib.content.model.baked;
 
-import com.arcanc.pulselib.content.model.PMesh;
+import com.arcanc.pulselib.content.model.PMeshPrimitive;
 import com.arcanc.pulselib.content.model.deformer.PMeshTessellator;
 import com.arcanc.pulselib.util.PRenderTypes;
-import com.arcanc.pulselib.util.PTextureCache;
+import com.arcanc.pulselib.util.PResourceCache;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
@@ -27,14 +27,26 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
+/**
+ * Caches subdivided mesh.
+ */
 public final class PSubdividedMeshCache
 {
 	private static final Map<PBakedMesh, Map<Integer, PBakedMesh>> MESHES = new IdentityHashMap<>();
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PSubdividedMeshCache()
 	{
 	}
 
+	/**
+	 * Performs the resolve operation.
+	 * @param mesh the mesh to use.
+	 * @param subdivisionLevel the subdivision level to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PBakedMesh resolve(PBakedMesh mesh, int subdivisionLevel)
 	{
 		if (subdivisionLevel == 0)
@@ -43,6 +55,10 @@ public final class PSubdividedMeshCache
 				level -> bake(mesh, level));
 	}
 
+	/**
+	 * Performs the close operation.
+	 * @param mesh the mesh to use.
+	 */
 	public static void close(PBakedMesh mesh)
 	{
 		Map<Integer, PBakedMesh> variants = MESHES.remove(mesh);
@@ -50,16 +66,25 @@ public final class PSubdividedMeshCache
 			variants.values().forEach(PSubdividedMeshCache :: closeBuffers);
 	}
 
+	/**
+	 * Performs the cleanup operation.
+	 */
 	public static void cleanup()
 	{
 		MESHES.values().forEach(variants -> variants.values().forEach(PSubdividedMeshCache :: closeBuffers));
 		MESHES.clear();
 	}
 
+	/**
+	 * Performs the bake operation.
+	 * @param base the base to use.
+	 * @param subdivisionLevel the subdivision level to use.
+	 * @return the value produced by this operation.
+	 */
 	private static PBakedMesh bake(PBakedMesh base, int subdivisionLevel)
 	{
-		PMesh source = PMeshTessellator.subdivide(base.source(), subdivisionLevel);
-		TextureAtlasSprite sprite = PTextureCache.getTextureAtlas().getSprite(base.textureLocation());
+		PMeshPrimitive source = PMeshTessellator.subdivide(base.source(), subdivisionLevel);
+		TextureAtlasSprite sprite = PResourceCache.getTextureAtlas().getSprite(base.textureLocation());
 		ByteBufferBuilder bytes = ByteBufferBuilder.exactlySized(
 				source.vertexCount() * PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize());
 		BufferBuilder builder = sprite.contents().name().getPath().equals("missingno")
@@ -82,11 +107,16 @@ public final class PSubdividedMeshCache
 					GpuBuffer.USAGE_INDEX,
 					indices);
 			return new PBakedMesh(base.uuid(), vertices, source.vertexCount(), indexBuffer, source.indicesCount(),
-					indexType(source), base.textureName(), base.isEmissive(), base.alphaMode(), source, base.textureLocation());
+					indexType(source), base.textureReference(), base.isEmissive(), base.alphaMode(), source, base.textureLocation());
 		}
 	}
 
-	private static VertexFormat.IndexType indexType(PMesh mesh)
+	/**
+	 * Performs the index type operation.
+	 * @param mesh the mesh to use.
+	 * @return the value produced by this operation.
+	 */
+	private static VertexFormat.IndexType indexType(PMeshPrimitive mesh)
 	{
 		return switch (mesh.glIndexType())
 		{
@@ -96,6 +126,10 @@ public final class PSubdividedMeshCache
 		};
 	}
 
+	/**
+	 * Closes the buffers.
+	 * @param mesh the mesh to use.
+	 */
 	private static void closeBuffers(PBakedMesh mesh)
 	{
 		mesh.vbo().close();

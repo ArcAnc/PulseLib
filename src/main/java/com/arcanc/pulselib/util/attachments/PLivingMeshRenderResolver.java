@@ -19,8 +19,21 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 @FunctionalInterface
+/**
+ * Defines the contract for living mesh render resolver.
+ */
 public interface PLivingMeshRenderResolver extends PMeshRenderResolver
 {
+	/**
+	 * Performs the resolve operation.
+	 * @param entity the entity to use.
+	 * @param stack the stack to use.
+	 * @param bone the bone to use.
+	 * @param mesh the mesh to use.
+	 * @param inherited the inherited to use.
+	 * @param partialTick the partial tick to use.
+	 * @return the value produced by this operation.
+	 */
 	PMeshRenderContext resolve(@Nullable LivingEntity entity,
 	                           ItemStack stack,
 	                           PBakedBone bone,
@@ -28,6 +41,13 @@ public interface PLivingMeshRenderResolver extends PMeshRenderResolver
 	                           PMeshRenderContext inherited,
 	                           float partialTick);
 	
+	/**
+	 * Performs the resolve operation.
+	 * @param bone the bone to use.
+	 * @param mesh the mesh to use.
+	 * @param inherited the inherited to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	default PMeshRenderContext resolve(PBakedBone bone, PBakedMesh mesh, PMeshRenderContext inherited)
 	{

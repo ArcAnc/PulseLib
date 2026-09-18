@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Provides support for deformer stack.
+ */
 public final class PDeformerStack
 {
 	public static final PDeformerStack EMPTY = new PDeformerStack(List.of());
@@ -23,17 +26,31 @@ public final class PDeformerStack
 	private final List<PPreparedDeformer> operations;
 	private final List<PDeformerInstance<?>> definitions;
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param operations the operations to use.
+	 */
 	PDeformerStack(List<PPreparedDeformer> operations)
 	{
 		this(operations, List.of());
 	}
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param operations the operations to use.
+	 * @param definitions the definitions to use.
+	 */
 	private PDeformerStack(List<PPreparedDeformer> operations, List<PDeformerInstance<?>> definitions)
 	{
 		this.operations = List.copyOf(operations);
 		this.definitions = List.copyOf(definitions);
 	}
 
+	/**
+	 * Performs the compile operation.
+	 * @param definitions the definitions to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PDeformerStack compile(List<? extends PDeformerInstance<?>> definitions)
 	{
 		Objects.requireNonNull(definitions);
@@ -44,6 +61,11 @@ public final class PDeformerStack
 		return new PDeformerStack(prepared.operations, List.copyOf(definitions));
 	}
 
+	/**
+	 * Performs the compose operation.
+	 * @param stacks the stacks to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PDeformerStack compose(PDeformerStack... stacks)
 	{
 		List<PPreparedDeformer> operations = new ArrayList<>();
@@ -56,16 +78,30 @@ public final class PDeformerStack
 		return operations.isEmpty() ? EMPTY : new PDeformerStack(operations, definitions);
 	}
 
+	/**
+	 * Determines whether empty.
+	 * @return the value produced by this operation.
+	 */
 	public boolean isEmpty()
 	{
 		return this.operations.isEmpty();
 	}
 
+	/**
+	 * Performs the definitions operation.
+	 * @return the value produced by this operation.
+	 */
 	public List<PDeformerInstance<?>> definitions()
 	{
 		return this.definitions;
 	}
 
+	/**
+	 * Performs the deform operation.
+	 * @param localPosition the local position to use.
+	 * @param values the values to use.
+	 * @return the value produced by this operation.
+	 */
 	public Vector3f deform(Vector3f localPosition, PDeformerValueSource values)
 	{
 		Vector3f result = new Vector3f(localPosition);
@@ -73,12 +109,24 @@ public final class PDeformerStack
 		return result;
 	}
 
+	/**
+	 * Performs the deform in place operation.
+	 * @param localPosition the local position to use.
+	 * @param values the values to use.
+	 */
 	public void deformInPlace(Vector3f localPosition, PDeformerValueSource values)
 	{
 		for (PPreparedDeformer operation : this.operations)
 			operation.deform(localPosition, values);
 	}
 	
+	/**
+	 * Performs the deform normal operation.
+	 * @param localPosition the local position to use.
+	 * @param normal the normal to use.
+	 * @param values the values to use.
+	 * @return the value produced by this operation.
+	 */
 	public Vector3f deformNormal(Vector3f localPosition, Vector3f normal, PDeformerValueSource values)
 	{
 		if (this.operations.isEmpty())
@@ -99,6 +147,14 @@ public final class PDeformerStack
 		return result.lengthSquared() < 1.0e-12f ? new Vector3f(normal) : result.normalize();
 	}
 	
+	/**
+	 * Performs the frame at operation.
+	 * @param localPosition the local position to use.
+	 * @param forwardAxis the forward axis to use.
+	 * @param upAxis the up axis to use.
+	 * @param values the values to use.
+	 * @return the value produced by this operation.
+	 */
 	public PDeformerFrame frameAt(Vector3f localPosition, Vector3f forwardAxis, Vector3f upAxis, PDeformerValueSource values)
 	{
 		Vector3f position = deform(localPosition, values);

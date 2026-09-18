@@ -25,7 +25,7 @@ import com.arcanc.pulselib.content.renderer.base.PBlockRenderState;
 import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import com.arcanc.pulselib.data.gecko.MolangParser;
 import com.arcanc.pulselib.util.PRenderTypes;
-import com.arcanc.pulselib.util.PTextureCache;
+import com.arcanc.pulselib.util.PResourceCache;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -49,36 +49,67 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * Renders block.
+ */
 public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS extends BlockEntityRenderState & PBlockRenderState<T>>
 		implements PRenderer<T, RS>, BlockEntityRenderer<T, RS>
 {
 	private final PModelData modelData;
 	private final Function<Identifier, RenderType> renderType;
 	
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param modelData the model data to use.
+	 * @param renderType the render type to use.
+	 */
 	public PBlockRenderer(PModelData modelData, Function<Identifier, RenderType> renderType)
 	{
 		this.modelData = modelData;
 		this.renderType = renderType;
 	}
 	
+	/**
+	 * Returns the model data.
+	 * @param renderState the render state to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public PModelData getModelData(RS renderState)
 	{
 		return this.modelData;
 	}
 	
+	/**
+	 * Returns the model.
+	 * @param renderState the render state to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public @Nullable PBakedModel getModel(RS renderState)
 	{
 		return getModelData(renderState).getModel();
 	}
 	
+	/**
+	 * Returns the render type.
+	 * @param texture the texture to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public RenderType getRenderType(Identifier texture)
 	{
 		return this.renderType.apply(texture);
 	}
 	
+	/**
+	 * Extracts the render state.
+	 * @param blockEntity the block entity to use.
+	 * @param renderState the render state to use.
+	 * @param partialTick the partial tick to use.
+	 * @param cameraPosition the camera position to use.
+	 * @param breakProgress the break progress to use.
+	 */
 	@Override
 	public void extractRenderState(T blockEntity,
 	                               RS renderState,
@@ -89,6 +120,13 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 		renderState.extractBlockData(blockEntity, this, breakProgress);
 	}
 	
+	/**
+	 * Performs the submit operation.
+	 * @param renderState the render state to use.
+	 * @param poseStack the pose stack to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 * @param cameraRenderState the camera render state to use.
+	 */
 	@Override
 	public void submit(RS renderState,
 	                   PoseStack poseStack,
@@ -104,11 +142,25 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 		poseStack.popPose();
 	}
 	
+	/**
+	 * Performs the pre submit operation.
+	 * @param poseStack the pose stack to use.
+	 * @param renderState the render state to use.
+	 * @param cameraRenderState the camera render state to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 */
 	@Override
 	public void preSubmit(PoseStack poseStack, RS renderState, CameraRenderState cameraRenderState, SubmitNodeCollector submitNodeCollector)
 	{
 	}
 	
+	/**
+	 * Performs the true submit operation.
+	 * @param poseStack the pose stack to use.
+	 * @param renderState the render state to use.
+	 * @param cameraRenderState the camera render state to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 */
 	@Override
 	public void trueSubmit(PoseStack poseStack, RS renderState, CameraRenderState cameraRenderState, SubmitNodeCollector submitNodeCollector)
 	{
@@ -125,11 +177,30 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 		model.bones().forEach(bone -> perBoneSubmit(renderState, poseStack, bone, controllers, molangContexts, renderType, -1, renderState.lightCoords, OverlayTexture.NO_OVERLAY));
 	}
 	
+	/**
+	 * Performs the post submit operation.
+	 * @param poseStack the pose stack to use.
+	 * @param renderState the render state to use.
+	 * @param cameraRenderState the camera render state to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 */
 	@Override
 	public void postSubmit(PoseStack poseStack, RS renderState, CameraRenderState cameraRenderState, SubmitNodeCollector submitNodeCollector)
 	{
 	}
 	
+	/**
+	 * Performs the per bone submit operation.
+	 * @param renderState the render state to use.
+	 * @param poseStack the pose stack to use.
+	 * @param bone the bone to use.
+	 * @param controllers the controllers to use.
+	 * @param molangContexts the molang contexts to use.
+	 * @param renderType the render type to use.
+	 * @param packedColor the packed color to use.
+	 * @param packedLight the packed light to use.
+	 * @param packedOverlay the packed overlay to use.
+	 */
 	protected void perBoneSubmit(RS renderState, PoseStack poseStack, PBakedBone bone, Collection<PAnimationController<T>> controllers, Map<PAnimationController<T>, MolangParser.Context> molangContexts, Function<Identifier, RenderType> renderType, int packedColor, int packedLight, int packedOverlay)
 	{
 		PModelData data = this.getModelData(renderState);
@@ -155,6 +226,14 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 		poseStack.popPose();
 	}
 
+	/**
+	 * Prepares the molang contexts.
+	 * @param animatable the animatable to use.
+	 * @param manager the manager to use.
+	 * @param controllers the controllers to use.
+	 * @param partialTick the partial tick to use.
+	 * @return the value produced by this operation.
+	 */
 	private Map<PAnimationController<T>, MolangParser.Context> prepareMolangContexts(T animatable,
 	                                                                                   PAnimationManager<T> manager,
 	                                                                                   Collection<PAnimationController<T>> controllers,
@@ -172,6 +251,13 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 		return contexts;
 	}
 
+	/**
+	 * Performs the populate molang context operation.
+	 * @param animatable the animatable to use.
+	 * @param controller the controller to use.
+	 * @param context the context to use.
+	 * @param partialTick the partial tick to use.
+	 */
 	protected void populateMolangContext(T animatable,
 	                                    PAnimationController<T> controller,
 	                                    MolangParser.Context context,
@@ -179,6 +265,18 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 	{
 	}
 	
+	/**
+	 * Performs the submit bone operation.
+	 * @param renderState the render state to use.
+	 * @param bone the bone to use.
+	 * @param poseStack the pose stack to use.
+	 * @param modelData the model data to use.
+	 * @param controllers the controllers to use.
+	 * @param renderType the render type to use.
+	 * @param color the color to use.
+	 * @param packedLight the packed light to use.
+	 * @param packedOverlay the packed overlay to use.
+	 */
 	protected void submitBone(RS renderState,
 	                          PBakedBone bone,
 	                          PoseStack poseStack,
@@ -193,7 +291,7 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 		
 		bone.meshes().forEach(mesh ->
 		{
-			if (mesh.textureName().isEmpty())
+			if (mesh.textureReference().isEmpty())
 				return;
 			
 			PMeshRenderContext inherited = new PMeshRenderContext(
@@ -204,7 +302,7 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 			PMeshRenderContext meshContext = resolveMeshRender(renderState, bone, mesh, inherited);
 			PMeshRenderMaterial material = PMeshRenderMaterial.resolve(mesh, meshContext);
 			
-			RenderType type = material.resolveRenderType(meshContext, PTextureCache.ATLAS_LOCATION);
+			RenderType type = material.resolveRenderType(meshContext, PResourceCache.ATLAS_LOCATION);
 			
 			if (PRenderTypes.isTransparent(type))
 				PRenderQueue.submitBlockEntityTranslucentMesh(type, material.mesh(), meshContext.deformation(), new PRenderQueue.InstanceData(matrix4fstack, meshContext.color(), material.packedLight(), meshContext.packedOverlay()));
@@ -213,6 +311,14 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 		});
 	}
 	
+	/**
+	 * Resolves the mesh render.
+	 * @param renderState the render state to use.
+	 * @param bone the bone to use.
+	 * @param mesh the mesh to use.
+	 * @param inherited the inherited to use.
+	 * @return the value produced by this operation.
+	 */
 	protected PMeshRenderContext resolveMeshRender(RS renderState,
 	                                               PBakedBone bone,
 	                                               PBakedMesh mesh,
@@ -221,6 +327,11 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 		return inherited;
 	}
 	
+	/**
+	 * Performs the try rotate to real rotation operation.
+	 * @param poseStack the pose stack to use.
+	 * @param facing the facing to use.
+	 */
 	protected void tryRotateToRealRotation(PoseStack poseStack, Direction facing)
 	{
 		if (facing.getAxis().isHorizontal())
@@ -229,6 +340,11 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 			poseStack.mulPose(Axis.XP.rotationDegrees(90 * facing.getUnitVec3i().getY()));
 	}
 	
+	/**
+	 * Returns the animatable facing.
+	 * @param renderState the render state to use.
+	 * @return the value produced by this operation.
+	 */
 	protected Direction getAnimatableFacing(RS renderState)
 	{
 		BlockState blockState = ((BlockEntityRenderStateAccessor)renderState).pulselib$getBlockState();

@@ -11,7 +11,17 @@ package com.arcanc.pulselib.content.model.baked;
 
 
 @FunctionalInterface
+/**
+ * Defines the contract for mesh render resolver.
+ */
 public interface PMeshRenderResolver
 {
+	/**
+	 * Performs the resolve operation.
+	 * @param bone the bone to use.
+	 * @param mesh the mesh to use.
+	 * @param inherited the inherited to use.
+	 * @return the value produced by this operation.
+	 */
 	PMeshRenderContext resolve(PBakedBone bone, PBakedMesh mesh, PMeshRenderContext inherited);
 }

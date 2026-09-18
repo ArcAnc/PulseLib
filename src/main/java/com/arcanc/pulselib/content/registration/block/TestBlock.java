@@ -24,13 +24,29 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+/**
+ * Provides support for test block.
+ */
 public class TestBlock extends Block implements EntityBlock
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param props the props to use.
+	 */
 	public TestBlock(Properties props)
 	{
 		super(props);
 	}
 	
+	/**
+	 * Performs the use without item operation.
+	 * @param state the state to use.
+	 * @param level the level to use.
+	 * @param pos the pos to use.
+	 * @param player the player to use.
+	 * @param hitResult the hit result to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	protected @NonNull InteractionResult useWithoutItem(@NonNull BlockState state,
 	                                                    @NonNull Level level,
@@ -45,12 +61,23 @@ public class TestBlock extends Block implements EntityBlock
 		return InteractionResult.SUCCESS;
 	}
 	
+	/**
+	 * Performs the new block entity operation.
+	 * @param blockPos the block pos to use.
+	 * @param blockState the block state to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public @Nullable BlockEntity newBlockEntity(@NonNull BlockPos blockPos, @NonNull BlockState blockState)
 	{
 		return new TestBlockEntity(blockPos, blockState);
 	}
 	
+	/**
+	 * Returns the render shape.
+	 * @param state the state to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	protected @NonNull RenderShape getRenderShape(@NonNull BlockState state)
 	{

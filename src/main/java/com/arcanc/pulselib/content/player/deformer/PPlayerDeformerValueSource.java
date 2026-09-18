@@ -13,7 +13,16 @@ import com.arcanc.pulselib.content.model.deformer.PChannelReference;
 import net.minecraft.world.entity.player.Player;
 
 @FunctionalInterface
+/**
+ * Defines the contract for player deformer value source.
+ */
 public interface PPlayerDeformerValueSource
 {
+	/**
+	 * Performs the resolve operation.
+	 * @param player the player to use.
+	 * @param reference the reference to use.
+	 * @return the value produced by this operation.
+	 */
 	float resolve(Player player, PChannelReference<Float> reference);
 }

@@ -11,6 +11,8 @@ package com.arcanc.pulselib.data.gecko;
 
 import com.arcanc.pulselib.content.model.PBone;
 import com.arcanc.pulselib.content.model.PMesh;
+import com.arcanc.pulselib.content.model.PMaterial;
+import com.arcanc.pulselib.content.model.PMeshPrimitive;
 import com.arcanc.pulselib.content.model.PModel;
 import com.arcanc.pulselib.content.model.animation.*;
 import com.arcanc.pulselib.content.registration.PLibRegistration;
@@ -36,6 +38,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Parses gecko model.
+ */
 public class PGeckoModelParser
 {
 	private static final float MODEL_SCALE = 1f / 16f;
@@ -44,18 +49,32 @@ public class PGeckoModelParser
 	private static final List<PGeckoChannelDecoder<?>> CHANNEL_DECODERS = List.of(
 			new PGeckoChannelDecoder<Vector3f>()
 			{
+				/**
+				 * Performs the field names operation.
+				 * @return the value produced by this operation.
+				 */
 				@Override
 				public Set<String> fieldNames()
 				{
 					return Set.of("position", "translation");
 				}
 
+				/**
+				 * Performs the channel operation.
+				 * @return the value produced by this operation.
+				 */
 				@Override
 				public PAnimationChannelType<Vector3f> channel()
 				{
 					return PLibRegistration.AnimationChannelReg.POSITION;
 				}
 
+				/**
+				 * Decodes the value.
+				 * @param element the element to use.
+				 * @param context the context to use.
+				 * @return the value produced by this operation.
+				 */
 				@Override
 				public PAnimationValue<Vector3f> decodeValue(JsonElement element, PGeckoDecodeContext context)
 				{
@@ -64,18 +83,32 @@ public class PGeckoModelParser
 			},
 			new PGeckoChannelDecoder<Quaternionf>()
 			{
+				/**
+				 * Performs the field names operation.
+				 * @return the value produced by this operation.
+				 */
 				@Override
 				public Set<String> fieldNames()
 				{
 					return Set.of("rotation");
 				}
 
+				/**
+				 * Performs the channel operation.
+				 * @return the value produced by this operation.
+				 */
 				@Override
 				public PAnimationChannelType<Quaternionf> channel()
 				{
 					return PLibRegistration.AnimationChannelReg.ROTATION;
 				}
 
+				/**
+				 * Decodes the value.
+				 * @param element the element to use.
+				 * @param context the context to use.
+				 * @return the value produced by this operation.
+				 */
 				@Override
 				public PAnimationValue<Quaternionf> decodeValue(JsonElement element, PGeckoDecodeContext context)
 				{
@@ -84,18 +117,32 @@ public class PGeckoModelParser
 			},
 			new PGeckoChannelDecoder<Vector3f>()
 			{
+				/**
+				 * Performs the field names operation.
+				 * @return the value produced by this operation.
+				 */
 				@Override
 				public Set<String> fieldNames()
 				{
 					return Set.of("scale");
 				}
 
+				/**
+				 * Performs the channel operation.
+				 * @return the value produced by this operation.
+				 */
 				@Override
 				public PAnimationChannelType<Vector3f> channel()
 				{
 					return PLibRegistration.AnimationChannelReg.SCALE;
 				}
 
+				/**
+				 * Decodes the value.
+				 * @param element the element to use.
+				 * @param context the context to use.
+				 * @return the value produced by this operation.
+				 */
 				@Override
 				public PAnimationValue<Vector3f> decodeValue(JsonElement element, PGeckoDecodeContext context)
 				{
@@ -103,6 +150,12 @@ public class PGeckoModelParser
 				}
 			});
 	
+	/**
+	 * Performs the parse operation.
+	 * @param modelStream the model stream to use.
+	 * @param animationStream the animation stream to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PModel parse(InputStream modelStream, InputStream animationStream) throws IOException
 	{
 		PModel model = parseModel(modelStream);
@@ -110,6 +163,11 @@ public class PGeckoModelParser
 		return model;
 	}
 	
+	/**
+	 * Parses the model.
+	 * @param stream the stream to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PModel parseModel(InputStream stream) throws IOException
 	{
 		JsonElement root = parseJson(stream);
@@ -156,11 +214,23 @@ public class PGeckoModelParser
 		return model;
 	}
 	
+	/**
+	 * Parses the animations.
+	 * @param stream the stream to use.
+	 * @param model the model to use.
+	 * @return the value produced by this operation.
+	 */
 	public static Map<String, PAnimation> parseAnimations(InputStream stream, PModel model) throws IOException
 	{
 		return parseAnimations(parseJson(stream), model);
 	}
 	
+	/**
+	 * Parses the animations.
+	 * @param root the root to use.
+	 * @param model the model to use.
+	 * @return the value produced by this operation.
+	 */
 	public static Map<String, PAnimation> parseAnimations(JsonElement root, PModel model)
 	{
 		Map<String, PAnimation> animations = new LinkedHashMap<>();
@@ -208,6 +278,11 @@ public class PGeckoModelParser
 		return animations;
 	}
 	
+	/**
+	 * Performs the first geometry operation.
+	 * @param root the root to use.
+	 * @return the value produced by this operation.
+	 */
 	private static JsonElement firstGeometry(JsonElement root)
 	{
 		JsonElement geometry = member(root, "minecraft:geometry");
@@ -220,6 +295,11 @@ public class PGeckoModelParser
 		return root;
 	}
 	
+	/**
+	 * Reads the bone.
+	 * @param boneNode the bone node to use.
+	 * @return the value produced by this operation.
+	 */
 	private static RawBone readBone(JsonElement boneNode)
 	{
 		String name = stringValue(member(boneNode, "name"), UUID.randomUUID().toString());
@@ -232,6 +312,15 @@ public class PGeckoModelParser
 				member(boneNode, "locators"));
 	}
 	
+	/**
+	 * Creates the bone.
+	 * @param model the model to use.
+	 * @param bonesByName the bones by name to use.
+	 * @param links the links to use.
+	 * @param rawBonesByName the raw bones by name to use.
+	 * @param rawBone the raw bone to use.
+	 * @param textureSize the texture size to use.
+	 */
 	private static void createBone(PModel model,
 	                               Map<String, PBone> bonesByName,
 	                               List<BoneLink> links,
@@ -263,6 +352,12 @@ public class PGeckoModelParser
 		addLocatorBones(bonesByName, links, rawBone);
 	}
 	
+	/**
+	 * Adds the locator bones.
+	 * @param bonesByName the bones by name to use.
+	 * @param links the links to use.
+	 * @param parentBone the parent bone to use.
+	 */
 	private static void addLocatorBones(Map<String, PBone> bonesByName,
 	                                    List<BoneLink> links,
 	                                    RawBone parentBone)
@@ -284,6 +379,11 @@ public class PGeckoModelParser
 		}
 	}
 	
+	/**
+	 * Performs the locator transform operation.
+	 * @param node the node to use.
+	 * @return the value produced by this operation.
+	 */
 	private static LocatorTransform locatorTransform(JsonElement node)
 	{
 		if (isArray(node))
@@ -303,6 +403,14 @@ public class PGeckoModelParser
 				eulerDegreesToQuaternion(vector3f(member(node, "rotation"), new Vector3f())));
 	}
 	
+	/**
+	 * Parses the cube mesh.
+	 * @param cubeNode the cube node to use.
+	 * @param pivot the pivot to use.
+	 * @param textureName the texture name to use.
+	 * @param textureSize the texture size to use.
+	 * @return the value produced by this operation.
+	 */
 	private static PMesh parseCubeMesh(JsonElement cubeNode, Vector3f pivot, String textureName, TextureSize textureSize)
 	{
 		Vector3f rawSize = vector3f(member(cubeNode, "size"), new Vector3f());
@@ -317,8 +425,7 @@ public class PGeckoModelParser
 		appendCube(buffers, min, max, cubeUv(cubeNode, rawSize, mirror, textureSize));
 		
 		UUID uuid = UUID.randomUUID();
-		return new PMesh(
-				uuid,
+		return new PMesh(uuid, List.of(new PMeshPrimitive(
 				buffers.vertexCount(),
 				buffers.positions(),
 				buffers.normals(),
@@ -326,9 +433,17 @@ public class PGeckoModelParser
 				buffers.indexCount(),
 				buffers.indices(),
 				GltfConstants.GL_UNSIGNED_INT,
-				textureName);
+				new PMaterial(textureName))));
 	}
 	
+	/**
+	 * Parses the animation channel.
+	 * @param channelNode the channel node to use.
+	 * @param name the name to use.
+	 * @param channel the channel to use.
+	 * @param tracks the tracks to use.
+	 * @return the value produced by this operation.
+	 */
 	private static <T> float parseAnimationChannel(JsonElement channelNode,
 	                                               String name,
 	                                               PAnimationChannelType<T> channel,
@@ -371,6 +486,11 @@ public class PGeckoModelParser
 		return maxTime;
 	}
 	
+	/**
+	 * Performs the key frame value node operation.
+	 * @param node the node to use.
+	 * @return the value produced by this operation.
+	 */
 	private static JsonElement keyFrameValueNode(JsonElement node)
 	{
 		if (isArray(node))
@@ -387,6 +507,12 @@ public class PGeckoModelParser
 		return node;
 	}
 	
+	/**
+	 * Decodes the value.
+	 * @param channel the channel to use.
+	 * @param node the node to use.
+	 * @return the value produced by this operation.
+	 */
 	@SuppressWarnings("unchecked")
 	private static <T> PAnimationValue<T> decodeValue(PAnimationChannelType<T> channel, JsonElement node)
 	{
@@ -396,18 +522,35 @@ public class PGeckoModelParser
 		throw new IllegalArgumentException("Unsupported Gecko animation channel type: " + channel.id());
 	}
 
+	/**
+	 * Performs the vector value operation.
+	 * @param node the node to use.
+	 * @param fallback the fallback to use.
+	 * @param conversion the conversion to use.
+	 * @return the value produced by this operation.
+	 */
 	private static PMolangVectorValue vectorValue(JsonElement node, float fallback, PVectorConversion conversion)
 	{
 		VectorExpression expression = vectorExpression(node, fallback);
 		return new PMolangVectorValue(expression.x(), expression.y(), expression.z(), conversion);
 	}
 
+	/**
+	 * Performs the interpolation operation.
+	 * @param keyframe the keyframe to use.
+	 * @return the value produced by this operation.
+	 */
 	private static PInterpolation interpolation(JsonElement keyframe)
 	{
 		String name = stringValue(member(keyframe, "lerp_mode"), "linear");
 		return PInterpolationType.INTERPOLATION_TYPES.getOrDefault(name, PInterpolationType.LINEAR);
 	}
 
+	/**
+	 * Performs the contains molang operation.
+	 * @param node the node to use.
+	 * @return the value produced by this operation.
+	 */
 	private static boolean containsMolang(JsonElement node)
 	{
 		if (!isArray(node))
@@ -419,6 +562,12 @@ public class PGeckoModelParser
 		return false;
 	}
 
+	/**
+	 * Performs the vector expression operation.
+	 * @param node the node to use.
+	 * @param fallback the fallback to use.
+	 * @return the value produced by this operation.
+	 */
 	private static VectorExpression vectorExpression(JsonElement node, float fallback)
 	{
 		JsonArray values = node.getAsJsonArray();
@@ -428,6 +577,13 @@ public class PGeckoModelParser
 				componentExpression(values, 2, fallback));
 	}
 
+	/**
+	 * Performs the component expression operation.
+	 * @param values the values to use.
+	 * @param index the index to use.
+	 * @param fallback the fallback to use.
+	 * @return the value produced by this operation.
+	 */
 	private static MolangParser.Expression componentExpression(JsonArray values, int index, float fallback)
 	{
 		if (values.size() <= index)
@@ -439,6 +595,12 @@ public class PGeckoModelParser
 		return context -> floatValue(value, fallback);
 	}
 	
+	/**
+	 * Performs the channel value operation.
+	 * @param node the node to use.
+	 * @param channel the channel to use.
+	 * @return the value produced by this operation.
+	 */
 	private static Object channelValue(JsonElement node, PAnimationChannelType<?> channel)
 	{
 		Vector3f vector = vector3f(node, channel == PLibRegistration.AnimationChannelReg.SCALE ? new Vector3f(1f, 1f, 1f) : new Vector3f());
@@ -449,6 +611,13 @@ public class PGeckoModelParser
 		return vector;
 	}
 	
+	/**
+	 * Performs the append cube operation.
+	 * @param buffers the buffers to use.
+	 * @param min the min to use.
+	 * @param max the max to use.
+	 * @param uv the uv to use.
+	 */
 	private static void appendCube(GeometryBuffers buffers, Vector3f min, Vector3f max, CubeUv uv)
 	{
 		appendFace(buffers,
@@ -471,6 +640,16 @@ public class PGeckoModelParser
 				new Vector3f(0, -1, 0), uv.down());
 	}
 	
+	/**
+	 * Performs the append face operation.
+	 * @param buffers the buffers to use.
+	 * @param a the a to use.
+	 * @param b the b to use.
+	 * @param c the c to use.
+	 * @param d the d to use.
+	 * @param normal the normal to use.
+	 * @param uv the uv to use.
+	 */
 	private static void appendFace(GeometryBuffers buffers,
 	                               Vector3f a,
 	                               Vector3f b,
@@ -488,6 +667,14 @@ public class PGeckoModelParser
 		buffers.addTriangle(start, start + 2, start + 3);
 	}
 	
+	/**
+	 * Performs the cube uv operation.
+	 * @param cubeNode the cube node to use.
+	 * @param size the size to use.
+	 * @param mirror the mirror to use.
+	 * @param textureSize the texture size to use.
+	 * @return the value produced by this operation.
+	 */
 	private static CubeUv cubeUv(JsonElement cubeNode, Vector3f size, boolean mirror, TextureSize textureSize)
 	{
 		JsonElement uvNode = member(cubeNode, "uv");
@@ -515,6 +702,13 @@ public class PGeckoModelParser
 				faceUv(u + z + x, v, x, z, mirror, textureSize));
 	}
 	
+	/**
+	 * Performs the face uv operation.
+	 * @param node the node to use.
+	 * @param mirror the mirror to use.
+	 * @param textureSize the texture size to use.
+	 * @return the value produced by this operation.
+	 */
 	private static FaceUv faceUv(JsonElement node, boolean mirror, TextureSize textureSize)
 	{
 		if (isMissing(node))
@@ -532,6 +726,16 @@ public class PGeckoModelParser
 		return faceUv(floatAt(uv, 0, 0f), floatAt(uv, 1, 0f), floatAt(uvSize, 0, 0f), floatAt(uvSize, 1, 0f), mirror, textureSize);
 	}
 	
+	/**
+	 * Performs the face uv operation.
+	 * @param u the u to use.
+	 * @param v the v to use.
+	 * @param width the width to use.
+	 * @param height the height to use.
+	 * @param mirror the mirror to use.
+	 * @param textureSize the texture size to use.
+	 * @return the value produced by this operation.
+	 */
 	private static FaceUv faceUv(float u, float v, float width, float height, boolean mirror, TextureSize textureSize)
 	{
 		float minU = u;
@@ -544,6 +748,16 @@ public class PGeckoModelParser
 		return normalizeUv(minU, v, maxU, v + height, textureSize);
 	}
 	
+	/**
+	 * Performs the face uv corners operation.
+	 * @param minU the min u to use.
+	 * @param minV the min v to use.
+	 * @param maxU the max u to use.
+	 * @param maxV the max v to use.
+	 * @param mirror the mirror to use.
+	 * @param textureSize the texture size to use.
+	 * @return the value produced by this operation.
+	 */
 	private static FaceUv faceUvCorners(float minU, float minV, float maxU, float maxV, boolean mirror, TextureSize textureSize)
 	{
 		if (mirror)
@@ -555,6 +769,15 @@ public class PGeckoModelParser
 		return normalizeUv(minU, minV, maxU, maxV, textureSize);
 	}
 	
+	/**
+	 * Performs the normalize uv operation.
+	 * @param minU the min u to use.
+	 * @param minV the min v to use.
+	 * @param maxU the max u to use.
+	 * @param maxV the max v to use.
+	 * @param textureSize the texture size to use.
+	 * @return the value produced by this operation.
+	 */
 	private static FaceUv normalizeUv(float minU, float minV, float maxU, float maxV, TextureSize textureSize)
 	{
 		return new FaceUv(
@@ -562,6 +785,11 @@ public class PGeckoModelParser
 				new Vector2f(maxU / textureSize.width(), maxV / textureSize.height()));
 	}
 	
+	/**
+	 * Performs the texture name operation.
+	 * @param cubeNode the cube node to use.
+	 * @return the value produced by this operation.
+	 */
 	private static String textureName(JsonElement cubeNode)
 	{
 		String texture = stringValue(member(cubeNode, "texture"), DEFAULT_TEXTURE_NAME);
@@ -570,6 +798,12 @@ public class PGeckoModelParser
 		return texture;
 	}
 	
+	/**
+	 * Performs the vector3f operation.
+	 * @param node the node to use.
+	 * @param fallback the fallback to use.
+	 * @return the value produced by this operation.
+	 */
 	private static Vector3f vector3f(JsonElement node, Vector3f fallback)
 	{
 		if (!isArray(node) || node.getAsJsonArray().size() < 3)
@@ -581,6 +815,11 @@ public class PGeckoModelParser
 				floatAt(node, 2, fallback.z()));
 	}
 	
+	/**
+	 * Performs the euler degrees to quaternion operation.
+	 * @param degrees the degrees to use.
+	 * @return the value produced by this operation.
+	 */
 	private static Quaternionf eulerDegreesToQuaternion(Vector3f degrees)
 	{
 		return new Quaternionf().rotationXYZ(
@@ -589,21 +828,44 @@ public class PGeckoModelParser
 				(float) Math.toRadians(degrees.z()));
 	}
 	
+	/**
+	 * Performs the scale operation.
+	 * @param vector the vector to use.
+	 * @return the value produced by this operation.
+	 */
 	private static Vector3f scale(Vector3f vector)
 	{
 		return vector.mul(MODEL_SCALE);
 	}
 	
+	/**
+	 * Performs the seconds to ticks operation.
+	 * @param seconds the seconds to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float secondsToTicks(float seconds)
 	{
 		return seconds * 20f;
 	}
 	
+	/**
+	 * Performs the positive operation.
+	 * @param value the value to use.
+	 * @param fallback the fallback to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float positive(float value, float fallback)
 	{
 		return value > 0f ? value : fallback;
 	}
 	
+	/**
+	 * Performs the float at operation.
+	 * @param node the node to use.
+	 * @param index the index to use.
+	 * @param fallback the fallback to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float floatAt(JsonElement node, int index, float fallback)
 	{
 		if (!isArray(node) || node.getAsJsonArray().size() <= index)
@@ -611,6 +873,12 @@ public class PGeckoModelParser
 		return floatValue(node.getAsJsonArray().get(index), fallback);
 	}
 	
+	/**
+	 * Performs the float value operation.
+	 * @param node the node to use.
+	 * @param fallback the fallback to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float floatValue(JsonElement node, float fallback)
 	{
 		if (isMissing(node) || !node.isJsonPrimitive() || !node.getAsJsonPrimitive().isNumber())
@@ -618,6 +886,12 @@ public class PGeckoModelParser
 		return node.getAsFloat();
 	}
 	
+	/**
+	 * Performs the bool value operation.
+	 * @param node the node to use.
+	 * @param fallback the fallback to use.
+	 * @return the value produced by this operation.
+	 */
 	private static boolean boolValue(JsonElement node, boolean fallback)
 	{
 		if (isMissing(node) || !node.isJsonPrimitive() || !node.getAsJsonPrimitive().isBoolean())
@@ -625,6 +899,12 @@ public class PGeckoModelParser
 		return node.getAsBoolean();
 	}
 	
+	/**
+	 * Performs the string value operation.
+	 * @param node the node to use.
+	 * @param fallback the fallback to use.
+	 * @return the value produced by this operation.
+	 */
 	private static String stringValue(JsonElement node, String fallback)
 	{
 		if (isMissing(node) || !node.isJsonPrimitive() || !node.getAsJsonPrimitive().isString())
@@ -632,6 +912,12 @@ public class PGeckoModelParser
 		return node.getAsString();
 	}
 	
+	/**
+	 * Parses the float.
+	 * @param value the value to use.
+	 * @param fallback the fallback to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float parseFloat(String value, float fallback)
 	{
 		try
@@ -644,6 +930,11 @@ public class PGeckoModelParser
 		}
 	}
 	
+	/**
+	 * Parses the json.
+	 * @param stream the stream to use.
+	 * @return the value produced by this operation.
+	 */
 	private static JsonElement parseJson(InputStream stream) throws IOException
 	{
 		try (InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8))
@@ -652,6 +943,12 @@ public class PGeckoModelParser
 		}
 	}
 	
+	/**
+	 * Performs the member operation.
+	 * @param element the element to use.
+	 * @param name the name to use.
+	 * @return the value produced by this operation.
+	 */
 	private static JsonElement member(JsonElement element, String name)
 	{
 		if (!isObject(element))
@@ -662,47 +959,88 @@ public class PGeckoModelParser
 		return value == null ? JsonNull.INSTANCE : value;
 	}
 	
+	/**
+	 * Determines whether missing.
+	 * @param element the element to use.
+	 * @return the value produced by this operation.
+	 */
 	private static boolean isMissing(@Nullable JsonElement element)
 	{
 		return element == null || element.isJsonNull();
 	}
 	
+	/**
+	 * Determines whether object.
+	 * @param element the element to use.
+	 * @return the value produced by this operation.
+	 */
 	private static boolean isObject(@Nullable JsonElement element)
 	{
 		return element != null && element.isJsonObject();
 	}
 	
+	/**
+	 * Determines whether array.
+	 * @param element the element to use.
+	 * @return the value produced by this operation.
+	 */
 	private static boolean isArray(@Nullable JsonElement element)
 	{
 		return element != null && element.isJsonArray();
 	}
 	
+/**
+ * Immutable value object representing bone link.
+ */
 	private record BoneLink(String childName, String parentName)
 	{
 	}
 	
+/**
+ * Immutable value object representing raw bone.
+ */
 	private record RawBone(String name, String parentName, Vector3f absolutePivot, Vector3f rotation, JsonElement cubes, JsonElement locators)
 	{
 	}
 	
+/**
+ * Immutable value object representing locator transform.
+ */
 	private record LocatorTransform(Vector3f position, Quaternionf rotation)
 	{
 	}
 	
+/**
+ * Immutable value object representing cube uv.
+ */
 	private record CubeUv(FaceUv north, FaceUv south, FaceUv east, FaceUv west, FaceUv up, FaceUv down)
 	{
 	}
 	
+/**
+ * Immutable value object representing face uv.
+ */
 	private record FaceUv(Vector2f min, Vector2f max)
 	{
 	}
 	
+/**
+ * Immutable value object representing texture size.
+ */
 	private record TextureSize(float width, float height)
 	{
 	}
 
+/**
+ * Immutable value object representing vector expression.
+ */
 	private record VectorExpression(MolangParser.Expression x, MolangParser.Expression y, MolangParser.Expression z)
 	{
+		/**
+		 * Performs the evaluate operation.
+		 * @param data the data to use.
+		 * @return the value produced by this operation.
+		 */
 		Vector3f evaluate(Object data)
 		{
 			return new Vector3f(
@@ -711,6 +1049,13 @@ public class PGeckoModelParser
 					evaluateComponent(this.z, data, 2));
 		}
 
+		/**
+		 * Performs the evaluate component operation.
+		 * @param expression the expression to use.
+		 * @param data the data to use.
+		 * @param component the component to use.
+		 * @return the value produced by this operation.
+		 */
 		private static float evaluateComponent(MolangParser.Expression expression, Object data, int component)
 		{
 			if (data instanceof MolangParser.Context context)
@@ -719,6 +1064,9 @@ public class PGeckoModelParser
 		}
 	}
 	
+/**
+ * Provides support for geometry buffers.
+ */
 	private static class GeometryBuffers
 	{
 		private final List<Float> positions = new ArrayList<>();
@@ -726,6 +1074,12 @@ public class PGeckoModelParser
 		private final List<Float> uvs = new ArrayList<>();
 		private final List<Integer> indices = new ArrayList<>();
 		
+		/**
+		 * Adds the vertex.
+		 * @param position the position to use.
+		 * @param normal the normal to use.
+		 * @param uv the uv to use.
+		 */
 		void addVertex(Vector3f position, Vector3f normal, Vector2f uv)
 		{
 			this.positions.add(position.x());
@@ -738,6 +1092,12 @@ public class PGeckoModelParser
 			this.uvs.add(uv.y());
 		}
 		
+		/**
+		 * Adds the triangle.
+		 * @param a the a to use.
+		 * @param b the b to use.
+		 * @param c the c to use.
+		 */
 		void addTriangle(int a, int b, int c)
 		{
 			this.indices.add(a);
@@ -745,31 +1105,55 @@ public class PGeckoModelParser
 			this.indices.add(c);
 		}
 		
+		/**
+		 * Performs the vertex count operation.
+		 * @return the value produced by this operation.
+		 */
 		int vertexCount()
 		{
 			return this.positions.size() / 3;
 		}
 		
+		/**
+		 * Performs the index count operation.
+		 * @return the value produced by this operation.
+		 */
 		int indexCount()
 		{
 			return this.indices.size();
 		}
 		
+		/**
+		 * Performs the positions operation.
+		 * @return the value produced by this operation.
+		 */
 		FloatBuffer positions()
 		{
 			return floatBuffer(this.positions);
 		}
 		
+		/**
+		 * Performs the normals operation.
+		 * @return the value produced by this operation.
+		 */
 		FloatBuffer normals()
 		{
 			return floatBuffer(this.normals);
 		}
 		
+		/**
+		 * Performs the uvs operation.
+		 * @return the value produced by this operation.
+		 */
 		FloatBuffer uvs()
 		{
 			return floatBuffer(this.uvs);
 		}
 		
+		/**
+		 * Performs the indices operation.
+		 * @return the value produced by this operation.
+		 */
 		ByteBuffer indices()
 		{
 			ByteBuffer buffer = ByteBuffer.allocateDirect(this.indices.size() * Integer.BYTES).order(ByteOrder.nativeOrder());
@@ -779,6 +1163,11 @@ public class PGeckoModelParser
 			return buffer;
 		}
 		
+		/**
+		 * Performs the float buffer operation.
+		 * @param values the values to use.
+		 * @return the value produced by this operation.
+		 */
 		private static FloatBuffer floatBuffer(List<Float> values)
 		{
 			FloatBuffer buffer = FloatBuffer.allocate(values.size());

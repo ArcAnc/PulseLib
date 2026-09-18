@@ -19,27 +19,45 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Pose;
 import org.jspecify.annotations.Nullable;
 
+/**
+ * Defines the contract for entity render state.
+ */
 public interface PEntityRenderState<T extends Entity & PAnimatable<T>> extends PRenderState<T>
 {
+	/**
+	 * Extracts the entity data.
+	 * @param entity the entity to use.
+	 * @param renderer the renderer to use.
+	 */
 	<RS extends EntityRenderState & PEntityRenderState<T>> void extractEntityData(
 			T entity,
 			PEntityRenderer<T, RS> renderer);
 	
+/**
+ * Provides support for impl.
+ */
 	class Impl<T extends Entity & PAnimatable<T>> extends EntityRenderState implements PEntityRenderState<T>
 	{
 		private @Nullable PBakedModel model;
 		private T animatable;
 		private AnimManagerKey key;
 		
+		/**
+		 * Extracts the data.
+		 */
 		@Override
 		public void extractData()
 		{
 			this.partialTick = PLibRenderHelper.mc().isPaused() ? 0 : this.partialTick;
 		}
 		
+		/**
+		 * Extracts the entity data.
+		 * @param entity the entity to use.
+		 * @param renderer the renderer to use.
+		 */
 		@Override
 		public <RS extends EntityRenderState & PEntityRenderState<T>> void extractEntityData(
 				T entity,
@@ -51,24 +69,40 @@ public interface PEntityRenderState<T extends Entity & PAnimatable<T>> extends P
 			this.key = AnimManagerKey.of(entity);
 		}
 		
+		/**
+		 * Performs the partial tick operation.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public float partialTick()
 		{
 			return this.partialTick;
 		}
 		
+		/**
+		 * Returns the baked model.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public @Nullable PBakedModel getBakedModel()
 		{
 			return this.model;
 		}
 		
+		/**
+		 * Returns the animatable.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public T getAnimatable()
 		{
 			return this.animatable;
 		}
 		
+		/**
+		 * Returns the anim key.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public AnimManagerKey getAnimKey()
 		{
@@ -76,6 +110,9 @@ public interface PEntityRenderState<T extends Entity & PAnimatable<T>> extends P
 		}
 	}
 	
+/**
+ * Provides support for living impl.
+ */
 	class LivingImpl<T extends LivingEntity & PAnimatable<T>> extends LivingEntityRenderState implements PEntityRenderState<T>
 	{
 		private @Nullable PBakedModel model;
@@ -84,12 +121,20 @@ public interface PEntityRenderState<T extends Entity & PAnimatable<T>> extends P
 		private float headYRot;
 		private float headXRot;
 		
+		/**
+		 * Extracts the data.
+		 */
 		@Override
 		public void extractData()
 		{
 			this.partialTick = PLibRenderHelper.mc().isPaused() ? 0 : this.partialTick;
 		}
 		
+		/**
+		 * Extracts the entity data.
+		 * @param entity the entity to use.
+		 * @param renderer the renderer to use.
+		 */
 		@Override
 		public <RS extends EntityRenderState & PEntityRenderState<T>> void extractEntityData(
 				T entity,
@@ -101,41 +146,70 @@ public interface PEntityRenderState<T extends Entity & PAnimatable<T>> extends P
 			this.key = AnimManagerKey.of(entity);
 		}
 		
+		/**
+		 * Extracts the head data.
+		 * @param headYRot the head y rot to use.
+		 * @param headXRot the head x rot to use.
+		 */
 		public void extractHeadData(float headYRot, float headXRot)
 		{
 			this.headYRot = headYRot;
 			this.headXRot = headXRot;
 		}
 		
+		/**
+		 * Performs the partial tick operation.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public float partialTick()
 		{
 			return this.partialTick;
 		}
 		
+		/**
+		 * Returns the baked model.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public @Nullable PBakedModel getBakedModel()
 		{
 			return this.model;
 		}
 		
+		/**
+		 * Returns the animatable.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public T getAnimatable()
 		{
 			return this.animatable;
 		}
 		
+		/**
+		 * Returns the anim key.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public AnimManagerKey getAnimKey()
 		{
 			return this.key;
 		}
 		
+		/**
+		 * Returns the head x rot.
+		 * @return the value produced by this operation.
+		 */
 		public float getHeadXRot()
 		{
 			return this.headXRot;
 		}
 		
+		/**
+		 * Returns the head y rot.
+		 * @return the value produced by this operation.
+		 */
 		public float getHeadYRot()
 		{
 			return this.headYRot;

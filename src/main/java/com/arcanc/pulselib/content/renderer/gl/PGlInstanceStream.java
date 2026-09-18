@@ -23,6 +23,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
 
+/**
+ * Streams gl instance.
+ */
 public final class PGlInstanceStream
 {
 	public static final int STRIDE = 96;
@@ -34,6 +37,13 @@ public final class PGlInstanceStream
 	private ByteBuffer persistentMapping;
 	private boolean persistent;
 
+	/**
+	 * Performs the upload operation.
+	 * @param instances the instances to use.
+	 * @param frameSlot the frame slot to use.
+	 * @param persistent the persistent to use.
+	 * @return the value produced by this operation.
+	 */
 	public Upload upload(List<PRenderQueue.InstanceData> instances, int frameSlot, boolean persistent)
 	{
 		int required = Math.max(STRIDE, instances.size() * STRIDE);
@@ -58,6 +68,9 @@ public final class PGlInstanceStream
 		return new Upload(this.buffer, 0L);
 	}
 
+	/**
+	 * Performs the close operation.
+	 */
 	public void close()
 	{
 		this.closeBuffer();
@@ -67,6 +80,10 @@ public final class PGlInstanceStream
 		this.staging = null;
 	}
 
+	/**
+	 * Performs the ensure capacity operation.
+	 * @param required the required to use.
+	 */
 	private void ensureCapacity(int required)
 	{
 		if (this.persistent)
@@ -87,6 +104,10 @@ public final class PGlInstanceStream
 		}
 	}
 
+	/**
+	 * Performs the ensure persistent capacity operation.
+	 * @param required the required to use.
+	 */
 	private void ensurePersistentCapacity(int required)
 	{
 		if (this.persistent && required <= this.capacity)
@@ -109,6 +130,9 @@ public final class PGlInstanceStream
 		this.persistent = true;
 	}
 
+	/**
+	 * Closes the buffer.
+	 */
 	private void closeBuffer()
 	{
 		if (this.buffer != -1)
@@ -123,6 +147,11 @@ public final class PGlInstanceStream
 		this.persistentMapping = null;
 	}
 
+	/**
+	 * Performs the write operation.
+	 * @param target the target to use.
+	 * @param instance the instance to use.
+	 */
 	private static void write(ByteBuffer target, PRenderQueue.InstanceData instance)
 	{
 		Matrix4f matrix = instance.posMatrix();
@@ -143,6 +172,9 @@ public final class PGlInstanceStream
 		target.putInt(0);
 	}
 
+/**
+ * Immutable value object representing upload.
+ */
 	public record Upload(int buffer, long offset)
 	{
 	}

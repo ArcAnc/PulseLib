@@ -22,12 +22,26 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Provides support for animation runtime.
+ */
 public final class PAnimationRuntime
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PAnimationRuntime()
 	{
 	}
 
+	/**
+	 * Performs the evaluate operation.
+	 * @param model the model to use.
+	 * @param controllers the controllers to use.
+	 * @param contexts the contexts to use.
+	 * @param partialTick the partial tick to use.
+	 * @return the value produced by this operation.
+	 */
 	public static <T extends PAnimatable<T>> PPose evaluate(PBakedModel model,
 	                                                        Collection<PAnimationController<T>> controllers,
 	                                                        PAnimationPoseResolver.MolangContextProvider<T> contexts,
@@ -94,6 +108,16 @@ public final class PAnimationRuntime
 		return pose;
 	}
 	
+	/**
+	 * Extracts the root motion.
+	 * @param animation the animation to use.
+	 * @param rootBoneName the root bone name to use.
+	 * @param previousTime the previous time to use.
+	 * @param currentTime the current time to use.
+	 * @param interpolation the interpolation to use.
+	 * @param data the data to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PRootMotionDelta extractRootMotion(PAnimation animation,
 	                                                 String rootBoneName,
 	                                                 float previousTime,
@@ -117,12 +141,28 @@ public final class PAnimationRuntime
 		return new PRootMotionDelta(translation, rotation);
 	}
 
+	/**
+	 * Performs the animation operation.
+	 * @param model the model to use.
+	 * @param controller the controller to use.
+	 * @return the value produced by this operation.
+	 */
 	private static <T extends PAnimatable<T>> PCompiledAnimation animation(PBakedModel model, PAnimationController<T> controller)
 	{
 		PRawAnimation.AnimationStage stage = controller.getCurrentStage();
 		return stage == null || stage.isWaiting() ? null : model.compiledAnimation(stage.animationName());
 	}
 
+	/**
+	 * Calculates the graph bone transformations.
+	 * @param model the model to use.
+	 * @param controller the controller to use.
+	 * @param layers the layers to use.
+	 * @param boneIndex the bone index to use.
+	 * @param context the context to use.
+	 * @param accumulatedFrame the accumulated frame to use.
+	 * @return the value produced by this operation.
+	 */
 	private static <T extends PAnimatable<T>> BoneFrame calculateGraphBoneTransformations(PBakedModel model,
 	                                                                                      PAnimationController<T> controller,
 	                                                                                      List<PAnimationGraphRuntime.Layer> layers,
@@ -194,10 +234,22 @@ public final class PAnimationRuntime
 		return new BoneFrame(translation, rotation, scale);
 	}
 
+/**
+ * Immutable value object representing graph frame.
+ */
 	private record GraphFrame(PAnimationGraphRuntime.Layer layer, BoneFrame frame)
 	{
 	}
 
+	/**
+	 * Performs the differs from bind operation.
+	 * @param model the model to use.
+	 * @param boneIndex the bone index to use.
+	 * @param translation the translation to use.
+	 * @param rotation the rotation to use.
+	 * @param scale the scale to use.
+	 * @return the value produced by this operation.
+	 */
 	private static boolean differsFromBind(PBakedModel model,
 	                                      int boneIndex,
 	                                      Vector3f translation,

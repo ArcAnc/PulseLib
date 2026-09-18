@@ -20,12 +20,33 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Provides support for deformed cuboid.
+ */
 public final class PDeformedCuboid extends ModelPart.Cube
 {
 	private static final float MODEL_SCALE = 1.0f / 16.0f;
 	private final List<Face> faces;
 	private volatile PPlayerVertexDeformer deformer = PPlayerVertexDeformer.IDENTITY;
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param texCoordU the tex coord u to use.
+	 * @param texCoordV the tex coord v to use.
+	 * @param originX the origin x to use.
+	 * @param originY the origin y to use.
+	 * @param originZ the origin z to use.
+	 * @param dimensionX the dimension x to use.
+	 * @param dimensionY the dimension y to use.
+	 * @param dimensionZ the dimension z to use.
+	 * @param growX the grow x to use.
+	 * @param growY the grow y to use.
+	 * @param growZ the grow z to use.
+	 * @param mirror the mirror to use.
+	 * @param texWidth the tex width to use.
+	 * @param texHeight the tex height to use.
+	 * @param visibleFaces the visible faces to use.
+	 */
 	public PDeformedCuboid(int texCoordU, int texCoordV, float originX, float originY, float originZ,
 						float dimensionX, float dimensionY, float dimensionZ, float growX, float growY, float growZ,
 						boolean mirror, float texWidth, float texHeight, Set<Direction> visibleFaces)
@@ -36,11 +57,23 @@ public final class PDeformedCuboid extends ModelPart.Cube
 				growX, growY, growZ, mirror, texWidth, texHeight, visibleFaces);
 	}
 
+	/**
+	 * Sets the deformer.
+	 * @param deformer the deformer to use.
+	 */
 	void setDeformer(PPlayerVertexDeformer deformer)
 	{
 		this.deformer = deformer;
 	}
 
+	/**
+	 * Performs the compile operation.
+	 * @param pose the pose to use.
+	 * @param consumer the consumer to use.
+	 * @param packedLight the packed light to use.
+	 * @param packedOverlay the packed overlay to use.
+	 * @param color the color to use.
+	 */
 	@Override
 	public void compile(PoseStack.Pose pose, VertexConsumer consumer, int packedLight, int packedOverlay, int color)
 	{
@@ -54,6 +87,25 @@ public final class PDeformedCuboid extends ModelPart.Cube
 			face.render(pose, consumer, packedLight, packedOverlay, color, active);
 	}
 
+	/**
+	 * Builds the faces.
+	 * @param u the u to use.
+	 * @param v the v to use.
+	 * @param x the x to use.
+	 * @param y the y to use.
+	 * @param z the z to use.
+	 * @param dx the dx to use.
+	 * @param dy the dy to use.
+	 * @param dz the dz to use.
+	 * @param growX the grow x to use.
+	 * @param growY the grow y to use.
+	 * @param growZ the grow z to use.
+	 * @param mirror the mirror to use.
+	 * @param textureWidth the texture width to use.
+	 * @param textureHeight the texture height to use.
+	 * @param visible the visible to use.
+	 * @return the value produced by this operation.
+	 */
 	private static List<Face> buildFaces(int u, int v, float x, float y, float z, float dx, float dy, float dz,
 										  float growX, float growY, float growZ, boolean mirror, float textureWidth, float textureHeight,
 										  Set<Direction> visible)
@@ -80,9 +132,21 @@ public final class PDeformedCuboid extends ModelPart.Cube
 		return faces;
 	}
 
+/**
+ * Immutable value object representing face.
+ */
 	private record Face(Vector3f p00, Vector3f p10, Vector3f p11, Vector3f p01,
 						float u0, float v0, float u1, float v1, float textureWidth, float textureHeight)
 	{
+		/**
+		 * Performs the render operation.
+		 * @param pose the pose to use.
+		 * @param consumer the consumer to use.
+		 * @param light the light to use.
+		 * @param overlay the overlay to use.
+		 * @param color the color to use.
+		 * @param deformer the deformer to use.
+		 */
 		void render(PoseStack.Pose pose, VertexConsumer consumer, int light, int overlay, int color, PPlayerVertexDeformer deformer)
 		{
 			int uSegments = segments(this.p00.distance(this.p10));
@@ -104,22 +168,52 @@ public final class PDeformedCuboid extends ModelPart.Cube
 			}
 		}
 
+		/**
+		 * Performs the interpolate operation.
+		 * @param u the u to use.
+		 * @param v the v to use.
+		 * @return the value produced by this operation.
+		 */
 		private Vector3f interpolate(float u, float v)
 		{
 			Vector3f bottom = new Vector3f(this.p00).lerp(this.p10, u);
 			return bottom.lerp(new Vector3f(this.p01).lerp(this.p11, u), v);
 		}
 
+		/**
+		 * Performs the segments operation.
+		 * @param length the length to use.
+		 * @return the value produced by this operation.
+		 */
 		private static int segments(float length)
 		{
 			return Math.clamp((int)Math.ceil(length / 2.0f), 1, 8);
 		}
 
+		/**
+		 * Performs the lerp operation.
+		 * @param a the a to use.
+		 * @param b the b to use.
+		 * @param amount the amount to use.
+		 * @return the value produced by this operation.
+		 */
 		private static float lerp(float a, float b, float amount)
 		{
 			return a + (b - a) * amount;
 		}
 
+		/**
+		 * Performs the emit operation.
+		 * @param pose the pose to use.
+		 * @param consumer the consumer to use.
+		 * @param position the position to use.
+		 * @param color the color to use.
+		 * @param u the u to use.
+		 * @param v the v to use.
+		 * @param overlay the overlay to use.
+		 * @param light the light to use.
+		 * @param normal the normal to use.
+		 */
 		private static void emit(PoseStack.Pose pose, VertexConsumer consumer, Vector3f position, int color, float u, float v,
 								 int overlay, int light, Vector3f normal)
 		{

@@ -23,8 +23,7 @@ import com.arcanc.pulselib.content.model.baked.PMeshRenderMaterial;
 import com.arcanc.pulselib.content.renderer.base.PEntityRenderState;
 import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import com.arcanc.pulselib.data.gecko.MolangParser;
-import com.arcanc.pulselib.util.PRenderTypes;
-import com.arcanc.pulselib.util.PTextureCache;
+import com.arcanc.pulselib.util.PResourceCache;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -63,6 +62,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * Renders entity.
+ */
 public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS extends EntityRenderState & PEntityRenderState<T>> extends EntityRenderer<T, RS>
 	implements PRenderer<T, RS>
 {
@@ -70,6 +72,12 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 	private final Function<Identifier, RenderType> renderType;
 	private final Map<String, List<PEntityRenderLayer<T, RS>>> renderLayers = new Object2ObjectOpenHashMap<>();
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param context the context to use.
+	 * @param modelData the model data to use.
+	 * @param renderType the render type to use.
+	 */
 	public PEntityRenderer(EntityRendererProvider.Context context, PModelData modelData, Function<Identifier, RenderType> renderType)
 	{
 		super(context);
@@ -77,24 +85,44 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		this.renderType = renderType;
 	}
 	
+	/**
+	 * Returns the model data.
+	 * @param renderState the render state to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public PModelData getModelData(RS renderState)
 	{
 		return this.modelData;
 	}
 	
+	/**
+	 * Returns the model.
+	 * @param renderState the render state to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public @Nullable PBakedModel getModel(RS renderState)
 	{
 		return getModelData(renderState).getModel();
 	}
 	
+	/**
+	 * Returns the render type.
+	 * @param texture the texture to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public RenderType getRenderType(Identifier texture)
 	{
 		return this.renderType.apply(texture);
 	}
 	
+	/**
+	 * Adds the render layer.
+	 * @param boneName the bone name to use.
+	 * @param renderLayer the render layer to use.
+	 */
 	public void addRenderLayer(String boneName, PEntityRenderLayer<T, RS> renderLayer)
 	{
 		this.renderLayers.compute(boneName, (bone, listLayers) ->
@@ -106,6 +134,12 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		});
 	}
 	
+	/**
+	 * Extracts the render state.
+	 * @param entity the entity to use.
+	 * @param renderState the render state to use.
+	 * @param partialTick the partial tick to use.
+	 */
 	@Override
 	public void extractRenderState(T entity, RS renderState, float partialTick)
 	{
@@ -115,6 +149,13 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 			extractLivingRenderData(living, livingEntityRenderState, partialTick);
 	}
 	
+	/**
+	 * Performs the submit operation.
+	 * @param renderState the render state to use.
+	 * @param poseStack the pose stack to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 * @param cameraRenderState the camera render state to use.
+	 */
 	@Override
 	public void submit(RS renderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState)
 	{
@@ -128,12 +169,26 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		postSubmit(poseStack, renderState, cameraRenderState, submitNodeCollector);
 	}
 	
+	/**
+	 * Performs the pre submit operation.
+	 * @param poseStack the pose stack to use.
+	 * @param renderState the render state to use.
+	 * @param cameraRenderState the camera render state to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 */
 	@Override
 	public void preSubmit(PoseStack poseStack, RS renderState, CameraRenderState cameraRenderState, SubmitNodeCollector submitNodeCollector)
 	{
 	
 	}
 	
+	/**
+	 * Performs the true submit operation.
+	 * @param poseStack the pose stack to use.
+	 * @param renderState the render state to use.
+	 * @param cameraRenderState the camera render state to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 */
 	@Override
 	public void trueSubmit(PoseStack poseStack, RS renderState, CameraRenderState cameraRenderState, SubmitNodeCollector submitNodeCollector)
 	{
@@ -180,12 +235,35 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		}
 	}
 	
+	/**
+	 * Performs the post submit operation.
+	 * @param poseStack the pose stack to use.
+	 * @param renderState the render state to use.
+	 * @param cameraRenderState the camera render state to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 */
 	@Override
 	public void postSubmit(PoseStack poseStack, RS renderState, CameraRenderState cameraRenderState, SubmitNodeCollector submitNodeCollector)
 	{
 	
 	}
 	
+	/**
+	 * Performs the per bone submit operation.
+	 * @param renderState the render state to use.
+	 * @param poseStack the pose stack to use.
+	 * @param bone the bone to use.
+	 * @param controllers the controllers to use.
+	 * @param data the data to use.
+	 * @param renderType the render type to use.
+	 * @param packedColor the packed color to use.
+	 * @param packedLight the packed light to use.
+	 * @param packedOverlay the packed overlay to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 * @param cameraRenderState the camera render state to use.
+	 * @param renderLayer the render layer to use.
+	 * @param molangContexts the molang contexts to use.
+	 */
 	protected void perBoneSubmit(RS renderState,
 	                             PoseStack poseStack,
 	                             PBakedBone bone,
@@ -203,6 +281,24 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		perBoneSubmit(renderState, poseStack, bone, controllers, data, renderType, packedColor, packedLight, packedOverlay, submitNodeCollector, cameraRenderState, renderLayer, null, null, null, molangContexts);
 	}
 	
+	/**
+	 * Performs the per bone submit operation.
+	 * @param renderState the render state to use.
+	 * @param poseStack the pose stack to use.
+	 * @param bone the bone to use.
+	 * @param controllers the controllers to use.
+	 * @param data the data to use.
+	 * @param renderType the render type to use.
+	 * @param packedColor the packed color to use.
+	 * @param packedLight the packed light to use.
+	 * @param packedOverlay the packed overlay to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 * @param cameraRenderState the camera render state to use.
+	 * @param renderLayer the render layer to use.
+	 * @param entityBonePoses the entity bone poses to use.
+	 * @param layerTransform the layer transform to use.
+	 * @param molangContexts the molang contexts to use.
+	 */
 	protected void perBoneSubmit(RS renderState,
 	                             PoseStack poseStack,
 	                             PBakedBone bone,
@@ -222,6 +318,25 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		perBoneSubmit(renderState, poseStack, bone, controllers, data, renderType, packedColor, packedLight, packedOverlay, submitNodeCollector, cameraRenderState, renderLayer, entityBonePoses, layerTransform, null, molangContexts);
 	}
 
+	/**
+	 * Performs the per bone submit operation.
+	 * @param renderState the render state to use.
+	 * @param poseStack the pose stack to use.
+	 * @param bone the bone to use.
+	 * @param controllers the controllers to use.
+	 * @param data the data to use.
+	 * @param renderType the render type to use.
+	 * @param packedColor the packed color to use.
+	 * @param packedLight the packed light to use.
+	 * @param packedOverlay the packed overlay to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 * @param cameraRenderState the camera render state to use.
+	 * @param renderLayer the render layer to use.
+	 * @param entityBonePoses the entity bone poses to use.
+	 * @param layerTransform the layer transform to use.
+	 * @param deferredLayers the deferred layers to use.
+	 * @param molangContexts the molang contexts to use.
+	 */
 	private void perBoneSubmit(RS renderState,
 	                           PoseStack poseStack,
 	                           PBakedBone bone,
@@ -293,6 +408,17 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		poseStack.popPose();
 	}
 
+	/**
+	 * Performs the submit deferred layer operation.
+	 * @param renderState the render state to use.
+	 * @param poseStack the pose stack to use.
+	 * @param submitNodeCollector the submit node collector to use.
+	 * @param cameraRenderState the camera render state to use.
+	 * @param controllers the controllers to use.
+	 * @param molangContexts the molang contexts to use.
+	 * @param entityBonePoses the entity bone poses to use.
+	 * @param deferredLayer the deferred layer to use.
+	 */
 	private void submitDeferredLayer(RS renderState,
 	                                 PoseStack poseStack,
 	                                 SubmitNodeCollector submitNodeCollector,
@@ -320,6 +446,14 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		poseStack.popPose();
 	}
 
+	/**
+	 * Prepares the molang contexts.
+	 * @param animatable the animatable to use.
+	 * @param manager the manager to use.
+	 * @param controllers the controllers to use.
+	 * @param partialTick the partial tick to use.
+	 * @return the value produced by this operation.
+	 */
 	private Map<PAnimationController<T>, MolangParser.Context> prepareMolangContexts(T animatable,
 	                                                                                   PAnimationManager<T> manager,
 	                                                                                   Collection<PAnimationController<T>> controllers,
@@ -337,6 +471,13 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		return contexts;
 	}
 
+	/**
+	 * Performs the populate molang context operation.
+	 * @param animatable the animatable to use.
+	 * @param controller the controller to use.
+	 * @param context the context to use.
+	 * @param partialTick the partial tick to use.
+	 */
 	protected void populateMolangContext(T animatable,
 	                                    PAnimationController<T> controller,
 	                                    MolangParser.Context context,
@@ -344,6 +485,13 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 	{
 	}
 
+	/**
+	 * Returns the layer transform.
+	 * @param anchorBoneName the anchor bone name to use.
+	 * @param poseStack the pose stack to use.
+	 * @param entityBonePoses the entity bone poses to use.
+	 * @return the value produced by this operation.
+	 */
 	private Matrix4f getLayerTransform(String anchorBoneName, PoseStack poseStack, @Nullable Map<String, Matrix4f> entityBonePoses)
 	{
 		if (entityBonePoses == null)
@@ -354,6 +502,14 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		return new Matrix4f(anchorPose).invert().mul(poseStack.last().pose());
 	}
 
+	/**
+	 * Applies the bound layer bone pose.
+	 * @param poseStack the pose stack to use.
+	 * @param bone the bone to use.
+	 * @param renderLayer the render layer to use.
+	 * @param entityBonePoses the entity bone poses to use.
+	 * @param layerTransform the layer transform to use.
+	 */
 	private void applyBoundLayerBonePose(PoseStack poseStack,
 	                                     PBakedBone bone,
 	                                     PEntityRenderLayer<T, RS> renderLayer,
@@ -373,6 +529,18 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 			pose.mul(layerTransform);
 	}
 	
+	/**
+	 * Performs the submit bone operation.
+	 * @param renderState the render state to use.
+	 * @param bone the bone to use.
+	 * @param poseStack the pose stack to use.
+	 * @param modelData the model data to use.
+	 * @param controllers the controllers to use.
+	 * @param renderType the render type to use.
+	 * @param color the color to use.
+	 * @param packedLight the packed light to use.
+	 * @param packedOverlay the packed overlay to use.
+	 */
 	protected void submitBone(RS renderState,
 	                          PBakedBone bone,
 	                          PoseStack poseStack,
@@ -386,6 +554,19 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		submitBone(renderState, bone, poseStack, modelData, controllers, renderType, color, packedLight, packedOverlay, null);
 	}
 	
+	/**
+	 * Performs the submit bone operation.
+	 * @param renderState the render state to use.
+	 * @param bone the bone to use.
+	 * @param poseStack the pose stack to use.
+	 * @param modelData the model data to use.
+	 * @param controllers the controllers to use.
+	 * @param renderType the render type to use.
+	 * @param color the color to use.
+	 * @param packedLight the packed light to use.
+	 * @param packedOverlay the packed overlay to use.
+	 * @param renderLayer the render layer to use.
+	 */
 	protected void submitBone(RS renderState,
 	                          PBakedBone bone,
 	                          PoseStack poseStack,
@@ -401,7 +582,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		
 		for (PBakedMesh mesh : bone.meshes())
 		{
-			if (mesh.textureName().isEmpty())
+			if (mesh.textureReference().isEmpty())
 				continue;
 			
 			PMeshRenderContext inherited = new PMeshRenderContext(
@@ -414,12 +595,20 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 					renderLayer.resolveMeshRender(renderState, bone, mesh, inherited);
 			PMeshRenderMaterial material = PMeshRenderMaterial.resolve(mesh, meshContext);
 			
-			RenderType type = material.resolveRenderType(meshContext, PTextureCache.ATLAS_LOCATION);
+			RenderType type = material.resolveRenderType(meshContext, PResourceCache.ATLAS_LOCATION);
 			
 			PRenderQueue.submitEntityMesh(type, material.mesh(), meshContext.deformation(), new PRenderQueue.InstanceData(matrix4fstack, meshContext.color(), material.packedLight(), meshContext.packedOverlay()));
 		}
 	}
 	
+	/**
+	 * Resolves the mesh render.
+	 * @param renderState the render state to use.
+	 * @param bone the bone to use.
+	 * @param mesh the mesh to use.
+	 * @param inherited the inherited to use.
+	 * @return the value produced by this operation.
+	 */
 	protected PMeshRenderContext resolveMeshRender(RS renderState,
 	                                               PBakedBone bone,
 	                                               PBakedMesh mesh,
@@ -428,6 +617,13 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		return inherited;
 	}
 	
+	/**
+	 * Performs the setup rotations operation.
+	 * @param renderState the render state to use.
+	 * @param poseStack the pose stack to use.
+	 * @param yBodyRot the y body rot to use.
+	 * @param scale the scale to use.
+	 */
 	protected void setupRotations(LivingEntityRenderState renderState, PoseStack poseStack, float yBodyRot, float scale)
 	{
 		if (renderState.isFullyFrozen)
@@ -466,6 +662,11 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		}
 	}
 	
+	/**
+	 * Performs the sleep direction to rotation operation.
+	 * @param facing the facing to use.
+	 * @return the value produced by this operation.
+	 */
 	private float sleepDirectionToRotation(Direction facing)
 	{
 		return switch (facing)
@@ -477,6 +678,12 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		};
 	}
 	
+	/**
+	 * Extracts the living render data.
+	 * @param entity the entity to use.
+	 * @param state the state to use.
+	 * @param partialTick the partial tick to use.
+	 */
 	protected void extractLivingRenderData(LivingEntity entity, PEntityRenderState.LivingImpl<?> state, float partialTick)
 	{
 		// Vanilla md copy/paste
@@ -556,6 +763,13 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		state.isInvisibleToPlayer = state.isInvisible && entity.isInvisibleTo(minecraft.player);
 	}
 	
+	/**
+	 * Performs the solve body rot operation.
+	 * @param entity the entity to use.
+	 * @param headRot the head rot to use.
+	 * @param partialTick the partial tick to use.
+	 * @return the value produced by this operation.
+	 */
 	private float solveBodyRot(LivingEntity entity, float headRot, float partialTick)
 	{
 		if (entity.getVehicle() instanceof LivingEntity riding)
@@ -573,17 +787,30 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 			return Mth.rotLerp(partialTick, entity.yBodyRotO, entity.yBodyRot);
 	}
 	
+	/**
+	 * Determines whether entity upside down.
+	 * @param mob the mob to use.
+	 * @return the value produced by this operation.
+	 */
 	protected boolean isEntityUpsideDown(LivingEntity mob)
 	{
 		Component customName = mob.getCustomName();
 		return customName != null && isUpsideDownName(customName.getString());
 	}
 	
+	/**
+	 * Determines whether upside down name.
+	 * @param name the name to use.
+	 * @return the value produced by this operation.
+	 */
 	protected static boolean isUpsideDownName(String name)
 	{
 		return "Dinnerbone".equals(name) || "Grumm".equals(name);
 	}
 	
+/**
+ * Provides support for deferred layer submit.
+ */
 	private final class DeferredLayerSubmit
 	{
 		private final PEntityRenderLayer<T, RS> layer;
@@ -593,6 +820,15 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		private final int packedLight;
 		private final int packedOverlay;
 		
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param layer the layer to use.
+		 * @param attachmentPose the attachment pose to use.
+		 * @param layerTransform the layer transform to use.
+		 * @param packedColor the packed color to use.
+		 * @param packedLight the packed light to use.
+		 * @param packedOverlay the packed overlay to use.
+		 */
 		private DeferredLayerSubmit(PEntityRenderLayer<T, RS> layer,
 		                            Matrix4f attachmentPose,
 		                            Matrix4f layerTransform,

@@ -17,8 +17,21 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 
 @FunctionalInterface
+/**
+ * Defines the contract for mesh render resolver.
+ */
 public interface PMeshRenderResolver
 {
+	/**
+	 * Performs the resolve operation.
+	 * @param entity the entity to use.
+	 * @param stack the stack to use.
+	 * @param bone the bone to use.
+	 * @param mesh the mesh to use.
+	 * @param inherited the inherited to use.
+	 * @param partialTick the partial tick to use.
+	 * @return the value produced by this operation.
+	 */
 	PMeshRenderContext resolve(LivingEntity entity,
 	                           ItemStack stack,
 	                           PBakedBone bone,

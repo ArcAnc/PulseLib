@@ -15,11 +15,28 @@ import com.google.gson.JsonElement;
 
 import java.util.Set;
 
+/**
+ * Defines the contract for gecko channel decoder.
+ */
 public interface PGeckoChannelDecoder<T>
 {
+	/**
+	 * Performs the field names operation.
+	 * @return the value produced by this operation.
+	 */
 	Set<String> fieldNames();
 
+	/**
+	 * Performs the channel operation.
+	 * @return the value produced by this operation.
+	 */
 	PAnimationChannelType<T> channel();
 
+	/**
+	 * Decodes the value.
+	 * @param element the element to use.
+	 * @param context the context to use.
+	 * @return the value produced by this operation.
+	 */
 	PAnimationValue<T> decodeValue(JsonElement element, PGeckoDecodeContext context);
 }

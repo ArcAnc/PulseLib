@@ -38,7 +38,7 @@ public final class ExamplePlayerAnimations {
 }
 ```
 
-The example uses the Gecko loader. Register `PGeckoModelLoader.INSTANCE` with `PModelCache` before the first client resource reload, as described in [Model loaders](model-loaders.md), or use a glTF skeleton instead.
+The example uses the Gecko loader. Register `PGeckoModelLoader.INSTANCE` with `PModelCache` before the first client resource reload, as described in [Model loaders](model-loaders.md), then register the same model and every material texture reference through `PulseLibEvents.RegisterResourceEvent`. Only registered resources are loaded; select the loader with `event.model(model, PGeckoModelLoader.INSTANCE.id())`. See [Resources](resources.md#register-model-resources).
 
 Controllers receive a `PPlayerAnimationInstance` as their animatable. Use `state.animatable().player()` to read the current player. PulseLib creates one instance for every `(player UUID, definition id)` pair, so remote players and multiple definitions never share a controller timeline.
 
@@ -58,7 +58,7 @@ if (animation != null)
 
 `bind(part, boneName)` maps a bone in the animation model to a semantic player part. `PPlayerPart` values are `ROOT`, `HEAD`, `BODY`, `RIGHT_ARM`, `LEFT_ARM`, `RIGHT_LEG`, and `LEFT_LEG`.
 
-`ROOT` applies the bone transform to the complete third-person player render, including its feature layers. Use it for an emote that moves or rotates the whole player, such as a flip. `rootPivot(x, y, z)` selects its rotation pivot in model-space blocks; a value close to `(0, 0.9, 0)` rotates around the centre of a standing player. In first person, `ROOT` and `HEAD` drive the local camera, while arms use only their local arm transforms. The root transform is deliberately not applied a second time to the first-person hand renderer. An empty off-hand is rendered when its `LEFT_ARM` or `RIGHT_ARM` binding has an active sampled transform.
+`ROOT` applies the bone transform to the complete third-person player render, including its feature layers. Use it for an emote that moves or rotates the whole player, such as a flip. `rootPivot(x, y, z)` selects its rotation pivot in model-space blocks; a value close to `(0, 0.9, 0)` rotates around the centre of a standing player. For the local player's camera, `ROOT` and `HEAD` are also sampled in first person. This camera adjustment is independent of the first-person hand renderer described below.
 
 Each semantic part applies to both the base part and the matching outer skin layer. For example, `RIGHT_ARM` transforms `rightArm` and `rightSleeve` together.
 
@@ -121,7 +121,7 @@ Definitions with the same non-empty `syncGroup` keep similarly named looping con
 .syncGroup("combat")
 ```
 
-Use this for layered models whose walk, idle, or other cyclic animations must stay aligned. `boneWeight(boneName, weight)` can additionally scale one bound bone independently of its semantic player-part weight.
+Use this for layered models whose walk, idle, or other cyclic animations must stay aligned. `boneWeight(boneName, weight)` can additionally scale one bound bone independently of its semantic player-part weight. It also scales first-person arms and item anchors that use that bone.
 
 ## Mesh deformers
 
@@ -150,7 +150,78 @@ See [Mesh deformers](mesh-deformers.md) for built-in operations, subdivision, no
 
 The model only needs a skeleton and animations; mesh data is optional. Bone positions from Gecko animations are converted from blocks to vanilla model pixels automatically. Rotation, position, and scale channels are supported. Standard glTF assets keep their normal right-handed Y-up coordinates: the player pipeline converts their position and quaternion axes to Minecraft's mirrored player render space. Do not pre-flip an exported glTF player animation. The skeleton resolver evaluates bind pose and parent transforms; a bound child therefore inherits transforms of intermediate animation bones. A bound `ROOT` is applied once to the render stack and is excluded from child deltas.
 
-The API affects the whole player model in third person and arms in first person. It restores position, rotation, and scale immediately after every draw, preventing a pose from leaking into a different player or another render layer.
+The API affects the whole player model in third person. It restores position, rotation, and scale immediately after every draw, preventing a pose from leaking into a different player or another render layer.
+
+## First-person hands, items, and camera space
+
+First-person hand rendering is opt-in. `PPlayerFirstPersonSettings.DISABLED` is the default. When a definition with `firstPerson(PPlayerFirstPersonSettings.ENABLED)` contributes for the local player, PulseLib cancels Minecraft's complete `renderHandsWithItems` call and draws the first-person view from the animation pose. Vanilla swing, equip, use, and empty-hand transforms are therefore not added automatically.
+
+For its arms, items, meshes, or custom anchors to appear, an enabled definition needs a `FIRST_PERSON_CAMERA` anchor. It defines the origin used to convert those bones into first-person space. It does **not** move the Minecraft camera; bind `ROOT` and `HEAD` when the animation itself should move or rotate the local camera.
+
+The first-person transform has two coordinate boundaries. PulseLib first expresses the camera-relative bone transform in Minecraft player-model coordinates. It then converts the result into the first-person renderer's view coordinates. For a glTF arm or item transform `M`, the resulting matrix is `M * C`, where `C = diag(-1, -1, 1)`. This is intentional: the transform receives vanilla arm or item geometry in player-model coordinates, so even an identity bone transform needs `C` to orient that geometry in view space. Animated glTF mesh attachments already have glTF vertex coordinates and therefore reduce to `M`. `C` currently has the same numeric values as the glTF-to-player conversion because it is self-inverse, but it is a separate player-model-to-first-person-view contract.
+
+### PulseLib Player Action Rig
+
+Use [`player_model_template.gltf`](../src/main/resources/assets/pulselib/template/player/player_model_template.gltf) or [`player_model_template.bbmodel`](../src/main/resources/assets/pulselib/template/player/player_model_template.bbmodel) as the starting skeleton for player actions. It contains `body`, `head`, `right_arm`, `left_arm`, and `fp_camera`, plus `right_hand` and `left_hand` item anchors. The file is intentionally skeleton-only: add preview meshes in Blockbench if they help authoring, but keep the named bone origins unchanged.
+
+`right_arm` and `left_arm` have a fixed rig contract. Each bone origin must equal the local origin of the geometry-only vanilla `ModelPart` used by the first-person renderer. In particular, it is the arm pivot, not the player-model root, the center of the cuboid, or the hand grip. The template matches the normal 4×12×4 vanilla arms exactly after glTF conversion. PulseLib applies no per-arm correction matrix; a rig that moves either origin will move the rendered vanilla arm and its persistent attachments by the same offset.
+
+```java
+PPlayerAnimationDefinition.builder(MODEL)
+        .bind(PPlayerPart.HEAD, "head")       // optional: drives the camera
+        .bind(PPlayerPart.RIGHT_ARM, "right_arm")
+        .bind(PPlayerPart.LEFT_ARM, "left_arm")
+        .anchor(PPlayerAnimationAnchors.FIRST_PERSON_CAMERA, "fp_camera")
+        .anchor(PPlayerAnimationAnchors.RIGHT_ITEM, "right_hand")
+        .anchor(PPlayerAnimationAnchors.LEFT_ITEM, "left_hand")
+        .firstPerson(PPlayerFirstPersonSettings.ENABLED)
+        // controller setup
+        .build();
+```
+
+`RIGHT_ARM` and `LEFT_ARM` supply the physical arms to draw; `RIGHT_ITEM` and `LEFT_ITEM` supply the physical first-person item-renderer origins. Minecraft maps its logical main/off hand to these physical left/right channels according to the player's main-arm setting.
+
+Each channel has a `PFirstPersonRenderMode`. A channel without a sampled transform remains `VANILLA`, so Minecraft's per-hand swing, equip, use, map, and item-model transforms still apply even though PulseLib owns the outer first-person render call. A sampled arm or item channel becomes `ANIMATED` and PulseLib applies its camera-space transform. `HIDDEN` draws nothing. `PFirstPersonArmPose` and `PFirstPersonItemPose` enforce this boundary: only `ANIMATED` has a non-null transform.
+
+An item anchor is applied before Minecraft renders the item with `FIRST_PERSON_RIGHT_HAND` or `FIRST_PERSON_LEFT_HAND`. It therefore controls the container transform, not the absolute transform of the item mesh or its final grip. Minecraft then applies the item's own first-person display transform, including any transform supplied by an item model or resource pack. This keeps animated items compatible with vanilla and custom first-person item models.
+
+Keep `firstPerson` disabled for ordinary third-person animations. If an enabled definition contributes no animated hand channel, custom anchor, or mesh attachment, PulseLib leaves Minecraft's complete first-person pass intact. Definitions are processed by ascending `priority` and then identifier; arm and item transforms blend in that same order.
+
+## Hiding first-person held items
+
+`itemRenderPolicy(...)` supplies a predicate for each first-person item channel. It is evaluated immediately before drawing each non-empty item and receives the local player, its logical hand, and current `ItemStack`:
+
+```java
+.firstPerson(PPlayerFirstPersonSettings.ENABLED)
+.itemRenderPolicy((player, hand, stack) ->
+        hand == InteractionHand.MAIN_HAND && stack.is(MyItems.KATANA.get()))
+```
+
+Return `true` to suppress that item's local first-person draw. `ItemRenderPolicy.HIDE` hides an item and `ItemRenderPolicy.RENDER` keeps it visible; rendering is the default. The policy is attached to each physical left/right item channel only when that definition contributes the matching item anchor. Definitions are processed by ascending `priority` and identifier, so the highest ordered contributor for each channel owns its discrete policy while its transform is blended normally. The inventory and third-person renderer are unaffected.
+
+For a moment that belongs to an animation sequence, use `itemVisibility(controllerName, ...)` instead. It samples the named controller's interpolated timeline in seconds, independently of the definition's activation crossfade. The resulting visibility is captured for the current render frame; it therefore remains consistent while Minecraft draws both hands.
+
+```java
+.itemVisibility("bandage", (player, hand, animationTime, stack) ->
+        animationTime > 0.2f
+                ? PPlayerAnimationDefinition.ItemVisibility.HIDDEN
+                : PPlayerAnimationDefinition.ItemVisibility.VISIBLE)
+```
+
+This phase policy supplements `itemRenderPolicy(...)`: either policy may hide the item. If several definitions contribute the same physical item channel, the last definition by priority and identifier owns both policies, just as it does for the item transform.
+
+## Animation anchors and mesh attachments
+
+`anchor(PPlayerAnimationAnchor, boneName)` exposes a model bone as a named attachment point. PulseLib reserves `FIRST_PERSON_CAMERA`, `RIGHT_ITEM`, and `LEFT_ITEM`; use a custom `PPlayerAnimationAnchor` for equipment or effects that follow an animation bone. Register a `PPlayerAnimatedAttachmentRenderer` through `PulseLibEvents.PlayerAnimatedAttachmentRegistrationEvent`. Its context contains the player, animation id, anchor, sampled transform, blend weight, render stack, collector, and whether it is rendering in first person.
+
+The player-animation model may also contain mesh branches that are not bound to a vanilla player part. By default, PulseLib automatically renders a mesh branch when it contains an active animated bone, both in third person and in the enabled first-person replacement pass. To render only known branches, declare their roots with `meshAttachment(boneName)`:
+
+```java
+.meshAttachment("ball")
+.meshAttachment("backpack")
+```
+
+Once at least one root is declared, PulseLib does not discover other free mesh branches. A selected root renders its complete descendant tree, so a prop can contain child bones and meshes without listing each one. Automatic and explicit attachments render only while the definition has an active animation, are blended from identity by its activation weight, and use the translucent render type. Skeleton-only models remain valid.
 
 `populateMolangContext(...)` can add player-specific Molang queries:
 

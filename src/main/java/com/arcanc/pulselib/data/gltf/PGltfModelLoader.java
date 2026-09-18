@@ -26,6 +26,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.BiConsumer;
 
+/**
+ * Loads gltf model.
+ */
 public class PGltfModelLoader implements PModelLoader
 {
 	public static final PGltfModelLoader INSTANCE = new PGltfModelLoader();
@@ -37,16 +40,28 @@ public class PGltfModelLoader implements PModelLoader
 	private static final String GLTF_EXTENSION = ".gltf";
 	private static final String EVENTS_EXTENSION = ".events.json";
 	private static final String ANIMATION_EVENTS_EXTENSION = ".animation_events.json";
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PGltfModelLoader()
 	{
 	}
 	
+	/**
+	 * Performs the id operation.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public Identifier id()
 	{
 		return ID;
 	}
 	
+	/**
+	 * Performs the supports operation.
+	 * @param modelPath the model path to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public boolean supports(Identifier modelPath)
 	{
@@ -54,26 +69,73 @@ public class PGltfModelLoader implements PModelLoader
 		return path.startsWith(ROOT + "/") && (path.endsWith(GLB_EXTENSION) || path.endsWith(GLTF_EXTENSION));
 	}
 	
+	/**
+	 * Performs the default model location operation.
+	 * @param modelLocation the model location to use.
+	 * @param modelType the model type to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public Identifier defaultModelLocation(Identifier modelLocation, String modelType)
 	{
 		return modelLocation.withPrefix(ROOT + "/" + modelType + "/").withSuffix(GLB_EXTENSION);
 	}
-	
+
+	/**
+	 * Performs the model resource location operation.
+	 * @param modelLocation the loader-relative model id.
+	 * @return the resource-pack model location.
+	 */
 	@Override
-	public Identifier textureLocation(Identifier modelPath, String textureName)
+	public Identifier modelResourceLocation(Identifier modelLocation)
 	{
-		String modelPathWithoutExtension = stripModelExtension(modelPath.getPath());
-		String[] divided = modelPathWithoutExtension.split("/");
-		Identifier loc = modelPath.withPath(divided[1] + "/" + divided[2] + "/");
-		
-		if (divided.length > 3)
-			for (int q = 3; q < divided.length; q++)
-				loc = loc.withSuffix(divided[q] + "/");
-		
-		return loc.withSuffix(stripTextureExtension(textureName));
+		return modelLocation.getPath().startsWith(ROOT + "/") ? modelLocation : modelLocation.withPrefix(ROOT + "/");
+	}
+
+	/**
+	 * Normalizes a GLTF resource id, using {@code .glb} when no extension was supplied.
+	 *
+	 * @param modelLocation the loader-relative model id.
+	 * @return the normalized GLTF resource location.
+	 */
+	@Override
+	public Identifier normalizeModelResourceLocation(Identifier modelLocation)
+	{
+		Identifier resourceLocation = modelResourceLocation(modelLocation);
+		String path = resourceLocation.getPath();
+		return path.endsWith(GLB_EXTENSION) || path.endsWith(GLTF_EXTENSION) ?
+				resourceLocation : resourceLocation.withSuffix(GLB_EXTENSION);
+	}
+
+	/**
+	 * Returns both supported glTF resource variants. The explicitly supplied
+	 * extension is preferred; an extension-less model id prefers {@code .glb}
+	 * for backwards compatibility.
+	 *
+	 * @param modelLocation the loader-relative model id.
+	 * @return the GLB and glTF resource candidates.
+	 */
+	@Override
+	public List<Identifier> modelResourceCandidates(Identifier modelLocation)
+	{
+		Identifier resourceLocation = modelResourceLocation(modelLocation);
+		String path = resourceLocation.getPath();
+		if (path.endsWith(GLTF_EXTENSION))
+			return List.of(resourceLocation, resourceLocation.withPath(
+					path.substring(0, path.length() - GLTF_EXTENSION.length()) + GLB_EXTENSION));
+		if (path.endsWith(GLB_EXTENSION))
+			return List.of(resourceLocation, resourceLocation.withPath(
+					path.substring(0, path.length() - GLB_EXTENSION.length()) + GLTF_EXTENSION));
+		return List.of(resourceLocation.withSuffix(GLB_EXTENSION), resourceLocation.withSuffix(GLTF_EXTENSION));
 	}
 	
+	/**
+	 * Loads the models.
+	 * @param backgroundExecutor the background executor to use.
+	 * @param resourceManager the resource manager to use.
+	 * @param elementConsumer the element consumer to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public CompletableFuture<?> loadModels(Executor backgroundExecutor,
 	                                       ResourceManager resourceManager,
@@ -113,6 +175,12 @@ public class PGltfModelLoader implements PModelLoader
 				}, backgroundExecutor);
 	}
 	
+	/**
+	 * Loads the animation events.
+	 * @param resourceManager the resource manager to use.
+	 * @param modelResource the model resource to use.
+	 * @param model the model to use.
+	 */
 	private void loadAnimationEvents(ResourceManager resourceManager, Identifier modelResource, PModel model) throws IOException
 	{
 		Optional<Identifier> eventsResource = eventCandidates(modelResource).stream().
@@ -127,6 +195,11 @@ public class PGltfModelLoader implements PModelLoader
 				model.animations);
 	}
 	
+	/**
+	 * Performs the event candidates operation.
+	 * @param modelResource the model resource to use.
+	 * @return the value produced by this operation.
+	 */
 	private List<Identifier> eventCandidates(Identifier modelResource)
 	{
 		String modelName = stripModelExtension(modelResource.getPath()).substring(ROOT.length() + 1);
@@ -140,6 +213,11 @@ public class PGltfModelLoader implements PModelLoader
 		return candidates;
 	}
 	
+	/**
+	 * Performs the strip model extension operation.
+	 * @param path the path to use.
+	 * @return the value produced by this operation.
+	 */
 	private static String stripModelExtension(String path)
 	{
 		if (path.endsWith(GLB_EXTENSION))
@@ -149,10 +227,4 @@ public class PGltfModelLoader implements PModelLoader
 		return path;
 	}
 
-	private static String stripTextureExtension(String textureName)
-	{
-		int extension = textureName.lastIndexOf('.');
-		int separator = textureName.lastIndexOf('/');
-		return extension > separator ? textureName.substring(0, extension) : textureName;
-	}
 }

@@ -14,6 +14,9 @@ import net.minecraft.client.model.player.PlayerModel;
 
 import java.util.List;
 
+/**
+ * Enumerates the available player part values.
+ */
 public enum PPlayerPart
 {
 	ROOT,
@@ -24,17 +27,22 @@ public enum PPlayerPart
 	RIGHT_LEG,
 	LEFT_LEG;
 
+	/**
+	 * Performs the resolve operation.
+	 * @param model the model to use.
+	 * @return the value produced by this operation.
+	 */
 	public List<ModelPart> resolve(PlayerModel model)
 	{
 		return switch (this)
 		{
 			case ROOT -> List.of();
-			case HEAD -> List.of(model.head, model.hat);
-			case BODY -> List.of(model.body, model.jacket);
-			case RIGHT_ARM -> List.of(model.rightArm, model.rightSleeve);
-			case LEFT_ARM -> List.of(model.leftArm, model.leftSleeve);
-			case RIGHT_LEG -> List.of(model.rightLeg, model.rightPants);
-			case LEFT_LEG -> List.of(model.leftLeg, model.leftPants);
+			case HEAD -> List.of(model.head);
+			case BODY -> List.of(model.body);
+			case RIGHT_ARM -> List.of(model.rightArm);
+			case LEFT_ARM -> List.of(model.leftArm);
+			case RIGHT_LEG -> List.of(model.rightLeg);
+			case LEFT_LEG -> List.of(model.leftLeg);
 		};
 	}
 }

@@ -10,21 +10,29 @@
 package com.arcanc.pulselib.data.gecko;
 
 import net.minecraft.util.RandomSource;
+import org.jspecify.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
+/**
+ * Parses molang.
+ */
 public final class MolangParser
 {
 	private static final int MAX_LOOP_ITERATIONS = 1_024;
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private MolangParser()
 	{
 	}
 
+	/**
+	 * Performs the parse operation.
+	 * @param source the source to use.
+	 * @return the value produced by this operation.
+	 */
 	public static Expression parse(String source)
 	{
 		if (source == null || source.isBlank())
@@ -32,21 +40,44 @@ public final class MolangParser
 		return new Parser(source).parse();
 	}
 
+	/**
+	 * Performs the evaluate operation.
+	 * @param source the source to use.
+	 * @param context the context to use.
+	 * @return the value produced by this operation.
+	 */
 	public static float evaluate(String source, Context context)
 	{
 		return parse(source).evaluate(context);
 	}
 
 	@FunctionalInterface
+/**
+ * Defines the contract for expression.
+ */
 	public interface Expression
 	{
+		/**
+		 * Performs the evaluate operation.
+		 * @param context the context to use.
+		 * @return the value produced by this operation.
+		 */
 		float evaluate(Context context);
 
+		/**
+		 * Performs the dependency operation.
+		 * @return the value produced by this operation.
+		 */
 		default PExpressionDependency dependency()
 		{
 			return PExpressionDependency.INSTANCE;
 		}
 
+		/**
+		 * Performs the evaluate operation.
+		 * @param data the data to use.
+		 * @return the value produced by this operation.
+		 */
 		default float evaluate(Object data)
 		{
 			if (data instanceof Context context)
@@ -57,18 +88,26 @@ public final class MolangParser
 		}
 	}
 
+/**
+ * Carries context context.
+ */
 	public static final class Context
 	{
 		private final Map<String, Float> queryValues = new HashMap<>();
 		private final Map<String, Float> variables = new HashMap<>();
 		private final Map<String, Float> contextValues = new HashMap<>();
-		private QueryResolver queryResolver;
+		private @Nullable QueryResolver queryResolver;
 		private float thisValue;
 		private float thisX;
 		private float thisY;
 		private float thisZ;
 		private final RandomSource random = RandomSource.create();
 
+		/**
+		 * Performs the from operation.
+		 * @param values the values to use.
+		 * @return the value produced by this operation.
+		 */
 		public static Context from(Map<?, ?> values)
 		{
 			Context context = new Context();
@@ -78,6 +117,12 @@ public final class MolangParser
 			return context;
 		}
 
+		/**
+		 * Performs the value operation.
+		 * @param name the name to use.
+		 * @param value the value to use.
+		 * @return the value produced by this operation.
+		 */
 		public Context value(String name, float value)
 		{
 			String normalized = normalizeName(name);
@@ -92,30 +137,60 @@ public final class MolangParser
 			return this;
 		}
 
+		/**
+		 * Performs the query operation.
+		 * @param name the name to use.
+		 * @param value the value to use.
+		 * @return the value produced by this operation.
+		 */
 		public Context query(String name, float value)
 		{
 			this.queryValues.put(stripNamespace(normalizeName(name), "query"), value);
 			return this;
 		}
 
+		/**
+		 * Performs the variable operation.
+		 * @param name the name to use.
+		 * @param value the value to use.
+		 * @return the value produced by this operation.
+		 */
 		public Context variable(String name, float value)
 		{
 			this.variables.put(stripNamespace(normalizeName(name), "variable"), value);
 			return this;
 		}
 
+		/**
+		 * Performs the context operation.
+		 * @param name the name to use.
+		 * @param value the value to use.
+		 * @return the value produced by this operation.
+		 */
 		public Context context(String name, float value)
 		{
 			this.contextValues.put(stripNamespace(normalizeName(name), "context"), value);
 			return this;
 		}
 
+		/**
+		 * Performs the this value operation.
+		 * @param value the value to use.
+		 * @return the value produced by this operation.
+		 */
 		public Context thisValue(float value)
 		{
 			this.thisValue = value;
 			return this;
 		}
 		
+		/**
+		 * Performs the this values operation.
+		 * @param x the x to use.
+		 * @param y the y to use.
+		 * @param z the z to use.
+		 * @return the value produced by this operation.
+		 */
 		public Context thisValues(float x, float y, float z)
 		{
 			this.thisX = x;
@@ -124,6 +199,11 @@ public final class MolangParser
 			return this;
 		}
 
+		/**
+		 * Performs the this component operation.
+		 * @param component the component to use.
+		 * @return the value produced by this operation.
+		 */
 		public float thisComponent(int component)
 		{
 			return switch (component)
@@ -135,19 +215,33 @@ public final class MolangParser
 			};
 		}
 
+		/**
+		 * Performs the query resolver operation.
+		 * @param resolver the resolver to use.
+		 * @return the value produced by this operation.
+		 */
 		public Context queryResolver(QueryResolver resolver)
 		{
 			this.queryResolver = resolver;
 			return this;
 		}
 
+		/**
+		 * Performs the random seed operation.
+		 * @param seed the seed to use.
+		 * @return the value produced by this operation.
+		 */
 		public Context randomSeed(long seed)
 		{
 			this.random.setSeed(seed);
 			return this;
 		}
-
-		/** Copies per-frame query data without touching persistent variables or random state. */
+		
+		/**
+		 * Copies the frame values from.
+		 * @param source the source to use.
+		 * @return the value produced by this operation.
+		 */
 		public Context copyFrameValuesFrom(Context source)
 		{
 			this.queryValues.clear();
@@ -162,6 +256,13 @@ public final class MolangParser
 			return this;
 		}
 
+		/**
+		 * Performs the resolve operation.
+		 * @param name the name to use.
+		 * @param arguments the arguments to use.
+		 * @param evaluation the evaluation to use.
+		 * @return the value produced by this operation.
+		 */
 		private Value resolve(String name, List<Value> arguments, Evaluation evaluation)
 		{
 			name = normalizeName(name);
@@ -197,6 +298,14 @@ public final class MolangParser
 			return Value.UNDEFINED;
 		}
 
+		/**
+		 * Performs the random operation.
+		 * @param roll the roll to use.
+		 * @param low the low to use.
+		 * @param high the high to use.
+		 * @param integer the integer to use.
+		 * @return the value produced by this operation.
+		 */
 		private float random(int roll, float low, float high, boolean integer)
 		{
 			float normalized = this.random.nextFloat();
@@ -211,6 +320,13 @@ public final class MolangParser
 			return from + normalized * (to - from);
 		}
 
+		/**
+		 * Performs the assign operation.
+		 * @param name the name to use.
+		 * @param value the value to use.
+		 * @param evaluation the evaluation to use.
+		 * @return the value produced by this operation.
+		 */
 		private Value assign(String name, Value value, Evaluation evaluation)
 		{
 			name = normalizeName(name);
@@ -226,11 +342,24 @@ public final class MolangParser
 	}
 
 	@FunctionalInterface
+/**
+ * Defines the contract for query resolver.
+ */
 	public interface QueryResolver
 	{
+		/**
+		 * Performs the resolve operation.
+		 * @param name the name to use.
+		 * @param arguments the arguments to use.
+		 * @param context the context to use.
+		 * @return the value produced by this operation.
+		 */
 		Float resolve(String name, List<Float> arguments, Context context);
 	}
 
+/**
+ * Provides support for evaluation.
+ */
 	private static final class Evaluation
 	{
 		private final Context context;
@@ -238,33 +367,61 @@ public final class MolangParser
 		private Flow flow = Flow.NONE;
 		private Value result = Value.of(0f);
 
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param context the context to use.
+		 */
 		private Evaluation(Context context)
 		{
 			this.context = context;
 		}
 	}
 
+/**
+ * Enumerates the available flow values.
+ */
 	private enum Flow { NONE, RETURN, BREAK, CONTINUE }
 
-	private record Value(Float value)
+/**
+ * Immutable value object representing value.
+ */
+	private record Value(@Nullable Float value)
 	{
 		private static final Value UNDEFINED = new Value(null);
 
+		/**
+		 * Performs the of operation.
+		 * @param value the value to use.
+		 * @return the value produced by this operation.
+		 */
 		private static Value of(float value)
 		{
 			return new Value(value);
 		}
 
-		private static Value ofNullable(Float value)
+		/**
+		 * Performs the of nullable operation.
+		 * @param value the value to use.
+		 * @return the value produced by this operation.
+		 */
+		private static Value ofNullable(@Nullable Float value)
 		{
 			return value == null ? UNDEFINED : of(value);
 		}
 
+		/**
+		 * Performs the number operation.
+		 * @return the value produced by this operation.
+		 */
 		private float number()
 		{
 			return this.value == null ? 0f : this.value;
 		}
 
+		/**
+		 * Performs the truthy operation.
+		 * @return the value produced by this operation.
+		 */
 		private boolean truthy()
 		{
 			return number() != 0f;
@@ -272,15 +429,31 @@ public final class MolangParser
 	}
 
 	@FunctionalInterface
+/**
+ * Defines the contract for node.
+ */
 	private interface Node
 	{
+		/**
+		 * Performs the evaluate operation.
+		 * @param evaluation the evaluation to use.
+		 * @return the value produced by this operation.
+		 */
 		Value evaluate(Evaluation evaluation);
 	}
 
-	private record Program(List<Node> statements, PExpressionDependency dependency, Float constantValue) implements Expression
+/**
+ * Immutable value object representing program.
+ */
+	private record Program(List<Node> statements, PExpressionDependency dependency, @Nullable Float constantValue) implements Expression
 	{
+		/**
+		 * Performs the evaluate operation.
+		 * @param context the context to use.
+		 * @return the value produced by this operation.
+		 */
 		@Override
-		public float evaluate(Context context)
+		public float evaluate(@Nullable Context context)
 		{
 			if (this.constantValue != null)
 				return this.constantValue;
@@ -298,18 +471,42 @@ public final class MolangParser
 		}
 	}
 
+/**
+ * Immutable value object representing literal.
+ */
 	private record Literal(float value) implements Node
 	{
+		/**
+		 * Performs the evaluate operation.
+		 * @param evaluation the evaluation to use.
+		 * @return the value produced by this operation.
+		 */
 		@Override public Value evaluate(Evaluation evaluation) { return Value.of(this.value); }
 	}
 
+/**
+ * Immutable value object representing variable.
+ */
 	private record Variable(String name) implements Node
 	{
+		/**
+		 * Performs the evaluate operation.
+		 * @param evaluation the evaluation to use.
+		 * @return the value produced by this operation.
+		 */
 		@Override public Value evaluate(Evaluation evaluation) { return evaluation.context.resolve(this.name, List.of(), evaluation); }
 	}
 	
+/**
+ * Immutable value object representing call.
+ */
 	private record Call(String name, List<Node> arguments) implements Node
 	{
+		/**
+		 * Performs the evaluate operation.
+		 * @param evaluation the evaluation to use.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public Value evaluate(Evaluation evaluation)
 		{
@@ -324,8 +521,16 @@ public final class MolangParser
 		}
 	}
 
+/**
+ * Immutable value object representing unary.
+ */
 	private record Unary(String operator, Node value) implements Node
 	{
+		/**
+		 * Performs the evaluate operation.
+		 * @param evaluation the evaluation to use.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public Value evaluate(Evaluation evaluation)
 		{
@@ -339,8 +544,16 @@ public final class MolangParser
 		}
 	}
 
+/**
+ * Immutable value object representing binary.
+ */
 	private record Binary(String operator, Node left, Node right) implements Node
 	{
+		/**
+		 * Performs the evaluate operation.
+		 * @param evaluation the evaluation to use.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public Value evaluate(Evaluation evaluation)
 		{
@@ -372,13 +585,29 @@ public final class MolangParser
 		}
 	}
 
+/**
+ * Immutable value object representing conditional.
+ */
 	private record Conditional(Node condition, Node yes, Node no) implements Node
 	{
+		/**
+		 * Performs the evaluate operation.
+		 * @param evaluation the evaluation to use.
+		 * @return the value produced by this operation.
+		 */
 		@Override public Value evaluate(Evaluation evaluation) { return this.condition.evaluate(evaluation).truthy() ? this.yes.evaluate(evaluation) : this.no.evaluate(evaluation); }
 	}
 
+/**
+ * Immutable value object representing assignment.
+ */
 	private record Assignment(String operator, Variable target, Node value) implements Node
 	{
+		/**
+		 * Performs the evaluate operation.
+		 * @param evaluation the evaluation to use.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public Value evaluate(Evaluation evaluation)
 		{
@@ -399,8 +628,16 @@ public final class MolangParser
 		}
 	}
 
+/**
+ * Immutable value object representing block.
+ */
 	private record Block(List<Node> statements) implements Node
 	{
+		/**
+		 * Performs the evaluate operation.
+		 * @param evaluation the evaluation to use.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public Value evaluate(Evaluation evaluation)
 		{
@@ -415,18 +652,42 @@ public final class MolangParser
 		}
 	}
 
+/**
+ * Immutable value object representing return.
+ */
 	private record Return(Node value) implements Node
 	{
+		/**
+		 * Performs the evaluate operation.
+		 * @param evaluation the evaluation to use.
+		 * @return the value produced by this operation.
+		 */
 		@Override public Value evaluate(Evaluation evaluation) { evaluation.result = this.value.evaluate(evaluation); evaluation.flow = Flow.RETURN; return evaluation.result; }
 	}
 
+/**
+ * Immutable value object representing flow node.
+ */
 	private record FlowNode(Flow flow) implements Node
 	{
+		/**
+		 * Performs the evaluate operation.
+		 * @param evaluation the evaluation to use.
+		 * @return the value produced by this operation.
+		 */
 		@Override public Value evaluate(Evaluation evaluation) { evaluation.flow = this.flow; return Value.of(0f); }
 	}
 
+/**
+ * Immutable value object representing loop.
+ */
 	private record Loop(Node count, Node body) implements Node
 	{
+		/**
+		 * Performs the evaluate operation.
+		 * @param evaluation the evaluation to use.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public Value evaluate(Evaluation evaluation)
 		{
@@ -449,11 +710,23 @@ public final class MolangParser
 		}
 	}
 
+	/**
+	 * Performs the bool operation.
+	 * @param value the value to use.
+	 * @return the value produced by this operation.
+	 */
 	private static Value bool(boolean value)
 	{
 		return Value.of(value ? 1f : 0f);
 	}
 
+	/**
+	 * Performs the math operation.
+	 * @param name the name to use.
+	 * @param arguments the arguments to use.
+	 * @param randomProvider the random provider to use.
+	 * @return the value produced by this operation.
+	 */
 	private static Value math(String name, List<Value> arguments, RandomProvider randomProvider)
 	{
 		name = name.toLowerCase(Locale.ROOT);
@@ -498,11 +771,22 @@ public final class MolangParser
 		};
 	}
 
+	/**
+	 * Performs the argument operation.
+	 * @param arguments the arguments to use.
+	 * @param index the index to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float argument(List<Value> arguments, int index)
 	{
 		return index < arguments.size() ? arguments.get(index).number() : 0f;
 	}
 
+	/**
+	 * Performs the min operation.
+	 * @param values the values to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float min(List<Value> values)
 	{
 		float result = Float.POSITIVE_INFINITY;
@@ -510,6 +794,11 @@ public final class MolangParser
 		return result == Float.POSITIVE_INFINITY ? 0f : result;
 	}
 
+	/**
+	 * Performs the max operation.
+	 * @param values the values to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float max(List<Value> values)
 	{
 		float result = Float.NEGATIVE_INFINITY;
@@ -517,6 +806,15 @@ public final class MolangParser
 		return result == Float.NEGATIVE_INFINITY ? 0f : result;
 	}
 
+	/**
+	 * Performs the die roll operation.
+	 * @param count the count to use.
+	 * @param low the low to use.
+	 * @param high the high to use.
+	 * @param integer the integer to use.
+	 * @param randomProvider the random provider to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float dieRoll(int count, float low, float high, boolean integer, RandomProvider randomProvider)
 	{
 		float result = 0f;
@@ -525,6 +823,11 @@ public final class MolangParser
 		return result;
 	}
 
+	/**
+	 * Performs the mix operation.
+	 * @param value the value to use.
+	 * @return the value produced by this operation.
+	 */
 	private static long mix(long value)
 	{
 		value = (value ^ value >>> 30) * 0xBF58476D1CE4E5B9L;
@@ -533,11 +836,27 @@ public final class MolangParser
 	}
 
 	@FunctionalInterface
+/**
+ * Defines the contract for random provider.
+ */
 	private interface RandomProvider
 	{
+		/**
+		 * Performs the next operation.
+		 * @param roll the roll to use.
+		 * @param low the low to use.
+		 * @param high the high to use.
+		 * @param integer the integer to use.
+		 * @return the value produced by this operation.
+		 */
 		float next(int roll, float low, float high, boolean integer);
 	}
 
+	/**
+	 * Performs the min angle operation.
+	 * @param angle the angle to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float minAngle(float angle)
 	{
 		float result = angle % 360f;
@@ -546,6 +865,14 @@ public final class MolangParser
 		return result;
 	}
 
+	/**
+	 * Performs the ease operation.
+	 * @param name the name to use.
+	 * @param start the start to use.
+	 * @param end the end to use.
+	 * @param time the time to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float ease(String name, float start, float end, float time)
 	{
 		String[] parts = name.split("_");
@@ -571,18 +898,40 @@ public final class MolangParser
 		return start + (end - start) * eased;
 	}
 
+	/**
+	 * Performs the power ease operation.
+	 * @param t the t to use.
+	 * @param power the power to use.
+	 * @param out the out to use.
+	 * @param inOut the in out to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float powerEase(float t, int power, boolean out, boolean inOut)
 	{
 		if (inOut) return t < .5f ? (float) Math.pow(2f * t, power) / 2f : 1f - (float) Math.pow(2f - 2f * t, power) / 2f;
 		return out ? 1f - (float) Math.pow(1f - t, power) : (float) Math.pow(t, power);
 	}
 
+	/**
+	 * Performs the sine ease operation.
+	 * @param t the t to use.
+	 * @param out the out to use.
+	 * @param inOut the in out to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float sineEase(float t, boolean out, boolean inOut)
 	{
 		if (inOut) return (float) (-(Math.cos(Math.PI * t) - 1d) / 2d);
 		return out ? (float) Math.sin(Math.PI * t / 2d) : (float) (1d - Math.cos(Math.PI * t / 2d));
 	}
 
+	/**
+	 * Performs the expo ease operation.
+	 * @param t the t to use.
+	 * @param out the out to use.
+	 * @param inOut the in out to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float expoEase(float t, boolean out, boolean inOut)
 	{
 		if (inOut) return t == 0f ? 0f : t == 1f ? 1f : t < .5f ? (float) Math.pow(2d, 20d * t - 10d) / 2f : (float) (2d - Math.pow(2d, -20d * t + 10d)) / 2f;
@@ -590,12 +939,26 @@ public final class MolangParser
 		return t == 0f ? 0f : (float) Math.pow(2d, 10d * t - 10d);
 	}
 
+	/**
+	 * Performs the circ ease operation.
+	 * @param t the t to use.
+	 * @param out the out to use.
+	 * @param inOut the in out to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float circEase(float t, boolean out, boolean inOut)
 	{
 		if (inOut) return t < .5f ? (float) ((1d - Math.sqrt(1d - Math.pow(2d * t, 2d))) / 2d) : (float) ((Math.sqrt(1d - Math.pow(-2d * t + 2d, 2d)) + 1d) / 2d);
 		return out ? (float) Math.sqrt(1d - Math.pow(t - 1d, 2d)) : (float) (1d - Math.sqrt(1d - t * t));
 	}
 
+	/**
+	 * Performs the back ease operation.
+	 * @param t the t to use.
+	 * @param out the out to use.
+	 * @param inOut the in out to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float backEase(float t, boolean out, boolean inOut)
 	{
 		float c1 = 1.70158f;
@@ -603,6 +966,13 @@ public final class MolangParser
 		return out ? (float) (1f + (c1 + 1f) * Math.pow(t - 1f, 3) + c1 * Math.pow(t - 1f, 2)) : (c1 + 1f) * t * t * t - c1 * t * t;
 	}
 
+	/**
+	 * Performs the bounce ease operation.
+	 * @param t the t to use.
+	 * @param out the out to use.
+	 * @param inOut the in out to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float bounceEase(float t, boolean out, boolean inOut)
 	{
 		if (inOut) return t < .5f ? (1f - bounceEase(1f - 2f * t, true, false)) / 2f : (1f + bounceEase(2f * t - 1f, true, false)) / 2f;
@@ -614,6 +984,13 @@ public final class MolangParser
 		t -= 2.625f / d; return n * t * t + .984375f;
 	}
 
+	/**
+	 * Performs the elastic ease operation.
+	 * @param t the t to use.
+	 * @param out the out to use.
+	 * @param inOut the in out to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float elasticEase(float t, boolean out, boolean inOut)
 	{
 		if (inOut) return t == 0f || t == 1f ? t : t < .5f ? (float) (-Math.pow(2d, 20d * t - 10d) * Math.sin((20d * t - 11.125d) * (2d * Math.PI / 4.5d))) / 2f : (float) (Math.pow(2d, -20d * t + 10d) * Math.sin((20d * t - 11.125d) * (2d * Math.PI / 4.5d))) / 2f + 1f;
@@ -621,6 +998,11 @@ public final class MolangParser
 		return out ? (float) (Math.pow(2d, -10d * t) * Math.sin((10d * t - .75d) * (2d * Math.PI / 3d)) + 1d) : (float) (-Math.pow(2d, 10d * t - 10d) * Math.sin((10d * t - 10.75d) * (2d * Math.PI / 3d)));
 	}
 
+	/**
+	 * Performs the normalize name operation.
+	 * @param name the name to use.
+	 * @return the value produced by this operation.
+	 */
 	private static String normalizeName(String name)
 	{
 		name = name.toLowerCase(Locale.ROOT);
@@ -639,6 +1021,12 @@ public final class MolangParser
 		return name;
 	}
 
+	/**
+	 * Performs the strip namespace operation.
+	 * @param name the name to use.
+	 * @param namespace the namespace to use.
+	 * @return the value produced by this operation.
+	 */
 	private static String stripNamespace(String name, String namespace)
 	{
 		return name.startsWith(namespace + ".") ?
@@ -646,17 +1034,28 @@ public final class MolangParser
 				name;
 	}
 
+/**
+ * Parses parser.
+ */
 	private static final class Parser
 	{
 		private final Lexer lexer;
 		private Token current;
 
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param source the source to use.
+		 */
 		private Parser(String source)
 		{
 			this.lexer = new Lexer(source);
 			this.current = this.lexer.next();
 		}
 
+		/**
+		 * Performs the parse operation.
+		 * @return the value produced by this operation.
+		 */
 		private Expression parse()
 		{
 			List<Node> statements = statements(TokenType.END);
@@ -668,6 +1067,11 @@ public final class MolangParser
 					program;
 		}
 
+		/**
+		 * Performs the dependency operation.
+		 * @param nodes the nodes to use.
+		 * @return the value produced by this operation.
+		 */
 		private static PExpressionDependency dependency(List<Node> nodes)
 		{
 			PExpressionDependency result = PExpressionDependency.CONSTANT;
@@ -676,6 +1080,11 @@ public final class MolangParser
 			return result;
 		}
 
+		/**
+		 * Performs the dependency operation.
+		 * @param node the node to use.
+		 * @return the value produced by this operation.
+		 */
 		private static PExpressionDependency dependency(Node node)
 		{
 			if (node instanceof Literal)
@@ -711,6 +1120,11 @@ public final class MolangParser
 			return PExpressionDependency.STATEFUL;
 		}
 
+		/**
+		 * Performs the variable dependency operation.
+		 * @param name the name to use.
+		 * @return the value produced by this operation.
+		 */
 		private static PExpressionDependency variableDependency(String name)
 		{
 			name = normalizeName(name);
@@ -723,6 +1137,11 @@ public final class MolangParser
 			return PExpressionDependency.INSTANCE;
 		}
 
+		/**
+		 * Performs the statements operation.
+		 * @param terminator the terminator to use.
+		 * @return the value produced by this operation.
+		 */
 		private List<Node> statements(TokenType terminator)
 		{
 			List<Node> nodes = new ArrayList<>();
@@ -736,6 +1155,10 @@ public final class MolangParser
 			return nodes;
 		}
 
+		/**
+		 * Performs the statement operation.
+		 * @return the value produced by this operation.
+		 */
 		private Node statement()
 		{
 			if (matchWord("return"))
@@ -747,11 +1170,19 @@ public final class MolangParser
 			return expression();
 		}
 
+		/**
+		 * Performs the expression operation.
+		 * @return the value produced by this operation.
+		 */
 		private Node expression()
 		{
 			return assignment();
 		}
 
+		/**
+		 * Performs the assignment operation.
+		 * @return the value produced by this operation.
+		 */
 		private Node assignment()
 		{
 			Node left = conditional();
@@ -767,6 +1198,10 @@ public final class MolangParser
 			return left;
 		}
 
+		/**
+		 * Performs the conditional operation.
+		 * @return the value produced by this operation.
+		 */
 		private Node conditional()
 		{
 			Node condition = coalesce();
@@ -777,6 +1212,10 @@ public final class MolangParser
 			return new Conditional(condition, yes, no);
 		}
 
+		/**
+		 * Performs the coalesce operation.
+		 * @return the value produced by this operation.
+		 */
 		private Node coalesce()
 		{
 			Node left = logicalOr();
@@ -785,6 +1224,10 @@ public final class MolangParser
 					left;
 		}
 
+		/**
+		 * Performs the logical or operation.
+		 * @return the value produced by this operation.
+		 */
 		private Node logicalOr()
 		{
 			Node node = logicalAnd();
@@ -793,6 +1236,10 @@ public final class MolangParser
 			return node;
 		}
 
+		/**
+		 * Performs the logical and operation.
+		 * @return the value produced by this operation.
+		 */
 		private Node logicalAnd()
 		{
 			Node node = equality();
@@ -801,6 +1248,10 @@ public final class MolangParser
 			return node;
 		}
 
+		/**
+		 * Performs the equality operation.
+		 * @return the value produced by this operation.
+		 */
 		private Node equality()
 		{
 			Node node = comparison();
@@ -814,6 +1265,10 @@ public final class MolangParser
 			return node;
 		}
 
+		/**
+		 * Performs the comparison operation.
+		 * @return the value produced by this operation.
+		 */
 		private Node comparison()
 		{
 			Node node = additive();
@@ -826,6 +1281,10 @@ public final class MolangParser
 			return node;
 		}
 
+		/**
+		 * Performs the additive operation.
+		 * @return the value produced by this operation.
+		 */
 		private Node additive()
 		{
 			Node node = multiplicative();
@@ -839,6 +1298,10 @@ public final class MolangParser
 			return node;
 		}
 
+		/**
+		 * Performs the multiplicative operation.
+		 * @return the value produced by this operation.
+		 */
 		private Node multiplicative()
 		{
 			Node node = unary();
@@ -852,6 +1315,10 @@ public final class MolangParser
 			return node;
 		}
 
+		/**
+		 * Performs the unary operation.
+		 * @return the value produced by this operation.
+		 */
 		private Node unary()
 		{
 			if (match("-") ||
@@ -863,6 +1330,10 @@ public final class MolangParser
 			return primary();
 		}
 
+		/**
+		 * Performs the primary operation.
+		 * @return the value produced by this operation.
+		 */
 		private Node primary()
 		{
 			if (match("("))
@@ -908,6 +1379,11 @@ public final class MolangParser
 			return new Literal(0f);
 		}
 
+		/**
+		 * Performs the match operation.
+		 * @param text the text to use.
+		 * @return the value produced by this operation.
+		 */
 		private boolean match(String text)
 		{
 			if (!this.current.text.equals(text)) return false;
@@ -915,6 +1391,11 @@ public final class MolangParser
 			return true;
 		}
 
+		/**
+		 * Performs the match word operation.
+		 * @param word the word to use.
+		 * @return the value produced by this operation.
+		 */
 		private boolean matchWord(String word)
 		{
 			if (this.current.type != TokenType.IDENTIFIER ||
@@ -924,40 +1405,73 @@ public final class MolangParser
 			return true;
 		}
 
+		/**
+		 * Performs the expect operation.
+		 * @param text the text to use.
+		 */
 		private void expect(String text)
 		{
 			if (!match(text)) error("Expected '" + text + "'");
 		}
 
+		/**
+		 * Performs the expect operation.
+		 * @param type the type to use.
+		 * @param expected the expected to use.
+		 */
 		private void expect(TokenType type, String expected)
 		{
 			if (this.current.type != type) error("Expected " + expected);
 			next();
 		}
 
+		/**
+		 * Performs the next operation.
+		 */
 		private void next()
 		{
 			this.lexer.previous = this.current;
 			this.current = this.lexer.next();
 		}
 
+		/**
+		 * Performs the error operation.
+		 * @param message the message to use.
+		 */
 		private void error(String message)
 		{
 			throw new IllegalArgumentException(message + " at position " + this.current.position);
 		}
 	}
 
+/**
+ * Enumerates the available token type values.
+ */
 	private enum TokenType { NUMBER, IDENTIFIER, OPERATOR, BRACE_CLOSE, END }
+/**
+ * Immutable value object representing token.
+ */
 	private record Token(TokenType type, String text, int position) { }
 
+/**
+ * Provides support for lexer.
+ */
 	private static final class Lexer
 	{
 		private final String source;
 		private int position;
 		private Token previous;
 
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param source the source to use.
+		 */
 		private Lexer(String source) { this.source = source; }
 
+		/**
+		 * Performs the next operation.
+		 * @return the value produced by this operation.
+		 */
 		private Token next()
 		{
 			while (this.position < this.source.length() &&

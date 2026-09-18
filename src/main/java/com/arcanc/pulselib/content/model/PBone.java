@@ -18,6 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Provides support for bone.
+ */
 public class PBone
 {
 	private final UUID uuid;
@@ -28,6 +31,16 @@ public class PBone
 	private final Vector3f pivot;
 	private final Quaternionf baseRotation;
 	
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param uuid the uuid to use.
+	 * @param name the name to use.
+	 * @param meshUUIDS the mesh uuids to use.
+	 * @param parent the parent to use.
+	 * @param children the children to use.
+	 * @param pivot the pivot to use.
+	 * @param baseRotation the base rotation to use.
+	 */
 	public PBone(
 			UUID uuid,
 			String name,
@@ -46,49 +59,87 @@ public class PBone
 		this.baseRotation = baseRotation;
 	}
 	
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param uuid the uuid to use.
+	 * @param name the name to use.
+	 * @param pivot the pivot to use.
+	 * @param baseRotation the base rotation to use.
+	 */
 	public PBone(UUID uuid, String name, Vector3f pivot, Quaternionf baseRotation)
 	{
 		this(uuid, name, new ArrayList<>(), null, new ArrayList<>(), pivot, baseRotation);
 	}
 	
+	/**
+	 * Performs the uuid operation.
+	 * @return the value produced by this operation.
+	 */
 	public UUID uuid()
 	{
 		return this.uuid;
 	}
 	
+	/**
+	 * Performs the name operation.
+	 * @return the value produced by this operation.
+	 */
 	public String name()
 	{
 		return this.name;
 	}
 	
+	/**
+	 * Performs the mesh uuids operation.
+	 * @return the value produced by this operation.
+	 */
 	public List<UUID> meshUUIDS()
 	{
 		return this.meshUUIDS;
 	}
 	
+	/**
+	 * Performs the parent operation.
+	 * @return the value produced by this operation.
+	 */
 	public @Nullable PBone parent()
 	{
 		return this.parent;
 	}
 	
+	/**
+	 * Sets the parent.
+	 * @param parent the parent to use.
+	 */
 	public void setParent(PBone parent)
 	{
 		this.parent = parent;
 	}
 	
+	/**
+	 * Performs the children operation.
+	 * @return the value produced by this operation.
+	 */
 	public List<PBone> children()
 	{
 		return this.children;
 	}
 	
+	/**
+	 * Performs the pivot operation.
+	 * @return the value produced by this operation.
+	 */
 	public Vector3f pivot()
 	{
 		return this.pivot;
 	}
 	
+	/**
+	 * Performs the base rotation operation.
+	 * @return the value produced by this operation.
+	 */
 	public Quaternionf baseRotation()
 	{
 		return this.baseRotation;
 	}
 }
-

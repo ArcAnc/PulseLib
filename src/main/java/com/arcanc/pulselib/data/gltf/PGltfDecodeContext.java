@@ -12,6 +12,9 @@ package com.arcanc.pulselib.data.gltf;
 import com.arcanc.pulselib.content.model.PBone;
 import com.arcanc.pulselib.content.model.animation.PAnimationDecodeContext;
 
+/**
+ * Immutable value object representing gltf decode context.
+ */
 public record PGltfDecodeContext(PBone bone) implements PAnimationDecodeContext
 {
 }

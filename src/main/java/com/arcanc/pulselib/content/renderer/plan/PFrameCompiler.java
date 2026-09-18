@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.ToDoubleFunction;
 
+/**
+ * Provides support for frame compiler.
+ */
 public final class PFrameCompiler<S, P, M, I>
 {
 	private final Map<S, Map<DrawKey<P, M>, List<I>>> opaque = new Object2ObjectOpenHashMap<>();
@@ -27,12 +30,25 @@ public final class PFrameCompiler<S, P, M, I>
 	private final Comparator<? super P> pipelineOrder;
 	private final ToDoubleFunction<I> distanceSquared;
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param pipelineOrder the pipeline order to use.
+	 * @param distanceSquared the distance squared to use.
+	 */
 	public PFrameCompiler(Comparator<? super P> pipelineOrder, ToDoubleFunction<I> distanceSquared)
 	{
 		this.pipelineOrder = pipelineOrder;
 		this.distanceSquared = distanceSquared;
 	}
 
+	/**
+	 * Performs the submit operation.
+	 * @param stage the stage to use.
+	 * @param pipeline the pipeline to use.
+	 * @param mesh the mesh to use.
+	 * @param instance the instance to use.
+	 * @param transparent the transparent to use.
+	 */
 	public void submit(S stage, P pipeline, M mesh, I instance, boolean transparent)
 	{
 		DrawKey<P, M> key = new DrawKey<>(pipeline, mesh);
@@ -46,6 +62,11 @@ public final class PFrameCompiler<S, P, M, I>
 				computeIfAbsent(key, ignored -> new ObjectArrayList<>()).add(instance);
 	}
 
+	/**
+	 * Performs the compile operation.
+	 * @param stage the stage to use.
+	 * @return the value produced by this operation.
+	 */
 	public PRenderPlan<P, M, I> compile(S stage)
 	{
 		Map<DrawKey<P, M>, List<I>> opaqueGroups = this.opaque.remove(stage);
@@ -94,27 +115,64 @@ public final class PFrameCompiler<S, P, M, I>
 		return groups.isEmpty() ? PRenderPlan.empty() : new PRenderPlan<>(groups);
 	}
 
+	/**
+	 * Performs the clear operation.
+	 */
 	public void clear()
 	{
 		this.opaque.clear();
 		this.translucent.clear();
 	}
 
+	/**
+	 * Performs the group operation.
+	 * @param key the key to use.
+	 * @param instances the instances to use.
+	 * @param writeDepth the write depth to use.
+	 * @return the value produced by this operation.
+	 */
 	private static <P, M, I> PDrawGroup<P, M, I> group(DrawKey<P, M> key, List<I> instances, boolean writeDepth)
 	{
 		return new PDrawGroup<>(key.pipeline(), key.mesh(), writeDepth, instances);
 	}
 
+	/**
+	 * Determines whether the object can batch with oit.
+	 * @param key the key to use.
+	 * @return the value produced by this operation.
+	 */
 	private static <P, M> boolean canBatchWithOit(DrawKey<P, M> key)
 	{
 		return key.pipeline() instanceof RenderType renderType && PRenderTypes.usesOit(renderType) &&
 				renderType.outputTarget().getRenderTarget().useDepth;
 	}
 
+	/**
+	 * Identifies one GPU draw resource pair.
+	 *
+	 * Meshes contain vertex and index buffers.  Their value hash codes may walk
+	 * every buffer element, so batching must use the resource identities rather
+	 * than structural equality.
+	 */
 	private record DrawKey<P, M>(P pipeline, M mesh)
 	{
+		@Override
+		public boolean equals(Object object)
+		{
+			return this == object || object instanceof DrawKey<?, ?> that &&
+					this.pipeline == that.pipeline && this.mesh == that.mesh;
+		}
+
+		@Override
+		public int hashCode()
+		{
+			return 31 * System.identityHashCode(this.pipeline) + System.identityHashCode(this.mesh);
+		}
 	}
 
+/**
+ * Immutable value object representing transparent submission.
+ */
 	private record TransparentSubmission<P, M, I>(DrawKey<P, M> key, I instance, double distanceSquared)
 	{
 	}

@@ -11,10 +11,11 @@ package com.arcanc.pulselib.data.gecko;
 
 
 import com.arcanc.pulselib.content.model.PModel;
+import com.arcanc.pulselib.data.PAnimationSidecarParser;
 import com.arcanc.pulselib.data.PModelLoader;
 import com.arcanc.pulselib.util.PLibDatabase;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import com.mojang.blaze3d.vertex.PoseStack;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 
@@ -27,6 +28,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.BiConsumer;
 
+/**
+ * Loads gecko model.
+ */
 public class PGeckoModelLoader implements PModelLoader
 {
 	public static final PGeckoModelLoader INSTANCE = new PGeckoModelLoader();
@@ -37,24 +41,42 @@ public class PGeckoModelLoader implements PModelLoader
 	private static final String ANIMATION_ROOT = "geckolib/animations";
 	private static final String MODEL_EXTENSION = ".geo.json";
 	private static final String ANIMATION_EXTENSION = ".animation.json";
+	private static final String EVENTS_EXTENSION = ".events.json";
+	private static final String ANIMATION_EVENTS_EXTENSION = ".animation_events.json";
 	private static final String JSON_EXTENSION = ".json";
 	
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PGeckoModelLoader()
 	{
 	}
 	
+	/**
+	 * Performs the id operation.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public Identifier id()
 	{
 		return ID;
 	}
 
+	/**
+	 * Applies the item transform.
+	 * @param poseStack the pose stack to use.
+	 */
 	@Override
 	public void applyItemTransform(PoseStack poseStack)
 	{
 		poseStack.translate(0.5f, 0.51f, 0.5f);
 	}
 	
+	/**
+	 * Performs the supports operation.
+	 * @param modelPath the model path to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public boolean supports(Identifier modelPath)
 	{
@@ -62,26 +84,50 @@ public class PGeckoModelLoader implements PModelLoader
 		return path.startsWith(MODEL_ROOT + "/") && path.endsWith(JSON_EXTENSION);
 	}
 	
+	/**
+	 * Performs the default model location operation.
+	 * @param modelLocation the model location to use.
+	 * @param modelType the model type to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public Identifier defaultModelLocation(Identifier modelLocation, String modelType)
 	{
 		return modelLocation.withPrefix(MODEL_ROOT + "/" + modelType + "/").withSuffix(MODEL_EXTENSION);
 	}
-	
+
+	/**
+	 * Performs the model resource location operation.
+	 * @param modelLocation the loader-relative model id.
+	 * @return the resource-pack model location.
+	 */
 	@Override
-	public Identifier textureLocation(Identifier modelPath, String textureName)
+	public Identifier modelResourceLocation(Identifier modelLocation)
 	{
-		String modelName = modelName(modelPath);
-		String[] divided = modelName.split("/");
-		
-		Identifier loc = modelPath.withPath(divided[0] + "/" + divided[1] + "/");
-		
-		if (divided.length > 2)
-			for (int q = 2; q < divided.length; q++)
-				loc = loc.withSuffix(divided[q] + "/");
-		return loc.withSuffix(textureName);
+		return modelLocation.getPath().startsWith(MODEL_ROOT + "/") ? modelLocation : modelLocation.withPrefix(MODEL_ROOT + "/");
+	}
+
+	/**
+	 * Normalizes a GeckoLib resource id, using {@code .geo.json} when no JSON extension was supplied.
+	 *
+	 * @param modelLocation the loader-relative model id.
+	 * @return the normalized GeckoLib resource location.
+	 */
+	@Override
+	public Identifier normalizeModelResourceLocation(Identifier modelLocation)
+	{
+		Identifier resourceLocation = modelResourceLocation(modelLocation);
+		return resourceLocation.getPath().endsWith(JSON_EXTENSION) ?
+				resourceLocation : resourceLocation.withSuffix(MODEL_EXTENSION);
 	}
 	
+	/**
+	 * Loads the models.
+	 * @param backgroundExecutor the background executor to use.
+	 * @param resourceManager the resource manager to use.
+	 * @param elementConsumer the element consumer to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public CompletableFuture<?> loadModels(Executor backgroundExecutor,
 	                                       ResourceManager resourceManager,
@@ -121,6 +167,12 @@ public class PGeckoModelLoader implements PModelLoader
 				}, backgroundExecutor);
 	}
 	
+	/**
+	 * Loads the animations.
+	 * @param resourceManager the resource manager to use.
+	 * @param modelResource the model resource to use.
+	 * @param model the model to use.
+	 */
 	private void loadAnimations(ResourceManager resourceManager, Identifier modelResource, PModel model) throws IOException
 	{
 		Optional<Identifier> animationResource = animationCandidates(modelResource).stream().
@@ -133,8 +185,35 @@ public class PGeckoModelLoader implements PModelLoader
 		model.animations.putAll(PGeckoModelParser.parseAnimations(
 				resourceManager.getResourceOrThrow(animationResource.get()).open(),
 				model));
+		loadAnimationSidecar(resourceManager, animationResource.get(), model);
+	}
+
+	/**
+	 * Loads the animation sidecar.
+	 * @param resourceManager the resource manager to use.
+	 * @param animationResource the animation resource to use.
+	 * @param model the model to use.
+	 */
+	private void loadAnimationSidecar(ResourceManager resourceManager,
+	                                 Identifier animationResource,
+	                                 PModel model) throws IOException
+	{
+		Optional<Identifier> sidecarResource = sidecarCandidates(animationResource).stream().
+				filter(resource -> resourceManager.getResource(resource).isPresent()).
+				findFirst();
+		if (sidecarResource.isEmpty())
+			return;
+
+		PAnimationSidecarParser.mergeSidecar(
+				PAnimationSidecarParser.parseJson(resourceManager.getResourceOrThrow(sidecarResource.get()).open()),
+				model.animations);
 	}
 	
+	/**
+	 * Performs the animation candidates operation.
+	 * @param modelResource the model resource to use.
+	 * @return the value produced by this operation.
+	 */
 	private List<Identifier> animationCandidates(Identifier modelResource)
 	{
 		String modelName = modelName(modelResource);
@@ -148,7 +227,33 @@ public class PGeckoModelLoader implements PModelLoader
 		candidates.add(modelResource.withPath(ANIMATION_ROOT + "/" + modelName + JSON_EXTENSION));
 		return candidates;
 	}
+
+	/**
+	 * Performs the sidecar candidates operation.
+	 * @param animationResource the animation resource to use.
+	 * @return the value produced by this operation.
+	 */
+	private List<Identifier> sidecarCandidates(Identifier animationResource)
+	{
+		String path = animationResource.getPath();
+		String base = path.endsWith(ANIMATION_EXTENSION) ?
+				path.substring(0, path.length() - ANIMATION_EXTENSION.length()) :
+				path.substring(0, path.length() - JSON_EXTENSION.length());
+		String fileName = base.substring(base.lastIndexOf('/') + 1);
+		String root = base.substring(0, base.lastIndexOf('/'));
+
+		List<Identifier> candidates = new ArrayList<>();
+		candidates.add(animationResource.withPath(base + EVENTS_EXTENSION));
+		candidates.add(animationResource.withPath(base + ANIMATION_EVENTS_EXTENSION));
+		candidates.add(animationResource.withPath(root + "/events/" + fileName + EVENTS_EXTENSION));
+		return candidates;
+	}
 	
+	/**
+	 * Performs the model name operation.
+	 * @param modelResource the model resource to use.
+	 * @return the value produced by this operation.
+	 */
 	private static String modelName(Identifier modelResource)
 	{
 		String path = modelResource.getPath();

@@ -12,22 +12,41 @@ package com.arcanc.pulselib.content.renderer.modelData;
 
 import net.minecraft.resources.Identifier;
 
+/**
+ * Provides support for default item model data.
+ */
 public class DefaultItemModelData extends PModelData
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param builder the builder to use.
+	 */
 	public DefaultItemModelData(DefaultItemModelDataBuilder builder)
 	{
 		super(builder);
 	}
 	
+/**
+ * Builds default item model data.
+ */
 	public static class DefaultItemModelDataBuilder extends Builder
 	{
 		private final Identifier shortModelLocation;
 		
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param modelLocation the model location to use.
+		 */
 		public DefaultItemModelDataBuilder(Identifier modelLocation)
 		{
 			this(modelLocation, PModelData.DEFAULT_MODEL_FORMAT);
 		}
 		
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param modelLocation the model location to use.
+		 * @param modelFormat the model format to use.
+		 */
 		public DefaultItemModelDataBuilder(Identifier modelLocation, Identifier modelFormat)
 		{
 			super(modelLocation, "item");
@@ -36,13 +55,10 @@ public class DefaultItemModelData extends PModelData
 			this.modelLocation = PModelData.generateDefaultModelLocation(modelLocation, this.modelType, this.modelFormat);
 		}
 		
-		@Override
-		public DefaultItemModelDataBuilder addTexture(Identifier texturePath)
-		{
-			super.addTexture(PModelData.generateDefaultTextureLocation(texturePath, this.shortModelLocation, this.modelType, this.modelFormat));
-			return this;
-		}
-		
+		/**
+		 * Performs the build operation.
+		 * @return the value produced by this operation.
+		 */
 		@Override
 		public DefaultItemModelData build()
 		{

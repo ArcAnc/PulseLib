@@ -20,6 +20,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
 
+/**
+ * Streams gl indirect.
+ */
 public final class PGlIndirectStream
 {
 	public static final int STRIDE = Integer.BYTES * 5;
@@ -33,6 +36,12 @@ public final class PGlIndirectStream
 	private int frameSlot;
 	private int cursor;
 
+	/**
+	 * Performs the begin operation.
+	 * @param maximumCommands the maximum commands to use.
+	 * @param frameSlot the frame slot to use.
+	 * @param persistent the persistent to use.
+	 */
 	public void begin(int maximumCommands, int frameSlot, boolean persistent)
 	{
 		this.cursor = 0;
@@ -41,6 +50,11 @@ public final class PGlIndirectStream
 			this.ensurePersistentCapacity(Math.max(STRIDE, maximumCommands * STRIDE));
 	}
 
+	/**
+	 * Performs the upload operation.
+	 * @param commands the commands to use.
+	 * @return the value produced by this operation.
+	 */
 	public Upload upload(List<Command> commands)
 	{
 		int required = Math.max(STRIDE, commands.size() * STRIDE);
@@ -65,6 +79,9 @@ public final class PGlIndirectStream
 		return new Upload(this.buffer, 0L);
 	}
 
+	/**
+	 * Performs the close operation.
+	 */
 	public void close()
 	{
 		this.closeBuffer();
@@ -74,6 +91,10 @@ public final class PGlIndirectStream
 		this.staging = null;
 	}
 
+	/**
+	 * Performs the ensure capacity operation.
+	 * @param required the required to use.
+	 */
 	private void ensureCapacity(int required)
 	{
 		if (this.persistent)
@@ -92,6 +113,10 @@ public final class PGlIndirectStream
 		}
 	}
 
+	/**
+	 * Performs the ensure persistent capacity operation.
+	 * @param required the required to use.
+	 */
 	private void ensurePersistentCapacity(int required)
 	{
 		if (this.persistent && required <= this.capacity)
@@ -114,6 +139,9 @@ public final class PGlIndirectStream
 		this.persistent = true;
 	}
 
+	/**
+	 * Closes the buffer.
+	 */
 	private void closeBuffer()
 	{
 		if (this.buffer != -1)
@@ -128,6 +156,11 @@ public final class PGlIndirectStream
 		this.persistentMapping = null;
 	}
 
+	/**
+	 * Performs the write operation.
+	 * @param target the target to use.
+	 * @param commands the commands to use.
+	 */
 	private static void write(ByteBuffer target, List<Command> commands)
 	{
 		for (Command command : commands)
@@ -135,10 +168,16 @@ public final class PGlIndirectStream
 					putInt(command.baseVertex()).putInt(command.baseInstance());
 	}
 
+/**
+ * Immutable value object representing command.
+ */
 	public record Command(int indexCount, int instanceCount, int firstIndex, int baseVertex, int baseInstance)
 	{
 	}
 
+/**
+ * Immutable value object representing upload.
+ */
 	public record Upload(int buffer, long offset)
 	{
 	}
