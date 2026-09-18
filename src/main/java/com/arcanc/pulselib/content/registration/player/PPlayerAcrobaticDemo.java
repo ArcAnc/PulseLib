@@ -10,35 +10,12 @@
 package com.arcanc.pulselib.content.registration.player;
 
 
-import com.arcanc.pulselib.content.animatable.ControllerState;
-import com.arcanc.pulselib.content.event.PulseLibEvents;
-import com.arcanc.pulselib.content.model.animation.PRawAnimation;
-import com.arcanc.pulselib.content.player.animation.PPlayerAnimationDefinition;
-import com.arcanc.pulselib.content.player.animation.PPlayerAnimationHandle;
-import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
-import com.arcanc.pulselib.content.player.animation.PPlayerAnimationAnchors;
-import com.arcanc.pulselib.content.player.animation.PPlayerPart;
-import com.arcanc.pulselib.content.renderer.modelData.PModelData;
-import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
-import com.arcanc.pulselib.util.PLibDatabase;
-import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.entity.player.Player;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.loading.FMLLoader;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.common.NeoForge;
-import org.lwjgl.glfw.GLFW;
-
 /**
  * Provides support for player acrobatic demo.
  */
 public final class PPlayerAcrobaticDemo
 {
-	private static final Identifier ID = PLibDatabase.rl("demo/player_acrobatic");
+/*	private static final Identifier ID = PLibDatabase.rl("demo/player_acrobatic");
 	private static final PModelData MODEL = new PModelData.Builder(
 			PLibDatabase.rl("glmodels/player/demo/acrobatic.gltf"), "", PGltfModelLoader.INSTANCE.id()).build();
 	private static final PRawAnimation ACROBATIC = PRawAnimation.begin().thenPlay("player_actobatic").build();
@@ -48,17 +25,10 @@ public final class PPlayerAcrobaticDemo
 			GLFW.GLFW_KEY_B,
 			KeyMapping.Category.MISC);
 
-	/**
-	 * Creates an instance of the enclosing type.
-	 */
 	private PPlayerAcrobaticDemo()
 	{
 	}
 
-	/**
-	 * Performs the register operation.
-	 * @param modEventBus the mod event bus to use.
-	 */
 	public static void register(IEventBus modEventBus)
 	{
 		if (FMLLoader.getCurrent().isProduction())
@@ -68,19 +38,11 @@ public final class PPlayerAcrobaticDemo
 		NeoForge.EVENT_BUS.addListener(PPlayerAcrobaticDemo::clientTick);
 	}
 
-	/**
-	 * Registers the key mapping.
-	 * @param event the event to use.
-	 */
 	private static void registerKeyMapping(RegisterKeyMappingsEvent event)
 	{
 		event.register(KEY);
 	}
 
-	/**
-	 * Registers the animation.
-	 * @param event the event to use.
-	 */
 	private static void registerAnimation(PulseLibEvents.PlayerAnimationRegistrationEvent event)
 	{
 		event.registration().register(ID, PPlayerAnimationDefinition.builder(MODEL).
@@ -98,10 +60,6 @@ public final class PPlayerAcrobaticDemo
 				build());
 	}
 
-	/**
-	 * Performs the client tick operation.
-	 * @param event the event to use.
-	 */
 	private static void clientTick(ClientTickEvent.Post event)
 	{
 		Player player = Minecraft.getInstance().player;
@@ -111,4 +69,5 @@ public final class PPlayerAcrobaticDemo
 		if (handle != null && !handle.isPlaying("acrobatic"))
 			handle.play("acrobatic", ACROBATIC);
 	}
+	*/
 }

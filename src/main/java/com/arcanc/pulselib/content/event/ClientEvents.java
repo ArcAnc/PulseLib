@@ -15,7 +15,6 @@ import com.arcanc.pulselib.content.animatable.instance.InstanceAnimationManager;
 import com.arcanc.pulselib.content.animatable.singleton.SingletonAnimationManager;
 import com.arcanc.pulselib.content.model.textures.atlas.RuntimeLoader;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
-import com.arcanc.pulselib.content.registration.player.PPlayerBallDemo;
 import com.arcanc.pulselib.content.renderer.PRenderQueue;
 import com.arcanc.pulselib.content.renderer.PRenderStagesHandler;
 import com.arcanc.pulselib.util.PLibDatabase;
@@ -70,7 +69,7 @@ public class ClientEvents
 		PResourceCache.register(modEventBus);
 		PLibArmorHandler.register(modEventBus);
 		
-		PPlayerBallDemo.register(modEventBus);
+		//PPlayerBallDemo.register(modEventBus);
 		//PPlayerAcrobaticDemo.register(modEventBus);
 	}
 	

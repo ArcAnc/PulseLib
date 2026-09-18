@@ -40,7 +40,7 @@ import org.lwjgl.glfw.GLFW;
  */
 public final class PPlayerBallDemo
 {
-	private static final Identifier ID = PLibDatabase.rl("demo/player_ball_toss");
+/*	private static final Identifier ID = PLibDatabase.rl("demo/player_ball_toss");
 	public static final Identifier TEXTURE = PLibDatabase.rl("player/demo/test_ball_model/0");
 	private static final PModelData MODEL = new PModelData.Builder(
 			PLibDatabase.rl("glmodels/player/demo/test_ball_model.gltf"), "", PGltfModelLoader.INSTANCE.id()).build();
@@ -98,5 +98,5 @@ public final class PPlayerBallDemo
 		PPlayerAnimationHandle handle = PPlayerAnimations.getHandle(player, ID);
 		if (handle != null && !handle.isPlaying("ball_toss"))
 			handle.play("ball_toss", BALL_TOSS);
-	}
+	}*/
 }
