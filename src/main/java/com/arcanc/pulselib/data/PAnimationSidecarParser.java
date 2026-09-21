@@ -3,6 +3,7 @@ package com.arcanc.pulselib.data;
 import com.arcanc.pulselib.content.model.animation.PAnimation;
 import com.arcanc.pulselib.content.model.animation.PAnimationEvent;
 import com.arcanc.pulselib.content.model.animation.PAnimationEventType;
+import com.arcanc.pulselib.content.model.animation.PAnimationVisibilityTrack;
 import com.arcanc.pulselib.content.registration.PLibRegistration;
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.google.gson.JsonElement;
@@ -20,6 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /** Shared sidecar event reader for model loaders. */
@@ -54,9 +56,63 @@ public final class PAnimationSidecarParser
 			List<PAnimationEvent<?>> events = new ArrayList<>(animation.events());
 			events.addAll(parseAnimationEvents(entry.getValue()));
 			events.sort(Comparator.comparingDouble(PAnimationEvent::time));
-			animations.put(entry.getKey(), new PAnimation(animation.name(), Math.max(animation.length(), maxEventTime(events)),
-					animation.boneAnimations(), events));
+			Map<String, PAnimationVisibilityTrack> visibilityTracks = new LinkedHashMap<>(animation.visibilityTracks());
+			visibilityTracks.putAll(parseVisibilityTracks(entry.getValue()));
+			animations.put(entry.getKey(), new PAnimation(animation.name(),
+					Math.max(animation.length(), Math.max(maxEventTime(events), maxVisibilityTime(visibilityTracks))),
+					animation.boneAnimations(), events, visibilityTracks));
 		}
+	}
+
+	private static Map<String, PAnimationVisibilityTrack> parseVisibilityTracks(JsonElement animationNode)
+	{
+		JsonElement visibilityNode = member(animationNode, "visibility");
+		if (!isObject(visibilityNode))
+			return Map.of();
+		Map<String, PAnimationVisibilityTrack> tracks = new LinkedHashMap<>();
+		for (Map.Entry<String, JsonElement> entry : visibilityNode.getAsJsonObject().entrySet())
+		{
+			List<PAnimationVisibilityTrack.Keyframe> keyframes = parseVisibilityKeyframes(entry.getValue());
+			if (!keyframes.isEmpty())
+				tracks.put(entry.getKey(), new PAnimationVisibilityTrack(keyframes));
+		}
+		return tracks;
+	}
+
+	private static List<PAnimationVisibilityTrack.Keyframe> parseVisibilityKeyframes(JsonElement node)
+	{
+		List<PAnimationVisibilityTrack.Keyframe> keyframes = new ArrayList<>();
+		if (isArray(node))
+			for (JsonElement keyframe : node.getAsJsonArray())
+				addVisibilityKeyframe(keyframes, keyframe);
+		else if (isObject(node))
+			for (Map.Entry<String, JsonElement> entry : node.getAsJsonObject().entrySet())
+				addVisibilityKeyframe(keyframes, entry.getKey(), entry.getValue());
+		return keyframes;
+	}
+
+	private static void addVisibilityKeyframe(List<PAnimationVisibilityTrack.Keyframe> keyframes, JsonElement node)
+	{
+		float seconds = floatValue(member(node, "time"), Float.NaN);
+		Boolean visible = booleanValue(member(node, "visible"));
+		if (Float.isFinite(seconds) && visible != null)
+			keyframes.add(new PAnimationVisibilityTrack.Keyframe(seconds * SECONDS_TO_TICKS, visible));
+	}
+
+	private static void addVisibilityKeyframe(List<PAnimationVisibilityTrack.Keyframe> keyframes, String rawTime, JsonElement node)
+	{
+		float seconds;
+		try
+		{
+			seconds = Float.parseFloat(rawTime);
+		}
+		catch (NumberFormatException ignored)
+		{
+			return;
+		}
+		Boolean visible = booleanValue(node);
+		if (Float.isFinite(seconds) && visible != null)
+			keyframes.add(new PAnimationVisibilityTrack.Keyframe(seconds * SECONDS_TO_TICKS, visible));
 	}
 
 	private static List<PAnimationEvent<?>> parseAnimationEvents(JsonElement animationNode)
@@ -80,6 +136,15 @@ public final class PAnimationSidecarParser
 		float maxTime = 0f;
 		for (PAnimationEvent<?> event : events)
 			maxTime = Math.max(maxTime, event.time());
+		return maxTime;
+	}
+
+	private static float maxVisibilityTime(Map<String, PAnimationVisibilityTrack> tracks)
+	{
+		float maxTime = 0f;
+		for (PAnimationVisibilityTrack track : tracks.values())
+			for (PAnimationVisibilityTrack.Keyframe keyframe : track.keyframes())
+				maxTime = Math.max(maxTime, keyframe.time());
 		return maxTime;
 	}
 
@@ -116,6 +181,11 @@ public final class PAnimationSidecarParser
 	private static String stringValue(JsonElement node, String fallback)
 	{
 		return isMissing(node) || !node.isJsonPrimitive() || !node.getAsJsonPrimitive().isString() ? fallback : node.getAsString();
+	}
+
+	private static @Nullable Boolean booleanValue(JsonElement node)
+	{
+		return isMissing(node) || !node.isJsonPrimitive() || !node.getAsJsonPrimitive().isBoolean() ? null : node.getAsBoolean();
 	}
 
 	private static JsonElement member(JsonElement element, String name)

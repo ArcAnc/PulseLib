@@ -116,8 +116,8 @@
 
 - Source status: `M`
 - Subsystem: `MODEL_RESOURCE`
-- Port status: `ADAPTED_26_2`
-- Notes: 26.1 source behavior: delegates glTF animation sidecars to the shared parser. 26.2 API difference: the current target `PAnimation` has no visibility-track state or constructor yet. 26.2 implementation: delegates event parsing to `PAnimationSidecarParser`; visibility tracks remain for the ANIMATION_CORE port.
+- Port status: `PORTED`
+- Notes: Delegates glTF sidecars to `PAnimationSidecarParser`, which now also merges source visibility tracks for `PBakedBone.instantDraw`.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/data/gltf/PGltfChannelDecoder.java`
@@ -182,280 +182,280 @@
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ALREADY_PRESENT`
+- Notes: Source delta is documentation only; current-master `AtlasBufferBuilder.setUv` already implements the inspected behavior.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ADAPTED_26_2`
+- Notes: 26.1 source behavior: instant drawing resolves one pose, skips invisible bones, and recurses with that resolver. 26.2 API difference: the current GPU draw path uses `GpuBufferSlice` mapping and RHI render-pass signatures. 26.2 implementation: `PBakedBone.instantDraw(PAnimationPoseResolver, ...)` keeps those APIs while using `PAnimationPoseResolver.isVisible` and `PResourceCache`.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/model/baked/PBakedMesh.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: `PBakedMesh` now carries `textureReference` and `PMeshPrimitive`, preserving resource-scoped primitive baking.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/model/baked/PBakedModel.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ALREADY_PRESENT`
+- Notes: Source delta is documentation only; current-master `PBakedModel.instantDraw` and `PBakedModel.bindPose` implement the inspected symbols.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/model/baked/PMeshRenderContext.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ALREADY_PRESENT`
+- Notes: Source delta is documentation only; current-master `PMeshRenderContext.withTexture` implements the inspected context override.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/model/baked/PMeshRenderMaterial.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ALREADY_PRESENT`
+- Notes: Source delta is documentation only; current-master `PMeshRenderMaterial.resolve` implements material resolution.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/model/baked/PMeshRenderResolver.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ALREADY_PRESENT`
+- Notes: Source delta is documentation only; current-master `PMeshRenderResolver.resolve` is the inspected resolver contract.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/model/baked/PMeshTextureVariants.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: `PMeshTextureVariants.resolve` normalizes overrides through `PResourceCache.spriteId`, preventing texture aliases across model resources.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/model/baked/PSubdividedMeshCache.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: `PSubdividedMeshCache.bake` retains `PMeshPrimitive` source data and reads atlas sprites through `PResourceCache`.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/renderer/PBlockRenderer.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: `PBlockRenderer.submitBone` uses `textureReference` and `PResourceCache.ATLAS_LOCATION` for queued meshes.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderLayer.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ALREADY_PRESENT`
+- Notes: Source delta is documentation only; current-master `PEntityRenderLayer.bindBone` and `submit` implement the inspected layer behavior.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: `PEntityRenderer.submitBone` resolves `textureReference` through `PResourceCache.ATLAS_LOCATION`; deferred-layer submission remains intact.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: `PItemRenderer.submitBone` and GUI submission use `PResourceCache.ATLAS_LOCATION` with resource-scoped mesh references.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/renderer/PMeshRenderResolver.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ALREADY_PRESENT`
+- Notes: Source delta is documentation only; current-master `com.arcanc.pulselib.content.renderer.PMeshRenderResolver.resolve` is the inspected extension contract.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ADAPTED_26_2`
+- Notes: 26.1 source behavior: batches submitted meshes, executes a plan, and composites OIT. 26.2 API difference: `PGlMultiDrawExecutor` and the generic GL plan are removed. 26.2 implementation: `PRenderQueue.flush` uses `RhiDrawExecutor.execute(PFrameCompiler.compile(...))`, whose texture binding uses `PResourceCache`.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ADAPTED_26_2`
+- Notes: 26.1 source behavior: flushes solid and translucent render stages then finishes the deformer frame. 26.2 API difference: the RHI queue compiles one stage at a time. 26.2 implementation: `PRenderStagesHandler.renderSolid` and `renderTranslucent` flush the equivalent stages, composite OIT, and call `PGpuDeformerBuffers.finishFrame`.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/renderer/PRenderer.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ALREADY_PRESENT`
+- Notes: Source delta is documentation only; current-master `PRenderer.getModelData` and submit hooks implement the inspected contract.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/renderer/base/PBlockRenderState.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ALREADY_PRESENT`
+- Notes: Source delta is documentation only; current-master `PBlockRenderState.Impl.extractBlockData` implements the inspected state extraction.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/renderer/base/PEntityRenderState.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ALREADY_PRESENT`
+- Notes: Source delta is documentation only; current-master `PEntityRenderState.Impl.extractEntityData` implements the inspected state extraction.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/renderer/base/PItemRenderState.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ALREADY_PRESENT`
+- Notes: Source delta is documentation only; current-master `PItemRenderState.Impl.extractStackData` implements the inspected state extraction.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/renderer/base/PRenderState.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ALREADY_PRESENT`
+- Notes: Source delta is documentation only; current-master `PRenderState` defines the inspected render-state contract.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlFrameArena.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ADAPTED_26_2`
+- Notes: 26.1 source behavior: owns transient OpenGL frame allocations. 26.2 API difference: the `PGlFrameArena` path was removed for RHI command encoding. 26.2 implementation: `RhiDrawExecutor.execute` submits the compiled frame through 26.2 RHI resources.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlGeometryArena.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ADAPTED_26_2`
+- Notes: 26.1 source behavior: stores GL geometry for multi-draw execution. 26.2 API difference: `PGlGeometryArena` was removed with the GL submission API. 26.2 implementation: `RhiDrawExecutor.execute` binds each `PBakedMesh` RHI buffer directly.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlIndirectStream.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ADAPTED_26_2`
+- Notes: 26.1 source behavior: writes indirect GL commands. 26.2 API difference: `PGlIndirectStream` was removed with the GL submission API. 26.2 implementation: `RhiDrawExecutor.execute` issues indexed RHI draws from `PRenderPlan` groups.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlInstanceStream.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ADAPTED_26_2`
+- Notes: 26.1 source behavior: packs per-instance GL data. 26.2 API difference: `PGlInstanceStream` was removed with the GL submission API. 26.2 implementation: `RhiDrawExecutor.execute` uploads `PRenderQueue.InstanceData` into RHI uniform buffers.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ADAPTED_26_2`
+- Notes: 26.1 source behavior: executes GL multi-draws and binds the shared texture atlas. 26.2 API difference: `PGlMultiDrawExecutor` was removed. 26.2 implementation: `RhiDrawExecutor.execute` replaces it and binds the atlas from `PResourceCache.getTextureAtlas`.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ADAPTED_26_2`
+- Notes: 26.1 source behavior: accumulates and composites weighted blended OIT. 26.2 API difference: the GL OIT implementation was removed. 26.2 implementation: `RhiDrawExecutor.compositeOit` provides the current RHI OIT composite called by `PRenderQueue.compositeTranslucency`.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/renderer/modelData/DefaultBlockModelData.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ALREADY_PRESENT`
+- Notes: Source delta is documentation only; current-master `DefaultBlockModelData.DefaultBlockModelDataBuilder` implements the inspected builder.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/renderer/modelData/DefaultEntityLayerModelData.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ALREADY_PRESENT`
+- Notes: Source delta is documentation only; current-master `DefaultEntityLayerModelData.DefaultEntityLayerModelDataBuilder` implements the inspected builder.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/renderer/modelData/DefaultEntityModelData.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ALREADY_PRESENT`
+- Notes: Source delta is documentation only; current-master `DefaultEntityModelData.DefaultEntityModelDataBuilder` implements the inspected builder.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/renderer/modelData/DefaultItemModelData.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ALREADY_PRESENT`
+- Notes: Source delta is documentation only; current-master `DefaultItemModelData.DefaultItemModelDataBuilder` implements the inspected builder.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/renderer/modelData/PModelData.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ALREADY_PRESENT`
+- Notes: Source delta is documentation only; current-master `PModelData.Builder.build` implements the inspected builder flow.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/renderer/plan/PDrawGroup.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ADAPTED_26_2`
+- Notes: 26.1 source behavior: stores a pipeline, mesh, depth-write flag, and instances. 26.2 API difference: the GL-generic record is replaced by RHI-specific types. 26.2 implementation: `PDrawGroup` stores `RenderType`, `PBakedMesh`, and `PRenderQueue.InstanceData`.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/renderer/plan/PFrameCompiler.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ADAPTED_26_2`
+- Notes: 26.1 source behavior: batches opaque draws and sorts transparent draws into a render plan. 26.2 API difference: generic GL planning is replaced by RHI types and OIT-aware batching. 26.2 implementation: `PFrameCompiler.compile` produces `PDrawGroup` instances consumed by `RhiDrawExecutor.execute`.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/renderer/plan/PRenderPlan.java`
 
 - Source status: `M`
 - Subsystem: `RENDER_INFRASTRUCTURE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ADAPTED_26_2`
+- Notes: 26.1 source behavior: exposes an immutable list of planned draw groups. 26.2 API difference: the generic GL plan is replaced by RHI-specific groups. 26.2 implementation: `PRenderPlan` and `PRenderPlan.EMPTY` provide the immutable RHI plan consumed by `RhiDrawExecutor.execute`.
 - Target path if renamed: `—`
 
 ### ANIMATION_CORE (56)
@@ -560,8 +560,8 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Dependency required by rendering: carries immutable visibility tracks and exposes `isBoneVisible` for the baked-bone pose resolver.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationChannel.java`
@@ -665,7 +665,7 @@
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
 - Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Notes: Rendering dependency applied: `isVisible(PBakedBone)` now evaluates source visibility tracks. The remaining ANIMATION_CORE delta stays pending for its dedicated stage.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationRuntime.java`
@@ -728,8 +728,8 @@
 
 - Source status: `A`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
-- Notes: Added in the source delta; port this addition against the 26.2 API.
+- Port status: `PORTED`
+- Notes: Dependency required by rendering: ordered visibility keyframes resolve the current bone visibility.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/model/animation/PBlendMode.java`
@@ -904,8 +904,8 @@
 
 - Source status: `A`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
-- Notes: Added in the source delta; port this addition against the 26.2 API.
+- Port status: `PORTED`
+- Notes: Dependency required by rendering: parses and merges sidecar visibility tracks alongside animation events.
 - Target path if renamed: `—`
 
 ### PLAYER_ANIMATION (18)

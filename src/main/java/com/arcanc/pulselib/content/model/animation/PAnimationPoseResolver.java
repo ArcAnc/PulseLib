@@ -73,6 +73,37 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 				animated,
 				animated);
 	}
+
+	public boolean isVisible(PBakedBone bone)
+	{
+		for (PAnimationController<T> controller : this.controllers)
+		{
+			if (controller.isStopped())
+				continue;
+
+			var layers = controller.graphLayers(this.model);
+			if (!layers.isEmpty())
+			{
+				for (PAnimationGraphRuntime.Layer layer : layers)
+				{
+					if (layer.weight() <= 0.0f)
+						continue;
+					PAnimation animation = this.model.animations().get(layer.animation());
+					if (animation != null && !animation.isBoneVisible(bone.name(), layer.time()))
+						return false;
+				}
+				continue;
+			}
+
+			PRawAnimation.AnimationStage stage = controller.getCurrentStage();
+			if (stage == null || stage.isWaiting())
+				continue;
+			PAnimation animation = this.model.animations().get(stage.animationName());
+			if (animation != null && !animation.isBoneVisible(bone.name(), controller.getInterpolatedTime(this.partialTick)))
+				return false;
+		}
+		return true;
+	}
 	
 	public @Nullable AnimationDelta animationDelta(String boneName, @Nullable String rootBoneName)
 	{

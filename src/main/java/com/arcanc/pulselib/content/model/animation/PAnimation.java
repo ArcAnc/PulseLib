@@ -22,16 +22,29 @@ import java.util.Map;
 public record PAnimation(String name,
                          float length,
                          Map<String, PBoneAnimation> boneAnimations,
-                         List<PAnimationEvent<?>> events)
+                         List<PAnimationEvent<?>> events,
+                         Map<String, PAnimationVisibilityTrack> visibilityTracks)
 {
 	public PAnimation(String name, float length, Map<String, PBoneAnimation> boneAnimations)
 	{
-		this(name, length, boneAnimations, List.of());
+		this(name, length, boneAnimations, List.of(), Map.of());
+	}
+
+	public PAnimation(String name, float length, Map<String, PBoneAnimation> boneAnimations, List<PAnimationEvent<?>> events)
+	{
+		this(name, length, boneAnimations, events, Map.of());
 	}
 
 	public PAnimation
 	{
 		events = List.copyOf(events);
+		visibilityTracks = Map.copyOf(visibilityTracks);
+	}
+
+	public boolean isBoneVisible(String boneName, float time)
+	{
+		PAnimationVisibilityTrack track = this.visibilityTracks.get(boneName);
+		return track == null || track.visibleAt(time);
 	}
 	
 	public PRootMotionRuntime rootMotion(String rootBoneName, PInterpolationType interpolation)
