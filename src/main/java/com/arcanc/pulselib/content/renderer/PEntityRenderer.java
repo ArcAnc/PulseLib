@@ -24,7 +24,7 @@ import com.arcanc.pulselib.content.renderer.base.PEntityRenderState;
 import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import com.arcanc.pulselib.data.gecko.MolangParser;
 import com.arcanc.pulselib.util.PRenderTypes;
-import com.arcanc.pulselib.util.PTextureCache;
+import com.arcanc.pulselib.util.PResourceCache;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -401,7 +401,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		
 		for (PBakedMesh mesh : bone.meshes())
 		{
-			if (mesh.textureName().isEmpty())
+			if (mesh.textureReference().isEmpty())
 				continue;
 			
 			PMeshRenderContext inherited = new PMeshRenderContext(
@@ -414,7 +414,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 					renderLayer.resolveMeshRender(renderState, bone, mesh, inherited);
 			
 			PMeshRenderMaterial material = PMeshRenderMaterial.resolve(mesh, meshContext);
-			RenderType type = material.resolveRenderType(meshContext, PTextureCache.ATLAS_LOCATION);
+			RenderType type = material.resolveRenderType(meshContext, PResourceCache.ATLAS_LOCATION);
 			
 			PRenderQueue.submitEntityMesh(type, material.mesh(), meshContext.deformation(), new PRenderQueue.InstanceData(matrix4fstack, meshContext.color(), material.packedLight(), meshContext.packedOverlay()));
 		}

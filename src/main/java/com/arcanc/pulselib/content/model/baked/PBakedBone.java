@@ -19,7 +19,7 @@ import com.arcanc.pulselib.data.gecko.MolangParser;
 import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.arcanc.pulselib.util.PRenderTypes;
-import com.arcanc.pulselib.util.PTextureCache;
+import com.arcanc.pulselib.util.PResourceCache;
 import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
@@ -153,7 +153,7 @@ public class PBakedBone
 		
 		Minecraft mc = PLibRenderHelper.mc();
 		
-		TextureAtlas atlas = PTextureCache.getTextureAtlas();
+		TextureAtlas atlas = PResourceCache.getTextureAtlas();
 		Matrix4f matrix4fStack = RenderSystem.getModelViewMatrixCopy();
 		matrix4fStack.mul(poseStack.last().pose());
 		GpuBufferSlice transforms = RenderSystem.getDynamicUniforms().
@@ -162,12 +162,12 @@ public class PBakedBone
 		PMeshRenderContext boneContext = inherited;
 		this.meshes().forEach(mesh ->
 		{
-			if (mesh.textureName().isEmpty())
+			if (mesh.textureReference().isEmpty())
 				return;
 			
 			PMeshRenderContext meshContext = resolver.resolve(this, mesh, boneContext);
 			PMeshRenderMaterial material = PMeshRenderMaterial.resolve(mesh, meshContext);
-			RenderType type = material.resolveInstantRenderType(meshContext, PTextureCache.ATLAS_LOCATION);
+			RenderType type = material.resolveInstantRenderType(meshContext, PResourceCache.ATLAS_LOCATION);
 
 			RenderTarget renderTarget = type.outputTarget().getRenderTarget();
 

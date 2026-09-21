@@ -9,10 +9,10 @@
 
 package com.arcanc.pulselib.content.model.baked;
 
-import com.arcanc.pulselib.content.model.PMesh;
+import com.arcanc.pulselib.content.model.PMeshPrimitive;
 import com.arcanc.pulselib.content.model.deformer.PMeshTessellator;
 import com.arcanc.pulselib.util.PRenderTypes;
-import com.arcanc.pulselib.util.PTextureCache;
+import com.arcanc.pulselib.util.PResourceCache;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.IndexType;
 import com.mojang.blaze3d.PrimitiveTopology;
@@ -59,8 +59,8 @@ public final class PSubdividedMeshCache
 
 	private static PBakedMesh bake(PBakedMesh base, int subdivisionLevel)
 	{
-		PMesh source = PMeshTessellator.subdivide(base.source(), subdivisionLevel);
-		TextureAtlasSprite sprite = PTextureCache.getTextureAtlas().getSprite(base.textureLocation());
+		PMeshPrimitive source = PMeshTessellator.subdivide(base.source(), subdivisionLevel);
+		TextureAtlasSprite sprite = PResourceCache.getTextureAtlas().getSprite(base.textureLocation());
 		ByteBufferBuilder bytes = ByteBufferBuilder.exactlySized(
 				source.vertexCount() * PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize());
 		BufferBuilder builder = sprite.contents().name().getPath().equals("missingno")
@@ -83,11 +83,11 @@ public final class PSubdividedMeshCache
 					GpuBuffer.USAGE_INDEX,
 					indices);
 			return new PBakedMesh(base.uuid(), vertices, source.vertexCount(), indexBuffer, source.indicesCount(),
-					indexType(source), base.textureName(), base.isEmissive(), base.alphaMode(), source, base.textureLocation());
+					indexType(source), base.textureReference(), base.isEmissive(), base.alphaMode(), source, base.textureLocation());
 		}
 	}
 
-	private static IndexType indexType(PMesh mesh)
+	private static IndexType indexType(PMeshPrimitive mesh)
 	{
 		return switch (mesh.glIndexType())
 		{

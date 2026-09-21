@@ -9,7 +9,7 @@
 
 package com.arcanc.pulselib.content.model.baked;
 
-import com.arcanc.pulselib.content.model.PMesh;
+import com.arcanc.pulselib.content.model.PMeshPrimitive;
 import com.arcanc.pulselib.content.model.textures.PAlphaMode;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.IndexType;
@@ -23,10 +23,10 @@ public record PBakedMesh(UUID uuid,
                          GpuBuffer indices,
                          int indicesCount,
                          IndexType indexType,
-                         String textureName,
+                         String textureReference,
                          boolean isEmissive,
                          PAlphaMode alphaMode,
-                         PMesh source,
+                         PMeshPrimitive source,
                          Identifier textureLocation)
 {
 }

@@ -37,13 +37,6 @@ public class DefaultBlockModelData extends PModelData
 		}
 		
 		@Override
-		public DefaultBlockModelDataBuilder addTexture(Identifier texturePath)
-		{
-			super.addTexture(PModelData.generateDefaultTextureLocation(texturePath, this.shortModelLocation, this.modelType, this.modelFormat));
-			return this;
-		}
-		
-		@Override
 		public DefaultBlockModelData build()
 		{
 			return new DefaultBlockModelData(this);

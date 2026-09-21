@@ -28,7 +28,7 @@ import com.arcanc.pulselib.data.gecko.MolangParser;
 import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
 import com.arcanc.pulselib.util.PModelCache;
 import com.arcanc.pulselib.util.PRenderTypes;
-import com.arcanc.pulselib.util.PTextureCache;
+import com.arcanc.pulselib.util.PResourceCache;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -142,7 +142,7 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 		{
 			submitNodeCollector.submitCustomGeometry(
 					poseStack,
-					PRenderTypes.RenderTypeProvider.trianglesInstantTranslucent(PTextureCache.ATLAS_LOCATION),
+					PRenderTypes.RenderTypeProvider.trianglesInstantTranslucent(PResourceCache.ATLAS_LOCATION),
 					(submittedPose, _) ->
 					{
 						PoseStack instantPoseStack = new PoseStack();
@@ -231,7 +231,7 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 		
 		bone.meshes().forEach(mesh ->
 		{
-			if (mesh.textureName().isEmpty())
+			if (mesh.textureReference().isEmpty())
 				return;
 			
 			PMeshRenderContext inherited = new PMeshRenderContext(
@@ -242,7 +242,7 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 			PMeshRenderContext meshContext = resolveMeshRender(renderState, context, bone, mesh, inherited);
 			PMeshRenderMaterial material = PMeshRenderMaterial.resolve(mesh, meshContext);
 			
-			RenderType type = material.resolveRenderType(meshContext, PTextureCache.ATLAS_LOCATION);
+			RenderType type = material.resolveRenderType(meshContext, PResourceCache.ATLAS_LOCATION);
 			
 			PRenderQueue.submitItem(context, type, material.mesh(), meshContext.deformation(), new PRenderQueue.InstanceData(matrix4fstack, meshContext.color(), material.packedLight(), meshContext.packedOverlay()));
 		});

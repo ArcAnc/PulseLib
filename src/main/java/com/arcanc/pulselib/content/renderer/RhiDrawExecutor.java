@@ -15,7 +15,7 @@ import com.arcanc.pulselib.content.renderer.plan.PDrawGroup;
 import com.arcanc.pulselib.content.renderer.plan.PRenderPlan;
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.arcanc.pulselib.util.PRenderTypes;
-import com.arcanc.pulselib.util.PTextureCache;
+import com.arcanc.pulselib.util.PResourceCache;
 import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
@@ -62,7 +62,7 @@ final class RhiDrawExecutor
 			return;
 		Minecraft minecraft = PLibRenderHelper.mc();
 		Matrix4f modelView = RenderSystem.getModelViewMatrixCopy();
-		TextureAtlas atlas = PTextureCache.getTextureAtlas();
+		TextureAtlas atlas = PResourceCache.getTextureAtlas();
 		GpuTextureView lightTexture = minecraft.gameRenderer.levelLightmap();
 		OverlayTexture overlayTexture = minecraft.gameRenderer.overlayTexture();
 		PGpuDeformerBuffers.Bindings bindings = PGpuDeformerBuffers.upload();

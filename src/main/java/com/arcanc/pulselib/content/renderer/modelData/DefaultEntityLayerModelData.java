@@ -37,13 +37,6 @@ public class DefaultEntityLayerModelData extends PModelData
 		}
 		
 		@Override
-		public DefaultEntityLayerModelDataBuilder addTexture(Identifier texturePath)
-		{
-			super.addTexture(PModelData.generateDefaultTextureLocation(texturePath, this.shortModelLocation, this.modelType, this.modelFormat));
-			return this;
-		}
-		
-		@Override
 		public DefaultEntityLayerModelData build()
 		{
 			return new DefaultEntityLayerModelData(this);

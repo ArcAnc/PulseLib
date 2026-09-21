@@ -11,8 +11,11 @@ package com.arcanc.pulselib.util;
 
 
 import com.arcanc.pulselib.content.model.PBone;
+import com.arcanc.pulselib.content.model.PMaterial;
 import com.arcanc.pulselib.content.model.PMesh;
+import com.arcanc.pulselib.content.model.PMeshPrimitive;
 import com.arcanc.pulselib.content.model.PModel;
+import com.arcanc.pulselib.content.model.resource.PModelResource;
 import com.arcanc.pulselib.content.model.baked.AtlasBufferBuilder;
 import com.arcanc.pulselib.content.model.baked.PBakedBone;
 import com.arcanc.pulselib.content.model.baked.PDeformedMeshBuffers;
@@ -104,6 +107,7 @@ public class PModelCache
 	{
 		Map<Identifier, PModel> models = new Object2ObjectOpenHashMap<>();
 		return CompletableFuture.allOf(loadModels(backgroundExecutor, sharedState.resourceManager(), models :: put)).
+				thenRun(() -> verifyModelsLoaded(models)).
 				thenCompose(preparationBarrier :: wait).
 				thenAcceptAsync(empty ->
 				{
@@ -143,133 +147,109 @@ public class PModelCache
 		Map<Identifier, PBakedModel> bakedModelMap = new Object2ObjectOpenHashMap<>();
 		for (Map.Entry<Identifier, PModel> rawModel : rawModels.entrySet())
 		{
-			PModel model = rawModel.getValue();
-			Identifier modelPath = rawModel.getKey();
-			Map<UUID, PBakedBone.PBakedBoneBuilder> bakedBoneBuilder = new HashMap<>();
-			for (PBone bone : model.bones.values())
+			try
 			{
-				bakedBoneBuilder.put(
-						bone.uuid(),
-						new PBakedBone.PBakedBoneBuilder(
-								bone.uuid(),
-								bone.name(),
-								new Vector3f(bone.pivot()),
-								new Quaternionf(bone.baseRotation()).normalize()
-						)
-				);
-			}
-			
-			for (Map.Entry<UUID, Pair<UUID, List<UUID>>> bone2MeshesEntry : model.boneMeshes.entrySet())
-			{
-				PBakedBone.PBakedBoneBuilder builder = bakedBoneBuilder.get(bone2MeshesEntry.getKey());
-				
-				for (UUID meshUUID : bone2MeshesEntry.getValue().getSecond())
+				PModel model = rawModel.getValue();
+				Identifier modelPath = rawModel.getKey();
+				Map<UUID, PBakedBone.PBakedBoneBuilder> bakedBoneBuilder = new HashMap<>();
+				for (PBone bone : model.bones.values())
 				{
-					PMesh mesh = model.meshes.get(meshUUID);
-					Identifier loc = textureLocation(modelPath, mesh.texture());
-					
-					TextureAtlasSprite sprite = PTextureCache.getTextureAtlas().getSprite(loc);
-					
-					boolean emissive = sprite.contents().getAdditionalMetadata(PLibSpriteMetadata.TYPE).
-							map(PLibSpriteMetadata :: emissive).
-							orElse(false);
-					
-					ByteBufferBuilder byteBufferBuilder = ByteBufferBuilder.
-							exactlySized(mesh.vertexCount() * PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize());
-					BufferBuilder bufferBuilder;
-					
-					if (sprite.contents().name().getPath().equals("missingno"))
-						bufferBuilder = new BufferBuilder(byteBufferBuilder, PrimitiveTopology.TRIANGLES, PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL);
-					else
-						bufferBuilder = new AtlasBufferBuilder(byteBufferBuilder, PrimitiveTopology.TRIANGLES, PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL, sprite);
-					
-					for (int q = 0; q < mesh.vertexCount(); q++)
-					{
-						float x = mesh.positions().get(q * 3);
-						float y = mesh.positions().get(q * 3 + 1);
-						float z = mesh.positions().get(q * 3 + 2);
-						
-						float u = mesh.uvs().get(q * 2);
-						float v = mesh.uvs().get(q * 2 + 1);
-						
-						float nx = mesh.normals().get(q * 3);
-						float ny = mesh.normals().get(q * 3 + 1);
-						float nz = mesh.normals().get(q * 3 + 2);
-						
-						bufferBuilder.
-								addVertex(
-										x,
-										y,
-										z).
-								setUv(
-										u,
-										v).
-								setNormal(
-										nx,
-										ny,
-										nz);
-					}
-					ByteBuffer indexBuffer = mesh.indices();
-					
-					try (MeshData meshData = bufferBuilder.buildOrThrow())
-					{
-						GpuBuffer buffer = RenderSystem.getDevice().createBuffer(
-								meshUUID :: toString,
-								GpuBuffer.USAGE_VERTEX,
-								meshData.vertexBuffer()
-						);
-						
-						GpuBuffer gpuIndexBuffer = RenderSystem.getDevice().createBuffer(
-								() -> meshUUID.toString() + "_indexes",
-								GpuBuffer.USAGE_INDEX,
-								indexBuffer);
-						IndexType type = mesh.glIndexType() == GltfConstants.GL_UNSIGNED_SHORT ? IndexType.SHORT : IndexType.INT;
-						builder.meshes.add(new PBakedMesh(
-								meshUUID,
-								buffer,
-								mesh.vertexCount(),
-								gpuIndexBuffer,
-								mesh.indicesCount(),
-								type,
-								mesh.texture(),
-								emissive,
-								PTextureAlphaClassifier.resolve(sprite.contents()),
-								mesh,
-								loc));
-					}
+					bakedBoneBuilder.put(bone.uuid(), new PBakedBone.PBakedBoneBuilder(bone.uuid(), bone.name(),
+							new Vector3f(bone.pivot()), new Quaternionf(bone.baseRotation()).normalize()));
 				}
-			}
 
-			for (PBone bone : model.bones.values())
+				for (Map.Entry<UUID, Pair<UUID, List<UUID>>> entry : model.boneMeshes.entrySet())
+				{
+					PBakedBone.PBakedBoneBuilder builder = bakedBoneBuilder.get(entry.getKey());
+					Map<PMaterial, List<PMeshPrimitive>> primitivesByMaterial = new LinkedHashMap<>();
+					for (UUID meshUUID : entry.getValue().getSecond())
+					{
+						PMesh mesh = model.meshes.get(meshUUID);
+						for (PMeshPrimitive primitive : mesh.primitives())
+							primitivesByMaterial.computeIfAbsent(primitive.material(), ignored -> new ArrayList<>()).add(primitive);
+					}
+					for (List<PMeshPrimitive> primitives : primitivesByMaterial.values())
+						bakePrimitive(modelPath, PMeshPrimitive.merge(primitives), builder);
+				}
+
+				for (PBone bone : model.bones.values())
+				{
+					PBone parentBone = bone.parent();
+					if (parentBone == null)
+						continue;
+					PBakedBone.PBakedBoneBuilder child = bakedBoneBuilder.get(bone.uuid());
+					PBakedBone.PBakedBoneBuilder parent = bakedBoneBuilder.get(parentBone.uuid());
+					child.parent = parent;
+					parent.children.add(child);
+				}
+
+				List<PBakedBone> rootBones = new ArrayList<>();
+				for (PBakedBone.PBakedBoneBuilder builder : bakedBoneBuilder.values())
+					if (builder.parent == null)
+						rootBones.add(bakeBone(builder, null));
+				bakedModelMap.put(rawModel.getKey(), new PBakedModel(ImmutableList.copyOf(rootBones), ImmutableMap.copyOf(model.animations)));
+			}
+			catch (RuntimeException exception)
 			{
-				PBone parentBone = bone.parent();
-				if (parentBone == null)
-					continue;
-				
-				PBakedBone.PBakedBoneBuilder child =
-						bakedBoneBuilder.get(bone.uuid());
-				
-				PBakedBone.PBakedBoneBuilder parent =
-						bakedBoneBuilder.get(parentBone.uuid());
-				
-				child.parent = parent;
-				parent.children.add(child);
+				throw new IllegalStateException("Can't bake model " + rawModel.getKey(), exception);
 			}
-
-			List<PBakedBone> rootBones = new ArrayList<>();
-			
-			for (PBakedBone.PBakedBoneBuilder builder : bakedBoneBuilder.values())
-				if (builder.parent == null)
-					rootBones.add(bakeBone(builder, null));
-			
-			bakedModelMap.put(
-					rawModel.getKey(),
-					new PBakedModel(ImmutableList.copyOf(rootBones),
-									  ImmutableMap.copyOf(model.animations))
-			);
 		}
 		
 		return bakedModelMap;
+	}
+
+	private static void verifyModelsLoaded(Map<Identifier, PModel> models)
+	{
+		for (PModelResource resource : PResourceCache.getResourceCache().values())
+		{
+			PModelLoader loader = MODEL_LOADERS.get(resource.modelLoaderId());
+			List<Identifier> candidates = loader.modelResourceCandidates(resource.model());
+			if (candidates.stream().noneMatch(models :: containsKey))
+				throw new IllegalStateException("Registered model was not loaded; tried: " +
+						candidates.stream().map(Identifier :: toString).collect(Collectors.joining(", ")));
+		}
+	}
+
+	private static void bakePrimitive(Identifier modelPath, PMeshPrimitive primitive, PBakedBone.PBakedBoneBuilder builder)
+	{
+		String textureReference = primitive == null || primitive.material() == null ? "<missing>" : primitive.material().textureReference();
+		if (textureReference.isEmpty())
+			return;
+		try
+		{
+			if (primitive == null || primitive.material() == null)
+				throw new IllegalStateException("Primitive has no material");
+			Identifier texture = PResourceCache.resolve(modelPath, textureReference);
+			TextureAtlasSprite sprite = PResourceCache.getTextureAtlas().getSprite(texture);
+			if (sprite.contents().name().getPath().equals("missingno"))
+				throw new IllegalStateException("Texture is missing from atlas: " + texture);
+			boolean emissive = sprite.contents().getAdditionalMetadata(PLibSpriteMetadata.TYPE).
+					map(PLibSpriteMetadata :: emissive).orElse(false);
+			ByteBufferBuilder bytes = ByteBufferBuilder.exactlySized(
+					primitive.vertexCount() * PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize());
+			BufferBuilder buffer = new AtlasBufferBuilder(bytes, PrimitiveTopology.TRIANGLES,
+					PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL, sprite);
+			for (int vertex = 0; vertex < primitive.vertexCount(); vertex++)
+				buffer.addVertex(primitive.positions().get(vertex * 3), primitive.positions().get(vertex * 3 + 1), primitive.positions().get(vertex * 3 + 2)).
+						setUv(primitive.uvs().get(vertex * 2), primitive.uvs().get(vertex * 2 + 1)).
+						setNormal(primitive.normals().get(vertex * 3), primitive.normals().get(vertex * 3 + 1), primitive.normals().get(vertex * 3 + 2));
+			UUID primitiveUUID = UUID.randomUUID();
+			try (MeshData data = buffer.buildOrThrow())
+			{
+				GpuBuffer vertices = RenderSystem.getDevice().createBuffer(primitiveUUID :: toString, GpuBuffer.USAGE_VERTEX, data.vertexBuffer());
+				ByteBuffer indices = primitive.indices().duplicate();
+				indices.clear();
+				GpuBuffer indexBuffer = RenderSystem.getDevice().createBuffer(() -> primitiveUUID + "_indexes", GpuBuffer.USAGE_INDEX, indices);
+				IndexType indexType = primitive.glIndexType() == GltfConstants.GL_UNSIGNED_SHORT ? IndexType.SHORT : IndexType.INT;
+				builder.meshes.add(new PBakedMesh(primitiveUUID, vertices, primitive.vertexCount(), indexBuffer,
+						primitive.indicesCount(), indexType, textureReference, emissive,
+						PTextureAlphaClassifier.resolve(sprite.contents()), primitive, texture));
+			}
+		}
+		catch (RuntimeException exception)
+		{
+			throw new IllegalStateException("Can't bake primitive for model " + modelPath + " with texture reference " + textureReference, exception);
+		}
 	}
 	
 	private static PBakedBone bakeBone(
@@ -300,28 +280,21 @@ public class PModelCache
 		);
 	}
 	
-	public static Identifier resolveTextureLocation(Identifier modelPath, String textureName)
-	{
-		for (PModelLoader modelLoader : PModelCache.getModelLoaders())
-			if (modelLoader.supports(modelPath))
-				return modelLoader.textureLocation(modelPath, textureName);
-		
-		return modelPath.withPath(textureName);
-	}
-	
-	private static Identifier textureLocation(Identifier modelPath, String textureName)
-	{
-		return resolveTextureLocation(modelPath, textureName);
-	}
-	
 	private static CompletableFuture<?> loadModels(Executor backgroundExecutor,
 	                                               ResourceManager resourceManager,
 	                                               BiConsumer<Identifier, PModel> elementConsumer)
 	{
 		CompletableFuture<?> chain = CompletableFuture.completedFuture(null);
-		
+		for (PModelResource resource : PResourceCache.getResourceCache().values())
+			if (!MODEL_LOADERS.containsKey(resource.modelLoaderId()))
+				throw new IllegalStateException("No model loader registered for " + resource.model() + ": " + resource.modelLoaderId());
 		for (PModelLoader modelLoader : getModelLoaders())
-			chain = chain.thenCompose(empty -> modelLoader.loadModels(backgroundExecutor, resourceManager, elementConsumer));
+			chain = chain.thenCompose(empty -> modelLoader.loadModels(backgroundExecutor, resourceManager, (model, parsed) ->
+			{
+				if (PResourceCache.getModelResource(model, resourceManager).
+						filter(resource -> resource.modelLoaderId().equals(modelLoader.id())).isPresent())
+					elementConsumer.accept(model, parsed);
+			}));
 		
 		return chain;
 	}

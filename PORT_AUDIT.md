@@ -12,7 +12,7 @@
 
 - Source status: `M`
 - Subsystem: `MODEL_RESOURCE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -20,7 +20,7 @@
 
 - Source status: `A`
 - Subsystem: `MODEL_RESOURCE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -28,7 +28,7 @@
 
 - Source status: `M`
 - Subsystem: `MODEL_RESOURCE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -36,7 +36,7 @@
 
 - Source status: `A`
 - Subsystem: `MODEL_RESOURCE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -44,7 +44,7 @@
 
 - Source status: `M`
 - Subsystem: `MODEL_RESOURCE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -52,7 +52,7 @@
 
 - Source status: `A`
 - Subsystem: `MODEL_RESOURCE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -60,7 +60,7 @@
 
 - Source status: `A`
 - Subsystem: `MODEL_RESOURCE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -68,7 +68,7 @@
 
 - Source status: `A`
 - Subsystem: `MODEL_RESOURCE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -76,7 +76,7 @@
 
 - Source status: `M`
 - Subsystem: `MODEL_RESOURCE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -84,7 +84,7 @@
 
 - Source status: `M`
 - Subsystem: `MODEL_RESOURCE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -92,7 +92,7 @@
 
 - Source status: `M`
 - Subsystem: `MODEL_RESOURCE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -100,7 +100,7 @@
 
 - Source status: `M`
 - Subsystem: `MODEL_RESOURCE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -108,7 +108,7 @@
 
 - Source status: `M`
 - Subsystem: `MODEL_RESOURCE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -116,15 +116,15 @@
 
 - Source status: `M`
 - Subsystem: `MODEL_RESOURCE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ADAPTED_26_2`
+- Notes: 26.1 source behavior: delegates glTF animation sidecars to the shared parser. 26.2 API difference: the current target `PAnimation` has no visibility-track state or constructor yet. 26.2 implementation: delegates event parsing to `PAnimationSidecarParser`; visibility tracks remain for the ANIMATION_CORE port.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/data/gltf/PGltfChannelDecoder.java`
 
 - Source status: `M`
 - Subsystem: `MODEL_RESOURCE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -132,7 +132,7 @@
 
 - Source status: `M`
 - Subsystem: `MODEL_RESOURCE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -140,7 +140,7 @@
 
 - Source status: `M`
 - Subsystem: `MODEL_RESOURCE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -148,7 +148,7 @@
 
 - Source status: `M`
 - Subsystem: `MODEL_RESOURCE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -156,15 +156,15 @@
 
 - Source status: `M`
 - Subsystem: `MODEL_RESOURCE`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ADAPTED_26_2`
+- Notes: 26.1 source behavior: bakes material-grouped primitives, resolves textures through the owning model resource, and validates registered-model candidates. 26.2 API difference: GPU buffers use `PrimitiveTopology` and `IndexType`, with the current deformed-buffer cleanup path. 26.2 implementation: retains those 26.2 APIs while applying the resource-scoped bake and fallback validation flow.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/util/PResourceCache.java`
 
 - Source status: `A`
 - Subsystem: `MODEL_RESOURCE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -172,7 +172,7 @@
 
 - Source status: `D`
 - Subsystem: `MODEL_RESOURCE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Deleted in the source delta; assess the equivalent removal or replacement on 26.2.
 - Target path if renamed: `—`
 

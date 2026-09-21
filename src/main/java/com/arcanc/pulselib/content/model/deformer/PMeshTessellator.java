@@ -9,7 +9,7 @@
 
 package com.arcanc.pulselib.content.model.deformer;
 
-import com.arcanc.pulselib.content.model.PMesh;
+import com.arcanc.pulselib.content.model.PMeshPrimitive;
 import de.javagl.jgltf.model.GltfConstants;
 
 import java.nio.ByteBuffer;
@@ -26,7 +26,7 @@ public final class PMeshTessellator
 	{
 	}
 	
-	public static PMesh subdivide(PMesh source, int level)
+	public static PMeshPrimitive subdivide(PMeshPrimitive source, int level)
 	{
 		if (level == 0)
 			return source;
@@ -78,8 +78,8 @@ public final class PMeshTessellator
 
 		int vertexCount = positions.size() / 3;
 		int indexType = vertexCount <= 0xFFFF ? GltfConstants.GL_UNSIGNED_SHORT : GltfConstants.GL_UNSIGNED_INT;
-		return new PMesh(source.uuid(), vertexCount, floatBuffer(positions), floatBuffer(normals), floatBuffer(uvs),
-				indices.size(), indexBuffer(indices, indexType), indexType, source.texture());
+		return new PMeshPrimitive(vertexCount, floatBuffer(positions), floatBuffer(normals), floatBuffer(uvs),
+				indices.size(), indexBuffer(indices, indexType), indexType, source.material());
 	}
 
 	private static int gridIndex(int i, int j, int segments)
@@ -87,7 +87,7 @@ public final class PMeshTessellator
 		return i * (segments + 1) - i * (i - 1) / 2 + j;
 	}
 
-	private static void appendVertex(PMesh source, int a, int b, int c, float bWeight, float cWeight,
+	private static void appendVertex(PMeshPrimitive source, int a, int b, int c, float bWeight, float cWeight,
 									 List<Float> positions, List<Float> normals, List<Float> uvs)
 	{
 		float aWeight = 1.0f - bWeight - cWeight;
@@ -118,7 +118,7 @@ public final class PMeshTessellator
 			target.add(z);
 	}
 
-	private static int indexAt(PMesh source, int index)
+	private static int indexAt(PMeshPrimitive source, int index)
 	{
 		ByteBuffer indices = source.indices().duplicate().order(source.indices().order());
 		return switch (source.glIndexType())
@@ -130,7 +130,7 @@ public final class PMeshTessellator
 		};
 	}
 
-	private static void validateVertexIndex(PMesh source, int index)
+	private static void validateVertexIndex(PMeshPrimitive source, int index)
 	{
 		if (index < 0 || index >= source.vertexCount())
 			throw new IllegalArgumentException("Mesh index is outside its vertex array: " + index);

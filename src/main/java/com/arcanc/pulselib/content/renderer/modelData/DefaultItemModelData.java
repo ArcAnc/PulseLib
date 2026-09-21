@@ -37,13 +37,6 @@ public class DefaultItemModelData extends PModelData
 		}
 		
 		@Override
-		public DefaultItemModelDataBuilder addTexture(Identifier texturePath)
-		{
-			super.addTexture(PModelData.generateDefaultTextureLocation(texturePath, this.shortModelLocation, this.modelType, this.modelFormat));
-			return this;
-		}
-		
-		@Override
 		public DefaultItemModelData build()
 		{
 			return new DefaultItemModelData(this);

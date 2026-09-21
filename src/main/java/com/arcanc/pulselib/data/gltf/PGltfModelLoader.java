@@ -61,17 +61,32 @@ public class PGltfModelLoader implements PModelLoader
 	}
 	
 	@Override
-	public Identifier textureLocation(Identifier modelPath, String textureName)
+	public Identifier modelResourceLocation(Identifier modelLocation)
 	{
-		String modelPathWithoutExtension = stripModelExtension(modelPath.getPath());
-		String[] divided = modelPathWithoutExtension.split("/");
-		Identifier loc = modelPath.withPath(divided[1] + "/" + divided[2] + "/");
-		
-		if (divided.length > 3)
-			for (int q = 3; q < divided.length; q++)
-				loc = loc.withSuffix(divided[q] + "/");
-		
-		return loc.withSuffix(stripTextureExtension(textureName));
+		return modelLocation.getPath().startsWith(ROOT + "/") ? modelLocation : modelLocation.withPrefix(ROOT + "/");
+	}
+
+	@Override
+	public Identifier normalizeModelResourceLocation(Identifier modelLocation)
+	{
+		Identifier resourceLocation = modelResourceLocation(modelLocation);
+		String path = resourceLocation.getPath();
+		return path.endsWith(GLB_EXTENSION) || path.endsWith(GLTF_EXTENSION) ?
+				resourceLocation : resourceLocation.withSuffix(GLB_EXTENSION);
+	}
+
+	@Override
+	public List<Identifier> modelResourceCandidates(Identifier modelLocation)
+	{
+		Identifier resourceLocation = modelResourceLocation(modelLocation);
+		String path = resourceLocation.getPath();
+		if (path.endsWith(GLTF_EXTENSION))
+			return List.of(resourceLocation, resourceLocation.withPath(
+					path.substring(0, path.length() - GLTF_EXTENSION.length()) + GLB_EXTENSION));
+		if (path.endsWith(GLB_EXTENSION))
+			return List.of(resourceLocation, resourceLocation.withPath(
+					path.substring(0, path.length() - GLB_EXTENSION.length()) + GLTF_EXTENSION));
+		return List.of(resourceLocation.withSuffix(GLB_EXTENSION), resourceLocation.withSuffix(GLTF_EXTENSION));
 	}
 	
 	@Override
@@ -147,12 +162,5 @@ public class PGltfModelLoader implements PModelLoader
 		if (path.endsWith(GLTF_EXTENSION))
 			return path.substring(0, path.length() - GLTF_EXTENSION.length());
 		return path;
-	}
-
-	private static String stripTextureExtension(String textureName)
-	{
-		int extension = textureName.lastIndexOf('.');
-		int separator = textureName.lastIndexOf('/');
-		return extension > separator ? textureName.substring(0, extension) : textureName;
 	}
 }

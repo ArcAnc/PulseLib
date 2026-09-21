@@ -20,7 +20,7 @@ import com.arcanc.pulselib.content.renderer.PRenderStagesHandler;
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.arcanc.pulselib.util.PModelCache;
 import com.arcanc.pulselib.util.PRenderTypes;
-import com.arcanc.pulselib.util.PTextureCache;
+import com.arcanc.pulselib.util.PResourceCache;
 import com.arcanc.pulselib.util.attachments.PAttachmentAnchorResolvers;
 import com.arcanc.pulselib.util.attachments.PLivingAttachments;
 import com.arcanc.pulselib.util.attachments.humanoid.armor.PArmorClientExtensions;
@@ -59,7 +59,7 @@ public class ClientEvents
 		PRenderTypes.register(modEventBus);
 		PLibAnimationTicker.register(modEventBus);
 		PRenderStagesHandler.register(modEventBus);
-		PTextureCache.register(modEventBus);
+		PResourceCache.register(modEventBus);
 		PLibArmorHandler.register(modEventBus);
 		
 		//PPlayerAcrobaticDemo.register(modEventBus);

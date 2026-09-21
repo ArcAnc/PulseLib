@@ -9,11 +9,11 @@
 
 package com.arcanc.pulselib.content.model.baked;
 
-import com.arcanc.pulselib.content.model.PMesh;
+import com.arcanc.pulselib.content.model.PMeshPrimitive;
 import com.arcanc.pulselib.content.model.textures.PTextureAlphaClassifier;
 import com.arcanc.pulselib.content.model.textures.atlas.PLibSpriteMetadata;
 import com.arcanc.pulselib.util.PRenderTypes;
-import com.arcanc.pulselib.util.PTextureCache;
+import com.arcanc.pulselib.util.PResourceCache;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
@@ -39,7 +39,11 @@ public final class PMeshTextureVariants
 
 	public static PBakedMesh resolve(PBakedMesh mesh, @Nullable Identifier texture)
 	{
-		Identifier resolvedTexture = texture == null ? mesh.textureLocation() : texture;
+		if (texture == null)
+			return mesh;
+		Identifier resolvedTexture = PResourceCache.spriteId(texture);
+		if (resolvedTexture.equals(mesh.textureLocation()))
+			return mesh;
 		return VARIANTS.computeIfAbsent(mesh, ignored -> new HashMap<>()).computeIfAbsent(resolvedTexture,
 				location -> bake(mesh, location));
 	}
@@ -59,8 +63,8 @@ public final class PMeshTextureVariants
 
 	private static PBakedMesh bake(PBakedMesh base, Identifier texture)
 	{
-		PMesh source = base.source();
-		TextureAtlasSprite sprite = PTextureCache.getTextureAtlas().getSprite(texture);
+		PMeshPrimitive source = base.source();
+		TextureAtlasSprite sprite = PResourceCache.getTextureAtlas().getSprite(texture);
 		boolean emissive = sprite.contents().getAdditionalMetadata(PLibSpriteMetadata.TYPE).
 				map(PLibSpriteMetadata :: emissive).orElse(false);
 		ByteBufferBuilder bytes = ByteBufferBuilder.exactlySized(
@@ -81,7 +85,7 @@ public final class PMeshTextureVariants
 			GpuBuffer indexBuffer = RenderSystem.getDevice().createBuffer(
 					() -> base.uuid() + "_" + texture + "_indices", GpuBuffer.USAGE_INDEX, indices);
 			return new PBakedMesh(base.uuid(), vertices, source.vertexCount(), indexBuffer, source.indicesCount(),
-					base.indexType(), base.textureName(), emissive, PTextureAlphaClassifier.resolve(sprite.contents()), source, texture);
+					base.indexType(), base.textureReference(), emissive, PTextureAlphaClassifier.resolve(sprite.contents()), source, texture);
 		}
 	}
 }

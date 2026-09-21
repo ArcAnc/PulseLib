@@ -11,7 +11,9 @@ package com.arcanc.pulselib.data.gltf;
 
 
 import com.arcanc.pulselib.content.model.PBone;
+import com.arcanc.pulselib.content.model.PMaterial;
 import com.arcanc.pulselib.content.model.PMesh;
+import com.arcanc.pulselib.content.model.PMeshPrimitive;
 import com.arcanc.pulselib.content.model.PModel;
 import com.arcanc.pulselib.content.model.animation.*;
 import com.arcanc.pulselib.content.registration.PLibRegistration;
@@ -281,13 +283,21 @@ public class PGltfModelParser
 	                              Map<UUID, PMesh> uuidToMesh,
 	                              boolean bakeNodePose)
 	{
-		//Only one primitive per mesh. At least for BBmodel
-		MeshPrimitiveModel primitive = mesh.getMeshPrimitiveModels().getFirst();
+		Matrix4f meshTransform = meshTransform(node, bakeNodePose);
+		List<PMeshPrimitive> primitives = mesh.getMeshPrimitiveModels().stream().
+				map(primitive -> parsePrimitive(primitive, meshTransform)).
+				toList();
+		PMesh pMesh = new PMesh(UUID.randomUUID(), primitives);
+		uuidToMesh.put(pMesh.uuid(), pMesh);
+		return pMesh.uuid();
+	}
+
+	private static PMeshPrimitive parsePrimitive(MeshPrimitiveModel primitive, Matrix4f meshTransform)
+	{
 		AccessorModel positionsAccessor = primitive.getAttributes().get("POSITION");
 		AccessorModel normalsAccessor = primitive.getAttributes().get("NORMAL");
 		AccessorModel uvsAccessor = primitive.getAttributes().get("TEXCOORD_0");
 		
-		Matrix4f meshTransform = meshTransform(node, bakeNodePose);
 		FloatBuffer positions = transformPositions(PLibParserHelper.getFloatBuffer(positionsAccessor), meshTransform);
 		FloatBuffer normals = transformNormals(PLibParserHelper.getFloatBuffer(normalsAccessor), meshTransform);
 		FloatBuffer uvs = PLibParserHelper.getFloatBuffer(uvsAccessor);
@@ -300,9 +310,7 @@ public class PGltfModelParser
 		int indicesType = indicesAccessor.getComponentType();
 		
 		MaterialModel material = primitive.getMaterialModel();
-		String textureName = PLibParserHelper.extractTextureName(material);
-		PMesh pMesh = new PMesh(
-				UUID.randomUUID(),
+		return new PMeshPrimitive(
 				vertexCount,
 				positions,
 				normals,
@@ -310,11 +318,8 @@ public class PGltfModelParser
 				indicesCount,
 				indices,
 				indicesType,
-				textureName
+				new PMaterial(PLibParserHelper.extractTextureName(material))
 		);
-		
-		uuidToMesh.put(pMesh.uuid(), pMesh);
-		return pMesh.uuid();
 	}
 
 	private static FloatBuffer transformPositions(FloatBuffer source, Matrix4f transform)

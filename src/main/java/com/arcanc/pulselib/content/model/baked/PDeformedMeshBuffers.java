@@ -9,10 +9,10 @@
 
 package com.arcanc.pulselib.content.model.baked;
 
-import com.arcanc.pulselib.content.model.PMesh;
+import com.arcanc.pulselib.content.model.PMeshPrimitive;
 import com.arcanc.pulselib.content.model.deformer.PMeshDeformation;
 import com.arcanc.pulselib.util.PRenderTypes;
-import com.arcanc.pulselib.util.PTextureCache;
+import com.arcanc.pulselib.util.PResourceCache;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.PrimitiveTopology;
@@ -52,7 +52,7 @@ public final class PDeformedMeshBuffers
 		if (deformation == null || deformation.stack().isEmpty())
 			return mesh;
 		return new PBakedMesh(mesh.uuid(), resolve(mesh, deformation).buffer(), mesh.vertexesAmount(),
-				mesh.indices(), mesh.indicesCount(), mesh.indexType(), mesh.textureName(), mesh.isEmissive(),
+				mesh.indices(), mesh.indicesCount(), mesh.indexType(), mesh.textureReference(), mesh.isEmissive(),
 				mesh.alphaMode(), mesh.source(), mesh.textureLocation());
 	}
 
@@ -71,8 +71,8 @@ public final class PDeformedMeshBuffers
 
 	private static GpuBuffer upload(PBakedMesh baked, PMeshDeformation deformation)
 	{
-		PMesh mesh = baked.source();
-		TextureAtlasSprite sprite = PTextureCache.getTextureAtlas().getSprite(baked.textureLocation());
+		PMeshPrimitive mesh = baked.source();
+		TextureAtlasSprite sprite = PResourceCache.getTextureAtlas().getSprite(baked.textureLocation());
 		ByteBufferBuilder bytes = ByteBufferBuilder.exactlySized(
 				mesh.vertexCount() * PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize());
 		BufferBuilder builder = sprite.contents().name().getPath().equals("missingno")

@@ -15,9 +15,14 @@ import com.arcanc.pulselib.util.attachments.PLivingAttachments;
 import com.arcanc.pulselib.content.model.animation.PAnimationChannelType;
 import com.arcanc.pulselib.content.model.animation.PAnimationEventType;
 import com.arcanc.pulselib.content.model.deformer.PMeshDeformer;
+import com.arcanc.pulselib.content.model.PTextureReference;
+import com.arcanc.pulselib.content.model.resource.PModelResource;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationDefinition;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
 import com.arcanc.pulselib.content.registration.PLibRegistration;
+import com.arcanc.pulselib.data.PModelLoader;
+import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
+import com.arcanc.pulselib.util.PModelCache;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.ItemLike;
 import net.neoforged.bus.api.Event;
@@ -25,7 +30,9 @@ import net.neoforged.fml.event.IModBusEvent;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public class PulseLibEvents
 {
@@ -47,21 +54,71 @@ public class PulseLibEvents
 		}
 	}
 
-	public static class RegisterTextureEvent extends Event implements IModBusEvent
+	public static class RegisterResourceEvent extends Event implements IModBusEvent
 	{
-		private final Set<Identifier> registeredTextures;
-		
-		public RegisterTextureEvent(Set<Identifier> registeredTextures)
+		private final Map<Identifier, ModelRegistration> models = new LinkedHashMap<>();
+
+		public ModelRegistration model(Identifier model)
 		{
-			this.registeredTextures = registeredTextures;
+			return model(model, PGltfModelLoader.INSTANCE.id());
 		}
-		
-		public RegisterTextureEvent addTextureLocation(Identifier textureLocation)
+
+		public ModelRegistration model(Identifier model, Identifier modelLoaderId)
 		{
-			this.registeredTextures.add(textureLocation);
-			return this;
+			Objects.requireNonNull(model);
+			Objects.requireNonNull(modelLoaderId);
+			PModelLoader loader = PModelCache.getModelLoader(modelLoaderId).
+					orElseThrow(() -> new IllegalStateException("No model loader registered for " + modelLoaderId));
+			Identifier normalizedModel = loader.normalizeModelResourceLocation(model);
+			ModelRegistration existing = this.models.get(normalizedModel);
+			if (existing == null)
+			{
+				existing = new ModelRegistration(normalizedModel, modelLoaderId);
+				this.models.put(normalizedModel, existing);
+			}
+			else if (!existing.modelLoaderId.equals(modelLoaderId))
+				throw new IllegalStateException("Conflicting model loaders registered for model " + normalizedModel + ": " +
+						existing.modelLoaderId + " and " + modelLoaderId);
+			return existing;
 		}
-	}
+
+		public void apply(Map<Identifier, PModelResource> registeredResources)
+		{
+			Map<Identifier, PModelResource> completed = new LinkedHashMap<>();
+			this.models.forEach((model, registration) -> completed.put(model, registration.build()));
+			registeredResources.putAll(completed);
+		}
+
+		public static final class ModelRegistration
+		{
+			private final Identifier model;
+			private final Identifier modelLoaderId;
+			private final Map<String, Identifier> textures = new LinkedHashMap<>();
+
+			private ModelRegistration(Identifier model, Identifier modelLoaderId)
+			{
+				this.model = model;
+				this.modelLoaderId = modelLoaderId;
+			}
+
+			public ModelRegistration texture(String reference, Identifier texture)
+			{
+				Objects.requireNonNull(reference);
+				Objects.requireNonNull(texture);
+				String normalizedReference = PTextureReference.normalize(reference);
+				Identifier previous = this.textures.putIfAbsent(normalizedReference, texture);
+				if (previous != null && !previous.equals(texture))
+					throw new IllegalStateException("Conflicting textures registered for model " + this.model + ", reference " +
+							normalizedReference + ": " + previous + " and " + texture);
+				return this;
+			}
+
+			private PModelResource build()
+			{
+				return new PModelResource(this.model, this.modelLoaderId, this.textures);
+			}
+		}
+		}
 	
 	public static class AttachmentRegistrationEvent extends Event implements IModBusEvent
 	{
