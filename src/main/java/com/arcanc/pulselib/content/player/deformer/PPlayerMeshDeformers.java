@@ -28,14 +28,28 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 
+/**
+ * Provides support for player mesh deformers.
+ */
 public final class PPlayerMeshDeformers
 {
 	private static final Map<Identifier, Binding> BINDINGS = new LinkedHashMap<>();
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PPlayerMeshDeformers()
 	{
 	}
 
+	/**
+	 * Performs the register operation.
+	 * @param id the id to use.
+	 * @param part the part to use.
+	 * @param applies the applies to use.
+	 * @param stack the stack to use.
+	 * @param values the values to use.
+	 */
 	public static void register(Identifier id, PPlayerPart part, Predicate<Player> applies,
 							PDeformerStack stack, PPlayerDeformerValueSource values)
 	{
@@ -44,22 +58,48 @@ public final class PPlayerMeshDeformers
 			throw new IllegalArgumentException("Duplicate player deformer binding " + id);
 	}
 
+	/**
+	 * Performs the unregister operation.
+	 * @param id the id to use.
+	 */
 	public static void unregister(Identifier id)
 	{
 		BINDINGS.remove(id);
 	}
 
+	/**
+	 * Performs the clear operation.
+	 */
 	public static void clear()
 	{
 		BINDINGS.clear();
 	}
 	
+	/**
+	 * Performs the frame at operation.
+	 * @param player the player to use.
+	 * @param part the part to use.
+	 * @param localPosition the local position to use.
+	 * @param forwardAxis the forward axis to use.
+	 * @param upAxis the up axis to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PDeformerFrame frameAt(Player player, PPlayerPart part, Vector3f localPosition,
 										Vector3f forwardAxis, Vector3f upAxis)
 	{
 		return frameAt(player, part, localPosition, forwardAxis, upAxis, 0.0f);
 	}
 
+	/**
+	 * Performs the frame at operation.
+	 * @param player the player to use.
+	 * @param part the part to use.
+	 * @param localPosition the local position to use.
+	 * @param forwardAxis the forward axis to use.
+	 * @param upAxis the up axis to use.
+	 * @param partialTick the partial tick to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PDeformerFrame frameAt(Player player, PPlayerPart part, Vector3f localPosition,
 										Vector3f forwardAxis, Vector3f upAxis, float partialTick)
 	{
@@ -79,11 +119,22 @@ public final class PPlayerMeshDeformers
 		return new PDeformerFrame(position, right, up, forward);
 	}
 
+	/**
+	 * Performs the apply operation.
+	 * @param player the player to use.
+	 * @param model the model to use.
+	 */
 	public static void apply(Player player, PlayerModel model)
 	{
 		apply(player, model, 0.0f);
 	}
 
+	/**
+	 * Performs the apply operation.
+	 * @param player the player to use.
+	 * @param model the model to use.
+	 * @param partialTick the partial tick to use.
+	 */
 	public static void apply(Player player, PlayerModel model, float partialTick)
 	{
 		for (PPlayerPart part : PPlayerPart.values())
@@ -91,11 +142,22 @@ public final class PPlayerMeshDeformers
 				apply(player, part, modelPart, partialTick);
 	}
 
+	/**
+	 * Performs the apply operation.
+	 * @param player the player to use.
+	 * @param model the model to use.
+	 */
 	public static void apply(Player player, HumanoidModel<?> model)
 	{
 		apply(player, model, 0.0f);
 	}
 
+	/**
+	 * Performs the apply operation.
+	 * @param player the player to use.
+	 * @param model the model to use.
+	 * @param partialTick the partial tick to use.
+	 */
 	public static void apply(Player player, HumanoidModel<?> model, float partialTick)
 	{
 		apply(player, PPlayerPart.HEAD, model.head, partialTick);
@@ -106,6 +168,13 @@ public final class PPlayerMeshDeformers
 		apply(player, PPlayerPart.LEFT_LEG, model.leftLeg, partialTick);
 	}
 
+	/**
+	 * Performs the apply operation.
+	 * @param player the player to use.
+	 * @param part the part to use.
+	 * @param modelPart the model part to use.
+	 * @param partialTick the partial tick to use.
+	 */
 	private static void apply(Player player, PPlayerPart part, ModelPart modelPart, float partialTick)
 	{
 		List<ActiveBinding> active = active(player, part, partialTick);
@@ -119,6 +188,13 @@ public final class PPlayerMeshDeformers
 				deformable.setDeformer(deformer);
 	}
 
+	/**
+	 * Performs the active operation.
+	 * @param player the player to use.
+	 * @param part the part to use.
+	 * @param partialTick the partial tick to use.
+	 * @return the value produced by this operation.
+	 */
 	private static List<ActiveBinding> active(Player player, PPlayerPart part, float partialTick)
 	{
 		List<ActiveBinding> active = new ArrayList<>();
@@ -130,6 +206,13 @@ public final class PPlayerMeshDeformers
 		return active;
 	}
 
+	/**
+	 * Performs the deform operation.
+	 * @param player the player to use.
+	 * @param bindings the bindings to use.
+	 * @param position the position to use.
+	 * @return the value produced by this operation.
+	 */
 	private static Vector3f deform(Player player, List<ActiveBinding> bindings, Vector3f position)
 	{
 		for (ActiveBinding binding : bindings)
@@ -137,8 +220,18 @@ public final class PPlayerMeshDeformers
 		return position;
 	}
 
+/**
+ * Immutable value object representing binding.
+ */
 	private record Binding(PPlayerPart part, Predicate<Player> applies, PDeformerStack stack, PPlayerDeformerValueSource values)
 	{
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param part the part to use.
+		 * @param applies the applies to use.
+		 * @param stack the stack to use.
+		 * @param values the values to use.
+		 */
 		private Binding
 		{
 			Objects.requireNonNull(part);
@@ -148,6 +241,9 @@ public final class PPlayerMeshDeformers
 		}
 	}
 
+/**
+ * Immutable value object representing active binding.
+ */
 	private record ActiveBinding(PDeformerStack stack, PPlayerDeformerValueSource values)
 	{
 	}

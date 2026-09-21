@@ -15,6 +15,9 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.joml.Vector3f;
 
+/**
+ * Immutable value object representing twist definition.
+ */
 public record PTwistDefinition(Vector3f origin,
 							  Vector3f lengthAxis,
 							  float positiveExtent,
@@ -29,6 +32,14 @@ public record PTwistDefinition(Vector3f origin,
 			PChannelReference.FLOAT_CODEC.forGetter(PTwistDefinition::angle)
 	).apply(instance, PTwistDefinition::new));
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param origin the origin to use.
+	 * @param lengthAxis the length axis to use.
+	 * @param positiveExtent the positive extent to use.
+	 * @param negativeExtent the negative extent to use.
+	 * @param angle the angle to use.
+	 */
 	public PTwistDefinition
 	{
 		origin = new Vector3f(origin);

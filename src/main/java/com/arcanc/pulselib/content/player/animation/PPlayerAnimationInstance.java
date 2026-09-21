@@ -21,9 +21,7 @@ import com.arcanc.pulselib.data.gecko.MolangParser;
 import net.minecraft.util.Mth;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
-import org.jetbrains.annotations.Nullable;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
+import org.jspecify.annotations.Nullable;
 import java.util.Map;
 import java.util.List;
 import java.util.Objects;
@@ -34,12 +32,16 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 	private final Identifier id;
 	private final PPlayerAnimationDefinition definition;
 	private final PAnimationManager<PPlayerAnimationInstance> animationManager;
+	private boolean wasApplying;
 	private boolean targetActive;
 	private float activation;
 	private float previousActivation;
 	private float transitionStart;
 	private float transitionTarget;
 	private float transitionElapsed;
+	@Nullable
+	private PPlayerAnimationFrame cachedFrame;
+	private int cachedFramePartialTickBits;
 
 	PPlayerAnimationInstance(Player player, Identifier id, PPlayerAnimationDefinition definition)
 	{
@@ -116,11 +118,15 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 
 	void tick(boolean shouldApply)
 	{
+		this.cachedFrame = null;
 		PBakedModel model = this.definition.modelData().getModel();
 		if (model == null)
 			return;
 
 		this.animationManager.bindModel(model);
+		if (!shouldApply && this.wasApplying)
+			stopAllControllers();
+		this.wasApplying = shouldApply;
 		updateActivation(shouldApply);
 		if (shouldApply || this.activation > 0.0f)
 			this.animationManager.tick();
@@ -166,8 +172,11 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 		this.activation = Mth.lerp(alpha, this.transitionStart, this.transitionTarget);
 	}
 
-	@Nullable PPlayerBonePose sample(String boneName, float partialTick)
+	public @Nullable PPlayerAnimationFrame sampleFrame(float partialTick)
 	{
+		int partialTickBits = Float.floatToIntBits(partialTick);
+		if (this.cachedFrame != null && this.cachedFramePartialTickBits == partialTickBits)
+			return this.cachedFrame;
 		PBakedModel model = this.definition.modelData().getModel();
 		if (model == null)
 			return null;
@@ -184,27 +193,8 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 					return context;
 				},
 				partialTick);
-		PAnimationPoseResolver.AnimationDelta pose = resolver.animationDelta(
-				boneName,
-				this.definition.bindings().get(PPlayerPart.ROOT));
-		if (pose == null || !pose.isAnimated())
-			return null;
-
-		return new PPlayerBonePose(
-				pose.translation(),
-				pose.rotation(),
-				pose.scale(),
-				pose.hasTranslation(),
-				pose.hasRotation(),
-				pose.hasScale());
-	}
-
-	record PPlayerBonePose(Vector3f translation,
-	                      Quaternionf rotation,
-	                      Vector3f scale,
-	                      boolean hasTranslation,
-	                      boolean hasRotation,
-	                      boolean hasScale)
-	{
+		this.cachedFrame = new PPlayerAnimationFrame(this.definition, resolver);
+		this.cachedFramePartialTickBits = partialTickBits;
+		return this.cachedFrame;
 	}
 }

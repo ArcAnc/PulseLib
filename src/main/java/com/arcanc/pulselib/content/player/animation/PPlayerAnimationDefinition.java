@@ -22,8 +22,10 @@ import org.joml.Vector3f;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -33,12 +35,12 @@ public final class PPlayerAnimationDefinition
 	private final PModelData modelData;
 	private final Predicate<Player> predicate;
 	private final Map<PPlayerPart, String> bindings;
-	private final Set<PPlayerPart> mask;
 	private final PPlayerAnimationMask partMask;
 	private final PPlayerAnimationBlendMode blendMode;
 	private final PPlayerAnimationWeight weight;
 	private final Map<PPlayerPart, PPlayerAnimationWeight> partWeights;
 	private final Map<String, PPlayerAnimationWeight> boneWeights;
+	private final Set<String> meshAttachmentRoots;
 	private final List<PPlayerAnimationDeformer> deformers;
 	private final Vector3f rootPivot;
 	private final int priority;
@@ -48,18 +50,19 @@ public final class PPlayerAnimationDefinition
 	private final String syncGroup;
 	private final ControllerRegistrar controllerRegistrar;
 	private final MolangContextProvider molangContextProvider;
+	private final Map<PPlayerAnimationAnchor, String> anchors;
 
 	private PPlayerAnimationDefinition(Builder builder)
 	{
 		this.modelData = builder.modelData;
 		this.predicate = builder.predicate;
 		this.bindings = Map.copyOf(builder.bindings);
-		this.mask = Set.copyOf(builder.mask);
-		this.partMask = builder.partMask == null ? PPlayerAnimationMask.of(this.mask) : builder.partMask;
+		this.partMask = builder.partMask == null ? PPlayerAnimationMask.of(builder.mask) : builder.partMask;
 		this.blendMode = builder.blendMode;
 		this.weight = builder.weight;
 		this.partWeights = Map.copyOf(builder.partWeights);
 		this.boneWeights = Map.copyOf(builder.boneWeights);
+		this.meshAttachmentRoots = Set.copyOf(builder.meshAttachmentRoots);
 		this.deformers = List.copyOf(builder.deformers);
 		this.rootPivot = new Vector3f(builder.rootPivot);
 		this.priority = builder.priority;
@@ -69,6 +72,7 @@ public final class PPlayerAnimationDefinition
 		this.syncGroup = builder.syncGroup;
 		this.controllerRegistrar = builder.controllerRegistrar;
 		this.molangContextProvider = builder.molangContextProvider;
+		this.anchors = Map.copyOf(builder.anchors);
 	}
 
 	public static Builder builder(PModelData modelData)
@@ -89,11 +93,6 @@ public final class PPlayerAnimationDefinition
 	public Map<PPlayerPart, String> bindings()
 	{
 		return this.bindings;
-	}
-
-	public Set<PPlayerPart> mask()
-	{
-		return this.mask;
 	}
 
 	public boolean appliesTo(Player player, PPlayerPart part, float partialTick)
@@ -126,6 +125,12 @@ public final class PPlayerAnimationDefinition
 	{
 		PPlayerAnimationWeight boneWeight = this.boneWeights.getOrDefault(boneName, PPlayerAnimationWeight.FULL);
 		return Math.clamp(boneWeight.weight(player, partialTick), 0.0f, 1.0f);
+	}
+
+	/** Returns explicitly configured mesh attachment roots; an empty set enables automatic discovery. */
+	public Set<String> meshAttachmentRoots()
+	{
+		return this.meshAttachmentRoots;
 	}
 
 	public List<PPlayerAnimationDeformer> deformers()
@@ -161,6 +166,11 @@ public final class PPlayerAnimationDefinition
 	public String syncGroup()
 	{
 		return this.syncGroup;
+	}
+
+	public Map<PPlayerAnimationAnchor, String> anchors()
+	{
+		return this.anchors;
 	}
 
 	void registerControllers(PAnimationManager.PAnimationRegistrar<PPlayerAnimationInstance> registrar)
@@ -208,6 +218,7 @@ public final class PPlayerAnimationDefinition
 		private PPlayerAnimationWeight weight = PPlayerAnimationWeight.FULL;
 		private final Map<PPlayerPart, PPlayerAnimationWeight> partWeights = new LinkedHashMap<>();
 		private final Map<String, PPlayerAnimationWeight> boneWeights = new LinkedHashMap<>();
+		private final Set<String> meshAttachmentRoots = new LinkedHashSet<>();
 		private final List<PPlayerAnimationDeformer> deformers = new ArrayList<>();
 		private Vector3f rootPivot = new Vector3f();
 		private int priority;
@@ -217,6 +228,7 @@ public final class PPlayerAnimationDefinition
 		private String syncGroup = "";
 		private ControllerRegistrar controllerRegistrar = ControllerRegistrar.EMPTY;
 		private MolangContextProvider molangContextProvider = MolangContextProvider.EMPTY;
+		private final Map<PPlayerAnimationAnchor, String> anchors = new HashMap<>();
 
 		private Builder(PModelData modelData)
 		{
@@ -294,6 +306,15 @@ public final class PPlayerAnimationDefinition
 			return this;
 		}
 
+		/** Attaches meshes rooted at this bone while the definition contributes. */
+		public Builder meshAttachment(String boneName)
+		{
+			if (boneName == null || boneName.isBlank())
+				throw new IllegalArgumentException("Player mesh attachment bone name cannot be blank");
+			this.meshAttachmentRoots.add(boneName);
+			return this;
+		}
+
 		public Builder deform(PPlayerPart part,
 		                      PDeformerStack stack,
 		                      PPlayerAnimationDeformerValueSource values)
@@ -344,6 +365,12 @@ public final class PPlayerAnimationDefinition
 		public Builder populateMolangContext(MolangContextProvider provider)
 		{
 			this.molangContextProvider = Objects.requireNonNull(provider);
+			return this;
+		}
+
+		public Builder anchor(PPlayerAnimationAnchor anchor, String boneName)
+		{
+			this.anchors.put(Objects.requireNonNull(anchor), Objects.requireNonNull(boneName));
 			return this;
 		}
 

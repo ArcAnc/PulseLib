@@ -15,32 +15,62 @@ import net.minecraft.world.entity.LivingEntity;
 
 import java.util.function.Predicate;
 
+/**
+ * Provides support for living attachment sources.
+ */
 public final class PLivingAttachmentSources
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PLivingAttachmentSources()
 	{
 	}
 	
+	/**
+	 * Performs the any equipment slot operation.
+	 * @return the value produced by this operation.
+	 */
 	public static PLivingAttachmentSource anyEquipmentSlot()
 	{
 		return (entity, slot, stack) -> true;
 	}
 	
+	/**
+	 * Performs the equipment slot operation.
+	 * @param slot the slot to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PLivingAttachmentSource equipmentSlot(EquipmentSlot slot)
 	{
 		return (entity, currentSlot, stack) -> currentSlot == slot;
 	}
 	
+	/**
+	 * Performs the hand operation.
+	 * @return the value produced by this operation.
+	 */
 	public static PLivingAttachmentSource hand()
 	{
 		return (entity, slot, stack) -> slot.getType() == EquipmentSlot.Type.HAND;
 	}
 	
+	/**
+	 * Performs the entity predicate operation.
+	 * @param predicate the predicate to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PLivingAttachmentSource entityPredicate(Predicate<LivingEntity> predicate)
 	{
 		return (entity, slot, stack) -> predicate.test(entity);
 	}
 	
+	/**
+	 * Performs the equipment slot predicate operation.
+	 * @param slot the slot to use.
+	 * @param predicate the predicate to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PLivingAttachmentSource equipmentSlotPredicate(EquipmentSlot slot, Predicate<LivingEntity> predicate)
 	{
 		return (entity, currentSlot, stack) -> currentSlot == slot && predicate.test(entity);

@@ -12,13 +12,26 @@ package com.arcanc.pulselib.util.attachments;
 
 import net.minecraft.resources.Identifier;
 
+/**
+ * Immutable value object representing attachment anchor.
+ */
 public record PAttachmentAnchor(Identifier id)
 {
+	/**
+	 * Performs the of operation.
+	 * @param id the id to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PAttachmentAnchor of(Identifier id)
 	{
 		return new PAttachmentAnchor(id);
 	}
 	
+	/**
+	 * Performs the minecraft operation.
+	 * @param path the path to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PAttachmentAnchor minecraft(String path)
 	{
 		return of(Identifier.withDefaultNamespace(path));

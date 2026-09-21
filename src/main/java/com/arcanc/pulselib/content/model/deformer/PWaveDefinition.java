@@ -15,6 +15,9 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.joml.Vector3f;
 
+/**
+ * Immutable value object representing wave definition.
+ */
 public record PWaveDefinition(Vector3f origin,
                               Vector3f lengthAxis,
                               Vector3f displacementAxis,
@@ -36,6 +39,17 @@ public record PWaveDefinition(Vector3f origin,
 					PChannelReference.FLOAT.fieldOf("phase").forGetter(PWaveDefinition::phase)).
 			apply(instance, PWaveDefinition::new));
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param origin the origin to use.
+	 * @param lengthAxis the length axis to use.
+	 * @param displacementAxis the displacement axis to use.
+	 * @param positiveExtent the positive extent to use.
+	 * @param negativeExtent the negative extent to use.
+	 * @param wavelength the wavelength to use.
+	 * @param amplitude the amplitude to use.
+	 * @param phase the phase to use.
+	 */
 	public PWaveDefinition
 	{
 		origin = new Vector3f(origin);

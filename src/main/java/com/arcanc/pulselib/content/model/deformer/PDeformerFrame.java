@@ -12,8 +12,18 @@ package com.arcanc.pulselib.content.model.deformer;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+/**
+ * Immutable value object representing deformer frame.
+ */
 public record PDeformerFrame(Vector3f position, Vector3f right, Vector3f up, Vector3f forward)
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param position the position to use.
+	 * @param right the right to use.
+	 * @param up the up to use.
+	 * @param forward the forward to use.
+	 */
 	public PDeformerFrame
 	{
 		position = new Vector3f(position);
@@ -22,6 +32,10 @@ public record PDeformerFrame(Vector3f position, Vector3f right, Vector3f up, Vec
 		forward = new Vector3f(forward);
 	}
 
+	/**
+	 * Performs the matrix operation.
+	 * @return the value produced by this operation.
+	 */
 	public Matrix4f matrix()
 	{
 		return new Matrix4f().identity().

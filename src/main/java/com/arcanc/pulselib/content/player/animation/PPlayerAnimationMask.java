@@ -17,10 +17,25 @@ import java.util.Objects;
 import java.util.Set;
 
 @FunctionalInterface
+/**
+ * Defines the contract for player animation mask.
+ */
 public interface PPlayerAnimationMask
 {
+	/**
+	 * Performs the contains operation.
+	 * @param player the player to use.
+	 * @param part the part to use.
+	 * @param partialTick the partial tick to use.
+	 * @return the value produced by this operation.
+	 */
 	boolean contains(Player player, PPlayerPart part, float partialTick);
 
+	/**
+	 * Performs the of operation.
+	 * @param parts the parts to use.
+	 * @return the value produced by this operation.
+	 */
 	static PPlayerAnimationMask of(PPlayerPart... parts)
 	{
 		Objects.requireNonNull(parts);
@@ -29,6 +44,11 @@ public interface PPlayerAnimationMask
 		return of(allowed);
 	}
 
+	/**
+	 * Performs the of operation.
+	 * @param parts the parts to use.
+	 * @return the value produced by this operation.
+	 */
 	static PPlayerAnimationMask of(Set<PPlayerPart> parts)
 	{
 		Set<PPlayerPart> allowed = Set.copyOf(parts);

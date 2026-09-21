@@ -21,31 +21,60 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Provides support for living attachments.
+ */
 public class PLivingAttachments
 {
 	private static final Map<Item, List<PLivingAttachmentDefinition>> ITEM_ATTACHMENTS = new Reference2ObjectLinkedOpenHashMap<>();
 	private static final List<PLivingAttachmentDefinition> GLOBAL_ATTACHMENTS = new ArrayList<>();
 	
+	/**
+	 * Performs the register operation.
+	 * @param item the item to use.
+	 * @param definition the definition to use.
+	 */
 	public static void register(Item item, PLivingAttachmentDefinition definition)
 	{
 		ITEM_ATTACHMENTS.computeIfAbsent(item, $ -> new ArrayList<>()).add(definition);
 	}
 	
+	/**
+	 * Performs the register operation.
+	 * @param item the item to use.
+	 * @param definitions the definitions to use.
+	 */
 	public static void register(Item item, Collection<? extends PLivingAttachmentDefinition> definitions)
 	{
 		definitions.forEach(definition -> register(item, definition));
 	}
 	
+	/**
+	 * Registers the global.
+	 * @param definition the definition to use.
+	 */
 	public static void registerGlobal(PLivingAttachmentDefinition definition)
 	{
 		GLOBAL_ATTACHMENTS.add(definition);
 	}
 	
+	/**
+	 * Performs the contains operation.
+	 * @param item the item to use.
+	 * @return the value produced by this operation.
+	 */
 	public static boolean contains(Item item)
 	{
 		return ITEM_ATTACHMENTS.containsKey(item);
 	}
 	
+	/**
+	 * Performs the get operation.
+	 * @param stack the stack to use.
+	 * @param slot the slot to use.
+	 * @param entity the entity to use.
+	 * @return the value produced by this operation.
+	 */
 	public static List<PLivingAttachmentDefinition> get(ItemStack stack, EquipmentSlot slot, LivingEntity entity)
 	{
 		List<PLivingAttachmentDefinition> definitions = ITEM_ATTACHMENTS.get(stack.getItem());
@@ -60,6 +89,11 @@ public class PLivingAttachments
 		return result;
 	}
 	
+	/**
+	 * Returns the global.
+	 * @param entity the entity to use.
+	 * @return the value produced by this operation.
+	 */
 	public static List<PLivingAttachmentDefinition> getGlobal(LivingEntity entity)
 	{
 		List<PLivingAttachmentDefinition> result = new ArrayList<>();
@@ -70,6 +104,13 @@ public class PLivingAttachments
 		return result;
 	}
 	
+	/**
+	 * Performs the hides vanilla armor operation.
+	 * @param stack the stack to use.
+	 * @param slot the slot to use.
+	 * @param entity the entity to use.
+	 * @return the value produced by this operation.
+	 */
 	public static boolean hidesVanillaArmor(ItemStack stack, EquipmentSlot slot, LivingEntity entity)
 	{
 		for (PLivingAttachmentDefinition definition : get(stack, slot, entity))
@@ -79,6 +120,11 @@ public class PLivingAttachments
 		return false;
 	}
 	
+	/**
+	 * Performs the hides vanilla armor operation.
+	 * @param stack the stack to use.
+	 * @return the value produced by this operation.
+	 */
 	public static boolean hidesVanillaArmor(ItemStack stack)
 	{
 		List<PLivingAttachmentDefinition> definitions = ITEM_ATTACHMENTS.get(stack.getItem());
@@ -92,6 +138,10 @@ public class PLivingAttachments
 		return false;
 	}
 	
+	/**
+	 * Performs the items operation.
+	 * @return the value produced by this operation.
+	 */
 	public static Collection<Item> items()
 	{
 		return ITEM_ATTACHMENTS.keySet();

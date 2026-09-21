@@ -15,27 +15,46 @@ import net.minecraft.resources.Identifier;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+/**
+ * Deforms bend.
+ */
 public final class PBendDeformer implements PMeshDeformer<PBendDefinition>
 {
 	public static final PBendDeformer INSTANCE = new PBendDeformer();
 	private static final float EPSILON = 1.0e-5f;
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PBendDeformer()
 	{
 	}
 
+	/**
+	 * Performs the id operation.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public Identifier id()
 	{
 		return PLibDatabase.rl("bend");
 	}
 
+	/**
+	 * Performs the codec operation.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public MapCodec<PBendDefinition> codec()
 	{
 		return PBendDefinition.CODEC;
 	}
 
+	/**
+	 * Performs the prepare operation.
+	 * @param context the context to use.
+	 * @param definition the definition to use.
+	 */
 	@Override
 	public void prepare(PDeformerPrepareContext context, PBendDefinition definition)
 	{
@@ -49,6 +68,12 @@ public final class PBendDeformer implements PMeshDeformer<PBendDefinition>
 				definition.positiveExtent(), definition.negativeExtent(), definition.angle()));
 	}
 
+	/**
+	 * Performs the require unit operation.
+	 * @param axis the axis to use.
+	 * @param name the name to use.
+	 * @return the value produced by this operation.
+	 */
 	private static Vector3f requireUnit(Vector3f axis, String name)
 	{
 		Vector3f result = new Vector3f(axis);
@@ -57,10 +82,18 @@ public final class PBendDeformer implements PMeshDeformer<PBendDefinition>
 		return result.normalize();
 	}
 
+/**
+ * Immutable value object representing operation.
+ */
 	private record Operation(Vector3f origin, Vector3f length, Vector3f axis, Vector3f radial,
 							 float positiveExtent, float negativeExtent, PChannelReference<Float> angle)
 			implements PPreparedDeformer
 	{
+		/**
+		 * Performs the deform operation.
+		 * @param position the position to use.
+		 * @param values the values to use.
+		 */
 		@Override
 		public void deform(Vector3f position, PDeformerValueSource values)
 		{

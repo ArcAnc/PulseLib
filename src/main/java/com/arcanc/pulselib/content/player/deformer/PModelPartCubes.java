@@ -13,7 +13,14 @@ import net.minecraft.client.model.geom.ModelPart;
 
 import java.util.List;
 
+/**
+ * Defines the contract for model part cubes.
+ */
 public interface PModelPartCubes
 {
+	/**
+	 * Performs the pulselib$cubes operation.
+	 * @return the value produced by this operation.
+	 */
 	List<ModelPart.Cube> pulselib$cubes();
 }

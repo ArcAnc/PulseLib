@@ -21,16 +21,29 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 
+/**
+ * Provides support for attachment anchor resolvers.
+ */
 public class PAttachmentAnchorResolvers
 {
 	private static final Map<Class<?>, Map<PAttachmentAnchor, AnchorResolver>> RESOLVERS = new Object2ObjectLinkedOpenHashMap<>();
 	
+	/**
+	 * Performs the init operation.
+	 * @param bus the bus to use.
+	 */
 	@ApiStatus.Internal
 	public static void init(IEventBus bus)
 	{
 		PHumanoidAnchors.registerDefaults();
 	}
 	
+	/**
+	 * Performs the register operation.
+	 * @param modelClass the model class to use.
+	 * @param anchor the anchor to use.
+	 * @param resolver the resolver to use.
+	 */
 	public static void register(
 			Class<?> modelClass,
 			PAttachmentAnchor anchor,
@@ -39,6 +52,13 @@ public class PAttachmentAnchorResolvers
 		RESOLVERS.computeIfAbsent(modelClass, _ -> new Object2ObjectLinkedOpenHashMap<>()).put(anchor, resolver);
 	}
 	
+	/**
+	 * Performs the resolve operation.
+	 * @param state the state to use.
+	 * @param model the model to use.
+	 * @param anchor the anchor to use.
+	 * @return the value produced by this operation.
+	 */
 	public static @Nullable <S extends EntityRenderState> ModelPart resolve(S state, EntityModel<? super S> model, PAttachmentAnchor anchor)
 	{
 		for (Map.Entry<Class<?>, Map<PAttachmentAnchor, AnchorResolver>> entry : RESOLVERS.entrySet())
@@ -57,8 +77,17 @@ public class PAttachmentAnchorResolvers
 	}
 	
 	@FunctionalInterface
+/**
+ * Defines the contract for anchor resolver.
+ */
 	public interface AnchorResolver
 	{
+		/**
+		 * Performs the resolve operation.
+		 * @param state the state to use.
+		 * @param model the model to use.
+		 * @return the value produced by this operation.
+		 */
 		@Nullable ModelPart resolve(EntityRenderState state, EntityModel<?> model);
 	}
 }

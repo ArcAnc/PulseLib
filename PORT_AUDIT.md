@@ -914,7 +914,7 @@
 
 - Source status: `A`
 - Subsystem: `PLAYER_ANIMATION`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -922,7 +922,7 @@
 
 - Source status: `A`
 - Subsystem: `PLAYER_ANIMATION`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -930,7 +930,7 @@
 
 - Source status: `A`
 - Subsystem: `PLAYER_ANIMATION`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -938,7 +938,7 @@
 
 - Source status: `M`
 - Subsystem: `PLAYER_ANIMATION`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -946,15 +946,15 @@
 
 - Source status: `M`
 - Subsystem: `PLAYER_ANIMATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Foundation bindings, anchors and mesh-attachment roots ported. First-person configuration members remain deferred with the FIRST_PERSON stage.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationDeformer.java`
 
 - Source status: `M`
 - Subsystem: `PLAYER_ANIMATION`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -962,7 +962,7 @@
 
 - Source status: `M`
 - Subsystem: `PLAYER_ANIMATION`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -970,7 +970,7 @@
 
 - Source status: `M`
 - Subsystem: `PLAYER_ANIMATION`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -978,7 +978,7 @@
 
 - Source status: `M`
 - Subsystem: `PLAYER_ANIMATION`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -986,7 +986,7 @@
 
 - Source status: `A`
 - Subsystem: `PLAYER_ANIMATION`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -994,7 +994,7 @@
 
 - Source status: `M`
 - Subsystem: `PLAYER_ANIMATION`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1002,15 +1002,15 @@
 
 - Source status: `M`
 - Subsystem: `PLAYER_ANIMATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Shared activation and cached evaluated-frame runtime ported. First-person activation state remains deferred with the FIRST_PERSON stage.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationMask.java`
 
 - Source status: `M`
 - Subsystem: `PLAYER_ANIMATION`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1018,7 +1018,7 @@
 
 - Source status: `A`
 - Subsystem: `PLAYER_ANIMATION`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -1026,7 +1026,7 @@
 
 - Source status: `M`
 - Subsystem: `PLAYER_ANIMATION`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1034,15 +1034,15 @@
 
 - Source status: `M`
 - Subsystem: `PLAYER_ANIMATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Third-person frame evaluation, anchors, mesh attachments and deformers ported. First-person presentation hooks remain deferred with the FIRST_PERSON stage.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerBonePose.java`
 
 - Source status: `A`
 - Subsystem: `PLAYER_ANIMATION`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -1050,8 +1050,8 @@
 
 - Source status: `M`
 - Subsystem: `PLAYER_ANIMATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ALREADY_PRESENT`
+- Notes: Current `resolve(PlayerModel)` already maps only base model parts, matching the source change.
 - Target path if renamed: `—`
 
 ### FIRST_PERSON (21)
@@ -1376,7 +1376,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1384,7 +1384,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1392,7 +1392,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1400,7 +1400,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1408,7 +1408,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1416,7 +1416,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1424,15 +1424,15 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ALREADY_PRESENT`
+- Notes: Current `frameAt`, `deformNormal` and `compile` implement the source behavior; the remaining delta is documentation.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/model/deformer/PDeformerValueSource.java`
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1440,7 +1440,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1448,15 +1448,15 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ALREADY_PRESENT`
+- Notes: Current `PHingeDeformer.Operation.deform` implements the source behavior; the remaining delta is documentation.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/model/deformer/PMeshDeformation.java`
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1464,7 +1464,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1472,15 +1472,15 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ALREADY_PRESENT`
+- Notes: Current `subdivide(PMeshPrimitive, int)` already preserves the source primitive/material conversion.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/model/deformer/PPreparedDeformer.java`
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1488,7 +1488,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1496,15 +1496,15 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ALREADY_PRESENT`
+- Notes: Current `PSquashDeformer.Operation.deform` implements the source behavior; the remaining delta is documentation.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/model/deformer/PStretchDefinition.java`
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1512,7 +1512,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1520,7 +1520,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1528,7 +1528,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1536,7 +1536,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1544,15 +1544,15 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ALREADY_PRESENT`
+- Notes: Current `PTwistDeformer.Operation.deform` implements the source behavior; the remaining delta is documentation.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/model/deformer/PWaveDefinition.java`
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1560,7 +1560,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1568,7 +1568,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1576,15 +1576,15 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ALREADY_PRESENT`
+- Notes: Current `UploadBuffers.upload` implements the source buffer lifecycle; the remaining delta is documentation.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerStack.java`
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1592,7 +1592,7 @@
 
 - Source status: `A`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -1600,7 +1600,7 @@
 
 - Source status: `A`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -1608,7 +1608,7 @@
 
 - Source status: `A`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -1616,7 +1616,7 @@
 
 - Source status: `A`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -1624,7 +1624,7 @@
 
 - Source status: `A`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -1632,7 +1632,7 @@
 
 - Source status: `A`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -1640,7 +1640,7 @@
 
 - Source status: `A`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -1648,7 +1648,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1656,7 +1656,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1664,7 +1664,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1672,7 +1672,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1680,7 +1680,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1688,7 +1688,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1696,7 +1696,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1704,7 +1704,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1712,7 +1712,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1720,7 +1720,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1728,7 +1728,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1736,7 +1736,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1744,7 +1744,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1752,7 +1752,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1760,7 +1760,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1768,7 +1768,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1776,7 +1776,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1784,7 +1784,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1792,7 +1792,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1800,7 +1800,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1808,7 +1808,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1816,7 +1816,7 @@
 
 - Source status: `M`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 

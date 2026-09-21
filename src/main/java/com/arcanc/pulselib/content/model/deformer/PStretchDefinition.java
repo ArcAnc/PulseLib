@@ -14,6 +14,9 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.joml.Vector3f;
 
+/**
+ * Immutable value object representing stretch definition.
+ */
 public record PStretchDefinition(Vector3f origin, Vector3f axis, PChannelReference<Float> scale)
 {
 	public static final MapCodec<PStretchDefinition> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.
@@ -23,6 +26,12 @@ public record PStretchDefinition(Vector3f origin, Vector3f axis, PChannelReferen
 					PChannelReference.FLOAT.fieldOf("scale").forGetter(PStretchDefinition::scale)).
 			apply(instance, PStretchDefinition::new));
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param origin the origin to use.
+	 * @param axis the axis to use.
+	 * @param scale the scale to use.
+	 */
 	public PStretchDefinition
 	{
 		origin = new Vector3f(origin);

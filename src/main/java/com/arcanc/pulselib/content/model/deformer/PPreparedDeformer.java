@@ -11,7 +11,15 @@ package com.arcanc.pulselib.content.model.deformer;
 
 import org.joml.Vector3f;
 
+/**
+ * Defines the contract for prepared deformer.
+ */
 public interface PPreparedDeformer
 {
+	/**
+	 * Performs the deform operation.
+	 * @param position the position to use.
+	 * @param values the values to use.
+	 */
 	void deform(Vector3f position, PDeformerValueSource values);
 }

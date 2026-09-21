@@ -12,11 +12,27 @@ package com.arcanc.pulselib.content.model.deformer;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.resources.Identifier;
 
+/**
+ * Defines the contract for mesh deformer.
+ */
 public interface PMeshDeformer<D>
 {
+	/**
+	 * Performs the id operation.
+	 * @return the value produced by this operation.
+	 */
 	Identifier id();
 
+	/**
+	 * Performs the codec operation.
+	 * @return the value produced by this operation.
+	 */
 	MapCodec<D> codec();
 
+	/**
+	 * Performs the prepare operation.
+	 * @param context the context to use.
+	 * @param definition the definition to use.
+	 */
 	void prepare(PDeformerPrepareContext context, D definition);
 }
