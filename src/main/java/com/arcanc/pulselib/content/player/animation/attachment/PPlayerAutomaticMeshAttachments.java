@@ -12,6 +12,7 @@ import com.arcanc.pulselib.content.model.baked.PBakedBone;
 import com.arcanc.pulselib.content.model.baked.PMeshRenderContext;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationDefinition;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationFrame;
+import com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonMeshAttachmentPose;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -153,6 +154,16 @@ public final class PPlayerAutomaticMeshAttachments
 	                                     int packedLight)
 	{
 		for (PPlayerAnimationMeshAttachmentPose pose : poses)
+			if (pose.weight() > 1.0e-4f)
+				render(pose.root(), pose.frame(), pose.transform(), poseStack, packedLight);
+	}
+
+	/** Renders first-person mesh roots from their canonical evaluated frames. */
+	public static void renderFirstPerson(List<PPlayerFirstPersonMeshAttachmentPose> poses,
+	                                     PoseStack poseStack,
+	                                     int packedLight)
+	{
+		for (PPlayerFirstPersonMeshAttachmentPose pose : poses)
 			if (pose.weight() > 1.0e-4f)
 				render(pose.root(), pose.frame(), pose.transform(), poseStack, packedLight);
 	}

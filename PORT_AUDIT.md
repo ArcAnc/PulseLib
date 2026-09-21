@@ -1060,7 +1060,7 @@
 
 - Source status: `A`
 - Subsystem: `FIRST_PERSON`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -1068,7 +1068,7 @@
 
 - Source status: `A`
 - Subsystem: `FIRST_PERSON`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -1076,7 +1076,7 @@
 
 - Source status: `A`
 - Subsystem: `FIRST_PERSON`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -1084,7 +1084,7 @@
 
 - Source status: `A`
 - Subsystem: `FIRST_PERSON`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -1092,7 +1092,7 @@
 
 - Source status: `A`
 - Subsystem: `FIRST_PERSON`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -1100,7 +1100,7 @@
 
 - Source status: `A`
 - Subsystem: `FIRST_PERSON`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -1108,7 +1108,7 @@
 
 - Source status: `A`
 - Subsystem: `FIRST_PERSON`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -1116,7 +1116,7 @@
 
 - Source status: `A`
 - Subsystem: `FIRST_PERSON`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -1124,7 +1124,7 @@
 
 - Source status: `A`
 - Subsystem: `FIRST_PERSON`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -1132,7 +1132,7 @@
 
 - Source status: `A`
 - Subsystem: `FIRST_PERSON`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -1140,7 +1140,7 @@
 
 - Source status: `A`
 - Subsystem: `FIRST_PERSON`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -1148,7 +1148,7 @@
 
 - Source status: `A`
 - Subsystem: `FIRST_PERSON`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -1156,7 +1156,7 @@
 
 - Source status: `A`
 - Subsystem: `FIRST_PERSON`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -1164,7 +1164,7 @@
 
 - Source status: `A`
 - Subsystem: `FIRST_PERSON`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -1172,7 +1172,7 @@
 
 - Source status: `A`
 - Subsystem: `FIRST_PERSON`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -1180,7 +1180,7 @@
 
 - Source status: `A`
 - Subsystem: `FIRST_PERSON`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -1188,7 +1188,7 @@
 
 - Source status: `A`
 - Subsystem: `FIRST_PERSON`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -1196,7 +1196,7 @@
 
 - Source status: `A`
 - Subsystem: `FIRST_PERSON`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -1204,7 +1204,7 @@
 
 - Source status: `A`
 - Subsystem: `FIRST_PERSON`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -1212,7 +1212,7 @@
 
 - Source status: `A`
 - Subsystem: `FIRST_PERSON`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -1220,7 +1220,7 @@
 
 - Source status: `A`
 - Subsystem: `FIRST_PERSON`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
