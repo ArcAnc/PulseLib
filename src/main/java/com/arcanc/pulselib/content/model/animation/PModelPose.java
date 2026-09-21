@@ -10,27 +10,40 @@
 package com.arcanc.pulselib.content.model.animation;
 
 import com.arcanc.pulselib.content.model.baked.PBakedModel;
-import org.joml.Matrix4f;
-
 import java.util.BitSet;
 
+/**
+ * Resolved MODEL-space transforms.  {@link PPose} supplies LOCAL_BONE TRS;
+ * this cache applies the baked parent hierarchy once for consumers such as
+ * render presentations, locators and deformers.
+ */
 public final class PModelPose
 {
-	private final Matrix4f[] transforms;
+	private final PTransform[] transforms;
 	private final BitSet validBones = new BitSet();
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param boneCount the bone count to use.
+	 */
 	public PModelPose(int boneCount)
 	{
-		this.transforms = new Matrix4f[boneCount];
+		this.transforms = new PTransform[boneCount];
 		for (int index = 0; index < boneCount; index++)
-			this.transforms[index] = new Matrix4f();
+			this.transforms[index] = PTransform.IDENTITY;
 	}
 
-	public Matrix4f transform(int boneIndex)
+	/** Returns a resolved MODEL-space bone transform. */
+	public PTransform transform(int boneIndex)
 	{
 		return this.transforms[boneIndex];
 	}
 
+	/**
+	 * Performs the update operation.
+	 * @param model the model to use.
+	 * @param localPose the local pose to use.
+	 */
 	public void update(PBakedModel model, PPose localPose)
 	{
 		BitSet update = localPose.dirtyBones();
@@ -44,11 +57,18 @@ public final class PModelPose
 			updateBone(model, localPose, index);
 	}
 
+	/**
+	 * Updates the bone.
+	 * @param model the model to use.
+	 * @param pose the pose to use.
+	 * @param index the index to use.
+	 */
 	private void updateBone(PBakedModel model, PPose pose, int index)
 	{
 		int parent = model.parentIndex(index);
-		Matrix4f transform = parent < 0 ? this.transforms[index].identity() : this.transforms[index].set(this.transforms[parent]);
-		transform.translate(pose.translation(index)).rotate(pose.rotation(index)).scale(pose.scale(index));
+		PTransform local = new PTransform(
+				pose.translation(index), pose.rotation(index), pose.scale(index));
+		this.transforms[index] = parent < 0 ? local : this.transforms[parent].compose(local);
 		this.validBones.set(index);
 	}
 }

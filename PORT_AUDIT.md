@@ -464,7 +464,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -472,7 +472,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -480,7 +480,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -488,7 +488,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -496,7 +496,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -504,7 +504,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -512,7 +512,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -520,7 +520,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -528,7 +528,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -536,7 +536,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -544,7 +544,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -552,7 +552,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -568,7 +568,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -576,7 +576,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -584,7 +584,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -592,7 +592,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -600,7 +600,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -608,7 +608,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -616,7 +616,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -624,7 +624,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -632,7 +632,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -640,7 +640,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -648,7 +648,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -656,7 +656,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -664,15 +664,15 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
-- Notes: Rendering dependency applied: `isVisible(PBakedBone)` now evaluates source visibility tracks. The remaining ANIMATION_CORE delta stays pending for its dedicated stage.
+- Port status: `PORTED`
+- Notes: Source delta applied: resolver now evaluates visibility, exposes active animation bones, and resolves local/model/relative transforms through `PTransform`.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationRuntime.java`
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -680,7 +680,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -688,7 +688,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -696,7 +696,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -704,7 +704,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -712,7 +712,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -720,7 +720,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -736,7 +736,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -744,7 +744,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -752,7 +752,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -760,7 +760,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -768,7 +768,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -776,7 +776,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -784,7 +784,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -792,7 +792,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -800,7 +800,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -808,7 +808,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -816,7 +816,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -824,7 +824,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -832,7 +832,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -840,7 +840,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -848,7 +848,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -856,7 +856,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -864,7 +864,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -872,7 +872,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -880,7 +880,7 @@
 
 - Source status: `A`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Added in the source delta; port this addition against the 26.2 API.
 - Target path if renamed: `—`
 
@@ -888,7 +888,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -896,7 +896,7 @@
 
 - Source status: `M`
 - Subsystem: `ANIMATION_CORE`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1826,7 +1826,7 @@
 
 - Source status: `M`
 - Subsystem: `DEMO_TEST_RESOURCES`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -1834,7 +1834,7 @@
 
 - Source status: `M`
 - Subsystem: `DEMO_TEST_RESOURCES`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -2120,7 +2120,7 @@
 
 - Source status: `M`
 - Subsystem: `OTHER`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -2128,7 +2128,7 @@
 
 - Source status: `M`
 - Subsystem: `OTHER`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -2136,7 +2136,7 @@
 
 - Source status: `M`
 - Subsystem: `OTHER`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -2144,7 +2144,7 @@
 
 - Source status: `M`
 - Subsystem: `OTHER`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -2152,7 +2152,7 @@
 
 - Source status: `M`
 - Subsystem: `OTHER`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -2160,7 +2160,7 @@
 
 - Source status: `M`
 - Subsystem: `OTHER`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -2168,7 +2168,7 @@
 
 - Source status: `M`
 - Subsystem: `OTHER`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -2176,7 +2176,7 @@
 
 - Source status: `M`
 - Subsystem: `OTHER`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -2184,7 +2184,7 @@
 
 - Source status: `M`
 - Subsystem: `OTHER`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 
@@ -2192,7 +2192,7 @@
 
 - Source status: `M`
 - Subsystem: `OTHER`
-- Port status: `PENDING`
+- Port status: `PORTED`
 - Notes: Modified in the source delta; port only the change relative to the source parent.
 - Target path if renamed: `—`
 

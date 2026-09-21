@@ -7,7 +7,6 @@
  * Details can be found in the license file in the root folder of this project
  */
 package com.arcanc.pulselib.content.animatable;
-
 import com.arcanc.pulselib.content.model.animation.*;
 import com.arcanc.pulselib.content.model.baked.PBakedModel;
 import net.minecraft.core.BlockPos;
@@ -24,15 +23,26 @@ import org.jspecify.annotations.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
+/**
+ * Provides support for animation event dispatcher.
+ */
 public final class PAnimationEventDispatcher
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private PAnimationEventDispatcher() { }
 
-	public static <T extends PAnimatable<T>> void dispatch(T animatable,
-	                                                       PAnimationController<T> controller,
-	                                                       PAnimationEvent<?> event,
-	                                                       @Nullable PBakedModel model,
+	/**
+	 * Performs the dispatch operation.
+	 * @param animatable the animatable to use.
+	 * @param controller the controller to use.
+	 * @param event the event to use.
+	 * @param model the model to use.
+	 * @param controllers the controllers to use.
+	 */
+	public static <T extends PAnimatable<T>> void dispatch(T animatable, PAnimationController<T> controller,
+	                                                       PAnimationEvent<?> event, @Nullable PBakedModel model,
 	                                                       Collection<PAnimationController<T>> controllers)
 	{
 		PositionContext fallback = position(animatable);
@@ -45,12 +55,24 @@ public final class PAnimationEventDispatcher
 		execute(context, event);
 	}
 	
+	/**
+	 * Performs the dispatch operation.
+	 * @param animatable the animatable to use.
+	 * @param controller the controller to use.
+	 * @param event the event to use.
+	 */
 	public static <T extends PAnimatable<T>> void dispatch(T animatable, PAnimationController<T> controller,
 	                                                       PAnimationEvent<?> event)
 	{
 		dispatch(animatable, controller, event, null, List.of(controller));
 	}
 
+	/**
+	 * Performs the runs on operation.
+	 * @param side the side to use.
+	 * @param level the level to use.
+	 * @return the value produced by this operation.
+	 */
 	private static boolean runsOn(PEventSide side, @Nullable Level level)
 	{
 		boolean client = level == null || level.isClientSide();
@@ -62,6 +84,11 @@ public final class PAnimationEventDispatcher
 		};
 	}
 
+	/**
+	 * Performs the execute operation.
+	 * @param context the context to use.
+	 * @param event the event to use.
+	 */
 	@SuppressWarnings("unchecked")
 	private static <T> void execute(PAnimationEventContext context, PAnimationEvent<?> event)
 	{
@@ -70,12 +97,18 @@ public final class PAnimationEventDispatcher
 		type.execute(context, typed.data());
 	}
 
+	/**
+	 * Performs the position for operation.
+	 * @param animatable the animatable to use.
+	 * @param model the model to use.
+	 * @param controllers the controllers to use.
+	 * @param fallback the fallback to use.
+	 * @param locator the locator to use.
+	 * @return the value produced by this operation.
+	 */
 	private static <T extends PAnimatable<T>> PAnimationEventContext.PAnimationEventDispatcherBridge.@Nullable Position positionFor(
-			T animatable,
-			@Nullable PBakedModel model,
-			Collection<PAnimationController<T>> controllers,
-			@Nullable PositionContext fallback,
-			String locator)
+			T animatable, @Nullable PBakedModel model, Collection<PAnimationController<T>> controllers,
+			@Nullable PositionContext fallback, String locator)
 	{
 		if (fallback == null)
 			return null;
@@ -85,12 +118,17 @@ public final class PAnimationEventDispatcher
 		return new PAnimationEventContext.PAnimationEventDispatcherBridge.Position(position.level(), position.x(), position.y(), position.z());
 	}
 
-	private static <T extends PAnimatable<T>> PositionContext resolveLocatorPosition(
-			T animatable,
-	        String locator,
-			PBakedModel model,
-			Collection<PAnimationController<T>> controllers,
-			PositionContext fallback)
+	/**
+	 * Resolves the locator position.
+	 * @param animatable the animatable to use.
+	 * @param locator the locator to use.
+	 * @param model the model to use.
+	 * @param controllers the controllers to use.
+	 * @param fallback the fallback to use.
+	 * @return the value produced by this operation.
+	 */
+	private static <T extends PAnimatable<T>> PositionContext resolveLocatorPosition(T animatable, String locator,
+			PBakedModel model, Collection<PAnimationController<T>> controllers, PositionContext fallback)
 	{
 		Vector3f localPosition = new Vector3f();
 		if (!findBonePosition(model, controllers, locator, localPosition))
@@ -113,6 +151,11 @@ public final class PAnimationEventDispatcher
 		return fallback;
 	}
 
+	/**
+	 * Performs the rotate for block state operation.
+	 * @param localPosition the local position to use.
+	 * @param blockState the block state to use.
+	 */
 	private static void rotateForBlockState(Vector3f localPosition, BlockState blockState)
 	{
 		Direction direction = Direction.NORTH;
@@ -123,6 +166,14 @@ public final class PAnimationEventDispatcher
 		else localPosition.rotateX((float)Math.toRadians(90f * direction.getUnitVec3i().getY()));
 	}
 
+	/**
+	 * Finds the bone position.
+	 * @param model the model to use.
+	 * @param controllers the controllers to use.
+	 * @param boneName the bone name to use.
+	 * @param result the result to use.
+	 * @return the value produced by this operation.
+	 */
 	private static <T extends PAnimatable<T>> boolean findBonePosition(PBakedModel model,
 			Collection<PAnimationController<T>> controllers, String boneName, Vector3f result)
 	{
@@ -131,10 +182,15 @@ public final class PAnimationEventDispatcher
 		PPose localPose = model.evaluate(controllers, Map.of(), 1f);
 		PModelPose modelPose = new PModelPose(model.boneCount());
 		modelPose.update(model, localPose);
-		modelPose.transform(boneIndex).getTranslation(result);
+		result.set(modelPose.transform(boneIndex).translation());
 		return true;
 	}
 
+	/**
+	 * Performs the position operation.
+	 * @param animatable the animatable to use.
+	 * @return the value produced by this operation.
+	 */
 	private static @Nullable PositionContext position(PAnimatable<?> animatable)
 	{
 		if (animatable instanceof Entity entity)
@@ -147,5 +203,8 @@ public final class PAnimationEventDispatcher
 		return null;
 	}
 
+/**
+ * Immutable value object representing position context.
+ */
 	private record PositionContext(Level level, double x, double y, double z) { }
 }

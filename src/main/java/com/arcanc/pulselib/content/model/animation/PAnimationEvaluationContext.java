@@ -16,6 +16,9 @@ import org.joml.Vector3f;
 
 import java.util.Objects;
 
+/**
+ * Carries animation evaluation context.
+ */
 public final class PAnimationEvaluationContext
 {
 	private final MolangParser.Context molang;
@@ -23,37 +26,67 @@ public final class PAnimationEvaluationContext
 	private final Vector3f temporaryVector = new Vector3f();
 	private final Quaternionf temporaryQuaternion = new Quaternionf();
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param molang the molang to use.
+	 */
 	public PAnimationEvaluationContext(MolangParser.Context molang)
 	{
 		this(molang, 0f);
 	}
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param molang the molang to use.
+	 * @param animationTime the animation time to use.
+	 */
 	public PAnimationEvaluationContext(MolangParser.Context molang, float animationTime)
 	{
 		this.molang = Objects.requireNonNull(molang);
 		this.animationTime = animationTime;
 	}
 
+	/**
+	 * Performs the molang operation.
+	 * @return the value produced by this operation.
+	 */
 	public MolangParser.Context molang()
 	{
 		return this.molang;
 	}
 
+	/**
+	 * Performs the temporary vector operation.
+	 * @return the value produced by this operation.
+	 */
 	public Vector3f temporaryVector()
 	{
 		return this.temporaryVector;
 	}
 
+	/**
+	 * Performs the temporary quaternion operation.
+	 * @return the value produced by this operation.
+	 */
 	public Quaternionf temporaryQuaternion()
 	{
 		return this.temporaryQuaternion;
 	}
 
+	/**
+	 * Performs the this values operation.
+	 * @param value the value to use.
+	 */
 	public void thisValues(Vector3f value)
 	{
 		this.molang.thisValues(value.x(), value.y(), value.z());
 	}
 
+	/**
+	 * Performs the evaluate operation.
+	 * @param expression the expression to use.
+	 * @return the value produced by this operation.
+	 */
 	public float evaluate(MolangParser.Expression expression)
 	{
 		return PExpressionEvaluator.SHARED.evaluate(expression, this.molang, this.animationTime);

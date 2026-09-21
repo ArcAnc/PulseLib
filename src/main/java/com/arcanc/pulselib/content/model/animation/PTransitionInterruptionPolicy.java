@@ -9,6 +9,9 @@
 
 package com.arcanc.pulselib.content.model.animation;
 
+/**
+ * Enumerates the available transition interruption policy values.
+ */
 public enum PTransitionInterruptionPolicy
 {
 	FROM_CURRENT,

@@ -9,6 +9,9 @@
 
 package com.arcanc.pulselib.data.gecko;
 
+/**
+ * Enumerates the available expression dependency values.
+ */
 public enum PExpressionDependency
 {
 	CONSTANT,
@@ -16,6 +19,12 @@ public enum PExpressionDependency
 	INSTANCE,
 	STATEFUL;
 
+	/**
+	 * Performs the combine operation.
+	 * @param first the first to use.
+	 * @param second the second to use.
+	 * @return the value produced by this operation.
+	 */
 	public static PExpressionDependency combine(PExpressionDependency first, PExpressionDependency second)
 	{
 		return first.ordinal() >= second.ordinal() ? first : second;

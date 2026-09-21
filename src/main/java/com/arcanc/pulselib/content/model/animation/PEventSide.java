@@ -9,6 +9,9 @@
 
 package com.arcanc.pulselib.content.model.animation;
 
+/**
+ * Enumerates the available event side values.
+ */
 public enum PEventSide
 {
 	CLIENT,

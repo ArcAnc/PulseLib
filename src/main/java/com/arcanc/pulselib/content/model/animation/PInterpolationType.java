@@ -29,24 +29,50 @@ public interface PInterpolationType extends PInterpolation
 	PInterpolationType BEZIER = register("bezier", PInterpolationType :: bezier);
 	PInterpolationType STEP = register("step", PInterpolationType :: step);
 	
+	/**
+	 * Builds the transformer.
+	 * @param strength the strength to use.
+	 * @return the value produced by this operation.
+	 */
 	double buildTransformer(double strength);
 	
+	/**
+	 * Performs the register operation.
+	 * @param name the name to use.
+	 * @param interpolationType the interpolation type to use.
+	 * @return the value produced by this operation.
+	 */
 	static <T extends PInterpolationType> T register(String name, T interpolationType)
 	{
 		INTERPOLATION_TYPES.putIfAbsent(name, interpolationType);
 		return interpolationType;
 	}
 	
+	/**
+	 * Performs the linear operation.
+	 * @param value the value to use.
+	 * @return the value produced by this operation.
+	 */
 	static double linear(double value)
 	{
 		return value;
 	}
 	
+	/**
+	 * Performs the step operation.
+	 * @param value the value to use.
+	 * @return the value produced by this operation.
+	 */
 	static double step(double value)
 	{
 		return value < 1.0d ? 0.0d : 1.0d;
 	}
 	
+	/**
+	 * Performs the catmull rom operation.
+	 * @param value the value to use.
+	 * @return the value produced by this operation.
+	 */
 	static double catmullRom(double value)
 	{
 		double t2 = value * value;
@@ -55,11 +81,22 @@ public interface PInterpolationType extends PInterpolation
 		return 0.5d * (2 * value + (-1 + value) * t2 + (2 - value) * t3);
 	}
 	
+	/**
+	 * Performs the bezier operation.
+	 * @param value the value to use.
+	 * @return the value produced by this operation.
+	 */
 	static double bezier(double value)
 	{
 		return bezier(value, 0.5d);
 	}
 	
+	/**
+	 * Performs the bezier operation.
+	 * @param value the value to use.
+	 * @param strength the strength to use.
+	 * @return the value produced by this operation.
+	 */
 	static double bezier(double value, double strength)
 	{
 		value = Math.clamp(value, 0.0d, 1.0d);

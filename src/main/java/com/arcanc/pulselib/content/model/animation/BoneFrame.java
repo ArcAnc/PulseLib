@@ -13,6 +13,9 @@ package com.arcanc.pulselib.content.model.animation;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+/**
+ * Immutable value object representing bone frame.
+ */
 public record BoneFrame(
 		Vector3f translation,
 		Quaternionf rotation,

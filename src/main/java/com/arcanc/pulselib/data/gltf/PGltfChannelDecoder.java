@@ -15,11 +15,29 @@ import com.arcanc.pulselib.content.model.animation.PAnimationValue;
 import java.nio.ByteBuffer;
 import java.util.Set;
 
+/**
+ * Defines the contract for gltf channel decoder.
+ */
 public interface PGltfChannelDecoder<T>
 {
+	/**
+	 * Performs the field names operation.
+	 * @return the value produced by this operation.
+	 */
 	Set<String> fieldNames();
 
+	/**
+	 * Performs the channel operation.
+	 * @return the value produced by this operation.
+	 */
 	PAnimationChannelType<T> channel();
 
+	/**
+	 * Decodes the value.
+	 * @param values the values to use.
+	 * @param keyframeIndex the keyframe index to use.
+	 * @param context the context to use.
+	 * @return the value produced by this operation.
+	 */
 	PAnimationValue<T> decodeValue(ByteBuffer values, int keyframeIndex, PGltfDecodeContext context);
 }

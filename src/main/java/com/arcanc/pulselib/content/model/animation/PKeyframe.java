@@ -9,6 +9,9 @@
 
 package com.arcanc.pulselib.content.model.animation;
 
+/**
+ * Immutable value object representing keyframe.
+ */
 public record PKeyframe<T>(float time,
                             PAnimationValue<T> pre,
                             PAnimationValue<T> post,

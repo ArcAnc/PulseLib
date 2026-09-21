@@ -35,16 +35,31 @@ public class SingletonAnimationManager<T extends PAnimatable<T>> extends PAnimat
 {
 	private static final Map<AnimManagerKey, AnimationManagerContainer<?>> MANAGERS = new Object2ObjectOpenHashMap<>();
 	
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param animatable the animatable to use.
+	 */
 	public SingletonAnimationManager(T animatable)
 	{
 		this(animatable, AnimManagerKey.ofObject(animatable));
 	}
 
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param animatable the animatable to use.
+	 * @param key the key to use.
+	 */
 	public SingletonAnimationManager(T animatable, AnimManagerKey key)
 	{
 		super(animatable, key);
 	}
 	
+	/**
+	 * Returns the manager.
+	 * @param id the id to use.
+	 * @param animatable the animatable to use.
+	 * @return the value produced by this operation.
+	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends PAnimatable<T>> PAnimationManager<T> getManager(AnimManagerKey id, T animatable)
 	{
@@ -64,12 +79,19 @@ public class SingletonAnimationManager<T extends PAnimatable<T>> extends PAnimat
 		return (SingletonAnimationManager<T>)cont.manager();
 	}
 	
+	/**
+	 * Updates the all.
+	 */
 	public static void tickAll()
 	{
 		MANAGERS.values().forEach(container ->
 					container.manager().tick());
 	}
 	
+	/**
+	 * Removes the unused.
+	 * @param event the event to use.
+	 */
 	@SubscribeEvent
 	public static void removeUnused(final ClientTickEvent.Post event)
 	{
@@ -86,27 +108,46 @@ public class SingletonAnimationManager<T extends PAnimatable<T>> extends PAnimat
 		MANAGERS.entrySet().removeIf(entry -> entry.getValue().lastUsedTick() + THRESHOLD_TIME < now);
 	}
 	
+	/**
+	 * Performs the clean up operation.
+	 */
 	public static void cleanUp()
 	{
 		MANAGERS.clear();
 	}
 	
+/**
+ * Provides support for animation manager container.
+ */
 	static class AnimationManagerContainer<T extends PAnimatable<T>>
 	{
 		long lastUsedTick;
 		SingletonAnimationManager<T> manager;
 		
+		/**
+		 * Creates an instance of the enclosing type.
+		 * @param lastUsedTick the last used tick to use.
+		 * @param manager the manager to use.
+		 */
 		AnimationManagerContainer(long lastUsedTick, SingletonAnimationManager<T> manager)
 		{
 			this.lastUsedTick = lastUsedTick;
 			this.manager = manager;
 		}
 		
+		/**
+		 * Performs the manager operation.
+		 * @return the value produced by this operation.
+		 */
 		SingletonAnimationManager<T> manager()
 		{
 			return this.manager;
 		}
 		
+		/**
+		 * Performs the last used tick operation.
+		 * @return the value produced by this operation.
+		 */
 		long lastUsedTick()
 		{
 			return this.lastUsedTick;

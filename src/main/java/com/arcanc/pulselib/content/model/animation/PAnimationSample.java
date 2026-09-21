@@ -11,8 +11,16 @@ package com.arcanc.pulselib.content.model.animation;
 
 import java.util.Objects;
 
+/**
+ * Immutable value object representing animation sample.
+ */
 public record PAnimationSample(String animation, float weight)
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param animation the animation to use.
+	 * @param weight the weight to use.
+	 */
 	public PAnimationSample
 	{
 		animation = Objects.requireNonNull(animation);

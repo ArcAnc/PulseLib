@@ -19,8 +19,15 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
+/**
+ * Provides support for lib animation ticker.
+ */
 public class PLibAnimationTicker
 {
+	/**
+	 * Performs the register operation.
+	 * @param modEvenBus the mod even bus to use.
+	 */
 	public static void register(final IEventBus modEvenBus)
 	{
 		NeoForge.EVENT_BUS.addListener(PLibAnimationTicker :: clientTick);
@@ -28,6 +35,10 @@ public class PLibAnimationTicker
 		NeoForge.EVENT_BUS.register(InstanceAnimationManager.class);
 	}
 	
+	/**
+	 * Performs the client tick operation.
+	 * @param event the event to use.
+	 */
 	private static void clientTick(final LevelTickEvent.Pre event)
 	{
 		if (!event.getLevel().isClientSide())
