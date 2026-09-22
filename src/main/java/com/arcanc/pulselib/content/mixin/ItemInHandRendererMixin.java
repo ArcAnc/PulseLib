@@ -1,15 +1,15 @@
+/**
+ * @author ArcAnc
+ * Created at: 30.07.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
 package com.arcanc.pulselib.content.mixin;
 
-import com.arcanc.pulselib.content.player.animation.firstPerson.PFirstPersonArmPose;
-import com.arcanc.pulselib.content.player.animation.firstPerson.PFirstPersonItemPose;
-import com.arcanc.pulselib.content.player.animation.firstPerson.PFirstPersonPoseStack;
-import com.arcanc.pulselib.content.player.animation.firstPerson.PFirstPersonRenderContext;
-import com.arcanc.pulselib.content.player.animation.firstPerson.PFirstPersonRenderContexts;
-import com.arcanc.pulselib.content.player.animation.firstPerson.PFirstPersonRenderMode;
-import com.arcanc.pulselib.content.player.animation.firstPerson.PFirstPersonTransformMode;
-import com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonRenderer;
-import com.arcanc.pulselib.content.player.animation.firstPerson.PVanillaFirstPersonArmResolver;
-import com.arcanc.pulselib.content.player.animation.firstPerson.PVanillaFirstPersonItemResolver;
+import com.arcanc.pulselib.content.player.animation.firstPerson.*;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
