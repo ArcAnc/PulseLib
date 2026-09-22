@@ -34,6 +34,7 @@ public class WandItem extends Item implements PAnimatable<WandItem> {
             return ControllerState.PLAY;
         });
     }
+
 }
 ```
 
@@ -56,8 +57,6 @@ public class WandRenderer extends PItemRenderer<WandItem, WandRenderState> {
 public class WandRenderState extends PItemRenderState.Impl<WandItem> {}
 ```
 
-When rendered in a GUI, `PItemRenderer` draws through the collector's immediate path with `trianglesInstantTranslucent` as its default material; the constructor's render type applies to non-GUI item contexts. To choose the GUI pipeline for a specific mesh, override `resolveMeshRender(...)` and return `inherited.withAlphaMode(...)`. This selects the matching instant solid, cutout, or translucent variant; emissive meshes automatically use their instant emissive counterpart.
-
 Provide an `Unbaked` special-model wrapper that bakes this renderer:
 
 ```java
@@ -77,9 +76,31 @@ public record Unbaked(PModelData data)
 }
 ```
 
-Register that unbaked codec with NeoForge's special-model renderer registration and reference it from the item's 26.2 model definition. PulseLib does not convert a legacy `builtin/entity` JSON into this renderer automatically.
+Register that codec with NeoForge's special-model renderer event:
 
-`PItemAnimatable` no longer exists, and animated item rendering needs no `IClientItemExtensions` registration. If the item needs an unrelated client extension, register it through NeoForge's normal `RegisterClientExtensionsEvent` handling.
+```java
+@SubscribeEvent
+public static void registerSpecialModels(RegisterSpecialModelRendererEvent event) {
+    event.register(Identifier.fromNamespaceAndPath("examplemod", "wand"), Unbaked.MAP_CODEC);
+}
+```
+
+Reference it from `assets/examplemod/items/wand.json`:
+
+```json
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "examplemod:item/wand",
+    "model": {
+      "type": "examplemod:wand",
+      "model_location": "examplemod:glmodels/item/wand.glb"
+    }
+  }
+}
+```
+
+The `base` model is the normal `assets/examplemod/models/item/wand.json` file that supplies display transforms. `PModelData.CODEC` accepts `model_location`, optional `model_type`, and optional `model_format`; texture lists do not belong in this JSON. Register the model and its material texture references separately through `PulseLibEvents.RegisterResourceEvent`, as described in [Resources](resources.md#register-model-resources). PulseLib does not convert a legacy `builtin/entity` JSON into this renderer automatically.
 
 ## Stack-specific state
 
@@ -87,7 +108,6 @@ Register that unbaked codec with NeoForge's special-model renderer registration 
 
 Classes used:
 
-* [`PAnimatable`](https://github.com/ArcAnc/PulseLib/blob/master/src/main/java/com/arcanc/pulselib/content/animatable/PAnimatable.java)
 * [`PItemRenderer`](https://github.com/ArcAnc/PulseLib/blob/master/src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java)
 * [`SingletonAnimationManager`](https://github.com/ArcAnc/PulseLib/blob/master/src/main/java/com/arcanc/pulselib/content/animatable/singleton/SingletonAnimationManager.java)
 * [`DefaultItemModelData`](https://github.com/ArcAnc/PulseLib/blob/master/src/main/java/com/arcanc/pulselib/content/renderer/modelData/DefaultItemModelData.java)

@@ -3,7 +3,7 @@
 - Source commit: `1976c6423786e38caa9d96c3f385bd469e887e49`
 - Source parent: `45d5282`
 - Scope: every record from `git diff --name-status -M SOURCE^ SOURCE`; port only that delta.
-- Initial status: all records are `PENDING`.
+- Manifest was created before porting; every record is now reconciled below.
 
 ## Manifest
 ### MODEL_RESOURCE (21)
@@ -172,8 +172,11 @@
 
 - Source status: `D`
 - Subsystem: `MODEL_RESOURCE`
-- Port status: `PORTED`
-- Notes: Deleted in the source delta; assess the equivalent removal or replacement on 26.2.
+- Port status: `OBSOLETE_WITH_REPLACEMENT`
+- Notes: original source responsibility: globally collect texture locations and expose the runtime texture atlas.
+  why exact implementation is obsolete in 26.2: the source architecture replaces global texture registration with model-scoped resource registrations.
+  replacement file/symbol: `PResourceCache`, `PModelResource`, `PulseLibEvents.RegisterResourceEvent`, and `RuntimeLoader`.
+  how equivalent behavior is preserved: the atlas is built only from registered model resources and `PResourceCache.resolve(model, reference)` resolves each texture in that model scope.
 - Target path if renamed: `—`
 
 ### RENDER_INFRASTRUCTURE (35)
@@ -1230,144 +1233,158 @@
 
 - Source status: `M`
 - Subsystem: `MIXIN_INTEGRATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/mixin/CameraMixin.java`
 
 - Source status: `M`
 - Subsystem: `MIXIN_INTEGRATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ADAPTED_26_2`
+- Notes: 26.1 source behavior: applies animated first-person camera position and rotation.
+  26.2 API difference: camera alignment and renderer submission use the 26.2 client signatures.
+  26.2 implementation: `CameraMixin#pulselib$followAnimatedHead` uses `PFirstPersonCameraSpace` after `Camera.alignWithEntity`.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/mixin/CubeDefinitionMixin.java`
 
 - Source status: `M`
 - Subsystem: `MIXIN_INTEGRATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/mixin/EntityModelSetMixin.java`
 
 - Source status: `M`
 - Subsystem: `MIXIN_INTEGRATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/mixin/GameRendererMixin.java`
 
 - Source status: `M`
 - Subsystem: `MIXIN_INTEGRATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ADAPTED_26_2`
+- Notes: 26.1 source behavior: flushes PulseLib first-person work at the hand-pass boundary.
+  26.2 API difference: feature submission is dispatched by `FeatureRenderDispatcher.renderAllFeatures`.
+  26.2 implementation: the current `GameRendererMixin` targets that 26.2 dispatch point while `ItemInHandRendererMixin` owns hand submission.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/mixin/GlBufferAccessor.java`
 
 - Source status: `M`
 - Subsystem: `MIXIN_INTEGRATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/mixin/HumanoidArmorLayerMixin.java`
 
 - Source status: `M`
 - Subsystem: `MIXIN_INTEGRATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/mixin/ItemInHandRendererAccessor.java`
 
 - Source status: `D`
 - Subsystem: `MIXIN_INTEGRATION`
-- Port status: `PENDING`
-- Notes: Deleted in the source delta; assess the equivalent removal or replacement on 26.2.
+- Port status: `OBSOLETE_WITH_REPLACEMENT`
+- Notes: original source responsibility: invoke the old private arm method for animated first-person arms.
+  why exact implementation is obsolete in 26.2: the source rewrite and 26.2 `AvatarRenderer` hand submission make the private invoker neither used nor registered.
+  replacement file/symbol: `ItemInHandRendererMixin#pulselib$renderRightHand`, `#pulselib$renderLeftHand`, and `#renderHeldArm`.
+  how equivalent behavior is preserved: the replacement wraps final 26.2 hand submissions and applies the same resolved arm pose.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/mixin/ItemInHandRendererMixin.java`
 
 - Source status: `M`
 - Subsystem: `MIXIN_INTEGRATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ADAPTED_26_2`
+- Notes: 26.1 source behavior: resolves separate arm/item poses, suppresses hidden channels, transforms animated channels, and renders attachments.
+  26.2 API difference: `renderHandsWithItems`/`renderArmWithItem` became `submitHandsWithItems`/`submitArmWithItem`, and hand methods take erased `Avatar` parameters.
+  26.2 implementation: `ItemInHandRendererMixin` wraps the 26.2 submit methods and `AvatarRenderer.renderRightHand/renderLeftHand`, preserving the source presentation semantics.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/mixin/ItemModelResolverAccessor.java`
 
 - Source status: `M`
 - Subsystem: `MIXIN_INTEGRATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/mixin/ItemStackRenderStateAccessor.java`
 
 - Source status: `M`
 - Subsystem: `MIXIN_INTEGRATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/mixin/LivingEntityRendererMixin.java`
 
 - Source status: `M`
 - Subsystem: `MIXIN_INTEGRATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/mixin/ModelPartCubesMixin.java`
 
 - Source status: `M`
 - Subsystem: `MIXIN_INTEGRATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/mixin/PlayerRendererMixin.java`
 
 - Source status: `D`
 - Subsystem: `MIXIN_INTEGRATION`
-- Port status: `PENDING`
-- Notes: Deleted in the source delta; assess the equivalent removal or replacement on 26.2.
+- Port status: `OBSOLETE_WITH_REPLACEMENT`
+- Notes: original source responsibility: inject animated first-person arm pose and attachment rendering into `AvatarRenderer.renderHand`.
+  why exact implementation is obsolete in 26.2: the source rewrite moves this ownership to the hand/item submission pipeline, and 26.2 no longer uses that source injection shape.
+  replacement file/symbol: `ItemInHandRendererMixin`, `PPlayerFirstPersonRenderer#renderExtras`, and `PFirstPersonRenderContexts`.
+  how equivalent behavior is preserved: arm transforms, hidden/vanilla/animated modes, mesh attachments, and persistent attachments are resolved before final 26.2 submissions.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/mixin/PlayerRootTransformMixin.java`
 
 - Source status: `M`
 - Subsystem: `MIXIN_INTEGRATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ALREADY_PRESENT`
+- Notes: Source delta is documentation-only here; current-master `PlayerRootTransformMixin#pulselib$applyPlayerRoot` and `#pulselib$restorePlayerRoot` already implement the inspected root transform behavior.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/mixin/SpecialModelWrapperAccessor.java`
 
 - Source status: `M`
 - Subsystem: `MIXIN_INTEGRATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/mixin/SpecialModelWrapperRenderStateExtractor.java`
 
 - Source status: `M`
 - Subsystem: `MIXIN_INTEGRATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/resources/pulselib.mixins.json`
 
 - Source status: `M`
 - Subsystem: `MIXIN_INTEGRATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ADAPTED_26_2`
+- Notes: 26.1 source behavior: registers the first-person rewrite hooks and removes superseded hooks.
+  26.2 API difference: the retained 26.2 `BlockEntityMixin` remains registered in addition to the source list.
+  26.2 implementation: registers `GlBufferAccessor` and the 26.2 hand/camera hooks; obsolete old first-person mixins are excluded.
 - Target path if renamed: `—`
 
 ### ATTACHMENTS_AND_DEFORMERS (56)
@@ -1842,144 +1859,144 @@
 
 - Source status: `M`
 - Subsystem: `DEMO_TEST_RESOURCES`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/registration/block/block_entity/TestBlockEntity.java`
 
 - Source status: `M`
 - Subsystem: `DEMO_TEST_RESOURCES`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/registration/block/block_entity/ber/TestBlockEntityRenderer.java`
 
 - Source status: `M`
 - Subsystem: `DEMO_TEST_RESOURCES`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/registration/block/block_entity/ber/renderState/TestBlockEntityRenderState.java`
 
 - Source status: `M`
 - Subsystem: `DEMO_TEST_RESOURCES`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/registration/entity/TestEntity.java`
 
 - Source status: `M`
 - Subsystem: `DEMO_TEST_RESOURCES`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/registration/entity/renderer/PTestArmor.java`
 
 - Source status: `M`
 - Subsystem: `DEMO_TEST_RESOURCES`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/registration/entity/renderer/TestEntityRender.java`
 
 - Source status: `M`
 - Subsystem: `DEMO_TEST_RESOURCES`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ALREADY_PRESENT`
+- Notes: Source delta is imports and documentation only; current-master `TestEntityRender#resolveMeshRender` already provides the inspected mesh/deformer behavior.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/registration/item/TestArmorItem.java`
 
 - Source status: `M`
 - Subsystem: `DEMO_TEST_RESOURCES`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/registration/item/TestBlockItem.java`
 
 - Source status: `M`
 - Subsystem: `DEMO_TEST_RESOURCES`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/registration/item/renderer/TestBlockItemRenderer.java`
 
 - Source status: `M`
 - Subsystem: `DEMO_TEST_RESOURCES`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/registration/item/renderer/renderState/TestBlockItemRenderState.java`
 
 - Source status: `M`
 - Subsystem: `DEMO_TEST_RESOURCES`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/registration/player/PPlayerAcrobaticDemo.java`
 
 - Source status: `M`
 - Subsystem: `DEMO_TEST_RESOURCES`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/registration/player/PPlayerBallDemo.java`
 
 - Source status: `A`
 - Subsystem: `DEMO_TEST_RESOURCES`
-- Port status: `PENDING`
-- Notes: Added in the source delta; port this addition against the 26.2 API.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/registration/renderer/TestDayTimeColor.java`
 
 - Source status: `M`
 - Subsystem: `DEMO_TEST_RESOURCES`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/resources/assets/pulselib/glmodels.zip`
 
 - Source status: `M`
 - Subsystem: `DEMO_TEST_RESOURCES`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/resources/assets/pulselib/template/player/player_model_template.bbmodel`
 
 - Source status: `A`
 - Subsystem: `DEMO_TEST_RESOURCES`
-- Port status: `PENDING`
-- Notes: Added in the source delta; port this addition against the 26.2 API.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/resources/assets/pulselib/template/player/player_model_template.gltf`
 
 - Source status: `A`
 - Subsystem: `DEMO_TEST_RESOURCES`
-- Port status: `PENDING`
-- Notes: Added in the source delta; port this addition against the 26.2 API.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/resources/assets/pulselib/textures.zip`
 
 - Source status: `M`
 - Subsystem: `DEMO_TEST_RESOURCES`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 ### DOCUMENTATION (12)
@@ -1988,96 +2005,96 @@
 
 - Source status: `M`
 - Subsystem: `DOCUMENTATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `wiki/api-reference.md`
 
 - Source status: `M`
 - Subsystem: `DOCUMENTATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `wiki/armor-and-attachments.md`
 
 - Source status: `M`
 - Subsystem: `DOCUMENTATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `wiki/basic.md`
 
 - Source status: `M`
 - Subsystem: `DOCUMENTATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `wiki/installation.md`
 
 - Source status: `M`
 - Subsystem: `DOCUMENTATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `wiki/model-loaders.md`
 
 - Source status: `M`
 - Subsystem: `DOCUMENTATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `wiki/modeldata.md`
 
 - Source status: `M`
 - Subsystem: `DOCUMENTATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `wiki/player-animations.md`
 
 - Source status: `M`
 - Subsystem: `DOCUMENTATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `wiki/pulselib-items.md`
 
 - Source status: `M`
 - Subsystem: `DOCUMENTATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `wiki/render-types-and-queue.md`
 
 - Source status: `M`
 - Subsystem: `DOCUMENTATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `wiki/renderers.md`
 
 - Source status: `M`
 - Subsystem: `DOCUMENTATION`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
-#### `wiki/textures-and-emissive.md`
+#### `wiki/resources.md`
 
 - Source status: `R`
 - Subsystem: `DOCUMENTATION`
-- Port status: `PENDING`
-- Notes: Renamed in the source delta; port the delta and retain the recorded destination.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `wiki/resources.md`
 
 ### BUILD_METADATA (1)
@@ -2086,8 +2103,10 @@
 
 - Source status: `M`
 - Subsystem: `BUILD_METADATA`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ADAPTED_26_2`
+- Notes: 26.1 source behavior: updates the PulseLib module version.
+  26.2 API difference: current master targets Minecraft 26.2 and NeoForge 26.2.
+  26.2 implementation: `mod_version` is 1.1.5 while `minecraft_version=26.2`, `minecraft_version_range=[26.2]`, and `neo_version=26.2.0.57` are retained.
 - Target path if renamed: `—`
 
 ### OTHER (19)
@@ -2096,24 +2115,28 @@
 
 - Source status: `M`
 - Subsystem: `OTHER`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ADAPTED_26_2`
+- Notes: 26.1 source behavior: registers `PResourceCache` and posts/applies animated-attachment registration.
+  26.2 API difference: client bootstrap uses current 26.2 lifecycle events.
+  26.2 implementation: `registerClientEvents` registers `PResourceCache`; `ensurePulseClientContentRegistered` posts and applies `PlayerAnimatedAttachmentRegistrationEvent`.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/event/CommonEvents.java`
 
 - Source status: `M`
 - Subsystem: `OTHER`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/event/PulseLibEvents.java`
 
 - Source status: `M`
 - Subsystem: `OTHER`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ADAPTED_26_2`
+- Notes: 26.1 source behavior: provides resource registration and animated-player-attachment registration.
+  26.2 API difference: registrations are consumed by current 26.2 client lifecycle events.
+  26.2 implementation: `RegisterResourceEvent` builds `PModelResource` values and `PlayerAnimatedAttachmentRegistrationEvent` queues `PPlayerAnimatedAttachments.register`.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/data/gecko/MolangParser.java`
@@ -2200,48 +2223,48 @@
 
 - Source status: `M`
 - Subsystem: `OTHER`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/util/PRenderTypes.java`
 
 - Source status: `M`
 - Subsystem: `OTHER`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `ALREADY_PRESENT`
+- Notes: Source delta is documentation-only; current-master `PRenderTypes.RenderTypeProvider` already provides every inspected pipeline and variant method.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/util/helpers/PLibCodecs.java`
 
 - Source status: `M`
 - Subsystem: `OTHER`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/util/helpers/PLibHelper.java`
 
 - Source status: `M`
 - Subsystem: `OTHER`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/util/helpers/PLibParserHelper.java`
 
 - Source status: `M`
 - Subsystem: `OTHER`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/util/helpers/PLibRenderHelper.java`
 
 - Source status: `M`
 - Subsystem: `OTHER`
-- Port status: `PENDING`
-- Notes: Modified in the source delta; port only the change relative to the source parent.
+- Port status: `PORTED`
+- Notes: Source delta was reviewed against 26.2 and ported without changing current Minecraft, NeoForge, Gradle, Java, or dependency versions.
 - Target path if renamed: `—`
 
 ## Reconciliation
@@ -2260,3 +2283,59 @@
 | BUILD_METADATA | 1 |
 | OTHER | 19 |
 | **Total source paths** | **277** |
+
+## Functional feature audit
+
+### First-person animation rewrite
+
+#### SOURCE FEATURE
+
+Rewrite whole first-person animations: separate arm and item poses, camera space and mode, presentations, rest poses, transform modes, anchor/mesh attachment poses, vanilla resolvers, renderer, and settings.
+
+#### 26.2 IMPLEMENTATION
+
+`PFirstPersonPresentation` builds a canonical model-to-view presentation from `PPlayerAnimationFrame`. `PFirstPersonRenderContexts` scopes it per 26.2 hand submission. `ItemInHandRendererMixin` applies `VANILLA`, `ANIMATED`, and `HIDDEN` channel modes at `submitHandsWithItems`/`submitArmWithItem`, while `CameraMixin` applies first-person camera space.
+
+#### FILES/SYMBOLS
+
+`PFirstPersonArmPose`, `PFirstPersonArmRig`, `PFirstPersonCameraMode`, `PFirstPersonCameraSpace`, `PFirstPersonItemPose`, `PFirstPersonItemRig`, `PFirstPersonPoseStack`, `PFirstPersonPresentation`, `PFirstPersonRenderContext`, `PFirstPersonRenderContexts`, `PFirstPersonRenderMode`, `PFirstPersonRenderPresentation`, `PFirstPersonRestPose`, `PFirstPersonTransformMode`, `PPlayerFirstPersonAnchorPose`, `PPlayerFirstPersonMeshAttachmentPose`, `PPlayerFirstPersonRenderer`, `PPlayerFirstPersonSettings`, `PVanillaFirstPersonArmResolver`, and `PVanillaFirstPersonItemResolver` are present at their source responsibilities. The 26.2 boundary implementation is `ItemInHandRendererMixin`.
+
+#### VERIFICATION
+
+All twenty responsibility types are present in `content/player/animation/firstPerson`; the 26.2 hand targets compile, are registered in `pulselib.mixins.json`, and the full Gradle build is run for this audit.
+
+### Model-scoped resources and textures
+
+#### SOURCE FEATURE
+
+Replace `PTextureCache` with `PResourceCache` and `PModelResource`; load registered models only and resolve texture references per model.
+
+#### 26.2 IMPLEMENTATION
+
+`PulseLibEvents.RegisterResourceEvent` records model and material-reference mappings. `RuntimeLoader` builds the atlas from those resources, `PModelCache` loads/bakes registered resources only, and `PResourceCache.resolve(model, reference)` performs the lookup in the owning model resource.
+
+#### FILES/SYMBOLS
+
+`PResourceCache`, `PModelResource`, `PTextureReference`, `RuntimeLoader`, `PModelCache`, and `PulseLibEvents.RegisterResourceEvent`.
+
+#### VERIFICATION
+
+`PResourceCache.resolve` keys texture references by `PModelResource`; equal local names in two model resources do not share a registration. `PModelCache` throws `Registered model was not loaded; tried: ...` when no registered candidate was loaded.
+
+### glTF GLB/GLTF fallback
+
+#### SOURCE FEATURE
+
+Allow a registered glTF model to fall back between `.glb` and `.gltf`, preferring `.glb` for an extension-less id and reporting both candidates on failure.
+
+#### 26.2 IMPLEMENTATION
+
+`PGltfModelLoader.modelResourceCandidates` returns the preferred extension followed by the alternate extension. `PModelCache` validates the candidates after loading and includes them in its failure message.
+
+#### FILES/SYMBOLS
+
+`PGltfModelLoader#modelResourceCandidates`, `PModelLoader#modelResourceCandidates`, and `PModelCache#loadModels`.
+
+#### VERIFICATION
+
+The implementation lists `.glb` then `.gltf` for extension-less ids, reverses preference for an explicit extension, and passes the complete candidate list to the registered-model validation error.

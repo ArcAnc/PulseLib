@@ -8,7 +8,7 @@ All built-in renderers implement [`PRenderer`](https://github.com/ArcAnc/PulseLi
 * `trueSubmit(...)` - default PulseLib model submission.
 * `postSubmit(...)` - hook after model submission.
 
-Most custom renderers need a model-data constructor and a render-state implementation. Override `preSubmit` or `postSubmit` when you need to submit extra PulseLib geometry or collector nodes around the model.
+Most custom renderers need a model-data constructor and a render-state implementation. Each model used by the renderer must also be registered as a `PModelResource`, including all of its material texture references; resource registration controls which models PulseLib loads. See [Resources](resources.md#register-model-resources). Override `preSubmit` or `postSubmit` when you need to submit extra PulseLib geometry or collector nodes around the model.
 
 ## Molang context
 
@@ -45,11 +45,9 @@ public static void registerRenderers(EntityRenderersEvent.RegisterRenderers even
 }
 ```
 
-Subclasses can override the protected `getAnimatableFacing(...)` and `tryRotateToRealRotation(...)` hooks when the block's facing property or model-space orientation differs from PulseLib's default.
-
 ## Item renderer
 
-Use [`PItemRenderer`](https://github.com/ArcAnc/PulseLib/blob/master/src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java) when the item model needs real animation instead of a static baked item JSON. The item must implement [`PAnimatable`](https://github.com/ArcAnc/PulseLib/blob/master/src/main/java/com/arcanc/pulselib/content/animatable/PAnimatable.java). `PItemAnimatable` and its automatic client-extension registration are obsolete.
+Use [`PItemRenderer`](https://github.com/ArcAnc/PulseLib/blob/master/src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java) when the item model needs real animation instead of a static baked item JSON. The item must implement [`PAnimatable`](https://github.com/ArcAnc/PulseLib/blob/master/src/main/java/com/arcanc/pulselib/content/animatable/PAnimatable.java).
 
 ```java
 public class WandRenderer extends PItemRenderer<WandItem, WandRenderState> {
@@ -69,7 +67,7 @@ public class WandRenderer extends PItemRenderer<WandItem, WandRenderState> {
 public class WandRenderState extends PItemRenderState.Impl<WandItem> {}
 ```
 
-In GUI context, `PItemRenderer` schedules an immediate draw through the collector. Its default GUI material is always `trianglesInstantTranslucent`; the render type passed to the constructor does not select the GUI pipeline. Override `resolveMeshRender(...)` and use `withAlphaMode(...)` when an individual mesh needs the instant solid, cutout, or translucent pipeline. Emissive meshes use the matching instant emissive variant, and the instant shader supports GPU deformers.
+In GUI context, `PItemRenderer` submits to the `GUI` queue and immediately flushes that stage through the collector. In `FIRST_PERSON_LEFT_HAND` and `FIRST_PERSON_RIGHT_HAND` contexts, it submits to the dedicated `FIRST_PERSON` stage, which PulseLib flushes and composites immediately after the current hand pass. That pass is vanilla normally and PulseLib's replacement pass while an enabled player first-person animation is active. It preserves the render type supplied to its constructor; use a render type compatible with the contexts in which the item is displayed.
 
 ## Entity renderer
 
@@ -103,8 +101,6 @@ PRenderTypes.RenderTypeProvider::trianglesCutout
 PRenderTypes.RenderTypeProvider::trianglesTranslucent
 ```
 
-`trianglesGui` is available only as a compatibility alias for instant translucent rendering; new renderers should use one of the three base types above.
-
-Do not pass vanilla entity/block `RenderType` values unless they use a compatible triangle vertex format and shader setup.
+These are the queued variants used by all three renderer classes, including `PItemRenderer` in GUI display context. `trianglesGui` is an instant-rendering compatibility alias and is not compatible with the instanced queue. Do not pass vanilla entity/block `RenderType` values unless they use a compatible triangle vertex format and shader setup.
 
 The renderer APIs use 26.2 render states and `SubmitNodeCollector`; the old `MultiBufferSource`/`BlockEntityWithoutLevelRenderer` examples do not apply to this branch.

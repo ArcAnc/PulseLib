@@ -13,12 +13,24 @@ package com.arcanc.pulselib.content.registration.renderer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 
+/**
+ * Provides support for test day time color.
+ */
 public final class TestDayTimeColor
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	private TestDayTimeColor()
 	{
 	}
 	
+	/**
+	 * Performs the color operation.
+	 * @param level the level to use.
+	 * @param partialTick the partial tick to use.
+	 * @return the value produced by this operation.
+	 */
 	public static int color(Level level, float partialTick)
 	{
 		if (level == null)
@@ -35,6 +47,13 @@ public final class TestDayTimeColor
 		return lerpColor(0xFF5E7CFF, 0xFFFFD36A, (time - 0.75f) / 0.25f);
 	}
 	
+	/**
+	 * Performs the lerp color operation.
+	 * @param from the from to use.
+	 * @param to the to to use.
+	 * @param delta the delta to use.
+	 * @return the value produced by this operation.
+	 */
 	private static int lerpColor(int from, int to, float delta)
 	{
 		int alpha = Mth.lerpInt(delta,(from >>> 24) & 0xFF, (to >>> 24) & 0xFF);

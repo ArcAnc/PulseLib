@@ -1,6 +1,6 @@
 # Basic
 
-## Table of contents
+## Table of Content
 * [Full Video Tutorial](#full-video-tutorial)
 * [Rigging](#rigging)
     - [Grouping](#grouping)
@@ -57,7 +57,7 @@ PulseLib animations follow the same principles as Bedrock entity animations, so 
 
 ## Exporting model
 
-Once your model is ready, export it to **.glb format**.
+Once your model is ready, export it as **`.glb`** or **`.gltf`**. A `.glb` is preferred for a self-contained binary asset; a `.gltf` can be useful when its JSON source should remain inspectable.
 Recommended Blockbench export settings:
 
 <img width="479" height="395" alt="изображение" src="https://github.com/user-attachments/assets/cd2c5d2e-99cf-43c8-af1f-dc5f57ef772f" />

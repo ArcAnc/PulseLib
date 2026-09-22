@@ -25,6 +25,8 @@ resolves to:
 assets/<namespace>/glmodels/entity/<path>.glb
 ```
 
+Model-resource registration can use either extension, or omit it. For an extension-less id, PulseLib checks `.glb` and then `.gltf`; when both files are present, `.glb` is selected. An explicit extension is preferred, with the other format used only as a fallback. `PModelData` must use the extension of the file that was loaded, so use a direct `PModelData` path for `.gltf` models rather than a default builder that generates `.glb`.
+
 The parser is [`PGltfModelParser`](https://github.com/ArcAnc/PulseLib/blob/master/src/main/java/com/arcanc/pulselib/data/gltf/PGltfModelParser.java). glTF channels are decoded through the registered position, rotation, and scale channel types, so the loaded animation data now uses the same generic track API as other formats.
 
 ## Gecko loader
@@ -57,20 +59,6 @@ The parser is [`PGeckoModelParser`](https://github.com/ArcAnc/PulseLib/blob/mast
 
 Gecko animation vector components may be Molang expressions. See [Molang animations](molang-animations.md) for the supported language, context values, renderer hooks, and persistence rules.
 
-## Item transforms
-
-`PItemRenderer` obtains the item's model loader from `PModelData` and calls `PModelLoader.applyItemTransform(...)` before drawing. The default transform is the glTF convention: translate by `(0.5, 0, 0.5)` and rotate 180 degrees around Y. The Gecko loader instead translates by `(0.5, 0.51, 0.5)` without that rotation, matching GeckoLib item coordinates.
-
-Override this hook for a custom format when its item coordinate system differs:
-
-```java
-@Override
-public void applyItemTransform(PoseStack poseStack) {
-    poseStack.translate(0.5f, 0.0f, 0.5f);
-    // Apply this format's item-space rotation and offsets here.
-}
-```
-
 ## Custom loader
 
 ```java
@@ -96,11 +84,6 @@ public final class MyModelLoader implements PModelLoader {
     }
 
     @Override
-    public Identifier textureLocation(Identifier modelPath, String textureName) {
-        return modelPath.withPath("entity/" + textureName);
-    }
-
-    @Override
     public CompletableFuture<?> loadModels(Executor backgroundExecutor,
                                            ResourceManager resourceManager,
                                            BiConsumer<Identifier, PModel> elementConsumer) {
@@ -116,5 +99,7 @@ Register before client resource reload:
 ```java
 PModelCache.registerModelLoader(MyModelLoader.INSTANCE);
 ```
+
+Register a model that uses this loader through `event.model(model, MyModelLoader.INSTANCE.id())`. The registration's model id is normalized with `normalizeModelResourceLocation(...)` and must be the same id that `loadModels(...)` passes to its consumer; only registered models are baked. Override `modelResourceLocation(...)` or `normalizeModelResourceLocation(...)` when the loader accepts a short model id but loads it from a resource-pack root or supplies a default extension. A loader that accepts several equivalent resource names can override `modelResourceCandidates(...)`; its first candidate is preferred, and the other candidates are fallback locations.
 
 `PModel` contains raw bones, meshes, bone-to-mesh mapping, and animations. `PModelCache` owns baking, vertex buffer creation, atlas UV conversion, emissive metadata, and cache cleanup.

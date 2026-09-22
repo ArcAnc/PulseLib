@@ -15,7 +15,6 @@ import com.arcanc.pulselib.content.animatable.ControllerState;
 import com.arcanc.pulselib.content.animatable.PAnimatable;
 import com.arcanc.pulselib.content.animatable.PAnimationManager;
 import com.arcanc.pulselib.content.model.animation.PRawAnimation;
-import com.arcanc.pulselib.util.PLibDatabase;
 import com.arcanc.pulselib.util.helpers.PLibHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -28,11 +27,13 @@ import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
-import net.minecraft.world.entity.animal.equine.AbstractHorse;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.NonNull;
 
+/**
+ * Provides support for test entity.
+ */
 public class TestEntity extends PathfinderMob implements PAnimatable<TestEntity>
 {
 	private static final PRawAnimation ANIMATION = PRawAnimation.begin().
@@ -50,16 +51,28 @@ public class TestEntity extends PathfinderMob implements PAnimatable<TestEntity>
 	
 	public boolean showArmor = false;
 	
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param type the type to use.
+	 * @param level the level to use.
+	 */
 	public TestEntity(EntityType<? extends PathfinderMob> type, Level level)
 	{
 		super(type, level);
 	}
 	
+	/**
+	 * Creates the attributes.
+	 * @return the value produced by this operation.
+	 */
 	public static AttributeSupplier.Builder createAttributes()
 	{
 		return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 10.0).add(Attributes.MOVEMENT_SPEED, 0.2F);
 	}
 	
+	/**
+	 * Registers the goals.
+	 */
 	@Override
 	protected void registerGoals()
 	{
@@ -69,6 +82,12 @@ public class TestEntity extends PathfinderMob implements PAnimatable<TestEntity>
 		this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
 	}
 	
+	/**
+	 * Performs the mob interact operation.
+	 * @param player the player to use.
+	 * @param hand the hand to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	protected InteractionResult mobInteract(Player player, InteractionHand hand)
 	{
@@ -76,12 +95,21 @@ public class TestEntity extends PathfinderMob implements PAnimatable<TestEntity>
 		return InteractionResult.SUCCESS;
 	}
 	
+	/**
+	 * Returns the animation manager.
+	 * @param key the key to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public PAnimationManager<TestEntity> getAnimationManager(AnimManagerKey key)
 	{
 		return this.animationManager;
 	}
 	
+	/**
+	 * Registers the animation controllers.
+	 * @param registrar the registrar to use.
+	 */
 	@Override
 	public void registerAnimationControllers(PAnimationManager.@NonNull PAnimationRegistrar<TestEntity> registrar)
 	{

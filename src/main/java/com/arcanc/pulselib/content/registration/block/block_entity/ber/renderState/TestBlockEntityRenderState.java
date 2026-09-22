@@ -13,6 +13,9 @@ package com.arcanc.pulselib.content.registration.block.block_entity.ber.renderSt
 import com.arcanc.pulselib.content.registration.block.block_entity.TestBlockEntity;
 import com.arcanc.pulselib.content.renderer.base.PBlockRenderState;
 
+/**
+ * Stores the test block entity render state.
+ */
 public class TestBlockEntityRenderState extends PBlockRenderState.Impl<TestBlockEntity>
 {
 }

@@ -84,6 +84,9 @@ public class ClientEvents
 		ModLoader.postEvent(registrationEvent);
 		PulseLibEvents.PlayerAnimationRegistrationEvent playerAnimationRegistrationEvent = new PulseLibEvents.PlayerAnimationRegistrationEvent();
 		ModLoader.postEvent(playerAnimationRegistrationEvent);
+		PulseLibEvents.PlayerAnimatedAttachmentRegistrationEvent animatedAttachmentRegistrationEvent =
+				new PulseLibEvents.PlayerAnimatedAttachmentRegistrationEvent();
+		ModLoader.postEvent(animatedAttachmentRegistrationEvent);
 		
 		/*registrationEvent.registration().registerLiving(PLibRegistration.ItemReg.TEST_HAT.get(),
 				new PLivingAttachmentDefinition(
@@ -111,6 +114,7 @@ public class ClientEvents
 		
 		registrationEvent.registration().apply();
 		playerAnimationRegistrationEvent.registration().apply();
+		animatedAttachmentRegistrationEvent.registration().apply();
 		pulseClientContentRegistered = true;
 	}
 	

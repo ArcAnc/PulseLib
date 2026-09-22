@@ -22,6 +22,9 @@ import java.util.List;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+/**
+ * Provides support for lib codecs.
+ */
 public class PLibCodecs
 {
 	public static final Codec<UUID> UUID_CODEC = UUIDUtil.CODEC;
@@ -34,6 +37,11 @@ public class PLibCodecs
 			values -> new Quaternionf(values.getFirst(), values.get(1), values.get(2), values.get(3)),
 			value -> List.of(value.x(), value.y(), value.z(), value.w()));
 
+	/**
+	 * Performs the fixed size float list codec operation.
+	 * @param size the size to use.
+	 * @return the value produced by this operation.
+	 */
 	private static Codec<List<Float>> fixedSizeFloatListCodec(int size)
 	{
 		return Codec.FLOAT.listOf().comapFlatMap(values -> values.size() == size ?

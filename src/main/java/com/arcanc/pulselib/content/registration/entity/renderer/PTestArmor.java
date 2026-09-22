@@ -18,8 +18,14 @@ import com.arcanc.pulselib.content.renderer.modelData.DefaultEntityLayerModelDat
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.arcanc.pulselib.util.PRenderTypes;
 
+/**
+ * Provides support for test armor.
+ */
 public class PTestArmor extends PEntityRenderLayer<TestEntity, PEntityRenderState.LivingImpl<TestEntity>>
 {
+	/**
+	 * Creates an instance of the enclosing type.
+	 */
 	public PTestArmor()
 	{
 		super(new DefaultEntityLayerModelData.
@@ -29,6 +35,11 @@ public class PTestArmor extends PEntityRenderLayer<TestEntity, PEntityRenderStat
 				PRenderTypes.RenderTypeProvider :: trianglesSolid);
 	}
 	
+	/**
+	 * Performs the should render operation.
+	 * @param renderState the render state to use.
+	 * @return the value produced by this operation.
+	 */
 	@Override
 	public boolean shouldRender(PEntityRenderState.LivingImpl<TestEntity> renderState)
 	{

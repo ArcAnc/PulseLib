@@ -10,6 +10,7 @@
 package com.arcanc.pulselib.content.mixin;
 
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
+import com.arcanc.pulselib.content.player.animation.firstPerson.PFirstPersonCameraSpace;
 import com.arcanc.pulselib.content.animatable.PAnimationCameraShake;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -25,15 +26,33 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+/**
+ * Applies PulseLib integration to {@code Camera}.
+ */
 @Mixin(Camera.class)
 public abstract class CameraMixin
 {
 	@Shadow private boolean detached;
 
+	/**
+	 * Sets the position.
+	 * @param pos the pos to use.
+	 */
 	@Shadow protected abstract void setPosition(Vec3 pos);
 
+	/**
+	 * Sets the rotation.
+	 * @param yRot the y rot to use.
+	 * @param xRot the x rot to use.
+	 * @param roll the roll to use.
+	 */
 	@Shadow protected abstract void setRotation(float yRot, float xRot, float roll);
 
+	/**
+	 * Performs the pulselib$follow animated head operation.
+	 * @param partialTick the partial tick to use.
+	 * @param ci the ci to use.
+	 */
 	@Inject(method = "alignWithEntity", at = @At("TAIL"))
 	private void pulselib$followAnimatedHead(float partialTick, CallbackInfo ci)
 	{
@@ -58,20 +77,22 @@ public abstract class CameraMixin
 		Camera camera = (Camera)(Object)this;
 		Quaternionf bodyRotation = new Quaternionf().rotationY((float)Math.toRadians(180.0f - Mth.rotLerp(partialTick, player.yBodyRotO, player.yBodyRot)));
 
-		Vector3f positionOffset = pose.positionOffset(player.getEyeHeight());
-		positionOffset.set(-positionOffset.x, -positionOffset.y, positionOffset.z).rotate(bodyRotation);
+		Vector3f positionOffset = PFirstPersonCameraSpace.toMinecraftOffset(
+				pose.positionOffset(player.getEyeHeight())).rotate(bodyRotation);
 		this.setPosition(camera.position().add(positionOffset.x, positionOffset.y, positionOffset.z));
 
-		Quaternionf modelRotation = pose.rotation();
-		modelRotation.set(-modelRotation.x, -modelRotation.y, modelRotation.z, modelRotation.w);
-		Quaternionf worldRotation = new Quaternionf(bodyRotation).
-				mul(modelRotation).
-				mul(new Quaternionf(bodyRotation).invert());
-		Quaternionf cameraRotation = worldRotation.mul(new Quaternionf(camera.rotation()));
-		Vector3f euler = cameraRotation.getEulerAnglesYXZ(new Vector3f());
-		this.setRotation(
-				180.0f - (float)Math.toDegrees(euler.y) + shake,
-				-(float)Math.toDegrees(euler.x) + shake * 0.5f,
-				-(float)Math.toDegrees(euler.z));
+		if (pose.hasRotation())
+		{
+			Quaternionf modelRotation = PFirstPersonCameraSpace.toMinecraftRotation(pose.rotation());
+			Quaternionf worldRotation = new Quaternionf(bodyRotation).
+					mul(modelRotation).
+					mul(new Quaternionf(bodyRotation).invert());
+			Quaternionf cameraRotation = worldRotation.mul(new Quaternionf(camera.rotation()));
+			Vector3f euler = cameraRotation.getEulerAnglesYXZ(new Vector3f());
+			this.setRotation(
+					180.0f - (float)Math.toDegrees(euler.y) + shake,
+					-(float)Math.toDegrees(euler.x) + shake * 0.5f,
+					-(float)Math.toDegrees(euler.z));
+		}
 	}
 }
