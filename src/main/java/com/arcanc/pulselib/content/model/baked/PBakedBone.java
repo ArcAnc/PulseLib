@@ -129,64 +129,38 @@ public record PBakedBone(String name,
 	                                                   PMeshRenderContext inherited,
 	                                                   float partialTick)
 	{
-		BoneFrame frame = mixBone(modelData.getModel(), controllers, molangContexts, partialTick);
+		PAnimationPoseResolver<T> poseResolver = new PAnimationPoseResolver<>(
+				modelData.getModel(),
+				controllers,
+				(controller, tick) ->
+				{
+					MolangParser.Context context = molangContexts.get(controller);
+					return context == null ? PAnimationPoseResolver.<T>defaultContexts().context(controller, tick) : context;
+				},
+				partialTick);
+		instantDraw(poseStack, poseResolver, resolver, inherited);
+	}
+
+	/** Renders this subtree from one resolved animation pose. */
+	public void instantDraw(PoseStack poseStack,
+	                        PAnimationPoseResolver<?> poseResolver,
+	                        PMeshRenderResolver resolver,
+	                        PMeshRenderContext inherited)
+	{
+		if (!poseResolver.isVisible(this))
+			return;
+		PAnimationPoseResolver.BonePose resolved = poseResolver.resolve(this);
+		if (resolved == null)
+			return;
+		BoneFrame frame = resolved.localTransform();
 		poseStack.pushPose();
-		if (frame != null)
-		{
-			poseStack.translate(frame.translation().x(), frame.translation().y(), frame.translation().z());
-			poseStack.mulPose(frame.rotation());
-			poseStack.scale(frame.scale().x(), frame.scale().y(), frame.scale().z());
-		}
-		else
-		{
-			poseStack.translate(this.basePosition().x(), this.basePosition().y(), this.basePosition().z());
-			poseStack.mulPose(this.baseRotation());
-		}
+		poseStack.translate(frame.translation().x(), frame.translation().y(), frame.translation().z());
+		poseStack.mulPose(frame.rotation());
+		poseStack.scale(frame.scale().x(), frame.scale().y(), frame.scale().z());
 		Matrix4f matrix4fstack = new Matrix4f(RenderSystem.getModelViewMatrix());
 		matrix4fstack.mul(poseStack.last().pose());
-		
-		PMeshRenderContext boneContext = inherited;
-		this.meshes().forEach(mesh ->
-		{
-			if (mesh.textureReference().isEmpty())
-				return;
-			
-			PMeshRenderContext meshContext = resolver.resolve(this, mesh, boneContext);
-			PMeshRenderMaterial material = PMeshRenderMaterial.resolve(mesh, meshContext);
-			
-			RenderType type = material.resolveRenderType(meshContext, PResourceCache.ATLAS_LOCATION);
-			
-			int u = meshContext.packedOverlay() & 0xFFFF;
-			int v = (meshContext.packedOverlay() >> 16) & 0xFFFF;
-			int red = FastColor.ARGB32.red(meshContext.color());
-			int green = FastColor.ARGB32.green(meshContext.color());
-			int blue = FastColor.ARGB32.blue(meshContext.color());
-			int alpha = FastColor.ARGB32.alpha(meshContext.color());
-			Vector4f colorVector = new Vector4f(red / 255f, green / 255f, blue / 255f, alpha / 255f);
-			
-			int meshPackedLight = material.packedLight();
-			int blockLight = LightTexture.block(meshPackedLight);
-			int skyLight = LightTexture.sky(meshPackedLight);
-			type.setupRenderState();
-			
-			ShaderInstance shaderInstance = RenderSystem.getShader();
-			if (shaderInstance == null)
-				return;
-			VertexBuffer vertexBuffer = PDeformedMeshBuffers.resolve(material.mesh(), meshContext.deformation()).vertexBuffer();
-			vertexBuffer.bind();
-			shaderInstance.safeGetUniform("Color").set(colorVector);
-			shaderInstance.safeGetUniform("Light").set(blockLight, skyLight);
-			shaderInstance.safeGetUniform("Overlay").set(u, v);
-			shaderInstance.safeGetUniform("NormalMat").set(poseStack.last().normal());
-			shaderInstance.apply();
-			vertexBuffer.drawWithShader(matrix4fstack, RenderSystem.getProjectionMatrix(), shaderInstance);
-			VertexBuffer.unbind();
-			type.clearRenderState();
-		});
-		
-		this.children().forEach(children ->
-				children.instantDraw(poseStack, modelData, controllers, molangContexts, resolver, boneContext, partialTick));
-		
+		this.meshes().forEach(mesh -> drawMesh(mesh, this, resolver, inherited, poseStack, matrix4fstack));
+		this.children().forEach(child -> child.instantDraw(poseStack, poseResolver, resolver, inherited));
 		poseStack.popPose();
 	}
 	

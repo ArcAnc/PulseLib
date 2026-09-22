@@ -124,6 +124,18 @@ public final class PFrameCompiler<S>
 
 	private record DrawKey(PPipelineHandle pipeline, PMeshHandle mesh, PDrawCommand command)
 	{
+		@Override
+		public boolean equals(Object object)
+		{
+			return this == object || object instanceof DrawKey that &&
+					this.pipeline == that.pipeline && this.mesh == that.mesh && this.command.equals(that.command);
+		}
+
+		@Override
+		public int hashCode()
+		{
+			return 31 * (31 * System.identityHashCode(this.pipeline) + System.identityHashCode(this.mesh)) + this.command.hashCode();
+		}
 	}
 
 	private record TransparentSubmission(DrawKey key, PInstanceHeader instance, float distanceSquared)

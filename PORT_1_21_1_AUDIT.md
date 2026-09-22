@@ -172,8 +172,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/mixin/CubeDefinitionMixin
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/mixin/CubeDefinitionMixin.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 020 — src/main/java/com/arcanc/pulselib/content/mixin/EntityModelSetMixin.java
 
@@ -181,8 +181,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/mixin/EntityModelSetMixin
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/mixin/EntityModelSetMixin.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 021 — src/main/java/com/arcanc/pulselib/content/mixin/GameRendererMixin.java
 
@@ -262,8 +262,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/mixin/ModelPartCubesMixin
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/mixin/ModelPartCubesMixin.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 030 — src/main/java/com/arcanc/pulselib/content/mixin/PlayerRendererMixin.java
 
@@ -757,8 +757,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/baked/AtlasBufferBu
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/baked/AtlasBufferBuilder.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 085 — src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java
 
@@ -766,8 +766,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.ja
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ADAPTED_1_21_1
+Notes: source behavior: resolve one animated pose for a bone subtree and suppress invisible bones; API difference: source uses the modern GPU render pass API; 1.21.1 implementation: shares PAnimationPoseResolver with the existing immediate-draw backend; target symbol: PBakedBone.instantDraw(PoseStack, PAnimationPoseResolver, PMeshRenderResolver, PMeshRenderContext).
 
 ## 086 — src/main/java/com/arcanc/pulselib/content/model/baked/PBakedMesh.java
 
@@ -775,8 +775,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/baked/PBakedMesh.ja
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/baked/PBakedMesh.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 087 — src/main/java/com/arcanc/pulselib/content/model/baked/PBakedModel.java
 
@@ -784,8 +784,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/baked/PBakedModel.j
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/baked/PBakedModel.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 088 — src/main/java/com/arcanc/pulselib/content/model/baked/PMeshRenderContext.java
 
@@ -793,8 +793,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/baked/PMeshRenderCo
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/baked/PMeshRenderContext.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 089 — src/main/java/com/arcanc/pulselib/content/model/baked/PMeshRenderMaterial.java
 
@@ -802,8 +802,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/baked/PMeshRenderMa
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/baked/PMeshRenderMaterial.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 090 — src/main/java/com/arcanc/pulselib/content/model/baked/PMeshRenderResolver.java
 
@@ -811,8 +811,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/baked/PMeshRenderRe
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/baked/PMeshRenderResolver.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 
 
@@ -822,8 +822,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/baked/PMeshTextureV
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/baked/PMeshTextureVariants.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 092 — src/main/java/com/arcanc/pulselib/content/model/baked/PSubdividedMeshCache.java
 
@@ -831,8 +831,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/baked/PSubdividedMe
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/baked/PSubdividedMeshCache.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 093 — src/main/java/com/arcanc/pulselib/content/model/deformer/PBendDefinition.java
 
@@ -840,8 +840,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/deformer/PBendDefin
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/deformer/PBendDefinition.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 094 — src/main/java/com/arcanc/pulselib/content/model/deformer/PBendDeformer.java
 
@@ -849,8 +849,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/deformer/PBendDefor
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/deformer/PBendDeformer.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 095 — src/main/java/com/arcanc/pulselib/content/model/deformer/PChannelReference.java
 
@@ -858,8 +858,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/deformer/PChannelRe
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/deformer/PChannelReference.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 096 — src/main/java/com/arcanc/pulselib/content/model/deformer/PDeformerFrame.java
 
@@ -867,8 +867,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/deformer/PDeformerF
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/deformer/PDeformerFrame.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 097 — src/main/java/com/arcanc/pulselib/content/model/deformer/PDeformerInstance.java
 
@@ -876,8 +876,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/deformer/PDeformerI
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/deformer/PDeformerInstance.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 098 — src/main/java/com/arcanc/pulselib/content/model/deformer/PDeformerPrepareContext.java
 
@@ -885,8 +885,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/deformer/PDeformerP
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/deformer/PDeformerPrepareContext.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 099 — src/main/java/com/arcanc/pulselib/content/model/deformer/PDeformerStack.java
 
@@ -894,8 +894,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/deformer/PDeformerS
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/deformer/PDeformerStack.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 100 — src/main/java/com/arcanc/pulselib/content/model/deformer/PDeformerValueSource.java
 
@@ -903,8 +903,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/deformer/PDeformerV
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/deformer/PDeformerValueSource.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 101 — src/main/java/com/arcanc/pulselib/content/model/deformer/PHingeDefinition.java
 
@@ -912,8 +912,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/deformer/PHingeDefi
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/deformer/PHingeDefinition.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 102 — src/main/java/com/arcanc/pulselib/content/model/deformer/PHingeDeformer.java
 
@@ -921,8 +921,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/deformer/PHingeDefo
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/deformer/PHingeDeformer.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 103 — src/main/java/com/arcanc/pulselib/content/model/deformer/PMeshDeformation.java
 
@@ -930,8 +930,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/deformer/PMeshDefor
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/deformer/PMeshDeformation.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 104 — src/main/java/com/arcanc/pulselib/content/model/deformer/PMeshDeformer.java
 
@@ -939,8 +939,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/deformer/PMeshDefor
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/deformer/PMeshDeformer.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 105 — src/main/java/com/arcanc/pulselib/content/model/deformer/PMeshTessellator.java
 
@@ -948,8 +948,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/deformer/PMeshTesse
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/deformer/PMeshTessellator.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 106 — src/main/java/com/arcanc/pulselib/content/model/deformer/PPreparedDeformer.java
 
@@ -957,8 +957,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/deformer/PPreparedD
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/deformer/PPreparedDeformer.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 107 — src/main/java/com/arcanc/pulselib/content/model/deformer/PSquashDefinition.java
 
@@ -966,8 +966,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/deformer/PSquashDef
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/deformer/PSquashDefinition.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 108 — src/main/java/com/arcanc/pulselib/content/model/deformer/PSquashDeformer.java
 
@@ -975,8 +975,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/deformer/PSquashDef
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/deformer/PSquashDeformer.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 109 — src/main/java/com/arcanc/pulselib/content/model/deformer/PStretchDefinition.java
 
@@ -984,8 +984,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/deformer/PStretchDe
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/deformer/PStretchDefinition.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 110 — src/main/java/com/arcanc/pulselib/content/model/deformer/PStretchDeformer.java
 
@@ -993,8 +993,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/deformer/PStretchDe
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/deformer/PStretchDeformer.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 111 — src/main/java/com/arcanc/pulselib/content/model/deformer/PTaperDefinition.java
 
@@ -1002,8 +1002,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/deformer/PTaperDefi
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/deformer/PTaperDefinition.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 112 — src/main/java/com/arcanc/pulselib/content/model/deformer/PTaperDeformer.java
 
@@ -1011,8 +1011,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/deformer/PTaperDefo
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/deformer/PTaperDeformer.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 113 — src/main/java/com/arcanc/pulselib/content/model/deformer/PTwistDefinition.java
 
@@ -1020,8 +1020,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/deformer/PTwistDefi
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/deformer/PTwistDefinition.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 114 — src/main/java/com/arcanc/pulselib/content/model/deformer/PTwistDeformer.java
 
@@ -1029,8 +1029,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/deformer/PTwistDefo
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/deformer/PTwistDeformer.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 115 — src/main/java/com/arcanc/pulselib/content/model/deformer/PWaveDefinition.java
 
@@ -1038,8 +1038,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/deformer/PWaveDefin
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/deformer/PWaveDefinition.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 116 — src/main/java/com/arcanc/pulselib/content/model/deformer/PWaveDeformer.java
 
@@ -1047,8 +1047,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/deformer/PWaveDefor
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/deformer/PWaveDeformer.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 117 — src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PDeformerStream.java
 
@@ -1056,8 +1056,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PDefor
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PDeformerStream.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 118 — src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers.java
 
@@ -1065,8 +1065,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PGpuDe
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 119 — src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerStack.java
 
@@ -1074,8 +1074,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PGpuDe
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerStack.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 120 — src/main/java/com/arcanc/pulselib/content/model/resource/PModelResource.java
 
@@ -1551,8 +1551,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/player/deformer/PDeformab
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/player/deformer/PDeformableCubeBakeScope.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 173 — src/main/java/com/arcanc/pulselib/content/player/deformer/PDeformedCuboid.java
 
@@ -1560,8 +1560,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/player/deformer/PDeformed
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/player/deformer/PDeformedCuboid.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 174 — src/main/java/com/arcanc/pulselib/content/player/deformer/PModelPartCubes.java
 
@@ -1569,8 +1569,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/player/deformer/PModelPar
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/player/deformer/PModelPartCubes.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 175 — src/main/java/com/arcanc/pulselib/content/player/deformer/PPlayerDeformerValueSource.java
 
@@ -1578,8 +1578,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/player/deformer/PPlayerDe
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/player/deformer/PPlayerDeformerValueSource.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 176 — src/main/java/com/arcanc/pulselib/content/player/deformer/PPlayerMeshDeformers.java
 
@@ -1587,8 +1587,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/player/deformer/PPlayerMe
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/player/deformer/PPlayerMeshDeformers.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 177 — src/main/java/com/arcanc/pulselib/content/player/deformer/PPlayerVertexDeformer.java
 
@@ -1596,8 +1596,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/player/deformer/PPlayerVe
 Source change: M
 Subsystem: MODEL_BAKING_DEFORMERS
 Target path: src/main/java/com/arcanc/pulselib/content/player/deformer/PPlayerVertexDeformer.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 178 — src/main/java/com/arcanc/pulselib/content/registration/PLibRegistration.java
 
@@ -1794,8 +1794,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.jav
 Source change: M
 Subsystem: RENDER_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 200 — src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java
 
@@ -1812,8 +1812,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/renderer/PRenderer.java
 Source change: M
 Subsystem: RENDER_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/renderer/PRenderer.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 202 — src/main/java/com/arcanc/pulselib/content/renderer/base/PBlockRenderState.java
 
@@ -1857,8 +1857,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlFrameArena
 Source change: M
 Subsystem: RENDER_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlFrameArena.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ADAPTED_1_21_1
+Notes: source behavior: fence-backed frame-slot reuse; API difference: modern GL backend is absent; 1.21.1 implementation: legacy GlFrameArena; target symbol: legacy.GlFrameArena.
 
 ## 207 — src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlGeometryArena.java
 
@@ -1866,8 +1866,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlGeometryAr
 Source change: M
 Subsystem: RENDER_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlGeometryArena.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ADAPTED_1_21_1
+Notes: source behavior: shared GPU geometry allocation; API difference: modern GL backend is absent; 1.21.1 implementation: legacy GlGeometryArena; target symbol: legacy.GlGeometryArena.
 
 ## 208 — src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlIndirectStream.java
 
@@ -1875,8 +1875,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlIndirectSt
 Source change: M
 Subsystem: RENDER_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlIndirectStream.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ADAPTED_1_21_1
+Notes: source behavior: indirect draw command streaming; API difference: modern GL backend is absent; 1.21.1 implementation: legacy indirect buffer in GlDrawExecutor; target symbol: legacy.GlDrawExecutor.
 
 ## 209 — src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlInstanceStream.java
 
@@ -1884,8 +1884,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlInstanceSt
 Source change: M
 Subsystem: RENDER_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlInstanceStream.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ADAPTED_1_21_1
+Notes: source behavior: instance data streaming; API difference: modern GL backend is absent; 1.21.1 implementation: legacy instance buffer in GlDrawExecutor; target symbol: legacy.GlDrawExecutor.
 
 ## 210 — src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java
 
@@ -1893,8 +1893,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawE
 Source change: M
 Subsystem: RENDER_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ADAPTED_1_21_1
+Notes: source behavior: multi-draw submission and deformer stream binding; API difference: modern GL backend is absent; 1.21.1 implementation: legacy multi-draw path; target symbol: legacy.GlDrawExecutor.
 
 ## 211 — src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java
 
@@ -1902,8 +1902,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBl
 Source change: M
 Subsystem: RENDER_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ADAPTED_1_21_1
+Notes: source behavior: weighted blended OIT accumulation and composite; API difference: modern GL backend is absent; 1.21.1 implementation: legacy GlWeightedBlendedOit; target symbol: legacy.GlWeightedBlendedOit.
 
 ## 212 — src/main/java/com/arcanc/pulselib/content/renderer/modelData/DefaultBlockModelData.java
 
@@ -1956,8 +1956,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/renderer/plan/PDrawGroup.
 Source change: M
 Subsystem: RENDER_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/renderer/plan/PDrawGroup.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 218 — src/main/java/com/arcanc/pulselib/content/renderer/plan/PFrameCompiler.java
 
@@ -1965,8 +1965,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/renderer/plan/PFrameCompi
 Source change: M
 Subsystem: RENDER_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/renderer/plan/PFrameCompiler.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ADAPTED_1_21_1
+Notes: source behavior: batch draw resources by identity instead of structural equality; API difference: 1.21.1 plans include PDrawCommand; 1.21.1 implementation: identity compares pipeline and mesh while retaining command equality; target symbol: PFrameCompiler.DrawKey.
 
 ## 219 — src/main/java/com/arcanc/pulselib/content/renderer/plan/PRenderPlan.java
 
@@ -1974,8 +1974,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/renderer/plan/PRenderPlan
 Source change: M
 Subsystem: RENDER_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/renderer/plan/PRenderPlan.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the source runtime behavior is already retained by the 1.21.1 resource-model, deformer, or legacy render implementation; remaining source changes are documentation-only.
 
 ## 220 — src/main/java/com/arcanc/pulselib/data/PAnimationSidecarParser.java
 
