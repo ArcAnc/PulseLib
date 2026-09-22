@@ -5,6 +5,7 @@ import com.arcanc.pulselib.content.model.baked.PBakedBone;
 import com.arcanc.pulselib.content.model.baked.PMeshRenderContext;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationDefinition;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationFrame;
+import com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonMeshAttachmentPose;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -43,6 +44,13 @@ public final class PPlayerAutomaticMeshAttachments
 	public static void renderThirdPerson(List<PPlayerAnimationMeshAttachmentPose> poses, PoseStack poseStack, int packedLight)
 	{
 		for (PPlayerAnimationMeshAttachmentPose pose : poses)
+			if (pose.weight() > 1.0e-4f) render(pose.root(), pose.frame(), pose.transform(), poseStack, packedLight);
+	}
+
+	/** Draws model mesh attachments after their first-person presentation has been resolved. */
+	public static void renderFirstPerson(List<PPlayerFirstPersonMeshAttachmentPose> poses, PoseStack poseStack, int packedLight)
+	{
+		for (PPlayerFirstPersonMeshAttachmentPose pose : poses)
 			if (pose.weight() > 1.0e-4f) render(pose.root(), pose.frame(), pose.transform(), poseStack, packedLight);
 	}
 

@@ -14,6 +14,9 @@ import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
 import com.arcanc.pulselib.content.model.animation.PTransform;
 import com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimationMeshAttachmentPose;
 import com.arcanc.pulselib.content.player.animation.attachment.PPlayerAutomaticMeshAttachments;
+import com.arcanc.pulselib.content.player.animation.firstPerson.*;
+import com.arcanc.pulselib.util.PLibDatabase;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -23,6 +26,7 @@ import net.minecraft.world.entity.player.Player;
 import com.arcanc.pulselib.content.model.animation.PPoseBlendMode;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -32,6 +36,7 @@ public final class PPlayerAnimations
 {
 	private static final Map<ResourceLocation, PPlayerAnimationDefinition> DEFINITIONS = new HashMap<>();
 	private static final Map<UUID, Map<ResourceLocation, PPlayerAnimationInstance>> INSTANCES = new HashMap<>();
+	private static final Set<ResourceLocation> INVALID_FIRST_PERSON_DEFINITIONS = new HashSet<>();
 
 	private PPlayerAnimations()
 	{
@@ -41,6 +46,12 @@ public final class PPlayerAnimations
 	{
 		if (DEFINITIONS.putIfAbsent(id, definition) != null)
 			throw new IllegalArgumentException("Duplicate player animation definition: " + id);
+		if (definition.firstPersonSettings().enabled() &&
+				!definition.anchors().containsKey(PPlayerAnimationAnchors.FIRST_PERSON_CAMERA))
+		{
+			INVALID_FIRST_PERSON_DEFINITIONS.add(id);
+			PLibDatabase.LOGGER.error("Player animation definition {} enables first-person rendering but has no {} anchor; vanilla first-person rendering will be used", id, PPlayerAnimationAnchors.FIRST_PERSON_CAMERA.id());
+		}
 	}
 
 	public static @Nullable PPlayerAnimationDefinition get(ResourceLocation id)
@@ -96,6 +107,33 @@ public final class PPlayerAnimations
 				poses.add(new PPlayerAnimationMeshAttachmentPose(entry.getKey(), definition.modelData(), root, frame, PTransform.IDENTITY, weight));
 		}
 		return List.copyOf(poses);
+	}
+
+	/** Produces the version-independent first-person command set; renderer hooks consume it later. */
+	public static @Nullable PFirstPersonRenderPresentation firstPersonPresentation(LocalPlayer player, float partialTick)
+	{
+		FirstPersonPresentationBuilder pose = new FirstPersonPresentationBuilder();
+		for (Map.Entry<ResourceLocation, PPlayerAnimationDefinition> entry : sortedDefinitions())
+		{
+			PPlayerAnimationDefinition definition = entry.getValue();
+			if (!definition.firstPersonSettings().enabled() || INVALID_FIRST_PERSON_DEFINITIONS.contains(entry.getKey())) continue;
+			PPlayerAnimationInstance instance = instance(player, entry.getKey(), definition);
+			if (!instance.isFirstPersonContributing()) continue;
+			PPlayerAnimationFrame frame = instance.sampleFrame(partialTick);
+			if (frame == null) continue;
+			float weight = definition.weight(player, partialTick) * instance.firstPersonActivationWeight(partialTick);
+			if (weight <= 0.0f) continue;
+			PFirstPersonPresentation presentation = PFirstPersonPresentation.create(frame);
+			if (presentation == null) continue;
+			pose.addArm(PPlayerPart.RIGHT_ARM, presentation, definition, player, partialTick, weight);
+			pose.addArm(PPlayerPart.LEFT_ARM, presentation, definition, player, partialTick, weight);
+			pose.addItem(PPlayerAnimationAnchors.RIGHT_ITEM, presentation, definition, player, partialTick, weight);
+			pose.addItem(PPlayerAnimationAnchors.LEFT_ITEM, presentation, definition, player, partialTick, weight);
+			pose.addAnimationAnchors(entry.getKey(), presentation, definition, weight);
+			pose.addMeshAttachments(entry.getKey(), frame, presentation, definition, weight);
+			pose.hasContributingAnimation = true;
+		}
+		return pose.hasContributingAnimation ? pose.build() : null;
 	}
 
 	@ApiStatus.Internal
@@ -570,6 +608,119 @@ public final class PPlayerAnimations
 				part.yScale = this.yScale;
 				part.zScale = this.zScale;
 			}
+		}
+	}
+
+	/** Builds immutable first-person commands from one or more active player animations. */
+	private static final class FirstPersonPresentationBuilder
+	{
+		private PFirstPersonArmPose rightArm = PFirstPersonArmPose.vanilla();
+		private PFirstPersonArmPose leftArm = PFirstPersonArmPose.vanilla();
+		private boolean rightArmContributed;
+		private boolean leftArmContributed;
+		private PTransform rightItem;
+		private PTransform leftItem;
+		private boolean rightItemContributed;
+		private boolean leftItemContributed;
+		private final List<PPlayerFirstPersonAnchorPose> animationAnchors = new ArrayList<>();
+		private final List<PPlayerFirstPersonMeshAttachmentPose> meshAttachments = new ArrayList<>();
+		private final Matrix4f presentationMatrix = new Matrix4f();
+		private boolean hasContributingAnimation;
+
+		private void addArm(PPlayerPart part, PFirstPersonPresentation presentation,
+		                    PPlayerAnimationDefinition definition, Player player, float partialTick, float activationWeight)
+		{
+			if (!definition.appliesTo(player, part, partialTick)) return;
+			String boneName = definition.bindings().get(part);
+			if (boneName == null) return;
+			float weight = activationWeight * definition.partWeight(player, part, partialTick) *
+					definition.boneWeight(player, boneName, partialTick);
+			if (weight <= 0.0f || !presentation.armPreModelPartMatrix(part, this.presentationMatrix)) return;
+			boolean right = part == PPlayerPart.RIGHT_ARM;
+			net.minecraft.world.entity.HumanoidArm arm = right ? net.minecraft.world.entity.HumanoidArm.RIGHT : net.minecraft.world.entity.HumanoidArm.LEFT;
+			PTransform handTarget = PTransform.fromMatrix(this.presentationMatrix).compose(PFirstPersonRestPose.armRig(arm).armToHand());
+			setArm(right, handTarget, definition.blendMode(), weight);
+		}
+
+		private void addItem(PPlayerAnimationAnchor anchor, PFirstPersonPresentation presentation,
+		                     PPlayerAnimationDefinition definition, Player player, float partialTick, float activationWeight)
+		{
+			String boneName = definition.anchors().get(anchor);
+			if (boneName == null) return;
+			float weight = activationWeight * definition.boneWeight(player, boneName, partialTick);
+			if (weight <= 0.0f || !presentation.itemMatrix(anchor, this.presentationMatrix)) return;
+			setItem(anchor.equals(PPlayerAnimationAnchors.RIGHT_ITEM), PTransform.fromMatrix(this.presentationMatrix), definition.blendMode(), weight);
+		}
+
+		private void addAnimationAnchors(ResourceLocation id, PFirstPersonPresentation presentation,
+		                                 PPlayerAnimationDefinition definition, float weight)
+		{
+			definition.anchors().keySet().stream().sorted(Comparator.comparing(anchor -> anchor.id().toString())).forEach(anchor ->
+			{
+				if (anchor.equals(PPlayerAnimationAnchors.FIRST_PERSON_CAMERA) || anchor.equals(PPlayerAnimationAnchors.RIGHT_ITEM) ||
+						anchor.equals(PPlayerAnimationAnchors.LEFT_ITEM) || !presentation.anchorMatrix(anchor, this.presentationMatrix)) return;
+				this.animationAnchors.add(new PPlayerFirstPersonAnchorPose(id, anchor, PTransform.fromMatrix(this.presentationMatrix), weight));
+			});
+		}
+
+		private void addMeshAttachments(ResourceLocation id, PPlayerAnimationFrame frame, PFirstPersonPresentation presentation,
+		                                PPlayerAnimationDefinition definition, float weight)
+		{
+			for (var root : PPlayerAutomaticMeshAttachments.roots(frame))
+				if (presentation.boneMatrix(root.name(), this.presentationMatrix))
+					this.meshAttachments.add(new PPlayerFirstPersonMeshAttachmentPose(id, definition.modelData(), root, frame,
+							PPlayerAnimationSpace.toPlayerGeometrySpace(PTransform.fromMatrix(this.presentationMatrix), definition), weight));
+		}
+
+		private void setArm(boolean right, PTransform transform, PPlayerAnimationBlendMode blendMode, float weight)
+		{
+			boolean contributed = right ? this.rightArmContributed : this.leftArmContributed;
+			PTransform rest = right ? PFirstPersonRestPose.VANILLA.rightHand() : PFirstPersonRestPose.VANILLA.leftHand();
+			PTransform current = right ? this.rightArm.transform() : this.leftArm.transform();
+			PTransform blended = contributed ? blend(current, transform, blendMode, weight) : rest.interpolate(transform, weight);
+			if (right) { this.rightArm = PFirstPersonArmPose.animated(blended); this.rightArmContributed = true; }
+			else { this.leftArm = PFirstPersonArmPose.animated(blended); this.leftArmContributed = true; }
+		}
+
+		private void setItem(boolean right, PTransform transform, PPlayerAnimationBlendMode blendMode, float weight)
+		{
+			boolean contributed = right ? this.rightItemContributed : this.leftItemContributed;
+			PTransform current = contributed ? (right ? this.rightItem : this.leftItem) :
+					PFirstPersonRestPose.item(right ? net.minecraft.world.entity.HumanoidArm.RIGHT : net.minecraft.world.entity.HumanoidArm.LEFT);
+			PTransform blended = blend(current, transform, blendMode, weight);
+			if (right) { this.rightItem = blended; this.rightItemContributed = true; }
+			else { this.leftItem = blended; this.leftItemContributed = true; }
+		}
+
+		private static PTransform blend(PTransform current, PTransform target, PPlayerAnimationBlendMode blendMode, float weight)
+		{
+			PTransform weighted = PTransform.IDENTITY.interpolate(target, weight);
+			return switch (blendMode.poseBlendMode())
+			{
+				case ADDITIVE_LOCAL, ADDITIVE_MESH_SPACE -> current.compose(weighted);
+				case DIFFERENCE -> new PTransform(new Vector3f(current.translation()).sub(weighted.translation()),
+						new Quaternionf(current.rotation()).mul(new Quaternionf(weighted.rotation()).invert()), divide(current.scale(), weighted.scale()));
+				case MULTIPLY_SCALE -> new PTransform(current.translation(), current.rotation(), new Vector3f(current.scale()).mul(weighted.scale()));
+				case OVERRIDE -> current.interpolate(target, weight);
+			};
+		}
+
+		private static Vector3f divide(Vector3f dividend, Vector3f divisor)
+		{
+			return new Vector3f(divide(dividend.x, divisor.x), divide(dividend.y, divisor.y), divide(dividend.z, divisor.z));
+		}
+
+		private static float divide(float dividend, float divisor)
+		{
+			return Math.abs(divisor) < 1.0e-6f ? 0.0f : dividend / divisor;
+		}
+
+		private PFirstPersonRenderPresentation build()
+		{
+			return new PFirstPersonRenderPresentation(this.rightArm, this.leftArm,
+					this.rightItemContributed ? PFirstPersonItemPose.animated(this.rightItem) : PFirstPersonItemPose.vanilla(),
+					this.leftItemContributed ? PFirstPersonItemPose.animated(this.leftItem) : PFirstPersonItemPose.vanilla(),
+					List.copyOf(this.animationAnchors), List.copyOf(this.meshAttachments));
 		}
 	}
 

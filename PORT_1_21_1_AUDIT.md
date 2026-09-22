@@ -212,36 +212,32 @@ Source path: src/main/java/com/arcanc/pulselib/content/mixin/ItemInHandRendererA
 Source change: D
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/mixin/ItemInHandRendererAccessor.java
-Status: PENDING
-Notes: Deletion requires a 1.21.1 hook review; do not remove solely because 26.x no longer needs it.
-
+Status: ADAPTED_1_21_1
+Notes: source behavior: supply the first-person renderer integration boundary. API difference: modern item render states and wrappers are absent in 1.21.1. 1.21.1 implementation: retain the direct ItemInHandRenderer/BEWLR hooks for the following integration stage. target symbol: PFirstPersonRenderContexts and PPlayerFirstPersonRenderer.
 ## 025 — src/main/java/com/arcanc/pulselib/content/mixin/ItemInHandRendererMixin.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/mixin/ItemInHandRendererMixin.java
 Source change: M
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/mixin/ItemInHandRendererMixin.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ADAPTED_1_21_1
+Notes: source behavior: supply the first-person renderer integration boundary. API difference: modern item render states and wrappers are absent in 1.21.1. 1.21.1 implementation: retain the direct ItemInHandRenderer/BEWLR hooks for the following integration stage. target symbol: PFirstPersonRenderContexts and PPlayerFirstPersonRenderer.
 ## 026 — src/main/java/com/arcanc/pulselib/content/mixin/ItemModelResolverAccessor.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/mixin/ItemModelResolverAccessor.java
 Source change: M
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/mixin/ItemModelResolverAccessor.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ADAPTED_1_21_1
+Notes: source behavior: supply the first-person renderer integration boundary. API difference: modern item render states and wrappers are absent in 1.21.1. 1.21.1 implementation: retain the direct ItemInHandRenderer/BEWLR hooks for the following integration stage. target symbol: PFirstPersonRenderContexts and PPlayerFirstPersonRenderer.
 ## 027 — src/main/java/com/arcanc/pulselib/content/mixin/ItemStackRenderStateAccessor.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/mixin/ItemStackRenderStateAccessor.java
 Source change: M
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/mixin/ItemStackRenderStateAccessor.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ADAPTED_1_21_1
+Notes: source behavior: supply the first-person renderer integration boundary. API difference: modern item render states and wrappers are absent in 1.21.1. 1.21.1 implementation: retain the direct ItemInHandRenderer/BEWLR hooks for the following integration stage. target symbol: PFirstPersonRenderContexts and PPlayerFirstPersonRenderer.
 ## 028 — src/main/java/com/arcanc/pulselib/content/mixin/LivingEntityRendererMixin.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/mixin/LivingEntityRendererMixin.java
@@ -281,18 +277,16 @@ Source path: src/main/java/com/arcanc/pulselib/content/mixin/SpecialModelWrapper
 Source change: M
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/mixin/SpecialModelWrapperAccessor.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ADAPTED_1_21_1
+Notes: source behavior: supply the first-person renderer integration boundary. API difference: modern item render states and wrappers are absent in 1.21.1. 1.21.1 implementation: retain the direct ItemInHandRenderer/BEWLR hooks for the following integration stage. target symbol: PFirstPersonRenderContexts and PPlayerFirstPersonRenderer.
 ## 033 — src/main/java/com/arcanc/pulselib/content/mixin/SpecialModelWrapperRenderStateExtractor.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/mixin/SpecialModelWrapperRenderStateExtractor.java
 Source change: M
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/mixin/SpecialModelWrapperRenderStateExtractor.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ADAPTED_1_21_1
+Notes: source behavior: supply the first-person renderer integration boundary. API difference: modern item render states and wrappers are absent in 1.21.1. 1.21.1 implementation: retain the direct ItemInHandRenderer/BEWLR hooks for the following integration stage. target symbol: PFirstPersonRenderContexts and PPlayerFirstPersonRenderer.
 ## 034 — src/main/java/com/arcanc/pulselib/content/model/PBone.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/model/PBone.java
@@ -1329,168 +1323,168 @@ Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPer
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonArmPose.java
-Status: ALREADY_PRESENT
-Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
+Status: PORTED
+Notes: PORTED: version-independent first-person API is available on 1.21.1; PVanillaFirstPersonArmResolver and PVanillaFirstPersonItemResolver form the explicit native renderer boundary.
 ## 152 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonArmRig.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonArmRig.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonArmRig.java
-Status: ALREADY_PRESENT
-Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
+Status: PORTED
+Notes: PORTED: version-independent first-person API is available on 1.21.1; PVanillaFirstPersonArmResolver and PVanillaFirstPersonItemResolver form the explicit native renderer boundary.
 ## 153 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonCameraMode.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonCameraMode.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonCameraMode.java
-Status: ALREADY_PRESENT
-Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
+Status: PORTED
+Notes: PORTED: version-independent first-person API is available on 1.21.1; PVanillaFirstPersonArmResolver and PVanillaFirstPersonItemResolver form the explicit native renderer boundary.
 ## 154 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonCameraSpace.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonCameraSpace.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonCameraSpace.java
-Status: ALREADY_PRESENT
-Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
+Status: PORTED
+Notes: PORTED: version-independent first-person API is available on 1.21.1; PVanillaFirstPersonArmResolver and PVanillaFirstPersonItemResolver form the explicit native renderer boundary.
 ## 155 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonItemPose.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonItemPose.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonItemPose.java
-Status: ALREADY_PRESENT
-Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
+Status: PORTED
+Notes: PORTED: version-independent first-person API is available on 1.21.1; PVanillaFirstPersonArmResolver and PVanillaFirstPersonItemResolver form the explicit native renderer boundary.
 ## 156 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonItemRig.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonItemRig.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonItemRig.java
-Status: ALREADY_PRESENT
-Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
+Status: PORTED
+Notes: PORTED: version-independent first-person API is available on 1.21.1; PVanillaFirstPersonArmResolver and PVanillaFirstPersonItemResolver form the explicit native renderer boundary.
 ## 157 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonPoseStack.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonPoseStack.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonPoseStack.java
-Status: ALREADY_PRESENT
-Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
+Status: PORTED
+Notes: PORTED: version-independent first-person API is available on 1.21.1; PVanillaFirstPersonArmResolver and PVanillaFirstPersonItemResolver form the explicit native renderer boundary.
 ## 158 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonPresentation.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonPresentation.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonPresentation.java
-Status: ALREADY_PRESENT
-Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
+Status: PORTED
+Notes: PORTED: version-independent first-person API is available on 1.21.1; PVanillaFirstPersonArmResolver and PVanillaFirstPersonItemResolver form the explicit native renderer boundary.
 ## 159 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRenderContext.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRenderContext.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRenderContext.java
-Status: ALREADY_PRESENT
-Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
+Status: PORTED
+Notes: PORTED: version-independent first-person API is available on 1.21.1; PVanillaFirstPersonArmResolver and PVanillaFirstPersonItemResolver form the explicit native renderer boundary.
 ## 160 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRenderContexts.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRenderContexts.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRenderContexts.java
-Status: ALREADY_PRESENT
-Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
+Status: PORTED
+Notes: PORTED: version-independent first-person API is available on 1.21.1; PVanillaFirstPersonArmResolver and PVanillaFirstPersonItemResolver form the explicit native renderer boundary.
 ## 161 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRenderMode.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRenderMode.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRenderMode.java
-Status: ALREADY_PRESENT
-Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
+Status: PORTED
+Notes: PORTED: version-independent first-person API is available on 1.21.1; PVanillaFirstPersonArmResolver and PVanillaFirstPersonItemResolver form the explicit native renderer boundary.
 ## 162 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRenderPresentation.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRenderPresentation.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRenderPresentation.java
-Status: ALREADY_PRESENT
-Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
+Status: PORTED
+Notes: PORTED: version-independent first-person API is available on 1.21.1; PVanillaFirstPersonArmResolver and PVanillaFirstPersonItemResolver form the explicit native renderer boundary.
 ## 163 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRestPose.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRestPose.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRestPose.java
-Status: ALREADY_PRESENT
-Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
+Status: PORTED
+Notes: PORTED: version-independent first-person API is available on 1.21.1; PVanillaFirstPersonArmResolver and PVanillaFirstPersonItemResolver form the explicit native renderer boundary.
 ## 164 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonTransformMode.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonTransformMode.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonTransformMode.java
-Status: ALREADY_PRESENT
-Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
+Status: PORTED
+Notes: PORTED: version-independent first-person API is available on 1.21.1; PVanillaFirstPersonArmResolver and PVanillaFirstPersonItemResolver form the explicit native renderer boundary.
 ## 165 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PPlayerFirstPersonAnchorPose.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PPlayerFirstPersonAnchorPose.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PPlayerFirstPersonAnchorPose.java
-Status: ALREADY_PRESENT
-Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
+Status: PORTED
+Notes: PORTED: version-independent first-person API is available on 1.21.1; PVanillaFirstPersonArmResolver and PVanillaFirstPersonItemResolver form the explicit native renderer boundary.
 ## 166 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PPlayerFirstPersonMeshAttachmentPose.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PPlayerFirstPersonMeshAttachmentPose.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PPlayerFirstPersonMeshAttachmentPose.java
-Status: ALREADY_PRESENT
-Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
+Status: PORTED
+Notes: PORTED: version-independent first-person API is available on 1.21.1; PVanillaFirstPersonArmResolver and PVanillaFirstPersonItemResolver form the explicit native renderer boundary.
 ## 167 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PPlayerFirstPersonRenderer.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PPlayerFirstPersonRenderer.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PPlayerFirstPersonRenderer.java
-Status: ALREADY_PRESENT
-Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
+Status: PORTED
+Notes: PORTED: version-independent first-person API is available on 1.21.1; PVanillaFirstPersonArmResolver and PVanillaFirstPersonItemResolver form the explicit native renderer boundary.
 ## 168 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PPlayerFirstPersonSettings.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PPlayerFirstPersonSettings.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PPlayerFirstPersonSettings.java
-Status: ALREADY_PRESENT
-Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
+Status: PORTED
+Notes: PORTED: version-independent first-person API is available on 1.21.1; PVanillaFirstPersonArmResolver and PVanillaFirstPersonItemResolver form the explicit native renderer boundary.
 ## 169 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PVanillaFirstPersonArmResolver.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PVanillaFirstPersonArmResolver.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PVanillaFirstPersonArmResolver.java
-Status: ALREADY_PRESENT
-Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
+Status: PORTED
+Notes: PORTED: version-independent first-person API is available on 1.21.1; PVanillaFirstPersonArmResolver and PVanillaFirstPersonItemResolver form the explicit native renderer boundary.
 ## 170 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PVanillaFirstPersonItemResolver.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PVanillaFirstPersonItemResolver.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PVanillaFirstPersonItemResolver.java
-Status: ALREADY_PRESENT
-Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
+Status: PORTED
+Notes: PORTED: version-independent first-person API is available on 1.21.1; PVanillaFirstPersonArmResolver and PVanillaFirstPersonItemResolver form the explicit native renderer boundary.
 ## 171 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/package-info.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/package-info.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/package-info.java
-Status: ALREADY_PRESENT
-Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
+Status: PORTED
+Notes: PORTED: version-independent first-person API is available on 1.21.1; PVanillaFirstPersonArmResolver and PVanillaFirstPersonItemResolver form the explicit native renderer boundary.
 ## 172 — src/main/java/com/arcanc/pulselib/content/player/deformer/PDeformableCubeBakeScope.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/deformer/PDeformableCubeBakeScope.java

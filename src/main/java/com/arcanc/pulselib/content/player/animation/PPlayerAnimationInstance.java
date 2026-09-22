@@ -40,6 +40,13 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 	private float transitionStart;
 	private float transitionTarget;
 	private float transitionElapsed;
+	private boolean firstPersonTargetActive;
+	private float firstPersonActivation;
+	private float previousFirstPersonActivation;
+	private float firstPersonTransitionStart;
+	private float firstPersonTransitionTarget;
+	private float firstPersonTransitionElapsed;
+	private float firstPersonTransitionDuration;
 	private @Nullable PPlayerAnimationFrame cachedFrame;
 	private int cachedFramePartialTickBits;
 
@@ -125,6 +132,7 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 
 		this.animationManager.bindModel(model);
 		updateActivation(shouldApply);
+		updateFirstPersonActivation(shouldApply && hasActiveController());
 		if (shouldApply || this.activation > 0.0f)
 			this.animationManager.tick();
 	}
@@ -137,6 +145,22 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 	float activationWeight(float partialTick)
 	{
 		return Mth.lerp(partialTick, this.previousActivation, this.activation);
+	}
+
+	boolean isFirstPersonContributing()
+	{
+		return this.firstPersonActivation > 0.0f || this.previousFirstPersonActivation > 0.0f || this.firstPersonTargetActive;
+	}
+
+	float firstPersonActivationWeight(float partialTick)
+	{
+		return Mth.lerp(partialTick, this.previousFirstPersonActivation, this.firstPersonActivation);
+	}
+
+	private boolean hasActiveController()
+	{
+		return this.animationManager.getControllers().values().stream().anyMatch(controller ->
+				controller.isPlaying() || controller.isPaused());
 	}
 
 	private void updateActivation(boolean shouldApply)
@@ -167,6 +191,38 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 		this.transitionElapsed = Math.min(this.transitionElapsed + 1.0f, duration);
 		float alpha = this.definition.crossfadeEasing().transform(this.transitionElapsed / duration);
 		this.activation = Mth.lerp(alpha, this.transitionStart, this.transitionTarget);
+	}
+
+	private void updateFirstPersonActivation(boolean shouldApply)
+	{
+		var settings = this.definition.firstPersonSettings();
+		this.previousFirstPersonActivation = this.firstPersonActivation;
+		if (!settings.enabled())
+		{
+			this.firstPersonTargetActive = false;
+			this.firstPersonActivation = 0.0f;
+			return;
+		}
+		if (shouldApply != this.firstPersonTargetActive)
+		{
+			if (this.firstPersonTransitionElapsed < this.firstPersonTransitionDuration &&
+					this.definition.transitionInterruptionPolicy() == PTransitionInterruptionPolicy.COMPLETE_CURRENT)
+				return;
+			this.firstPersonTransitionStart = this.definition.transitionInterruptionPolicy() == PTransitionInterruptionPolicy.RESTART ?
+					(this.firstPersonTargetActive ? 1.0f : 0.0f) : this.firstPersonActivation;
+			this.firstPersonTransitionTarget = shouldApply ? 1.0f : 0.0f;
+			this.firstPersonTransitionDuration = shouldApply ? settings.transitionIn() : settings.transitionOut();
+			this.firstPersonTransitionElapsed = 0.0f;
+			this.firstPersonTargetActive = shouldApply;
+		}
+		if (this.firstPersonTransitionDuration <= 0.0f)
+		{
+			this.firstPersonActivation = this.firstPersonTargetActive ? 1.0f : 0.0f;
+			return;
+		}
+		this.firstPersonTransitionElapsed = Math.min(this.firstPersonTransitionElapsed + 1.0f, this.firstPersonTransitionDuration);
+		float alpha = this.definition.crossfadeEasing().transform(this.firstPersonTransitionElapsed / this.firstPersonTransitionDuration);
+		this.firstPersonActivation = Mth.lerp(alpha, this.firstPersonTransitionStart, this.firstPersonTransitionTarget);
 	}
 
 	public @Nullable PPlayerAnimationFrame sampleFrame(float partialTick)

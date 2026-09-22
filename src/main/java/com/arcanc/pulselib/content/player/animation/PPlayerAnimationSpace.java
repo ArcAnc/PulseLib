@@ -36,6 +36,12 @@ public final class PPlayerAnimationSpace
 				toPlayerSpace(transform.rotation(), definition), transform.scale()) : transform;
 	}
 
+	/** Converts a canonical player-model transform for the first-person mesh basis. */
+	public static PTransform toPlayerGeometrySpace(PTransform transform, PPlayerAnimationDefinition definition)
+	{
+		return toPlayerSpace(transform, definition);
+	}
+
 	private static boolean usesGltfCoordinates(PPlayerAnimationDefinition definition)
 	{
 		return definition.modelData().getModelFormat().equals(PGltfModelLoader.INSTANCE.id());

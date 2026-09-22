@@ -12,6 +12,7 @@ package com.arcanc.pulselib.content.player.animation;
 import com.arcanc.pulselib.content.animatable.PAnimationController;
 import com.arcanc.pulselib.content.animatable.PAnimationManager;
 import com.arcanc.pulselib.content.model.deformer.PDeformerStack;
+import com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonSettings;
 import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import com.arcanc.pulselib.content.model.animation.PPoseEasing;
 import com.arcanc.pulselib.content.model.animation.PTransitionInterruptionPolicy;
@@ -42,6 +43,7 @@ public final class PPlayerAnimationDefinition
 	private final Map<String, PPlayerAnimationWeight> boneWeights;
 	private final Set<String> meshAttachmentRoots;
 	private final Map<PPlayerAnimationAnchor, String> anchors;
+	private final PPlayerFirstPersonSettings firstPersonSettings;
 	private final List<PPlayerAnimationDeformer> deformers;
 	private final Vector3f rootPivot;
 	private final int priority;
@@ -65,6 +67,7 @@ public final class PPlayerAnimationDefinition
 		this.boneWeights = Map.copyOf(builder.boneWeights);
 		this.meshAttachmentRoots = Set.copyOf(builder.meshAttachmentRoots);
 		this.anchors = Map.copyOf(builder.anchors);
+		this.firstPersonSettings = builder.firstPersonSettings;
 		this.deformers = List.copyOf(builder.deformers);
 		this.rootPivot = new Vector3f(builder.rootPivot);
 		this.priority = builder.priority;
@@ -142,6 +145,11 @@ public final class PPlayerAnimationDefinition
 	public Map<PPlayerAnimationAnchor, String> anchors()
 	{
 		return this.anchors;
+	}
+
+	public PPlayerFirstPersonSettings firstPersonSettings()
+	{
+		return this.firstPersonSettings;
 	}
 
 	public List<PPlayerAnimationDeformer> deformers()
@@ -226,6 +234,7 @@ public final class PPlayerAnimationDefinition
 		private final Map<String, PPlayerAnimationWeight> boneWeights = new LinkedHashMap<>();
 		private final Set<String> meshAttachmentRoots = new LinkedHashSet<>();
 		private final Map<PPlayerAnimationAnchor, String> anchors = new LinkedHashMap<>();
+		private PPlayerFirstPersonSettings firstPersonSettings = PPlayerFirstPersonSettings.DISABLED;
 		private final List<PPlayerAnimationDeformer> deformers = new ArrayList<>();
 		private Vector3f rootPivot = new Vector3f();
 		private int priority;
@@ -326,6 +335,12 @@ public final class PPlayerAnimationDefinition
 			if (boneName == null || boneName.isBlank())
 				throw new IllegalArgumentException("Player animation anchor bone name cannot be blank");
 			this.anchors.put(Objects.requireNonNull(anchor), boneName);
+			return this;
+		}
+
+		public Builder firstPerson(PPlayerFirstPersonSettings settings)
+		{
+			this.firstPersonSettings = Objects.requireNonNull(settings);
 			return this;
 		}
 
