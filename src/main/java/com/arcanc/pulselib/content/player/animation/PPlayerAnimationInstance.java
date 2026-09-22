@@ -40,6 +40,8 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 	private float transitionStart;
 	private float transitionTarget;
 	private float transitionElapsed;
+	private @Nullable PPlayerAnimationFrame cachedFrame;
+	private int cachedFramePartialTickBits;
 
 	PPlayerAnimationInstance(Player player, ResourceLocation id, PPlayerAnimationDefinition definition)
 	{
@@ -116,6 +118,7 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 
 	void tick(boolean shouldApply)
 	{
+		this.cachedFrame = null;
 		PBakedModel model = this.definition.modelData().getModel();
 		if (model == null)
 			return;
@@ -166,8 +169,11 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 		this.activation = Mth.lerp(alpha, this.transitionStart, this.transitionTarget);
 	}
 
-	@Nullable PPlayerBonePose sample(String boneName, float partialTick)
+	public @Nullable PPlayerAnimationFrame sampleFrame(float partialTick)
 	{
+		int partialTickBits = Float.floatToIntBits(partialTick);
+		if (this.cachedFrame != null && this.cachedFramePartialTickBits == partialTickBits)
+			return this.cachedFrame;
 		PBakedModel model = this.definition.modelData().getModel();
 		if (model == null)
 			return null;
@@ -184,27 +190,14 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 					return context;
 				},
 				partialTick);
-		PAnimationPoseResolver.AnimationDelta pose = resolver.animationDelta(
-				boneName,
-				this.definition.bindings().get(PPlayerPart.ROOT));
-		if (pose == null || !pose.isAnimated())
-			return null;
-
-		return new PPlayerBonePose(
-				pose.translation(),
-				pose.rotation(),
-				pose.scale(),
-				pose.hasTranslation(),
-				pose.hasRotation(),
-				pose.hasScale());
+		this.cachedFrame = new PPlayerAnimationFrame(this.definition, resolver);
+		this.cachedFramePartialTickBits = partialTickBits;
+		return this.cachedFrame;
 	}
 
-	record PPlayerBonePose(Vector3f translation,
-	                      Quaternionf rotation,
-	                      Vector3f scale,
-	                      boolean hasTranslation,
-	                      boolean hasRotation,
-	                      boolean hasScale)
+	@Nullable PPlayerBonePose sample(String boneName, float partialTick)
 	{
+		PPlayerAnimationFrame frame = sampleFrame(partialTick);
+		return frame == null ? null : frame.canonicalModelDelta(boneName);
 	}
 }

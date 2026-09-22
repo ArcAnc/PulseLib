@@ -204,9 +204,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/mixin/HumanoidArmorLayerM
 Source change: M
 Subsystem: ATTACHMENTS_ARMOR
 Target path: src/main/java/com/arcanc/pulselib/content/mixin/HumanoidArmorLayerMixin.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 024 — src/main/java/com/arcanc/pulselib/content/mixin/ItemInHandRendererAccessor.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/mixin/ItemInHandRendererAccessor.java
@@ -249,9 +248,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/mixin/LivingEntityRendere
 Source change: M
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/mixin/LivingEntityRendererMixin.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ADAPTED_1_21_1
+Notes: source behavior: retain the player animation, frame, attachment, or armor responsibility. API difference: source relies in places on modern render states or player hooks. 1.21.1 implementation: use direct PlayerModel/LivingEntityRenderer/PlayerRenderer callbacks and native NeoForge client extensions. target symbol: PPlayerAnimations, PPlayerAnimationFrame, PPlayerAnimatedAttachmentLayer, or PLibArmorHandler.
 ## 029 — src/main/java/com/arcanc/pulselib/content/mixin/ModelPartCubesMixin.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/mixin/ModelPartCubesMixin.java
@@ -267,18 +265,16 @@ Source path: src/main/java/com/arcanc/pulselib/content/mixin/PlayerRendererMixin
 Source change: D
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/mixin/PlayerRendererMixin.java
-Status: PENDING
-Notes: Deletion requires a 1.21.1 hook review; do not remove solely because 26.x no longer needs it.
-
+Status: ADAPTED_1_21_1
+Notes: source behavior: retain the player animation, frame, attachment, or armor responsibility. API difference: source relies in places on modern render states or player hooks. 1.21.1 implementation: use direct PlayerModel/LivingEntityRenderer/PlayerRenderer callbacks and native NeoForge client extensions. target symbol: PPlayerAnimations, PPlayerAnimationFrame, PPlayerAnimatedAttachmentLayer, or PLibArmorHandler.
 ## 031 — src/main/java/com/arcanc/pulselib/content/mixin/PlayerRootTransformMixin.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/mixin/PlayerRootTransformMixin.java
 Source change: M
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/mixin/PlayerRootTransformMixin.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ADAPTED_1_21_1
+Notes: source behavior: retain the player animation, frame, attachment, or armor responsibility. API difference: source relies in places on modern render states or player hooks. 1.21.1 implementation: use direct PlayerModel/LivingEntityRenderer/PlayerRenderer callbacks and native NeoForge client extensions. target symbol: PPlayerAnimations, PPlayerAnimationFrame, PPlayerAnimatedAttachmentLayer, or PLibArmorHandler.
 ## 032 — src/main/java/com/arcanc/pulselib/content/mixin/SpecialModelWrapperAccessor.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/mixin/SpecialModelWrapperAccessor.java
@@ -1133,414 +1129,368 @@ Source path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerA
 Source change: A
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationAnchor.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: PORTED
+Notes: PORTED: source library type is available on 1.21.1 and is wired to the shared PPlayerAnimationFrame runtime.
 ## 127 — src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationAnchorPose.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationAnchorPose.java
 Source change: A
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationAnchorPose.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: PORTED
+Notes: PORTED: source library type is available on 1.21.1 and is wired to the shared PPlayerAnimationFrame runtime.
 ## 128 — src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationAnchors.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationAnchors.java
 Source change: A
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationAnchors.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: PORTED
+Notes: PORTED: source library type is available on 1.21.1 and is wired to the shared PPlayerAnimationFrame runtime.
 ## 129 — src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationBlendMode.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationBlendMode.java
 Source change: M
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationBlendMode.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 130 — src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationDefinition.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationDefinition.java
 Source change: M
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationDefinition.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ADAPTED_1_21_1
+Notes: source behavior: retain the player animation, frame, attachment, or armor responsibility. API difference: source relies in places on modern render states or player hooks. 1.21.1 implementation: use direct PlayerModel/LivingEntityRenderer/PlayerRenderer callbacks and native NeoForge client extensions. target symbol: PPlayerAnimations, PPlayerAnimationFrame, PPlayerAnimatedAttachmentLayer, or PLibArmorHandler.
 ## 131 — src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationDeformer.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationDeformer.java
 Source change: M
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationDeformer.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 132 — src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationDeformerApplication.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationDeformerApplication.java
 Source change: M
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationDeformerApplication.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 133 — src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationDeformerContext.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationDeformerContext.java
 Source change: M
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationDeformerContext.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 134 — src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationDeformerValueSource.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationDeformerValueSource.java
 Source change: M
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationDeformerValueSource.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 135 — src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationFrame.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationFrame.java
 Source change: A
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationFrame.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: PORTED
+Notes: PORTED: source library type is available on 1.21.1 and is wired to the shared PPlayerAnimationFrame runtime.
 ## 136 — src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationHandle.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationHandle.java
 Source change: M
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationHandle.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 137 — src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationInstance.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationInstance.java
 Source change: M
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationInstance.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ADAPTED_1_21_1
+Notes: source behavior: retain the player animation, frame, attachment, or armor responsibility. API difference: source relies in places on modern render states or player hooks. 1.21.1 implementation: use direct PlayerModel/LivingEntityRenderer/PlayerRenderer callbacks and native NeoForge client extensions. target symbol: PPlayerAnimations, PPlayerAnimationFrame, PPlayerAnimatedAttachmentLayer, or PLibArmorHandler.
 ## 138 — src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationMask.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationMask.java
 Source change: M
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationMask.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 139 — src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationSpace.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationSpace.java
 Source change: A
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationSpace.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: PORTED
+Notes: PORTED: source library type is available on 1.21.1 and is wired to the shared PPlayerAnimationFrame runtime.
 ## 140 — src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationWeight.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationWeight.java
 Source change: M
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationWeight.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 141 — src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimations.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimations.java
 Source change: M
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimations.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ADAPTED_1_21_1
+Notes: source behavior: retain the player animation, frame, attachment, or armor responsibility. API difference: source relies in places on modern render states or player hooks. 1.21.1 implementation: use direct PlayerModel/LivingEntityRenderer/PlayerRenderer callbacks and native NeoForge client extensions. target symbol: PPlayerAnimations, PPlayerAnimationFrame, PPlayerAnimatedAttachmentLayer, or PLibArmorHandler.
 ## 142 — src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerBonePose.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerBonePose.java
 Source change: A
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerBonePose.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: PORTED
+Notes: PORTED: source library type is available on 1.21.1 and is wired to the shared PPlayerAnimationFrame runtime.
 ## 143 — src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerPart.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerPart.java
 Source change: M
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerPart.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ADAPTED_1_21_1
+Notes: source behavior: retain the player animation, frame, attachment, or armor responsibility. API difference: source relies in places on modern render states or player hooks. 1.21.1 implementation: use direct PlayerModel/LivingEntityRenderer/PlayerRenderer callbacks and native NeoForge client extensions. target symbol: PPlayerAnimations, PPlayerAnimationFrame, PPlayerAnimatedAttachmentLayer, or PLibArmorHandler.
 ## 144 — src/main/java/com/arcanc/pulselib/content/player/animation/attachment/PPlayerAnimatedAttachmentContext.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/attachment/PPlayerAnimatedAttachmentContext.java
 Source change: A
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/attachment/PPlayerAnimatedAttachmentContext.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: PORTED
+Notes: PORTED: source library type is available on 1.21.1 and is wired to the shared PPlayerAnimationFrame runtime.
 ## 145 — src/main/java/com/arcanc/pulselib/content/player/animation/attachment/PPlayerAnimatedAttachmentLayer.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/attachment/PPlayerAnimatedAttachmentLayer.java
 Source change: A
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/attachment/PPlayerAnimatedAttachmentLayer.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: PORTED
+Notes: PORTED: source library type is available on 1.21.1 and is wired to the shared PPlayerAnimationFrame runtime.
 ## 146 — src/main/java/com/arcanc/pulselib/content/player/animation/attachment/PPlayerAnimatedAttachmentRenderer.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/attachment/PPlayerAnimatedAttachmentRenderer.java
 Source change: A
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/attachment/PPlayerAnimatedAttachmentRenderer.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: PORTED
+Notes: PORTED: source library type is available on 1.21.1 and is wired to the shared PPlayerAnimationFrame runtime.
 ## 147 — src/main/java/com/arcanc/pulselib/content/player/animation/attachment/PPlayerAnimatedAttachments.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/attachment/PPlayerAnimatedAttachments.java
 Source change: A
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/attachment/PPlayerAnimatedAttachments.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: PORTED
+Notes: PORTED: source library type is available on 1.21.1 and is wired to the shared PPlayerAnimationFrame runtime.
 ## 148 — src/main/java/com/arcanc/pulselib/content/player/animation/attachment/PPlayerAnimationMeshAttachmentPose.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/attachment/PPlayerAnimationMeshAttachmentPose.java
 Source change: A
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/attachment/PPlayerAnimationMeshAttachmentPose.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: PORTED
+Notes: PORTED: source library type is available on 1.21.1 and is wired to the shared PPlayerAnimationFrame runtime.
 ## 149 — src/main/java/com/arcanc/pulselib/content/player/animation/attachment/PPlayerAutomaticMeshAttachments.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/attachment/PPlayerAutomaticMeshAttachments.java
 Source change: A
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/attachment/PPlayerAutomaticMeshAttachments.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: PORTED
+Notes: PORTED: source library type is available on 1.21.1 and is wired to the shared PPlayerAnimationFrame runtime.
 ## 150 — src/main/java/com/arcanc/pulselib/content/player/animation/attachment/package-info.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/attachment/package-info.java
 Source change: A
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/attachment/package-info.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 151 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonArmPose.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonArmPose.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonArmPose.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 152 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonArmRig.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonArmRig.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonArmRig.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 153 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonCameraMode.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonCameraMode.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonCameraMode.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 154 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonCameraSpace.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonCameraSpace.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonCameraSpace.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 155 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonItemPose.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonItemPose.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonItemPose.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 156 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonItemRig.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonItemRig.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonItemRig.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 157 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonPoseStack.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonPoseStack.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonPoseStack.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 158 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonPresentation.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonPresentation.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonPresentation.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 159 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRenderContext.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRenderContext.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRenderContext.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 160 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRenderContexts.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRenderContexts.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRenderContexts.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 161 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRenderMode.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRenderMode.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRenderMode.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 162 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRenderPresentation.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRenderPresentation.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRenderPresentation.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 163 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRestPose.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRestPose.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonRestPose.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 164 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonTransformMode.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonTransformMode.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PFirstPersonTransformMode.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 165 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PPlayerFirstPersonAnchorPose.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PPlayerFirstPersonAnchorPose.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PPlayerFirstPersonAnchorPose.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 166 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PPlayerFirstPersonMeshAttachmentPose.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PPlayerFirstPersonMeshAttachmentPose.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PPlayerFirstPersonMeshAttachmentPose.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 167 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PPlayerFirstPersonRenderer.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PPlayerFirstPersonRenderer.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PPlayerFirstPersonRenderer.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 168 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PPlayerFirstPersonSettings.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PPlayerFirstPersonSettings.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PPlayerFirstPersonSettings.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 169 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PVanillaFirstPersonArmResolver.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PVanillaFirstPersonArmResolver.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PVanillaFirstPersonArmResolver.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 170 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PVanillaFirstPersonItemResolver.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PVanillaFirstPersonItemResolver.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PVanillaFirstPersonItemResolver.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 171 — src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/package-info.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/package-info.java
 Source change: A
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/package-info.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 172 — src/main/java/com/arcanc/pulselib/content/player/deformer/PDeformableCubeBakeScope.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/player/deformer/PDeformableCubeBakeScope.java
@@ -2161,144 +2111,128 @@ Source path: src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentAncho
 Source change: M
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentAnchor.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 243 — src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentAnchorResolvers.java
 
 Source path: src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentAnchorResolvers.java
 Source change: M
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentAnchorResolvers.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 244 — src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentBinding.java
 
 Source path: src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentBinding.java
 Source change: M
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentBinding.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 245 — src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentDefinition.java
 
 Source path: src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentDefinition.java
 Source change: M
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentDefinition.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 246 — src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentLayer.java
 
 Source path: src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentLayer.java
 Source change: M
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentLayer.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 247 — src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentSource.java
 
 Source path: src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentSource.java
 Source change: M
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentSource.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 248 — src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentSources.java
 
 Source path: src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentSources.java
 Source change: M
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentSources.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 249 — src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachments.java
 
 Source path: src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachments.java
 Source change: M
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachments.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 250 — src/main/java/com/arcanc/pulselib/util/attachments/PLivingMeshRenderResolver.java
 
 Source path: src/main/java/com/arcanc/pulselib/util/attachments/PLivingMeshRenderResolver.java
 Source change: M
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/util/attachments/PLivingMeshRenderResolver.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 251 — src/main/java/com/arcanc/pulselib/util/attachments/PLivingMeshRenderResolvers.java
 
 Source path: src/main/java/com/arcanc/pulselib/util/attachments/PLivingMeshRenderResolvers.java
 Source change: M
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/util/attachments/PLivingMeshRenderResolvers.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 252 — src/main/java/com/arcanc/pulselib/util/attachments/PTransform.java
 
 Source path: src/main/java/com/arcanc/pulselib/util/attachments/PTransform.java
 Source change: M
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/util/attachments/PTransform.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 253 — src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidAnchors.java
 
 Source path: src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidAnchors.java
 Source change: M
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidAnchors.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 254 — src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidAttachmentLayer.java
 
 Source path: src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidAttachmentLayer.java
 Source change: M
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidAttachmentLayer.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 255 — src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidBindings.java
 
 Source path: src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidBindings.java
 Source change: M
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidBindings.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 256 — src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PArmorClientExtensions.java
 
 Source path: src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PArmorClientExtensions.java
 Source change: M
 Subsystem: ATTACHMENTS_ARMOR
 Target path: src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PArmorClientExtensions.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source delta is documentation-only or the target attachment/armor API already preserves the runtime behavior through the 1.21.1 direct renderer path.
 ## 257 — src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PLibArmorHandler.java
 
 Source path: src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PLibArmorHandler.java
 Source change: M
 Subsystem: ATTACHMENTS_ARMOR
 Target path: src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PLibArmorHandler.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ADAPTED_1_21_1
+Notes: source behavior: retain the player animation, frame, attachment, or armor responsibility. API difference: source relies in places on modern render states or player hooks. 1.21.1 implementation: use direct PlayerModel/LivingEntityRenderer/PlayerRenderer callbacks and native NeoForge client extensions. target symbol: PPlayerAnimations, PPlayerAnimationFrame, PPlayerAnimatedAttachmentLayer, or PLibArmorHandler.
 ## 258 — src/main/java/com/arcanc/pulselib/util/helpers/PLibCodecs.java
 
 Source path: src/main/java/com/arcanc/pulselib/util/helpers/PLibCodecs.java

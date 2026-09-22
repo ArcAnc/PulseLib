@@ -12,6 +12,7 @@ package com.arcanc.pulselib.util.attachments.humanoid.armor;
 
 import com.arcanc.pulselib.util.attachments.PLivingAttachmentLayer;
 import com.arcanc.pulselib.util.attachments.humanoid.PHumanoidAttachmentLayer;
+import com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimatedAttachmentLayer;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -35,7 +36,10 @@ public class PLibArmorHandler
 		{
 			PlayerRenderer renderer = event.getSkin(skin);
 			if (renderer != null)
+			{
 				renderer.addLayer(new PHumanoidAttachmentLayer(renderer));
+				renderer.addLayer(new PPlayerAnimatedAttachmentLayer(renderer));
+			}
 		}
 		
 		for (var entityType : event.getEntityTypes())

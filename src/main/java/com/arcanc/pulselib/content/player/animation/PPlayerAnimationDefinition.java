@@ -22,6 +22,7 @@ import org.joml.Vector3f;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -39,6 +40,8 @@ public final class PPlayerAnimationDefinition
 	private final PPlayerAnimationWeight weight;
 	private final Map<PPlayerPart, PPlayerAnimationWeight> partWeights;
 	private final Map<String, PPlayerAnimationWeight> boneWeights;
+	private final Set<String> meshAttachmentRoots;
+	private final Map<PPlayerAnimationAnchor, String> anchors;
 	private final List<PPlayerAnimationDeformer> deformers;
 	private final Vector3f rootPivot;
 	private final int priority;
@@ -60,6 +63,8 @@ public final class PPlayerAnimationDefinition
 		this.weight = builder.weight;
 		this.partWeights = Map.copyOf(builder.partWeights);
 		this.boneWeights = Map.copyOf(builder.boneWeights);
+		this.meshAttachmentRoots = Set.copyOf(builder.meshAttachmentRoots);
+		this.anchors = Map.copyOf(builder.anchors);
 		this.deformers = List.copyOf(builder.deformers);
 		this.rootPivot = new Vector3f(builder.rootPivot);
 		this.priority = builder.priority;
@@ -126,6 +131,17 @@ public final class PPlayerAnimationDefinition
 	{
 		PPlayerAnimationWeight boneWeight = this.boneWeights.getOrDefault(boneName, PPlayerAnimationWeight.FULL);
 		return Math.clamp(boneWeight.weight(player, partialTick), 0.0f, 1.0f);
+	}
+
+	/** Explicit mesh roots; an empty set enables automatic discovery. */
+	public Set<String> meshAttachmentRoots()
+	{
+		return this.meshAttachmentRoots;
+	}
+
+	public Map<PPlayerAnimationAnchor, String> anchors()
+	{
+		return this.anchors;
 	}
 
 	public List<PPlayerAnimationDeformer> deformers()
@@ -208,6 +224,8 @@ public final class PPlayerAnimationDefinition
 		private PPlayerAnimationWeight weight = PPlayerAnimationWeight.FULL;
 		private final Map<PPlayerPart, PPlayerAnimationWeight> partWeights = new LinkedHashMap<>();
 		private final Map<String, PPlayerAnimationWeight> boneWeights = new LinkedHashMap<>();
+		private final Set<String> meshAttachmentRoots = new LinkedHashSet<>();
+		private final Map<PPlayerAnimationAnchor, String> anchors = new LinkedHashMap<>();
 		private final List<PPlayerAnimationDeformer> deformers = new ArrayList<>();
 		private Vector3f rootPivot = new Vector3f();
 		private int priority;
@@ -291,6 +309,23 @@ public final class PPlayerAnimationDefinition
 			if (boneName == null || boneName.isBlank())
 				throw new IllegalArgumentException("Player animation bone name cannot be blank");
 			this.boneWeights.put(boneName, Objects.requireNonNull(weight));
+			return this;
+		}
+
+		/** Marks the model subtree rooted at {@code boneName} for player-mesh attachment rendering. */
+		public Builder meshAttachment(String boneName)
+		{
+			if (boneName == null || boneName.isBlank())
+				throw new IllegalArgumentException("Player mesh attachment bone name cannot be blank");
+			this.meshAttachmentRoots.add(boneName);
+			return this;
+		}
+
+		public Builder anchor(PPlayerAnimationAnchor anchor, String boneName)
+		{
+			if (boneName == null || boneName.isBlank())
+				throw new IllegalArgumentException("Player animation anchor bone name cannot be blank");
+			this.anchors.put(Objects.requireNonNull(anchor), boneName);
 			return this;
 		}
 
