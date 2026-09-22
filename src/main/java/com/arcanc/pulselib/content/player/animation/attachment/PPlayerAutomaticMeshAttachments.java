@@ -7,16 +7,19 @@
 package com.arcanc.pulselib.content.player.animation.attachment;
 
 import com.arcanc.pulselib.content.model.animation.BoneFrame;
+import com.arcanc.pulselib.content.model.animation.PAnimationPoseResolver;
 import com.arcanc.pulselib.content.model.animation.PTransform;
 import com.arcanc.pulselib.content.model.baked.PBakedBone;
+import com.arcanc.pulselib.content.model.baked.PBakedMesh;
 import com.arcanc.pulselib.content.model.baked.PMeshRenderContext;
+import com.arcanc.pulselib.content.model.baked.PMeshRenderMaterial;
+import com.arcanc.pulselib.content.renderer.PRenderQueue;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationDefinition;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationFrame;
 import com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonMeshAttachmentPose;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.arcanc.pulselib.util.PResourceCache;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import org.joml.Quaternionf;
 
@@ -153,20 +156,11 @@ public final class PPlayerAutomaticMeshAttachments
 	 */
 	public static void renderThirdPerson(List<PPlayerAnimationMeshAttachmentPose> poses,
 	                                     PoseStack poseStack,
-	                                     SubmitNodeCollector submitNodeCollector,
 	                                     int packedLight)
 	{
 		for (PPlayerAnimationMeshAttachmentPose pose : poses)
 			if (pose.weight() > 1.0e-4f)
-				submitNodeCollector.submitCustomGeometry(
-						poseStack,
-						PRenderTypes.RenderTypeProvider.trianglesInstantTranslucent(PResourceCache.ATLAS_LOCATION),
-						(submittedPose, _) ->
-						{
-							PoseStack attachmentPoseStack = new PoseStack();
-							attachmentPoseStack.last().set(submittedPose);
-							render(pose.root(), pose.frame(), pose.transform(), attachmentPoseStack, packedLight);
-						});
+				submit(PRenderQueue.RenderStage.ENTITIES, pose.root(), pose.frame(), pose.transform(), poseStack, packedLight);
 	}
 
 	/** Renders first-person mesh roots from their canonical evaluated frames. */
@@ -176,18 +170,23 @@ public final class PPlayerAutomaticMeshAttachments
 	{
 		for (PPlayerFirstPersonMeshAttachmentPose pose : poses)
 			if (pose.weight() > 1.0e-4f)
-				render(pose.root(), pose.frame(), pose.transform(), poseStack, packedLight);
+				submit(PRenderQueue.RenderStage.FIRST_PERSON, pose.root(), pose.frame(), pose.transform(), poseStack, packedLight);
 	}
 
 	/**
-	 * Performs the render operation.
+	 * Submits an attachment root to the render stage that owns its depth buffer.
+	 * First-person mesh roots must wait for Minecraft to finish submitting the
+	 * hand scene; submitting an immediate pass from the hand collector observes
+	 * stale world depth and clips the mesh against it.
+	 * @param stage the render stage to use.
 	 * @param root the root to use.
 	 * @param frame the frame to use.
 	 * @param transform the transform to use.
 	 * @param poseStack the pose stack to use.
 	 * @param packedLight the packed light to use.
 	 */
-	private static void render(PBakedBone root,
+	private static void submit(PRenderQueue.RenderStage stage,
+	                           PBakedBone root,
 	                           PPlayerAnimationFrame frame,
 	                           PTransform transform,
 	                           PoseStack poseStack,
@@ -204,15 +203,57 @@ public final class PPlayerAutomaticMeshAttachments
 			poseStack.scale(safeInverse(local.scale().x), safeInverse(local.scale().y), safeInverse(local.scale().z));
 			poseStack.mulPose(new Quaternionf(local.rotation()).invert());
 			poseStack.translate(-local.translation().x, -local.translation().y, -local.translation().z);
-			root.instantDraw(
-					poseStack,
-					frame.resolver(),
-					(bone, mesh, inherited) -> inherited,
-					new PMeshRenderContext(
-							PRenderTypes.RenderTypeProvider::trianglesTranslucent,
-							-1,
-							packedLight,
-							OverlayTexture.NO_OVERLAY));
+			submitBone(stage, root, frame.resolver(), poseStack, new PMeshRenderContext(
+					PRenderTypes.RenderTypeProvider::trianglesTranslucent,
+					-1,
+					packedLight,
+					OverlayTexture.NO_OVERLAY));
+		}
+		finally
+		{
+			poseStack.popPose();
+		}
+	}
+
+	/**
+	/** Submits an evaluated attachment bone and its children to the selected queue. */
+	private static void submitBone(PRenderQueue.RenderStage stage,
+	                               PBakedBone bone,
+	                               PAnimationPoseResolver<?> resolver,
+	                               PoseStack poseStack,
+	                               PMeshRenderContext inherited)
+	{
+		if (!resolver.isVisible(bone))
+			return;
+
+		BoneFrame frame = resolver.resolve(bone).localTransform();
+		poseStack.pushPose();
+		try
+		{
+			poseStack.translate(frame.translation().x(), frame.translation().y(), frame.translation().z());
+			poseStack.mulPose(frame.rotation());
+			poseStack.scale(frame.scale().x(), frame.scale().y(), frame.scale().z());
+
+			for (PBakedMesh mesh : bone.meshes())
+			{
+				if (mesh.textureReference().isEmpty())
+					continue;
+
+				PMeshRenderMaterial material = PMeshRenderMaterial.resolve(mesh, inherited);
+				PRenderQueue.submit(
+						stage,
+						material.resolveRenderType(inherited, PResourceCache.ATLAS_LOCATION),
+						material.mesh(),
+						inherited.deformation(),
+						new PRenderQueue.InstanceData(
+								poseStack.last().pose(),
+								inherited.color(),
+								material.packedLight(),
+								inherited.packedOverlay()));
+			}
+
+			for (PBakedBone child : bone.children())
+				submitBone(stage, child, resolver, poseStack, inherited);
 		}
 		finally
 		{

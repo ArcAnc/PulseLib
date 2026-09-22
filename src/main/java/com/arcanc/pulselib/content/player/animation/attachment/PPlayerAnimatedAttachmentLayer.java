@@ -56,7 +56,6 @@ public final class PPlayerAnimatedAttachmentLayer extends RenderLayer<AvatarRend
 		PPlayerAutomaticMeshAttachments.renderThirdPerson(
 				PPlayerAnimations.automaticMeshAttachmentPoses(player, state.partialTick),
 				poseStack,
-				submitNodeCollector,
 				packedLight);
 		PPlayerAnimatedAttachments.renderThirdPerson(player, poseStack, submitNodeCollector, packedLight, state.partialTick);
 	}
