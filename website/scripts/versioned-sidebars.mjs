@@ -14,7 +14,7 @@ export const versionedSidebars = {
     {
       type: 'category', label: 'Core API', items: [
         'modeldata', 'animatables-and-controllers', 'animation-events', 'molang-animations',
-        'renderers', 'render-types-and-queue', 'textures-and-emissive',
+        'renderers', 'render-types-and-queue', 'resources',
       ],
     },
     common[1],
@@ -25,7 +25,7 @@ export const versionedSidebars = {
     {
       type: 'category', label: 'Core API', items: [
         'modeldata', 'animatables-and-controllers', 'animation-events', 'renderers',
-        'render-types-and-queue', 'shaders', 'textures-and-emissive',
+        'render-types-and-queue', 'shaders', 'resources',
       ],
     },
     common[1],
