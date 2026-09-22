@@ -1,3 +1,12 @@
+/**
+ * @author ArcAnc
+ * Created at: 23.09.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
 package com.arcanc.pulselib.content.player.animation.attachment;
 
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationAnchorPose;
@@ -8,11 +17,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /** Registry and third-person dispatcher for semantic player-animation anchors. */
 public final class PPlayerAnimatedAttachments

@@ -7,12 +7,12 @@
  * Details can be found in the license file in the root folder of this project
  */
 
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+@FieldsAreNonnullByDefault
 package com.arcanc.pulselib.content.player.animation.attachment;
 
-import com.arcanc.pulselib.content.player.animation.PPlayerAnimationAnchor;
+import net.minecraft.FieldsAreNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
 
-public interface PPlayerAnimatedAttachmentRenderer
-{
-	PPlayerAnimationAnchor anchor();
-	void render(PPlayerAnimatedAttachmentContext context);
-}
+import javax.annotation.ParametersAreNonnullByDefault;

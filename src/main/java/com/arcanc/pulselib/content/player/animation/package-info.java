@@ -7,11 +7,12 @@
  * Details can be found in the license file in the root folder of this project
  */
 
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+@FieldsAreNonnullByDefault
 package com.arcanc.pulselib.content.player.animation;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.FieldsAreNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
 
-/** A named socket in an animated player model. */
-public record PPlayerAnimationAnchor(ResourceLocation id)
-{
-}
+import javax.annotation.ParametersAreNonnullByDefault;
