@@ -1617,8 +1617,10 @@
 
 - Source status: `A`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PORTED`
-- Notes: Added in the source delta; port this addition against the 26.2 API.
+- Port status: `ADAPTED_26_2`
+- Notes: 26.1 source behavior: renders automatic mesh attachments and registered anchor attachments in the player layer.
+  26.2 API difference: mesh attachment rendering must use the collector passed to `RenderLayer.submit`.
+  26.2 implementation: forwards `SubmitNodeCollector` to `PPlayerAutomaticMeshAttachments`, preserving the player id, partial tick, packed light, and registered-anchor rendering.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/player/animation/attachment/PPlayerAnimatedAttachmentRenderer.java`
@@ -1649,8 +1651,10 @@
 
 - Source status: `A`
 - Subsystem: `ATTACHMENTS_AND_DEFORMERS`
-- Port status: `PORTED`
-- Notes: Added in the source delta; port this addition against the 26.2 API.
+- Port status: `ADAPTED_26_2`
+- Notes: 26.1 source behavior: draws evaluated third-person mesh attachment roots directly from the render layer pose.
+  26.2 API difference: `RenderLayer.submit` is a submission-collection phase, so immediate GPU work is not associated with its saved entity transform.
+  26.2 implementation: `renderThirdPerson` submits custom geometry through `SubmitNodeCollector`, captures the submitted pose, and performs the same evaluated `PBakedBone.instantDraw` in the renderer pass.
 - Target path if renamed: `—`
 
 #### `src/main/java/com/arcanc/pulselib/content/player/animation/attachment/package-info.java`

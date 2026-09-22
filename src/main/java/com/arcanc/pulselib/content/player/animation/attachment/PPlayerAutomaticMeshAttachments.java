@@ -14,7 +14,9 @@ import com.arcanc.pulselib.content.player.animation.PPlayerAnimationDefinition;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationFrame;
 import com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonMeshAttachmentPose;
 import com.arcanc.pulselib.util.PRenderTypes;
+import com.arcanc.pulselib.util.PResourceCache;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import org.joml.Quaternionf;
 
@@ -151,11 +153,20 @@ public final class PPlayerAutomaticMeshAttachments
 	 */
 	public static void renderThirdPerson(List<PPlayerAnimationMeshAttachmentPose> poses,
 	                                     PoseStack poseStack,
+	                                     SubmitNodeCollector submitNodeCollector,
 	                                     int packedLight)
 	{
 		for (PPlayerAnimationMeshAttachmentPose pose : poses)
 			if (pose.weight() > 1.0e-4f)
-				render(pose.root(), pose.frame(), pose.transform(), poseStack, packedLight);
+				submitNodeCollector.submitCustomGeometry(
+						poseStack,
+						PRenderTypes.RenderTypeProvider.trianglesInstantTranslucent(PResourceCache.ATLAS_LOCATION),
+						(submittedPose, _) ->
+						{
+							PoseStack attachmentPoseStack = new PoseStack();
+							attachmentPoseStack.last().set(submittedPose);
+							render(pose.root(), pose.frame(), pose.transform(), attachmentPoseStack, packedLight);
+						});
 	}
 
 	/** Renders first-person mesh roots from their canonical evaluated frames. */
