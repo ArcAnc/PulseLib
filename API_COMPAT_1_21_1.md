@@ -127,3 +127,40 @@ available in 1.21.1: DIFFERENT
 1.21.1 equivalent: ItemInHandRendererAccessor and PlayerRendererMixin remain valid 1.21.1 integration hooks; PTextureCache must be assessed independently of API migration.
 probable target class/method: existing target mixins and resource-cache users.
 notes: Do not mechanically carry these deletions. Decide each after the subsystem's behavior has a native 1.21.1 replacement.
+
+## Verified native 1.21.1 backend mappings
+
+26.x concept: block-entity extraction and SubmitNodeCollector submission.
+source responsibility: retain live block inputs, animate registered meshes, and resolve their materials from the owning model resource.
+available in 1.21.1: DIFFERENT
+1.21.1 equivalent: BlockEntityRenderer.render(T, float, PoseStack, MultiBufferSource, int, int) and RenderLevelStageEvent.Stage.
+probable target class/method: PBlockRenderer.render, PBlockRenderer.submitBone, and PRenderStagesHandler.renderLevelStages.
+notes: The renderer reads the live block entity, evaluates controllers and Molang contexts, resolves PMeshRenderMaterial through PResourceCache.ATLAS_LOCATION, then flushes solid and translucent work at the corresponding 1.21.1 level stages.
+
+26.x concept: EntityRenderState extraction and deferred entity submission.
+source responsibility: preserve entity animation data, per-bone attachments, layers, lighting, overlays, and model-local materials.
+available in 1.21.1: DIFFERENT
+1.21.1 equivalent: EntityRenderer.render(T, yaw, partialTick, PoseStack, MultiBufferSource, light).
+probable target class/method: PEntityRenderer.render, PEntityRenderer.perBoneSubmit, and PEntityRenderLayer.submit.
+notes: Entity data is read during the live renderer call. Bone transforms and layer anchors are built there, and mesh submissions use PResourceCache.ATLAS_LOCATION before the entity queue flush.
+
+26.x concept: ItemModelResolver, ItemStackRenderState, and SpecialModelWrapper.
+source responsibility: select an item model, retain stack/display inputs, and submit special animated geometry.
+available in 1.21.1: NO
+1.21.1 equivalent: BakedModel.isCustomRenderer and BlockEntityWithoutLevelRenderer.renderByItem(ItemStack, ItemDisplayContext, PoseStack, MultiBufferSource, int, int).
+probable target class/method: PItemRenderer.renderByItem and PItemRenderer.trueSubmit.
+notes: The native BEWLR callback supplies ItemStack, ItemDisplayContext, light, and overlay directly. GUI meshes are drawn immediately; world and hand meshes are staged in PRenderQueue, with the first-person queue flushed by GameRendererMixin after renderHandsWithItems.
+
+26.x concept: extracted animation pose consumed by renderer submission.
+source responsibility: apply pose evaluation and visibility tracks consistently to immediate item rendering.
+available in 1.21.1: DIFFERENT
+1.21.1 equivalent: PoseStack traversal during the direct renderer callback.
+probable target class/method: PBakedModel.instantDraw and PBakedBone.instantDraw.
+notes: PBakedModel now creates one PAnimationPoseResolver for the draw traversal, so visibility tracks and resolved local transforms apply to GUI and other immediate paths without a modern vanilla render state.
+
+26.x concept: model texture lookup through PResourceCache.
+source responsibility: ensure each renderer resolves mesh textures in the registered model resource context rather than through a global texture-name cache.
+available in 1.21.1: YES
+1.21.1 equivalent: PResourceCache.resolve, PMeshTextureVariants.resolve, TextureAtlas, and RenderType.
+probable target class/method: PBlockRenderer.submitBone, PEntityRenderer.submitBone, PItemRenderer.submitBone, and PBakedBone.drawMesh.
+notes: Every target renderer resolves PMeshRenderMaterial and uses PResourceCache.ATLAS_LOCATION. Texture overrides are converted to the resource-cache sprite id by PMeshTextureVariants, so identically named relative textures remain scoped to their model resource.

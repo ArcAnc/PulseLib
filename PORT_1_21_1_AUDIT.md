@@ -154,18 +154,16 @@ Source path: src/main/java/com/arcanc/pulselib/content/mixin/BlockEntityRenderSt
 Source change: M
 Subsystem: VANILLA_1_21_1_INTEGRATION
 Target path: src/main/java/com/arcanc/pulselib/content/mixin/BlockEntityRenderStateAccessor.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ADAPTED_1_21_1
+Notes: source behavior: retain block state and render inputs through modern block-entity extraction. API difference: BlockEntityRenderState does not exist in 1.21.1. 1.21.1 implementation: read the live BlockEntity and render arguments in the native renderer lifecycle. target symbol: PBlockRenderer.render(T, float, PoseStack, MultiBufferSource, int, int).
 ## 018 — src/main/java/com/arcanc/pulselib/content/mixin/CameraMixin.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/mixin/CameraMixin.java
 Source change: M
 Subsystem: VANILLA_1_21_1_INTEGRATION
 Target path: src/main/java/com/arcanc/pulselib/content/mixin/CameraMixin.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ADAPTED_1_21_1
+Notes: source behavior: apply animated camera pose and shake after vanilla camera setup. API difference: 1.21.1 has Camera.setup rather than the modern camera render-state path. 1.21.1 implementation: CameraMixin injects at Camera.setup tail and updates the live camera position and rotation. target symbol: CameraMixin.pulselib$followAnimatedHead.
 ## 019 — src/main/java/com/arcanc/pulselib/content/mixin/CubeDefinitionMixin.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/mixin/CubeDefinitionMixin.java
@@ -190,18 +188,16 @@ Source path: src/main/java/com/arcanc/pulselib/content/mixin/GameRendererMixin.j
 Source change: M
 Subsystem: VANILLA_1_21_1_INTEGRATION
 Target path: src/main/java/com/arcanc/pulselib/content/mixin/GameRendererMixin.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ADAPTED_1_21_1
+Notes: source behavior: flush first-person PulseLib geometry after vanilla hands and items. API difference: 1.21.1 has no SubmitNodeCollector. 1.21.1 implementation: flush the FIRST_PERSON PRenderQueue stage after ItemInHandRenderer.renderHandsWithItems. target symbol: GameRendererMixin.pulselib$flushFirstPersonItems.
 ## 022 — src/main/java/com/arcanc/pulselib/content/mixin/GlBufferAccessor.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/mixin/GlBufferAccessor.java
 Source change: M
 Subsystem: RENDER_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/mixin/GlBufferAccessor.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ADAPTED_1_21_1
+Notes: source behavior: reach renderer buffer storage for GPU submissions. API difference: the source accessor targets newer rendering internals unavailable in 1.21.1. 1.21.1 implementation: the legacy GL backend owns geometry and instance buffers directly. target symbol: GlResourceRegistry and McLegacyGlHostBridge.
 ## 023 — src/main/java/com/arcanc/pulselib/content/mixin/HumanoidArmorLayerMixin.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/mixin/HumanoidArmorLayerMixin.java
@@ -1749,45 +1745,40 @@ Source path: src/main/java/com/arcanc/pulselib/content/renderer/PBlockRenderer.j
 Source change: M
 Subsystem: RENDER_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/renderer/PBlockRenderer.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ADAPTED_1_21_1
+Notes: source behavior: render registered model meshes with model-local texture references. API difference: source submits BlockEntityRenderState through SubmitNodeCollector. 1.21.1 implementation: render live block entities through BlockEntityRenderer.render, resolve PMeshRenderMaterial, and queue using PResourceCache.ATLAS_LOCATION. target symbol: PBlockRenderer.render and submitBone.
 ## 195 — src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderLayer.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderLayer.java
 Source change: M
 Subsystem: RENDER_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderLayer.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ADAPTED_1_21_1
+Notes: source behavior: attach layer meshes to entity-bone transforms while carrying material context. API difference: modern entity render states are absent in 1.21.1. 1.21.1 implementation: extract transforms from the live entity render traversal and submit through PEntityRenderer. target symbol: PEntityRenderLayer.submit and PEntityRenderer.perBoneSubmit.
 ## 196 — src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java
 Source change: M
 Subsystem: RENDER_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ADAPTED_1_21_1
+Notes: source behavior: evaluate animated entity meshes and resolve textures from each model resource. API difference: source renderer consumes EntityRenderState and SubmitNodeCollector. 1.21.1 implementation: direct EntityRenderer.render evaluates live animation state and queues material output through PResourceCache.ATLAS_LOCATION. target symbol: PEntityRenderer.render and submitBone.
 ## 197 — src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java
 Source change: M
 Subsystem: RENDER_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ADAPTED_1_21_1
+Notes: source behavior: render special animated items in GUI, first-person, and world display contexts using model-local resources. API difference: ItemModelResolver, ItemStackRenderState, and SpecialModelWrapper are absent in 1.21.1. 1.21.1 implementation: BlockEntityWithoutLevelRenderer.renderByItem receives ItemStack and ItemDisplayContext directly and submits material output through PResourceCache.ATLAS_LOCATION. target symbol: PItemRenderer.renderByItem and trueSubmit.
 ## 198 — src/main/java/com/arcanc/pulselib/content/renderer/PMeshRenderResolver.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/renderer/PMeshRenderResolver.java
 Source change: M
 Subsystem: RENDER_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/renderer/PMeshRenderResolver.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ADAPTED_1_21_1
+Notes: source behavior: resolve per-mesh material overrides during state submission. API difference: source resolver carries modern renderer state. 1.21.1 implementation: resolve directly from live animatable, item stack, display context, bone, and mesh. target symbol: content.model.baked.PMeshRenderResolver and PItemRenderer.resolveMeshRender.
 ## 199 — src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java
@@ -1803,9 +1794,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHan
 Source change: M
 Subsystem: RENDER_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ADAPTED_1_21_1
+Notes: source behavior: flush solid, entity, translucent, and OIT work at the correct renderer stages. API difference: 1.21.1 RenderLevelStageEvent has Stage constants rather than source after-feature event subclasses. 1.21.1 implementation: flush at AFTER_BLOCK_ENTITIES and AFTER_PARTICLES, then composite at AFTER_WEATHER. target symbol: PRenderStagesHandler.renderLevelStages.
 ## 201 — src/main/java/com/arcanc/pulselib/content/renderer/PRenderer.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/renderer/PRenderer.java
@@ -1821,36 +1811,32 @@ Source path: src/main/java/com/arcanc/pulselib/content/renderer/base/PBlockRende
 Source change: M
 Subsystem: RENDER_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/renderer/base/PBlockRenderState.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ADAPTED_1_21_1
+Notes: source behavior: keep block rendering inputs after extraction. API difference: vanilla BlockEntityRenderState is unavailable. 1.21.1 implementation: use the live BlockEntity passed to the native render callback. target symbol: PBlockRenderer.render.
 ## 203 — src/main/java/com/arcanc/pulselib/content/renderer/base/PEntityRenderState.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/renderer/base/PEntityRenderState.java
 Source change: M
 Subsystem: RENDER_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/renderer/base/PEntityRenderState.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ADAPTED_1_21_1
+Notes: source behavior: retain entity animation and model inputs after extraction. API difference: vanilla EntityRenderState is unavailable. 1.21.1 implementation: evaluate data during the live EntityRenderer callback. target symbol: PEntityRenderer.render.
 ## 204 — src/main/java/com/arcanc/pulselib/content/renderer/base/PItemRenderState.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/renderer/base/PItemRenderState.java
 Source change: M
 Subsystem: RENDER_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/renderer/base/PItemRenderState.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ADAPTED_1_21_1
+Notes: source behavior: retain item stack, display context, lighting, and overlay across item extraction and submission. API difference: ItemStackRenderState is unavailable. 1.21.1 implementation: use renderByItem arguments directly. target symbol: PItemRenderer.renderByItem.
 ## 205 — src/main/java/com/arcanc/pulselib/content/renderer/base/PRenderState.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/renderer/base/PRenderState.java
 Source change: M
 Subsystem: RENDER_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/renderer/base/PRenderState.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ADAPTED_1_21_1
+Notes: source behavior: provide a renderer-neutral extracted state contract. API difference: 1.21.1 vanilla rendering is direct rather than extraction-based. 1.21.1 implementation: preserve the responsibility in renderer-local live data and PRenderQueue submissions. target symbol: PBlockRenderer, PEntityRenderer, and PItemRenderer.
 ## 206 — src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlFrameArena.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlFrameArena.java
@@ -1911,45 +1897,40 @@ Source path: src/main/java/com/arcanc/pulselib/content/renderer/modelData/Defaul
 Source change: M
 Subsystem: RENDER_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/renderer/modelData/DefaultBlockModelData.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source removes model-data texture registration; target model data delegates texture ownership to the registered PModelResource and exposes no global texture builder.
 ## 213 — src/main/java/com/arcanc/pulselib/content/renderer/modelData/DefaultEntityLayerModelData.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/renderer/modelData/DefaultEntityLayerModelData.java
 Source change: M
 Subsystem: RENDER_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/renderer/modelData/DefaultEntityLayerModelData.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source removes model-data texture registration; target model data delegates texture ownership to the registered PModelResource and exposes no global texture builder.
 ## 214 — src/main/java/com/arcanc/pulselib/content/renderer/modelData/DefaultEntityModelData.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/renderer/modelData/DefaultEntityModelData.java
 Source change: M
 Subsystem: RENDER_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/renderer/modelData/DefaultEntityModelData.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source removes model-data texture registration; target model data delegates texture ownership to the registered PModelResource and exposes no global texture builder.
 ## 215 — src/main/java/com/arcanc/pulselib/content/renderer/modelData/DefaultItemModelData.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/renderer/modelData/DefaultItemModelData.java
 Source change: M
 Subsystem: RENDER_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/renderer/modelData/DefaultItemModelData.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: source removes model-data texture registration; target model data delegates texture ownership to the registered PModelResource and exposes no global texture builder.
 ## 216 — src/main/java/com/arcanc/pulselib/content/renderer/modelData/PModelData.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/renderer/modelData/PModelData.java
 Source change: M
 Subsystem: RENDER_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/renderer/modelData/PModelData.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: PModelData no longer stores or resolves textures; PResourceCache supplies the registered model-local texture context.
 ## 217 — src/main/java/com/arcanc/pulselib/content/renderer/plan/PDrawGroup.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/renderer/plan/PDrawGroup.java
@@ -2154,9 +2135,8 @@ Source path: src/main/java/com/arcanc/pulselib/util/PRenderTypes.java
 Source change: M
 Subsystem: RENDER_CORE
 Target path: src/main/java/com/arcanc/pulselib/util/PRenderTypes.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
-
+Status: ADAPTED_1_21_1
+Notes: source behavior: create material-specific render layers and identify translucency/OIT work. API difference: 1.21.1 RenderType and render-pipeline APIs differ from the source version. 1.21.1 implementation: retain the target RenderType factories and route queue submissions by native transparency state. target symbol: PRenderTypes.RenderTypeProvider and PRenderQueue.
 ## 240 — src/main/java/com/arcanc/pulselib/util/PResourceCache.java
 
 Source path: src/main/java/com/arcanc/pulselib/util/PResourceCache.java

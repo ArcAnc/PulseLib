@@ -125,8 +125,9 @@ public final class PBakedModel
 	                                                   Function<ResourceLocation, RenderType> renderType, int color,
 	                                                   int packedLight, int packedOverlay, float partialTick)
 	{
-		PPose pose = evaluate(controllers, molangContexts, partialTick);
-		this.bones.forEach(bone -> bone.instantDraw(poseStack, this, pose, renderType, color, packedLight, packedOverlay));
+		PMeshRenderContext inherited = new PMeshRenderContext(renderType, color, packedLight, packedOverlay);
+		PAnimationPoseResolver<T> poseResolver = poseResolver(controllers, molangContexts, partialTick);
+		this.bones.forEach(bone -> bone.instantDraw(poseStack, poseResolver, (ignoredBone, mesh, context) -> context, inherited));
 	}
 
 	public <T extends PAnimatable<T>> void instantDraw(PoseStack poseStack, PModelData modelData,
@@ -141,8 +142,8 @@ public final class PBakedModel
 	                                                   Map<PAnimationController<T>, MolangParser.Context> molangContexts,
 	                                                   PMeshRenderResolver resolver, PMeshRenderContext inherited, float partialTick)
 	{
-		PPose pose = evaluate(controllers, molangContexts, partialTick);
-		this.bones.forEach(bone -> bone.instantDraw(poseStack, this, pose, resolver, inherited));
+		PAnimationPoseResolver<T> poseResolver = poseResolver(controllers, molangContexts, partialTick);
+		this.bones.forEach(bone -> bone.instantDraw(poseStack, poseResolver, resolver, inherited));
 	}
 
 	public <T extends PAnimatable<T>> PPose evaluate(Collection<PAnimationController<T>> controllers,
@@ -150,6 +151,16 @@ public final class PBakedModel
 	                                                 float partialTick)
 	{
 		return PAnimationRuntime.evaluate(this, controllers,
+				(controller, tick) -> contexts.getOrDefault(controller,
+						PAnimationPoseResolver.<T>defaultContexts().context(controller, tick)), partialTick);
+	}
+
+	private <T extends PAnimatable<T>> PAnimationPoseResolver<T> poseResolver(
+			Collection<PAnimationController<T>> controllers,
+			Map<PAnimationController<T>, MolangParser.Context> contexts,
+			float partialTick)
+	{
+		return new PAnimationPoseResolver<>(this, controllers,
 				(controller, tick) -> contexts.getOrDefault(controller,
 						PAnimationPoseResolver.<T>defaultContexts().context(controller, tick)), partialTick);
 	}
