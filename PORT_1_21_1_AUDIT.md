@@ -28,8 +28,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/animatable/AnimManagerKey
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/animatable/AnimManagerKey.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 004 — src/main/java/com/arcanc/pulselib/content/animatable/ControllerState.java
 
@@ -37,8 +37,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/animatable/ControllerStat
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/animatable/ControllerState.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 005 — src/main/java/com/arcanc/pulselib/content/animatable/PAnimatable.java
 
@@ -46,8 +46,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/animatable/PAnimatable.ja
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/animatable/PAnimatable.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 006 — src/main/java/com/arcanc/pulselib/content/animatable/PAnimationCameraShake.java
 
@@ -55,8 +55,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/animatable/PAnimationCame
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/animatable/PAnimationCameraShake.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 007 — src/main/java/com/arcanc/pulselib/content/animatable/PAnimationController.java
 
@@ -64,8 +64,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/animatable/PAnimationCont
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/animatable/PAnimationController.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 008 — src/main/java/com/arcanc/pulselib/content/animatable/PAnimationEventCallbacks.java
 
@@ -73,8 +73,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/animatable/PAnimationEven
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/animatable/PAnimationEventCallbacks.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 009 — src/main/java/com/arcanc/pulselib/content/animatable/PAnimationEventDispatcher.java
 
@@ -82,8 +82,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/animatable/PAnimationEven
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/animatable/PAnimationEventDispatcher.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Ported from SOURCE^ -> SOURCE; preserved the source runtime behavior.
 
 ## 010 — src/main/java/com/arcanc/pulselib/content/animatable/PAnimationManager.java
 
@@ -91,8 +91,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/animatable/PAnimationMana
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/animatable/PAnimationManager.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 011 — src/main/java/com/arcanc/pulselib/content/animatable/PLibAnimationTicker.java
 
@@ -100,8 +100,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/animatable/PLibAnimationT
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/animatable/PLibAnimationTicker.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 012 — src/main/java/com/arcanc/pulselib/content/animatable/instance/InstanceAnimationManager.java
 
@@ -109,8 +109,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/animatable/instance/Insta
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/animatable/instance/InstanceAnimationManager.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 013 — src/main/java/com/arcanc/pulselib/content/animatable/singleton/SingletonAnimationManager.java
 
@@ -118,8 +118,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/animatable/singleton/Sing
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/animatable/singleton/SingletonAnimationManager.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 014 — src/main/java/com/arcanc/pulselib/content/event/ClientEvents.java
 
@@ -361,8 +361,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/BoneFrame
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/BoneFrame.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 041 — src/main/java/com/arcanc/pulselib/content/model/animation/PAnimation.java
 
@@ -370,8 +370,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimatio
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimation.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Ported from SOURCE^ -> SOURCE; preserved the source runtime behavior.
 
 ## 042 — src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationChannel.java
 
@@ -379,8 +379,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimatio
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationChannel.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 043 — src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationChannelType.java
 
@@ -388,8 +388,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimatio
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationChannelType.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 044 — src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationDecodeContext.java
 
@@ -397,8 +397,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimatio
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationDecodeContext.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 045 — src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationEvaluationContext.java
 
@@ -406,8 +406,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimatio
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationEvaluationContext.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 046 — src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationEvent.java
 
@@ -415,8 +415,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimatio
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationEvent.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 047 — src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationEventContext.java
 
@@ -424,8 +424,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimatio
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationEventContext.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 048 — src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationEventType.java
 
@@ -433,8 +433,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimatio
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationEventType.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 049 — src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationEventTypes.java
 
@@ -442,8 +442,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimatio
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationEventTypes.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 050 — src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationFormatDecoder.java
 
@@ -451,8 +451,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimatio
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationFormatDecoder.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 051 — src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationGraph.java
 
@@ -460,8 +460,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimatio
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationGraph.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 052 — src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationGraphRuntime.java
 
@@ -469,8 +469,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimatio
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationGraphRuntime.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 053 — src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationParameters.java
 
@@ -478,8 +478,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimatio
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationParameters.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 054 — src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationPoseResolver.java
 
@@ -487,8 +487,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimatio
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationPoseResolver.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ADAPTED_1_21_1
+Notes: source behavior: resolved canonical TRS model transforms, relative transforms, and animation visibility; API difference: JSpecify annotations are unavailable; 1.21.1 implementation: uses org.jetbrains Nullable; target symbol: PAnimationPoseResolver.
 
 ## 055 — src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationRuntime.java
 
@@ -496,8 +496,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimatio
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationRuntime.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 056 — src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationSample.java
 
@@ -505,8 +505,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimatio
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationSample.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 057 — src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationState.java
 
@@ -514,8 +514,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimatio
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationState.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 058 — src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationTrack.java
 
@@ -523,8 +523,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimatio
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationTrack.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 059 — src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationTransition.java
 
@@ -532,8 +532,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimatio
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationTransition.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 060 — src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationType.java
 
@@ -541,8 +541,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimatio
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationType.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 061 — src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationValue.java
 
@@ -550,8 +550,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimatio
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationValue.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 062 — src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationVisibilityTrack.java
 
@@ -559,8 +559,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimatio
 Source change: A
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationVisibilityTrack.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
+Status: PORTED
+Notes: Ported from SOURCE^ -> SOURCE; preserved the source runtime behavior.
 
 ## 063 — src/main/java/com/arcanc/pulselib/content/model/animation/PBlendMode.java
 
@@ -568,8 +568,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PBlendMod
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PBlendMode.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 064 — src/main/java/com/arcanc/pulselib/content/model/animation/PBoneAnimation.java
 
@@ -577,8 +577,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PBoneAnim
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PBoneAnimation.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 065 — src/main/java/com/arcanc/pulselib/content/model/animation/PCompiledAnimation.java
 
@@ -586,8 +586,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PCompiled
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PCompiledAnimation.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 066 — src/main/java/com/arcanc/pulselib/content/model/animation/PCondition.java
 
@@ -595,8 +595,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PConditio
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PCondition.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 067 — src/main/java/com/arcanc/pulselib/content/model/animation/PEventSide.java
 
@@ -604,8 +604,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PEventSid
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PEventSide.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 068 — src/main/java/com/arcanc/pulselib/content/model/animation/PInterpolation.java
 
@@ -613,8 +613,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PInterpol
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PInterpolation.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 069 — src/main/java/com/arcanc/pulselib/content/model/animation/PInterpolationType.java
 
@@ -622,8 +622,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PInterpol
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PInterpolationType.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 070 — src/main/java/com/arcanc/pulselib/content/model/animation/PInterruptionPolicy.java
 
@@ -631,8 +631,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PInterrup
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PInterruptionPolicy.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 071 — src/main/java/com/arcanc/pulselib/content/model/animation/PKeyframe.java
 
@@ -640,8 +640,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PKeyframe
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PKeyframe.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 072 — src/main/java/com/arcanc/pulselib/content/model/animation/PModelPose.java
 
@@ -649,8 +649,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PModelPos
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PModelPose.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Ported from SOURCE^ -> SOURCE; preserved the source runtime behavior.
 
 ## 073 — src/main/java/com/arcanc/pulselib/content/model/animation/PPose.java
 
@@ -658,8 +658,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PPose.jav
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PPose.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 074 — src/main/java/com/arcanc/pulselib/content/model/animation/PPoseBlendMode.java
 
@@ -667,8 +667,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PPoseBlen
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PPoseBlendMode.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 075 — src/main/java/com/arcanc/pulselib/content/model/animation/PPoseEasing.java
 
@@ -676,8 +676,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PPoseEasi
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PPoseEasing.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 076 — src/main/java/com/arcanc/pulselib/content/model/animation/PPoseMixer.java
 
@@ -685,8 +685,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PPoseMixe
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PPoseMixer.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 077 — src/main/java/com/arcanc/pulselib/content/model/animation/PPoseWriter.java
 
@@ -694,8 +694,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PPoseWrit
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PPoseWriter.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 078 — src/main/java/com/arcanc/pulselib/content/model/animation/PRawAnimation.java
 
@@ -703,8 +703,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PRawAnima
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PRawAnimation.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 079 — src/main/java/com/arcanc/pulselib/content/model/animation/PRootMotionDelta.java
 
@@ -712,8 +712,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PRootMoti
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PRootMotionDelta.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 080 — src/main/java/com/arcanc/pulselib/content/model/animation/PRootMotionRuntime.java
 
@@ -721,8 +721,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PRootMoti
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PRootMotionRuntime.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 081 — src/main/java/com/arcanc/pulselib/content/model/animation/PTransform.java
 
@@ -730,8 +730,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PTransfor
 Source change: A
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PTransform.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
+Status: PORTED
+Notes: Ported from SOURCE^ -> SOURCE; preserved the source runtime behavior.
 
 ## 082 — src/main/java/com/arcanc/pulselib/content/model/animation/PTransitionInterruptionPolicy.java
 
@@ -739,8 +739,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PTransiti
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PTransitionInterruptionPolicy.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 083 — src/main/java/com/arcanc/pulselib/content/model/animation/PVectorConversion.java
 
@@ -748,8 +748,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/animation/PVectorCo
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/model/animation/PVectorConversion.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 084 — src/main/java/com/arcanc/pulselib/content/model/baked/AtlasBufferBuilder.java
 
@@ -1983,8 +1983,8 @@ Source path: src/main/java/com/arcanc/pulselib/data/PAnimationSidecarParser.java
 Source change: A
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/data/PAnimationSidecarParser.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
+Status: ADAPTED_1_21_1
+Notes: source behavior: merge animation events and visibility sidecars; API difference: 26.x Identifier is absent; 1.21.1 implementation: ResourceLocation parsing and registry lookup; target symbol: PAnimationSidecarParser.
 
 ## 221 — src/main/java/com/arcanc/pulselib/data/PModelLoader.java
 
@@ -2001,8 +2001,8 @@ Source path: src/main/java/com/arcanc/pulselib/data/gecko/MolangParser.java
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/data/gecko/MolangParser.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ADAPTED_1_21_1
+Notes: source behavior: full Molang expression evaluation; API difference: JSpecify annotations are unavailable; 1.21.1 implementation: uses org.jetbrains Nullable; target symbol: MolangParser.
 
 ## 223 — src/main/java/com/arcanc/pulselib/data/gecko/PExpressionDependency.java
 
@@ -2010,8 +2010,8 @@ Source path: src/main/java/com/arcanc/pulselib/data/gecko/PExpressionDependency.
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/data/gecko/PExpressionDependency.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 224 — src/main/java/com/arcanc/pulselib/data/gecko/PExpressionEvaluator.java
 
@@ -2019,8 +2019,8 @@ Source path: src/main/java/com/arcanc/pulselib/data/gecko/PExpressionEvaluator.j
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/data/gecko/PExpressionEvaluator.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 225 — src/main/java/com/arcanc/pulselib/data/gecko/PGeckoAnimationEventParser.java
 
@@ -2028,8 +2028,8 @@ Source path: src/main/java/com/arcanc/pulselib/data/gecko/PGeckoAnimationEventPa
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/data/gecko/PGeckoAnimationEventParser.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 226 — src/main/java/com/arcanc/pulselib/data/gecko/PGeckoChannelDecoder.java
 
@@ -2037,8 +2037,8 @@ Source path: src/main/java/com/arcanc/pulselib/data/gecko/PGeckoChannelDecoder.j
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/data/gecko/PGeckoChannelDecoder.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 227 — src/main/java/com/arcanc/pulselib/data/gecko/PGeckoDecodeContext.java
 
@@ -2046,8 +2046,8 @@ Source path: src/main/java/com/arcanc/pulselib/data/gecko/PGeckoDecodeContext.ja
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/data/gecko/PGeckoDecodeContext.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 228 — src/main/java/com/arcanc/pulselib/data/gecko/PGeckoModelLoader.java
 
@@ -2073,8 +2073,8 @@ Source path: src/main/java/com/arcanc/pulselib/data/gecko/PMolangEulerRotationVa
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/data/gecko/PMolangEulerRotationValue.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 231 — src/main/java/com/arcanc/pulselib/data/gecko/PMolangVectorValue.java
 
@@ -2082,8 +2082,8 @@ Source path: src/main/java/com/arcanc/pulselib/data/gecko/PMolangVectorValue.jav
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/data/gecko/PMolangVectorValue.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 232 — src/main/java/com/arcanc/pulselib/data/gltf/PGltfAnimationEventSidecarParser.java
 
@@ -2091,8 +2091,8 @@ Source path: src/main/java/com/arcanc/pulselib/data/gltf/PGltfAnimationEventSide
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/data/gltf/PGltfAnimationEventSidecarParser.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Ported from SOURCE^ -> SOURCE; preserved the source runtime behavior.
 
 ## 233 — src/main/java/com/arcanc/pulselib/data/gltf/PGltfChannelDecoder.java
 
@@ -2100,8 +2100,8 @@ Source path: src/main/java/com/arcanc/pulselib/data/gltf/PGltfChannelDecoder.jav
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/data/gltf/PGltfChannelDecoder.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 234 — src/main/java/com/arcanc/pulselib/data/gltf/PGltfDecodeContext.java
 
@@ -2109,8 +2109,8 @@ Source path: src/main/java/com/arcanc/pulselib/data/gltf/PGltfDecodeContext.java
 Source change: M
 Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/data/gltf/PGltfDecodeContext.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: ALREADY_PRESENT: the runtime API was already present in the 1.21.1 baseline; SOURCE^ -> SOURCE changes are documentation or import hygiene.
 
 ## 235 — src/main/java/com/arcanc/pulselib/data/gltf/PGltfModelLoader.java
 
