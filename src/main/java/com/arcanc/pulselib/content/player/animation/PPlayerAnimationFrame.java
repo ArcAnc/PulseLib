@@ -98,6 +98,16 @@ public final class PPlayerAnimationFrame
 		return bone == null ? null : transform(bone);
 	}
 
+	/** Returns the animated first-person camera anchor relative to its bind pose. */
+	public @Nullable PTransform cameraAnchorModelDelta()
+	{
+		String cameraBone = this.definition.anchors().get(PPlayerAnimationAnchors.FIRST_PERSON_CAMERA);
+		if (cameraBone == null) return null;
+		PTransform current = transform(cameraBone);
+		PTransform bind = bindTransform(cameraBone);
+		return current == null || bind == null ? null : current.compose(bind.inverse());
+	}
+
 	private @Nullable PTransform transform(String boneName)
 	{
 		PTransform cached = this.transforms.get(boneName);

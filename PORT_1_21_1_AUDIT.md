@@ -213,7 +213,7 @@ Source change: D
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/mixin/ItemInHandRendererAccessor.java
 Status: ADAPTED_1_21_1
-Notes: source behavior: supply the first-person renderer integration boundary. API difference: modern item render states and wrappers are absent in 1.21.1. 1.21.1 implementation: retain the direct ItemInHandRenderer/BEWLR hooks for the following integration stage. target symbol: PFirstPersonRenderContexts and PPlayerFirstPersonRenderer.
+Notes: source behavior: obsolete private arm bridge removed by the newer renderer. API difference: 1.21.1 has private ItemInHandRenderer orchestration but direct PlayerRenderer hand calls. 1.21.1 implementation: ItemInHandRendererMixin wraps those direct calls, so no accessor is registered. target symbol: ItemInHandRendererMixin.
 ## 025 — src/main/java/com/arcanc/pulselib/content/mixin/ItemInHandRendererMixin.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/mixin/ItemInHandRendererMixin.java
@@ -221,7 +221,7 @@ Source change: M
 Subsystem: FIRST_PERSON_CORE
 Target path: src/main/java/com/arcanc/pulselib/content/mixin/ItemInHandRendererMixin.java
 Status: ADAPTED_1_21_1
-Notes: source behavior: supply the first-person renderer integration boundary. API difference: modern item render states and wrappers are absent in 1.21.1. 1.21.1 implementation: retain the direct ItemInHandRenderer/BEWLR hooks for the following integration stage. target symbol: PFirstPersonRenderContexts and PPlayerFirstPersonRenderer.
+Notes: source behavior: scope first-person rendering and replace final arm/item submissions. API difference: 1.21.1 uses MultiBufferSource and direct ItemInHandRenderer calls. 1.21.1 implementation: wrap renderHandsWithItems, renderArmWithItem, renderPlayerArm, and renderItem; retain vanilla equip/swing/use transforms. target symbol: ItemInHandRendererMixin.
 ## 026 — src/main/java/com/arcanc/pulselib/content/mixin/ItemModelResolverAccessor.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/mixin/ItemModelResolverAccessor.java
@@ -245,7 +245,7 @@ Source change: M
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/mixin/LivingEntityRendererMixin.java
 Status: ADAPTED_1_21_1
-Notes: source behavior: retain the player animation, frame, attachment, or armor responsibility. API difference: source relies in places on modern render states or player hooks. 1.21.1 implementation: use direct PlayerModel/LivingEntityRenderer/PlayerRenderer callbacks and native NeoForge client extensions. target symbol: PPlayerAnimations, PPlayerAnimationFrame, PPlayerAnimatedAttachmentLayer, or PLibArmorHandler.
+Notes: source behavior: apply and restore the third-person PPlayerAnimationFrame pose and root transform. API difference: 1.21.1 renders live entities instead of modern render states. 1.21.1 implementation: inject around EntityModel.setupAnim in LivingEntityRenderer.render. target symbol: LivingEntityRendererMixin.
 ## 029 — src/main/java/com/arcanc/pulselib/content/mixin/ModelPartCubesMixin.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/mixin/ModelPartCubesMixin.java
@@ -262,7 +262,7 @@ Source change: D
 Subsystem: PLAYER_ANIMATION
 Target path: src/main/java/com/arcanc/pulselib/content/mixin/PlayerRendererMixin.java
 Status: ADAPTED_1_21_1
-Notes: source behavior: retain the player animation, frame, attachment, or armor responsibility. API difference: source relies in places on modern render states or player hooks. 1.21.1 implementation: use direct PlayerModel/LivingEntityRenderer/PlayerRenderer callbacks and native NeoForge client extensions. target symbol: PPlayerAnimations, PPlayerAnimationFrame, PPlayerAnimatedAttachmentLayer, or PLibArmorHandler.
+Notes: source behavior: remove the old first-person PlayerRenderer bridge. API difference: 1.21.1 still exposes direct PlayerRenderer hand calls from ItemInHandRenderer. 1.21.1 implementation: ItemInHandRendererMixin owns those calls; PlayerRendererMixin is removed from mixin config to avoid duplicate poses. target symbol: ItemInHandRendererMixin.
 ## 031 — src/main/java/com/arcanc/pulselib/content/mixin/PlayerRootTransformMixin.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/mixin/PlayerRootTransformMixin.java

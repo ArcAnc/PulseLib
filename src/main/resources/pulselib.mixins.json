@@ -17,11 +17,9 @@
 	"EntityModelSetMixin",
 	"GameRendererMixin",
 	"HumanoidArmorLayerMixin",
-	"ItemInHandRendererAccessor",
 	"ItemInHandRendererMixin",
     "LivingEntityRendererMixin",
 	"ModelPartCubesMixin",
-    "PlayerRendererMixin",
     "RenderTypeAccessor$CompositeRenderTypeAccessor",
     "RenderTypeAccessor$CompositeStateAccessor",
     "VertexBufferAccessor"

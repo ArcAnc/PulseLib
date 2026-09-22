@@ -247,13 +247,21 @@ public final class PPlayerAnimations
 	public static @Nullable PPlayerCameraPose cameraPose(Player player, float partialTick)
 	{
 		PPlayerCameraPose cameraPose = new PPlayerCameraPose();
-		applyDefinitions(player, partialTick, Set.of(PPlayerPart.ROOT), (part, pose, definition, weight) ->
-				cameraPose.addRoot(
-						playerModelSpace(pose, definition),
-						playerModelSpace(definition.rootPivot(), definition),
-						weight));
-		applyDefinitions(player, partialTick, Set.of(PPlayerPart.HEAD), (part, pose, definition, weight) ->
-				cameraPose.addHead(playerModelSpace(pose, definition), definition.blendMode(), weight));
+		for (Map.Entry<ResourceLocation, PPlayerAnimationDefinition> entry : sortedDefinitions())
+		{
+			PPlayerAnimationDefinition definition = entry.getValue();
+			if (!definition.firstPersonSettings().enabled() ||
+					definition.firstPersonSettings().cameraMode() != PFirstPersonCameraMode.ANIMATED ||
+					INVALID_FIRST_PERSON_DEFINITIONS.contains(entry.getKey())) continue;
+			float definitionWeight = definition.weight(player, partialTick);
+			if (definitionWeight <= 0.0f) continue;
+			PPlayerAnimationInstance instance = instance(player, entry.getKey(), definition);
+			if (!instance.isFirstPersonContributing()) continue;
+			PPlayerAnimationFrame frame = instance.sampleFrame(partialTick);
+			PTransform delta = frame == null ? null : frame.cameraAnchorModelDelta();
+			if (delta != null)
+				cameraPose.addCamera(delta, definition.blendMode(), definitionWeight * instance.firstPersonActivationWeight(partialTick));
+		}
 		return cameraPose.isEmpty() ? null : cameraPose;
 	}
 
@@ -462,6 +470,9 @@ public final class PPlayerAnimations
 		private final List<RootTransform> rootTransforms = new ArrayList<>();
 		private final Vector3f headTranslation = new Vector3f();
 		private final Quaternionf headRotation = new Quaternionf();
+		private PTransform cameraTransform = PTransform.IDENTITY;
+		private boolean hasCameraTransform;
+		private boolean hasCameraRotation;
 		private boolean changed;
 
 		private void addRoot(PPlayerBonePose pose,
@@ -509,9 +520,26 @@ public final class PPlayerAnimations
 		{
 			return !this.changed;
 		}
+
+		private void addCamera(PTransform delta, PPlayerAnimationBlendMode blendMode, float weight)
+		{
+			if (weight <= 0.0f || isIdentity(delta)) return;
+			if (!this.hasCameraTransform || blendMode.poseBlendMode() == PPoseBlendMode.OVERRIDE)
+				this.cameraTransform = this.cameraTransform.interpolate(delta, weight);
+			else this.cameraTransform = this.cameraTransform.compose(PTransform.IDENTITY.interpolate(delta, weight));
+			this.hasCameraTransform = true;
+			this.hasCameraRotation |= hasRotation(delta);
+			this.changed = true;
+		}
+
+		public boolean hasRotation()
+		{
+			return this.hasCameraTransform ? this.hasCameraRotation : !this.headRotation.equals(new Quaternionf());
+		}
 		
 		public Quaternionf rotation()
 		{
+			if (this.hasCameraTransform) return this.cameraTransform.rotation();
 			Quaternionf rotation = new Quaternionf();
 			for (RootTransform transform : this.rootTransforms)
 				rotation.mul(transform.rotation());
@@ -520,6 +548,7 @@ public final class PPlayerAnimations
 		
 		public Vector3f positionOffset(float eyeHeight)
 		{
+			if (this.hasCameraTransform) return this.cameraTransform.translation();
 			Vector3f initialEyePosition = new Vector3f(0.0f, VANILLA_MODEL_ORIGIN_HEIGHT - eyeHeight, 0.0f);
 			Vector3f eyePosition = new Vector3f(initialEyePosition).add(this.headTranslation);
 			for (int index = this.rootTransforms.size() - 1; index >= 0; index--)
@@ -528,6 +557,22 @@ public final class PPlayerAnimations
 				eyePosition.sub(transform.pivot()).mul(transform.scale()).rotate(transform.rotation()).add(transform.pivot()).add(transform.translation());
 			}
 			return eyePosition.sub(initialEyePosition);
+		}
+
+		private static boolean isIdentity(PTransform transform)
+		{
+			return transform.translation().lengthSquared() < 1.0e-10f &&
+					Math.abs(Math.abs(transform.rotation().w) - 1.0f) < 1.0e-5f &&
+					Math.abs(transform.rotation().x) < 1.0e-5f && Math.abs(transform.rotation().y) < 1.0e-5f &&
+					Math.abs(transform.rotation().z) < 1.0e-5f &&
+					new Vector3f(transform.scale()).sub(1.0f, 1.0f, 1.0f).lengthSquared() < 1.0e-10f;
+		}
+
+		private static boolean hasRotation(PTransform transform)
+		{
+			Quaternionf rotation = transform.rotation();
+			return Math.abs(Math.abs(rotation.w) - 1.0f) >= 1.0e-5f || Math.abs(rotation.x) >= 1.0e-5f ||
+					Math.abs(rotation.y) >= 1.0e-5f || Math.abs(rotation.z) >= 1.0e-5f;
 		}
 
 		private record RootTransform(Vector3f pivot, Vector3f translation, Quaternionf rotation, Vector3f scale)

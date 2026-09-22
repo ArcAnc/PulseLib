@@ -71,8 +71,8 @@ notes: Preserve queue ordering and first-person flush/composite behavior, but su
 source responsibility: replace or suppress each physical arm/item transform and inject animated attachments around first-person submission.
 available in 1.21.1: DIFFERENT
 1.21.1 equivalent: PlayerRenderer.renderRightHand/renderLeftHand, private renderHand, and ItemInHandRenderer.renderPlayerArm/renderArmWithItem.
-probable target class/method: ItemInHandRendererMixin, ItemInHandRendererAccessor and PlayerRendererMixin.
-notes: The target has direct hand render methods but no AvatarRenderer or feature dispatcher. Keep the accessor for private renderPlayerArm when needed; use ordinary mixin injections/wraps compatible with 1.21.1.
+probable target class/method: ItemInHandRendererMixin around renderHandsWithItems, renderArmWithItem, renderPlayerArm and renderItem.
+notes: The target has direct hand render methods but no AvatarRenderer or feature dispatcher. ItemInHandRendererMixin wraps its private arm/item path and its direct PlayerRenderer hand calls, so the accessor and PlayerRendererMixin are removed from the active config to avoid applying a pose twice.
 
 ## Block entity and entity renderer interfaces
 
@@ -124,9 +124,9 @@ notes: ItemDisplayContext is compatible enough to preserve first-person/GUI deci
 26.x concept: deleted ItemInHandRendererAccessor, PlayerRendererMixin and PTextureCache.
 source responsibility: 26.x removes old private-arm access because AvatarRenderer exposes hand methods; replaces texture cache naming with PResourceCache.
 available in 1.21.1: DIFFERENT
-1.21.1 equivalent: ItemInHandRendererAccessor and PlayerRendererMixin remain valid 1.21.1 integration hooks; PTextureCache must be assessed independently of API migration.
-probable target class/method: existing target mixins and resource-cache users.
-notes: Do not mechanically carry these deletions. Decide each after the subsystem's behavior has a native 1.21.1 replacement.
+1.21.1 equivalent: ItemInHandRenderer directly invokes PlayerRenderer.renderRightHand/renderLeftHand; PTextureCache must be assessed independently of API migration.
+probable target class/method: ItemInHandRendererMixin wrap operations and resource-cache users.
+notes: The target retains neither deleted hook in its mixin config: direct ItemInHandRenderer wrapping replaces their responsibility without duplicate PlayerRenderer pose application.
 
 ## Verified native 1.21.1 backend mappings
 
@@ -164,3 +164,25 @@ available in 1.21.1: YES
 1.21.1 equivalent: PResourceCache.resolve, PMeshTextureVariants.resolve, TextureAtlas, and RenderType.
 probable target class/method: PBlockRenderer.submitBone, PEntityRenderer.submitBone, PItemRenderer.submitBone, and PBakedBone.drawMesh.
 notes: Every target renderer resolves PMeshRenderMaterial and uses PResourceCache.ATLAS_LOCATION. Texture overrides are converted to the resource-cache sprite id by PMeshTextureVariants, so identically named relative textures remain scoped to their model resource.
+
+## First-person integration hooks implemented for 1.21.1
+
+| Source hook | Source responsibility | Why the source vanilla target is unavailable | 1.21.1 hook | Implementation |
+| --- | --- | --- | --- | --- |
+| `BlockEntityRenderStateAccessor` | Read extracted block state during deferred block rendering. | `BlockEntityRenderState` does not exist. | Live `BlockEntityRenderer.render`. | `PBlockRenderer` reads the live block entity and block state; no accessor is registered. |
+| `CameraMixin` | Apply animated camera position and rotation after entity alignment. | 1.21.1 has `Camera.setup`, not `alignWithEntity`. | `CameraMixin#setup` tail. | Converts the animated `FIRST_PERSON_CAMERA` delta through `PFirstPersonCameraSpace`; camera mode is honored. |
+| `CubeDefinitionMixin` | Bake deformable player cuboids. | Available with the same model builder API. | `CubeDefinition.bake`. | Existing cancellable bake hook returns `PDeformedCuboid` inside the scoped player layer bake. |
+| `EntityModelSetMixin` | Scope deformable cube baking to player layers. | Available but has the direct `LayerDefinition.bakeRoot` call. | `EntityModelSet.bakeLayer` redirect. | Wraps only vanilla player and slim-player layers in `PDeformableCubeBakeScope`. |
+| `GameRendererMixin` | Flush first-person queued geometry after hands/items. | 1.21.1 uses `Camera, float, Matrix4f`, not render states. | `GameRenderer.renderItemInHand` after `renderHandsWithItems`. | Flushes `PRenderQueue.FIRST_PERSON` and composites the target render target. |
+| `GlBufferAccessor` | Read a modern `GlBuffer` handle for the new backend. | That modern class is absent. | Existing 1.21.1 buffer backend. | No fake accessor; the 1.21.1 renderer backend uses its native buffer path. |
+| `HumanoidArmorLayerMixin` | Apply player deformers to armor geometry. | 1.21.1 armor is live-entity rendering, not render states. | `HumanoidArmorLayer.renderArmorPiece` after `setupModelAnimations`. | Applies `PPlayerMeshDeformers` to the actual armor model for the current player. |
+| `ItemInHandRendererAccessor` | Old private bridge to vanilla arm rendering. | Source deletes it because newer renderer exposes direct hand submissions. | No accessor. | `ItemInHandRendererMixin` now wraps the direct 1.21.1 `PlayerRenderer.renderRightHand/renderLeftHand` calls, so the invoker is not registered. |
+| `ItemInHandRendererMixin` | Scope a first-person pass; replace arm/item spatial submissions; render attachments. | Source uses `SubmitNodeCollector`, AvatarRenderer, and a feature dispatcher. | `renderHandsWithItems`, `renderArmWithItem`, `renderPlayerArm`, and `renderItem`. | A scoped `PFirstPersonRenderContexts` pass preserves vanilla equip/swing/use transforms; wraps final arm and item calls with `PoseStack` replacement, keeps hand side and maps distinct, and renders attachments before `BufferSource.endBatch`. |
+| `ItemModelResolverAccessor` | Inspect modern item-model resolution. | `ItemModelResolver` is absent. | `ItemRenderer.renderStatic`/`BakedModel` and BEWLR. | First-person transforms wrap the existing `ItemInHandRenderer.renderItem` call without recreating item state machinery. |
+| `ItemStackRenderStateAccessor` | Read modern display/render state. | `ItemStackRenderState` is absent. | `renderItem` arguments. | `ItemStack`, `ItemDisplayContext`, left-hand flag, light, and `MultiBufferSource` are carried directly by the 1.21.1 invocation. |
+| `LivingEntityRendererMixin` | Apply and restore player animation frame in third person. | 1.21.1 renders live entities. | `LivingEntityRenderer.render` around `EntityModel.setupAnim`. | Applies `PPlayerAnimationFrame` poses, deformers, and root transform, then restores the model. |
+| `ModelPartCubesMixin` | Expose cubes to player deformers. | Available with the same field. | `ModelPart.cubes` shadow. | Existing `PModelPartCubes` implementation supplies the live cube list. |
+| `PlayerRendererMixin` | Old first-person arm bridge. | The old bridge would double-apply poses after direct item-renderer wrapping. | No separate player-renderer mixin. | `ItemInHandRendererMixin` owns first-person arm submission; third-person poses remain in `LivingEntityRendererMixin`. |
+| `PlayerRootTransformMixin` | Apply player root transform during state-based player rendering. | The state renderer is absent. | `LivingEntityRenderer.render`. | `LivingEntityRendererMixin` calls `PPlayerAnimations.applyRoot` on the live `PoseStack`. |
+| `SpecialModelWrapperAccessor` | Reach a modern special item renderer. | `SpecialModelWrapper` is absent. | `BakedModel.isCustomRenderer` and BEWLR. | Existing `PItemRenderer` handles custom models through the native 1.21.1 item renderer path. |
+| `SpecialModelWrapperRenderStateExtractor` | Transfer special model data to modern item render state. | Neither wrapper nor render state exists. | Direct BEWLR and `ItemInHandRenderer.renderItem`. | No fake extraction layer; standard display-context arguments and `PItemRenderer` retain the required data. |
