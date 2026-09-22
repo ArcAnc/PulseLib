@@ -9,13 +9,13 @@
 
 package com.arcanc.pulselib.content.model.baked;
 
-import com.arcanc.pulselib.content.model.PMesh;
+import com.arcanc.pulselib.content.model.PMeshPrimitive;
 import com.arcanc.pulselib.content.model.textures.PTextureAlphaClassifier;
 import com.arcanc.pulselib.content.renderer.legacy.GlGeometryDataFactory;
 import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
 import com.arcanc.pulselib.content.model.textures.atlas.PLibMetadata;
 import com.arcanc.pulselib.util.PRenderTypes;
-import com.arcanc.pulselib.util.PTextureCache;
+import com.arcanc.pulselib.util.PResourceCache;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.MeshData;
@@ -39,9 +39,12 @@ public final class PMeshTextureVariants
 
 	public static PBakedMesh resolve(PBakedMesh mesh, @Nullable ResourceLocation texture)
 	{
-		if (texture == null || texture.equals(mesh.textureLocation()))
+		if (texture == null)
 			return mesh;
-		return VARIANTS.computeIfAbsent(mesh, ignored -> new HashMap<>()).computeIfAbsent(texture,
+		ResourceLocation sprite = PResourceCache.spriteId(texture);
+		if (sprite.equals(mesh.textureLocation()))
+			return mesh;
+		return VARIANTS.computeIfAbsent(mesh, ignored -> new HashMap<>()).computeIfAbsent(sprite,
 				location -> bake(mesh, location));
 	}
 
@@ -59,8 +62,8 @@ public final class PMeshTextureVariants
 
 	private static PBakedMesh bake(PBakedMesh base, ResourceLocation texture)
 	{
-		PMesh source = base.source();
-		TextureAtlasSprite sprite = PTextureCache.getTextureAtlas().getSprite(texture);
+		PMeshPrimitive source = base.source();
+		TextureAtlasSprite sprite = PResourceCache.getTextureAtlas().getSprite(texture);
 		boolean emissive = sprite.contents().metadata().getSection(PLibMetadata.TYPE).
 				map(PLibMetadata :: isEmissive).orElse(false);
 		ByteBufferBuilder bytes = new ByteBufferBuilder(source.vertexCount() * PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize());
@@ -77,7 +80,7 @@ public final class PMeshTextureVariants
 			geometry = GlGeometryDataFactory.capture(data, source,
 					PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize());
 		}
-		return new PBakedMesh(base.uuid(), geometry, base.textureName(), emissive,
+		return new PBakedMesh(base.uuid(), geometry, base.textureReference(), emissive,
 				PTextureAlphaClassifier.resolve(sprite.contents()), source, texture);
 	}
 }

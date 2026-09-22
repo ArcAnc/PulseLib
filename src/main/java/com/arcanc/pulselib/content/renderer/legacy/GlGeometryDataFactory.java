@@ -9,7 +9,7 @@
 
 package com.arcanc.pulselib.content.renderer.legacy;
 
-import com.arcanc.pulselib.content.model.PMesh;
+import com.arcanc.pulselib.content.model.PMeshPrimitive;
 import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
 import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.blaze3d.vertex.VertexFormat;
@@ -22,7 +22,7 @@ public final class GlGeometryDataFactory
 	{
 	}
 
-	public static PGeometryData capture(MeshData meshData, PMesh mesh, int vertexStride)
+	public static PGeometryData capture(MeshData meshData, PMeshPrimitive mesh, int vertexStride)
 	{
 		ByteBuffer vertices = meshData.vertexBuffer().duplicate();
 		ByteBuffer indices = mesh.indices().duplicate();

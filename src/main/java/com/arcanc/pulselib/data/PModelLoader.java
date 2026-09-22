@@ -16,6 +16,7 @@ import com.mojang.math.Axis;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.BiConsumer;
@@ -34,12 +35,20 @@ public interface PModelLoader
 	
 	ResourceLocation defaultModelLocation(ResourceLocation modelLocation, String modelType);
 	
-	default ResourceLocation defaultTextureLocation(ResourceLocation textureLocation, ResourceLocation modelLocation, String modelType)
+	default ResourceLocation modelResourceLocation(ResourceLocation modelLocation)
 	{
-		return textureLocation.withPrefix(modelType + "/" + modelLocation.getPath() + "/");
+		return modelLocation;
 	}
-	
-	ResourceLocation textureLocation(ResourceLocation modelPath, String textureName);
+
+	default ResourceLocation normalizeModelResourceLocation(ResourceLocation modelLocation)
+	{
+		return modelResourceLocation(modelLocation);
+	}
+
+	default List<ResourceLocation> modelResourceCandidates(ResourceLocation modelLocation)
+	{
+		return List.of(normalizeModelResourceLocation(modelLocation));
+	}
 	
 	CompletableFuture<?> loadModels(Executor backgroundExecutor,
 	                                ResourceManager resourceManager,

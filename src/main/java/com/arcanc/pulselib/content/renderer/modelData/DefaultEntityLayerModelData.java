@@ -21,8 +21,6 @@ public class DefaultEntityLayerModelData extends PModelData
 	
 	public static class DefaultEntityLayerModelDataBuilder extends Builder
 	{
-		private final ResourceLocation shortModelLocation;
-		
 		public DefaultEntityLayerModelDataBuilder(ResourceLocation entityType, ResourceLocation shortModelLocation)
 		{
 			this(entityType, shortModelLocation, PModelData.DEFAULT_MODEL_FORMAT);
@@ -31,16 +29,8 @@ public class DefaultEntityLayerModelData extends PModelData
 		public DefaultEntityLayerModelDataBuilder(ResourceLocation entityType, ResourceLocation shortModelLocation, ResourceLocation modelFormat)
 		{
 			super(shortModelLocation, "entity");
-			this.shortModelLocation = shortModelLocation.withPrefix(entityType.getPath() + "/");
 			this.modelFormat = modelFormat;
-			this.modelLocation = PModelData.generateDefaultModelLocation(this.shortModelLocation, this.modelType, this.modelFormat);
-		}
-		
-		@Override
-		public DefaultEntityLayerModelDataBuilder addTexture(ResourceLocation texturePath)
-		{
-			super.addTexture(PModelData.generateDefaultTextureLocation(texturePath, this.shortModelLocation, this.modelType, this.modelFormat));
-			return this;
+			this.modelLocation = PModelData.generateDefaultModelLocation(shortModelLocation.withPrefix(entityType.getPath() + "/"), this.modelType, this.modelFormat);
 		}
 		
 		@Override

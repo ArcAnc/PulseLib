@@ -10,7 +10,7 @@
 package com.arcanc.pulselib.content.model.baked;
 
 
-import com.arcanc.pulselib.content.model.PMesh;
+import com.arcanc.pulselib.content.model.PMeshPrimitive;
 import com.arcanc.pulselib.content.model.textures.PAlphaMode;
 import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
 import net.minecraft.resources.ResourceLocation;
@@ -20,10 +20,10 @@ import java.util.UUID;
 public record PBakedMesh(
 		UUID uuid,
 		PGeometryData geometry,
-		String textureName,
+		String textureReference,
 		boolean isEmissive,
 		PAlphaMode alphaMode,
-		PMesh source,
+		PMeshPrimitive source,
 		ResourceLocation textureLocation)
 {
 }

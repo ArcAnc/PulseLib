@@ -14,7 +14,9 @@ import com.arcanc.pulselib.content.renderer.legacy.GlGeometryDataFactory;
 import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
 import com.arcanc.pulselib.content.model.PBone;
 import com.arcanc.pulselib.content.model.PMesh;
+import com.arcanc.pulselib.content.model.PMeshPrimitive;
 import com.arcanc.pulselib.content.model.PModel;
+import com.arcanc.pulselib.content.model.resource.PModelResource;
 import com.arcanc.pulselib.content.model.baked.*;
 import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
 import com.arcanc.pulselib.content.model.textures.atlas.PLibMetadata;
@@ -96,6 +98,7 @@ public class PModelCache
 	{
 		Map<ResourceLocation, PModel> models = new Object2ObjectOpenHashMap<>();
 		return CompletableFuture.allOf(loadModels(backgroundExecutor, resourceManager, models :: put)).
+				thenRun(() -> verifyModelsLoaded(models)).
 				thenCompose(stage :: wait).
 				thenAcceptAsync(empty ->
 				{
@@ -118,6 +121,18 @@ public class PModelCache
 			MODELS = null;
 		}
 		PGpuDeformerBuffers.clearDefinitions();
+	}
+
+	private static void verifyModelsLoaded(Map<ResourceLocation, PModel> models)
+	{
+		for (PModelResource resource : PResourceCache.getResourceCache().values())
+		{
+			PModelLoader loader = MODEL_LOADERS.get(resource.modelLoaderId());
+			List<ResourceLocation> candidates = loader.modelResourceCandidates(resource.model());
+			if (!models.containsKey(resource.model()))
+				throw new IllegalStateException("Registered model was not loaded: " + resource.model()
+						+ "; checked resources: " + candidates);
+		}
 	}
 	
 	private static void clearBoneCache(PBakedBone bone)
@@ -155,67 +170,15 @@ public class PModelCache
 			{
 				PBakedBone.PBakedBoneBuilder builder = bakedBoneBuilder.get(bone2MeshesEntry.getKey());
 				
+				Map<com.arcanc.pulselib.content.model.PMaterial, List<PMeshPrimitive>> byMaterial = new LinkedHashMap<>();
 				for (UUID meshUUID : bone2MeshesEntry.getValue().getSecond())
 				{
 					PMesh mesh = model.meshes.get(meshUUID);
-					ResourceLocation loc = textureLocation(modelPath, mesh.texture());
-					
-					TextureAtlasSprite sprite = PTextureCache.getTextureAtlas().getSprite(loc);
-					boolean isEmissive = sprite.contents().
-							metadata().
-							getSection(PLibMetadata.TYPE).
-							map(PLibMetadata :: isEmissive).
-							orElse(false);
-					
-					
-					ByteBufferBuilder byteBufferBuilder = new ByteBufferBuilder(mesh.vertexCount() * PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize());
-					BufferBuilder bufferBuilder;
-					
-					if (sprite.contents().name().getPath().equals("missingno"))
-						bufferBuilder = new BufferBuilder(byteBufferBuilder, VertexFormat.Mode.TRIANGLES, PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL);
-					else
-						bufferBuilder = new AtlasBufferBuilder(byteBufferBuilder, VertexFormat.Mode.TRIANGLES, PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL, sprite);
-					
-					for (int q = 0; q < mesh.vertexCount(); q++)
-					{
-						float x = mesh.positions().get(q * 3);
-						float y = mesh.positions().get(q * 3 + 1);
-						float z = mesh.positions().get(q * 3 + 2);
-						
-						float u = mesh.uvs().get(q * 2);
-						float v = mesh.uvs().get(q * 2 + 1);
-						
-						float nx = mesh.normals().get(q * 3);
-						float ny = mesh.normals().get(q * 3 + 1);
-						float nz = mesh.normals().get(q * 3 + 2);
-						
-						bufferBuilder.
-								addVertex(
-										x,
-										y,
-										z).
-								setUv(
-										u,
-										v).
-								setNormal(
-										nx,
-										ny,
-										nz);
-					}
-					try (MeshData meshData = bufferBuilder.buildOrThrow())
-					{
-						PGeometryData geometry = GlGeometryDataFactory.capture(meshData, mesh,
-								PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize());
-						builder.meshes.add(new PBakedMesh(
-								meshUUID,
-								geometry,
-								mesh.texture(),
-								isEmissive,
-								PTextureAlphaClassifier.resolve(sprite.contents()),
-								mesh,
-								loc));
-					}
+					for (PMeshPrimitive primitive : mesh.primitives())
+						byMaterial.computeIfAbsent(primitive.material(), ignored -> new ArrayList<>()).add(primitive);
 				}
+				for (List<PMeshPrimitive> primitives : byMaterial.values())
+					bakePrimitive(modelPath, UUID.randomUUID(), PMeshPrimitive.merge(primitives), builder);
 			}
 			
 			for (PBone bone : model.bones.values())
@@ -249,6 +212,44 @@ public class PModelCache
 		
 		return bakedModelMap;
 	}
+
+	private static void bakePrimitive(ResourceLocation modelPath, UUID meshId, PMeshPrimitive primitive,
+	                                  PBakedBone.PBakedBoneBuilder builder)
+	{
+		String reference = primitive.material() == null ? "<missing>" : primitive.material().textureReference();
+		if (reference.isEmpty())
+			return;
+		try
+		{
+			if (primitive.material() == null)
+				throw new IllegalStateException("Primitive has no material");
+			ResourceLocation texture = PResourceCache.resolve(modelPath, reference);
+			TextureAtlasSprite sprite = PResourceCache.getTextureAtlas().getSprite(texture);
+			if (sprite.contents().name().getPath().equals("missingno"))
+				throw new IllegalStateException("Texture is missing from atlas: " + texture);
+			boolean emissive = sprite.contents().metadata().getSection(PLibMetadata.TYPE)
+					.map(PLibMetadata::isEmissive).orElse(false);
+			ByteBufferBuilder bytes = new ByteBufferBuilder(
+					primitive.vertexCount() * PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize());
+			BufferBuilder buffer = new AtlasBufferBuilder(bytes, VertexFormat.Mode.TRIANGLES,
+					PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL, sprite);
+			for (int vertex = 0; vertex < primitive.vertexCount(); vertex++)
+				buffer.addVertex(primitive.positions().get(vertex * 3), primitive.positions().get(vertex * 3 + 1), primitive.positions().get(vertex * 3 + 2))
+						.setUv(primitive.uvs().get(vertex * 2), primitive.uvs().get(vertex * 2 + 1))
+						.setNormal(primitive.normals().get(vertex * 3), primitive.normals().get(vertex * 3 + 1), primitive.normals().get(vertex * 3 + 2));
+			try (MeshData meshData = buffer.buildOrThrow())
+			{
+				PGeometryData geometry = GlGeometryDataFactory.capture(meshData, primitive,
+						PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize());
+				builder.meshes.add(new PBakedMesh(meshId, geometry, reference, emissive,
+						PTextureAlphaClassifier.resolve(sprite.contents()), primitive, texture));
+			}
+		}
+		catch (RuntimeException exception)
+		{
+			throw new IllegalStateException("Can't bake model " + modelPath + " texture " + reference, exception);
+		}
+	}
 	
 	private static PBakedBone bakeBone(
 			PBakedBone.PBakedBoneBuilder builder,
@@ -278,28 +279,20 @@ public class PModelCache
 		);
 	}
 	
-	public static ResourceLocation resolveTextureLocation(ResourceLocation modelPath, String textureName)
-	{
-		for (PModelLoader modelLoader : PModelCache.getModelLoaders())
-			if (modelLoader.supports(modelPath))
-				return modelLoader.textureLocation(modelPath, textureName);
-		
-		return modelPath.withPath(textureName);
-	}
-	
-	private static ResourceLocation textureLocation(ResourceLocation modelPath, String textureName)
-	{
-		return resolveTextureLocation(modelPath, textureName);
-	}
-	
 	private static CompletableFuture<?> loadModels(Executor backgroundExecutor,
 	                                               ResourceManager resourceManager,
 	                                               BiConsumer<ResourceLocation, PModel> elementConsumer)
 	{
 		CompletableFuture<?> chain = CompletableFuture.completedFuture(null);
+		for (PModelResource resource : PResourceCache.getResourceCache().values())
+			if (!MODEL_LOADERS.containsKey(resource.modelLoaderId()))
+				throw new IllegalStateException("No model loader registered for " + resource.model() + ": " + resource.modelLoaderId());
 		
 		for (PModelLoader modelLoader : getModelLoaders())
-			chain = chain.thenCompose(empty -> modelLoader.loadModels(backgroundExecutor, resourceManager, elementConsumer));
+			chain = chain.thenCompose(empty -> modelLoader.loadModels(backgroundExecutor, resourceManager, (model, parsed) ->
+					PResourceCache.getModelResource(model, resourceManager)
+							.filter(resource -> resource.modelLoaderId().equals(modelLoader.id()))
+							.ifPresent(resource -> elementConsumer.accept(resource.model(), parsed))));
 		
 		return chain;
 	}

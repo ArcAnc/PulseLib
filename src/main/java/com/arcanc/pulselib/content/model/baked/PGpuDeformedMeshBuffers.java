@@ -9,11 +9,11 @@
 
 package com.arcanc.pulselib.content.model.baked;
 
-import com.arcanc.pulselib.content.model.PMesh;
+import com.arcanc.pulselib.content.model.PMeshPrimitive;
 import com.arcanc.pulselib.content.model.deformer.PMeshTessellator;
 import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
 import com.arcanc.pulselib.util.PRenderTypes;
-import com.arcanc.pulselib.util.PTextureCache;
+import com.arcanc.pulselib.util.PResourceCache;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
@@ -51,9 +51,9 @@ public final class PGpuDeformedMeshBuffers
 		GEOMETRIES.clear();
 	}
 
-	private static PGeometryData bake(PBakedMesh baked, PMesh mesh)
+	private static PGeometryData bake(PBakedMesh baked, PMeshPrimitive mesh)
 	{
-		TextureAtlasSprite sprite = PTextureCache.getTextureAtlas().getSprite(baked.textureLocation());
+		TextureAtlasSprite sprite = PResourceCache.getTextureAtlas().getSprite(baked.textureLocation());
 		ByteBufferBuilder bytes = new ByteBufferBuilder(mesh.vertexCount() * PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize());
 		BufferBuilder builder = sprite.contents().name().getPath().equals("missingno") ?
 				new BufferBuilder(bytes, VertexFormat.Mode.TRIANGLES, PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL) :

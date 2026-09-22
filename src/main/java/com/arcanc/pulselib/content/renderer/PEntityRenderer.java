@@ -27,7 +27,7 @@ import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
 import com.arcanc.pulselib.content.renderer.plan.PInstanceHeader;
 import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import com.arcanc.pulselib.data.gecko.MolangParser;
-import com.arcanc.pulselib.util.PTextureCache;
+import com.arcanc.pulselib.util.PResourceCache;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -396,7 +396,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>> extends
 		
 		for (PBakedMesh mesh : bone.meshes())
 		{
-			if (mesh.textureName().isEmpty())
+			if (mesh.textureReference().isEmpty())
 				continue;
 			
 			PMeshRenderContext meshContext = renderLayer == null ?
@@ -404,7 +404,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>> extends
 					renderLayer.resolveMeshRender(animatable, bone, mesh, inherited, partialTick);
 			PMeshRenderMaterial material = PMeshRenderMaterial.resolve(mesh, meshContext);
 			
-			RenderType type = material.resolveRenderType(meshContext, PTextureCache.ATLAS_LOCATION);
+			RenderType type = material.resolveRenderType(meshContext, PResourceCache.ATLAS_LOCATION);
 			
 			PGpuDeformerBuffers.Submission deformation = PGpuDeformerBuffers.submit(meshContext.deformation());
 			PInstanceHeader instance = new PInstanceHeader(matrix4fstack, meshContext.color(), material.packedLight(), meshContext.packedOverlay(),

@@ -10,7 +10,9 @@
 package com.arcanc.pulselib.data.gecko;
 
 import com.arcanc.pulselib.content.model.PBone;
+import com.arcanc.pulselib.content.model.PMaterial;
 import com.arcanc.pulselib.content.model.PMesh;
+import com.arcanc.pulselib.content.model.PMeshPrimitive;
 import com.arcanc.pulselib.content.model.PModel;
 import com.arcanc.pulselib.content.model.animation.*;
 import com.arcanc.pulselib.content.registration.PLibRegistration;
@@ -317,8 +319,7 @@ public class PGeckoModelParser
 		appendCube(buffers, min, max, cubeUv(cubeNode, rawSize, mirror, textureSize));
 		
 		UUID uuid = UUID.randomUUID();
-		return new PMesh(
-				uuid,
+		return new PMesh(uuid, List.of(new PMeshPrimitive(
 				buffers.vertexCount(),
 				buffers.positions(),
 				buffers.normals(),
@@ -326,7 +327,7 @@ public class PGeckoModelParser
 				buffers.indexCount(),
 				buffers.indices(),
 				GltfConstants.GL_UNSIGNED_INT,
-				textureName);
+				new PMaterial(textureName))));
 	}
 	
 	private static <T> float parseAnimationChannel(JsonElement channelNode,

@@ -314,45 +314,45 @@ Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
 
 Source path: src/main/java/com/arcanc/pulselib/content/model/PMaterial.java
 Source change: A
-Subsystem: OTHER
+Subsystem: RESOURCE_MODEL
 Target path: src/main/java/com/arcanc/pulselib/content/model/PMaterial.java
-Status: PENDING
+Status: PORTED
 Notes: New source API; port after its owning subsystem is scheduled.
 
 ## 036 — src/main/java/com/arcanc/pulselib/content/model/PMesh.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/model/PMesh.java
 Source change: M
-Subsystem: OTHER
+Subsystem: RESOURCE_MODEL
 Target path: src/main/java/com/arcanc/pulselib/content/model/PMesh.java
-Status: PENDING
+Status: PORTED
 Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
 
 ## 037 — src/main/java/com/arcanc/pulselib/content/model/PMeshPrimitive.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/model/PMeshPrimitive.java
 Source change: A
-Subsystem: OTHER
+Subsystem: RESOURCE_MODEL
 Target path: src/main/java/com/arcanc/pulselib/content/model/PMeshPrimitive.java
-Status: PENDING
+Status: PORTED
 Notes: New source API; port after its owning subsystem is scheduled.
 
 ## 038 — src/main/java/com/arcanc/pulselib/content/model/PModel.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/model/PModel.java
 Source change: M
-Subsystem: OTHER
+Subsystem: RESOURCE_MODEL
 Target path: src/main/java/com/arcanc/pulselib/content/model/PModel.java
-Status: PENDING
+Status: PORTED
 Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
 
 ## 039 — src/main/java/com/arcanc/pulselib/content/model/PTextureReference.java
 
 Source path: src/main/java/com/arcanc/pulselib/content/model/PTextureReference.java
 Source change: A
-Subsystem: OTHER
+Subsystem: RESOURCE_MODEL
 Target path: src/main/java/com/arcanc/pulselib/content/model/PTextureReference.java
-Status: PENDING
+Status: PORTED
 Notes: New source API; port after its owning subsystem is scheduled.
 
 ## 040 — src/main/java/com/arcanc/pulselib/content/model/animation/BoneFrame.java
@@ -1083,7 +1083,7 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/resource/PModelReso
 Source change: A
 Subsystem: RESOURCE_MODEL
 Target path: src/main/java/com/arcanc/pulselib/content/model/resource/PModelResource.java
-Status: PENDING
+Status: PORTED
 Notes: New source API; port after its owning subsystem is scheduled.
 
 ## 121 — src/main/java/com/arcanc/pulselib/content/model/resource/package-info.java
@@ -1092,7 +1092,7 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/resource/package-in
 Source change: A
 Subsystem: RESOURCE_MODEL
 Target path: src/main/java/com/arcanc/pulselib/content/model/resource/package-info.java
-Status: PENDING
+Status: PORTED
 Notes: New source API; port after its owning subsystem is scheduled.
 
 ## 122 — src/main/java/com/arcanc/pulselib/content/model/textures/PAlphaMode.java
@@ -1101,7 +1101,7 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/textures/PAlphaMode
 Source change: M
 Subsystem: RESOURCE_MODEL
 Target path: src/main/java/com/arcanc/pulselib/content/model/textures/PAlphaMode.java
-Status: PENDING
+Status: ALREADY_PRESENT
 Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
 
 ## 123 — src/main/java/com/arcanc/pulselib/content/model/textures/PTextureAlphaClassifier.java
@@ -1110,7 +1110,7 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/textures/PTextureAl
 Source change: M
 Subsystem: RESOURCE_MODEL
 Target path: src/main/java/com/arcanc/pulselib/content/model/textures/PTextureAlphaClassifier.java
-Status: PENDING
+Status: ALREADY_PRESENT
 Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
 
 ## 124 — src/main/java/com/arcanc/pulselib/content/model/textures/atlas/PLibSpriteMetadata.java
@@ -1119,7 +1119,7 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/textures/atlas/PLib
 Source change: M
 Subsystem: RESOURCE_MODEL
 Target path: src/main/java/com/arcanc/pulselib/content/model/textures/atlas/PLibSpriteMetadata.java
-Status: PENDING
+Status: ALREADY_PRESENT
 Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
 
 ## 125 — src/main/java/com/arcanc/pulselib/content/model/textures/atlas/RuntimeLoader.java
@@ -1128,8 +1128,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/textures/atlas/Runt
 Source change: M
 Subsystem: RESOURCE_MODEL
 Target path: src/main/java/com/arcanc/pulselib/content/model/textures/atlas/RuntimeLoader.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ADAPTED_1_21_1
+Notes: source behavior: rebuild the atlas from textures registered under each model resource. API difference: 1.21.1 SpriteSource uses SpriteResourceLoader and RegisterMaterialAtlasesEvent. 1.21.1 implementation: collect registered textures, namespace atlas sprites with PResourceCache.spriteId, and load through the target SpriteResourceLoader. target symbol: RuntimeLoader.run(ResourceManager, Output).
 
 ## 126 — src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationAnchor.java
 
@@ -1981,7 +1981,7 @@ Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
 
 Source path: src/main/java/com/arcanc/pulselib/data/PAnimationSidecarParser.java
 Source change: A
-Subsystem: RESOURCE_MODEL
+Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/data/PAnimationSidecarParser.java
 Status: PENDING
 Notes: New source API; port after its owning subsystem is scheduled.
@@ -1992,14 +1992,14 @@ Source path: src/main/java/com/arcanc/pulselib/data/PModelLoader.java
 Source change: M
 Subsystem: RESOURCE_MODEL
 Target path: src/main/java/com/arcanc/pulselib/data/PModelLoader.java
-Status: PENDING
+Status: PORTED
 Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
 
 ## 222 — src/main/java/com/arcanc/pulselib/data/gecko/MolangParser.java
 
 Source path: src/main/java/com/arcanc/pulselib/data/gecko/MolangParser.java
 Source change: M
-Subsystem: RESOURCE_MODEL
+Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/data/gecko/MolangParser.java
 Status: PENDING
 Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
@@ -2008,7 +2008,7 @@ Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
 
 Source path: src/main/java/com/arcanc/pulselib/data/gecko/PExpressionDependency.java
 Source change: M
-Subsystem: RESOURCE_MODEL
+Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/data/gecko/PExpressionDependency.java
 Status: PENDING
 Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
@@ -2017,7 +2017,7 @@ Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
 
 Source path: src/main/java/com/arcanc/pulselib/data/gecko/PExpressionEvaluator.java
 Source change: M
-Subsystem: RESOURCE_MODEL
+Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/data/gecko/PExpressionEvaluator.java
 Status: PENDING
 Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
@@ -2026,7 +2026,7 @@ Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
 
 Source path: src/main/java/com/arcanc/pulselib/data/gecko/PGeckoAnimationEventParser.java
 Source change: M
-Subsystem: RESOURCE_MODEL
+Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/data/gecko/PGeckoAnimationEventParser.java
 Status: PENDING
 Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
@@ -2035,7 +2035,7 @@ Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
 
 Source path: src/main/java/com/arcanc/pulselib/data/gecko/PGeckoChannelDecoder.java
 Source change: M
-Subsystem: RESOURCE_MODEL
+Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/data/gecko/PGeckoChannelDecoder.java
 Status: PENDING
 Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
@@ -2044,7 +2044,7 @@ Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
 
 Source path: src/main/java/com/arcanc/pulselib/data/gecko/PGeckoDecodeContext.java
 Source change: M
-Subsystem: RESOURCE_MODEL
+Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/data/gecko/PGeckoDecodeContext.java
 Status: PENDING
 Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
@@ -2055,7 +2055,7 @@ Source path: src/main/java/com/arcanc/pulselib/data/gecko/PGeckoModelLoader.java
 Source change: M
 Subsystem: RESOURCE_MODEL
 Target path: src/main/java/com/arcanc/pulselib/data/gecko/PGeckoModelLoader.java
-Status: PENDING
+Status: PORTED
 Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
 
 ## 229 — src/main/java/com/arcanc/pulselib/data/gecko/PGeckoModelParser.java
@@ -2064,14 +2064,14 @@ Source path: src/main/java/com/arcanc/pulselib/data/gecko/PGeckoModelParser.java
 Source change: M
 Subsystem: RESOURCE_MODEL
 Target path: src/main/java/com/arcanc/pulselib/data/gecko/PGeckoModelParser.java
-Status: PENDING
+Status: PORTED
 Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
 
 ## 230 — src/main/java/com/arcanc/pulselib/data/gecko/PMolangEulerRotationValue.java
 
 Source path: src/main/java/com/arcanc/pulselib/data/gecko/PMolangEulerRotationValue.java
 Source change: M
-Subsystem: RESOURCE_MODEL
+Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/data/gecko/PMolangEulerRotationValue.java
 Status: PENDING
 Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
@@ -2080,7 +2080,7 @@ Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
 
 Source path: src/main/java/com/arcanc/pulselib/data/gecko/PMolangVectorValue.java
 Source change: M
-Subsystem: RESOURCE_MODEL
+Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/data/gecko/PMolangVectorValue.java
 Status: PENDING
 Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
@@ -2089,7 +2089,7 @@ Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
 
 Source path: src/main/java/com/arcanc/pulselib/data/gltf/PGltfAnimationEventSidecarParser.java
 Source change: M
-Subsystem: RESOURCE_MODEL
+Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/data/gltf/PGltfAnimationEventSidecarParser.java
 Status: PENDING
 Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
@@ -2098,7 +2098,7 @@ Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
 
 Source path: src/main/java/com/arcanc/pulselib/data/gltf/PGltfChannelDecoder.java
 Source change: M
-Subsystem: RESOURCE_MODEL
+Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/data/gltf/PGltfChannelDecoder.java
 Status: PENDING
 Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
@@ -2107,7 +2107,7 @@ Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
 
 Source path: src/main/java/com/arcanc/pulselib/data/gltf/PGltfDecodeContext.java
 Source change: M
-Subsystem: RESOURCE_MODEL
+Subsystem: ANIMATION_CORE
 Target path: src/main/java/com/arcanc/pulselib/data/gltf/PGltfDecodeContext.java
 Status: PENDING
 Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
@@ -2118,7 +2118,7 @@ Source path: src/main/java/com/arcanc/pulselib/data/gltf/PGltfModelLoader.java
 Source change: M
 Subsystem: RESOURCE_MODEL
 Target path: src/main/java/com/arcanc/pulselib/data/gltf/PGltfModelLoader.java
-Status: PENDING
+Status: PORTED
 Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
 
 ## 236 — src/main/java/com/arcanc/pulselib/data/gltf/PGltfModelParser.java
@@ -2127,7 +2127,7 @@ Source path: src/main/java/com/arcanc/pulselib/data/gltf/PGltfModelParser.java
 Source change: M
 Subsystem: RESOURCE_MODEL
 Target path: src/main/java/com/arcanc/pulselib/data/gltf/PGltfModelParser.java
-Status: PENDING
+Status: PORTED
 Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
 
 ## 237 — src/main/java/com/arcanc/pulselib/util/PLibDatabase.java
@@ -2145,7 +2145,7 @@ Source path: src/main/java/com/arcanc/pulselib/util/PModelCache.java
 Source change: M
 Subsystem: RESOURCE_MODEL
 Target path: src/main/java/com/arcanc/pulselib/util/PModelCache.java
-Status: PENDING
+Status: PORTED
 Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
 
 ## 239 — src/main/java/com/arcanc/pulselib/util/PRenderTypes.java
@@ -2163,7 +2163,7 @@ Source path: src/main/java/com/arcanc/pulselib/util/PResourceCache.java
 Source change: A
 Subsystem: RESOURCE_MODEL
 Target path: src/main/java/com/arcanc/pulselib/util/PResourceCache.java
-Status: PENDING
+Status: PORTED
 Notes: New source API; port after its owning subsystem is scheduled.
 
 ## 241 — src/main/java/com/arcanc/pulselib/util/PTextureCache.java
@@ -2172,7 +2172,7 @@ Source path: src/main/java/com/arcanc/pulselib/util/PTextureCache.java
 Source change: D
 Subsystem: RESOURCE_MODEL
 Target path: src/main/java/com/arcanc/pulselib/util/PTextureCache.java
-Status: PENDING
+Status: PORTED
 Notes: Deletion requires a 1.21.1 hook review; do not remove solely because 26.x no longer needs it.
 
 ## 242 — src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentAnchor.java

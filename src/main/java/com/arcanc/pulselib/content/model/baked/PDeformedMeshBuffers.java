@@ -10,12 +10,12 @@
 package com.arcanc.pulselib.content.model.baked;
 
 import com.arcanc.pulselib.content.mixin.VertexBufferAccessor;
-import com.arcanc.pulselib.content.model.PMesh;
+import com.arcanc.pulselib.content.model.PMeshPrimitive;
 import com.arcanc.pulselib.content.model.deformer.PMeshDeformation;
 import com.arcanc.pulselib.content.model.deformer.PMeshTessellator;
 import com.arcanc.pulselib.content.renderer.legacy.GlDynamicGeometry;
 import com.arcanc.pulselib.util.PRenderTypes;
-import com.arcanc.pulselib.util.PTextureCache;
+import com.arcanc.pulselib.util.PResourceCache;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import org.joml.Vector3f;
@@ -29,7 +29,7 @@ public final class PDeformedMeshBuffers
 {
 	private static final Object STATIC_CACHE_KEY = new Object();
 	private static final Map<PBakedMesh, IdentityHashMap<Object, GlDynamicGeometry>> BUFFERS = new IdentityHashMap<>();
-	private static final Map<PBakedMesh, Map<Integer, PMesh>> SUBDIVIDED_SOURCES = new IdentityHashMap<>();
+	private static final Map<PBakedMesh, Map<Integer, PMeshPrimitive>> SUBDIVIDED_SOURCES = new IdentityHashMap<>();
 
 	private PDeformedMeshBuffers()
 	{
@@ -67,7 +67,7 @@ public final class PDeformedMeshBuffers
 		SUBDIVIDED_SOURCES.clear();
 	}
 
-	private static PMesh source(PBakedMesh mesh, PMeshDeformation deformation)
+	private static PMeshPrimitive source(PBakedMesh mesh, PMeshDeformation deformation)
 	{
 		int level = deformation.subdivisionLevel();
 		if (level == 0)
@@ -76,10 +76,10 @@ public final class PDeformedMeshBuffers
 				level, ignored -> PMeshTessellator.subdivide(mesh.source(), level));
 	}
 
-	private static void upload(VertexBuffer target, PBakedMesh baked, PMesh mesh, PMeshDeformation deformation)
+	private static void upload(VertexBuffer target, PBakedMesh baked, PMeshPrimitive mesh, PMeshDeformation deformation)
 	{
 		boolean deformed = deformation != null && !deformation.stack().isEmpty();
-		TextureAtlasSprite sprite = PTextureCache.getTextureAtlas().getSprite(baked.textureLocation());
+		TextureAtlasSprite sprite = PResourceCache.getTextureAtlas().getSprite(baked.textureLocation());
 		ByteBufferBuilder bytes = new ByteBufferBuilder(mesh.vertexCount() * PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize());
 		BufferBuilder builder = sprite.contents().name().getPath().equals("missingno") ?
 				new BufferBuilder(bytes, VertexFormat.Mode.TRIANGLES, PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL) :

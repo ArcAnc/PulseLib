@@ -11,7 +11,9 @@ package com.arcanc.pulselib.data.gltf;
 
 
 import com.arcanc.pulselib.content.model.PBone;
+import com.arcanc.pulselib.content.model.PMaterial;
 import com.arcanc.pulselib.content.model.PMesh;
+import com.arcanc.pulselib.content.model.PMeshPrimitive;
 import com.arcanc.pulselib.content.model.PModel;
 import com.arcanc.pulselib.content.model.animation.*;
 import com.arcanc.pulselib.content.registration.PLibRegistration;
@@ -269,14 +271,23 @@ public class PGltfModelParser
 	private static UUID parseMesh(MeshModel mesh, NodeModel node, Map<UUID, PMesh> uuidToMesh,
 	                              boolean bakeNodePlacement)
 	{
-		//Only one primitive per mesh. At least for BBmodel
-		MeshPrimitiveModel primitive = mesh.getMeshPrimitiveModels().getFirst();
+		Matrix4f transform = meshTransform(node, bakeNodePlacement);
+		List<PMeshPrimitive> primitives = mesh.getMeshPrimitiveModels().stream()
+				.map(primitive -> parsePrimitive(primitive, transform))
+				.toList();
+		PMesh pMesh = new PMesh(UUID.randomUUID(), primitives);
+		uuidToMesh.put(pMesh.uuid(), pMesh);
+		return pMesh.uuid();
+	}
+
+	private static PMeshPrimitive parsePrimitive(MeshPrimitiveModel primitive, Matrix4f transform)
+	{
 		AccessorModel positionsAccessor = primitive.getAttributes().get("POSITION");
 		AccessorModel normalsAccessor = primitive.getAttributes().get("NORMAL");
 		AccessorModel uvsAccessor = primitive.getAttributes().get("TEXCOORD_0");
 		
-		FloatBuffer positions = transformPositions(PLibParserHelper.getFloatBuffer(positionsAccessor), node, bakeNodePlacement);
-		FloatBuffer normals = transformNormals(PLibParserHelper.getFloatBuffer(normalsAccessor), node, bakeNodePlacement);
+		FloatBuffer positions = transformPositions(PLibParserHelper.getFloatBuffer(positionsAccessor), transform);
+		FloatBuffer normals = transformNormals(PLibParserHelper.getFloatBuffer(normalsAccessor), transform);
 		FloatBuffer uvs = PLibParserHelper.getFloatBuffer(uvsAccessor);
 		
 		int vertexCount = positionsAccessor.getCount();
@@ -288,8 +299,7 @@ public class PGltfModelParser
 		
 		MaterialModel material = primitive.getMaterialModel();
 		String textureName = PLibParserHelper.extractTextureName(material);
-		PMesh pMesh = new PMesh(
-				UUID.randomUUID(),
+		return new PMeshPrimitive(
 				vertexCount,
 				positions,
 				normals,
@@ -297,16 +307,11 @@ public class PGltfModelParser
 				indicesCount,
 				indices,
 				indicesType,
-				textureName
-		);
-		
-		uuidToMesh.put(pMesh.uuid(), pMesh);
-		return pMesh.uuid();
+				new PMaterial(textureName));
 	}
 
-	private static FloatBuffer transformPositions(FloatBuffer source, NodeModel node, boolean bakeNodePlacement)
+	private static FloatBuffer transformPositions(FloatBuffer source, Matrix4f transform)
 	{
-		Matrix4f transform = meshTransform(node, bakeNodePlacement);
 		FloatBuffer result = FloatBuffer.allocate(source.limit());
 		for (int offset = 0; offset < source.limit(); offset += 3)
 		{
@@ -317,14 +322,14 @@ public class PGltfModelParser
 		return result.flip();
 	}
 
-	private static FloatBuffer transformNormals(FloatBuffer source, NodeModel node, boolean bakeNodePlacement)
+	private static FloatBuffer transformNormals(FloatBuffer source, Matrix4f transform)
 	{
-		Matrix3f transform = new Matrix3f().set(meshTransform(node, bakeNodePlacement)).invert().transpose();
+		Matrix3f normalTransform = new Matrix3f().set(transform).invert().transpose();
 		FloatBuffer result = FloatBuffer.allocate(source.limit());
 		for (int offset = 0; offset < source.limit(); offset += 3)
 		{
 			Vector3f normal = new Vector3f(source.get(offset), source.get(offset + 1), source.get(offset + 2));
-			transform.transform(normal).normalize();
+			normalTransform.transform(normal).normalize();
 			result.put(normal.x).put(normal.y).put(normal.z);
 		}
 		return result.flip();

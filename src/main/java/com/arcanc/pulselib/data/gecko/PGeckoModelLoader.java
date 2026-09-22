@@ -69,17 +69,16 @@ public class PGeckoModelLoader implements PModelLoader
 	}
 	
 	@Override
-	public ResourceLocation textureLocation(ResourceLocation modelPath, String textureName)
+	public ResourceLocation modelResourceLocation(ResourceLocation modelLocation)
 	{
-		String modelName = modelName(modelPath);
-		String[] divided = modelName.split("/");
-		
-		ResourceLocation loc = modelPath.withPath(divided[0] + "/" + divided[1] + "/");
-		
-		if (divided.length > 2)
-			for (int q = 2; q < divided.length; q++)
-				loc = loc.withSuffix(divided[q] + "/");
-		return loc.withSuffix(textureName);
+		return modelLocation.getPath().startsWith(MODEL_ROOT + "/") ? modelLocation : modelLocation.withPrefix(MODEL_ROOT + "/");
+	}
+
+	@Override
+	public ResourceLocation normalizeModelResourceLocation(ResourceLocation modelLocation)
+	{
+		ResourceLocation resource = modelResourceLocation(modelLocation);
+		return resource.getPath().endsWith(JSON_EXTENSION) ? resource : resource.withSuffix(MODEL_EXTENSION);
 	}
 	
 	@Override

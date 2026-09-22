@@ -21,8 +21,6 @@ public class DefaultBlockModelData extends PModelData
 	
 	public static class DefaultBlockModelDataBuilder extends Builder
 	{
-		private final ResourceLocation shortModelLocation;
-		
 		public DefaultBlockModelDataBuilder(ResourceLocation modelLocation)
 		{
 			this(modelLocation, PModelData.DEFAULT_MODEL_FORMAT);
@@ -31,16 +29,8 @@ public class DefaultBlockModelData extends PModelData
 		public DefaultBlockModelDataBuilder(ResourceLocation modelLocation, ResourceLocation modelFormat)
 		{
 			super(modelLocation, "block");
-			this.shortModelLocation = modelLocation;
 			this.modelFormat = modelFormat;
 			this.modelLocation = PModelData.generateDefaultModelLocation(modelLocation, this.modelType, this.modelFormat);
-		}
-		
-		@Override
-		public DefaultBlockModelDataBuilder addTexture(ResourceLocation texturePath)
-		{
-			super.addTexture(PModelData.generateDefaultTextureLocation(texturePath, this.shortModelLocation, this.modelType, this.modelFormat));
-			return this;
 		}
 		
 		@Override

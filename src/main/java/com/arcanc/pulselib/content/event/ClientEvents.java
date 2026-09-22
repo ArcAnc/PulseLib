@@ -24,7 +24,7 @@ import com.arcanc.pulselib.content.renderer.PRenderStagesHandler;
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.arcanc.pulselib.util.PModelCache;
 import com.arcanc.pulselib.util.PRenderTypes;
-import com.arcanc.pulselib.util.PTextureCache;
+import com.arcanc.pulselib.util.PResourceCache;
 import com.arcanc.pulselib.util.attachments.PAttachmentAnchorResolvers;
 import com.arcanc.pulselib.util.attachments.PLivingAttachments;
 import com.arcanc.pulselib.util.attachments.humanoid.armor.PArmorClientExtensions;
@@ -52,7 +52,7 @@ public class ClientEvents
 		ModLoader.postEvent(new PulseLibEvents.TypeRegistrationEvent());
 
 		//modEventBus.addListener(ClientEvents :: registerRenderers);
-		//modEventBus.addListener(ClientEvents :: registerTextures);
+	//modEventBus.addListener(ClientEvents :: registerResources);
 		PAttachmentAnchorResolvers.init(modEventBus);
 		//registerTestCowTail();
 		
@@ -66,7 +66,7 @@ public class ClientEvents
 		PLibAnimationTicker.register(modEventBus);
 //		PPlayerAcrobaticDemo.register(modEventBus);
 		PRenderStagesHandler.register(modEventBus);
-		PTextureCache.register(modEventBus);
+		PResourceCache.register(modEventBus);
 	}
 	
 	/*private static void registerTestCowTail()
@@ -177,7 +177,7 @@ public class ClientEvents
 		event.registerBlockEntityRenderer(PLibRegistration.BETypeReg.TEST_BLOCK_ENTITY.get(), TestBlockEntityRenderer :: new);
 	}
 
-	private static void registerTextures(final PulseLibEvents.RegisterTextureEvent event)
+	private static void registerResources(final PulseLibEvents.RegisterResourceEvent event)
 	{
 		event.addTextureLocation(TestEntityRender.SPHERE).
 				addTextureLocation(TestEntityRender.TUBE).

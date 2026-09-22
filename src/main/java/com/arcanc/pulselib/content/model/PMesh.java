@@ -10,20 +10,12 @@
 package com.arcanc.pulselib.content.model;
 
 
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
+import java.util.List;
 import java.util.UUID;
 
 public record PMesh(
 			UUID uuid,
-			int vertexCount,
-			FloatBuffer positions,
-			FloatBuffer normals,
-			FloatBuffer uvs,
-			int indicesCount,
-			ByteBuffer indices,
-			int glIndexType,
-			String texture
+			List<PMeshPrimitive> primitives
 )
 {
 

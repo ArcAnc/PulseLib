@@ -11,7 +11,7 @@ package com.arcanc.pulselib.content.model.textures.atlas;
 
 
 import com.arcanc.pulselib.util.PLibDatabase;
-import com.arcanc.pulselib.util.PTextureCache;
+import com.arcanc.pulselib.util.PResourceCache;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.client.renderer.texture.SpriteLoader;
 import net.minecraft.client.renderer.texture.atlas.SpriteSource;
@@ -25,6 +25,8 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class RuntimeLoader implements SpriteSource
 {
@@ -34,20 +36,24 @@ public class RuntimeLoader implements SpriteSource
 	@Override
 	public void run(ResourceManager resourceManager, Output output)
 	{
-		PTextureCache.getTextureCache().clear();
-		PTextureCache.postEvent();
+		PResourceCache.clear();
+		PResourceCache.postEvent();
 		List<MetadataSectionSerializer<?>> metadataSections = new ArrayList<>(SpriteLoader.DEFAULT_METADATA_SECTIONS);
 		metadataSections.add(PLibMetadata.TYPE);
 		SpriteResourceLoader spriteResourceLoader = SpriteResourceLoader.create(metadataSections);
 		
-		PTextureCache.getTextureCache().forEach(texture ->
+		Set<ResourceLocation> textures = PResourceCache.getResourceCache().values().stream()
+				.flatMap(resource -> resource.textures().values().stream())
+				.collect(Collectors.toSet());
+		textures.forEach(texture ->
 		{
 			ResourceLocation resourcelocation = TEXTURE_ID_CONVERTER.idToFile(texture);
 			Optional<Resource> optional = resourceManager.getResource(resourcelocation);
 			if (optional.isPresent())
 			{
 				Resource resource = optional.get();
-				output.add(texture, loader -> spriteResourceLoader.loadSprite(texture, resource));
+				ResourceLocation sprite = PResourceCache.spriteId(texture);
+				output.add(sprite, loader -> spriteResourceLoader.loadSprite(sprite, resource));
 			}
 			else
 				PLibDatabase.LOGGER.warn("Missing sprite: {}", resourcelocation);

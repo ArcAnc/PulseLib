@@ -17,7 +17,7 @@ import com.arcanc.pulselib.content.model.animation.PAnimationPoseResolver;
 import com.arcanc.pulselib.content.model.animation.PPose;
 import com.arcanc.pulselib.data.gecko.MolangParser;
 import com.arcanc.pulselib.content.renderer.modelData.PModelData;
-import com.arcanc.pulselib.util.PTextureCache;
+import com.arcanc.pulselib.util.PResourceCache;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexBuffer;
@@ -148,13 +148,13 @@ public record PBakedBone(String name,
 		PMeshRenderContext boneContext = inherited;
 		this.meshes().forEach(mesh ->
 		{
-			if (mesh.textureName().isEmpty())
+			if (mesh.textureReference().isEmpty())
 				return;
 			
 			PMeshRenderContext meshContext = resolver.resolve(this, mesh, boneContext);
 			PMeshRenderMaterial material = PMeshRenderMaterial.resolve(mesh, meshContext);
 			
-			RenderType type = material.resolveRenderType(meshContext, PTextureCache.ATLAS_LOCATION);
+			RenderType type = material.resolveRenderType(meshContext, PResourceCache.ATLAS_LOCATION);
 			
 			int u = meshContext.packedOverlay() & 0xFFFF;
 			int v = (meshContext.packedOverlay() >> 16) & 0xFFFF;
@@ -247,11 +247,11 @@ public record PBakedBone(String name,
 	                             PoseStack poseStack,
 	                             Matrix4f matrix4fstack)
 	{
-		if (mesh.textureName().isEmpty())
+		if (mesh.textureReference().isEmpty())
 			return;
 		PMeshRenderContext meshContext = resolver.resolve(bone, mesh, inherited);
 		PMeshRenderMaterial material = PMeshRenderMaterial.resolve(mesh, meshContext);
-		RenderType type = material.resolveRenderType(meshContext, PTextureCache.ATLAS_LOCATION);
+		RenderType type = material.resolveRenderType(meshContext, PResourceCache.ATLAS_LOCATION);
 		int u = meshContext.packedOverlay() & 0xFFFF;
 		int v = (meshContext.packedOverlay() >> 16) & 0xFFFF;
 		int color = meshContext.color();

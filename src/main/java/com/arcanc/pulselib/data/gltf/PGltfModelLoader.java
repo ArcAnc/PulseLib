@@ -61,17 +61,29 @@ public class PGltfModelLoader implements PModelLoader
 	}
 	
 	@Override
-	public ResourceLocation textureLocation(ResourceLocation modelPath, String textureName)
+	public ResourceLocation modelResourceLocation(ResourceLocation modelLocation)
 	{
-		String modelPathWithoutExtension = stripModelExtension(modelPath.getPath());
-		String[] divided = modelPathWithoutExtension.split("/");
-		ResourceLocation loc = modelPath.withPath(divided[1] + "/" + divided[2] + "/");
-		
-		if (divided.length > 3)
-			for (int q = 3; q < divided.length; q++)
-				loc = loc.withSuffix(divided[q] + "/");
-		
-		return loc.withSuffix(textureName);
+		return modelLocation.getPath().startsWith(ROOT + "/") ? modelLocation : modelLocation.withPrefix(ROOT + "/");
+	}
+
+	@Override
+	public ResourceLocation normalizeModelResourceLocation(ResourceLocation modelLocation)
+	{
+		ResourceLocation resource = modelResourceLocation(modelLocation);
+		String path = resource.getPath();
+		return path.endsWith(GLB_EXTENSION) || path.endsWith(GLTF_EXTENSION) ? resource : resource.withSuffix(GLB_EXTENSION);
+	}
+
+	@Override
+	public List<ResourceLocation> modelResourceCandidates(ResourceLocation modelLocation)
+	{
+		ResourceLocation resource = modelResourceLocation(modelLocation);
+		String path = resource.getPath();
+		if (path.endsWith(GLTF_EXTENSION))
+			return List.of(resource, resource.withPath(path.substring(0, path.length() - GLTF_EXTENSION.length()) + GLB_EXTENSION));
+		if (path.endsWith(GLB_EXTENSION))
+			return List.of(resource, resource.withPath(path.substring(0, path.length() - GLB_EXTENSION.length()) + GLTF_EXTENSION));
+		return List.of(resource.withSuffix(GLB_EXTENSION), resource.withSuffix(GLTF_EXTENSION));
 	}
 	
 	@Override
