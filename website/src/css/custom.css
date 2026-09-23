@@ -39,6 +39,12 @@ pre,
   align-items: center;
 }
 
+@media (min-width: 997px) {
+  #autocomplete {
+    transform: translateY(-0.5rem);
+  }
+}
+
 @media (max-width: 996px) {
   #autocomplete {
     min-width: 0;
