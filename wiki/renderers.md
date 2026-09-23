@@ -8,7 +8,7 @@ All built-in renderers implement [`PRenderer`](https://github.com/ArcAnc/PulseLi
 * `trueSubmit(...)` - default PulseLib model submission.
 * `postSubmit(...)` - hook after model submission.
 
-Most custom renderers only need a constructor. Override `preSubmit` or `postSubmit` when you need to draw something extra around the PulseLib model.
+Most custom renderers only need a constructor. Register each model and its material texture references as a `PModelResource`, since resource registration determines what PulseLib loads. Override `preSubmit` or `postSubmit` when you need to draw something extra around the PulseLib model.
 
 ## Molang context
 

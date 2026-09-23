@@ -17,6 +17,8 @@ import com.arcanc.pulselib.content.model.animation.PAnimationEventType;
 import com.arcanc.pulselib.content.model.deformer.PMeshDeformer;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationDefinition;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
+import com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimatedAttachmentRenderer;
+import com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimatedAttachments;
 import com.arcanc.pulselib.content.registration.PLibRegistration;
 import com.arcanc.pulselib.content.model.PTextureReference;
 import com.arcanc.pulselib.content.model.resource.PModelResource;
@@ -163,6 +165,32 @@ public class PulseLibEvents
 			public void apply()
 			{
 				this.actions.forEach(Runnable :: run);
+			}
+		}
+	}
+
+	/** Registers renderers for semantic player-animation anchors. */
+	public static class PlayerAnimatedAttachmentRegistrationEvent extends Event implements IModBusEvent
+	{
+		private final PlayerAnimatedAttachmentRegistration registration = new PlayerAnimatedAttachmentRegistration();
+
+		public PlayerAnimatedAttachmentRegistration registration()
+		{
+			return this.registration;
+		}
+
+		public static final class PlayerAnimatedAttachmentRegistration
+		{
+			private final List<Runnable> actions = new ArrayList<>();
+
+			public void register(PPlayerAnimatedAttachmentRenderer renderer)
+			{
+				this.actions.add(() -> PPlayerAnimatedAttachments.register(renderer));
+			}
+
+			public void apply()
+			{
+				this.actions.forEach(Runnable::run);
 			}
 		}
 	}

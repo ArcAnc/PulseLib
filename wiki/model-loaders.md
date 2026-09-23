@@ -25,6 +25,8 @@ resolves to:
 assets/<namespace>/glmodels/entity/<path>.glb
 ```
 
+Resource registration accepts either extension or no extension. An extension-less id checks `.glb` then `.gltf`; an explicit extension is preferred and its counterpart is used only as fallback. Override `modelResourceCandidates(...)` when a custom loader supports equivalent resource names.
+
 The parser is [`PGltfModelParser`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/data/gltf/PGltfModelParser.java). glTF channels are decoded through the registered position, rotation, and scale channel types, so the loaded animation data now uses the same generic track API as other formats.
 
 ## Gecko loader
@@ -82,11 +84,6 @@ public final class MyModelLoader implements PModelLoader {
     }
 
     @Override
-    public ResourceLocation textureLocation(ResourceLocation modelPath, String textureName) {
-        return modelPath.withPath("entity/" + textureName);
-    }
-
-    @Override
     public CompletableFuture<?> loadModels(Executor backgroundExecutor,
                                            ResourceManager resourceManager,
                                            BiConsumer<ResourceLocation, PModel> elementConsumer) {
@@ -102,5 +99,7 @@ Register before client resource reload:
 ```java
 PModelCache.registerModelLoader(MyModelLoader.INSTANCE);
 ```
+
+Register the model through `PulseLibEvents.RegisterResourceEvent` and map each material reference there. The registration controls which models are loaded; `PModelData` deliberately has no texture map.
 
 `PModel` contains raw bones, meshes, bone-to-mesh mapping, and animations. `PModelCache` owns baking, vertex buffer creation, atlas UV conversion, emissive metadata, and cache cleanup.

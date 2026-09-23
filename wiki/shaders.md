@@ -88,7 +88,7 @@ The immediate emissive shader omits `NormalMat`, `Light`, `Sampler2`, and direct
 
 `AUTO` is resolved from the atlas sprite before a render type is selected. A texture containing only alpha values 0 and 255 becomes `CUTOUT`; any alpha value from 1 through 254 makes it `TRANSLUCENT`; a fully opaque texture becomes `OPAQUE`.
 
-The renderer's constructor-provided render type remains authoritative by default. Call `withAlphaMode(PAlphaMode.AUTO)` from a bone or mesh render resolver to opt into the baked texture classification, or pass a concrete mode to force a specific path. See [Textures and Emissive](textures-and-emissive.md) for metadata and examples.
+The renderer's constructor-provided render type remains authoritative by default. Call `withAlphaMode(PAlphaMode.AUTO)` from a bone or mesh render resolver to opt into the baked texture classification, or pass a concrete mode to force a specific path. See [Resources](resources.md) for metadata and examples.
 
 Alpha-mode selection currently targets the queued world path: it resolves to `trianglesSolid`, `trianglesCutout`, or `trianglesTranslucent`. Do not apply `withAlphaMode(...)` to a GUI/immediate context, because those render types require the immediate uniform contract rather than queued instance attributes.
 

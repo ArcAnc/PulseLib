@@ -4,6 +4,8 @@ The attachment system is for cases where you do not want to replace the whole en
 
 This is useful for custom armor, tails, backpacks, masks, equipment on arms, or other accessories. Definitions can be tied to an item stack, registered globally for living entities, hide vanilla armor for a slot, and render first-person arm attachments.
 
+First-person arm attachments render through an enabled player-animation first-person presentation with sampled arm and camera anchors. Register every attachment model and its material references through `PulseLibEvents.RegisterResourceEvent` before it is used.
+
 Important classes:
 
 * [`PLivingAttachmentDefinition`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentDefinition.java)

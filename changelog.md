@@ -9,3 +9,6 @@
 * made block-renderer direction setup methods available to subclasses
 * moved animation channel, animation event, and mesh deformer types to PulseLib's internal registries
 * added a type-registration event for external animation channels, animation events, and mesh deformers
+* rewrote first-person player animation presentation, including arms, held items, attachments, and camera-space transforms
+* replaced `PTextureCache` with model-local `PResourceCache` and `PModelResource` registrations
+* added `.glb`/`.gltf` fallback for registered glTF models, with diagnostics for both checked paths

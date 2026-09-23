@@ -24,7 +24,7 @@ super(modelData, PRenderTypes.RenderTypeProvider::trianglesSolid);
 
 If a texture is marked as emissive, the default renderers automatically switch the mesh to the matching emissive variant. You normally do not need to choose `trianglesSolidEmissive` yourself unless you are writing custom draw code.
 
-Emissive and alpha-mode texture metadata is described on [Textures and Emissive](textures-and-emissive.md).
+Emissive and alpha-mode texture metadata is described on [Resources](resources.md).
 
 ## Why vanilla RenderType is not enough
 
@@ -53,7 +53,7 @@ The queue has a few stages:
 * `FIRST_PERSON` for first-person item rendering.
 * `GUI` for GUI rendering.
 
-Normal renderers submit into these stages for you. [`PRenderStagesHandler`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java) flushes `ENTITIES` and `TRANSLUCENT_BLOCKS` together; `GameRendererMixin` flushes `FIRST_PERSON` directly after the vanilla hand pass.
+Normal renderers submit into these stages for you. [`PRenderStagesHandler`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java) flushes `ENTITIES` and `TRANSLUCENT_BLOCKS` together; `GameRendererMixin` flushes `FIRST_PERSON` directly after the hand pass. With an enabled player first-person animation, that pass uses PulseLib's presentation for the affected arms and items.
 
 ## When to submit manually
 

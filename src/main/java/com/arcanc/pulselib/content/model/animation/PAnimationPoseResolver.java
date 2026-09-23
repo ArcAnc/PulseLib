@@ -175,7 +175,7 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 		destination.addAll(animation.boneAnimations().keySet());
 		destination.addAll(animation.visibilityTracks().keySet());
 	}
-	
+
 	/**
 	 * Performs the animation delta operation.
 	 * @param boneName the bone name to use.
@@ -188,10 +188,10 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 
 		if (boneIndex < 0)
 			return null;
-		
+
 		PTransform current;
 		PTransform bind;
-		
+
 		if (rootBoneName == null || boneName.equals(rootBoneName))
 		{
 			current = modelTransform(boneIndex);
@@ -200,41 +200,41 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 		else
 		{
 			int rootIndex = this.model.boneIndex(rootBoneName);
-			
+
 			if (rootIndex < 0)
 				return null;
-			
+
 			current = relativeTransform(
 					boneIndex,
 					rootIndex);
-			
+
 			bind = relativeBindTransform(
 					boneIndex,
 					rootIndex);
 		}
-		
+
 		Vector3f currentTranslation = current.translation();
 		Vector3f bindTranslation = bind.translation();
-		
+
 		Vector3f translation =
 				currentTranslation.sub(bindTranslation);
-		
+
 		Quaternionf currentRotation = current.rotation();
 		Quaternionf bindRotation = bind.rotation();
-		
+
 		Quaternionf rotation =
 				new Quaternionf(bindRotation).
 						invert().
 						premul(currentRotation);
-		
+
 		Vector3f currentScale = current.scale();
 		Vector3f bindScale = bind.scale();
-		
+
 		Vector3f scale = new Vector3f(
 				ratio(currentScale.x, bindScale.x),
 				ratio(currentScale.y, bindScale.y),
 				ratio(currentScale.z, bindScale.z));
-		
+
 		return new AnimationDelta(
 				translation,
 				rotation,
@@ -245,7 +245,7 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 						Math.abs(scale.y - 1.0f) > 1.0e-5f ||
 						Math.abs(scale.z - 1.0f) > 1.0e-5f);
 	}
-	
+
 	/**
 	 * Performs the model transform operation.
 	 * @param boneName the bone name to use.
@@ -256,7 +256,7 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 		int index = this.model.boneIndex(boneName);
 		return index < 0 ? null : modelTransform(index);
 	}
-	
+
 	/**
 	 * Performs the model transform operation.
 	 * @param bone the bone to use.
@@ -266,13 +266,13 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	{
 		return modelTransform(this.model.boneIndex(bone));
 	}
-	
+
 	/** Returns the canonical resolved MODEL-space transform for a bone. */
 	public PTransform modelTransform(int boneIndex)
 	{
 		return this.modelPose.transform(boneIndex);
 	}
-	
+
 	/**
 	 * Binds the model transform.
 	 * @param boneName the bone name to use.
@@ -283,7 +283,7 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 		int index = this.model.boneIndex(boneName);
 		return index < 0 ? null : bindModelTransform(index);
 	}
-	
+
 	/**
 	 * Binds the model transform.
 	 * @param bone the bone to use.
@@ -293,7 +293,7 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	{
 		return bindModelTransform(this.model.boneIndex(bone));
 	}
-	
+
 	/**
 	 * Binds the model transform.
 	 * @param boneIndex the bone index to use.
@@ -303,7 +303,7 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	{
 		return this.bindModelPose.transform(boneIndex);
 	}
-	
+
 	/**
 	 * Performs the relative transform operation.
 	 * @param boneName the bone name to use.
@@ -314,13 +314,13 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	{
 		int boneIndex = this.model.boneIndex(boneName);
 		int referenceIndex = this.model.boneIndex(referenceBoneName);
-		
+
 		if (boneIndex < 0 || referenceIndex < 0)
 			return null;
-		
+
 		return relativeTransform(boneIndex, referenceIndex);
 	}
-	
+
 	/**
 	 * Performs the relative transform operation.
 	 * @param boneIndex the bone index to use.
@@ -331,7 +331,7 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	{
 		return this.modelPose.transform(referenceIndex).inverse().compose(this.modelPose.transform(boneIndex));
 	}
-	
+
 	/**
 	 * Performs the relative bind transform operation.
 	 * @param boneName the bone name to use.
@@ -342,13 +342,13 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	{
 		int boneIndex = this.model.boneIndex(boneName);
 		int referenceIndex = this.model.boneIndex(referenceBoneName);
-		
+
 		if (boneIndex < 0 || referenceIndex < 0)
 			return null;
-		
+
 		return relativeBindTransform(boneIndex, referenceIndex);
 	}
-	
+
 	/**
 	 * Performs the relative bind transform operation.
 	 * @param boneIndex the bone index to use.
@@ -359,7 +359,7 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	{
 		return this.bindModelPose.transform(referenceIndex).inverse().compose(this.bindModelPose.transform(boneIndex));
 	}
-	
+
 	/**
 	 * Binds the parent transform.
 	 * @param boneName the bone name to use.
@@ -370,18 +370,18 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	{
 		int boneIndex =
 				this.model.boneIndex(boneName);
-		
+
 		if (boneIndex < 0)
 			return null;
-		
+
 		int parentIndex =
 				this.model.parentIndex(boneIndex);
-		
+
 		return parentIndex < 0 ?
 				PTransform.IDENTITY :
 				this.bindModelPose.transform(parentIndex);
 	}
-	
+
 	/**
 	 * Resolves the local.
 	 * @param bone the bone to use.

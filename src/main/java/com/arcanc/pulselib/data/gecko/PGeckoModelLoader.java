@@ -34,9 +34,9 @@ import java.util.function.BiConsumer;
 public class PGeckoModelLoader implements PModelLoader
 {
 	public static final PGeckoModelLoader INSTANCE = new PGeckoModelLoader();
-	
+
 	private static final ResourceLocation ID = PLibDatabase.rl("gecko");
-	
+
 	private static final String MODEL_ROOT = "geckolib/models";
 	private static final String ANIMATION_ROOT = "geckolib/animations";
 	private static final String MODEL_EXTENSION = ".geo.json";
@@ -44,14 +44,14 @@ public class PGeckoModelLoader implements PModelLoader
 	private static final String EVENTS_EXTENSION = ".events.json";
 	private static final String ANIMATION_EVENTS_EXTENSION = ".animation_events.json";
 	private static final String JSON_EXTENSION = ".json";
-	
+
 	/**
 	 * Creates an instance of the enclosing type.
 	 */
 	private PGeckoModelLoader()
 	{
 	}
-	
+
 	/**
 	 * Performs the id operation.
 	 * @return the value produced by this operation.
@@ -71,7 +71,7 @@ public class PGeckoModelLoader implements PModelLoader
 	{
 		poseStack.translate(0.5f, 0.51f, 0.5f);
 	}
-	
+
 	/**
 	 * Performs the supports operation.
 	 * @param modelPath the model path to use.
@@ -83,7 +83,7 @@ public class PGeckoModelLoader implements PModelLoader
 		String path = modelPath.getPath();
 		return path.startsWith(MODEL_ROOT + "/") && path.endsWith(JSON_EXTENSION);
 	}
-	
+
 	/**
 	 * Performs the default model location operation.
 	 * @param modelLocation the model location to use.
@@ -120,7 +120,7 @@ public class PGeckoModelLoader implements PModelLoader
 		return resourceLocation.getPath().endsWith(JSON_EXTENSION) ?
 				resourceLocation : resourceLocation.withSuffix(MODEL_EXTENSION);
 	}
-	
+
 	/**
 	 * Loads the models.
 	 * @param backgroundExecutor the background executor to use.
@@ -141,7 +141,7 @@ public class PGeckoModelLoader implements PModelLoader
 				thenApplyAsync(resources ->
 				{
 					Map<ResourceLocation, CompletableFuture<PModel>> tasks = new Object2ObjectOpenHashMap<>();
-					
+
 					for (ResourceLocation resource : resources.keySet())
 					{
 						tasks.put(resource, CompletableFuture.supplyAsync(() ->
@@ -166,7 +166,7 @@ public class PGeckoModelLoader implements PModelLoader
 						elementConsumer.accept(entry.getKey(), entry.getValue().join());
 				}, backgroundExecutor);
 	}
-	
+
 	/**
 	 * Loads the animations.
 	 * @param resourceManager the resource manager to use.
@@ -178,10 +178,10 @@ public class PGeckoModelLoader implements PModelLoader
 		Optional<ResourceLocation> animationResource = animationCandidates(modelResource).stream().
 				filter(resource -> resourceManager.getResource(resource).isPresent()).
 				findFirst();
-		
+
 		if (animationResource.isEmpty())
 			return;
-		
+
 		model.animations.putAll(PGeckoModelParser.parseAnimations(
 				resourceManager.getResourceOrThrow(animationResource.get()).open(),
 				model));
@@ -208,7 +208,7 @@ public class PGeckoModelLoader implements PModelLoader
 				PAnimationSidecarParser.parseJson(resourceManager.getResourceOrThrow(sidecarResource.get()).open()),
 				model.animations);
 	}
-	
+
 	/**
 	 * Performs the animation candidates operation.
 	 * @param modelResource the model resource to use.
@@ -219,7 +219,7 @@ public class PGeckoModelLoader implements PModelLoader
 		String modelName = modelName(modelResource);
 		String[] divided = modelName.split("/");
 		String fileName = divided[divided.length - 1];
-		
+
 		List<ResourceLocation> candidates = new ArrayList<>();
 		candidates.add(modelResource.withPath(ANIMATION_ROOT + "/" + fileName + ANIMATION_EXTENSION));
 		candidates.add(modelResource.withPath(ANIMATION_ROOT + "/" + fileName + JSON_EXTENSION));
@@ -248,7 +248,7 @@ public class PGeckoModelLoader implements PModelLoader
 		candidates.add(animationResource.withPath(root + "/events/" + fileName + EVENTS_EXTENSION));
 		return candidates;
 	}
-	
+
 	/**
 	 * Performs the model name operation.
 	 * @param modelResource the model resource to use.
@@ -260,7 +260,7 @@ public class PGeckoModelLoader implements PModelLoader
 		String modelName = path.substring(MODEL_ROOT.length() + 1);
 		if (modelName.endsWith(MODEL_EXTENSION))
 			return modelName.substring(0, modelName.length() - MODEL_EXTENSION.length());
-		
+
 		return modelName.substring(0, modelName.length() - JSON_EXTENSION.length());
 	}
 }

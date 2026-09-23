@@ -1,5 +1,13 @@
 # Player animations
 
+## First-person integration (Minecraft 1.21.1)
+
+First-person output is opt-in with `firstPerson(PPlayerFirstPersonSettings.ENABLED)` and requires the `FIRST_PERSON_CAMERA` anchor. Bind `RIGHT_ARM` and `LEFT_ARM` for the physical arms, and use `RIGHT_ITEM` and `LEFT_ITEM` anchors for held items. PulseLib preserves the native 1.21.1 `ItemInHandRenderer` equip, swing, use, map, display-context, and left/right hand pipeline; it replaces only the final arm or item spatial submission when the presentation supplies an animated pose.
+
+`PFirstPersonRenderContexts` carries a per-hand presentation through the renderer. `PVanillaFirstPersonArmResolver` and `PVanillaFirstPersonItemResolver` adapt camera-relative animation transforms to the vanilla arm and item origins. `PPlayerFirstPersonRenderer` draws first-person anchor and mesh attachments before the native buffer batch closes. `PFirstPersonCameraMode.ANIMATED` applies the `FIRST_PERSON_CAMERA` delta in `Camera.setup`; `VANILLA` leaves the camera unchanged.
+
+Register custom first-person anchor renderers on `PulseLibEvents.PlayerAnimatedAttachmentRegistrationEvent`. The callback receives the animated transform, its weight, `PoseStack`, `MultiBufferSource`, and a `firstPerson` flag.
+
 Player animations modify the vanilla player model after Minecraft has prepared its normal walk, swim, crouch, and item-use pose. They work for both classic and slim skins, including hats, jackets, sleeves, and pants layers.
 
 The API is client-only. Register definitions on the mod event bus through `PulseLibEvents.PlayerAnimationRegistrationEvent`:

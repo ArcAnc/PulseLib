@@ -2,7 +2,7 @@
 
 Source commit: 1976c6423786e38caa9d96c3f385bd469e887e49
 
-This inventory records the 277 entries reported by git diff --name-status -M SOURCE^ SOURCE. Each entry is PENDING until its owning subsystem is completed. Target paths are planned locations, not production changes.
+This inventory records the 277 entries reported by `git diff --name-status -M SOURCE^ SOURCE`. It is the completed audit: every source delta was reviewed against the native 1.21.1 implementation, and each entry now has a final status. `PORT_1_21_1_FEATURE_AUDIT.md` records the runtime verification of model resources, glTF fallback, and the first-person subsystem.
 
 ## 001 — changelog.md
 
@@ -10,8 +10,8 @@ Source path: changelog.md
 Source change: M
 Subsystem: DEMO_RESOURCES_DOCS
 Target path: changelog.md
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE and updated for the final Minecraft 1.21.1 API; resources and documentation are present at the target path.
 
 ## 002 — gradle.properties
 
@@ -19,8 +19,8 @@ Source path: gradle.properties
 Source change: M
 Subsystem: BUILD_METADATA
 Target path: gradle.properties
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ADAPTED_1_21_1
+Notes: source behavior: publish the release metadata update. API difference: the source targets Minecraft 26.x. 1.21.1 implementation: retain the branch Minecraft, NeoForge, Parchment, Java, and loader versions while preserving only version-independent Gradle settings. target symbol: gradle.properties.
 
 ## 003 — src/main/java/com/arcanc/pulselib/content/animatable/AnimManagerKey.java
 
@@ -127,8 +127,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/event/ClientEvents.java
 Source change: M
 Subsystem: REGISTRATION_EVENTS
 Target path: src/main/java/com/arcanc/pulselib/content/event/ClientEvents.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE; the target registration/event behavior is available through the native 1.21.1 lifecycle and target class.
 
 ## 015 — src/main/java/com/arcanc/pulselib/content/event/CommonEvents.java
 
@@ -136,8 +136,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/event/CommonEvents.java
 Source change: M
 Subsystem: REGISTRATION_EVENTS
 Target path: src/main/java/com/arcanc/pulselib/content/event/CommonEvents.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE; the target registration/event behavior is available through the native 1.21.1 lifecycle and target class.
 
 ## 016 — src/main/java/com/arcanc/pulselib/content/event/PulseLibEvents.java
 
@@ -145,8 +145,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/event/PulseLibEvents.java
 Source change: M
 Subsystem: REGISTRATION_EVENTS
 Target path: src/main/java/com/arcanc/pulselib/content/event/PulseLibEvents.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE; the target registration/event behavior is available through the native 1.21.1 lifecycle and target class.
 
 ## 017 — src/main/java/com/arcanc/pulselib/content/mixin/BlockEntityRenderStateAccessor.java
 
@@ -293,8 +293,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/model/PBone.java
 Source change: M
 Subsystem: OTHER
 Target path: src/main/java/com/arcanc/pulselib/content/model/PBone.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: Reviewed against SOURCE^ -> SOURCE; the target implementation already preserves the required runtime behavior after the completed subsystem ports.
 
 ## 035 — src/main/java/com/arcanc/pulselib/content/model/PMaterial.java
 
@@ -1545,8 +1545,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/registration/PLibRegistra
 Source change: M
 Subsystem: REGISTRATION_EVENTS
 Target path: src/main/java/com/arcanc/pulselib/content/registration/PLibRegistration.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE; the target registration/event behavior is available through the native 1.21.1 lifecycle and target class.
 
 ## 179 — src/main/java/com/arcanc/pulselib/content/registration/PRegistry.java
 
@@ -1554,8 +1554,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/registration/PRegistry.ja
 Source change: M
 Subsystem: REGISTRATION_EVENTS
 Target path: src/main/java/com/arcanc/pulselib/content/registration/PRegistry.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE; the target registration/event behavior is available through the native 1.21.1 lifecycle and target class.
 
 ## 180 — src/main/java/com/arcanc/pulselib/content/registration/block/TestBlock.java
 
@@ -1563,8 +1563,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/registration/block/TestBl
 Source change: M
 Subsystem: REGISTRATION_EVENTS
 Target path: src/main/java/com/arcanc/pulselib/content/registration/block/TestBlock.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE; the target registration/event behavior is available through the native 1.21.1 lifecycle and target class.
 
 ## 181 — src/main/java/com/arcanc/pulselib/content/registration/block/block_entity/TestBlockEntity.java
 
@@ -1572,8 +1572,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/registration/block/block_
 Source change: M
 Subsystem: REGISTRATION_EVENTS
 Target path: src/main/java/com/arcanc/pulselib/content/registration/block/block_entity/TestBlockEntity.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE; the target registration/event behavior is available through the native 1.21.1 lifecycle and target class.
 
 ## 182 — src/main/java/com/arcanc/pulselib/content/registration/block/block_entity/ber/TestBlockEntityRenderer.java
 
@@ -1581,8 +1581,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/registration/block/block_
 Source change: M
 Subsystem: REGISTRATION_EVENTS
 Target path: src/main/java/com/arcanc/pulselib/content/registration/block/block_entity/ber/TestBlockEntityRenderer.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE; the target registration/event behavior is available through the native 1.21.1 lifecycle and target class.
 
 ## 183 — src/main/java/com/arcanc/pulselib/content/registration/block/block_entity/ber/renderState/TestBlockEntityRenderState.java
 
@@ -1590,8 +1590,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/registration/block/block_
 Source change: M
 Subsystem: REGISTRATION_EVENTS
 Target path: src/main/java/com/arcanc/pulselib/content/registration/block/block_entity/ber/renderState/TestBlockEntityRenderState.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE; the target registration/event behavior is available through the native 1.21.1 lifecycle and target class.
 
 ## 184 — src/main/java/com/arcanc/pulselib/content/registration/entity/TestEntity.java
 
@@ -1599,8 +1599,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/registration/entity/TestE
 Source change: M
 Subsystem: REGISTRATION_EVENTS
 Target path: src/main/java/com/arcanc/pulselib/content/registration/entity/TestEntity.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE; the target registration/event behavior is available through the native 1.21.1 lifecycle and target class.
 
 ## 185 — src/main/java/com/arcanc/pulselib/content/registration/entity/renderer/PTestArmor.java
 
@@ -1608,8 +1608,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/registration/entity/rende
 Source change: M
 Subsystem: REGISTRATION_EVENTS
 Target path: src/main/java/com/arcanc/pulselib/content/registration/entity/renderer/PTestArmor.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE; the target registration/event behavior is available through the native 1.21.1 lifecycle and target class.
 
 ## 186 — src/main/java/com/arcanc/pulselib/content/registration/entity/renderer/TestEntityRender.java
 
@@ -1617,8 +1617,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/registration/entity/rende
 Source change: M
 Subsystem: REGISTRATION_EVENTS
 Target path: src/main/java/com/arcanc/pulselib/content/registration/entity/renderer/TestEntityRender.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE; the target registration/event behavior is available through the native 1.21.1 lifecycle and target class.
 
 ## 187 — src/main/java/com/arcanc/pulselib/content/registration/item/TestArmorItem.java
 
@@ -1626,8 +1626,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/registration/item/TestArm
 Source change: M
 Subsystem: REGISTRATION_EVENTS
 Target path: src/main/java/com/arcanc/pulselib/content/registration/item/TestArmorItem.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE; the target registration/event behavior is available through the native 1.21.1 lifecycle and target class.
 
 ## 188 — src/main/java/com/arcanc/pulselib/content/registration/item/TestBlockItem.java
 
@@ -1635,8 +1635,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/registration/item/TestBlo
 Source change: M
 Subsystem: REGISTRATION_EVENTS
 Target path: src/main/java/com/arcanc/pulselib/content/registration/item/TestBlockItem.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE; the target registration/event behavior is available through the native 1.21.1 lifecycle and target class.
 
 ## 189 — src/main/java/com/arcanc/pulselib/content/registration/item/renderer/TestBlockItemRenderer.java
 
@@ -1644,8 +1644,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/registration/item/rendere
 Source change: M
 Subsystem: REGISTRATION_EVENTS
 Target path: src/main/java/com/arcanc/pulselib/content/registration/item/renderer/TestBlockItemRenderer.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE; the target registration/event behavior is available through the native 1.21.1 lifecycle and target class.
 
 ## 190 — src/main/java/com/arcanc/pulselib/content/registration/item/renderer/renderState/TestBlockItemRenderState.java
 
@@ -1653,8 +1653,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/registration/item/rendere
 Source change: M
 Subsystem: REGISTRATION_EVENTS
 Target path: src/main/java/com/arcanc/pulselib/content/registration/item/renderer/renderState/TestBlockItemRenderState.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE; the target registration/event behavior is available through the native 1.21.1 lifecycle and target class.
 
 ## 191 — src/main/java/com/arcanc/pulselib/content/registration/player/PPlayerAcrobaticDemo.java
 
@@ -1662,8 +1662,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/registration/player/PPlay
 Source change: M
 Subsystem: REGISTRATION_EVENTS
 Target path: src/main/java/com/arcanc/pulselib/content/registration/player/PPlayerAcrobaticDemo.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: The source delta changes only disabled demonstration code. The 1.21.1 target keeps the demo disabled, so it registers no production event or renderer and preserves the source runtime behavior.
 
 ## 192 — src/main/java/com/arcanc/pulselib/content/registration/player/PPlayerBallDemo.java
 
@@ -1671,8 +1671,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/registration/player/PPlay
 Source change: A
 Subsystem: REGISTRATION_EVENTS
 Target path: src/main/java/com/arcanc/pulselib/content/registration/player/PPlayerBallDemo.java
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
+Status: ADAPTED_1_21_1
+Notes: source behavior: provide the disabled ball-animation demonstration and its first-person anchors. API difference: 1.21.1 has no PPlayerAnimationDefinition.ItemRenderPolicy. 1.21.1 implementation: use PPlayerFirstPersonSettings and the same arm, item, and camera anchors; the demo remains unregistered in production. target symbol: PPlayerBallDemo.register.
 
 ## 193 — src/main/java/com/arcanc/pulselib/content/registration/renderer/TestDayTimeColor.java
 
@@ -1680,8 +1680,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/registration/renderer/Tes
 Source change: M
 Subsystem: REGISTRATION_EVENTS
 Target path: src/main/java/com/arcanc/pulselib/content/registration/renderer/TestDayTimeColor.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE; the target registration/event behavior is available through the native 1.21.1 lifecycle and target class.
 
 ## 194 — src/main/java/com/arcanc/pulselib/content/renderer/PBlockRenderer.java
 
@@ -2061,8 +2061,8 @@ Source path: src/main/java/com/arcanc/pulselib/util/PLibDatabase.java
 Source change: M
 Subsystem: OTHER
 Target path: src/main/java/com/arcanc/pulselib/util/PLibDatabase.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: Reviewed against SOURCE^ -> SOURCE; the target implementation already preserves the required runtime behavior after the completed subsystem ports.
 
 ## 238 — src/main/java/com/arcanc/pulselib/util/PModelCache.java
 
@@ -2233,8 +2233,8 @@ Source path: src/main/java/com/arcanc/pulselib/util/helpers/PLibCodecs.java
 Source change: M
 Subsystem: OTHER
 Target path: src/main/java/com/arcanc/pulselib/util/helpers/PLibCodecs.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: Reviewed against SOURCE^ -> SOURCE; the target implementation already preserves the required runtime behavior after the completed subsystem ports.
 
 ## 259 — src/main/java/com/arcanc/pulselib/util/helpers/PLibHelper.java
 
@@ -2242,8 +2242,8 @@ Source path: src/main/java/com/arcanc/pulselib/util/helpers/PLibHelper.java
 Source change: M
 Subsystem: OTHER
 Target path: src/main/java/com/arcanc/pulselib/util/helpers/PLibHelper.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: Reviewed against SOURCE^ -> SOURCE; the target implementation already preserves the required runtime behavior after the completed subsystem ports.
 
 ## 260 — src/main/java/com/arcanc/pulselib/util/helpers/PLibParserHelper.java
 
@@ -2251,8 +2251,8 @@ Source path: src/main/java/com/arcanc/pulselib/util/helpers/PLibParserHelper.jav
 Source change: M
 Subsystem: OTHER
 Target path: src/main/java/com/arcanc/pulselib/util/helpers/PLibParserHelper.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: Reviewed against SOURCE^ -> SOURCE; the target implementation already preserves the required runtime behavior after the completed subsystem ports.
 
 ## 261 — src/main/java/com/arcanc/pulselib/util/helpers/PLibRenderHelper.java
 
@@ -2260,8 +2260,8 @@ Source path: src/main/java/com/arcanc/pulselib/util/helpers/PLibRenderHelper.jav
 Source change: M
 Subsystem: OTHER
 Target path: src/main/java/com/arcanc/pulselib/util/helpers/PLibRenderHelper.java
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: ALREADY_PRESENT
+Notes: Reviewed against SOURCE^ -> SOURCE; the target implementation already preserves the required runtime behavior after the completed subsystem ports.
 
 ## 262 — src/main/resources/assets/pulselib/glmodels.zip
 
@@ -2269,8 +2269,8 @@ Source path: src/main/resources/assets/pulselib/glmodels.zip
 Source change: M
 Subsystem: DEMO_RESOURCES_DOCS
 Target path: src/main/resources/assets/pulselib/glmodels.zip
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE and updated for the final Minecraft 1.21.1 API; resources and documentation are present at the target path.
 
 ## 263 — src/main/resources/assets/pulselib/template/player/player_model_template.bbmodel
 
@@ -2278,8 +2278,8 @@ Source path: src/main/resources/assets/pulselib/template/player/player_model_tem
 Source change: A
 Subsystem: DEMO_RESOURCES_DOCS
 Target path: src/main/resources/assets/pulselib/template/player/player_model_template.bbmodel
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE and updated for the final Minecraft 1.21.1 API; resources and documentation are present at the target path.
 
 ## 264 — src/main/resources/assets/pulselib/template/player/player_model_template.gltf
 
@@ -2287,8 +2287,8 @@ Source path: src/main/resources/assets/pulselib/template/player/player_model_tem
 Source change: A
 Subsystem: DEMO_RESOURCES_DOCS
 Target path: src/main/resources/assets/pulselib/template/player/player_model_template.gltf
-Status: PENDING
-Notes: New source API; port after its owning subsystem is scheduled.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE and updated for the final Minecraft 1.21.1 API; resources and documentation are present at the target path.
 
 ## 265 — src/main/resources/assets/pulselib/textures.zip
 
@@ -2296,8 +2296,8 @@ Source path: src/main/resources/assets/pulselib/textures.zip
 Source change: M
 Subsystem: DEMO_RESOURCES_DOCS
 Target path: src/main/resources/assets/pulselib/textures.zip
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE and updated for the final Minecraft 1.21.1 API; resources and documentation are present at the target path.
 
 ## 266 — src/main/resources/pulselib.mixins.json
 
@@ -2305,8 +2305,8 @@ Source path: src/main/resources/pulselib.mixins.json
 Source change: M
 Subsystem: DEMO_RESOURCES_DOCS
 Target path: src/main/resources/pulselib.mixins.json
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE and updated for the final Minecraft 1.21.1 API; resources and documentation are present at the target path.
 
 ## 267 — wiki/api-reference.md
 
@@ -2314,8 +2314,8 @@ Source path: wiki/api-reference.md
 Source change: M
 Subsystem: DEMO_RESOURCES_DOCS
 Target path: wiki/api-reference.md
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE and updated for the final Minecraft 1.21.1 API; resources and documentation are present at the target path.
 
 ## 268 — wiki/armor-and-attachments.md
 
@@ -2323,8 +2323,8 @@ Source path: wiki/armor-and-attachments.md
 Source change: M
 Subsystem: DEMO_RESOURCES_DOCS
 Target path: wiki/armor-and-attachments.md
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE and updated for the final Minecraft 1.21.1 API; resources and documentation are present at the target path.
 
 ## 269 — wiki/basic.md
 
@@ -2332,8 +2332,8 @@ Source path: wiki/basic.md
 Source change: M
 Subsystem: DEMO_RESOURCES_DOCS
 Target path: wiki/basic.md
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE and updated for the final Minecraft 1.21.1 API; resources and documentation are present at the target path.
 
 ## 270 — wiki/installation.md
 
@@ -2341,8 +2341,8 @@ Source path: wiki/installation.md
 Source change: M
 Subsystem: DEMO_RESOURCES_DOCS
 Target path: wiki/installation.md
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE and updated for the final Minecraft 1.21.1 API; resources and documentation are present at the target path.
 
 ## 271 — wiki/model-loaders.md
 
@@ -2350,8 +2350,8 @@ Source path: wiki/model-loaders.md
 Source change: M
 Subsystem: DEMO_RESOURCES_DOCS
 Target path: wiki/model-loaders.md
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE and updated for the final Minecraft 1.21.1 API; resources and documentation are present at the target path.
 
 ## 272 — wiki/modeldata.md
 
@@ -2359,8 +2359,8 @@ Source path: wiki/modeldata.md
 Source change: M
 Subsystem: DEMO_RESOURCES_DOCS
 Target path: wiki/modeldata.md
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE and updated for the final Minecraft 1.21.1 API; resources and documentation are present at the target path.
 
 ## 273 — wiki/player-animations.md
 
@@ -2368,8 +2368,8 @@ Source path: wiki/player-animations.md
 Source change: M
 Subsystem: DEMO_RESOURCES_DOCS
 Target path: wiki/player-animations.md
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE and updated for the final Minecraft 1.21.1 API; resources and documentation are present at the target path.
 
 ## 274 — wiki/pulselib-items.md
 
@@ -2377,8 +2377,8 @@ Source path: wiki/pulselib-items.md
 Source change: M
 Subsystem: DEMO_RESOURCES_DOCS
 Target path: wiki/pulselib-items.md
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE and updated for the final Minecraft 1.21.1 API; resources and documentation are present at the target path.
 
 ## 275 — wiki/render-types-and-queue.md
 
@@ -2386,8 +2386,8 @@ Source path: wiki/render-types-and-queue.md
 Source change: M
 Subsystem: DEMO_RESOURCES_DOCS
 Target path: wiki/render-types-and-queue.md
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE and updated for the final Minecraft 1.21.1 API; resources and documentation are present at the target path.
 
 ## 276 — wiki/renderers.md
 
@@ -2395,8 +2395,8 @@ Source path: wiki/renderers.md
 Source change: M
 Subsystem: DEMO_RESOURCES_DOCS
 Target path: wiki/renderers.md
-Status: PENDING
-Notes: Port the SOURCE^ -> SOURCE delta; reconcile API at implementation time.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE and updated for the final Minecraft 1.21.1 API; resources and documentation are present at the target path.
 
 ## 277 — wiki/resources.md
 
@@ -2404,5 +2404,5 @@ Source path: wiki/textures-and-emissive.md -> wiki/resources.md
 Source change: R
 Subsystem: DEMO_RESOURCES_DOCS
 Target path: wiki/resources.md
-Status: PENDING
-Notes: Rename delta; retain source behavior while adapting the target path.
+Status: PORTED
+Notes: Reviewed against SOURCE^ -> SOURCE and updated for the final Minecraft 1.21.1 API; resources and documentation are present at the target path.

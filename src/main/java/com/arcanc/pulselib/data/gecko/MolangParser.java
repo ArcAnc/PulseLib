@@ -183,7 +183,7 @@ public final class MolangParser
 			this.thisValue = value;
 			return this;
 		}
-		
+
 		/**
 		 * Performs the this values operation.
 		 * @param x the x to use.
@@ -236,7 +236,7 @@ public final class MolangParser
 			this.random.setSeed(seed);
 			return this;
 		}
-		
+
 		/**
 		 * Copies the frame values from.
 		 * @param source the source to use.
@@ -496,7 +496,7 @@ public final class MolangParser
 		 */
 		@Override public Value evaluate(Evaluation evaluation) { return evaluation.context.resolve(this.name, List.of(), evaluation); }
 	}
-	
+
 /**
  * Immutable value object representing call.
  */

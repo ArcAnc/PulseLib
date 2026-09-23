@@ -23,7 +23,7 @@ public record PPlayerFirstPersonSettings(
 {
 	public static final PPlayerFirstPersonSettings DISABLED =
 			new PPlayerFirstPersonSettings(false, 0.0f, 0.0f, PFirstPersonCameraMode.VANILLA);
-	
+
 	public static final PPlayerFirstPersonSettings ENABLED =
 			new PPlayerFirstPersonSettings(true, 3.0f, 3.0f, PFirstPersonCameraMode.ANIMATED);
 
