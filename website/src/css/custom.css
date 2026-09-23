@@ -28,7 +28,15 @@ pre,
 }
 
 #autocomplete {
+  display: flex;
+  align-items: center;
   min-width: 16rem;
+}
+
+.navbar__item:has(#autocomplete) {
+  display: flex;
+  align-self: stretch;
+  align-items: center;
 }
 
 @media (max-width: 996px) {
