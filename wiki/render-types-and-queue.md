@@ -53,9 +53,9 @@ The queue has a few stages:
 * `TRANSLUCENT_BLOCKS` for transparent block/entity-adjacent meshes.
 * `ENTITIES` for entity and hand-held item rendering.
 * `FIRST_PERSON` for items rendered in either first-person hand.
-* `GUI` for GUI rendering.
+* `GUI` is present for explicit queue submissions, but PulseLib does not flush it by default.
 
-Normal renderers submit into these stages for you. [`PRenderStagesHandler`](https://github.com/ArcAnc/PulseLib/blob/master/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java) flushes the level stages, while PulseLib flushes `FIRST_PERSON` immediately after the hand pass. When an enabled player first-person animation is active, that pass is integrated through the 26.2 `ItemInHandRenderer` submission hooks, which preserve vanilla submissions for `VANILLA` channels. `PItemRenderer` selects `FIRST_PERSON` automatically for `FIRST_PERSON_LEFT_HAND` and `FIRST_PERSON_RIGHT_HAND`; no special renderer code is needed.
+Normal world and hand renderers submit into these stages for you. [`PRenderStagesHandler`](https://github.com/ArcAnc/PulseLib/blob/master/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java) flushes the level stages, while PulseLib flushes `FIRST_PERSON` immediately after the hand pass. GUI `PItemRenderer` instances bypass the queue and use a `SubmitNodeCollector` custom-geometry callback with the instant pipeline. When an enabled player first-person animation is active, the hand pass is integrated through the 26.2 `ItemInHandRenderer` submission hooks, which preserve vanilla submissions for `VANILLA` channels. `PItemRenderer` selects `FIRST_PERSON` automatically for `FIRST_PERSON_LEFT_HAND` and `FIRST_PERSON_RIGHT_HAND`; no special renderer code is needed.
 
 ## When to submit manually
 

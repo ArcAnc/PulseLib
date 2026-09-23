@@ -5,7 +5,7 @@ module.exports = {
     {
       type: 'category', label: 'Core API', items: [
         'modeldata', 'animatables-and-controllers', 'animation-events', 'molang-animations',
-        'renderers', 'render-types-and-queue', 'resources',
+        'renderers', 'render-types-and-queue', 'shaders', 'resources',
       ],
     },
     {

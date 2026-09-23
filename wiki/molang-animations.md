@@ -23,9 +23,9 @@ The renderer supplies these values by default:
 
 * `query.anim_time` (also available as `q.anim_time`) is the controller's interpolated animation time in seconds.
 * `this` is supplied by the animation mixer from the accumulated value of the vector component currently being evaluated.
-* The random generator is reset from `PAnimationManager.key()` for every prepared context. `math.random`, `math.random_integer`, `math.die_roll`, and `math.die_roll_integer` are therefore deterministic for the same animation-manager key and evaluation order.
+* The renderer initializes each prepared frame context with `PAnimationManager.key()`. A controller copies only its frame values into its persistent context, so the random functions use the persistent generator described below.
 
-The context is deliberately prepared outside `PAnimationController`. A controller only mixes an animation with the ready context; it does not retain an animatable, a query provider, or a random seed.
+The renderer prepares the frame context outside `PAnimationController`. Before it mixes a pose, the controller copies the current `query.*`, `context.*`, `this`, and query resolver values into its own persistent Molang context. This keeps frame-dependent data current while preserving state owned by the controller.
 
 ## Providing custom queries
 
@@ -52,9 +52,8 @@ The parser supports numeric literals, arithmetic, comparisons, logical operators
 
 Supported math functions include trigonometry, interpolation, clamping, rounding, powers, min/max, random and die-roll functions, plus the implemented `math.ease_*` variants. An unsupported function is reported as an error instead of silently evaluating to an arbitrary value.
 
-## Current limitation: `variable.*` lifetime
+## `variable.*` lifetime and random state
 
-> TODO: move the per-controller `MolangParser.Context` ownership to `PAnimationManager` (or an equivalent animation-instance store).
+Each `PAnimationController` owns a persistent `MolangParser.Context`. An assignment to `variable.*` therefore remains available on later frames while that controller remains alive. Separate controllers, including controllers created for different animation-manager keys, have separate variable maps.
 
-At present, renderers create a fresh context for each render pass. Consequently, an assignment to `variable.*` is available while that context is being evaluated, but does not persist into the next frame. This is intentionally documented as incomplete Molang behavior and must be addressed before relying on `variable.*` as long-lived animation state.
-
+The renderer supplies queries afresh for every pass. `temp.*` remains temporary to one expression evaluation, and assignments to it never persist. The persistent context also retains the random-generator stream; the per-pass manager-key seed belongs to the renderer's temporary context and is not copied into that stream. Do not use `math.random` when a repeatable result across controller recreation is required.

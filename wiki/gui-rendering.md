@@ -22,7 +22,7 @@ public final class WandRenderState extends PItemRenderState.Impl<WandItem> {
 
 For custom GUI-only geometry, use [`PBakedModel.instantDraw(...)`](https://github.com/ArcAnc/PulseLib/blob/master/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedModel.java) or [`PBakedBone.instantDraw(...)`](https://github.com/ArcAnc/PulseLib/blob/master/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java) from a `SubmitNodeCollector` custom-geometry callback. Keep that code inside a renderer or special-model renderer: it needs the callback's saved pose plus the packed light/overlay values supplied by Minecraft.
 
-`PItemRenderer` uses `trianglesInstantTranslucent` as its default GUI material; the renderer's base type applies only outside GUI context. Choose the instant pipeline for an individual mesh in `resolveMeshRender(...)` with `withAlphaMode(...)`. `trianglesGui` remains a compatibility alias for instant translucent rendering, but there is no separate GUI shader.
+The custom-geometry callback itself uses `trianglesInstantTranslucent`, but that is only the callback's scheduling type. Each mesh still starts with the renderer's supplied base render type and is converted to the matching instant solid, cutout, or translucent variant; emissive meshes receive the matching emissive instant variant. Use `withAlphaMode(...)` in `resolveMeshRender(...)` to select the instant variant from a mesh's alpha classification. `trianglesGui` remains a compatibility alias for instant translucent rendering, but there is no separate GUI shader.
 
 Classes used:
 

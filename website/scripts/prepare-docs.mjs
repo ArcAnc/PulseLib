@@ -26,11 +26,16 @@ async function markdownFiles(directory) {
   }))).flat();
 }
 
-async function normalizeMarkdown(directory) {
+async function normalizeMarkdown(directory, ref) {
+  const sourceRef = ref === currentDocsRef ? 'master' : ref.replace(/^origin\//, '');
   await rm(path.join(directory, 'mkdocs.yml'), {force: true});
   for (const file of await markdownFiles(directory)) {
     let content = await readFile(file, 'utf8');
-    content = content.replace(/<br>/g, '<br />').replace(/<img\b([^>]*?)(?<!\/)>/g, '<img$1 />').replace('(Entity-Render-Layers)', '(entity-render-layers.md)');
+    content = content.
+        replace(/<br>/g, '<br />').
+        replace(/<img\b([^>]*?)(?<!\/)>/g, '<img$1 />').
+        replace('(Entity-Render-Layers)', '(entity-render-layers.md)').
+        replace(/\]\(\.\.\/(src\/[^)\s]+)\)/g, `](https://github.com/ArcAnc/PulseLib/blob/${sourceRef}/$1)`);
     if (path.basename(file) === 'index.md' && !content.startsWith('---\n')) content = `---\ntitle: PulseLib\nhide_title: true\nslug: /\n---\n\n${content}`;
     await writeFile(file, content);
   }
@@ -41,7 +46,7 @@ for (const source of docSources) {
   const destination = path.join(websiteDir, source.destination);
   await mkdir(destination, {recursive: true});
   extractWiki(source.ref, destination);
-  await normalizeMarkdown(destination);
+  await normalizeMarkdown(destination, source.ref);
 }
 await mkdir(path.join(websiteDir, 'versioned_sidebars'), {recursive: true});
 for (const [version, sidebar] of Object.entries(versionedSidebars)) {

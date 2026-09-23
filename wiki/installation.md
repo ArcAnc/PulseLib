@@ -12,8 +12,8 @@ repositories {
 }
 
 dependencies {
-    // Current project version: Minecraft 26.2.2, PulseLib 1.1.4.3
-    implementation "com.arcanc.pulselib:pulselib-neoforge:26.2.2-1.1.4.3"
+    // Current project version: Minecraft 26.2, PulseLib 1.1.5
+    implementation "com.arcanc.pulselib:pulselib-neoforge:26.2-1.1.5"
 }
 ```
 
