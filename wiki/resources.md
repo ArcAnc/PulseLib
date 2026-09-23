@@ -48,16 +48,123 @@ becomes:
 Identifier.fromNamespaceAndPath("examplemod", "entity/robot/body")
 ```
 
+## Animation-event sidecars
+
+An animation-event sidecar is optional and needs no `RegisterResourceEvent` entry: the model loader finds it while loading its model or animation file. The first existing candidate is used, so keep only one sidecar for a model unless you deliberately want the earlier path to take precedence. Its contents use the `animations` JSON object described in [Animation events](animation-events.md).
+
+For a glTF model at `assets/examplemod/glmodels/entity/robot.glb` or `.gltf`, PulseLib checks these paths in order:
+
+```text
+assets/examplemod/glmodels/entity/robot.events.json
+assets/examplemod/glmodels/entity/robot.animation_events.json
+assets/examplemod/glmodels/events/entity/robot.events.json
+assets/examplemod/glmodels/events/robot.events.json
+```
+
+Gecko sidecars are associated with the animation JSON that the loader selected. For an animation at `assets/examplemod/geckolib/animations/robot.animation.json`, the candidates are:
+
+```text
+assets/examplemod/geckolib/animations/robot.events.json
+assets/examplemod/geckolib/animations/robot.animation_events.json
+assets/examplemod/geckolib/animations/events/robot.events.json
+```
+
+When the selected Gecko animation is in a subdirectory, the first two sidecar paths stay beside that selected animation file and the third path uses an `events/` directory beside it.
+
+### glTF sidecar example
+
+`time` is specified in seconds. The following file at `assets/examplemod/glmodels/entity/robot.events.json` adds effects, a callback, a graph-controller trigger, and visibility tracks to the `attack` animation:
+
+```json
+{
+  "animations": {
+    "attack": {
+      "events": [
+        {
+          "type": "sound",
+          "time": 0.15,
+          "sound": "minecraft:entity.player.attack.strong",
+          "locator": "right_hand",
+          "volume": 0.9,
+          "pitch": 1.1
+        },
+        {
+          "type": "particle",
+          "time": 0.18,
+          "particle": "minecraft:crit",
+          "locator": "right_hand",
+          "offset": [0.0, 0.0, 0.0],
+          "motion": [0.0, 0.05, 0.0]
+        },
+        {
+          "type": "locator_callback",
+          "time": 0.20,
+          "callback": "examplemod:attack_hit",
+          "locator": "right_hand"
+        },
+        {
+          "type": "animation_parameter",
+          "time": 0.35,
+          "controller": "combat",
+          "parameter": "attack_complete",
+          "trigger": true
+        }
+      ],
+      "visibility": {
+        "weapon": {
+          "0.0": false,
+          "0.12": true,
+          "0.45": false
+        },
+        "muzzle_flash": [
+          { "time": 0.18, "visible": true },
+          { "time": 0.23, "visible": false }
+        ]
+      }
+    }
+  }
+}
+```
+
+`locator_callback` invokes a callback registered through `PAnimationEventCallbacks`. `animation_parameter` addresses a graph controller; an empty `controller` uses the current graph controller, and `trigger: true` invokes the named trigger. Event types may use built-in short names, as above, or namespaced identifiers.
+
+### Gecko sidecar example
+
+The format is identical for Gecko. A sidecar may also omit the outer `animations` object. For example, `assets/examplemod/geckolib/animations/robot.animation_events.json` can contain:
+
+```json
+{
+  "animation.robot.idle": {
+    "events": [
+      {
+        "type": "camera_shake",
+        "time": 0.0,
+        "strength": 0.15,
+        "duration": 2,
+        "frequency": 8
+      }
+    ],
+    "visibility": {
+      "glow": [
+        { "time": 0.0, "visible": false },
+        { "time": 0.5, "visible": true }
+      ]
+    }
+  }
+}
+```
+
+The animation key must exactly match the animation name in the loaded model. Both visibility forms shown above are supported.
+
 ## Gecko model fallback texture
 
 When a cube in a Gecko model has no `texture` field, PulseLib assigns the material reference `"0"`. Register that reference as the model's fallback texture:
 
 ```java
-event.model(Identifier.fromNamespaceAndPath("examplemod", "entity/robot"),
+event.model(ResourceLocation.fromNamespaceAndPath("examplemod", "entity/robot"),
                 PGeckoModelLoader.INSTANCE.id())
-        .texture("0", Identifier.fromNamespaceAndPath("examplemod", "entity/robot/fallback"));
+        .texture("0", ResourceLocation.fromNamespaceAndPath("examplemod", "entity/robot/fallback"));
 ```
-
 ## Runtime atlas
 
 The atlas is registered by PulseLib itself. Your mod contributes model-resource texture mappings.

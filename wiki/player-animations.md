@@ -154,9 +154,9 @@ The API affects the whole player model in third person. It restores position, ro
 
 ## First-person hands, items, and camera space
 
-First-person hand rendering is opt-in. `PPlayerFirstPersonSettings.DISABLED` is the default. When a definition with `firstPerson(PPlayerFirstPersonSettings.ENABLED)` contributes for the local player, PulseLib cancels Minecraft's complete `renderHandsWithItems` call and draws the first-person view from the animation pose. Vanilla swing, equip, use, and empty-hand transforms are therefore not added automatically.
+First-person pose integration is opt-in. `PPlayerFirstPersonSettings.DISABLED` is the default. When a definition with `firstPerson(PPlayerFirstPersonSettings.ENABLED)` contributes for the local player, PulseLib keeps Minecraft's normal `renderHandsWithItems` flow and replaces only the local pose used for an animated arm or item. Vanilla swing, equip, use, map, empty-hand, and item-model processing therefore remain in place.
 
-For its arms, items, meshes, or custom anchors to appear, an enabled definition needs a `FIRST_PERSON_CAMERA` anchor. It defines the origin used to convert those bones into first-person space. It does **not** move the Minecraft camera; bind `ROOT` and `HEAD` when the animation itself should move or rotate the local camera.
+For its arms, items, meshes, or custom anchors to appear, an enabled definition needs a `FIRST_PERSON_CAMERA` anchor. It defines the origin used to convert those bones into first-person space. It does **not** itself move the Minecraft camera. Camera movement comes from `ROOT` and `HEAD` bindings when `PPlayerFirstPersonSettings.cameraMode()` is `ANIMATED`, which is the mode used by `PPlayerFirstPersonSettings.ENABLED`. Use `new PPlayerFirstPersonSettings(true, transitionIn, transitionOut, PFirstPersonCameraMode.VANILLA)` to keep the vanilla camera while still animating hands, items, and attachments.
 
 The first-person transform has two coordinate boundaries. PulseLib first expresses the camera-relative bone transform in Minecraft player-model coordinates. It then converts the result into the first-person renderer's view coordinates. For a glTF arm or item transform `M`, the resulting matrix is `M * C`, where `C = diag(-1, -1, 1)`. This is intentional: the transform receives vanilla arm or item geometry in player-model coordinates, so even an identity bone transform needs `C` to orient that geometry in view space. Animated glTF mesh attachments already have glTF vertex coordinates and therefore reduce to `M`. `C` currently has the same numeric values as the glTF-to-player conversion because it is self-inverse, but it is a separate player-model-to-first-person-view contract.
 
@@ -181,11 +181,11 @@ PPlayerAnimationDefinition.builder(MODEL)
 
 `RIGHT_ARM` and `LEFT_ARM` supply the physical arms to draw; `RIGHT_ITEM` and `LEFT_ITEM` supply the physical first-person item-renderer origins. Minecraft maps its logical main/off hand to these physical left/right channels according to the player's main-arm setting.
 
-Each channel has a `PFirstPersonRenderMode`. A channel without a sampled transform remains `VANILLA`, so Minecraft's per-hand swing, equip, use, map, and item-model transforms still apply even though PulseLib owns the outer first-person render call. A sampled arm or item channel becomes `ANIMATED` and PulseLib applies its camera-space transform. `HIDDEN` draws nothing. `PFirstPersonArmPose` and `PFirstPersonItemPose` enforce this boundary: only `ANIMATED` has a non-null transform.
+Each channel has a `PFirstPersonRenderMode`. A channel without a sampled transform remains `VANILLA`, so Minecraft's per-hand swing, equip, use, map, and item-model transforms still apply. A sampled arm or item channel becomes `ANIMATED` and PulseLib applies its camera-space transform before Minecraft submits the normal geometry. `HIDDEN` draws nothing. `PFirstPersonArmPose` and `PFirstPersonItemPose` enforce this boundary: only `ANIMATED` has a non-null transform.
 
 An item anchor is applied before Minecraft renders the item with `FIRST_PERSON_RIGHT_HAND` or `FIRST_PERSON_LEFT_HAND`. It therefore controls the container transform, not the absolute transform of the item mesh or its final grip. Minecraft then applies the item's own first-person display transform, including any transform supplied by an item model or resource pack. This keeps animated items compatible with vanilla and custom first-person item models.
 
-Keep `firstPerson` disabled for ordinary third-person animations. If an enabled definition contributes no animated hand channel, custom anchor, or mesh attachment, PulseLib leaves Minecraft's complete first-person pass intact. Definitions are processed by ascending `priority` and then identifier; arm and item transforms blend in that same order.
+Keep `firstPerson` disabled for ordinary third-person animations. Even while it is enabled, channels without sampled transforms use the vanilla arm and item rendering path; the complete Minecraft hand pass is always retained. Definitions are processed by ascending `priority` and then identifier; arm and item transforms blend in that same order.
 
 ## Hiding first-person held items
 
@@ -214,7 +214,7 @@ This phase policy supplements `itemRenderPolicy(...)`: either policy may hide th
 
 `anchor(PPlayerAnimationAnchor, boneName)` exposes a model bone as a named attachment point. PulseLib reserves `FIRST_PERSON_CAMERA`, `RIGHT_ITEM`, and `LEFT_ITEM`; use a custom `PPlayerAnimationAnchor` for equipment or effects that follow an animation bone. Register a `PPlayerAnimatedAttachmentRenderer` through `PulseLibEvents.PlayerAnimatedAttachmentRegistrationEvent`. Its context contains the player, animation id, anchor, sampled transform, blend weight, render stack, collector, and whether it is rendering in first person.
 
-The player-animation model may also contain mesh branches that are not bound to a vanilla player part. By default, PulseLib automatically renders a mesh branch when it contains an active animated bone, both in third person and in the enabled first-person replacement pass. To render only known branches, declare their roots with `meshAttachment(boneName)`:
+The player-animation model may also contain mesh branches that are not bound to a vanilla player part. By default, PulseLib automatically renders a mesh branch when it contains an active animated bone, both in third person and through the enabled first-person integration. To render only known branches, declare their roots with `meshAttachment(boneName)`:
 
 ```java
 .meshAttachment("ball")
