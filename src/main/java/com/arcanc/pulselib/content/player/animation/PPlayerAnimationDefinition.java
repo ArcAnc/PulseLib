@@ -17,7 +17,11 @@ import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import com.arcanc.pulselib.content.model.animation.PPoseEasing;
 import com.arcanc.pulselib.content.model.animation.PTransitionInterruptionPolicy;
 import com.arcanc.pulselib.data.gecko.MolangParser;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -44,6 +48,9 @@ public final class PPlayerAnimationDefinition
 	private final Set<String> meshAttachmentRoots;
 	private final Map<PPlayerAnimationAnchor, String> anchors;
 	private final PPlayerFirstPersonSettings firstPersonSettings;
+	private final ItemRenderPolicy itemRenderPolicy;
+	private final @Nullable String itemVisibilityController;
+	private final @Nullable ItemVisibilityPolicy itemVisibilityPolicy;
 	private final List<PPlayerAnimationDeformer> deformers;
 	private final Vector3f rootPivot;
 	private final int priority;
@@ -68,6 +75,9 @@ public final class PPlayerAnimationDefinition
 		this.meshAttachmentRoots = Set.copyOf(builder.meshAttachmentRoots);
 		this.anchors = Map.copyOf(builder.anchors);
 		this.firstPersonSettings = builder.firstPersonSettings;
+		this.itemRenderPolicy = builder.itemRenderPolicy;
+		this.itemVisibilityController = builder.itemVisibilityController;
+		this.itemVisibilityPolicy = builder.itemVisibilityPolicy;
 		this.deformers = List.copyOf(builder.deformers);
 		this.rootPivot = new Vector3f(builder.rootPivot);
 		this.priority = builder.priority;
@@ -152,6 +162,24 @@ public final class PPlayerAnimationDefinition
 		return this.firstPersonSettings;
 	}
 
+	/** Decides whether this definition suppresses a physical first-person hand item. */
+	public ItemRenderPolicy itemRenderPolicy()
+	{
+		return this.itemRenderPolicy;
+	}
+
+	/** Controller used to sample {@link #itemVisibilityPolicy()}, when configured. */
+	public @Nullable String itemVisibilityController()
+	{
+		return this.itemVisibilityController;
+	}
+
+	/** Optional phase-based item visibility policy, combined with {@link #itemRenderPolicy()}. */
+	public @Nullable ItemVisibilityPolicy itemVisibilityPolicy()
+	{
+		return this.itemVisibilityPolicy;
+	}
+
 	public List<PPlayerAnimationDeformer> deformers()
 	{
 		return this.deformers;
@@ -221,6 +249,30 @@ public final class PPlayerAnimationDefinition
 		              float partialTick);
 	}
 
+	@FunctionalInterface
+	public interface ItemRenderPolicy
+	{
+		ItemRenderPolicy RENDER = (player, hand, stack) -> false;
+		ItemRenderPolicy HIDE = (player, hand, stack) -> true;
+
+		boolean hide(LocalPlayer player, InteractionHand hand, ItemStack stack);
+	}
+
+	public enum ItemVisibility
+	{
+		VISIBLE,
+		HIDDEN
+	}
+
+	@FunctionalInterface
+	public interface ItemVisibilityPolicy
+	{
+		ItemVisibilityPolicy VISIBLE = (player, hand, animationTime, stack) -> ItemVisibility.VISIBLE;
+		ItemVisibilityPolicy HIDDEN = (player, hand, animationTime, stack) -> ItemVisibility.HIDDEN;
+
+		ItemVisibility visibility(LocalPlayer player, InteractionHand hand, float animationTime, ItemStack stack);
+	}
+
 	public static final class Builder
 	{
 		private final PModelData modelData;
@@ -235,6 +287,9 @@ public final class PPlayerAnimationDefinition
 		private final Set<String> meshAttachmentRoots = new LinkedHashSet<>();
 		private final Map<PPlayerAnimationAnchor, String> anchors = new LinkedHashMap<>();
 		private PPlayerFirstPersonSettings firstPersonSettings = PPlayerFirstPersonSettings.DISABLED;
+		private ItemRenderPolicy itemRenderPolicy = ItemRenderPolicy.RENDER;
+		private @Nullable String itemVisibilityController;
+		private @Nullable ItemVisibilityPolicy itemVisibilityPolicy;
 		private final List<PPlayerAnimationDeformer> deformers = new ArrayList<>();
 		private Vector3f rootPivot = new Vector3f();
 		private int priority;
@@ -341,6 +396,22 @@ public final class PPlayerAnimationDefinition
 		public Builder firstPerson(PPlayerFirstPersonSettings settings)
 		{
 			this.firstPersonSettings = Objects.requireNonNull(settings);
+			return this;
+		}
+
+		public Builder itemRenderPolicy(ItemRenderPolicy itemRenderPolicy)
+		{
+			this.itemRenderPolicy = Objects.requireNonNull(itemRenderPolicy);
+			return this;
+		}
+
+		/** Controls per-hand visibility at a named controller's interpolated time in seconds. */
+		public Builder itemVisibility(String controllerName, ItemVisibilityPolicy itemVisibilityPolicy)
+		{
+			if (controllerName == null || controllerName.isBlank())
+				throw new IllegalArgumentException("Item visibility controller name cannot be blank");
+			this.itemVisibilityController = controllerName;
+			this.itemVisibilityPolicy = Objects.requireNonNull(itemVisibilityPolicy);
 			return this;
 		}
 

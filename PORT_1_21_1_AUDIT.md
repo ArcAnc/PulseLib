@@ -1671,8 +1671,8 @@ Source path: src/main/java/com/arcanc/pulselib/content/registration/player/PPlay
 Source change: A
 Subsystem: REGISTRATION_EVENTS
 Target path: src/main/java/com/arcanc/pulselib/content/registration/player/PPlayerBallDemo.java
-Status: ADAPTED_1_21_1
-Notes: source behavior: provide the disabled ball-animation demonstration and its first-person anchors. API difference: 1.21.1 has no PPlayerAnimationDefinition.ItemRenderPolicy. 1.21.1 implementation: use PPlayerFirstPersonSettings and the same arm, item, and camera anchors; the demo remains unregistered in production. target symbol: PPlayerBallDemo.register.
+Status: PORTED
+Notes: The source ball-animation demonstration, its first-person anchors, and its explicit ItemRenderPolicy.RENDER setting are present in the target. The demo remains unregistered in production.
 
 ## 193 — src/main/java/com/arcanc/pulselib/content/registration/renderer/TestDayTimeColor.java
 

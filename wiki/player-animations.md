@@ -6,6 +6,8 @@ First-person output is opt-in with `firstPerson(PPlayerFirstPersonSettings.ENABL
 
 `PFirstPersonRenderContexts` carries a per-hand presentation through the renderer. `PVanillaFirstPersonArmResolver` and `PVanillaFirstPersonItemResolver` adapt camera-relative animation transforms to the vanilla arm and item origins. `PPlayerFirstPersonRenderer` draws first-person anchor and mesh attachments before the native buffer batch closes. `PFirstPersonCameraMode.ANIMATED` applies the `FIRST_PERSON_CAMERA` delta in `Camera.setup`; `VANILLA` leaves the camera unchanged.
 
+`Builder.itemRenderPolicy(...)` decides whether a physical `InteractionHand` item is suppressed: `ItemRenderPolicy.RENDER` is the default and `HIDE` hides it. `Builder.itemVisibility(controller, policy)` adds a phase-based decision using the named controller's interpolated time in seconds. Either policy produces a per-hand hidden presentation while preserving vanilla map handling and equip/swing/use transforms for visible items.
+
 Register custom first-person anchor renderers on `PulseLibEvents.PlayerAnimatedAttachmentRegistrationEvent`. The callback receives the animated transform, its weight, `PoseStack`, `MultiBufferSource`, and a `firstPerson` flag.
 
 Player animations modify the vanilla player model after Minecraft has prepared its normal walk, swim, crouch, and item-use pose. They work for both classic and slim skins, including hats, jackets, sleeves, and pants layers.

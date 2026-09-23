@@ -76,6 +76,7 @@ public class PPlayerBallDemo
 						anchor(PPlayerAnimationAnchors.RIGHT_ITEM, "right_hand").
 						anchor(PPlayerAnimationAnchors.LEFT_ITEM, "left_hand").
 						firstPerson(PPlayerFirstPersonSettings.ENABLED).
+						itemRenderPolicy(PPlayerAnimationDefinition.ItemRenderPolicy.RENDER).
 						controllers(registrar -> registrar.add("ball_toss", () -> state ->
 								state.controller().isStopped() ? ControllerState.STOP : ControllerState.PLAY)).
 				build());

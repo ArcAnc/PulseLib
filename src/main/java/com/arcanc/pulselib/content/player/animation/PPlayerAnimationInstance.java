@@ -157,6 +157,13 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 		return Mth.lerp(partialTick, this.previousFirstPersonActivation, this.firstPersonActivation);
 	}
 
+	/** Returns the named controller's interpolated animation time in seconds. */
+	float controllerAnimationTime(String controllerName, float partialTick)
+	{
+		PAnimationController<PPlayerAnimationInstance> controller = controller(controllerName);
+		return controller == null ? 0.0f : controller.getInterpolatedTime(partialTick) / 20.0f;
+	}
+
 	private boolean hasActiveController()
 	{
 		return this.animationManager.getControllers().values().stream().anyMatch(controller ->

@@ -129,6 +129,8 @@ public final class PPlayerAnimations
 			pose.addArm(PPlayerPart.LEFT_ARM, presentation, definition, player, partialTick, weight);
 			pose.addItem(PPlayerAnimationAnchors.RIGHT_ITEM, presentation, definition, player, partialTick, weight);
 			pose.addItem(PPlayerAnimationAnchors.LEFT_ITEM, presentation, definition, player, partialTick, weight);
+			pose.resolveItemVisibility(true, definition, instance, player, partialTick);
+			pose.resolveItemVisibility(false, definition, instance, player, partialTick);
 			pose.addAnimationAnchors(entry.getKey(), presentation, definition, weight);
 			pose.addMeshAttachments(entry.getKey(), frame, presentation, definition, weight);
 			pose.hasContributingAnimation = true;
@@ -667,6 +669,8 @@ public final class PPlayerAnimations
 		private PTransform leftItem;
 		private boolean rightItemContributed;
 		private boolean leftItemContributed;
+		private boolean rightItemHidden;
+		private boolean leftItemHidden;
 		private final List<PPlayerFirstPersonAnchorPose> animationAnchors = new ArrayList<>();
 		private final List<PPlayerFirstPersonMeshAttachmentPose> meshAttachments = new ArrayList<>();
 		private final Matrix4f presentationMatrix = new Matrix4f();
@@ -695,6 +699,27 @@ public final class PPlayerAnimations
 			float weight = activationWeight * definition.boneWeight(player, boneName, partialTick);
 			if (weight <= 0.0f || !presentation.itemMatrix(anchor, this.presentationMatrix)) return;
 			setItem(anchor.equals(PPlayerAnimationAnchors.RIGHT_ITEM), PTransform.fromMatrix(this.presentationMatrix), definition.blendMode(), weight);
+		}
+
+		private void resolveItemVisibility(boolean right,
+		                                   PPlayerAnimationDefinition definition,
+		                                   PPlayerAnimationInstance instance,
+		                                   Player player,
+		                                   float partialTick)
+		{
+			if (!(player instanceof LocalPlayer localPlayer))
+				return;
+			net.minecraft.world.InteractionHand hand = right == (localPlayer.getMainArm() == net.minecraft.world.entity.HumanoidArm.RIGHT) ?
+					net.minecraft.world.InteractionHand.MAIN_HAND : net.minecraft.world.InteractionHand.OFF_HAND;
+			boolean hidden = definition.itemRenderPolicy().hide(localPlayer, hand, localPlayer.getItemInHand(hand));
+			PPlayerAnimationDefinition.ItemVisibilityPolicy visibilityPolicy = definition.itemVisibilityPolicy();
+			String controllerName = definition.itemVisibilityController();
+			if (visibilityPolicy != null && controllerName != null)
+				hidden |= visibilityPolicy.visibility(localPlayer, hand,
+						instance.controllerAnimationTime(controllerName, partialTick), localPlayer.getItemInHand(hand)) ==
+						PPlayerAnimationDefinition.ItemVisibility.HIDDEN;
+			if (right) this.rightItemHidden = hidden;
+			else this.leftItemHidden = hidden;
 		}
 
 		private void addAnimationAnchors(ResourceLocation id, PFirstPersonPresentation presentation,
@@ -763,8 +788,10 @@ public final class PPlayerAnimations
 		private PFirstPersonRenderPresentation build()
 		{
 			return new PFirstPersonRenderPresentation(this.rightArm, this.leftArm,
-					this.rightItemContributed ? PFirstPersonItemPose.animated(this.rightItem) : PFirstPersonItemPose.vanilla(),
-					this.leftItemContributed ? PFirstPersonItemPose.animated(this.leftItem) : PFirstPersonItemPose.vanilla(),
+					this.rightItemHidden ? PFirstPersonItemPose.hidden() :
+							(this.rightItemContributed ? PFirstPersonItemPose.animated(this.rightItem) : PFirstPersonItemPose.vanilla()),
+					this.leftItemHidden ? PFirstPersonItemPose.hidden() :
+							(this.leftItemContributed ? PFirstPersonItemPose.animated(this.leftItem) : PFirstPersonItemPose.vanilla()),
 					List.copyOf(this.animationAnchors), List.copyOf(this.meshAttachments));
 		}
 	}
