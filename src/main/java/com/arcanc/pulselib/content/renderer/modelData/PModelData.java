@@ -11,8 +11,10 @@ package com.arcanc.pulselib.content.renderer.modelData;
 
 
 import com.arcanc.pulselib.content.model.baked.PBakedModel;
+import com.arcanc.pulselib.data.PModelLoader;
 import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
 import com.arcanc.pulselib.util.PModelCache;
+import com.arcanc.pulselib.util.PResourceCache;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
@@ -63,7 +65,12 @@ public class PModelData
 	{
 		if (PModelCache.getModels() == null)
 			return null;
-		return PModelCache.getModels().get(this.modelLocation);
+		PBakedModel direct = PModelCache.getModels().get(this.modelLocation);
+		if (direct != null)
+			return direct;
+		return PResourceCache.getModelResource(this.modelLocation).
+						map(resource -> PModelCache.getModels().get(resource.model())).
+						orElse(null);
 	}
 	
 	public static class Builder
@@ -92,7 +99,10 @@ public class PModelData
 		private static ResourceLocation normalizeModelLocation(ResourceLocation modelLocation, String modelType, ResourceLocation modelFormat)
 		{
 			if (modelType.isEmpty())
-				return modelLocation;
+			{
+				PModelLoader loader = PModelCache.getModelLoader(modelFormat).orElse(PGltfModelLoader.INSTANCE);
+				return loader.normalizeModelResourceLocation(modelLocation);
+			}
 			
 			if (PModelCache.getModelLoaders().stream().anyMatch(loader -> loader.supports(modelLocation)))
 				return modelLocation;

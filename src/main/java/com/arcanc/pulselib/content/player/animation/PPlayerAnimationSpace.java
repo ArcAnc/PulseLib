@@ -19,6 +19,10 @@ import org.joml.Vector3fc;
 /** Coordinate conversion between imported player models and vanilla ModelPart space. */
 public final class PPlayerAnimationSpace
 {
+	/** Converts glTF model space to the basis expected by vanilla player geometry. */
+	private static final PTransform GLTF_TO_PLAYER_GEOMETRY =
+			PTransform.rotation(new Quaternionf().rotationZ((float)Math.PI));
+
 	private PPlayerAnimationSpace() {}
 
 	public static Vector3f toPlayerSpace(Vector3fc vector, PPlayerAnimationDefinition definition)
@@ -45,10 +49,19 @@ public final class PPlayerAnimationSpace
 				toPlayerSpace(transform.rotation(), definition), transform.scale()) : transform;
 	}
 
-	/** Converts a canonical player-model transform for the first-person mesh basis. */
+	/** Converts a model transform for geometry rendered by vanilla player parts. */
 	public static PTransform toPlayerGeometrySpace(PTransform transform, PPlayerAnimationDefinition definition)
 	{
-		return toPlayerSpace(transform, definition);
+		return usesGltfCoordinates(definition) ? GLTF_TO_PLAYER_GEOMETRY.compose(transform) : transform;
+	}
+
+	/**
+	 * Converts a camera-relative transform for imported mesh geometry. glTF
+	 * vertices remain in their source basis, so the two basis changes cancel.
+	 */
+	public static PTransform toFirstPersonGeometrySpace(PTransform transform, PPlayerAnimationDefinition definition)
+	{
+		return usesGltfCoordinates(definition) ? GLTF_TO_PLAYER_GEOMETRY.compose(toPlayerGeometrySpace(transform, definition)) : transform;
 	}
 
 	private static boolean usesGltfCoordinates(PPlayerAnimationDefinition definition)

@@ -35,7 +35,7 @@ public class PPlayerBallDemo
 	private static final ResourceLocation ID = PLibDatabase.rl("demo/player_ball_toss");
 	public static final ResourceLocation TEXTURE = PLibDatabase.rl("player/demo/test_ball_model/0");
 	private static final PModelData MODEL = new PModelData.Builder(
-			PLibDatabase.rl("glmodels/player/demo/test_ball_model.gltf"), "").build();
+			PLibDatabase.rl("glmodels/player/demo/test_ball_model"), "").build();
 	private static final PRawAnimation BALL_TOSS = PRawAnimation.begin().thenPlay("ball_toss").build();
 	private static final KeyMapping KEY = new KeyMapping(
 			"key.pulselib.player_ball_toss",

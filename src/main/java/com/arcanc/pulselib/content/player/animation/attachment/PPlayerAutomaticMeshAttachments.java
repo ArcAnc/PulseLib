@@ -10,14 +10,22 @@
 package com.arcanc.pulselib.content.player.animation.attachment;
 
 import com.arcanc.pulselib.content.model.animation.BoneFrame;
+import com.arcanc.pulselib.content.model.animation.PAnimationPoseResolver;
+import com.arcanc.pulselib.content.model.animation.PTransform;
 import com.arcanc.pulselib.content.model.baked.PBakedBone;
+import com.arcanc.pulselib.content.model.baked.PBakedMesh;
 import com.arcanc.pulselib.content.model.baked.PMeshRenderContext;
+import com.arcanc.pulselib.content.model.baked.PMeshRenderMaterial;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationDefinition;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationFrame;
 import com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonMeshAttachmentPose;
+import com.arcanc.pulselib.content.renderer.PRenderQueue;
+import com.arcanc.pulselib.content.renderer.plan.PInstanceHeader;
+import com.arcanc.pulselib.util.PResourceCache;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
 import java.util.ArrayList;
@@ -53,18 +61,41 @@ public final class PPlayerAutomaticMeshAttachments
 	public static void renderThirdPerson(List<PPlayerAnimationMeshAttachmentPose> poses, PoseStack poseStack, int packedLight)
 	{
 		for (PPlayerAnimationMeshAttachmentPose pose : poses)
-			if (pose.weight() > 1.0e-4f) render(pose.root(), pose.frame(), pose.transform(), poseStack, packedLight);
+			if (pose.weight() > 1.0e-4f) submit(pose.root(), pose.frame(), pose.transform(), poseStack, packedLight);
 	}
 
 	/** Draws model mesh attachments after their first-person presentation has been resolved. */
 	public static void renderFirstPerson(List<PPlayerFirstPersonMeshAttachmentPose> poses, PoseStack poseStack, int packedLight)
 	{
 		for (PPlayerFirstPersonMeshAttachmentPose pose : poses)
-			if (pose.weight() > 1.0e-4f) render(pose.root(), pose.frame(), pose.transform(), poseStack, packedLight);
+			if (pose.weight() > 1.0e-4f) submitFirstPerson(pose.root(), pose.frame(), pose.transform(), poseStack, packedLight);
 	}
 
-	private static void render(PBakedBone root, PPlayerAnimationFrame frame,
-	                           com.arcanc.pulselib.content.model.animation.PTransform transform,
+	/**
+	 * First-person meshes are drawn after Minecraft has written hand depth. An
+	 * immediate draw here would still test against the world depth buffer.
+	 */
+	private static void submitFirstPerson(PBakedBone root, PPlayerAnimationFrame frame,
+	                                      PTransform transform,
+	                                      PoseStack poseStack, int packedLight)
+	{
+		BoneFrame local = frame.localTransform(root.name());
+		if (local == null) return;
+		poseStack.pushPose();
+		try
+		{
+			poseStack.mulPose(transform.matrix());
+			poseStack.scale(inverse(local.scale().x), inverse(local.scale().y), inverse(local.scale().z));
+			poseStack.mulPose(new Quaternionf(local.rotation()).invert());
+			poseStack.translate(-local.translation().x, -local.translation().y, -local.translation().z);
+			submitFirstPersonBone(root, frame.resolver(), poseStack,
+					new PMeshRenderContext(PRenderTypes.RenderTypeProvider::trianglesTranslucent, -1, packedLight, OverlayTexture.NO_OVERLAY));
+		}
+		finally { poseStack.popPose(); }
+	}
+
+	private static void submit(PBakedBone root, PPlayerAnimationFrame frame,
+	                           PTransform transform,
 	                           PoseStack poseStack, int packedLight)
 	{
 		BoneFrame local = frame.localTransform(root.name());
@@ -76,8 +107,60 @@ public final class PPlayerAutomaticMeshAttachments
 			poseStack.scale(inverse(local.scale().x), inverse(local.scale().y), inverse(local.scale().z));
 			poseStack.mulPose(new Quaternionf(local.rotation()).invert());
 			poseStack.translate(-local.translation().x, -local.translation().y, -local.translation().z);
-			root.instantDraw(poseStack, frame.resolver(), (bone, mesh, inherited) -> inherited,
+			submitBone(root, frame.resolver(), poseStack,
 					new PMeshRenderContext(PRenderTypes.RenderTypeProvider::trianglesTranslucent, -1, packedLight, OverlayTexture.NO_OVERLAY));
+		}
+		finally { poseStack.popPose(); }
+	}
+
+	private static void submitBone(PBakedBone bone, PAnimationPoseResolver<?> resolver,
+	                               PoseStack poseStack, PMeshRenderContext inherited)
+	{
+		if (!resolver.isVisible(bone)) return;
+		BoneFrame frame = resolver.resolve(bone).localTransform();
+		poseStack.pushPose();
+		try
+		{
+			poseStack.translate(frame.translation().x(), frame.translation().y(), frame.translation().z());
+			poseStack.mulPose(frame.rotation());
+			poseStack.scale(frame.scale().x(), frame.scale().y(), frame.scale().z());
+			for (PBakedMesh mesh : bone.meshes())
+			{
+				if (mesh.textureReference().isEmpty()) continue;
+				PMeshRenderMaterial material = PMeshRenderMaterial.resolve(mesh, inherited);
+				PRenderQueue.submitEntityMesh(
+						material.resolveRenderType(inherited, PResourceCache.ATLAS_LOCATION),
+						material.mesh().geometry(),
+						new PInstanceHeader(new Matrix4f(poseStack.last().pose()), inherited.color(),
+								material.packedLight(), inherited.packedOverlay()));
+			}
+			for (PBakedBone child : bone.children()) submitBone(child, resolver, poseStack, inherited);
+		}
+		finally { poseStack.popPose(); }
+	}
+
+	private static void submitFirstPersonBone(PBakedBone bone, PAnimationPoseResolver<?> resolver,
+	                                           PoseStack poseStack, PMeshRenderContext inherited)
+	{
+		if (!resolver.isVisible(bone)) return;
+		BoneFrame frame = resolver.resolve(bone).localTransform();
+		poseStack.pushPose();
+		try
+		{
+			poseStack.translate(frame.translation().x(), frame.translation().y(), frame.translation().z());
+			poseStack.mulPose(frame.rotation());
+			poseStack.scale(frame.scale().x(), frame.scale().y(), frame.scale().z());
+			for (PBakedMesh mesh : bone.meshes())
+			{
+				if (mesh.textureReference().isEmpty()) continue;
+				PMeshRenderMaterial material = PMeshRenderMaterial.resolve(mesh, inherited);
+				PRenderQueue.submitFirstPersonMesh(
+						material.resolveRenderType(inherited, PResourceCache.ATLAS_LOCATION),
+						material.mesh().geometry(),
+						new PInstanceHeader(new Matrix4f(poseStack.last().pose()), inherited.color(),
+								material.packedLight(), inherited.packedOverlay()));
+			}
+			for (PBakedBone child : bone.children()) submitFirstPersonBone(child, resolver, poseStack, inherited);
 		}
 		finally { poseStack.popPose(); }
 	}

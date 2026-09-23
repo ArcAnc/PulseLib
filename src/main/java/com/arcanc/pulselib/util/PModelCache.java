@@ -10,23 +10,23 @@
 package com.arcanc.pulselib.util;
 
 
-import com.arcanc.pulselib.content.renderer.legacy.GlGeometryDataFactory;
-import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
-import com.arcanc.pulselib.content.model.PBone;
-import com.arcanc.pulselib.content.model.PMesh;
-import com.arcanc.pulselib.content.model.PMeshPrimitive;
-import com.arcanc.pulselib.content.model.PModel;
-import com.arcanc.pulselib.content.model.resource.PModelResource;
+import com.arcanc.pulselib.content.model.*;
 import com.arcanc.pulselib.content.model.baked.*;
 import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
-import com.arcanc.pulselib.content.model.textures.atlas.PLibMetadata;
+import com.arcanc.pulselib.content.model.resource.PModelResource;
 import com.arcanc.pulselib.content.model.textures.PTextureAlphaClassifier;
+import com.arcanc.pulselib.content.model.textures.atlas.PLibMetadata;
 import com.arcanc.pulselib.content.renderer.PRenderQueue;
+import com.arcanc.pulselib.content.renderer.legacy.GlGeometryDataFactory;
+import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
 import com.arcanc.pulselib.data.PModelLoader;
 import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.mojang.blaze3d.vertex.*;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
+import com.mojang.blaze3d.vertex.MeshData;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -170,7 +170,7 @@ public class PModelCache
 			{
 				PBakedBone.PBakedBoneBuilder builder = bakedBoneBuilder.get(bone2MeshesEntry.getKey());
 				
-				Map<com.arcanc.pulselib.content.model.PMaterial, List<PMeshPrimitive>> byMaterial = new LinkedHashMap<>();
+				Map<PMaterial, List<PMeshPrimitive>> byMaterial = new LinkedHashMap<>();
 				for (UUID meshUUID : bone2MeshesEntry.getValue().getSecond())
 				{
 					PMesh mesh = model.meshes.get(meshUUID);

@@ -77,6 +77,12 @@ public final class PRenderQueue
 		submit(RenderStage.ENTITIES, renderType, geometry, data);
 	}
 
+	/** Queues geometry for the depth buffer produced by Minecraft's hand pass. */
+	public static void submitFirstPersonMesh(RenderType renderType, PGeometryData geometry, PInstanceHeader data)
+	{
+		submit(RenderStage.FIRST_PERSON, renderType, geometry, data);
+	}
+
 	public static void submit(RenderStage stage, RenderType type, PDynamicGeometry geometry, PInstanceHeader data)
 	{
 		submit(stage, type, geometry, data, PRenderTypes.isTranslucent(type));

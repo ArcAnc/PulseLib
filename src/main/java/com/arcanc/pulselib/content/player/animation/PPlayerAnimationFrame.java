@@ -92,6 +92,22 @@ public final class PPlayerAnimationFrame
 		return pose == null ? null : pose.bindTransform();
 	}
 
+	/**
+	 * Returns a bone transform relative to the animation root, or to the head
+	 * bind pose when the definition has no explicit root binding.
+	 */
+	public @Nullable PTransform rootRelativeTransform(String boneName)
+	{
+		PTransform transform = transform(boneName);
+		if (transform == null) return null;
+		String referenceBone = this.rootBone == null
+				? this.definition.bindings().get(PPlayerPart.HEAD)
+				: this.rootBone;
+		if (referenceBone == null) return transform;
+		PTransform rootBind = bindTransform(referenceBone);
+		return rootBind == null ? transform : rootBind.inverse().compose(transform);
+	}
+
 	public @Nullable PTransform actionTransform(PPlayerAnimationAnchor anchor)
 	{
 		String bone = this.definition.anchors().get(anchor);

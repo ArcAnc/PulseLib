@@ -9,21 +9,23 @@
 
 package com.arcanc.pulselib.content.player.animation;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
+import com.arcanc.pulselib.content.model.animation.PPoseBlendMode;
 import com.arcanc.pulselib.content.model.animation.PTransform;
 import com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimationMeshAttachmentPose;
 import com.arcanc.pulselib.content.player.animation.attachment.PPlayerAutomaticMeshAttachments;
 import com.arcanc.pulselib.content.player.animation.firstPerson.*;
+import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
 import com.arcanc.pulselib.util.PLibDatabase;
-import net.minecraft.client.player.LocalPlayer;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
-import com.arcanc.pulselib.content.model.animation.PPoseBlendMode;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
@@ -104,7 +106,12 @@ public final class PPlayerAnimations
 			PPlayerAnimationFrame frame = instance.sampleFrame(partialTick);
 			if (frame == null) continue;
 			for (var root : PPlayerAutomaticMeshAttachments.roots(frame))
-				poses.add(new PPlayerAnimationMeshAttachmentPose(entry.getKey(), definition.modelData(), root, frame, PTransform.IDENTITY, weight));
+			{
+				PTransform transform = frame.rootRelativeTransform(root.name());
+				if (transform != null)
+					poses.add(new PPlayerAnimationMeshAttachmentPose(entry.getKey(), definition.modelData(), root, frame,
+							PPlayerAnimationSpace.toPlayerGeometrySpace(transform, definition), weight));
+			}
 		}
 		return List.copyOf(poses);
 	}
@@ -686,7 +693,7 @@ public final class PPlayerAnimations
 					definition.boneWeight(player, boneName, partialTick);
 			if (weight <= 0.0f || !presentation.armPreModelPartMatrix(part, this.presentationMatrix)) return;
 			boolean right = part == PPlayerPart.RIGHT_ARM;
-			net.minecraft.world.entity.HumanoidArm arm = right ? net.minecraft.world.entity.HumanoidArm.RIGHT : net.minecraft.world.entity.HumanoidArm.LEFT;
+			HumanoidArm arm = right ? HumanoidArm.RIGHT : HumanoidArm.LEFT;
 			PTransform handTarget = PTransform.fromMatrix(this.presentationMatrix).compose(PFirstPersonRestPose.armRig(arm).armToHand());
 			setArm(right, handTarget, definition.blendMode(), weight);
 		}
@@ -709,8 +716,8 @@ public final class PPlayerAnimations
 		{
 			if (!(player instanceof LocalPlayer localPlayer))
 				return;
-			net.minecraft.world.InteractionHand hand = right == (localPlayer.getMainArm() == net.minecraft.world.entity.HumanoidArm.RIGHT) ?
-					net.minecraft.world.InteractionHand.MAIN_HAND : net.minecraft.world.InteractionHand.OFF_HAND;
+			InteractionHand hand = right == (localPlayer.getMainArm() == HumanoidArm.RIGHT) ?
+					InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
 			boolean hidden = definition.itemRenderPolicy().hide(localPlayer, hand, localPlayer.getItemInHand(hand));
 			PPlayerAnimationDefinition.ItemVisibilityPolicy visibilityPolicy = definition.itemVisibilityPolicy();
 			String controllerName = definition.itemVisibilityController();
@@ -739,7 +746,7 @@ public final class PPlayerAnimations
 			for (var root : PPlayerAutomaticMeshAttachments.roots(frame))
 				if (presentation.boneMatrix(root.name(), this.presentationMatrix))
 					this.meshAttachments.add(new PPlayerFirstPersonMeshAttachmentPose(id, definition.modelData(), root, frame,
-							PPlayerAnimationSpace.toPlayerGeometrySpace(PTransform.fromMatrix(this.presentationMatrix), definition), weight));
+							PPlayerAnimationSpace.toFirstPersonGeometrySpace(PTransform.fromMatrix(this.presentationMatrix), definition), weight));
 		}
 
 		private void setArm(boolean right, PTransform transform, PPlayerAnimationBlendMode blendMode, float weight)
@@ -756,7 +763,7 @@ public final class PPlayerAnimations
 		{
 			boolean contributed = right ? this.rightItemContributed : this.leftItemContributed;
 			PTransform current = contributed ? (right ? this.rightItem : this.leftItem) :
-					PFirstPersonRestPose.item(right ? net.minecraft.world.entity.HumanoidArm.RIGHT : net.minecraft.world.entity.HumanoidArm.LEFT);
+					PFirstPersonRestPose.item(right ? HumanoidArm.RIGHT : HumanoidArm.LEFT);
 			PTransform blended = blend(current, transform, blendMode, weight);
 			if (right) { this.rightItem = blended; this.rightItemContributed = true; }
 			else { this.leftItem = blended; this.leftItemContributed = true; }

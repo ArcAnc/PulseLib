@@ -9,6 +9,7 @@
 
 package com.arcanc.pulselib.content.player.animation.attachment;
 
+import com.arcanc.pulselib.content.player.animation.PPlayerAnimationAnchor;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationAnchorPose;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
 import com.arcanc.pulselib.content.player.animation.firstPerson.PFirstPersonRenderPresentation;
@@ -22,7 +23,7 @@ import java.util.*;
 /** Registry and third-person dispatcher for semantic player-animation anchors. */
 public final class PPlayerAnimatedAttachments
 {
-	private static final Map<com.arcanc.pulselib.content.player.animation.PPlayerAnimationAnchor, List<PPlayerAnimatedAttachmentRenderer>> RENDERERS = new HashMap<>();
+	private static final Map<PPlayerAnimationAnchor, List<PPlayerAnimatedAttachmentRenderer>> RENDERERS = new HashMap<>();
 
 	private PPlayerAnimatedAttachments() {}
 

@@ -19,12 +19,6 @@ import com.arcanc.pulselib.content.model.baked.PGpuDeformedMeshBuffers;
 import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
 import com.arcanc.pulselib.content.model.textures.atlas.RuntimeLoader;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
-import com.arcanc.pulselib.content.registration.player.PPlayerBallDemo;
-import com.arcanc.pulselib.content.registration.PLibRegistration;
-import com.arcanc.pulselib.content.registration.block.block_entity.ber.TestBlockEntityRenderer;
-import com.arcanc.pulselib.content.registration.entity.renderer.TestEntityRender;
-import com.arcanc.pulselib.content.registration.item.TestArmor;
-import com.arcanc.pulselib.content.registration.item.renderer.TestBlockItemRenderer;
 import com.arcanc.pulselib.content.renderer.PRenderQueue;
 import com.arcanc.pulselib.content.renderer.PRenderStagesHandler;
 import com.arcanc.pulselib.util.PLibDatabase;
@@ -41,7 +35,6 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModLoader;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.RegisterSpriteSourceTypesEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
@@ -58,8 +51,8 @@ public class ClientEvents
 	{
 		ModLoader.postEvent(new PulseLibEvents.TypeRegistrationEvent());
 
-		modEventBus.addListener(ClientEvents :: registerRenderers);
-		modEventBus.addListener(ClientEvents :: registerResources);
+		//modEventBus.addListener(ClientEvents :: registerRenderers);
+		//modEventBus.addListener(ClientEvents :: registerResources);
 
 		PAttachmentAnchorResolvers.init(modEventBus);
 		//registerTestCowTail();
@@ -76,6 +69,7 @@ public class ClientEvents
 		PResourceCache.register(modEventBus);
 
 		//PPlayerAcrobaticDemo.register(modEventBus);
+		//PPlayerBallDemo.register(modEventBus);
 	}
 
 	/*private static void registerTestCowTail()
@@ -183,7 +177,7 @@ public class ClientEvents
 		event.register(PLibDatabase.rl("runtime_loader"), RuntimeLoader.TYPE);
 	}
 
-	private static void registerRenderers(final EntityRenderersEvent.RegisterRenderers event)
+	/*private static void registerRenderers(final EntityRenderersEvent.RegisterRenderers event)
 	{
 		event.registerEntityRenderer(PLibRegistration.EntityTypeReg.TEST_ENTITY.get(), TestEntityRender :: new);
 		event.registerBlockEntityRenderer(PLibRegistration.BETypeReg.TEST_BLOCK_ENTITY.get(), TestBlockEntityRenderer :: new);
@@ -211,5 +205,5 @@ public class ClientEvents
 				texture("0", TestArmor.TEXTURE);
 		event.model(PLibDatabase.rl("player/demo/test_ball_model")).
 				texture("0", PPlayerBallDemo.TEXTURE);
-	}
+	}*/
 }
