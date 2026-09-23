@@ -88,10 +88,12 @@ PPlayerAnimationDefinition.builder(model)
 
 ## Custom deformer types
 
-Implement `PMeshDeformer<D>` for a new operation. `codec()` describes a serializable definition and `prepare(...)` creates one or more efficient `PPreparedDeformer` operations. Register the type in the `pulselib:mesh_deformer` registry from your mod.
+Implement `PMeshDeformer<D>` for a new operation. `codec()` describes a serializable definition and `prepare(...)` creates one or more efficient `PPreparedDeformer` operations. Register the type from the mod event bus through `PulseLibEvents.TypeRegistrationEvent.registerMeshDeformer(...)`.
 
 ```java
 public final class MyDeformer implements PMeshDeformer<MyDefinition> {
+    public static final MyDeformer INSTANCE = new MyDeformer();
+
     @Override public ResourceLocation id() { return MY_ID; }
     @Override public MapCodec<MyDefinition> codec() { return MyDefinition.CODEC; }
 
@@ -101,6 +103,13 @@ public final class MyDeformer implements PMeshDeformer<MyDefinition> {
             // Modify position in place.
         });
     }
+}
+```
+
+```java
+@SubscribeEvent
+public static void registerTypes(PulseLibEvents.TypeRegistrationEvent event) {
+    event.registerMeshDeformer(MyDeformer.INSTANCE);
 }
 ```
 

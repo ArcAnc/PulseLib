@@ -34,7 +34,7 @@ PModelData data = new PModelData.Builder(
         ResourceLocation.fromNamespaceAndPath("examplemod", "glmodels/entity/robot.gltf"),
         "").build();
 ```
-If neither candidate exists, resource reload fails with `Registered model was not loaded; tried: ...`, followed by both paths.
+If neither candidate exists, resource reload fails with `Registered model was not loaded: ...; checked resources: ...`, followed by both paths.
 
 Each `texture` key is the reference stored in the model material. It preserves its complete directory path, while a final `.png` is ignored: `body/claws.png` becomes `body/claws`, and remains distinct from `armor/claws`. The value is a Minecraft resource location relative to `textures` without `.png`:
 
@@ -47,6 +47,114 @@ becomes:
 ```java
 ResourceLocation.fromNamespaceAndPath("examplemod", "entity/robot/body")
 ```
+
+## Animation-event sidecars
+
+An animation-event sidecar is optional and needs no `RegisterResourceEvent` entry: the model loader finds it while loading its model or animation file. The first existing candidate is used, so keep only one sidecar for a model unless you deliberately want the earlier path to take precedence. Its contents use the `animations` JSON object described in [Animation events](animation-events.md).
+
+For a glTF model at `assets/examplemod/glmodels/entity/robot.glb` or `.gltf`, PulseLib checks these paths in order:
+
+```text
+assets/examplemod/glmodels/entity/robot.events.json
+assets/examplemod/glmodels/entity/robot.animation_events.json
+assets/examplemod/glmodels/events/entity/robot.events.json
+assets/examplemod/glmodels/events/robot.events.json
+```
+
+Gecko sidecars are associated with the animation JSON that the loader selected. For an animation at `assets/examplemod/geckolib/animations/robot.animation.json`, the candidates are:
+
+```text
+assets/examplemod/geckolib/animations/robot.events.json
+assets/examplemod/geckolib/animations/robot.animation_events.json
+assets/examplemod/geckolib/animations/events/robot.events.json
+```
+
+When the selected Gecko animation is in a subdirectory, the first two sidecar paths stay beside that selected animation file and the third path uses an `events/` directory beside it.
+
+### glTF sidecar example
+
+`time` is specified in seconds. The following file at `assets/examplemod/glmodels/entity/robot.events.json` adds effects, a callback, a graph-controller trigger, and visibility tracks to the `attack` animation:
+
+```json
+{
+  "animations": {
+    "attack": {
+      "events": [
+        {
+          "type": "sound",
+          "time": 0.15,
+          "sound": "minecraft:entity.player.attack.strong",
+          "locator": "right_hand",
+          "volume": 0.9,
+          "pitch": 1.1
+        },
+        {
+          "type": "particle",
+          "time": 0.18,
+          "particle": "minecraft:crit",
+          "locator": "right_hand",
+          "offset": [0.0, 0.0, 0.0],
+          "motion": [0.0, 0.05, 0.0]
+        },
+        {
+          "type": "locator_callback",
+          "time": 0.20,
+          "callback": "examplemod:attack_hit",
+          "locator": "right_hand"
+        },
+        {
+          "type": "animation_parameter",
+          "time": 0.35,
+          "controller": "combat",
+          "parameter": "attack_complete",
+          "trigger": true
+        }
+      ],
+      "visibility": {
+        "weapon": {
+          "0.0": false,
+          "0.12": true,
+          "0.45": false
+        },
+        "muzzle_flash": [
+          { "time": 0.18, "visible": true },
+          { "time": 0.23, "visible": false }
+        ]
+      }
+    }
+  }
+}
+```
+
+`locator_callback` invokes a callback registered through `PAnimationEventCallbacks`. `animation_parameter` addresses a graph controller; an empty `controller` uses the current graph controller, and `trigger: true` invokes the named trigger. Event types may use built-in short names, as above, or namespaced identifiers.
+
+### Gecko sidecar example
+
+The format is identical for Gecko. A sidecar may also omit the outer `animations` object. For example, `assets/examplemod/geckolib/animations/robot.animation_events.json` can contain:
+
+```json
+{
+  "animation.robot.idle": {
+    "events": [
+      {
+        "type": "camera_shake",
+        "time": 0.0,
+        "strength": 0.15,
+        "duration": 2,
+        "frequency": 8
+      }
+    ],
+    "visibility": {
+      "glow": [
+        { "time": 0.0, "visible": false },
+        { "time": 0.5, "visible": true }
+      ]
+    }
+  }
+}
+```
+
+The animation key must exactly match the animation name in the loaded model. Both visibility forms shown above are supported.
 
 ## Gecko model fallback texture
 
@@ -120,7 +228,7 @@ Prefer `withColor(...)`, `withPackedLight(...)`, `withPackedOverlay(...)`, and t
 
 ## Emissive textures
 
-Emissive textures are useful for eyes, screens, lamps, energy parts, and other pieces that should ignore normal light. PulseLib reads this flag from texture metadata through [`PLibSpriteMetadata`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/model/textures/atlas/PLibSpriteMetadata.java).
+Emissive textures are useful for eyes, screens, lamps, energy parts, and other pieces that should ignore normal light. PulseLib reads this flag from texture metadata through [`PLibMetadata`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/model/textures/atlas/PLibMetadata.java).
 
 To mark a texture as emissive, add a `.png.mcmeta` file next to it:
 
@@ -143,21 +251,21 @@ When `PModelCache` bakes the model, each mesh stores whether its sprite is emiss
 PRenderTypes.RenderTypeProvider.emissiveVariant(baseType, PResourceCache.ATLAS_LOCATION);
 ```
 
-You can also choose an emissive render type directly in custom rendering code:
+You can also choose an emissive render type directly in custom rendering code. Choose the solid, cutout, or translucent variant according to the desired alpha mode:
 
 ```java
-PRenderTypes.RenderTypeProvider::trianglesEmissiveCutout
-PRenderTypes.RenderTypeProvider::trianglesEmissiveTranslucent
-PRenderTypes.RenderTypeProvider::trianglesEmissiveSolid
+PRenderTypes.RenderTypeProvider::trianglesSolidEmissive
+PRenderTypes.RenderTypeProvider::trianglesCutoutEmissive
+PRenderTypes.RenderTypeProvider::trianglesTranslucentEmissive
 ```
 
-Choose the solid, cutout, or translucent variant according to the desired alpha mode. Direct `PBakedBone.instantDraw(...)` rendering has matching `trianglesInstantEmissiveSolid`, `trianglesInstantEmissiveCutout`, and `trianglesInstantEmissiveTranslucent` variants; `trianglesGui` remains a compatibility alias for the non-emissive instant translucent pipeline.
+Direct `PBakedBone.instantDraw(...)` accepts the same render-type functions. Use `trianglesImmediateEmissive` for an opaque immediate draw or `trianglesGuiEmissive` for a translucent immediate draw; `trianglesGui` is the non-emissive translucent immediate type.
 
 Classes used:
 
 * [`PResourceCache`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/util/PResourceCache.java)
 * [`RuntimeLoader`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/model/textures/atlas/RuntimeLoader.java)
-* [`PLibSpriteMetadata`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/model/textures/atlas/PLibSpriteMetadata.java)
+* [`PLibMetadata`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/model/textures/atlas/PLibMetadata.java)
 * [`PAlphaMode`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/model/textures/PAlphaMode.java)
 * [`PTextureAlphaClassifier`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/model/textures/PTextureAlphaClassifier.java)
 * [`PRenderTypes`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java)
