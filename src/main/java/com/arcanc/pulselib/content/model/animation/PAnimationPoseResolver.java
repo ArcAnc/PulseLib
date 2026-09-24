@@ -122,7 +122,7 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 				continue;
 			}
 
-			PRawAnimation.AnimationStage stage = controller.getCurrentStage();
+			PAnimationStagePlayback stage = controller.getCurrentStage();
 			if (stage == null || stage.isWaiting())
 				continue;
 			PAnimation animation = this.model.animations().get(stage.animationName());
@@ -156,7 +156,7 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 				continue;
 			}
 
-			PRawAnimation.AnimationStage stage = controller.getCurrentStage();
+			PAnimationStagePlayback stage = controller.getCurrentStage();
 			if (stage != null && !stage.isWaiting())
 				addAnimationBones(result, this.model.animations().get(stage.animationName()));
 		}
@@ -409,7 +409,7 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 
 		for (PAnimationController<T> controller : controllers)
 		{
-			PRawAnimation.AnimationStage stage = controller.getCurrentStage();
+		PAnimationStagePlayback stage = controller.getCurrentStage();
 			if (stage == null || stage.isWaiting())
 				continue;
 

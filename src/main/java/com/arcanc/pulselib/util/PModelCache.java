@@ -214,7 +214,7 @@ public class PModelCache
 	{
 		String textureReference = primitive == null || primitive.material() == null ? "<missing>" : primitive.material().textureReference();
 		if (textureReference.isEmpty())
-			return;
+			throw new IllegalStateException("Primitive has no texture reference");
 		try
 		{
 			if (primitive == null || primitive.material() == null)

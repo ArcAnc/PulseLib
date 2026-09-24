@@ -46,7 +46,7 @@ PModelData data = new PModelData.Builder(
 ```
 If neither candidate exists, resource reload fails with `Registered model was not loaded; tried: ...`, followed by both paths.
 
-Each `texture` key is the reference stored in the model material. It preserves its complete directory path, while a final `.png` is ignored: `body/claws.png` becomes `body/claws`, and remains distinct from `armor/claws`. The value is a Minecraft resource location relative to `textures` without `.png`:
+Each `texture` key is the reference stored in the model material. For glTF it comes from the base-colour image URI, image name, or texture name. It preserves its complete directory path, while a final `.png` is ignored: `body/claws.png` becomes `body/claws`, and remains distinct from `armor/claws`. The value is a Minecraft resource location relative to `textures` without `.png`. Anonymous GLB `bufferView` images have no such key and are rejected during baking; use an image URI or a stable image or texture name:
 
 ```text
 assets/examplemod/textures/entity/robot/body.png

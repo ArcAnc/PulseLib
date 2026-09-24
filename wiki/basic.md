@@ -57,7 +57,10 @@ PulseLib animations follow the same principles as Bedrock entity animations, so 
 
 ## Exporting model
 
-Once your model is ready, export it as **`.glb`** or **`.gltf`**. A `.glb` is preferred for a self-contained binary asset; a `.gltf` can be useful when its JSON source should remain inspectable.
+Once your model is ready, export it as **`.gltf` with external PNG files** or as a **`.glb`** whose images have a URI or a name. PulseLib needs a material texture reference in order to map every image into the Minecraft resource atlas. A `.glb` containing anonymous images only as binary `bufferView` data cannot be used by the current loader, even though that representation is valid glTF.
+
+For Blockbench, prefer an export that keeps texture files external. Place the exported PNG files under `assets/<modid>/textures/` and register the exact texture references as described in [Resources](resources.md#register-model-resources). If you use `.glb`, verify that each base-colour image has a non-blank URI or name; resource reload otherwise fails with `Primitive has no texture reference`.
+
 Recommended Blockbench export settings:
 
 <img width="479" height="395" alt="изображение" src="https://github.com/user-attachments/assets/cd2c5d2e-99cf-43c8-af1f-dc5f57ef772f" />
