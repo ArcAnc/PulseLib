@@ -227,16 +227,16 @@ public class PModelCache
 			TextureAtlasSprite sprite = PResourceCache.getTextureAtlas().getSprite(texture);
 			if (sprite.contents().name().getPath().equals("missingno"))
 				throw new IllegalStateException("Texture is missing from atlas: " + texture);
-			boolean emissive = sprite.contents().metadata().getSection(PLibMetadata.TYPE)
-					.map(PLibMetadata::isEmissive).orElse(false);
+			boolean emissive = sprite.contents().metadata().getSection(PLibMetadata.TYPE).
+					map(PLibMetadata::isEmissive).orElse(false);
 			ByteBufferBuilder bytes = new ByteBufferBuilder(
 					primitive.vertexCount() * PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize());
 			BufferBuilder buffer = new AtlasBufferBuilder(bytes, VertexFormat.Mode.TRIANGLES,
 					PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL, sprite);
 			for (int vertex = 0; vertex < primitive.vertexCount(); vertex++)
-				buffer.addVertex(primitive.positions().get(vertex * 3), primitive.positions().get(vertex * 3 + 1), primitive.positions().get(vertex * 3 + 2))
-						.setUv(primitive.uvs().get(vertex * 2), primitive.uvs().get(vertex * 2 + 1))
-						.setNormal(primitive.normals().get(vertex * 3), primitive.normals().get(vertex * 3 + 1), primitive.normals().get(vertex * 3 + 2));
+				buffer.addVertex(primitive.positions().get(vertex * 3), primitive.positions().get(vertex * 3 + 1), primitive.positions().get(vertex * 3 + 2)).
+								setUv(primitive.uvs().get(vertex * 2), primitive.uvs().get(vertex * 2 + 1)).
+								setNormal(primitive.normals().get(vertex * 3), primitive.normals().get(vertex * 3 + 1), primitive.normals().get(vertex * 3 + 2));
 			try (MeshData meshData = buffer.buildOrThrow())
 			{
 				PGeometryData geometry = GlGeometryDataFactory.capture(meshData, primitive,

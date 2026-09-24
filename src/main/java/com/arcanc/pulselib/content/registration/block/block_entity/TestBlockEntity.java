@@ -31,7 +31,7 @@ public class TestBlockEntity extends BlockEntity implements PAnimatable<TestBloc
 					add("animation2", 5).
 					preventImmediateRepeat()).
 			build();
-	private boolean playAnimation = true;
+	private boolean playAnimation = false;
 	
 	/**
 	 * Creates an instance of the enclosing type.
