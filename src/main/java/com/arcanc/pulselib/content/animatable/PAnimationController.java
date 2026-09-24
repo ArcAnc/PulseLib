@@ -10,20 +10,15 @@
 package com.arcanc.pulselib.content.animatable;
 
 
-import com.arcanc.pulselib.content.model.animation.BoneFrame;
-import com.arcanc.pulselib.data.gecko.MolangParser;
-import com.arcanc.pulselib.content.model.animation.PAnimation;
-import com.arcanc.pulselib.content.model.animation.PAnimationGraph;
-import com.arcanc.pulselib.content.model.animation.PAnimationGraphRuntime;
-import com.arcanc.pulselib.content.model.animation.PCompiledAnimation;
-import com.arcanc.pulselib.content.model.animation.PAnimationType;
-import com.arcanc.pulselib.content.model.animation.PRawAnimation;
+import com.arcanc.pulselib.content.model.animation.*;
 import com.arcanc.pulselib.content.model.baked.PBakedModel;
+import com.arcanc.pulselib.data.gecko.MolangParser;
 import net.minecraft.util.Mth;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Provides support for animation controller.
@@ -36,10 +31,16 @@ public class PAnimationController<T extends PAnimatable<T>>
 	protected @Nullable PRawAnimation currentAnimation;
 	
 	private int stageIndex;
+	private @Nullable PAnimationStagePlayer stagePlayer;
+	private @Nullable PAnimationStagePlayback currentPlayback;
 	private float time;
 	private float prevTime;
+	private float interpolationFrom;
+	private float interpolationTo;
+	private float interpolationCycleLength;
 	private boolean stageStarted = true;
 	private ControllerState state;
+	private final long randomSeed;
 	private final MolangParser.Context persistentMolangContext = new MolangParser.Context();
 	private @Nullable PAnimationGraphRuntime graphRuntime;
 	
@@ -59,8 +60,20 @@ public class PAnimationController<T extends PAnimatable<T>>
 	 */
 	public PAnimationController(String name, StateHandler<T> stateHandler)
 	{
+		this(name, stateHandler, name.hashCode());
+	}
+
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param name the name to use.
+	 * @param stateHandler the state handler to use.
+	 * @param randomSeed deterministic seed for runtime animation stages.
+	 */
+	public PAnimationController(String name, StateHandler<T> stateHandler, long randomSeed)
+	{
 		this.name = name;
 		this.stateHandler = stateHandler;
+		this.randomSeed = randomSeed;
 		this.state = ControllerState.STOP;
 	}
 	
@@ -92,8 +105,13 @@ public class PAnimationController<T extends PAnimatable<T>>
 	{
 		this.currentAnimation = null;
 		this.stageIndex = 0;
+		this.stagePlayer = null;
+		this.currentPlayback = null;
 		this.time = 0.0f;
 		this.prevTime = 0.0f;
+		this.interpolationFrom = 0.0f;
+		this.interpolationTo = 0.0f;
+		this.interpolationCycleLength = 0.0f;
 		this.stageStarted = true;
 		this.graphRuntime = new PAnimationGraphRuntime(graph);
 		this.state = ControllerState.PLAY;
@@ -158,7 +176,7 @@ public class PAnimationController<T extends PAnimatable<T>>
 		this.graphRuntime = null;
 		if (this.currentAnimation == animation)
 		{
-			PRawAnimation.AnimationStage stage = getCurrentStage();
+			PAnimationStagePlayback stage = getCurrentStage();
 			if (stage != null && stage.animationType() == PAnimationType.HOLD_LAST_FRAME)
 				if (this.state == ControllerState.PAUSE)
 					return;
@@ -168,10 +186,8 @@ public class PAnimationController<T extends PAnimatable<T>>
 		
 		this.currentAnimation = animation;
 		this.stageIndex = 0;
-		this.time = 0;
-		this.prevTime = 0;
-		this.stageStarted = true;
 		this.state = ControllerState.PLAY;
+		enterCurrentStage();
 	}
 	
 	/**
@@ -199,8 +215,13 @@ public class PAnimationController<T extends PAnimatable<T>>
 	{
 		this.currentAnimation = null;
 		this.stageIndex = 0;
+		this.stagePlayer = null;
+		this.currentPlayback = null;
 		this.prevTime = 0;
 		this.time = 0;
+		this.interpolationFrom = 0.0f;
+		this.interpolationTo = 0.0f;
+		this.interpolationCycleLength = 0.0f;
 		this.stageStarted = true;
 		this.state = ControllerState.STOP;
 	}
@@ -259,7 +280,7 @@ public class PAnimationController<T extends PAnimatable<T>>
 		if (this.state == ControllerState.STOP)
 			return null;
 		
-		PRawAnimation.AnimationStage stage = getCurrentStage();
+		PAnimationStagePlayback stage = getCurrentStage();
 		if (stage == null)
 			return null;
 		
@@ -294,7 +315,7 @@ public class PAnimationController<T extends PAnimatable<T>>
 	{
 		if (this.state == ControllerState.STOP)
 			return null;
-		PRawAnimation.AnimationStage stage = getCurrentStage();
+		PAnimationStagePlayback stage = getCurrentStage();
 		if (stage == null || stage.isWaiting() || animation.boneAnimation(boneIndex) == null)
 			return null;
 		return animation.animation().calculateBoneTransformations(
@@ -369,21 +390,29 @@ public class PAnimationController<T extends PAnimatable<T>>
 		if (model == null)
 			return;
 		
-		PRawAnimation.AnimationStage stage = this.currentAnimation.getStages().get(this.stageIndex);
+		PAnimationStagePlayback stage = getCurrentStage();
+		if (stage == null)
+		{
+			this.state = ControllerState.STOP;
+			return;
+		}
 		
 		if (stage.isWaiting())
 		{
 			this.prevTime = this.time;
 			this.time += tickCount;
+			this.interpolationFrom = this.prevTime;
+			this.interpolationTo = this.time;
+			this.interpolationCycleLength = 0.0f;
 			if (this.time >= stage.waitTicks())
-				nextStage();
+				completePlayback();
 			return;
 		}
 		
 		PAnimation animation = model.animations().get(stage.animationName());
 		if (animation == null)
 		{
-			nextStage();
+			completePlayback();
 			return;
 		}
 		
@@ -401,10 +430,13 @@ public class PAnimationController<T extends PAnimatable<T>>
 			case PLAY_ONCE ->
 			{
 				this.time = nextTime;
+				this.interpolationFrom = this.prevTime;
+				this.interpolationTo = this.time;
+				this.interpolationCycleLength = 0.0f;
 				float bounded = Math.clamp(this.time, 0.0f, length);
 				fireEvents(animatable, model, poseControllers, animation, this.prevTime, bounded, PAnimationType.PLAY_ONCE);
 				if ((stage.speed() >= 0.0f && this.time >= length) || (stage.speed() < 0.0f && this.time <= 0.0f))
-					nextStage();
+					completePlayback();
 			}
 			case HOLD_LAST_FRAME ->
 			{
@@ -416,16 +448,27 @@ public class PAnimationController<T extends PAnimatable<T>>
 					this.time = stage.speed() < 0.0f ? 0.0f : length;
 					this.state = ControllerState.PAUSE;
 				}
+				this.interpolationFrom = this.prevTime;
+				this.interpolationTo = this.time;
+				this.interpolationCycleLength = 0.0f;
 			}
 			case CYCLE ->
 			{
 				if (length > 0)
 				{
+					this.interpolationFrom = this.time;
+					this.interpolationTo = nextTime;
+					this.interpolationCycleLength = length;
 					fireEvents(animatable, model, poseControllers, animation, this.prevTime, nextTime, PAnimationType.CYCLE);
 					this.time = floorMod(nextTime, length);
 				}
 				else
+				{
 					this.time = nextTime;
+					this.interpolationFrom = this.prevTime;
+					this.interpolationTo = this.time;
+					this.interpolationCycleLength = 0.0f;
+				}
 			}
 		}
 	}
@@ -521,18 +564,59 @@ public class PAnimationController<T extends PAnimatable<T>>
 	private void nextStage()
 	{
 		this.stageIndex++;
-		this.time = 0;
-		this.prevTime = 0;
-		this.stageStarted = true;
-		
-		if (this.currentAnimation == null)
+		enterCurrentStage();
+	}
+
+	/**
+	 * Completes the playback currently provided by the active stage player.
+	 */
+	private void completePlayback()
+	{
+		if (this.stagePlayer == null)
 		{
 			this.state = ControllerState.STOP;
 			return;
 		}
-		
-		if (this.stageIndex >= this.currentAnimation.getStages().size())
+		switch (this.stagePlayer.complete())
+		{
+			case NEXT_STAGE -> nextStage();
+			case REPEAT_PLAYBACK -> resetPlayback(this.stagePlayer.currentPlayback());
+		}
+	}
+
+	/**
+	 * Creates the runtime player for the current recipe stage.
+	 */
+	private void enterCurrentStage()
+	{
+		if (this.currentAnimation == null || this.stageIndex >= this.currentAnimation.getStages().size())
+		{
+			this.stagePlayer = null;
+			this.currentPlayback = null;
 			this.state = ControllerState.STOP;
+			return;
+		}
+
+		PIAnimationStage stage = this.currentAnimation.getStages().get(this.stageIndex);
+		long stageSeed = this.randomSeed ^ ((long)this.stageIndex * 0x9E3779B97F4A7C15L);
+		this.stagePlayer = Objects.requireNonNull(stage.createPlayer(new PAnimationStageContext(stageSeed)),
+				"Animation stage player must not be null");
+		resetPlayback(this.stagePlayer.currentPlayback());
+	}
+
+	/**
+	 * Starts a resolved playback command from its initial time.
+	 * @param playback the playback command to start.
+	 */
+	private void resetPlayback(PAnimationStagePlayback playback)
+	{
+		this.currentPlayback = Objects.requireNonNull(playback, "Animation stage playback must not be null");
+		this.time = 0.0f;
+		this.prevTime = 0.0f;
+		this.interpolationFrom = 0.0f;
+		this.interpolationTo = 0.0f;
+		this.interpolationCycleLength = 0.0f;
+		this.stageStarted = true;
 	}
 	
 	/**
@@ -544,9 +628,8 @@ public class PAnimationController<T extends PAnimatable<T>>
 	{
 		if (this.graphRuntime != null)
 			return this.graphRuntime.interpolatedTime(partialTick);
-		if  (this.time < this.prevTime)
-			return Mth.lerp(partialTick, this.prevTime, this.prevTime + this.time);
-		return Mth.lerp(partialTick, this.prevTime, this.time);
+		float interpolated = Mth.lerp(partialTick, this.interpolationFrom, this.interpolationTo);
+		return this.interpolationCycleLength > 0.0f ? floorMod(interpolated, this.interpolationCycleLength) : interpolated;
 	}
 	
 	/**
@@ -569,7 +652,7 @@ public class PAnimationController<T extends PAnimatable<T>>
 	{
 		if (this.graphRuntime != null)
 			return this.graphRuntime.cyclePhase(model);
-		PRawAnimation.AnimationStage stage = getCurrentStage();
+		PAnimationStagePlayback stage = getCurrentStage();
 		if (stage == null || stage.animationType() != PAnimationType.CYCLE)
 			return Float.NaN;
 		PAnimation animation = model.animations().get(stage.animationName());
@@ -588,7 +671,7 @@ public class PAnimationController<T extends PAnimatable<T>>
 			this.graphRuntime.syncCycle(model, phase);
 			return;
 		}
-		PRawAnimation.AnimationStage stage = getCurrentStage();
+		PAnimationStagePlayback stage = getCurrentStage();
 		if (stage == null || stage.animationType() != PAnimationType.CYCLE)
 			return;
 		PAnimation animation = model.animations().get(stage.animationName());
@@ -607,7 +690,7 @@ public class PAnimationController<T extends PAnimatable<T>>
 	{
 		if (this.graphRuntime != null)
 			return;
-		PRawAnimation.AnimationStage stage = getCurrentStage();
+		PAnimationStagePlayback stage = getCurrentStage();
 		if (stage == null || stage.isWaiting())
 			return;
 		PAnimation animation = model.animations().get(stage.animationName());
@@ -620,16 +703,12 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 	
 	/**
-	 * Returns the current stage.
-	 * @return the value produced by this operation.
+	 * Returns the playback currently resolved by the active stage player.
+	 * @return the current playback, or {@code null} when no raw animation is active.
 	 */
-	public PRawAnimation.@Nullable AnimationStage getCurrentStage()
+	public @Nullable PAnimationStagePlayback getCurrentStage()
 	{
-		if (this.currentAnimation == null)
-			return null;
-		if (this.stageIndex >= this.currentAnimation.getStages().size())
-			return null;
-		return this.currentAnimation.getStages().get(this.stageIndex);
+		return this.currentPlayback;
 	}
 
 	/**

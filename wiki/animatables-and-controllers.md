@@ -73,6 +73,27 @@ Stage helpers:
 * `withSpeed(speed)` changes the last stage speed.
 * `withInterpolation(type)` changes the last stage interpolation.
 
+### Weighted random stages
+
+`thenRandom(...)` chooses one clip from a weighted pool, plays it once, then advances to the next stage.
+`thenRandomLoop(...)` chooses and plays a new clip every time the previous selected clip ends. A selected
+clip is always played as `PAnimationType.PLAY_ONCE`; this is separate from `thenLoop(...)`, which cycles one
+clip forever.
+
+```java
+private static final PRawAnimation IDLE = PRawAnimation.begin()
+        .thenRandomLoop(random -> random
+                .add("idle_breath", 6)
+                .add("idle_look_left", 2)
+                .add("idle_look_right", 2)
+                .add("idle_scratch", 1)
+                .preventImmediateRepeat())
+        .build();
+```
+
+The random selection is runtime state owned by each controller playback. `preventImmediateRepeat()` removes the
+previously selected animation from the next draw when the pool contains more than one entry.
+
 Example with speed and interpolation:
 
 ```java

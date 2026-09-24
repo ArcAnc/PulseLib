@@ -58,7 +58,8 @@ public record AnimManagerKey(long key)
 	 */
 	public static AnimManagerKey of (Entity entity)
 	{
-		return new AnimManagerKey(entity.getUUID().hashCode());
+		return new AnimManagerKey(entity.getUUID().getMostSignificantBits() ^
+				entity.getUUID().getLeastSignificantBits());
 	}
 	
 	/**

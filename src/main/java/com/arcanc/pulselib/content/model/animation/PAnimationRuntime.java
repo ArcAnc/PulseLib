@@ -149,7 +149,7 @@ public final class PAnimationRuntime
 	 */
 	private static <T extends PAnimatable<T>> PCompiledAnimation animation(PBakedModel model, PAnimationController<T> controller)
 	{
-		PRawAnimation.AnimationStage stage = controller.getCurrentStage();
+		PAnimationStagePlayback stage = controller.getCurrentStage();
 		return stage == null || stage.isWaiting() ? null : model.compiledAnimation(stage.animationName());
 	}
 

@@ -10,8 +10,8 @@
 package com.arcanc.pulselib.content.animatable;
 
 
-import com.arcanc.pulselib.content.model.baked.PBakedModel;
 import com.arcanc.pulselib.content.model.animation.PAnimationGraph;
+import com.arcanc.pulselib.content.model.baked.PBakedModel;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
@@ -86,9 +86,20 @@ public class PAnimationManager<T extends PAnimatable<T>>
 	protected final void createControllers()
 	{
 		this.factories.forEach((name, supplier) -> this.controllers.put(name,
-				new PAnimationController<>(name, supplier.get())));
+				new PAnimationController<>(name, supplier.get(), randomSeedFor(name))));
 		this.graphFactories.forEach((name, supplier) -> this.controllers.put(name,
 				new PAnimationController<>(name, supplier.get())));
+	}
+
+	/**
+	 * Creates a deterministic random source for one controller of this animation owner.
+	 * @param controllerName the registered controller name.
+	 * @return the controller random source.
+	 */
+	private long randomSeedFor(String controllerName)
+	{
+		long controllerSeed = (long)controllerName.hashCode() * 0x9E3779B97F4A7C15L;
+		return this.key.key() ^ controllerSeed;
 	}
 
 	/**
