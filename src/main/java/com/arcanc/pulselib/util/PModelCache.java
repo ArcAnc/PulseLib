@@ -216,9 +216,9 @@ public class PModelCache
 	private static void bakePrimitive(ResourceLocation modelPath, UUID meshId, PMeshPrimitive primitive,
 	                                  PBakedBone.PBakedBoneBuilder builder)
 	{
-		String reference = primitive.material() == null ? "<missing>" : primitive.material().textureReference();
+		String reference = primitive == null || primitive.material() == null ? "<missing>" : primitive.material().textureReference();
 		if (reference.isEmpty())
-			return;
+			throw new IllegalStateException("Primitive has no texture reference");
 		try
 		{
 			if (primitive.material() == null)

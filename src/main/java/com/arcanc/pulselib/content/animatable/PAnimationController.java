@@ -10,25 +10,18 @@
 package com.arcanc.pulselib.content.animatable;
 
 
-import com.arcanc.pulselib.content.model.animation.BoneFrame;
-import com.arcanc.pulselib.data.gecko.MolangParser;
-import com.arcanc.pulselib.content.model.animation.PAnimation;
-import com.arcanc.pulselib.content.model.animation.PAnimationGraph;
-import com.arcanc.pulselib.content.model.animation.PAnimationGraphRuntime;
-import com.arcanc.pulselib.content.model.animation.PCompiledAnimation;
-import com.arcanc.pulselib.content.model.animation.PAnimationType;
-import com.arcanc.pulselib.content.model.animation.PRawAnimation;
+import com.arcanc.pulselib.content.model.animation.*;
 import com.arcanc.pulselib.content.model.baked.PBakedModel;
+import com.arcanc.pulselib.data.gecko.MolangParser;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
- * Part of this code copied from Geckolib: <a href="https://github.com/bernie-g/geckolib/blob/main/common/src/main/java/com/geckolib/animatable/manager/AnimatableManager.java#L24">AnimatableManager</a>
- * <p>Stop crying, Tslat!</p>
- * <p>Modified by ArcAnc</p>
+ * Provides support for animation controller.
  */
 public class PAnimationController<T extends PAnimatable<T>>
 {
@@ -38,52 +31,107 @@ public class PAnimationController<T extends PAnimatable<T>>
 	protected @Nullable PRawAnimation currentAnimation;
 	
 	private int stageIndex;
+	private @Nullable PAnimationStagePlayer stagePlayer;
+	private @Nullable PAnimationStagePlayback currentPlayback;
 	private float time;
 	private float prevTime;
+	private float interpolationFrom;
+	private float interpolationTo;
+	private float interpolationCycleLength;
 	private boolean stageStarted = true;
 	private ControllerState state;
+	private final long randomSeed;
 	private final MolangParser.Context persistentMolangContext = new MolangParser.Context();
 	private @Nullable PAnimationGraphRuntime graphRuntime;
 	
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param stateHandler the state handler to use.
+	 */
 	public PAnimationController(StateHandler<T> stateHandler)
 	{
 		this("default", stateHandler);
 	}
 	
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param name the name to use.
+	 * @param stateHandler the state handler to use.
+	 */
 	public PAnimationController(String name, StateHandler<T> stateHandler)
+	{
+		this(name, stateHandler, name.hashCode());
+	}
+
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param name the name to use.
+	 * @param stateHandler the state handler to use.
+	 * @param randomSeed deterministic seed for runtime animation stages.
+	 */
+	public PAnimationController(String name, StateHandler<T> stateHandler, long randomSeed)
 	{
 		this.name = name;
 		this.stateHandler = stateHandler;
+		this.randomSeed = randomSeed;
 		this.state = ControllerState.STOP;
 	}
 	
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param graph the graph to use.
+	 */
 	public PAnimationController(PAnimationGraph graph)
 	{
 		this("default", graph);
 	}
 	
+	/**
+	 * Creates an instance of the enclosing type.
+	 * @param name the name to use.
+	 * @param graph the graph to use.
+	 */
 	public PAnimationController(String name, PAnimationGraph graph)
 	{
 		this(name, state -> ControllerState.PLAY);
 		play(graph);
 	}
 	
+	/**
+	 * Performs the play operation.
+	 * @param graph the graph to use.
+	 */
 	public void play(PAnimationGraph graph)
 	{
 		this.currentAnimation = null;
 		this.stageIndex = 0;
+		this.stagePlayer = null;
+		this.currentPlayback = null;
 		this.time = 0.0f;
 		this.prevTime = 0.0f;
+		this.interpolationFrom = 0.0f;
+		this.interpolationTo = 0.0f;
+		this.interpolationCycleLength = 0.0f;
 		this.stageStarted = true;
 		this.graphRuntime = new PAnimationGraphRuntime(graph);
 		this.state = ControllerState.PLAY;
 	}
 
+	/**
+	 * Performs the graph runtime operation.
+	 * @return the value produced by this operation.
+	 */
 	public @Nullable PAnimationGraphRuntime graphRuntime()
 	{
 		return this.graphRuntime;
 	}
 
+	/**
+	 * Sets the parameter.
+	 * @param name the name to use.
+	 * @param value the value to use.
+	 * @return the value produced by this operation.
+	 */
 	public PAnimationController<T> setParameter(String name, float value)
 	{
 		if (this.graphRuntime == null)
@@ -92,6 +140,12 @@ public class PAnimationController<T extends PAnimatable<T>>
 		return this;
 	}
 
+	/**
+	 * Sets the parameter.
+	 * @param name the name to use.
+	 * @param value the value to use.
+	 * @return the value produced by this operation.
+	 */
 	public PAnimationController<T> setParameter(String name, boolean value)
 	{
 		if (this.graphRuntime == null)
@@ -100,6 +154,11 @@ public class PAnimationController<T extends PAnimatable<T>>
 		return this;
 	}
 
+	/**
+	 * Performs the trigger operation.
+	 * @param name the name to use.
+	 * @return the value produced by this operation.
+	 */
 	public PAnimationController<T> trigger(String name)
 	{
 		if (this.graphRuntime == null)
@@ -108,12 +167,16 @@ public class PAnimationController<T extends PAnimatable<T>>
 		return this;
 	}
 	
+	/**
+	 * Performs the play operation.
+	 * @param animation the animation to use.
+	 */
 	public void play(PRawAnimation animation)
 	{
 		this.graphRuntime = null;
 		if (this.currentAnimation == animation)
 		{
-			PRawAnimation.AnimationStage stage = getCurrentStage();
+			PAnimationStagePlayback stage = getCurrentStage();
 			if (stage != null && stage.animationType() == PAnimationType.HOLD_LAST_FRAME)
 				if (this.state == ControllerState.PAUSE)
 					return;
@@ -123,54 +186,91 @@ public class PAnimationController<T extends PAnimatable<T>>
 		
 		this.currentAnimation = animation;
 		this.stageIndex = 0;
-		this.time = 0;
-		this.prevTime = 0;
-		this.stageStarted = true;
 		this.state = ControllerState.PLAY;
+		enterCurrentStage();
 	}
 	
+	/**
+	 * Performs the pause operation.
+	 */
 	public void pause()
 	{
 		if (this.state == ControllerState.PLAY)
 			this.state = ControllerState.PAUSE;
 	}
 	
+	/**
+	 * Performs the resume operation.
+	 */
 	public void resume()
 	{
 		if (this.state == ControllerState.PAUSE)
 			this.state = ControllerState.PLAY;
 	}
 	
+	/**
+	 * Performs the stop operation.
+	 */
 	public void stop()
 	{
 		this.currentAnimation = null;
 		this.stageIndex = 0;
+		this.stagePlayer = null;
+		this.currentPlayback = null;
 		this.prevTime = 0;
 		this.time = 0;
+		this.interpolationFrom = 0.0f;
+		this.interpolationTo = 0.0f;
+		this.interpolationCycleLength = 0.0f;
 		this.stageStarted = true;
 		this.state = ControllerState.STOP;
 	}
 	
+	/**
+	 * Returns the state.
+	 * @return the value produced by this operation.
+	 */
 	public ControllerState getState()
 	{
 		return this.state;
 	}
 	
+	/**
+	 * Determines whether playing.
+	 * @return the value produced by this operation.
+	 */
 	public boolean isPlaying()
 	{
 		return this.state == ControllerState.PLAY;
 	}
 	
+	/**
+	 * Determines whether paused.
+	 * @return the value produced by this operation.
+	 */
 	public boolean isPaused()
 	{
 		return this.state == ControllerState.PAUSE;
 	}
 	
+	/**
+	 * Determines whether stopped.
+	 * @return the value produced by this operation.
+	 */
 	public boolean isStopped()
 	{
 		return this.state == ControllerState.STOP;
 	}
 	
+	/**
+	 * Calculates the bone transformations.
+	 * @param boneName the bone name to use.
+	 * @param model the model to use.
+	 * @param partialTick the partial tick to use.
+	 * @param molangContext the molang context to use.
+	 * @param accumulatedFrame the accumulated frame to use.
+	 * @return the value produced by this operation.
+	 */
 	public @Nullable BoneFrame calculateBoneTransformations(String boneName,
 	                                                        PBakedModel model,
 	                                                        float partialTick,
@@ -180,7 +280,7 @@ public class PAnimationController<T extends PAnimatable<T>>
 		if (this.state == ControllerState.STOP)
 			return null;
 		
-		PRawAnimation.AnimationStage stage = getCurrentStage();
+		PAnimationStagePlayback stage = getCurrentStage();
 		if (stage == null)
 			return null;
 		
@@ -198,6 +298,15 @@ public class PAnimationController<T extends PAnimatable<T>>
 				accumulatedFrame);
 	}
 
+	/**
+	 * Calculates the bone transformations.
+	 * @param animation the animation to use.
+	 * @param boneIndex the bone index to use.
+	 * @param partialTick the partial tick to use.
+	 * @param molangContext the molang context to use.
+	 * @param accumulatedFrame the accumulated frame to use.
+	 * @return the value produced by this operation.
+	 */
 	public @Nullable BoneFrame calculateBoneTransformations(PCompiledAnimation animation,
 	                                                        int boneIndex,
 	                                                        float partialTick,
@@ -206,7 +315,7 @@ public class PAnimationController<T extends PAnimatable<T>>
 	{
 		if (this.state == ControllerState.STOP)
 			return null;
-		PRawAnimation.AnimationStage stage = getCurrentStage();
+		PAnimationStagePlayback stage = getCurrentStage();
 		if (stage == null || stage.isWaiting() || animation.boneAnimation(boneIndex) == null)
 			return null;
 		return animation.animation().calculateBoneTransformations(
@@ -217,16 +326,33 @@ public class PAnimationController<T extends PAnimatable<T>>
 				accumulatedFrame);
 	}
 
+	/**
+	 * Performs the persistent molang context operation.
+	 * @return the value produced by this operation.
+	 */
 	public MolangParser.Context persistentMolangContext()
 	{
 		return this.persistentMolangContext;
 	}
 
+	/**
+	 * Performs the tick operation.
+	 * @param animatable the animatable to use.
+	 * @param tickCount the tick count to use.
+	 * @param model the model to use.
+	 */
 	public void tick(T animatable, float tickCount, PBakedModel model)
 	{
 		tick(animatable, tickCount, model, List.of(this));
 	}
 	
+	/**
+	 * Performs the tick operation.
+	 * @param animatable the animatable to use.
+	 * @param tickCount the tick count to use.
+	 * @param model the model to use.
+	 * @param poseControllers the pose controllers to use.
+	 */
 	public void tick(T animatable, float tickCount, PBakedModel model, Collection<PAnimationController<T>> poseControllers)
 	{
 		if (!Float.isFinite(tickCount))
@@ -264,21 +390,29 @@ public class PAnimationController<T extends PAnimatable<T>>
 		if (model == null)
 			return;
 		
-		PRawAnimation.AnimationStage stage = this.currentAnimation.getStages().get(this.stageIndex);
+		PAnimationStagePlayback stage = getCurrentStage();
+		if (stage == null)
+		{
+			this.state = ControllerState.STOP;
+			return;
+		}
 		
 		if (stage.isWaiting())
 		{
 			this.prevTime = this.time;
 			this.time += tickCount;
+			this.interpolationFrom = this.prevTime;
+			this.interpolationTo = this.time;
+			this.interpolationCycleLength = 0.0f;
 			if (this.time >= stage.waitTicks())
-				nextStage();
+				completePlayback();
 			return;
 		}
 		
 		PAnimation animation = model.animations().get(stage.animationName());
 		if (animation == null)
 		{
-			nextStage();
+			completePlayback();
 			return;
 		}
 		
@@ -296,10 +430,13 @@ public class PAnimationController<T extends PAnimatable<T>>
 			case PLAY_ONCE ->
 			{
 				this.time = nextTime;
+				this.interpolationFrom = this.prevTime;
+				this.interpolationTo = this.time;
+				this.interpolationCycleLength = 0.0f;
 				float bounded = Math.clamp(this.time, 0.0f, length);
 				fireEvents(animatable, model, poseControllers, animation, this.prevTime, bounded, PAnimationType.PLAY_ONCE);
 				if ((stage.speed() >= 0.0f && this.time >= length) || (stage.speed() < 0.0f && this.time <= 0.0f))
-					nextStage();
+					completePlayback();
 			}
 			case HOLD_LAST_FRAME ->
 			{
@@ -311,20 +448,41 @@ public class PAnimationController<T extends PAnimatable<T>>
 					this.time = stage.speed() < 0.0f ? 0.0f : length;
 					this.state = ControllerState.PAUSE;
 				}
+				this.interpolationFrom = this.prevTime;
+				this.interpolationTo = this.time;
+				this.interpolationCycleLength = 0.0f;
 			}
 			case CYCLE ->
 			{
 				if (length > 0)
 				{
+					this.interpolationFrom = this.time;
+					this.interpolationTo = nextTime;
+					this.interpolationCycleLength = length;
 					fireEvents(animatable, model, poseControllers, animation, this.prevTime, nextTime, PAnimationType.CYCLE);
 					this.time = floorMod(nextTime, length);
 				}
 				else
+				{
 					this.time = nextTime;
+					this.interpolationFrom = this.prevTime;
+					this.interpolationTo = this.time;
+					this.interpolationCycleLength = 0.0f;
+				}
 			}
 		}
 	}
 	
+	/**
+	 * Fires the events.
+	 * @param animatable the animatable to use.
+	 * @param model the model to use.
+	 * @param poseControllers the pose controllers to use.
+	 * @param animation the animation to use.
+	 * @param from the from to use.
+	 * @param to the to to use.
+	 * @param type the type to use.
+	 */
 	private void fireEvents(T animatable,
 	                        PBakedModel model,
 	                        Collection<PAnimationController<T>> poseControllers,
@@ -341,6 +499,15 @@ public class PAnimationController<T extends PAnimatable<T>>
 			animation.eventsBetweenReverse(from, to).forEach(event -> PAnimationEventDispatcher.dispatch(animatable, this, event, model, poseControllers));
 	}
 
+	/**
+	 * Fires the cyclic events.
+	 * @param animatable the animatable to use.
+	 * @param model the model to use.
+	 * @param controllers the controllers to use.
+	 * @param animation the animation to use.
+	 * @param from the from to use.
+	 * @param to the to to use.
+	 */
 	private void fireCyclicEvents(T animatable, PBakedModel model, Collection<PAnimationController<T>> controllers,
 	                              PAnimation animation, float from, float to)
 	{
@@ -379,38 +546,96 @@ public class PAnimationController<T extends PAnimatable<T>>
 		}
 	}
 
+	/**
+	 * Performs the floor mod operation.
+	 * @param value the value to use.
+	 * @param modulus the modulus to use.
+	 * @return the value produced by this operation.
+	 */
 	private static float floorMod(float value, float modulus)
 	{
 		float result = value % modulus;
 		return result < 0.0f ? result + modulus : result;
 	}
 	
+	/**
+	 * Performs the next stage operation.
+	 */
 	private void nextStage()
 	{
 		this.stageIndex++;
-		this.time = 0;
-		this.prevTime = 0;
-		this.stageStarted = true;
-		
-		if (this.currentAnimation == null)
+		enterCurrentStage();
+	}
+
+	/**
+	 * Completes the playback currently provided by the active stage player.
+	 */
+	private void completePlayback()
+	{
+		if (this.stagePlayer == null)
 		{
 			this.state = ControllerState.STOP;
 			return;
 		}
-		
-		if (this.stageIndex >= this.currentAnimation.getStages().size())
+		switch (this.stagePlayer.complete())
+		{
+			case NEXT_STAGE -> nextStage();
+			case REPEAT_PLAYBACK -> resetPlayback(this.stagePlayer.currentPlayback());
+		}
+	}
+
+	/**
+	 * Creates the runtime player for the current recipe stage.
+	 */
+	private void enterCurrentStage()
+	{
+		if (this.currentAnimation == null || this.stageIndex >= this.currentAnimation.getStages().size())
+		{
+			this.stagePlayer = null;
+			this.currentPlayback = null;
 			this.state = ControllerState.STOP;
+			return;
+		}
+
+		PIAnimationStage stage = this.currentAnimation.getStages().get(this.stageIndex);
+		long stageSeed = this.randomSeed ^ ((long)this.stageIndex * 0x9E3779B97F4A7C15L);
+		this.stagePlayer = Objects.requireNonNull(stage.createPlayer(new PAnimationStageContext(stageSeed)),
+				"Animation stage player must not be null");
+		resetPlayback(this.stagePlayer.currentPlayback());
+	}
+
+	/**
+	 * Starts a resolved playback command from its initial time.
+	 * @param playback the playback command to start.
+	 */
+	private void resetPlayback(PAnimationStagePlayback playback)
+	{
+		this.currentPlayback = Objects.requireNonNull(playback, "Animation stage playback must not be null");
+		this.time = 0.0f;
+		this.prevTime = 0.0f;
+		this.interpolationFrom = 0.0f;
+		this.interpolationTo = 0.0f;
+		this.interpolationCycleLength = 0.0f;
+		this.stageStarted = true;
 	}
 	
+	/**
+	 * Returns the interpolated time.
+	 * @param partialTick the partial tick to use.
+	 * @return the value produced by this operation.
+	 */
 	public float getInterpolatedTime(float partialTick)
 	{
 		if (this.graphRuntime != null)
 			return this.graphRuntime.interpolatedTime(partialTick);
-		if  (this.time < this.prevTime)
-			return Mth.lerp(partialTick, this.prevTime, this.prevTime + this.time);
-		return Mth.lerp(partialTick, this.prevTime, this.time);
+		float interpolated = Mth.lerp(partialTick, this.interpolationFrom, this.interpolationTo);
+		return this.interpolationCycleLength > 0.0f ? floorMod(interpolated, this.interpolationCycleLength) : interpolated;
 	}
 	
+	/**
+	 * Returns the time.
+	 * @return the value produced by this operation.
+	 */
 	public float getTime()
 	{
 		if (this.graphRuntime != null)
@@ -418,17 +643,27 @@ public class PAnimationController<T extends PAnimatable<T>>
 		return this.time;
 	}
 	
+	/**
+	 * Performs the cycle phase operation.
+	 * @param model the model to use.
+	 * @return the value produced by this operation.
+	 */
 	public float cyclePhase(PBakedModel model)
 	{
 		if (this.graphRuntime != null)
 			return this.graphRuntime.cyclePhase(model);
-		PRawAnimation.AnimationStage stage = getCurrentStage();
+		PAnimationStagePlayback stage = getCurrentStage();
 		if (stage == null || stage.animationType() != PAnimationType.CYCLE)
 			return Float.NaN;
 		PAnimation animation = model.animations().get(stage.animationName());
 		return animation == null || animation.length() <= 0.0f ? Float.NaN : this.time / animation.length();
 	}
 	
+	/**
+	 * Synchronizes the cycle.
+	 * @param model the model to use.
+	 * @param phase the phase to use.
+	 */
 	public void syncCycle(PBakedModel model, float phase)
 	{
 		if (this.graphRuntime != null)
@@ -436,7 +671,7 @@ public class PAnimationController<T extends PAnimatable<T>>
 			this.graphRuntime.syncCycle(model, phase);
 			return;
 		}
-		PRawAnimation.AnimationStage stage = getCurrentStage();
+		PAnimationStagePlayback stage = getCurrentStage();
 		if (stage == null || stage.animationType() != PAnimationType.CYCLE)
 			return;
 		PAnimation animation = model.animations().get(stage.animationName());
@@ -444,18 +679,17 @@ public class PAnimationController<T extends PAnimatable<T>>
 			return;
 		this.time = Math.clamp(phase, 0.0f, 1.0f) * animation.length();
 		this.prevTime = this.time;
+		this.interpolationFrom = this.time;
+		this.interpolationTo = this.time;
+		this.interpolationCycleLength = 0.0f;
 		this.stageStarted = false;
 	}
 
-	/**
-	 * Moves the current stage cursor without replaying events. This is the safe operation for seeks,
-	 * corrections received from the network, and late-created client instances.
-	 */
 	public void seek(PBakedModel model, float animationTime)
 	{
 		if (this.graphRuntime != null)
 			return;
-		PRawAnimation.AnimationStage stage = getCurrentStage();
+		PAnimationStagePlayback stage = getCurrentStage();
 		if (stage == null || stage.isWaiting())
 			return;
 		PAnimation animation = model.animations().get(stage.animationName());
@@ -464,18 +698,26 @@ public class PAnimationController<T extends PAnimatable<T>>
 		this.time = stage.animationType() == PAnimationType.CYCLE ? floorMod(animationTime, animation.length()) :
 				Math.clamp(animationTime, 0.0f, animation.length());
 		this.prevTime = this.time;
+		this.interpolationFrom = this.time;
+		this.interpolationTo = this.time;
+		this.interpolationCycleLength = 0.0f;
 		this.stageStarted = false;
 	}
 	
-	public PRawAnimation.@Nullable AnimationStage getCurrentStage()
+	/**
+	 * Returns the playback currently resolved by the active stage player.
+	 * @return the current playback, or {@code null} when no raw animation is active.
+	 */
+	public @Nullable PAnimationStagePlayback getCurrentStage()
 	{
-		if (this.currentAnimation == null)
-			return null;
-		if (this.stageIndex >= this.currentAnimation.getStages().size())
-			return null;
-		return this.currentAnimation.getStages().get(this.stageIndex);
+		return this.currentPlayback;
 	}
 
+	/**
+	 * Performs the graph layers operation.
+	 * @param model the model to use.
+	 * @return the value produced by this operation.
+	 */
 	public List<PAnimationGraphRuntime.Layer> graphLayers(PBakedModel model)
 	{
 		if (this.graphRuntime == null || this.state == ControllerState.STOP)
@@ -484,16 +726,31 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 	
 	@FunctionalInterface
+/**
+ * Defines the contract for state handler.
+ */
 	public interface StateHandler<T extends PAnimatable<T>>
 	{
+		/**
+		 * Performs the handle operation.
+		 * @param state the state to use.
+		 * @return the value produced by this operation.
+		 */
 		ControllerState handle(AnimatableState<T> state);
 	}
 
+	/**
+	 * Performs the name operation.
+	 * @return the value produced by this operation.
+	 */
 	public String name()
 	{
 		return this.name;
 	}
 	
+/**
+ * Immutable value object representing animatable state.
+ */
 	public record AnimatableState<T extends PAnimatable<T>>(T animatable, PAnimationController<T> controller)
 	{
 	}

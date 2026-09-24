@@ -67,7 +67,7 @@ Gecko `sound_effects` and `particle_effects` retain their native format and are 
 ## Delivery rules
 
 - A forward move delivers events in `(previousTime, currentTime]`; the initial move from zero also delivers time-zero events.
-- A reverse move delivers `[currentTime, previousTime)` in reverse timestamp order. Negative `AnimationStage.speed()` starts a stage at its final frame, so it does not need a one-tick forward setup.
+- A reverse move delivers `[currentTime, previousTime)` in reverse timestamp order. Negative `PAnimationStagePlayback.speed()` starts a playback at its final frame, so it does not need a one-tick forward setup.
 - A cyclic stage is treated as an unwrapped timeline. Every wrap crossed by a tick is traversed in order, including multiple wraps caused by speed changes or a large delta. Events at `0` and at the animation length are distinct and retain their order at the wrap.
 - A missed tick and a large positive delta use the same traversal rules: every crossed event is delivered once per crossed loop. Content authors should avoid expensive event handlers in very short loops.
 - Graph states and transition source/target layers report their own traversals; events from every contributing clip are therefore delivered. This is intentional—put gameplay effects in an unblended clip when duplicate blended effects are undesirable.

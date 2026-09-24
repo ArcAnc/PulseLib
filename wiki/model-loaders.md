@@ -29,6 +29,12 @@ Resource registration accepts either extension or no extension. An extension-les
 
 The parser is [`PGltfModelParser`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/data/gltf/PGltfModelParser.java). glTF channels are decoded through the registered position, rotation, and scale channel types, so the loaded animation data now uses the same generic track API as other formats.
 
+### Material textures
+
+The glTF loader gets a material texture reference from the base-colour image URI, then the image name, then the texture name. That string is the key passed to `PModelResource.texture(...)` and is resolved into the runtime atlas during baking.
+
+An embedded image represented only by `image.bufferView` has pixel data but no resource identifier. PulseLib cannot infer a Minecraft texture path from those bytes, so a primitive using such an image fails resource reload with `Primitive has no texture reference`. Export external PNG files with image URIs, or assign stable image or texture names and register those names as texture keys.
+
 ## Gecko loader
 
 [`PGeckoModelLoader`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/data/gecko/PGeckoModelLoader.java) supports:
