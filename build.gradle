@@ -247,6 +247,7 @@ publishing {
 }
 
 modrinth {
+    debugMode = true
     token = modrinthToken
     projectId = "73TaZXLZ"
     versionNumber = "${minecraft_version}-${mod_version}"
@@ -259,6 +260,7 @@ modrinth {
 }
 
 tasks.register("publishCurseForge", TaskPublishCurseForge) {
+    debugMode = true
     apiToken = curseforgeToken
 
     dependsOn tasks.jar
@@ -282,18 +284,105 @@ tasks.register("publishCurseForge", TaskPublishCurseForge) {
     sourcesFile.displayName = "${mod_name}-${minecraft_version}-${mod_version}-sources"
 }
 
+def discordWebhookUrl = providers.gradleProperty("discordWebhookUrl").
+        orElse(providers.environmentVariable("DISCORD_WEBHOOK_URL")).
+        orNull
+def discordRoleIds = providers.gradleProperty("discordRoleIds").
+        getOrElse("").
+        split(",").
+        collect { it.trim() }.
+        findAll { it }
+def publishModsChangelog = providers.fileContents(layout.projectDirectory.file("changelog.md")).
+        asText.
+        get().
+        trim()
+def discordMentions = discordRoleIds.collect { "<@&${it}>" }.join(" ")
+def curseForgeProjectUrl = "https://www.curseforge.com/minecraft/mc-mods/pulselib"
+def modrinthProjectUrl = "https://modrinth.com/mod/pulselib"
+def discordEmbedLogoUrl = "https://raw.githubusercontent.com/ArcAnc/PulseLib/1.21.1/src/main/resources/logo.png"
+def discordCurseForgeEmoji = providers.gradleProperty("discordCurseForgeEmoji").getOrElse("🟠")
+def discordModrinthEmoji = providers.gradleProperty("discordModrinthEmoji").getOrElse("🟢")
+def publishModsEmbedTitle = "✨ Pulse Lib v${mod_version} has been released!"
+
+tasks.register("publishDiscord") {
+    group = "publishing"
+    description = "Publishes the release announcement to Discord."
+
+    doLast {
+        if (!discordWebhookUrl) {
+            logger.lifecycle("Discord webhook is not configured; announcement skipped.")
+        } else {
+            def changelog = publishModsChangelog
+            if (changelog.length() > 3800) {
+                changelog = changelog.take(3800) + "\n\n_Changelog was shortened._"
+            }
+
+            def payload = groovy.json.JsonOutput.toJson([
+                content         : discordMentions,
+                allowed_mentions: [roles: discordRoleIds],
+                embeds          : [[
+                    author     : [
+                        name    : "ArcAnc • Pulse Lib",
+                        icon_url: discordEmbedLogoUrl
+                        ],
+                    title      : publishModsEmbedTitle,
+                    url        : modrinthProjectUrl,
+                    description: "## 📋 Changelog\n${changelog}",
+                    color      : 0x5865F2,
+                    thumbnail  : [url: discordEmbedLogoUrl],
+                    fields     : [
+                        [
+                            name  : "📦 Downloads",
+                            value : "${discordCurseForgeEmoji} [CurseForge](${curseForgeProjectUrl})\n" +
+                            "${discordModrinthEmoji} [Modrinth](${modrinthProjectUrl})",
+                            inline: false
+                        ],
+                        [
+                            name  : "⛏️ Minecraft",
+                            value : minecraft_version,
+                            inline: true
+                        ],
+                        [
+                            name  : "🧩 Loader",
+                            value : "NeoForge",
+                            inline: true
+                        ]
+                    ],
+                    footer     : [text: "✅ Publication completed successfully"],
+                    timestamp  : java.time.Instant.now().toString()]]
+            ])
+
+            try {
+                def connection = new URI(discordWebhookUrl).toURL().openConnection()
+                connection.requestMethod = "POST"
+                connection.doOutput = true
+                connection.setRequestProperty("Content-Type", "application/json")
+                connection.outputStream.withCloseable {
+                    it.write(payload.getBytes(java.nio.charset.StandardCharsets.UTF_8))
+                }
+
+                if (connection.responseCode !in [200, 204]) {
+                    logger.warn("Discord webhook returned HTTP ${connection.responseCode}.")
+                }
+            } catch (Exception exception) {
+                logger.warn("Could not send Discord announcement: ${exception.message}")
+            }
+        }
+    }
+}
+
 tasks.register("publishMods") {
     group = "publishing"
-    dependsOn "modrinth"
-    dependsOn "publishCurseForge"
+    description = "Publishes mod files to Modrinth and CurseForge."
+    dependsOn tasks.named("modrinth")
+    dependsOn tasks.named("publishCurseForge")
 }
 
 tasks.register("publishAll") {
     group = "publishing"
 
     dependsOn tasks.named("publish")
-    dependsOn tasks.named("modrinth")
-    dependsOn tasks.named("publishCurseForge")
+    dependsOn tasks.named("publishMods")
 }
 
 tasks.withType(JavaCompile).configureEach {
