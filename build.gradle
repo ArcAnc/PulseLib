@@ -247,7 +247,6 @@ publishing {
 }
 
 modrinth {
-    debugMode = true
     token = modrinthToken
     projectId = "73TaZXLZ"
     versionNumber = "${minecraft_version}-${mod_version}"
@@ -260,7 +259,6 @@ modrinth {
 }
 
 tasks.register("publishCurseForge", TaskPublishCurseForge) {
-    debugMode = true
     apiToken = curseforgeToken
 
     dependsOn tasks.jar
