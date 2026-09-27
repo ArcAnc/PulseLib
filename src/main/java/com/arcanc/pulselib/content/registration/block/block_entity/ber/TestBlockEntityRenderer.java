@@ -17,7 +17,7 @@ import com.arcanc.pulselib.content.registration.block.block_entity.TestBlockEnti
 import com.arcanc.pulselib.content.registration.block.block_entity.ber.renderState.TestBlockEntityRenderState;
 import com.arcanc.pulselib.content.registration.renderer.TestDayTimeColor;
 import com.arcanc.pulselib.content.renderer.PBlockRenderer;
-import com.arcanc.pulselib.content.renderer.modelData.DefaultBlockModelData;
+import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.arcanc.pulselib.util.PRenderTypes;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -28,6 +28,8 @@ import net.minecraft.resources.Identifier;
  */
 public class TestBlockEntityRenderer extends PBlockRenderer<TestBlockEntity, TestBlockEntityRenderState>
 {
+	public static final PModelData MODEL_DATA = PModelData.block(PLibDatabase.rl("test_block"));
+
 	public static final Identifier TUBE = PLibDatabase.rl("block/test_block/tube_texture");
 	public static final Identifier TORUS = PLibDatabase.rl("block/test_block/torus_texture");
 	public static final Identifier PYRAMID = PLibDatabase.rl("block/test_block/pyramid_texture");
@@ -39,8 +41,7 @@ public class TestBlockEntityRenderer extends PBlockRenderer<TestBlockEntity, Tes
 	 */
 	public TestBlockEntityRenderer(final BlockEntityRendererProvider.Context ctx)
 	{
-		super(new DefaultBlockModelData.DefaultBlockModelDataBuilder(PLibDatabase.rl("test_block")).
-				build(), PRenderTypes.RenderTypeProvider :: trianglesCutout);
+		super(MODEL_DATA, PRenderTypes.RenderTypeProvider :: trianglesCutout);
 	}
 	
 	/**

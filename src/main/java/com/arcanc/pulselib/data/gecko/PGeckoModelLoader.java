@@ -11,22 +11,23 @@ package com.arcanc.pulselib.data.gecko;
 
 
 import com.arcanc.pulselib.content.model.PModel;
+import com.arcanc.pulselib.content.model.resource.PModelResource;
 import com.arcanc.pulselib.data.PAnimationSidecarParser;
+import com.arcanc.pulselib.data.PLoadedModel;
 import com.arcanc.pulselib.data.PModelLoader;
 import com.arcanc.pulselib.util.PLibDatabase;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class PGeckoModelLoader implements PModelLoader
 {
@@ -58,69 +59,41 @@ public class PGeckoModelLoader implements PModelLoader
 		poseStack.translate(0.5f, 0.51f, 0.5f);
 	}
 	
+	/** Resolves a canonical model id to a GeckoLib model resource. */
 	@Override
-	public boolean supports(Identifier modelPath)
+	public List<Identifier> physicalResourceCandidates(Identifier modelId)
 	{
-		String path = modelPath.getPath();
-		return path.startsWith(MODEL_ROOT + "/") && path.endsWith(JSON_EXTENSION);
-	}
-	
-	@Override
-	public Identifier defaultModelLocation(Identifier modelLocation, String modelType)
-	{
-		return modelLocation.withPrefix(MODEL_ROOT + "/" + modelType + "/").withSuffix(MODEL_EXTENSION);
-	}
-	
-	@Override
-	public Identifier modelResourceLocation(Identifier modelLocation)
-	{
-		return modelLocation.getPath().startsWith(MODEL_ROOT + "/") ? modelLocation : modelLocation.withPrefix(MODEL_ROOT + "/");
-	}
-
-	@Override
-	public Identifier normalizeModelResourceLocation(Identifier modelLocation)
-	{
-		Identifier resourceLocation = modelResourceLocation(modelLocation);
-		return resourceLocation.getPath().endsWith(JSON_EXTENSION) ? resourceLocation : resourceLocation.withSuffix(MODEL_EXTENSION);
+		return List.of(modelId.withPrefix(MODEL_ROOT + "/").withSuffix(MODEL_EXTENSION));
 	}
 	
 	@Override
 	public CompletableFuture<?> loadModels(Executor backgroundExecutor,
 	                                       ResourceManager resourceManager,
-	                                       BiConsumer<Identifier, PModel> elementConsumer)
+	                                       Collection<PModelResource> models,
+	                                       Consumer<PLoadedModel> elementConsumer)
 	{
-		return CompletableFuture.supplyAsync(
-				() -> resourceManager.listResources(
-						MODEL_ROOT,
-						fileName -> fileName.toString().endsWith(JSON_EXTENSION)),
-				backgroundExecutor).
-				thenApplyAsync(resources ->
-				{
-					Map<Identifier, CompletableFuture<PModel>> tasks = new Object2ObjectOpenHashMap<>();
-					
-					for (Identifier resource : resources.keySet())
-					{
-						tasks.put(resource, CompletableFuture.supplyAsync(() ->
-						{
-							try
-							{
-								PModel model = PGeckoModelParser.parseModel(resources.get(resource).open());
-								loadAnimations(resourceManager, resource, model);
-								return model;
-							}
-							catch (IOException e)
-							{
-								throw new RuntimeException("Can't load GeckoLib model " + resource, e);
-							}
-						}, backgroundExecutor));
-					}
-					return tasks;
-				}, backgroundExecutor).
-				thenAcceptAsync(modelsMap ->
-				{
-					for (Map.Entry<Identifier, CompletableFuture<PModel>> entry : modelsMap.entrySet())
-						elementConsumer.accept(entry.getKey(), entry.getValue().join());
-				}, backgroundExecutor);
+		List<CompletableFuture<PLoadedModel>> tasks = models.stream().map(resource ->
+				CompletableFuture.supplyAsync(() -> loadModel(resourceManager, resource), backgroundExecutor)).toList();
+		return CompletableFuture.allOf(tasks.toArray(CompletableFuture[] :: new)).thenRunAsync(
+				() -> tasks.forEach(task -> elementConsumer.accept(task.join())), backgroundExecutor);
+	}
+
+	private PLoadedModel loadModel(ResourceManager resourceManager, PModelResource resource)
+	{
+		Identifier source = physicalResourceCandidates(resource.modelId()).stream().
+				filter(candidate -> resourceManager.getResource(candidate).isPresent()).findFirst().
+				orElseThrow(() -> new IllegalStateException("Registered GeckoLib model " + resource.modelId() +
+						" has no resource; tried: " + physicalResourceCandidates(resource.modelId())));
+		try
+		{
+			PModel model = PGeckoModelParser.parseModel(resourceManager.getResourceOrThrow(source).open());
+			loadAnimations(resourceManager, source, model);
+			return new PLoadedModel(resource.modelId(), source, model);
+		}
+		catch (IOException exception)
+		{
+			throw new RuntimeException("Can't load GeckoLib model " + resource.modelId() + " from " + source, exception);
+		}
 	}
 	
 	private void loadAnimations(ResourceManager resourceManager, Identifier modelResource, PModel model) throws IOException

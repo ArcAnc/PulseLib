@@ -16,8 +16,8 @@ package com.arcanc.pulselib.content.registration.player;
 public final class PPlayerAcrobaticDemo
 {
 /*	private static final Identifier ID = PLibDatabase.rl("demo/player_acrobatic");
-	private static final PModelData MODEL = new PModelData.Builder(
-			PLibDatabase.rl("glmodels/player/demo/acrobatic.gltf"), "", PGltfModelLoader.INSTANCE.id()).build();
+	private static final PModelData MODEL = PModelData.direct(
+			PLibDatabase.rl("player/demo/acrobatic"), PGltfModelLoader.INSTANCE.id());
 	private static final PRawAnimation ACROBATIC = PRawAnimation.begin().thenPlay("player_actobatic").build();
 	private static final KeyMapping KEY = new KeyMapping(
 			"key.pulselib.player_acrobatic",

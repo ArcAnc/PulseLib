@@ -23,7 +23,7 @@ import com.arcanc.pulselib.content.registration.entity.TestEntity;
 import com.arcanc.pulselib.content.registration.renderer.TestDayTimeColor;
 import com.arcanc.pulselib.content.renderer.PEntityRenderer;
 import com.arcanc.pulselib.content.renderer.base.PEntityRenderState;
-import com.arcanc.pulselib.content.renderer.modelData.DefaultEntityModelData;
+import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.arcanc.pulselib.util.helpers.PLibHelper;
@@ -35,6 +35,8 @@ import java.util.List;
 
 public class TestEntityRender extends PEntityRenderer<TestEntity, PEntityRenderState.LivingImpl<TestEntity>>
 {
+	public static final PModelData MODEL_DATA = PModelData.entity(PLibDatabase.rl("test_entity"));
+
 	public static final Identifier TUBE = PLibDatabase.rl("entity/test_entity/tube");
 	public static final Identifier SPHERE = PLibDatabase.rl("entity/test_entity/sphere");
 	public static final Identifier TORUS = PLibDatabase.rl("entity/test_entity/torus");
@@ -53,9 +55,8 @@ public class TestEntityRender extends PEntityRenderer<TestEntity, PEntityRenderS
 	
 	public TestEntityRender(EntityRendererProvider.Context context)
 	{
-		super(context, new DefaultEntityModelData.DefaultEntityModelDataBuilder(
-				PLibDatabase.rl("test_entity")).
-				build(), PRenderTypes.RenderTypeProvider :: trianglesSolid);
+		super(context, MODEL_DATA,
+				PRenderTypes.RenderTypeProvider :: trianglesTranslucent);
 		
 		addRenderLayer("body", new PTestArmor().
 				bindBone("armor_chest", "body").

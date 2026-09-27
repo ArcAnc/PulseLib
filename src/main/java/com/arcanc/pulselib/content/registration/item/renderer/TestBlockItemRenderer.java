@@ -25,6 +25,8 @@ import net.minecraft.resources.Identifier;
  */
 public class TestBlockItemRenderer extends PItemRenderer<TestBlockItem, TestBlockItemRenderState>
 {
+	public static final PModelData MODEL_DATA = PModelData.item(PLibDatabase.rl("test_block"));
+
 	public static final Identifier CIRCLE = PLibDatabase.rl("item/test_block/circle");
 	public static final Identifier PYRAMID = PLibDatabase.rl("item/test_block/pyramid");
 	

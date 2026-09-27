@@ -5,6 +5,8 @@
 
 Model resources are registered through [`PulseLibEvents.RegisterResourceEvent`](https://github.com/ArcAnc/PulseLib/blob/master/src/main/java/com/arcanc/pulselib/content/event/PulseLibEvents.java).
 
+PulseLib collects these registrations while client reload listeners are being registered, before resource reload starts. The model loader and runtime atlas then consume the same completed registration cache; resource registration callbacks must therefore describe stable client content.
+
 ## Register model resources
 
 Subscribe on the mod event bus and register every model together with its material texture references:
@@ -12,9 +14,12 @@ Subscribe on the mod event bus and register every model together with its materi
 ```java
 @Mod.EventBusSubscriber(modid = ExampleMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public final class ExampleClientEvents {
+    public static final PModelData ROBOT_MODEL =
+            PModelData.entity(Identifier.fromNamespaceAndPath(ExampleMod.MOD_ID, "robot"));
+
     @SubscribeEvent
     public static void registerPulseResources(PulseLibEvents.RegisterResourceEvent event) {
-        event.model(Identifier.fromNamespaceAndPath(ExampleMod.MOD_ID, "entity/robot"))
+        event.model(ROBOT_MODEL)
                 .texture("textures/body", Identifier.fromNamespaceAndPath(
                         ExampleMod.MOD_ID, "entity/robot/body"))
                 .texture("textures/eyes", Identifier.fromNamespaceAndPath(
@@ -23,28 +28,17 @@ public final class ExampleClientEvents {
 }
 ```
 
-`event.model(...)` uses the glTF loader by default. When the id does not already start with the loader root, the glTF loader adds `glmodels/` and the Gecko loader adds `geckolib/models/`. Repeated calls for one normalized model id extend the same registration. A resource registration is also what makes PulseLib load and bake that model, so every `PModelData` path needs one matching registration.
+`event.model(PModelData)` uses the model data's canonical ID and loader. For item JSON, create a static `PModelData` for registration; the JSON later creates a separate instance with the same canonical ID. `event.model(Identifier)` remains available for lower-level registrations and uses the glTF loader by default. The ID is canonical: it has no loader root or file extension. The glTF loader resolves `entity/robot` under `glmodels/`, and the Gecko loader resolves the same canonical id under `geckolib/models/`; call `event.model(model, PGeckoModelLoader.INSTANCE.id())` for Gecko. Repeated calls for one model extend the same registration. A resource registration is also what makes PulseLib load and bake that model, so every `PModelData` canonical ID needs one matching registration.
 
-`PGeckoModelLoader` is available but is not registered by default. Register it before the first client resource reload, then select it when registering the model:
-
-```java
-PModelCache.registerModelLoader(PGeckoModelLoader.INSTANCE);
-
-event.model(Identifier.fromNamespaceAndPath("examplemod", "entity/robot"),
-                PGeckoModelLoader.INSTANCE.id())
-        .texture("0", Identifier.fromNamespaceAndPath("examplemod", "entity/robot/fallback"));
-```
-
-The glTF loader accepts both `.glb` and `.gltf`. When the registered id has no extension, PulseLib tries `<model>.glb` first and then `<model>.gltf`; the same fallback applies when the registered extension is missing. If both files exist, the registered extension wins, and an extension-less registration therefore selects `.glb`. Use the actual extension in `PModelData`, because baked models are stored under the path of the file that was loaded. For example, with only `robot.gltf` present:
+The glTF loader accepts both `.glb` and `.gltf`. For every canonical ID it tries `<model>.glb` first and then `<model>.gltf`. The selected physical representation never changes the cache key or `PModelData` ID:
 
 ```java
-event.model(Identifier.fromNamespaceAndPath("examplemod", "entity/robot"));
+PModelData data = PModelData.entity(
+        Identifier.fromNamespaceAndPath("examplemod", "robot"));
 
-PModelData data = new PModelData.Builder(
-        Identifier.fromNamespaceAndPath("examplemod", "glmodels/entity/robot.gltf"),
-        "").build();
+event.model(data);
 ```
-If neither candidate exists, resource reload fails with `Registered model was not loaded; tried: ...`, followed by both paths.
+If neither candidate exists, resource reload fails and reports the canonical ID and both attempted physical paths.
 
 Each `texture` key is the reference stored in the model material. For glTF it comes from the base-colour image URI, image name, or texture name. It preserves its complete directory path, while a final `.png` is ignored: `body/claws.png` becomes `body/claws`, and remains distinct from `armor/claws`. The value is a Minecraft resource location relative to `textures` without `.png`. Anonymous GLB `bufferView` images have no such key and are rejected during baking; use an image URI or a stable image or texture name:
 

@@ -17,7 +17,6 @@ import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.sprite.AtlasManager;
 import net.minecraft.resources.Identifier;
-import net.minecraft.server.packs.resources.ResourceManager;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModLoader;
 import net.neoforged.neoforge.client.event.RegisterTextureAtlasesEvent;
@@ -35,13 +34,14 @@ public final class PResourceCache
 	public static final Identifier ATLAS_LOCATION = PLibDatabase.rl("textures/atlas.png");
 	@ApiStatus.Internal
 	public static final Identifier ATLAS_FILE_LOCATION = PLibDatabase.rl("atlas");
-	private static @Nullable TextureAtlas textures;
+	private static @Nullable TextureAtlas TEXTURES;
+
 	private static final Map<Identifier, PModelResource> RESOURCE_CACHE = new LinkedHashMap<>();
 
-	private PResourceCache()
-	{
-	}
-
+	/**
+	 * Returns the texture atlas.
+	 * @return the value produced by this operation.
+	 */
 	public static TextureAtlas getTextureAtlas()
 	{
 		if (textures == null)
@@ -66,44 +66,59 @@ public final class PResourceCache
 		return RESOURCE_CACHE;
 	}
 
+	/**
+	 * Finds the registration for a canonical model id.
+	 *
+	 * @param modelId the canonical model id.
+	 * @return the matching model resource registration, if any.
+	 */
 	@ApiStatus.Internal
-	public static Optional<PModelResource> getModelResource(Identifier model)
+	public static Optional<PModelResource> getModelResource(Identifier modelId)
 	{
-		PModelResource exact = RESOURCE_CACHE.get(model);
-		if (exact != null)
-			return Optional.of(exact);
-		return RESOURCE_CACHE.values().stream().filter(resource ->
-				PModelCache.getModelLoader(resource.modelLoaderId()).
-						map(loader -> loader.modelResourceCandidates(resource.model()).contains(model)).
-						orElse(false)).findFirst();
-	}
-
-	@ApiStatus.Internal
-	public static Optional<PModelResource> getModelResource(Identifier model, ResourceManager resourceManager)
-	{
-		PModelResource exact = RESOURCE_CACHE.get(model);
-		if (exact != null)
-			return Optional.of(exact);
-		return RESOURCE_CACHE.values().stream().filter(resource ->
-				PModelCache.getModelLoader(resource.modelLoaderId()).
-						map(loader -> resourceManager.getResource(resource.model()).isEmpty() &&
-								loader.modelResourceCandidates(resource.model()).contains(model)).
-						orElse(false)).findFirst();
+		return Optional.ofNullable(RESOURCE_CACHE.get(modelId));
 	}
 
 	@ApiStatus.Internal
 	public static void clear()
 	{
 		RESOURCE_CACHE.clear();
-		textures = null;
+		invalidateTextureAtlas();
 	}
 
-	public static Identifier resolve(Identifier model, String textureReference)
+	/**
+	 * Drops the cached atlas reference at the beginning of a resource reload.
+	 * AtlasManager owns the atlas and performs its disposal.
+	 */
+	@ApiStatus.Internal
+	public static void invalidateTextureAtlas()
 	{
-		PModelResource resource = getModelResource(model).
-				orElseThrow(() -> new IllegalStateException("No resources registered for model " + model));
+		TEXTURES = null;
+	}
+
+	/**
+	 * Rebuilds registered model resources before client resource reload begins.
+	 * Resource registrations describe stable mod content, so reload listeners and
+	 * sprite sources only consume the completed cache.
+	 */
+	@ApiStatus.Internal
+	public static void reloadRegistrations()
+	{
+		clear();
+		postEvent();
+	}
+
+	/**
+	 * Resolves a texture reference in the context of its model.
+	 * @param modelId the canonical model id.
+	 * @param textureReference the reference stored in the model material.
+	 * @return the registered atlas texture id.
+	 */
+	public static Identifier resolve(Identifier modelId, String textureReference)
+	{
+		PModelResource resource = getModelResource(modelId).
+				orElseThrow(() -> new IllegalStateException("No resources registered for model " + modelId));
 		Identifier texture = Optional.ofNullable(resource.textures().get(PTextureReference.normalize(textureReference))).
-				orElseThrow(() -> new IllegalStateException("No texture registered for model " + model + ": " + textureReference));
+				orElseThrow(() -> new IllegalStateException("No texture registered for model " + modelId + ": " + textureReference));
 		return spriteId(texture);
 	}
 
@@ -112,7 +127,7 @@ public final class PResourceCache
 	{
 		return PLibDatabase.rl(SPRITE_PATH_PREFIX + texture.getNamespace() + "/" + texture.getPath());
 	}
-
+	
 	@ApiStatus.Internal
 	public static void postEvent()
 	{

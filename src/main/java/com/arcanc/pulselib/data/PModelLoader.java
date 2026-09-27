@@ -10,16 +10,17 @@
 package com.arcanc.pulselib.data;
 
 
-import com.arcanc.pulselib.content.model.PModel;
+import com.arcanc.pulselib.content.model.resource.PModelResource;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public interface PModelLoader
 {
@@ -31,26 +32,26 @@ public interface PModelLoader
 		poseStack.mulPose(Axis.YP.rotationDegrees(180));
 	}
 	
-	boolean supports(Identifier modelPath);
+	/**
+	 * Resolves a canonical model id to physical resource candidates. The first
+	 * candidate has the highest precedence.
+	 *
+	 * @param modelId the registered canonical model id.
+	 * @return physical resource candidates.
+	 */
+	List<Identifier> physicalResourceCandidates(Identifier modelId);
 	
-	Identifier defaultModelLocation(Identifier modelLocation, String modelType);
-	
-	default Identifier modelResourceLocation(Identifier modelLocation)
-	{
-		return modelLocation;
-	}
-
-	default Identifier normalizeModelResourceLocation(Identifier modelLocation)
-	{
-		return modelResourceLocation(modelLocation);
-	}
-
-	default List<Identifier> modelResourceCandidates(Identifier modelLocation)
-	{
-		return List.of(normalizeModelResourceLocation(modelLocation));
-	}
-	
+	/**
+	 * Loads the models.
+	 * @param backgroundExecutor the background executor to use.
+	 * @param resourceManager the resource manager to use.
+	 * @param models registered logical models owned by this loader.
+	 * @param elementConsumer receives a canonical id, selected physical source,
+	 *                        and parsed model.
+	 * @return the value produced by this operation.
+	 */
 	CompletableFuture<?> loadModels(Executor backgroundExecutor,
 	                                ResourceManager resourceManager,
-	                                BiConsumer<Identifier, PModel> elementConsumer);
+	                                Collection<PModelResource> models,
+	                                Consumer<PLoadedModel> elementConsumer);
 }

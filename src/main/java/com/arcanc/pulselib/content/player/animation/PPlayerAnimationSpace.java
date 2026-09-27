@@ -158,7 +158,7 @@ public final class PPlayerAnimationSpace
 			PPlayerAnimationDefinition definition)
 	{
 		return definition.modelData().
-				getModelFormat().
+				getModelLoaderId().
 				equals(PGltfModelLoader.INSTANCE.id());
 	}
 }

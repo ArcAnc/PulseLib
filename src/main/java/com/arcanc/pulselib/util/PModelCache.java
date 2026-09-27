@@ -10,24 +10,16 @@
 package com.arcanc.pulselib.util;
 
 
-import com.arcanc.pulselib.content.model.PBone;
-import com.arcanc.pulselib.content.model.PMaterial;
-import com.arcanc.pulselib.content.model.PMesh;
-import com.arcanc.pulselib.content.model.PMeshPrimitive;
-import com.arcanc.pulselib.content.model.PModel;
+import com.arcanc.pulselib.content.model.*;
+import com.arcanc.pulselib.content.model.baked.*;
+import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
 import com.arcanc.pulselib.content.model.resource.PModelResource;
-import com.arcanc.pulselib.content.model.baked.AtlasBufferBuilder;
-import com.arcanc.pulselib.content.model.baked.PBakedBone;
-import com.arcanc.pulselib.content.model.baked.PDeformedMeshBuffers;
-import com.arcanc.pulselib.content.model.baked.PMeshTextureVariants;
-import com.arcanc.pulselib.content.model.baked.PBakedMesh;
-import com.arcanc.pulselib.content.model.baked.PSubdividedMeshCache;
-import com.arcanc.pulselib.content.model.baked.PBakedModel;
 import com.arcanc.pulselib.content.model.textures.PTextureAlphaClassifier;
 import com.arcanc.pulselib.content.model.textures.atlas.PLibSpriteMetadata;
-import com.arcanc.pulselib.content.renderer.PRenderQueue;
-import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
+import com.arcanc.pulselib.data.PLoadedModel;
 import com.arcanc.pulselib.data.PModelLoader;
+import com.arcanc.pulselib.data.gecko.PGeckoModelLoader;
+import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.buffers.GpuBuffer;
@@ -53,7 +45,6 @@ import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -61,7 +52,7 @@ import java.util.stream.Stream;
 public class PModelCache
 {
 	private static @Nullable Map<Identifier, PBakedModel> MODELS;
-	private static final Map<Identifier, PModelLoader> MODEL_LOADERS = Stream.of(PGltfModelLoader.INSTANCE).
+	private static final Map<Identifier, PModelLoader> MODEL_LOADERS = Stream.of(PGltfModelLoader.INSTANCE, PGeckoModelLoader.INSTANCE).
 			collect(Collectors.toMap(
 					PModelLoader :: id,
 					Function.identity(),
@@ -71,6 +62,10 @@ public class PModelCache
 					},
 					Object2ObjectOpenHashMap :: new));
 	
+	/**
+	 * Returns baked models keyed by canonical model id.
+	 * @return the baked model cache.
+	 */
 	public static @Nullable Map<Identifier, PBakedModel> getModels()
 	{
 		return MODELS;
@@ -105,8 +100,10 @@ public class PModelCache
 	                                             PreparableReloadListener.PreparationBarrier preparationBarrier,
 	                                             Executor gameExecutor)
 	{
+		PResourceCache.invalidateTextureAtlas();
 		Map<Identifier, PModel> models = new Object2ObjectOpenHashMap<>();
-		return CompletableFuture.allOf(loadModels(backgroundExecutor, sharedState.resourceManager(), models :: put)).
+		return CompletableFuture.allOf(loadModels(backgroundExecutor, sharedState.resourceManager(),
+				loaded -> models.put(loaded.modelId(), loaded.model()))).
 				thenRun(() -> verifyModelsLoaded(models)).
 				thenCompose(preparationBarrier :: wait).
 				thenAcceptAsync(empty ->
@@ -150,7 +147,7 @@ public class PModelCache
 			try
 			{
 				PModel model = rawModel.getValue();
-				Identifier modelPath = rawModel.getKey();
+				Identifier modelId = rawModel.getKey();
 				Map<UUID, PBakedBone.PBakedBoneBuilder> bakedBoneBuilder = new HashMap<>();
 				for (PBone bone : model.bones.values())
 				{
@@ -160,16 +157,16 @@ public class PModelCache
 
 				for (Map.Entry<UUID, Pair<UUID, List<UUID>>> entry : model.boneMeshes.entrySet())
 				{
-					PBakedBone.PBakedBoneBuilder builder = bakedBoneBuilder.get(entry.getKey());
-					Map<PMaterial, List<PMeshPrimitive>> primitivesByMaterial = new LinkedHashMap<>();
-					for (UUID meshUUID : entry.getValue().getSecond())
-					{
-						PMesh mesh = model.meshes.get(meshUUID);
-						for (PMeshPrimitive primitive : mesh.primitives())
-							primitivesByMaterial.computeIfAbsent(primitive.material(), ignored -> new ArrayList<>()).add(primitive);
-					}
-					for (List<PMeshPrimitive> primitives : primitivesByMaterial.values())
-						bakePrimitive(modelPath, PMeshPrimitive.merge(primitives), builder);
+				PBakedBone.PBakedBoneBuilder builder = bakedBoneBuilder.get(bone2MeshesEntry.getKey());
+				Map<PMaterial, List<PMeshPrimitive>> primitivesByMaterial = new LinkedHashMap<>();
+				for (UUID meshUUID : bone2MeshesEntry.getValue().getSecond())
+				{
+					PMesh mesh = model.meshes.get(meshUUID);
+					for (PMeshPrimitive primitive : mesh.primitives())
+						primitivesByMaterial.computeIfAbsent(primitive.material(), ignored -> new ArrayList<>()).add(primitive);
+				}
+				for (List<PMeshPrimitive> primitives : primitivesByMaterial.values())
+					bakePrimitive(modelId, PMeshPrimitive.merge(primitives), builder);
 				}
 
 				for (PBone bone : model.bones.values())
@@ -198,19 +195,28 @@ public class PModelCache
 		return bakedModelMap;
 	}
 
+	/**
+	 * Verifies that every registered canonical model has been supplied by its loader.
+	 * @param models the parsed models.
+	 */
 	private static void verifyModelsLoaded(Map<Identifier, PModel> models)
 	{
 		for (PModelResource resource : PResourceCache.getResourceCache().values())
 		{
-			PModelLoader loader = MODEL_LOADERS.get(resource.modelLoaderId());
-			List<Identifier> candidates = loader.modelResourceCandidates(resource.model());
-			if (candidates.stream().noneMatch(models :: containsKey))
-				throw new IllegalStateException("Registered model was not loaded; tried: " +
-						candidates.stream().map(Identifier :: toString).collect(Collectors.joining(", ")));
+			if (!models.containsKey(resource.modelId()))
+				throw new IllegalStateException("Registered model was not loaded: " + resource.modelId());
 		}
 	}
 
-	private static void bakePrimitive(Identifier modelPath, PMeshPrimitive primitive, PBakedBone.PBakedBoneBuilder builder)
+	/**
+	 * Bakes one primitive with the sprite registered for its material reference.
+	 * @param modelId the canonical model id.
+	 * @param primitive the primitive to bake.
+	 * @param builder the destination bone builder.
+	 */
+	private static void bakePrimitive(Identifier modelId,
+	                                  PMeshPrimitive primitive,
+	                                  PBakedBone.PBakedBoneBuilder builder)
 	{
 		String textureReference = primitive == null || primitive.material() == null ? "<missing>" : primitive.material().textureReference();
 		if (textureReference.isEmpty())
@@ -219,7 +225,8 @@ public class PModelCache
 		{
 			if (primitive == null || primitive.material() == null)
 				throw new IllegalStateException("Primitive has no material");
-			Identifier texture = PResourceCache.resolve(modelPath, textureReference);
+
+			Identifier texture = PResourceCache.resolve(modelId, textureReference);
 			TextureAtlasSprite sprite = PResourceCache.getTextureAtlas().getSprite(texture);
 			if (sprite.contents().name().getPath().equals("missingno"))
 				throw new IllegalStateException("Texture is missing from atlas: " + texture);
@@ -248,7 +255,7 @@ public class PModelCache
 		}
 		catch (RuntimeException exception)
 		{
-			throw new IllegalStateException("Can't bake primitive for model " + modelPath + " with texture reference " + textureReference, exception);
+			throw new IllegalStateException("Can't bake primitive for model " + modelId + " with texture reference " + textureReference, exception);
 		}
 	}
 	
@@ -280,22 +287,28 @@ public class PModelCache
 		);
 	}
 	
+	/**
+	 * Loads the models.
+	 * @param backgroundExecutor the background executor to use.
+	 * @param resourceManager the resource manager to use.
+	 * @param elementConsumer receives parsed models keyed by canonical id.
+	 * @return the value produced by this operation.
+	 */
 	private static CompletableFuture<?> loadModels(Executor backgroundExecutor,
 	                                               ResourceManager resourceManager,
-	                                               BiConsumer<Identifier, PModel> elementConsumer)
+	                                               java.util.function.Consumer<PLoadedModel> elementConsumer)
 	{
-		CompletableFuture<?> chain = CompletableFuture.completedFuture(null);
+		Map<Identifier, List<PModelResource>> resourcesByLoader = new LinkedHashMap<>();
 		for (PModelResource resource : PResourceCache.getResourceCache().values())
 			if (!MODEL_LOADERS.containsKey(resource.modelLoaderId()))
-				throw new IllegalStateException("No model loader registered for " + resource.model() + ": " + resource.modelLoaderId());
-		for (PModelLoader modelLoader : getModelLoaders())
-			chain = chain.thenCompose(empty -> modelLoader.loadModels(backgroundExecutor, resourceManager, (model, parsed) ->
-			{
-				if (PResourceCache.getModelResource(model, resourceManager).
-						filter(resource -> resource.modelLoaderId().equals(modelLoader.id())).isPresent())
-					elementConsumer.accept(model, parsed);
-			}));
-		
+				throw new IllegalStateException("No model loader registered for " + resource.modelId() + ": " + resource.modelLoaderId());
+			else
+				resourcesByLoader.computeIfAbsent(resource.modelLoaderId(), ignored -> new ArrayList<>()).add(resource);
+
+		CompletableFuture<?> chain = CompletableFuture.completedFuture(null);
+		for (Map.Entry<Identifier, List<PModelResource>> entry : resourcesByLoader.entrySet())
+			chain = chain.thenCompose(empty -> MODEL_LOADERS.get(entry.getKey()).
+					loadModels(backgroundExecutor, resourceManager, entry.getValue(), elementConsumer));
 		return chain;
 	}
 }

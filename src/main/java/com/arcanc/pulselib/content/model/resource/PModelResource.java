@@ -17,19 +17,24 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
-/** Immutable registration of a model loader and its material textures. */
-public record PModelResource(Identifier model, Identifier modelLoaderId, Map<String, Identifier> textures)
+/**
+ * Immutable registration for one canonical model id.
+ */
+public record PModelResource(
+		Identifier modelId,
+		Identifier modelLoaderId,
+		Map<String, Identifier> textures)
 {
 	public PModelResource
 	{
-		Objects.requireNonNull(model);
+		Objects.requireNonNull(modelId);
 		Objects.requireNonNull(modelLoaderId);
 		Map<String, Identifier> normalizedTextures = new LinkedHashMap<>();
 		textures.forEach((reference, texture) ->
 		{
 			String normalizedReference = PTextureReference.normalize(reference);
 			if (normalizedTextures.putIfAbsent(normalizedReference, Objects.requireNonNull(texture)) != null)
-				throw new IllegalArgumentException("Duplicate texture reference for model " + model + ": " + normalizedReference);
+				throw new IllegalArgumentException("Duplicate texture reference for model " + modelId + ": " + normalizedReference);
 		});
 		textures = Collections.unmodifiableMap(normalizedTextures);
 	}

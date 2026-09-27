@@ -94,13 +94,23 @@ Reference it from `assets/examplemod/items/wand.json`:
     "base": "examplemod:item/wand",
     "model": {
       "type": "examplemod:wand",
-      "model_location": "examplemod:glmodels/item/wand.glb"
+      "model_id": "examplemod:item/wand"
     }
   }
 }
 ```
 
-The `base` model is the normal `assets/examplemod/models/item/wand.json` file that supplies display transforms. `PModelData.CODEC` accepts `model_location`, optional `model_type`, and optional `model_format`; texture lists do not belong in this JSON. Register the model and its material texture references separately through `PulseLibEvents.RegisterResourceEvent`, as described in [Resources](resources.md#register-model-resources). PulseLib does not convert a legacy `builtin/entity` JSON into this renderer automatically.
+The `base` model is the normal `assets/examplemod/models/item/wand.json` file that supplies display transforms. `PModelData.CODEC` accepts canonical `model_id` and optional `model_loader`; texture lists do not belong in this JSON. Item JSON is decoded after `RegisterResourceEvent`, so it cannot pass that decoded `PModelData` instance to `event.model(...)`. Create a separate static `PModelData` for registration and add its material textures there:
+
+```java
+public static final PModelData WAND_RESOURCE =
+        PModelData.item(Identifier.fromNamespaceAndPath("examplemod", "wand"));
+
+event.model(WAND_RESOURCE)
+        .texture("body", Identifier.fromNamespaceAndPath("examplemod", "item/wand/body"));
+```
+
+The decoded `PModelData` is a separate object, but `getModel()` looks up its canonical ID in `PModelCache`; it therefore receives the model loaded by `WAND_RESOURCE`. If `model_loader` is present in JSON, use the same loader ID in the registration. PulseLib does not convert a legacy `builtin/entity` JSON into this renderer automatically.
 
 ## Stack-specific state
 
@@ -108,6 +118,6 @@ The `base` model is the normal `assets/examplemod/models/item/wand.json` file th
 
 Classes used:
 
-* [`PItemRenderer`](https://github.com/ArcAnc/PulseLib/blob/master/src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java)
-* [`SingletonAnimationManager`](https://github.com/ArcAnc/PulseLib/blob/master/src/main/java/com/arcanc/pulselib/content/animatable/singleton/SingletonAnimationManager.java)
-* [`DefaultItemModelData`](https://github.com/ArcAnc/PulseLib/blob/master/src/main/java/com/arcanc/pulselib/content/renderer/modelData/DefaultItemModelData.java)
+* [`PItemRenderer`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java)
+* [`SingletonAnimationManager`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/animatable/singleton/SingletonAnimationManager.java)
+* [`PModelData.item(...)`](modeldata.md)

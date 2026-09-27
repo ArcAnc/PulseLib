@@ -27,7 +27,7 @@ import net.minecraft.world.item.ItemStack;
 public class TestArmorItem extends Item
 {
 	public static final Identifier TEXTURE = PLibDatabase.rl("entity/armor/test_armor/0");
-	public static final PModelData MODEL_DATA = new PModelData.Builder(PLibDatabase.rl("armor/test_armor"), "entity").build();
+	public static final PModelData MODEL_DATA = PModelData.entity(PLibDatabase.rl("armor/test_armor"));
 	private final PRawAnimation tailSwing = PRawAnimation.begin().
 			thenLoop("swing").
 			build();
