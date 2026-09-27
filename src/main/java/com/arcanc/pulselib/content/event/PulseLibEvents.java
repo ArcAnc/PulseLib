@@ -23,6 +23,8 @@ import com.arcanc.pulselib.content.registration.PLibRegistration;
 import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
 import com.arcanc.pulselib.util.PModelCache;
+import com.arcanc.pulselib.util.attachments.PLivingAttachmentDefinition;
+import com.arcanc.pulselib.util.attachments.PLivingAttachments;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.ItemLike;
 import net.neoforged.bus.api.Event;

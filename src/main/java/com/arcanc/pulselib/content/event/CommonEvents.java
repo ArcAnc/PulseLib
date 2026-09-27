@@ -10,10 +10,7 @@
 package com.arcanc.pulselib.content.event;
 
 
-import com.arcanc.pulselib.content.registration.PLibRegistration;
-import com.arcanc.pulselib.content.registration.entity.TestEntity;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 
 /**
  * Provides support for common events.

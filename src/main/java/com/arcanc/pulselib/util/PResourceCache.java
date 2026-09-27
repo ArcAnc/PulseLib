@@ -44,9 +44,9 @@ public final class PResourceCache
 	 */
 	public static TextureAtlas getTextureAtlas()
 	{
-		if (textures == null)
-			textures = PLibRenderHelper.mc().getAtlasManager().getAtlasOrThrow(ATLAS_FILE_LOCATION);
-		return textures;
+		if (TEXTURES == null)
+			TEXTURES = PLibRenderHelper.mc().getAtlasManager().getAtlasOrThrow(ATLAS_FILE_LOCATION);
+		return TEXTURES;
 	}
 
 	public static void register(IEventBus modEventBus)

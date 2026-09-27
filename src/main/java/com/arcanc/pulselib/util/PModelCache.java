@@ -16,6 +16,7 @@ import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
 import com.arcanc.pulselib.content.model.resource.PModelResource;
 import com.arcanc.pulselib.content.model.textures.PTextureAlphaClassifier;
 import com.arcanc.pulselib.content.model.textures.atlas.PLibSpriteMetadata;
+import com.arcanc.pulselib.content.renderer.PRenderQueue;
 import com.arcanc.pulselib.data.PLoadedModel;
 import com.arcanc.pulselib.data.PModelLoader;
 import com.arcanc.pulselib.data.gecko.PGeckoModelLoader;
@@ -157,9 +158,9 @@ public class PModelCache
 
 				for (Map.Entry<UUID, Pair<UUID, List<UUID>>> entry : model.boneMeshes.entrySet())
 				{
-				PBakedBone.PBakedBoneBuilder builder = bakedBoneBuilder.get(bone2MeshesEntry.getKey());
+				PBakedBone.PBakedBoneBuilder builder = bakedBoneBuilder.get(entry.getKey());
 				Map<PMaterial, List<PMeshPrimitive>> primitivesByMaterial = new LinkedHashMap<>();
-				for (UUID meshUUID : bone2MeshesEntry.getValue().getSecond())
+				for (UUID meshUUID : entry.getValue().getSecond())
 				{
 					PMesh mesh = model.meshes.get(meshUUID);
 					for (PMeshPrimitive primitive : mesh.primitives())
