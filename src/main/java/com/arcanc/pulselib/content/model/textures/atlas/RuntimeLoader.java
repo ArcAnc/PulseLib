@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Loads runtime.
+ * Adds textures from the resource registrations collected before reload.
  */
 public class RuntimeLoader implements SpriteSource
 {
@@ -37,8 +37,8 @@ public class RuntimeLoader implements SpriteSource
 	@Override
 	public void run(ResourceManager resourceManager, Output output)
 	{
-		PResourceCache.clear();
-		PResourceCache.postEvent();
+		// Resource registrations are immutable for this reload. Do not rebuild
+		// them here: model reload listeners may already be reading the cache.
 		Set<Identifier> textures = PResourceCache.getResourceCache().values().stream().
 				flatMap(resource -> resource.textures().values().stream()).
 				collect(Collectors.toSet());

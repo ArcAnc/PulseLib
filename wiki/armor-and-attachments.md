@@ -37,9 +37,8 @@ public final class ExampleClientEvents {
     public static void registerAttachments(PulseLibEvents.AttachmentRegistrationEvent event) {
         event.registration().registerLiving(MyItems.EXAMPLE_HELMET.get(),
                 new PLivingAttachmentDefinition(
-                        new PModelData.Builder(
-                                Identifier.fromNamespaceAndPath("examplemod", "armor/example_helmet"),
-                                "entity").build(),
+                        PModelData.entity(
+                                Identifier.fromNamespaceAndPath("examplemod", "armor/example_helmet")),
                         PLivingAttachmentSources.equipmentSlot(EquipmentSlot.HEAD),
                         List.of(PHumanoidBindings.head("helmet")),
                         PLivingMeshRenderResolvers.defaultLit(),
@@ -63,9 +62,8 @@ Attachments are not limited to armor slots. A held item can render a tail, an am
 ```java
 event.registration().registerLiving(MyItems.TAIL.get(),
         new PLivingAttachmentDefinition(
-                new PModelData.Builder(
-                        Identifier.fromNamespaceAndPath("examplemod", "attachment/tail"),
-                        "entity").build(),
+                PModelData.entity(
+                        Identifier.fromNamespaceAndPath("examplemod", "attachment/tail")),
                 PLivingAttachmentSources.hand(),
                 List.of(PHumanoidBindings.bind(
                         PHumanoidAnchors.BODY,

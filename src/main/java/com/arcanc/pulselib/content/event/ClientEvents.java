@@ -15,6 +15,12 @@ import com.arcanc.pulselib.content.animatable.instance.InstanceAnimationManager;
 import com.arcanc.pulselib.content.animatable.singleton.SingletonAnimationManager;
 import com.arcanc.pulselib.content.model.textures.atlas.RuntimeLoader;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
+import com.arcanc.pulselib.content.registration.PLibRegistration;
+import com.arcanc.pulselib.content.registration.block.block_entity.ber.TestBlockEntityRenderer;
+import com.arcanc.pulselib.content.registration.entity.renderer.PTestArmor;
+import com.arcanc.pulselib.content.registration.entity.renderer.TestEntityRender;
+import com.arcanc.pulselib.content.registration.item.TestArmorItem;
+import com.arcanc.pulselib.content.registration.item.renderer.TestBlockItemRenderer;
 import com.arcanc.pulselib.content.renderer.PRenderQueue;
 import com.arcanc.pulselib.content.renderer.PRenderStagesHandler;
 import com.arcanc.pulselib.util.PLibDatabase;
@@ -32,6 +38,8 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModLoader;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent;
 import net.neoforged.neoforge.client.event.RegisterSpriteSourcesEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
@@ -79,6 +87,7 @@ public class ClientEvents
 	 */
 	private static void registerReloadListeners(final AddClientReloadListenersEvent event)
 	{
+		PResourceCache.reloadRegistrations();
 		event.addListener(PLibDatabase.RELOAD_LISTENER_ID, PModelCache :: reload);
 	}
 	
@@ -205,7 +214,7 @@ public class ClientEvents
 	{
 		event.registerBlockEntityRenderer(PLibRegistration.BETypeReg.TEST_BLOCK_ENTITY.get(), TestBlockEntityRenderer :: new);
 		event.registerEntityRenderer(PLibRegistration.EntityTypeReg.TEST_ENTITY.get(), TestEntityRender :: new);
-	}/*
+	}*/
 	
 	/**
 	 * Registers the custom textures.
@@ -213,25 +222,25 @@ public class ClientEvents
 	 */
 	/*private static void registerCustomTextures(final PulseLibEvents.RegisterResourceEvent event)
 	{
-		event.model(PLibDatabase.rl("entity/test_entity")).
+		event.model(TestEntityRender.MODEL_DATA).
 						texture("tube", TestEntityRender.TUBE).
 						texture("sphere", TestEntityRender.SPHERE).
 						texture("torus", TestEntityRender.TORUS).
 						texture("0", TestEntityRender.ZERO).
-						texture("armor/0", TestEntityRender.ARMOR));
-		event.model(PLibDatabase.rl("entity/test_entity/armor")).
-						texture("0", TestEntityRender.ARMOR));
-		event.model(PLibDatabase.rl("block/test_block")).
+						texture("armor/0", TestEntityRender.ARMOR);
+		event.model(PTestArmor.MODEL_DATA).
+						texture("0", TestEntityRender.ARMOR);
+		event.model(TestBlockEntityRenderer.MODEL_DATA).
 						texture("cube_texture", TestBlockEntityRenderer.CUBE).
 						texture("torus_texture", TestBlockEntityRenderer.TORUS).
 						texture("tube_texture", TestBlockEntityRenderer.TUBE).
-						texture("pyramid_texture", TestBlockEntityRenderer.PYRAMID));
-		event.model(PLibDatabase.rl("item/test_block")).
+						texture("pyramid_texture", TestBlockEntityRenderer.PYRAMID);
+		event.model(TestBlockItemRenderer.MODEL_DATA).
 						texture("pyramid", TestBlockItemRenderer.PYRAMID).
-						texture("circle", TestBlockItemRenderer.CIRCLE));
-		event.model(PLibDatabase.rl("entity/armor/test_armor")).
-						texture("0", TestArmorItem.TEXTURE));
-		event.model(PLibDatabase.rl("player/demo/test_ball_model")).
-						texture("0", PPlayerBallDemo.TEXTURE);
+						texture("circle", TestBlockItemRenderer.CIRCLE);
+		event.model(TestArmorItem.MODEL_DATA).
+						texture("0", TestArmorItem.TEXTURE);
+		//event.model(PLibDatabase.rl("player/demo/test_ball_model")).
+		//				texture("0", PPlayerBallDemo.TEXTURE);
 	}*/
 }

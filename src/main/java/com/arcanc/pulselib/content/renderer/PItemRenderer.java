@@ -92,7 +92,7 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 		renderState.extractAdditionalData(lightCoords,  overlayCoords, hasFoil, outlineColor);
 		poseStack.pushPose();
 		PModelData modelData = getModelData(renderState);
-		PModelLoader modelLoader = PModelCache.getModelLoader(modelData.getModelFormat()).orElse(PGltfModelLoader.INSTANCE);
+		PModelLoader modelLoader = PModelCache.getModelLoader(modelData.getModelLoaderId()).orElse(PGltfModelLoader.INSTANCE);
 		modelLoader.applyItemTransform(poseStack);
 		
 		CameraRenderState cameraRenderState = new CameraRenderState();

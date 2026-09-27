@@ -9,10 +9,9 @@ The API is client-only. Register definitions on the mod event bus through `Pulse
         bus = Mod.EventBusSubscriber.Bus.MOD,
         value = Dist.CLIENT)
 public final class ExamplePlayerAnimations {
-    private static final PModelData COMBAT_MODEL = new PModelData.Builder(
+    private static final PModelData COMBAT_MODEL = PModelData.direct(
             Identifier.fromNamespaceAndPath(ExampleMod.MOD_ID, "player/combat"),
-            "player",
-            PGeckoModelLoader.INSTANCE.id()).build();
+            PGeckoModelLoader.INSTANCE.id());
 
     private static final PRawAnimation IDLE = PRawAnimation.begin()
             .thenLoop("animation.combat.idle")
@@ -38,7 +37,7 @@ public final class ExamplePlayerAnimations {
 }
 ```
 
-The example uses the Gecko loader. Register `PGeckoModelLoader.INSTANCE` with `PModelCache` before the first client resource reload, as described in [Model loaders](model-loaders.md), then register the same model and every material texture reference through `PulseLibEvents.RegisterResourceEvent`. Only registered resources are loaded; select the loader with `event.model(model, PGeckoModelLoader.INSTANCE.id())`. See [Resources](resources.md#register-model-resources).
+The example uses the Gecko loader. Then register the same model and every material texture reference through `PulseLibEvents.RegisterResourceEvent`. Only registered resources are loaded; select the loader with `event.model(COMBAT_MODEL)`. See [Resources](resources.md#register-model-resources).
 
 Controllers receive a `PPlayerAnimationInstance` as their animatable. Use `state.animatable().player()` to read the current player. PulseLib creates one instance for every `(player UUID, definition id)` pair, so remote players and multiple definitions never share a controller timeline.
 

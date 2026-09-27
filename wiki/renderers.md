@@ -21,9 +21,8 @@ Use [`PBlockRenderer`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/jav
 ```java
 public class CrusherRenderer extends PBlockRenderer<CrusherBlockEntity, CrusherRenderState> {
     public CrusherRenderer(BlockEntityRendererProvider.Context context) {
-        super(new DefaultBlockModelData.DefaultBlockModelDataBuilder(
-                        Identifier.fromNamespaceAndPath("examplemod", "crusher"))
-                        .build(),
+        super(PModelData.block(
+                        Identifier.fromNamespaceAndPath("examplemod", "crusher")),
                 PRenderTypes.RenderTypeProvider::trianglesCutout);
     }
 
@@ -51,10 +50,8 @@ Use [`PItemRenderer`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java
 
 ```java
 public class WandRenderer extends PItemRenderer<WandItem, WandRenderState> {
-    public WandRenderer() {
-        super(new DefaultItemModelData.DefaultItemModelDataBuilder(
-                        Identifier.fromNamespaceAndPath("examplemod", "wand"))
-                        .build(),
+    public WandRenderer(PModelData modelData) {
+        super(modelData,
                 PRenderTypes.RenderTypeProvider::trianglesSolid);
     }
 
@@ -67,6 +64,8 @@ public class WandRenderer extends PItemRenderer<WandItem, WandRenderState> {
 public class WandRenderState extends PItemRenderState.Impl<WandItem> {}
 ```
 
+For standard special item models, `modelData` is decoded from the item JSON. See [PulseLib Items](pulselib-items.md) for the matching resource registration.
+
 In GUI context, `PItemRenderer` submits to the `GUI` queue and immediately flushes that stage through the collector. In `FIRST_PERSON_LEFT_HAND` and `FIRST_PERSON_RIGHT_HAND` contexts, it submits to the dedicated `FIRST_PERSON` stage, which PulseLib flushes and composites immediately after the current hand pass. An enabled player first-person animation adjusts the arm or item pose inside that normal vanilla pass; it does not replace the pass. The renderer preserves the render type supplied to its constructor; use a render type compatible with the contexts in which the item is displayed.
 
 ## Entity renderer
@@ -77,8 +76,7 @@ Use [`PEntityRenderer`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/ja
 public class RobotRenderer extends PEntityRenderer<RobotEntity, PEntityRenderState.Impl<RobotEntity>> {
     public RobotRenderer(EntityRendererProvider.Context context) {
         super(context,
-                new DefaultEntityModelData.DefaultEntityModelDataBuilder(
-                        Identifier.fromNamespaceAndPath("examplemod", "robot")).build(),
+                PModelData.entity(Identifier.fromNamespaceAndPath("examplemod", "robot")),
                 PRenderTypes.RenderTypeProvider::trianglesSolid);
     }
 

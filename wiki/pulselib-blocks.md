@@ -72,9 +72,8 @@ The renderer is intentionally small. It only needs model data and a PulseLib ren
 ```java
 public class CrusherRenderer extends PBlockRenderer<CrusherBlockEntity, CrusherRenderState> {
     public CrusherRenderer(BlockEntityRendererProvider.Context context) {
-        super(new DefaultBlockModelData.DefaultBlockModelDataBuilder(
-                        Identifier.fromNamespaceAndPath("examplemod", "crusher"))
-                        .build(),
+        super(PModelData.block(
+                        Identifier.fromNamespaceAndPath("examplemod", "crusher")),
                 PRenderTypes.RenderTypeProvider::trianglesSolid);
     }
 
@@ -104,6 +103,6 @@ public void postSubmit(PoseStack poseStack,
 Classes used:
 
 * [`PBlockRenderer`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/PBlockRenderer.java)
-* [`DefaultBlockModelData`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/modelData/DefaultBlockModelData.java)
+* [`PModelData.block(...)`](modeldata.md)
 * [`PAnimatable`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/animatable/PAnimatable.java)
 * [`PLibHelper`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/util/helpers/PLibHelper.java)

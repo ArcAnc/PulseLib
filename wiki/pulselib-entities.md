@@ -48,8 +48,7 @@ The renderer is mostly declarative: model data plus render type. Living entity r
 public class RobotRenderer extends PEntityRenderer<RobotEntity, PEntityRenderState.LivingImpl<RobotEntity>> {
     public RobotRenderer(EntityRendererProvider.Context context) {
         super(context,
-                new DefaultEntityModelData.DefaultEntityModelDataBuilder(
-                        Identifier.fromNamespaceAndPath("examplemod", "robot")).build(),
+                PModelData.entity(Identifier.fromNamespaceAndPath("examplemod", "robot")),
                 PRenderTypes.RenderTypeProvider::trianglesSolid);
     }
 
@@ -85,5 +84,5 @@ Use [`PEntityRenderLayer`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main
 Classes used:
 
 * [`PEntityRenderer`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java)
-* [`DefaultEntityModelData`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/modelData/DefaultEntityModelData.java)
+* [`PModelData.entity(...)`](modeldata.md)
 * [`PAnimationController`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/animatable/PAnimationController.java)

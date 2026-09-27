@@ -11,20 +11,21 @@ package com.arcanc.pulselib.data.gltf;
 
 
 import com.arcanc.pulselib.content.model.PModel;
+import com.arcanc.pulselib.content.model.resource.PModelResource;
+import com.arcanc.pulselib.data.PLoadedModel;
 import com.arcanc.pulselib.data.PModelLoader;
 import com.arcanc.pulselib.util.PLibDatabase;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * Loads gltf model.
@@ -58,75 +59,17 @@ public class PGltfModelLoader implements PModelLoader
 	}
 	
 	/**
-	 * Performs the supports operation.
-	 * @param modelPath the model path to use.
-	 * @return the value produced by this operation.
-	 */
-	@Override
-	public boolean supports(Identifier modelPath)
-	{
-		String path = modelPath.getPath();
-		return path.startsWith(ROOT + "/") && (path.endsWith(GLB_EXTENSION) || path.endsWith(GLTF_EXTENSION));
-	}
-	
-	/**
-	 * Performs the default model location operation.
-	 * @param modelLocation the model location to use.
-	 * @param modelType the model type to use.
-	 * @return the value produced by this operation.
-	 */
-	@Override
-	public Identifier defaultModelLocation(Identifier modelLocation, String modelType)
-	{
-		return modelLocation.withPrefix(ROOT + "/" + modelType + "/").withSuffix(GLB_EXTENSION);
-	}
-
-	/**
-	 * Performs the model resource location operation.
-	 * @param modelLocation the loader-relative model id.
-	 * @return the resource-pack model location.
-	 */
-	@Override
-	public Identifier modelResourceLocation(Identifier modelLocation)
-	{
-		return modelLocation.getPath().startsWith(ROOT + "/") ? modelLocation : modelLocation.withPrefix(ROOT + "/");
-	}
-
-	/**
-	 * Normalizes a GLTF resource id, using {@code .glb} when no extension was supplied.
+	 * Returns both physical glTF representations for a canonical model. GLB is
+	 * preferred for an extension-less logical id.
 	 *
-	 * @param modelLocation the loader-relative model id.
-	 * @return the normalized GLTF resource location.
-	 */
-	@Override
-	public Identifier normalizeModelResourceLocation(Identifier modelLocation)
-	{
-		Identifier resourceLocation = modelResourceLocation(modelLocation);
-		String path = resourceLocation.getPath();
-		return path.endsWith(GLB_EXTENSION) || path.endsWith(GLTF_EXTENSION) ?
-				resourceLocation : resourceLocation.withSuffix(GLB_EXTENSION);
-	}
-
-	/**
-	 * Returns both supported glTF resource variants. The explicitly supplied
-	 * extension is preferred; an extension-less model id prefers {@code .glb}
-	 * for backwards compatibility.
-	 *
-	 * @param modelLocation the loader-relative model id.
+	 * @param modelId the canonical model id.
 	 * @return the GLB and glTF resource candidates.
 	 */
 	@Override
-	public List<Identifier> modelResourceCandidates(Identifier modelLocation)
+	public List<Identifier> physicalResourceCandidates(Identifier modelId)
 	{
-		Identifier resourceLocation = modelResourceLocation(modelLocation);
-		String path = resourceLocation.getPath();
-		if (path.endsWith(GLTF_EXTENSION))
-			return List.of(resourceLocation, resourceLocation.withPath(
-					path.substring(0, path.length() - GLTF_EXTENSION.length()) + GLB_EXTENSION));
-		if (path.endsWith(GLB_EXTENSION))
-			return List.of(resourceLocation, resourceLocation.withPath(
-					path.substring(0, path.length() - GLB_EXTENSION.length()) + GLTF_EXTENSION));
-		return List.of(resourceLocation.withSuffix(GLB_EXTENSION), resourceLocation.withSuffix(GLTF_EXTENSION));
+		Identifier base = modelId.withPrefix(ROOT + "/");
+		return List.of(base.withSuffix(GLB_EXTENSION), base.withSuffix(GLTF_EXTENSION));
 	}
 	
 	/**
@@ -139,40 +82,31 @@ public class PGltfModelLoader implements PModelLoader
 	@Override
 	public CompletableFuture<?> loadModels(Executor backgroundExecutor,
 	                                       ResourceManager resourceManager,
-	                                       BiConsumer<Identifier, PModel> elementConsumer)
+	                                       Collection<PModelResource> models,
+	                                       Consumer<PLoadedModel> elementConsumer)
 	{
-		return CompletableFuture.supplyAsync(
-				() -> resourceManager.listResources(
-						ROOT,
-						fileName -> fileName.toString().endsWith(GLB_EXTENSION) || fileName.toString().endsWith(GLTF_EXTENSION)),
-				backgroundExecutor).
-				thenApplyAsync(resources ->
-				{
-					Map<Identifier, CompletableFuture<PModel>> tasks = new Object2ObjectOpenHashMap<>();
-					
-					for (Identifier resource : resources.keySet())
-					{
-						tasks.put(resource, CompletableFuture.supplyAsync(() ->
-						{
-							try
-							{
-								PModel model = PGltfModelParser.parse(resources.get(resource).open());
-								loadAnimationEvents(resourceManager, resource, model);
-								return model;
-							}
-							catch (IOException e)
-							{
-								throw new RuntimeException("Can't load GLTF model " + resource, e);
-							}
-						}, backgroundExecutor));
-					}
-					return tasks;
-				}, backgroundExecutor).
-				thenAcceptAsync(modelsMap ->
-				{
-					for (Map.Entry<Identifier, CompletableFuture<PModel>> entry : modelsMap.entrySet())
-						elementConsumer.accept(entry.getKey(), entry.getValue().join());
-				}, backgroundExecutor);
+		List<CompletableFuture<PLoadedModel>> tasks = models.stream().map(resource ->
+				CompletableFuture.supplyAsync(() -> loadModel(resourceManager, resource), backgroundExecutor)).toList();
+		return CompletableFuture.allOf(tasks.toArray(CompletableFuture[] :: new)).thenRunAsync(
+				() -> tasks.forEach(task -> elementConsumer.accept(task.join())), backgroundExecutor);
+	}
+
+	private PLoadedModel loadModel(ResourceManager resourceManager, PModelResource resource)
+	{
+		Identifier source = physicalResourceCandidates(resource.modelId()).stream().
+				filter(candidate -> resourceManager.getResource(candidate).isPresent()).findFirst().
+				orElseThrow(() -> new IllegalStateException("Registered glTF model " + resource.modelId() +
+						" has no resource; tried: " + physicalResourceCandidates(resource.modelId())));
+		try
+		{
+			PModel model = PGltfModelParser.parse(resourceManager.getResourceOrThrow(source).open());
+			loadAnimationEvents(resourceManager, source, model);
+			return new PLoadedModel(resource.modelId(), source, model);
+		}
+		catch (IOException exception)
+		{
+			throw new RuntimeException("Can't load GLTF model " + resource.modelId() + " from " + source, exception);
+		}
 	}
 	
 	/**

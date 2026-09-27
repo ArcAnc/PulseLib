@@ -9,10 +9,9 @@ Layers are useful for armor pieces, equipment, accessories, conditional attachme
 ```java
 public class RobotChestLayer extends PEntityRenderLayer<RobotEntity, PEntityRenderState.LivingImpl<RobotEntity>> {
     public RobotChestLayer() {
-        super(new DefaultEntityLayerModelData.DefaultEntityLayerModelDataBuilder(
+        super(PModelData.entityLayer(
                         MyEntities.ROBOT.getId(),
-                        Identifier.fromNamespaceAndPath("examplemod", "armor"))
-                        .build(),
+                        Identifier.fromNamespaceAndPath("examplemod", "armor")),
                 PRenderTypes.RenderTypeProvider::trianglesSolid);
     }
 
@@ -82,6 +81,6 @@ The default layer resolver applies these hooks through `PMeshRenderContext.withC
 Classes used:
 
 * [`PEntityRenderLayer`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderLayer.java)
-* [`DefaultEntityLayerModelData`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/modelData/DefaultEntityLayerModelData.java)
+* [`PModelData.entityLayer(...)`](modeldata.md)
 * [`PBakedBone`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java)
 * [`PBakedMesh`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedMesh.java)

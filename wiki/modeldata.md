@@ -1,64 +1,68 @@
 # Model Data
 
-[`PModelData`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/modelData/PModelData.java) is the small object that tells a renderer which model file to use. Texture mappings and the list of models to load belong to [`PModelResource`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/model/resource/PModelResource.java), which is registered during resource reload.
+[`PModelData`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/modelData/PModelData.java) tells a renderer which canonical model to obtain. It never contains a loader root or filename extension. [`PModelResource`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/model/resource/PModelResource.java) holds the matching registration and texture mappings.
 
-It is deliberately separate from the renderer. That lets the same renderer logic stay simple while different blocks, items, entities, or layers point at different files. If a PulseLib model is invisible or has missing textures, `PModelData` is one of the first things to inspect.
-
-## Direct builder
-
-Use the direct builder when you already know the exact model path, or when you are using a folder layout that does not match PulseLib's default conventions.
+Use the factories for the conventional canonical IDs:
 
 ```java
-PModelData data = new PModelData.Builder(
-        Identifier.fromNamespaceAndPath("examplemod", "glmodels/block/crusher.glb"),
-        "").build();
-```
-
-Passing an empty `modelType` means "do not rewrite this path." Passing a non-empty type lets PulseLib ask the active model loader to build the conventional path.
-
-## Default builders
-
-For normal mods, default builders are more pleasant because they expand a short logical name into the resource-pack model path.
-
-```java
-PModelData blockData = new DefaultBlockModelData.DefaultBlockModelDataBuilder(
-        Identifier.fromNamespaceAndPath("examplemod", "crusher"))
-        .build();
-```
-
-For the default glTF loader, the example resolves to:
-
-```text
-Model: assets/examplemod/glmodels/block/crusher.glb
-```
-
-Available default builders:
-
-* [`DefaultBlockModelData`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/modelData/DefaultBlockModelData.java)
-* [`DefaultItemModelData`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/modelData/DefaultItemModelData.java)
-* [`DefaultEntityModelData`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/modelData/DefaultEntityModelData.java)
-* [`DefaultEntityLayerModelData`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/modelData/DefaultEntityLayerModelData.java)
-
-## Model resources
-
-Register every model used by `PModelData` and every material reference through `PModelResource`; only registered models are loaded and baked. For glTF, resource registration can fall back between `.glb` and `.gltf`, but `PModelData` must name the extension of the file that PulseLib loaded. A texture reference keeps its directories, while a final `.png` is normalized away. See [Resources](resources.md) for the registration API.
-
-## Gecko model data
-
-PulseLib can load Gecko-style JSON models through [`PGeckoModelLoader`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/data/gecko/PGeckoModelLoader.java), but the default registered loader in `PModelCache` is glTF. Register the Gecko loader before client resources reload if your mod needs Gecko paths:
-
-```java
-PModelCache.registerModelLoader(PGeckoModelLoader.INSTANCE);
-
-PModelData data = new DefaultEntityModelData.DefaultEntityModelDataBuilder(
+PModelData block = PModelData.block(Identifier.fromNamespaceAndPath("examplemod", "crusher"));
+PModelData item = PModelData.item(Identifier.fromNamespaceAndPath("examplemod", "wand"));
+PModelData entity = PModelData.entity(Identifier.fromNamespaceAndPath("examplemod", "robot"));
+PModelData armor = PModelData.entityLayer(
         Identifier.fromNamespaceAndPath("examplemod", "robot"),
-        PGeckoModelLoader.INSTANCE.id())
-        .build();
+        Identifier.fromNamespaceAndPath("examplemod", "armor"));
+PModelData gui = PModelData.direct(Identifier.fromNamespaceAndPath("examplemod", "gui/gene_screen"));
 ```
 
-Classes used:
+The first three create `block/crusher`, `item/wand`, and `entity/robot`; `entityLayer(...)` creates `entity/robot/armor`. `direct(...)` uses the supplied canonical path unchanged. Each factory has an overload taking a loader ID:
 
-* [`PModelData`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/modelData/PModelData.java)
-* [`PModelCache`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/util/PModelCache.java)
-* [`PGltfModelLoader`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/data/gltf/PGltfModelLoader.java)
-* [`PGeckoModelLoader`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/data/gecko/PGeckoModelLoader.java)
+```java
+PModelData geckoRobot = PModelData.entity(
+        Identifier.fromNamespaceAndPath("examplemod", "robot"),
+        PGeckoModelLoader.INSTANCE.id());
+```
+
+For the default glTF loader, `examplemod:entity/robot` is resolved internally to `assets/examplemod/glmodels/entity/robot.glb`, then to `.gltf` when the GLB is absent. The cache and renderer keep using `examplemod:entity/robot` in both cases.
+
+For renderers constructed in code, register the same object used by the renderer so the ID cannot drift:
+
+```java
+public static final PModelData ROBOT_MODEL =
+        PModelData.entity(Identifier.fromNamespaceAndPath("examplemod", "robot"));
+
+event.model(ROBOT_MODEL)
+        .texture("textures/body", Identifier.fromNamespaceAndPath("examplemod", "entity/robot/body"));
+```
+
+`PModelData` instances are not compared with each other. The resource and baked-model caches are keyed by canonical `Identifier`, so separate instances select the same baked model when their `model_id` values are equal.
+
+Item special renderers are data-driven: their renderer `PModelData` is decoded from item JSON after resource registrations are collected. Create a separate static `PModelData` for registration:
+
+```java
+public static final PModelData WAND_RESOURCE =
+        PModelData.item(Identifier.fromNamespaceAndPath("examplemod", "wand"));
+
+event.model(WAND_RESOURCE)
+        .texture("body", Identifier.fromNamespaceAndPath("examplemod", "item/wand/body"));
+```
+
+```json
+{
+  "model_id": "examplemod:item/wand"
+}
+```
+
+The decoded object is a different `PModelData` instance, but it looks up `examplemod:item/wand` in `PModelCache`, which is the entry loaded from `WAND_RESOURCE`. If JSON supplies `model_loader`, it must match the loader used by the registration.
+
+`PModelData` is not final. Custom implementations can call its protected constructor and override lookup methods when a renderer needs dynamic or multiple models. Register every canonical model that such an implementation can select.
+
+The codec uses `model_id` and optional `model_loader`:
+
+```json
+{
+  "model_id": "examplemod:item/wand",
+  "model_loader": "pulselib:gltf"
+}
+```
+
+Physical paths such as `glmodels/item/wand.glb` and `geckolib/models/robot.geo.json` are loader implementation details and must not appear in model data.
