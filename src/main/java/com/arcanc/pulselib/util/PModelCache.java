@@ -42,7 +42,6 @@ import org.joml.Vector3f;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -97,8 +96,7 @@ public class PModelCache
 	                                             Executor gameExecutor)
 	{
 		Map<ResourceLocation, PModel> models = new Object2ObjectOpenHashMap<>();
-		return CompletableFuture.allOf(loadModels(backgroundExecutor, resourceManager, models :: put)).
-				thenRun(() -> verifyModelsLoaded(models)).
+		return loadModels(backgroundExecutor, resourceManager, models :: put).
 				thenCompose(stage :: wait).
 				thenAcceptAsync(empty ->
 				{
@@ -123,18 +121,6 @@ public class PModelCache
 		PGpuDeformerBuffers.clearDefinitions();
 	}
 
-	private static void verifyModelsLoaded(Map<ResourceLocation, PModel> models)
-	{
-		for (PModelResource resource : PResourceCache.getResourceCache().values())
-		{
-			PModelLoader loader = MODEL_LOADERS.get(resource.modelLoaderId());
-			List<ResourceLocation> candidates = loader.modelResourceCandidates(resource.model());
-			if (!models.containsKey(resource.model()))
-				throw new IllegalStateException("Registered model was not loaded: " + resource.model()
-						+ "; checked resources: " + candidates);
-		}
-	}
-	
 	private static void clearBoneCache(PBakedBone bone)
 	{
 		bone.meshes().forEach(mesh ->
@@ -151,7 +137,7 @@ public class PModelCache
 		for (Map.Entry<ResourceLocation, PModel> rawModel : rawModels.entrySet())
 		{
 			PModel model = rawModel.getValue();
-			ResourceLocation modelPath = rawModel.getKey();
+			ResourceLocation modelId = rawModel.getKey();
 			Map<UUID, PBakedBone.PBakedBoneBuilder> bakedBoneBuilder = new HashMap<>();
 			for (PBone bone : model.bones.values())
 			{
@@ -178,7 +164,7 @@ public class PModelCache
 						byMaterial.computeIfAbsent(primitive.material(), ignored -> new ArrayList<>()).add(primitive);
 				}
 				for (List<PMeshPrimitive> primitives : byMaterial.values())
-					bakePrimitive(modelPath, UUID.randomUUID(), PMeshPrimitive.merge(primitives), builder);
+					bakePrimitive(modelId, UUID.randomUUID(), PMeshPrimitive.merge(primitives), builder);
 			}
 			
 			for (PBone bone : model.bones.values())
@@ -213,7 +199,7 @@ public class PModelCache
 		return bakedModelMap;
 	}
 
-	private static void bakePrimitive(ResourceLocation modelPath, UUID meshId, PMeshPrimitive primitive,
+	private static void bakePrimitive(ResourceLocation modelId, UUID meshId, PMeshPrimitive primitive,
 	                                  PBakedBone.PBakedBoneBuilder builder)
 	{
 		String reference = primitive == null || primitive.material() == null ? "<missing>" : primitive.material().textureReference();
@@ -223,7 +209,7 @@ public class PModelCache
 		{
 			if (primitive.material() == null)
 				throw new IllegalStateException("Primitive has no material");
-			ResourceLocation texture = PResourceCache.resolve(modelPath, reference);
+			ResourceLocation texture = PResourceCache.resolve(modelId, reference);
 			TextureAtlasSprite sprite = PResourceCache.getTextureAtlas().getSprite(texture);
 			if (sprite.contents().name().getPath().equals("missingno"))
 				throw new IllegalStateException("Texture is missing from atlas: " + texture);
@@ -247,7 +233,7 @@ public class PModelCache
 		}
 		catch (RuntimeException exception)
 		{
-			throw new IllegalStateException("Can't bake model " + modelPath + " texture " + reference, exception);
+			throw new IllegalStateException("Can't bake model " + modelId + " texture " + reference, exception);
 		}
 	}
 	
@@ -279,21 +265,24 @@ public class PModelCache
 		);
 	}
 	
-	private static CompletableFuture<?> loadModels(Executor backgroundExecutor,
-	                                               ResourceManager resourceManager,
-	                                               BiConsumer<ResourceLocation, PModel> elementConsumer)
+	private static CompletableFuture<Void> loadModels(Executor backgroundExecutor,
+	                                                  ResourceManager resourceManager,
+	                                                  java.util.function.BiConsumer<ResourceLocation, PModel> elementConsumer)
 	{
-		CompletableFuture<?> chain = CompletableFuture.completedFuture(null);
+		List<CompletableFuture<?>> tasks = new ArrayList<>();
 		for (PModelResource resource : PResourceCache.getResourceCache().values())
-			if (!MODEL_LOADERS.containsKey(resource.modelLoaderId()))
-				throw new IllegalStateException("No model loader registered for " + resource.model() + ": " + resource.modelLoaderId());
-		
-		for (PModelLoader modelLoader : getModelLoaders())
-			chain = chain.thenCompose(empty -> modelLoader.loadModels(backgroundExecutor, resourceManager, (model, parsed) ->
-					PResourceCache.getModelResource(model, resourceManager)
-							.filter(resource -> resource.modelLoaderId().equals(modelLoader.id()))
-							.ifPresent(resource -> elementConsumer.accept(resource.model(), parsed))));
-		
-		return chain;
+		{
+			PModelLoader loader = getModelLoader(resource.modelLoaderId()).orElseThrow(() ->
+					new IllegalStateException("No model loader registered for " + resource.modelId() + ": " + resource.modelLoaderId()));
+			tasks.add(loader.loadModel(backgroundExecutor, resourceManager, resource.modelId()).thenAccept(loaded ->
+			{
+				if (!loaded.modelId().equals(resource.modelId()))
+					throw new IllegalStateException("Model loader " + loader.id() + " returned " + loaded.modelId()
+							+ " while loading " + resource.modelId());
+				elementConsumer.accept(loaded.modelId(), loaded.model());
+			}));
+		}
+
+		return CompletableFuture.allOf(tasks.toArray(CompletableFuture[]::new));
 	}
 }

@@ -9,8 +9,6 @@
 
 package com.arcanc.pulselib.data;
 
-
-import com.arcanc.pulselib.content.model.PModel;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.resources.ResourceLocation;
@@ -19,8 +17,10 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.function.BiConsumer;
 
+/**
+ * Resolves canonical model ids to physical resources and parses them.
+ */
 public interface PModelLoader
 {
 	ResourceLocation id();
@@ -30,27 +30,19 @@ public interface PModelLoader
 		poseStack.translate(0.5f, 0, 0.5f);
 		poseStack.mulPose(Axis.YP.rotationDegrees(180));
 	}
-	
-	boolean supports(ResourceLocation modelPath);
-	
-	ResourceLocation defaultModelLocation(ResourceLocation modelLocation, String modelType);
-	
-	default ResourceLocation modelResourceLocation(ResourceLocation modelLocation)
-	{
-		return modelLocation;
-	}
 
-	default ResourceLocation normalizeModelResourceLocation(ResourceLocation modelLocation)
-	{
-		return modelResourceLocation(modelLocation);
-	}
+	/**
+	 * Returns physical resource candidates for a canonical model id, in
+	 * precedence order. This is intentionally the only place resource-path
+	 * conventions belong.
+	 */
+	List<ResourceLocation> modelResourceCandidates(ResourceLocation modelId);
 
-	default List<ResourceLocation> modelResourceCandidates(ResourceLocation modelLocation)
-	{
-		return List.of(normalizeModelResourceLocation(modelLocation));
-	}
-	
-	CompletableFuture<?> loadModels(Executor backgroundExecutor,
-	                                ResourceManager resourceManager,
-	                                BiConsumer<ResourceLocation, PModel> elementConsumer);
+	/**
+	 * Loads one registered canonical model. The returned source is the physical
+	 * candidate selected by this loader and must not be used as a cache key.
+	 */
+	CompletableFuture<PLoadedModel> loadModel(Executor backgroundExecutor,
+	                                         ResourceManager resourceManager,
+	                                         ResourceLocation modelId);
 }

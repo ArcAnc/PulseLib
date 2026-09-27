@@ -12,8 +12,8 @@ package com.arcanc.pulselib.content.registration.player;
 public final class PPlayerAcrobaticDemo
 {
 /*	private static final ResourceLocation ID = PLibDatabase.rl("demo/player_acrobatic");
-	private static final PModelData MODEL = new PModelData.Builder(
-			PLibDatabase.rl("glmodels/player/demo/acrobatic.gltf"), "", PGltfModelLoader.INSTANCE.id()).build();
+	private static final PModelData MODEL = PModelData.direct(
+			PLibDatabase.rl("player/demo/acrobatic"), PGltfModelLoader.INSTANCE.id());
 	private static final PRawAnimation ANIMATION = PRawAnimation.begin().thenPlay("player_actobatic").build();
 	private static final PChannelReference<Float> KNEE_BEND = new PChannelReference<>("acrobatic_knee_bend", 0.0f);
 	private static final PDeformerStack BENT_LEG = PDeformerStack.compile(List.of(

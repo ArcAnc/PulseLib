@@ -156,6 +156,7 @@ public class ClientEvents
 
 	private static void registerReloadListeners(final RegisterClientReloadListenersEvent event)
 	{
+		PResourceCache.reloadRegistrations();
 		event.registerReloadListener(PModelCache :: reload);
 	}
 
@@ -185,25 +186,25 @@ public class ClientEvents
 
 	private static void registerResources(final PulseLibEvents.RegisterResourceEvent event)
 	{
-		event.model(PLibDatabase.rl("entity/test_entity")).
+		event.model(TestEntityRender.MODEL_DATA).
 				texture("tube", TestEntityRender.TUBE).
 				texture("sphere", TestEntityRender.SPHERE).
 				texture("torus", TestEntityRender.TORUS).
 				texture("0", TestEntityRender.ZERO).
 				texture("armor/0", TestEntityRender.ARMOR);
-		event.model(PLibDatabase.rl("entity/test_entity/armor")).
+		event.model(PTestArmor.MODEL_DATA).
 				texture("0", TestEntityRender.ARMOR);
-		event.model(PLibDatabase.rl("block/test_block")).
+		event.model(TestBlockEntityRenderer.MODEL_DATA).
 				texture("cube_texture", TestBlockEntityRenderer.CUBE).
 				texture("torus_texture", TestBlockEntityRenderer.TORUS).
 				texture("tube_texture", TestBlockEntityRenderer.TUBE).
 				texture("pyramid_texture", TestBlockEntityRenderer.PYRAMID);
-		event.model(PLibDatabase.rl("item/test_block")).
+		event.model(TestBlockItemRenderer.MODEL_DATA).
 				texture("pyramid", TestBlockItemRenderer.PYRAMID).
 				texture("circle", TestBlockItemRenderer.CIRCLE);
-		event.model(PLibDatabase.rl("entity/armor/test_armor")).
+		event.model(TestArmor.MODEL_DATA).
 				texture("0", TestArmor.TEXTURE);
-		event.model(PLibDatabase.rl("player/demo/test_ball_model")).
+		event.model(PPlayerBallDemo.MODEL_DATA).
 				texture("0", PPlayerBallDemo.TEXTURE);
 	}*/
 }

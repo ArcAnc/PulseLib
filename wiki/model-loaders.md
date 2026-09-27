@@ -1,111 +1,70 @@
 # Model Loaders
 
-PulseLib model loading is extensible through [`PModelLoader`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/data/PModelLoader.java). Loaded raw models are baked into [`PBakedModel`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedModel.java) by [`PModelCache`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/util/PModelCache.java).
+PulseLib model loading is extensible through [`PModelLoader`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/data/PModelLoader.java). A loader resolves a registered canonical ID to physical resource candidates, selects a source, parses it, and returns a `PLoadedModel`. [`PModelCache`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/util/PModelCache.java) bakes it under the canonical ID.
 
 ## Built-in glTF loader
 
-[`PGltfModelLoader`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/data/gltf/PGltfModelLoader.java) is registered by default.
-
-Supported roots and extensions:
+[`PGltfModelLoader`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/data/gltf/PGltfModelLoader.java) is registered by default. For canonical ID `examplemod:entity/robot`, it tries:
 
 ```text
-assets/<modid>/glmodels/**/*.glb
-assets/<modid>/glmodels/**/*.gltf
+assets/examplemod/glmodels/entity/robot.glb
+assets/examplemod/glmodels/entity/robot.gltf
 ```
 
-Default path:
+`.glb` has precedence; `.gltf` is the fallback. The physical extension never affects the cache key. Animation-event sidecars use the selected physical source, so their existing relative lookup behavior is preserved.
 
-```java
-new DefaultEntityModelData.DefaultEntityModelDataBuilder(id)
-```
-
-resolves to:
-
-```text
-assets/<namespace>/glmodels/entity/<path>.glb
-```
-
-Resource registration accepts either extension or no extension. An extension-less id checks `.glb` then `.gltf`; an explicit extension is preferred and its counterpart is used only as fallback. Override `modelResourceCandidates(...)` when a custom loader supports equivalent resource names.
-
-The parser is [`PGltfModelParser`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/data/gltf/PGltfModelParser.java). glTF channels are decoded through the registered position, rotation, and scale channel types, so the loaded animation data now uses the same generic track API as other formats.
-
-### Material textures
-
-The glTF loader gets a material texture reference from the base-colour image URI, then the image name, then the texture name. That string is the key passed to `PModelResource.texture(...)` and is resolved into the runtime atlas during baking.
-
-An embedded image represented only by `image.bufferView` has pixel data but no resource identifier. PulseLib cannot infer a Minecraft texture path from those bytes, so a primitive using such an image fails resource reload with `Primitive has no texture reference`. Export external PNG files with image URIs, or assign stable image or texture names and register those names as texture keys.
+The glTF parser gets a material texture reference from the base-colour image URI, then the image name, then the texture name. That string is the key passed to `PModelResource.texture(...)` and is resolved into the runtime atlas during baking.
 
 ## Gecko loader
 
-[`PGeckoModelLoader`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/data/gecko/PGeckoModelLoader.java) supports:
+[`PGeckoModelLoader`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/data/gecko/PGeckoModelLoader.java) resolves canonical ID `examplemod:entity/robot` to:
 
 ```text
-assets/<modid>/geckolib/models/**/*.geo.json
-assets/<modid>/geckolib/models/**/*.json
-assets/<modid>/geckolib/animations/**/*.animation.json
-assets/<modid>/geckolib/animations/**/*.json
+assets/examplemod/geckolib/models/entity/robot.geo.json
 ```
 
-Register it:
+It uses the selected physical model source to find Gecko animation files and animation-event sidecars. Register it during client initialization, before PulseLib collects model-resource registrations:
 
 ```java
 PModelCache.registerModelLoader(PGeckoModelLoader.INSTANCE);
 ```
 
-Use it in model data:
+Use it with model data and registration:
 
 ```java
-PModelData data = new DefaultEntityModelData.DefaultEntityModelDataBuilder(
+PModelData robot = PModelData.entity(
         ResourceLocation.fromNamespaceAndPath("examplemod", "robot"),
-        PGeckoModelLoader.INSTANCE.id())
-        .build();
+        PGeckoModelLoader.INSTANCE.id());
+event.model(robot).texture("body", bodyTexture);
 ```
-
-The parser is [`PGeckoModelParser`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/data/gecko/PGeckoModelParser.java).
-
-Gecko animation vector components may be Molang expressions. See [Molang animations](molang-animations.md) for the supported language, context values, renderer hooks, and persistence rules.
 
 ## Custom loader
 
+Custom loaders receive a canonical ID, so they own all resource-root, extension, fallback, and sidecar conventions:
+
 ```java
 public final class MyModelLoader implements PModelLoader {
-    public static final MyModelLoader INSTANCE = new MyModelLoader();
-    private static final ResourceLocation ID =
-            ResourceLocation.fromNamespaceAndPath("examplemod", "my_format");
-
     @Override
     public ResourceLocation id() {
         return ID;
     }
 
     @Override
-    public boolean supports(ResourceLocation modelPath) {
-        return modelPath.getPath().startsWith("mymodels/")
-                && modelPath.getPath().endsWith(".json");
+    public List<ResourceLocation> modelResourceCandidates(ResourceLocation modelId) {
+        return List.of(modelId.withPrefix("mymodels/").withSuffix(".json"));
     }
 
     @Override
-    public ResourceLocation defaultModelLocation(ResourceLocation modelLocation, String modelType) {
-        return modelLocation.withPrefix("mymodels/" + modelType + "/").withSuffix(".json");
-    }
-
-    @Override
-    public CompletableFuture<?> loadModels(Executor backgroundExecutor,
-                                           ResourceManager resourceManager,
-                                           BiConsumer<ResourceLocation, PModel> elementConsumer) {
-        return CompletableFuture.runAsync(() -> {
-            // Parse resources and call elementConsumer.accept(modelLocation, model).
-        }, backgroundExecutor);
+    public CompletableFuture<PLoadedModel> loadModel(Executor executor,
+                                                      ResourceManager resources,
+                                                      ResourceLocation modelId) {
+        return CompletableFuture.supplyAsync(() -> {
+            ResourceLocation source = modelResourceCandidates(modelId).getFirst();
+            PModel model = parse(resources.getResourceOrThrow(source));
+            return new PLoadedModel(modelId, source, model);
+        }, executor);
     }
 }
 ```
 
-Register before client resource reload:
-
-```java
-PModelCache.registerModelLoader(MyModelLoader.INSTANCE);
-```
-
-Register the model through `PulseLibEvents.RegisterResourceEvent` and map each material reference there. The registration controls which models are loaded; `PModelData` deliberately has no texture map.
-
-`PModel` contains raw bones, meshes, bone-to-mesh mapping, and animations. `PModelCache` owns baking, vertex buffer creation, atlas UV conversion, emissive metadata, and cache cleanup.
+Register the loader during client initialization, before PulseLib collects `RegisterResourceEvent` registrations. The registration controls which models are loaded; loaders must not scan and parse every physical model file. Physical resource reloads reuse that logical registration set.

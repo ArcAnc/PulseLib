@@ -8,11 +8,12 @@ Layers are useful for armor pieces, equipment, accessories, conditional attachme
 
 ```java
 public class RobotChestLayer extends PEntityRenderLayer<RobotEntity> {
+    public static final PModelData MODEL = PModelData.entityLayer(
+            MyEntities.ROBOT.getId(),
+            ResourceLocation.fromNamespaceAndPath("examplemod", "armor"));
+
     public RobotChestLayer() {
-        super(new DefaultEntityLayerModelData.DefaultEntityLayerModelDataBuilder(
-                        MyEntities.ROBOT.getId(),
-                        ResourceLocation.fromNamespaceAndPath("examplemod", "armor"))
-                        .build(),
+        super(MODEL,
                 PRenderTypes.RenderTypeProvider::trianglesSolid);
     }
 
@@ -22,6 +23,8 @@ public class RobotChestLayer extends PEntityRenderLayer<RobotEntity> {
     }
 }
 ```
+
+Register the same `MODEL` object in `RegisterResourceEvent` with the layer model's material references. This gives the renderer and resource registration one canonical ID.
 
 ## Add layer to renderer
 
@@ -79,6 +82,6 @@ public int getPackedLight(RobotEntity entity, int packedLight) {
 Classes used:
 
 * [`PEntityRenderLayer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderLayer.java)
-* [`DefaultEntityLayerModelData`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/renderer/modelData/DefaultEntityLayerModelData.java)
+* [`PModelData`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/renderer/modelData/PModelData.java)
 * [`PBakedBone`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java)
 * [`PBakedMesh`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedMesh.java)

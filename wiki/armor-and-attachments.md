@@ -4,7 +4,7 @@ The attachment system is for cases where you do not want to replace the whole en
 
 This is useful for custom armor, tails, backpacks, masks, equipment on arms, or other accessories. Definitions can be tied to an item stack, registered globally for living entities, hide vanilla armor for a slot, and render first-person arm attachments.
 
-First-person arm attachments render through an enabled player-animation first-person presentation with sampled arm and camera anchors. Register every attachment model and its material references through `PulseLibEvents.RegisterResourceEvent` before it is used.
+First-person arm attachments render through an enabled player-animation first-person presentation with sampled arm and camera anchors. Register every attachment model and its material references through `PulseLibEvents.RegisterResourceEvent` during client initialization, before client resources first load.
 
 Important classes:
 
@@ -35,9 +35,8 @@ public final class ExampleClientEvents {
     public static void registerAttachments(PulseLibEvents.AttachmentRegistrationEvent event) {
         event.registration().registerLiving(MyItems.EXAMPLE_HELMET.get(),
                 new PLivingAttachmentDefinition(
-                        new PModelData.Builder(
-                                ResourceLocation.fromNamespaceAndPath("examplemod", "armor/example_helmet"),
-                                "entity").build(),
+                        PModelData.entity(
+                                ResourceLocation.fromNamespaceAndPath("examplemod", "armor/example_helmet")),
                         PLivingAttachmentSources.equipmentSlot(EquipmentSlot.HEAD),
                         List.of(PHumanoidBindings.head("helmet")),
                         PLivingMeshRenderResolvers.defaultLit(),
@@ -61,9 +60,8 @@ Attachments are not limited to armor slots. A held item can render a tail, an am
 ```java
 event.registration().registerLiving(MyItems.TAIL.get(),
         new PLivingAttachmentDefinition(
-                new PModelData.Builder(
-                        ResourceLocation.fromNamespaceAndPath("examplemod", "attachment/tail"),
-                        "entity").build(),
+                PModelData.entity(
+                        ResourceLocation.fromNamespaceAndPath("examplemod", "attachment/tail")),
                 PLivingAttachmentSources.hand(),
                 List.of(PHumanoidBindings.bind(
                         PHumanoidAnchors.BODY,

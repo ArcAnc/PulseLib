@@ -66,6 +66,6 @@ public final class PPlayerAnimationSpace
 
 	private static boolean usesGltfCoordinates(PPlayerAnimationDefinition definition)
 	{
-		return definition.modelData().getModelFormat().equals(PGltfModelLoader.INSTANCE.id());
+		return definition.modelData().getModelLoaderId().equals(PGltfModelLoader.INSTANCE.id());
 	}
 }

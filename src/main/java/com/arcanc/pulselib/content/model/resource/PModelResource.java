@@ -20,13 +20,13 @@ import java.util.Objects;
 /**
  * A registered model and its model-local material texture references.
  */
-public record PModelResource(ResourceLocation model,
+public record PModelResource(ResourceLocation modelId,
                              ResourceLocation modelLoaderId,
                              Map<String, ResourceLocation> textures)
 {
 	public PModelResource
 	{
-		Objects.requireNonNull(model);
+		Objects.requireNonNull(modelId);
 		Objects.requireNonNull(modelLoaderId);
 		Objects.requireNonNull(textures);
 		Map<String, ResourceLocation> normalized = new LinkedHashMap<>();
@@ -34,7 +34,7 @@ public record PModelResource(ResourceLocation model,
 		{
 			String key = PTextureReference.normalize(reference);
 			if (normalized.putIfAbsent(key, Objects.requireNonNull(texture)) != null)
-				throw new IllegalArgumentException("Duplicate texture reference for model " + model + ": " + key);
+				throw new IllegalArgumentException("Duplicate texture reference for model " + modelId + ": " + key);
 		});
 		textures = Collections.unmodifiableMap(normalized);
 	}

@@ -36,8 +36,7 @@ public class RuntimeLoader implements SpriteSource
 	@Override
 	public void run(ResourceManager resourceManager, Output output)
 	{
-		PResourceCache.clear();
-		PResourceCache.postEvent();
+		PResourceCache.invalidateTextureAtlas();
 		List<MetadataSectionSerializer<?>> metadataSections = new ArrayList<>(SpriteLoader.DEFAULT_METADATA_SECTIONS);
 		metadataSections.add(PLibMetadata.TYPE);
 		SpriteResourceLoader spriteResourceLoader = SpriteResourceLoader.create(metadataSections);

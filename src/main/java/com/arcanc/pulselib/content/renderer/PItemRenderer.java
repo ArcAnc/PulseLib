@@ -85,7 +85,7 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>> extends Blo
 		float partialTick = PLibRenderHelper.mc().isPaused() ? 0f : PLibRenderHelper.mc().getTimer().getGameTimeDeltaPartialTick(false);
 		
 		poseStack.pushPose();
-		PModelLoader modelLoader = PModelCache.getModelLoader(this.modelData.getModelFormat()).orElse(PGltfModelLoader.INSTANCE);
+		PModelLoader modelLoader = PModelCache.getModelLoader(this.modelData.getModelLoaderId()).orElse(PGltfModelLoader.INSTANCE);
 		modelLoader.applyItemTransform(poseStack);
 		preSubmit(poseStack, animatable, this :: getRenderType, buffer, packedLight, packedOverlay, partialTick, displayContext);
 		trueSubmit(poseStack, animatable, this :: getRenderType, buffer, packedLight, packedOverlay, partialTick, displayContext, stack);

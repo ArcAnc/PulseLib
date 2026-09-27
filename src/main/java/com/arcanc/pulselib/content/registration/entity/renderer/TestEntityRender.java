@@ -16,7 +16,7 @@ import com.arcanc.pulselib.content.model.baked.PMeshRenderContext;
 import com.arcanc.pulselib.content.model.deformer.*;
 import com.arcanc.pulselib.content.registration.entity.TestEntity;
 import com.arcanc.pulselib.content.renderer.PEntityRenderer;
-import com.arcanc.pulselib.content.renderer.modelData.DefaultEntityModelData;
+import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.arcanc.pulselib.util.PRenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -32,6 +32,7 @@ public class TestEntityRender extends PEntityRenderer<TestEntity>
 	public static final ResourceLocation TUBE = PLibDatabase.rl("entity/test_entity/tube");
 	public static final ResourceLocation ZERO = PLibDatabase.rl("entity/test_entity/0");
 	public static final ResourceLocation ARMOR = PLibDatabase.rl("entity/test_entity/armor/0");
+	public static final PModelData MODEL_DATA = PModelData.entity(PLibDatabase.rl("test_entity"));
 	
 	private static final PChannelReference<Float> ARM_HINGE_ANGLE = new PChannelReference<>("test_entity_arm_hinge_angle", 0.0f);
 	private static final PDeformerStack ARM_HINGE = PDeformerStack.compile(List.of(
@@ -45,8 +46,7 @@ public class TestEntityRender extends PEntityRenderer<TestEntity>
 	
 	public TestEntityRender(EntityRendererProvider.Context context)
 	{
-		super(context, new DefaultEntityModelData.DefaultEntityModelDataBuilder(PLibDatabase.rl("test_entity")).
-				build(),
+		super(context, MODEL_DATA,
 				PRenderTypes.RenderTypeProvider :: trianglesTranslucent);
 		
 		addRenderLayer("body", new PTestArmor().

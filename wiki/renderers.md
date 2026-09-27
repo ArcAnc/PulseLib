@@ -21,9 +21,8 @@ Use [`PBlockRenderer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/j
 ```java
 public class CrusherRenderer extends PBlockRenderer<CrusherBlockEntity> {
     public CrusherRenderer(BlockEntityRendererProvider.Context context) {
-        super(new DefaultBlockModelData.DefaultBlockModelDataBuilder(
-                        ResourceLocation.fromNamespaceAndPath("examplemod", "crusher"))
-                        .build(),
+        super(PModelData.block(
+                        ResourceLocation.fromNamespaceAndPath("examplemod", "crusher")),
                 PRenderTypes.RenderTypeProvider::trianglesCutout);
     }
 }
@@ -45,9 +44,8 @@ Use [`PItemRenderer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/ja
 ```java
 public class WandRenderer extends PItemRenderer<WandItem> {
     public WandRenderer(BlockEntityRenderDispatcher blockEntityRenderDispatcher, EntityModelSet entityModelSet) {
-        super(new DefaultItemModelData.DefaultItemModelDataBuilder(
-                        ResourceLocation.fromNamespaceAndPath("examplemod", "wand"))
-                        .build(),
+        super(PModelData.item(
+                        ResourceLocation.fromNamespaceAndPath("examplemod", "wand")),
                 PRenderTypes.RenderTypeProvider::trianglesSolid,
                 blockEntityRenderDispatcher,
                 entityModelSet);
@@ -65,8 +63,8 @@ Use [`PEntityRenderer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/
 public class RobotRenderer extends PEntityRenderer<RobotEntity> {
     public RobotRenderer(EntityRendererProvider.Context context) {
         super(context,
-                new DefaultEntityModelData.DefaultEntityModelDataBuilder(
-                        ResourceLocation.fromNamespaceAndPath("examplemod", "robot")).build(),
+                PModelData.entity(
+                        ResourceLocation.fromNamespaceAndPath("examplemod", "robot")),
                 PRenderTypes.RenderTypeProvider::trianglesSolid);
     }
 }

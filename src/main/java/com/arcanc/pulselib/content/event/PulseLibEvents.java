@@ -10,31 +10,27 @@
 package com.arcanc.pulselib.content.event;
 
 
-import com.arcanc.pulselib.util.attachments.PLivingAttachmentDefinition;
-import com.arcanc.pulselib.util.attachments.PLivingAttachments;
+import com.arcanc.pulselib.content.model.PTextureReference;
 import com.arcanc.pulselib.content.model.animation.PAnimationChannelType;
 import com.arcanc.pulselib.content.model.animation.PAnimationEventType;
 import com.arcanc.pulselib.content.model.deformer.PMeshDeformer;
+import com.arcanc.pulselib.content.model.resource.PModelResource;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationDefinition;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
 import com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimatedAttachmentRenderer;
 import com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimatedAttachments;
 import com.arcanc.pulselib.content.registration.PLibRegistration;
-import com.arcanc.pulselib.content.model.PTextureReference;
-import com.arcanc.pulselib.content.model.resource.PModelResource;
-import com.arcanc.pulselib.data.PModelLoader;
+import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
 import com.arcanc.pulselib.util.PModelCache;
+import com.arcanc.pulselib.util.attachments.PLivingAttachmentDefinition;
+import com.arcanc.pulselib.util.attachments.PLivingAttachments;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ItemLike;
 import net.neoforged.bus.api.Event;
 import net.neoforged.fml.event.IModBusEvent;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class PulseLibEvents
 {
@@ -60,41 +56,47 @@ public class PulseLibEvents
 	{
 		private final Map<ResourceLocation, ModelRegistration> models = new LinkedHashMap<>();
 
-		public ModelRegistration model(ResourceLocation model)
+		public ModelRegistration model(PModelData modelData)
 		{
-			return model(model, PGltfModelLoader.INSTANCE.id());
+			Objects.requireNonNull(modelData);
+			return model(modelData.getModelId(), modelData.getModelLoaderId());
 		}
 
-		public ModelRegistration model(ResourceLocation model, ResourceLocation modelLoaderId)
+		public ModelRegistration model(ResourceLocation modelId)
 		{
-			PModelLoader loader = PModelCache.getModelLoader(modelLoaderId)
-					.orElseThrow(() -> new IllegalStateException("No model loader registered for " + modelLoaderId));
-			ResourceLocation normalized = loader.normalizeModelResourceLocation(Objects.requireNonNull(model));
-			ModelRegistration registration = models.get(normalized);
+			return model(modelId, PGltfModelLoader.INSTANCE.id());
+		}
+
+		public ModelRegistration model(ResourceLocation modelId, ResourceLocation modelLoaderId)
+		{
+			PModelCache.getModelLoader(modelLoaderId).
+					orElseThrow(() -> new IllegalStateException("No model loader registered for " + modelLoaderId));
+			modelId = Objects.requireNonNull(modelId);
+			ModelRegistration registration = models.get(modelId);
 			if (registration == null)
 			{
-				registration = new ModelRegistration(normalized, modelLoaderId);
-				models.put(normalized, registration);
+				registration = new ModelRegistration(modelId, modelLoaderId);
+				models.put(modelId, registration);
 			}
 			else if (!registration.modelLoaderId.equals(modelLoaderId))
-				throw new IllegalStateException("Conflicting model loaders registered for " + normalized);
+				throw new IllegalStateException("Conflicting model loaders registered for " + modelId);
 			return registration;
 		}
 
 		public void apply(Map<ResourceLocation, PModelResource> target)
 		{
-			models.forEach((model, registration) -> target.put(model, registration.build()));
+			models.forEach((modelId, registration) -> target.put(modelId, registration.build()));
 		}
 
 		public static final class ModelRegistration
 		{
-			private final ResourceLocation model;
+			private final ResourceLocation modelId;
 			private final ResourceLocation modelLoaderId;
 			private final Map<String, ResourceLocation> textures = new LinkedHashMap<>();
 
-			private ModelRegistration(ResourceLocation model, ResourceLocation modelLoaderId)
+			private ModelRegistration(ResourceLocation modelId, ResourceLocation modelLoaderId)
 			{
-				this.model = model;
+				this.modelId = modelId;
 				this.modelLoaderId = modelLoaderId;
 			}
 
@@ -103,13 +105,13 @@ public class PulseLibEvents
 				String normalized = PTextureReference.normalize(reference);
 				ResourceLocation previous = textures.putIfAbsent(normalized, Objects.requireNonNull(texture));
 				if (previous != null && !previous.equals(texture))
-					throw new IllegalStateException("Conflicting texture for model " + model + ": " + normalized);
+					throw new IllegalStateException("Conflicting texture for model " + modelId + ": " + normalized);
 				return this;
 			}
 
 			private PModelResource build()
 			{
-				return new PModelResource(model, modelLoaderId, textures);
+				return new PModelResource(modelId, modelLoaderId, textures);
 			}
 		}
 	}

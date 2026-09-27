@@ -69,9 +69,8 @@ The renderer points at the GLB model and selects a PulseLib render type. It also
 public class WandRenderer extends PItemRenderer<WandItem> {
     public WandRenderer(BlockEntityRenderDispatcher blockEntityRenderDispatcher,
                         EntityModelSet entityModelSet) {
-        super(new DefaultItemModelData.DefaultItemModelDataBuilder(
-                        ResourceLocation.fromNamespaceAndPath("examplemod", "wand"))
-                        .build(),
+        super(PModelData.item(
+                        ResourceLocation.fromNamespaceAndPath("examplemod", "wand")),
                 PRenderTypes.RenderTypeProvider::trianglesSolid,
                 blockEntityRenderDispatcher,
                 entityModelSet);
@@ -90,4 +89,4 @@ Classes used:
 * [`PItemAnimatable`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/animatable/PItemAnimatable.java)
 * [`PItemRenderer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java)
 * [`SingletonAnimationManager`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/animatable/singleton/SingletonAnimationManager.java)
-* [`DefaultItemModelData`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/renderer/modelData/DefaultItemModelData.java)
+* [`PModelData`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/renderer/modelData/PModelData.java)

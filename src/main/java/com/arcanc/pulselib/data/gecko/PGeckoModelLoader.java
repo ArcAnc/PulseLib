@@ -9,27 +9,24 @@
 
 package com.arcanc.pulselib.data.gecko;
 
-
 import com.arcanc.pulselib.content.model.PModel;
 import com.arcanc.pulselib.data.PAnimationSidecarParser;
+import com.arcanc.pulselib.data.PLoadedModel;
 import com.arcanc.pulselib.data.PModelLoader;
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.mojang.blaze3d.vertex.PoseStack;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.function.BiConsumer;
 
 /**
- * Loads gecko model.
+ * Loads Gecko models and their animation sidecars.
  */
 public class PGeckoModelLoader implements PModelLoader
 {
@@ -45,162 +42,75 @@ public class PGeckoModelLoader implements PModelLoader
 	private static final String ANIMATION_EVENTS_EXTENSION = ".animation_events.json";
 	private static final String JSON_EXTENSION = ".json";
 
-	/**
-	 * Creates an instance of the enclosing type.
-	 */
 	private PGeckoModelLoader()
 	{
 	}
 
-	/**
-	 * Performs the id operation.
-	 * @return the value produced by this operation.
-	 */
 	@Override
 	public ResourceLocation id()
 	{
 		return ID;
 	}
 
-	/**
-	 * Applies the item transform.
-	 * @param poseStack the pose stack to use.
-	 */
 	@Override
 	public void applyItemTransform(PoseStack poseStack)
 	{
 		poseStack.translate(0.5f, 0.51f, 0.5f);
 	}
 
-	/**
-	 * Performs the supports operation.
-	 * @param modelPath the model path to use.
-	 * @return the value produced by this operation.
-	 */
 	@Override
-	public boolean supports(ResourceLocation modelPath)
+	public List<ResourceLocation> modelResourceCandidates(ResourceLocation modelId)
 	{
-		String path = modelPath.getPath();
-		return path.startsWith(MODEL_ROOT + "/") && path.endsWith(JSON_EXTENSION);
+		return List.of(modelId.withPrefix(MODEL_ROOT + "/").withSuffix(MODEL_EXTENSION));
 	}
 
-	/**
-	 * Performs the default model location operation.
-	 * @param modelLocation the model location to use.
-	 * @param modelType the model type to use.
-	 * @return the value produced by this operation.
-	 */
 	@Override
-	public ResourceLocation defaultModelLocation(ResourceLocation modelLocation, String modelType)
+	public CompletableFuture<PLoadedModel> loadModel(Executor backgroundExecutor,
+	                                                 ResourceManager resourceManager,
+	                                                 ResourceLocation modelId)
 	{
-		return modelLocation.withPrefix(MODEL_ROOT + "/" + modelType + "/").withSuffix(MODEL_EXTENSION);
+		return CompletableFuture.supplyAsync(() ->
+		{
+			ResourceLocation source = modelResourceCandidates(modelId).stream()
+					.filter(candidate -> resourceManager.getResource(candidate).isPresent())
+					.findFirst()
+					.orElseThrow(() -> new IllegalStateException(
+							"Registered model was not loaded: " + modelId + "; checked resources: "
+									+ modelResourceCandidates(modelId)));
+			try
+			{
+				PModel model = PGeckoModelParser.parseModel(resourceManager.getResourceOrThrow(source).open());
+				loadAnimations(resourceManager, source, model);
+				return new PLoadedModel(modelId, source, model);
+			}
+			catch (IOException exception)
+			{
+				throw new RuntimeException("Can't load Gecko model " + source + " for " + modelId, exception);
+			}
+		}, backgroundExecutor);
 	}
 
-	/**
-	 * Performs the model resource location operation.
-	 * @param modelLocation the loader-relative model id.
-	 * @return the resource-pack model location.
-	 */
-	@Override
-	public ResourceLocation modelResourceLocation(ResourceLocation modelLocation)
-	{
-		return modelLocation.getPath().startsWith(MODEL_ROOT + "/") ? modelLocation : modelLocation.withPrefix(MODEL_ROOT + "/");
-	}
-
-	/**
-	 * Normalizes a GeckoLib resource id, using {@code .geo.json} when no JSON extension was supplied.
-	 *
-	 * @param modelLocation the loader-relative model id.
-	 * @return the normalized GeckoLib resource location.
-	 */
-	@Override
-	public ResourceLocation normalizeModelResourceLocation(ResourceLocation modelLocation)
-	{
-		ResourceLocation resourceLocation = modelResourceLocation(modelLocation);
-		return resourceLocation.getPath().endsWith(JSON_EXTENSION) ?
-				resourceLocation : resourceLocation.withSuffix(MODEL_EXTENSION);
-	}
-
-	/**
-	 * Loads the models.
-	 * @param backgroundExecutor the background executor to use.
-	 * @param resourceManager the resource manager to use.
-	 * @param elementConsumer the element consumer to use.
-	 * @return the value produced by this operation.
-	 */
-	@Override
-	public CompletableFuture<?> loadModels(Executor backgroundExecutor,
-	                                       ResourceManager resourceManager,
-	                                       BiConsumer<ResourceLocation, PModel> elementConsumer)
-	{
-		return CompletableFuture.supplyAsync(
-				() -> resourceManager.listResources(
-						MODEL_ROOT,
-						fileName -> fileName.toString().endsWith(JSON_EXTENSION)),
-				backgroundExecutor).
-				thenApplyAsync(resources ->
-				{
-					Map<ResourceLocation, CompletableFuture<PModel>> tasks = new Object2ObjectOpenHashMap<>();
-
-					for (ResourceLocation resource : resources.keySet())
-					{
-						tasks.put(resource, CompletableFuture.supplyAsync(() ->
-						{
-							try
-							{
-								PModel model = PGeckoModelParser.parseModel(resources.get(resource).open());
-								loadAnimations(resourceManager, resource, model);
-								return model;
-							}
-							catch (IOException e)
-							{
-								throw new RuntimeException("Can't load GeckoLib model " + resource, e);
-							}
-						}, backgroundExecutor));
-					}
-					return tasks;
-				}, backgroundExecutor).
-				thenAcceptAsync(modelsMap ->
-				{
-					for (Map.Entry<ResourceLocation, CompletableFuture<PModel>> entry : modelsMap.entrySet())
-						elementConsumer.accept(entry.getKey(), entry.getValue().join());
-				}, backgroundExecutor);
-	}
-
-	/**
-	 * Loads the animations.
-	 * @param resourceManager the resource manager to use.
-	 * @param modelResource the model resource to use.
-	 * @param model the model to use.
-	 */
 	private void loadAnimations(ResourceManager resourceManager, ResourceLocation modelResource, PModel model) throws IOException
 	{
-		Optional<ResourceLocation> animationResource = animationCandidates(modelResource).stream().
-				filter(resource -> resourceManager.getResource(resource).isPresent()).
-				findFirst();
+		Optional<ResourceLocation> animationResource = animationCandidates(modelResource).stream()
+				.filter(resource -> resourceManager.getResource(resource).isPresent())
+				.findFirst();
 
 		if (animationResource.isEmpty())
 			return;
 
 		model.animations.putAll(PGeckoModelParser.parseAnimations(
-				resourceManager.getResourceOrThrow(animationResource.get()).open(),
-				model));
+				resourceManager.getResourceOrThrow(animationResource.get()).open(), model));
 		loadAnimationSidecar(resourceManager, animationResource.get(), model);
 	}
 
-	/**
-	 * Loads the animation sidecar.
-	 * @param resourceManager the resource manager to use.
-	 * @param animationResource the animation resource to use.
-	 * @param model the model to use.
-	 */
 	private void loadAnimationSidecar(ResourceManager resourceManager,
-	                                 ResourceLocation animationResource,
-	                                 PModel model) throws IOException
+	                                  ResourceLocation animationResource,
+	                                  PModel model) throws IOException
 	{
-		Optional<ResourceLocation> sidecarResource = sidecarCandidates(animationResource).stream().
-				filter(resource -> resourceManager.getResource(resource).isPresent()).
-				findFirst();
+		Optional<ResourceLocation> sidecarResource = sidecarCandidates(animationResource).stream()
+				.filter(resource -> resourceManager.getResource(resource).isPresent())
+				.findFirst();
 		if (sidecarResource.isEmpty())
 			return;
 
@@ -209,16 +119,10 @@ public class PGeckoModelLoader implements PModelLoader
 				model.animations);
 	}
 
-	/**
-	 * Performs the animation candidates operation.
-	 * @param modelResource the model resource to use.
-	 * @return the value produced by this operation.
-	 */
 	private List<ResourceLocation> animationCandidates(ResourceLocation modelResource)
 	{
 		String modelName = modelName(modelResource);
-		String[] divided = modelName.split("/");
-		String fileName = divided[divided.length - 1];
+		String fileName = modelName.substring(modelName.lastIndexOf('/') + 1);
 
 		List<ResourceLocation> candidates = new ArrayList<>();
 		candidates.add(modelResource.withPath(ANIMATION_ROOT + "/" + fileName + ANIMATION_EXTENSION));
@@ -228,17 +132,12 @@ public class PGeckoModelLoader implements PModelLoader
 		return candidates;
 	}
 
-	/**
-	 * Performs the sidecar candidates operation.
-	 * @param animationResource the animation resource to use.
-	 * @return the value produced by this operation.
-	 */
 	private List<ResourceLocation> sidecarCandidates(ResourceLocation animationResource)
 	{
 		String path = animationResource.getPath();
-		String base = path.endsWith(ANIMATION_EXTENSION) ?
-				path.substring(0, path.length() - ANIMATION_EXTENSION.length()) :
-				path.substring(0, path.length() - JSON_EXTENSION.length());
+		String base = path.endsWith(ANIMATION_EXTENSION)
+				? path.substring(0, path.length() - ANIMATION_EXTENSION.length())
+				: path.substring(0, path.length() - JSON_EXTENSION.length());
 		String fileName = base.substring(base.lastIndexOf('/') + 1);
 		String root = base.substring(0, base.lastIndexOf('/'));
 
@@ -249,18 +148,10 @@ public class PGeckoModelLoader implements PModelLoader
 		return candidates;
 	}
 
-	/**
-	 * Performs the model name operation.
-	 * @param modelResource the model resource to use.
-	 * @return the value produced by this operation.
-	 */
 	private static String modelName(ResourceLocation modelResource)
 	{
 		String path = modelResource.getPath();
 		String modelName = path.substring(MODEL_ROOT.length() + 1);
-		if (modelName.endsWith(MODEL_EXTENSION))
-			return modelName.substring(0, modelName.length() - MODEL_EXTENSION.length());
-
-		return modelName.substring(0, modelName.length() - JSON_EXTENSION.length());
+		return modelName.substring(0, modelName.length() - MODEL_EXTENSION.length());
 	}
 }

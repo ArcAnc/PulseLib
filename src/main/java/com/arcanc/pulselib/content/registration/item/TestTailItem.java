@@ -18,7 +18,6 @@ import com.arcanc.pulselib.util.PLibDatabase;
 import com.arcanc.pulselib.util.attachments.*;
 import com.arcanc.pulselib.util.attachments.humanoid.PHumanoidAnchors;
 import com.arcanc.pulselib.util.attachments.humanoid.PHumanoidBindings;
-import com.arcanc.pulselib.util.attachments.PLivingAttachmentDefinition;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
@@ -36,7 +35,7 @@ public class TestTailItem extends Item
 			thenLoop("swing").
 			build();
 	
-	private static final PModelData MODEL_DATA = new PModelData.Builder(PLibDatabase.rl("attachment/test_tail"), "entity").build();
+	public static final PModelData MODEL_DATA = PModelData.entity(PLibDatabase.rl("attachment/test_tail"));
 	private static final TailAnimatable ANIMATABLE = new TailAnimatable();
 	private static final Map<UUID, TailController> CONTROLLERS = new HashMap<>();
 	

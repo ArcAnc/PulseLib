@@ -25,7 +25,8 @@ import net.minecraft.world.item.ItemStack;
 public class TestArmor extends ArmorItem
 {
 	public static final ResourceLocation TEXTURE = PLibDatabase.rl("entity/armor/test_armor/0");
-	public static final PModelData MODEL_DATA = new PModelData.Builder(PLibDatabase.rl("armor/test_armor"), "entity").build();
+	public static final PModelData MODEL_DATA = PModelData.entity(PLibDatabase.rl("armor/test_armor"));
+
 	public TestArmor(Holder<ArmorMaterial> material, Type type, Properties properties)
 	{
 		super(material, type, properties);

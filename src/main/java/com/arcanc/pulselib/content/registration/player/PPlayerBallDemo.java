@@ -34,8 +34,8 @@ public class PPlayerBallDemo
 {
 	private static final ResourceLocation ID = PLibDatabase.rl("demo/player_ball_toss");
 	public static final ResourceLocation TEXTURE = PLibDatabase.rl("player/demo/test_ball_model/0");
-	private static final PModelData MODEL = new PModelData.Builder(
-			PLibDatabase.rl("glmodels/player/demo/test_ball_model"), "").build();
+	public static final PModelData MODEL_DATA = PModelData.direct(
+			PLibDatabase.rl("player/demo/test_ball_model"));
 	private static final PRawAnimation BALL_TOSS = PRawAnimation.begin().thenPlay("ball_toss").build();
 	private static final KeyMapping KEY = new KeyMapping(
 			"key.pulselib.player_ball_toss",
@@ -63,7 +63,7 @@ public class PPlayerBallDemo
 
 	private static void registerAnimation(PulseLibEvents.PlayerAnimationRegistrationEvent event)
 	{
-		event.registration().register(ID, PPlayerAnimationDefinition.builder(MODEL).
+		event.registration().register(ID, PPlayerAnimationDefinition.builder(MODEL_DATA).
 						when(player -> player == PLibRenderHelper.mc().player).
 						bind(PPlayerPart.HEAD, "head").
 						bind(PPlayerPart.RIGHT_ARM, "right_arm").

@@ -249,7 +249,7 @@ public final class PPlayerAnimations
 
 	private static boolean usesGltfCoordinates(PPlayerAnimationDefinition definition)
 	{
-		return definition.modelData().getModelFormat().equals(PGltfModelLoader.INSTANCE.id());
+		return definition.modelData().getModelLoaderId().equals(PGltfModelLoader.INSTANCE.id());
 	}
 	
 	@ApiStatus.Internal

@@ -14,9 +14,8 @@ import com.arcanc.pulselib.content.model.baked.PBakedBone;
 import com.arcanc.pulselib.content.model.baked.PMeshRenderContext;
 import com.arcanc.pulselib.content.model.textures.PAlphaMode;
 import com.arcanc.pulselib.content.registration.block.block_entity.TestBlockEntity;
-import com.arcanc.pulselib.content.registration.renderer.TestDayTimeColor;
 import com.arcanc.pulselib.content.renderer.PBlockRenderer;
-import com.arcanc.pulselib.content.renderer.modelData.DefaultBlockModelData;
+import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.arcanc.pulselib.util.PRenderTypes;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -29,11 +28,11 @@ public class TestBlockEntityRenderer extends PBlockRenderer<TestBlockEntity>
 	public static final ResourceLocation PYRAMID = PLibDatabase.rl("block/test_block/pyramid_texture");
 	public static final ResourceLocation CUBE = PLibDatabase.rl("block/test_block/cube_texture");
 	public static final ResourceLocation ZERO = PLibDatabase.rl("block/test_block/0");
+	public static final PModelData MODEL_DATA = PModelData.block(PLibDatabase.rl("test_block"));
 	
 	public TestBlockEntityRenderer(final BlockEntityRendererProvider.Context ctx)
 	{
-		super(new DefaultBlockModelData.DefaultBlockModelDataBuilder(PLibDatabase.rl("test_block")).
-						build(),
+		super(MODEL_DATA,
 				PRenderTypes.RenderTypeProvider :: trianglesTranslucent);
 	}
 	

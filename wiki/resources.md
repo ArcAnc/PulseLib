@@ -14,7 +14,9 @@ Subscribe on the mod event bus and register every model together with its materi
 public final class ExampleClientEvents {
     @SubscribeEvent
     public static void registerPulseResources(PulseLibEvents.RegisterResourceEvent event) {
-        event.model(ResourceLocation.fromNamespaceAndPath(ExampleMod.MOD_ID, "entity/robot"))
+        PModelData robot = PModelData.entity(
+                ResourceLocation.fromNamespaceAndPath(ExampleMod.MOD_ID, "robot"));
+        event.model(robot)
                 .texture("textures/body", ResourceLocation.fromNamespaceAndPath(
                         ExampleMod.MOD_ID, "entity/robot/body"))
                 .texture("textures/eyes", ResourceLocation.fromNamespaceAndPath(
@@ -23,18 +25,11 @@ public final class ExampleClientEvents {
 }
 ```
 
-`event.model(...)` uses the glTF loader by default. The model id is relative to its loader root: the glTF loader adds `glmodels/`, and the Gecko loader adds `geckolib/models/`; call `event.model(model, PGeckoModelLoader.INSTANCE.id())` when registering a Gecko model. Repeated calls for one model extend the same registration. A resource registration is also what makes PulseLib load and bake that model, so every `PModelData` path needs one matching registration.
+`event.model(PModelData)` uses both the canonical ID and the loader selected by that object. Repeated calls for one canonical model extend the same registration. A resource registration is also what makes PulseLib load and bake that model.
 
-The glTF loader accepts both `.glb` and `.gltf`. When the registered id has no extension, PulseLib tries `<model>.glb` first and then `<model>.gltf`; the same fallback applies when the registered extension is missing. If both files exist, the registered extension wins, and an extension-less registration therefore selects `.glb`. Use the actual extension in `PModelData`, because baked models are stored under the path of the file that was loaded:
+PulseLib collects these registrations when client reload listeners are registered, before the first model and atlas reload. The resulting logical model and texture map is shared by model baking and the runtime atlas. Later resource reloads such as `F3+T` reload physical models, textures, and sidecars using that same registration set; they do not repost `RegisterResourceEvent`. Register listeners during normal mod initialization, before client resources first load.
 
-```java
-event.model(ResourceLocation.fromNamespaceAndPath("examplemod", "entity/robot"));
-
-PModelData data = new PModelData.Builder(
-        ResourceLocation.fromNamespaceAndPath("examplemod", "glmodels/entity/robot.gltf"),
-        "").build();
-```
-If neither candidate exists, resource reload fails with `Registered model was not loaded: ...; checked resources: ...`, followed by both paths.
+The glTF loader tries `.glb` and then `.gltf` for every canonical model. Both `PModelData` and `PModelCache` keep the canonical ID, so changing the existing physical file from `.glb` to `.gltf` does not change renderer lookup or texture registration. If neither candidate exists, resource reload fails with the canonical ID and both physical candidates.
 
 Each `texture` key is the reference stored in the model material. For glTF it comes from the base-colour image URI, image name, or texture name. It preserves its complete directory path, while a final `.png` is ignored: `body/claws.png` becomes `body/claws`, and remains distinct from `armor/claws`. The value is a Minecraft resource location relative to `textures` without `.png`. Anonymous GLB `bufferView` images have no such key and are rejected during baking; use an image URI or a stable image or texture name:
 
@@ -161,14 +156,16 @@ The animation key must exactly match the animation name in the loaded model. Bot
 When a cube in a Gecko model has no `texture` field, PulseLib assigns the material reference `"0"`. Register that reference as the model's fallback texture:
 
 ```java
-event.model(ResourceLocation.fromNamespaceAndPath("examplemod", "entity/robot"),
-                PGeckoModelLoader.INSTANCE.id())
+PModelData robot = PModelData.entity(
+        ResourceLocation.fromNamespaceAndPath("examplemod", "robot"),
+        PGeckoModelLoader.INSTANCE.id());
+event.model(robot)
         .texture("0", ResourceLocation.fromNamespaceAndPath("examplemod", "entity/robot/fallback"));
 ```
 
 ## Runtime atlas
 
-The atlas is registered by PulseLib itself. Your mod contributes model-resource texture mappings.
+The atlas is registered by PulseLib itself. Your mod contributes model-resource texture mappings through `RegisterResourceEvent`. `RuntimeLoader` consumes those prepared mappings to rebuild atlas sprites; it does not create or clear model registrations.
 
 Runtime atlas classes:
 

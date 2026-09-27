@@ -13,18 +13,18 @@ package com.arcanc.pulselib.content.registration.entity.renderer;
 import com.arcanc.pulselib.content.registration.PLibRegistration;
 import com.arcanc.pulselib.content.registration.entity.TestEntity;
 import com.arcanc.pulselib.content.renderer.PEntityRenderLayer;
-import com.arcanc.pulselib.content.renderer.modelData.DefaultEntityLayerModelData;
+import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.arcanc.pulselib.util.PRenderTypes;
 
 public class PTestArmor extends PEntityRenderLayer<TestEntity>
 {
+	public static final PModelData MODEL_DATA = PModelData.entityLayer(
+			PLibRegistration.EntityTypeReg.TEST_ENTITY.getId(), PLibDatabase.rl("armor"));
+
 	public PTestArmor()
 	{
-		super(new DefaultEntityLayerModelData.
-						DefaultEntityLayerModelDataBuilder(PLibRegistration.EntityTypeReg.TEST_ENTITY.getId(),
-						PLibDatabase.rl("armor")).
-							build(),
+		super(MODEL_DATA,
 				PRenderTypes.RenderTypeProvider :: trianglesSolid);
 	}
 	

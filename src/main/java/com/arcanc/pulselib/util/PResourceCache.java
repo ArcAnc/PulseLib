@@ -15,7 +15,6 @@ import com.arcanc.pulselib.content.model.resource.PModelResource;
 import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.ResourceManager;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModLoader;
 import net.neoforged.neoforge.client.event.RegisterMaterialAtlasesEvent;
@@ -66,44 +65,40 @@ public final class PResourceCache
 	}
 
 	@ApiStatus.Internal
-	public static Optional<PModelResource> getModelResource(ResourceLocation model)
-	{
-		PModelResource exact = resources.get(model);
-		if (exact != null)
-			return Optional.of(exact);
-		return resources.values().stream().filter(resource ->
-				PModelCache.getModelLoader(resource.modelLoaderId())
-						.map(loader -> loader.modelResourceCandidates(resource.model()).contains(model))
-						.orElse(false)).findFirst();
-	}
-
-	@ApiStatus.Internal
-	public static Optional<PModelResource> getModelResource(ResourceLocation model, ResourceManager resourceManager)
-	{
-		PModelResource exact = resources.get(model);
-		if (exact != null)
-			return Optional.of(exact);
-		return resources.values().stream().filter(resource ->
-				PModelCache.getModelLoader(resource.modelLoaderId()).map(loader ->
-						resourceManager.getResource(resource.model()).isEmpty()
-								&& loader.modelResourceCandidates(resource.model()).contains(model))
-						.orElse(false)).findFirst();
-	}
-
-	@ApiStatus.Internal
 	public static void clear()
 	{
 		resources.clear();
 		textures = null;
 	}
 
-	public static ResourceLocation resolve(ResourceLocation model, String textureReference)
+	/**
+	 * Rebuilds the logical model-resource registrations before any model or
+	 * atlas reload work consumes them.
+	 */
+	@ApiStatus.Internal
+	public static void reloadRegistrations()
 	{
-		PModelResource resource = getModelResource(model)
-				.orElseThrow(() -> new IllegalStateException("No resources registered for model " + model));
-		ResourceLocation texture = Optional.ofNullable(resource.textures().get(PTextureReference.normalize(textureReference)))
-				.orElseThrow(() -> new IllegalStateException(
-						"No texture registered for model " + model + ": " + textureReference));
+		clear();
+		postEvent();
+	}
+
+	/**
+	 * Discards the atlas instance while retaining logical model registrations.
+	 */
+	@ApiStatus.Internal
+	public static void invalidateTextureAtlas()
+	{
+		textures = null;
+	}
+
+	public static ResourceLocation resolve(ResourceLocation modelId, String textureReference)
+	{
+		PModelResource resource = resources.get(modelId);
+		if (resource == null)
+			throw new IllegalStateException("No resources registered for model " + modelId);
+		ResourceLocation texture = Optional.ofNullable(resource.textures().get(PTextureReference.normalize(textureReference))).
+				orElseThrow(() -> new IllegalStateException(
+						"No texture registered for model " + modelId + ": " + textureReference));
 		return spriteId(texture);
 	}
 
