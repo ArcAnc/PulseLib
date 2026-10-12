@@ -1,0 +1,15 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="Arc's License of Common Sense"
+[[mods]]
+modId="pulselibtest"
+version="1.0.0"
+displayName="PulseLib integration fixture"
+[[mixins]]
+config="pulselib-test.mixins.json"
+[[dependencies.pulselibtest]]
+modId="pulselib"
+type="required"
+versionRange="[1,)"
+ordering="AFTER"
+side="BOTH"

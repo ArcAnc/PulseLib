@@ -1,0 +1,46 @@
+import net.darkhax.curseforgegradle.Constants
+import net.darkhax.curseforgegradle.TaskPublishCurseForge
+
+plugins {
+    id 'com.modrinth.minotaur'
+    id 'net.darkhax.curseforgegradle'
+}
+
+def loaderName = project.name
+def gameJar = loaderName == 'fabric' ? tasks.named('remapJar') : tasks.named('jar')
+def sourceJar = loaderName == 'fabric' ? tasks.named('remapSourcesJar') : tasks.named('sourcesJar')
+
+modrinth {
+    token = providers.gradleProperty('modrinthToken').orElse(providers.environmentVariable('MODRINTH_TOKEN')).orNull
+    projectId = '73TaZXLZ'
+    versionNumber = "${minecraft_version}-${mod_version}-${loaderName}"
+    versionName = "${mod_name}-${minecraft_version}-${mod_version}-${loaderName}"
+    uploadFile = gameJar
+    additionalFiles = [sourceJar]
+    changelog = rootProject.file('changelog.md').text
+    gameVersions = [minecraft_version]
+    loaders = [loaderName]
+    if (loaderName == 'fabric') {
+        dependencies { required.project 'fabric-api' }
+    }
+}
+
+tasks.register('publishCurseForge', TaskPublishCurseForge) {
+    apiToken = providers.gradleProperty('curseforgeToken').orElse(providers.environmentVariable('CURSEFORGE_TOKEN')).orNull
+    dependsOn gameJar, sourceJar
+    disableVersionDetection()
+    def mainFile = upload('1484554', gameJar)
+    mainFile.changelog = rootProject.file('changelog.md')
+    mainFile.changelogType = Constants.CHANGELOG_MARKDOWN
+    mainFile.displayName = "${mod_name}-${minecraft_version}-${mod_version}-${loaderName}"
+    mainFile.releaseType = 'release'
+    mainFile.addGameVersion(minecraft_version)
+    mainFile.addModLoader(loaderName == 'fabric' ? 'Fabric' : 'NeoForge')
+    mainFile.addEnvironment('Client')
+    mainFile.addEnvironment('Server')
+    mainFile.addJavaVersion('Java 21')
+    if (loaderName == 'fabric') {
+        mainFile.addRequirement('fabric-api')
+    }
+    mainFile.withAdditionalFile(sourceJar)
+}

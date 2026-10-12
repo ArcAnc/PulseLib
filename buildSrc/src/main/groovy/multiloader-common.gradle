@@ -1,0 +1,57 @@
+plugins {
+    id 'java-library'
+    id 'idea'
+}
+
+base {
+    archivesName = "${mod_id}-${minecraft_version}-${project.name}"
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+    withSourcesJar()
+    withJavadocJar()
+}
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://maven.neoforged.net/releases' }
+    maven { url = 'https://maven.fabricmc.net/' }
+}
+
+dependencies {
+    compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
+    implementation 'de.javagl:jgltf-model:2.0.3'
+    implementation 'de.javagl:jgltf-impl-v1:2.0.3'
+    implementation 'de.javagl:jgltf-impl-v2:2.0.3'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.2.1'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.13.2'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.13.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+tasks.withType(Test).configureEach { useJUnitPlatform() }
+tasks.withType(Javadoc).configureEach {
+    options.encoding = 'UTF-8'
+    options.addStringOption('Xdoclint:none', '-quiet')
+}
+
+tasks.named('jar') {
+    from(rootProject.file('LICENSE.txt'))
+}
+
+tasks.named('processResources') {
+    def properties = [mod_id: mod_id, mod_name: mod_name, mod_version: mod_version,
+                      mod_license: mod_license, minecraft_version: minecraft_version,
+                      minecraft_version_range: minecraft_version_range, neo_version: neo_version,
+                      loader_version_range: loader_version_range, fabric_loader_version: fabric_loader_version]
+    inputs.properties properties
+    filesMatching(['fabric.mod.json', 'META-INF/neoforge.mods.toml']) { expand properties }
+}
+
+idea.module {
+    downloadSources = true
+    downloadJavadoc = true
+}

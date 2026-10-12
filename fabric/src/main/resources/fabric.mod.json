@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${mod_version}",
+  "name": "${mod_name}",
+  "description": "Animation and rendering library",
+  "authors": ["ArcAnc"],
+  "license": "${mod_license}",
+  "icon": "logo.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.arcanc.pulselib.fabric.PulseLibFabric"],
+    "client": ["com.arcanc.pulselib.fabric.PulseLibFabricClient"]
+  },
+  "mixins": ["pulselib-common.mixins.json", "pulselib-fabric.mixins.json"],
+  "accessWidener": "pulselib.accesswidener",
+  "depends": {
+    "fabricloader": ">=${fabric_loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}",
+    "java": ">=21"
+  }
+}

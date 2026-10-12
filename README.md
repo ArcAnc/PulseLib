@@ -11,7 +11,9 @@
 - [Discord][discord]
 
 ## TechStack
-- [NeoForge](https://github.com/neoforged/NeoForge) (modding API for Minecraft)
+- Minecraft 1.21.1 / Java 21 / Mojang + Parchment mappings
+- [NeoForge](https://github.com/neoforged/NeoForge) and [Fabric](https://github.com/FabricMC/fabric)
+- MultiLoader Common with platform services; no required Architectury API
 - [SpongePowered Mixin](https://github.com/SpongePowered/Mixin) (mixin and bytecode weaving framework)
 
 ## License
@@ -20,7 +22,9 @@ All code and artwork is licensed under the [Arc's License of Common Sense](/LICE
 
 ## Development
 
-Welcome to our [Wiki][wiki]
+Welcome to our [Wiki][wiki].
+
+See [automatic plugins and NeoForge migration](wiki/plugins.md), [installation/building](wiki/installation.md), and the [MultiLoader architecture and verification report](docs/multiloader.md).
 
 ### Maven
 

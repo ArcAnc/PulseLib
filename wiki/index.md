@@ -27,6 +27,8 @@ PulseLib is a modern animation library for Minecraft designed to deliver high pe
 
 ---
 
+Minecraft 1.21.1 supports NeoForge and Fabric with Java 21. Start with [installation](installation.md) and [automatic plugins](plugins.md).
+
 Installation instructions are available [here](https://github.com/ArcAnc/PulseLib/wiki/Installation).
 
 ---

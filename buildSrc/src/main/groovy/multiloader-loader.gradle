@@ -1,0 +1,73 @@
+plugins {
+    id 'multiloader-common'
+    id 'maven-publish'
+}
+
+configurations {
+    commonJava { canBeResolved = true; canBeConsumed = false }
+    commonResources { canBeResolved = true; canBeConsumed = false }
+}
+
+dependencies {
+    compileOnly project(':common')
+    commonJava project(path: ':common', configuration: 'commonJava')
+    commonResources project(path: ':common', configuration: 'commonResources')
+}
+
+def commonSources = providers.provider {
+    configurations.commonJava.collect { directory ->
+        fileTree(directory) {
+            if (project.name == 'neoforge') {
+                exclude 'com/arcanc/pulselib/content/registration/PLibRegistration.java'
+                exclude 'com/arcanc/pulselib/content/animatable/PItemAnimatable.java'
+            }
+        }
+    }
+}
+
+tasks.named('compileJava', JavaCompile) {
+    dependsOn configurations.commonJava
+    source commonSources
+}
+tasks.named('javadoc', Javadoc) {
+    dependsOn configurations.commonJava
+    source commonSources
+}
+tasks.named('processResources') {
+    dependsOn configurations.commonResources
+    from(configurations.commonResources) { exclude 'META-INF/accesstransformer.cfg' }
+}
+tasks.named('sourcesJar', Jar) {
+    dependsOn configurations.commonJava, configurations.commonResources
+    from commonSources
+    from(configurations.commonResources) { exclude 'META-INF/accesstransformer.cfg' }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            groupId = mod_group_id
+            artifactId = "${mod_id}-${project.name}"
+            version = "${minecraft_version}-${mod_version}"
+            pom {
+                name = mod_name
+                description = 'Animation and rendering library for Minecraft'
+                url = 'https://github.com/ArcAnc/PulseLib'
+                licenses {
+                    license {
+                        name = mod_license
+                        url = 'https://github.com/ArcAnc/PulseLib/blob/1.21.1/LICENSE.txt'
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = 'localMavenRepository'
+            url = providers.gradleProperty('mavenRepoDir').map { rootProject.file(it).toURI() }
+                    .orElse(rootProject.layout.buildDirectory.dir('maven-repository').map { it.asFile.toURI() }).get()
+        }
+    }
+}

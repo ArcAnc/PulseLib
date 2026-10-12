@@ -27,4 +27,30 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew build --no-daemon
+
+      - name: Build external plugin fixture
+        run: ./gradlew :neoforge:testmodJar :fabric:testmodJar --no-daemon
+
+      - name: Dedicated server plugin smoke tests
+        run: |
+          mkdir -p neoforge/run fabric/runs/server
+          printf 'eula=true\n' > neoforge/run/eula.txt
+          printf 'eula=true\n' > fabric/runs/server/eula.txt
+          printf 'server-ip=127.0.0.1\nonline-mode=false\nview-distance=2\nsimulation-distance=2\n' > neoforge/run/server.properties
+          printf 'server-ip=127.0.0.1\nserver-port=25566\nonline-mode=false\nview-distance=2\nsimulation-distance=2\n' > fabric/runs/server/server.properties
+          timeout 180s ./gradlew :neoforge:runServer -PpulseTestJar -PpulseSmokeAuto --no-daemon --console=plain | tee build/neoforge-server-smoke.log
+          rg -q 'PULSE TEST SERVER PASS' build/neoforge-server-smoke.log
+          timeout 180s ./gradlew :fabric:runServer -PpulseTestJar -PpulseSmokeAuto --no-daemon --console=plain | tee build/fabric-server-smoke.log
+          rg -q 'PULSE TEST SERVER PASS' build/fabric-server-smoke.log
+
+      - name: Upload loader artifacts and test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: pulselib-1.21.1
+          path: |
+            neoforge/build/libs/pulselib-1.21.1-neoforge-*.jar
+            fabric/build/libs/pulselib-1.21.1-fabric-*.jar
+            common/build/reports/tests/
+            fabric/build/reports/tests/
+            build/*-server-smoke.log

@@ -1,0 +1,34 @@
+plugins {
+    id 'multiloader-loader'
+    id 'net.neoforged.moddev'
+    id 'multiloader-publishing'
+}
+
+neoForge {
+    version = neo_version
+    parchment {
+        minecraftVersion = parchment_minecraft_version
+        mappingsVersion = parchment_mappings_version
+    }
+    runs {
+        client { client() }
+        server { server(); programArgument '--nogui' }
+        configureEach { ideName = "NeoForge ${it.name.capitalize()} (PulseLib)" }
+    }
+    mods {
+        pulselib { sourceSet sourceSets.main }
+    }
+}
+
+dependencies {
+    ['de.javagl:jgltf-model:2.0.3', 'de.javagl:jgltf-impl-v1:2.0.3', 'de.javagl:jgltf-impl-v2:2.0.3',
+     'com.fasterxml.jackson.core:jackson-databind:2.13.2.1',
+     'com.fasterxml.jackson.core:jackson-annotations:2.13.2', 'com.fasterxml.jackson.core:jackson-core:2.13.2'].each {
+        jarJar it
+        additionalRuntimeClasspath it
+    }
+}
+
+sourceSets.main.resources.srcDir 'src/main/templates'
+
+apply plugin: 'multiloader-testmod'

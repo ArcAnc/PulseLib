@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "pulselibtest",
+  "version": "1.0.0",
+  "name": "PulseLib integration fixture",
+  "environment": "*",
+  "mixins": [
+    "pulselib-test.mixins.json"
+  ],
+  "depends": {
+    "pulselib": "*",
+    "minecraft": "1.21.1"
+  },
+  "entrypoints": {
+    "main": [
+      "com.arcanc.pulselib.test.fabric.TestModFabric"
+    ]
+  }
+}

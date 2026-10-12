@@ -1,0 +1,68 @@
+sourceSets {
+    testmod {
+        java.srcDir rootProject.file('tests/testmod/src/main/java')
+        java.srcDir rootProject.file("tests/testmod/${project.name}/java")
+        resources.srcDir rootProject.file('tests/testmod/src/main/resources')
+        resources.srcDir rootProject.file("tests/testmod/${project.name}/resources")
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.output + configurations.runtimeClasspath
+    }
+}
+
+def testmodJar = tasks.register('testmodJar', Jar) {
+    from sourceSets.testmod.output
+    archiveBaseName = 'pulselib-testmod'
+    archiveClassifier = project.name
+}
+
+if (providers.gradleProperty('pulseTestMod').isPresent()) {
+    sourceSets.main.runtimeClasspath += sourceSets.testmod.output
+}
+
+if (project.name == 'neoforge') {
+    neoForge.addModdingDependenciesTo(sourceSets.testmod)
+    neoForge {
+        if (providers.gradleProperty('pulseTestMod').isPresent()) {
+            mods { pulselibtest { sourceSet sourceSets.testmod } }
+        }
+        runs.configureEach {
+            if (providers.gradleProperty('pulseSmokeAuto').isPresent()) {
+                systemProperty 'pulselib.test.auto', 'true'
+            }
+            if (name == 'client' && providers.gradleProperty('pulseSmokeWorld').isPresent()) {
+                systemProperty 'pulselib.test.world', 'true'
+                programArguments.addAll '--quickPlaySingleplayer', 'pulselib-smoke'
+            }
+        }
+    }
+    if (providers.gradleProperty('pulseTestJar').isPresent()) {
+        dependencies { runtimeOnly files(testmodJar) }
+    }
+} else {
+    tasks.register('remapTestmodJar', net.fabricmc.loom.task.RemapJarTask) {
+        inputFile = testmodJar.flatMap { it.archiveFile }
+        archiveBaseName = 'pulselib-testmod-intermediary'
+        archiveClassifier = 'fabric'
+        dependsOn testmodJar
+    }
+    loom {
+        mods {
+            pulselib { sourceSet sourceSets.main }
+            if (providers.gradleProperty('pulseTestMod').isPresent()) {
+                pulselibtest { sourceSet sourceSets.testmod }
+            }
+        }
+        runs.configureEach {
+            if (providers.gradleProperty('pulseSmokeAuto').isPresent()) {
+                vmArg '-Dpulselib.test.auto=true'
+            }
+            if (name == 'client' && providers.gradleProperty('pulseSmokeWorld').isPresent()) {
+                vmArg '-Dpulselib.test.world=true'
+                programArgs '--quickPlaySingleplayer', 'pulselib-smoke'
+            }
+        }
+    }
+    if (providers.gradleProperty('pulseTestJar').isPresent()) {
+        dependencies { modRuntimeOnly files(testmodJar) }
+    }
+}

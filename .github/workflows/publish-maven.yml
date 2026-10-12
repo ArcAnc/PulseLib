@@ -38,7 +38,7 @@ jobs:
 
       - name: Publish into Pages repository
         run: |
-          ./gradlew publish --no-daemon \
+          ./gradlew :neoforge:publish :fabric:publish --no-daemon \
             -PmavenRepoDir="$GITHUB_WORKSPACE/maven-repository"
 
       - name: Commit Maven artifacts

@@ -1,0 +1,7 @@
+{
+  "required": true,
+  "package": "com.arcanc.pulselib.content.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": ["HumanoidArmorLayerMixin", "NeoForgeCameraAccessor"],
+  "injectors": {"defaultRequire": 1}
+}
