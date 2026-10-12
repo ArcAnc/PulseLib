@@ -553,7 +553,7 @@ public final class PPlayerAnimations
 
 		if (pose.hasRotation())
 		{
-			Quaternionf current = new Quaternionf().rotationXYZ(part.xRot, part.yRot, part.zRot);
+			Quaternionf current = new Quaternionf().rotationXYZ(part.zRot, part.yRot, part.xRot);
 			Quaternionf target = current;
 			switch (mode)
 			{
@@ -563,7 +563,7 @@ public final class PPlayerAnimations
 				case MULTIPLY_SCALE -> target = current;
 			}
 
-			Vector3f euler = target.getEulerAnglesXYZ(new Vector3f());
+			Vector3f euler = target.getEulerAnglesZYX(new Vector3f());
 			part.xRot = euler.x;
 			part.yRot = euler.y;
 			part.zRot = euler.z;
