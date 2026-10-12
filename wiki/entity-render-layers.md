@@ -1,6 +1,6 @@
 # Entity Render Layers
 
-[`PEntityRenderLayer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderLayer.java) renders an additional PulseLib model on top of a [`PEntityRenderer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java).
+[`PEntityRenderLayer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderLayer.java) renders an additional PulseLib model on top of a [`PEntityRenderer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java).
 
 Layers are useful for armor pieces, equipment, accessories, conditional attachments, or model variants.
 
@@ -24,7 +24,7 @@ public class RobotChestLayer extends PEntityRenderLayer<RobotEntity> {
 }
 ```
 
-Register the same `MODEL` object in `RegisterResourceEvent` with the layer model's material references. This gives the renderer and resource registration one canonical ID.
+Register the same `MODEL` object in `registerModels(PModelRegistrar)` with the layer model's material references. This gives the renderer and resource registration one canonical ID.
 
 ## Add layer to renderer
 
@@ -81,7 +81,7 @@ public int getPackedLight(RobotEntity entity, int packedLight) {
 
 Classes used:
 
-* [`PEntityRenderLayer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderLayer.java)
-* [`PModelData`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/renderer/modelData/PModelData.java)
-* [`PBakedBone`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java)
-* [`PBakedMesh`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedMesh.java)
+* [`PEntityRenderLayer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderLayer.java)
+* [`PModelData`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/modelData/PModelData.java)
+* [`PBakedBone`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java)
+* [`PBakedMesh`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedMesh.java)

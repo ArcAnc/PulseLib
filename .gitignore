@@ -24,3 +24,9 @@ runs
 run-data
 
 repo
+
+# Minecraft/JUnit runtime diagnostics
+**/logs/
+**/crash-reports/
+**/hs_err_pid*.log
+**/replay_pid*.log

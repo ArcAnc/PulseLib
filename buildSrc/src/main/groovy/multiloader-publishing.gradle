@@ -13,6 +13,7 @@ def sourceJar = loaderName == 'fabric' ? tasks.named('remapSourcesJar') : tasks.
 modrinth {
     token = providers.gradleProperty('modrinthToken').orElse(providers.environmentVariable('MODRINTH_TOKEN')).orNull
     projectId = '73TaZXLZ'
+    versionType = mod_release_type
     versionNumber = "${minecraft_version}-${mod_version}-${loaderName}"
     versionName = "${mod_name}-${minecraft_version}-${mod_version}-${loaderName}"
     uploadFile = gameJar
@@ -33,7 +34,7 @@ tasks.register('publishCurseForge', TaskPublishCurseForge) {
     mainFile.changelog = rootProject.file('changelog.md')
     mainFile.changelogType = Constants.CHANGELOG_MARKDOWN
     mainFile.displayName = "${mod_name}-${minecraft_version}-${mod_version}-${loaderName}"
-    mainFile.releaseType = 'release'
+    mainFile.releaseType = mod_release_type
     mainFile.addGameVersion(minecraft_version)
     mainFile.addModLoader(loaderName == 'fabric' ? 'Fabric' : 'NeoForge')
     mainFile.addEnvironment('Client')

@@ -4,36 +4,36 @@ The attachment system is for cases where you do not want to replace the whole en
 
 This is useful for custom armor, tails, backpacks, masks, equipment on arms, or other accessories. Definitions can be tied to an item stack, registered globally for living entities, hide vanilla armor for a slot, and render first-person arm attachments.
 
-First-person arm attachments render through an enabled player-animation first-person presentation with sampled arm and camera anchors. Register every attachment model and its material references through `PulseLibEvents.RegisterResourceEvent` during client initialization, before client resources first load.
+First-person arm attachments render through an enabled player-animation first-person presentation with sampled arm and camera anchors. Register every attachment model and its material references in `IPulseClientPlugin.registerModels(PModelRegistrar)` before atlas/model reload work.
 
 Important classes:
 
-* [`PLivingAttachmentDefinition`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentDefinition.java)
-* [`PLivingAttachments`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachments.java)
-* [`PLivingAttachmentSource`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentSource.java)
-* [`PLivingAttachmentSources`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentSources.java)
-* [`PAttachmentBinding`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentBinding.java)
-* [`PAttachmentAnchor`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentAnchor.java)
-* [`PAttachmentAnchorResolvers`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentAnchorResolvers.java)
-* [`PTransform`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/util/attachments/PTransform.java)
-* [`PHumanoidAnchors`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidAnchors.java)
-* [`PHumanoidBindings`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidBindings.java)
-* [`PLivingAttachmentLayer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentLayer.java)
-* [`PHumanoidAttachmentLayer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidAttachmentLayer.java)
-* [`PArmorClientExtensions`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PArmorClientExtensions.java)
+* [`PLivingAttachmentDefinition`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentDefinition.java)
+* [`PLivingAttachments`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachments.java)
+* [`PLivingAttachmentSource`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentSource.java)
+* [`PLivingAttachmentSources`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentSources.java)
+* [`PAttachmentBinding`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentBinding.java)
+* [`PAttachmentAnchor`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentAnchor.java)
+* [`PAttachmentAnchorResolvers`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentAnchorResolvers.java)
+* [`PTransform`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PTransform.java)
+* [`PHumanoidAnchors`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidAnchors.java)
+* [`PHumanoidBindings`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidBindings.java)
+* [`PLivingAttachmentLayer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentLayer.java)
+* [`PHumanoidAttachmentLayer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidAttachmentLayer.java)
 
-PulseLib adds attachment render layers for players and living entities automatically through [`PLibArmorHandler`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PLibArmorHandler.java). Attachment definitions should be contributed on the mod event bus through [`PulseLibEvents.AttachmentRegistrationEvent`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/event/PulseLibEvents.java).
+PulseLib adds attachment render layers for players and living entities automatically through [`PLibArmorHandler`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PLibArmorHandler.java). Attachment definitions are contributed in `IPulseClientPlugin.registerAttachments(PAttachmentRegistrar)`.
 
 ## Armor item example
 
 Armor is the most direct use case: register a living attachment definition for the armor item, say which equipment slot owns it, and map PulseLib bones to humanoid anchors.
 
 ```java
-@Mod.EventBusSubscriber(modid = ExampleMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-public final class ExampleClientEvents {
-    @SubscribeEvent
-    public static void registerAttachments(PulseLibEvents.AttachmentRegistrationEvent event) {
-        event.registration().registerLiving(MyItems.EXAMPLE_HELMET.get(),
+@PulsePlugin
+public final class ExamplePlugin implements IPulseClientPlugin {
+    @Override public ResourceLocation getPluginId() { return ResourceLocation.fromNamespaceAndPath("examplemod", "attachments"); }
+    @Override
+    public void registerAttachments(PAttachmentRegistrar registrar) {
+        registrar.registerLiving(MyItems.EXAMPLE_HELMET.get(),
                 new PLivingAttachmentDefinition(
                         PModelData.entity(
                                 ResourceLocation.fromNamespaceAndPath("examplemod", "armor/example_helmet")),
@@ -51,14 +51,14 @@ For the default glTF loader this model path resolves to:
 assets/examplemod/glmodels/entity/armor/example_helmet.glb
 ```
 
-`hideVanilla = true` makes `PArmorClientExtensions` hide the vanilla armor model for matching equipment slots. Use it when the PulseLib model fully replaces the vanilla armor layer.
+`hideVanilla = true` makes the loader armor adapter hide the vanilla armor model for matching equipment slots. Use it when the PulseLib model fully replaces the vanilla armor layer.
 
 ## General attachment item
 
 Attachments are not limited to armor slots. A held item can render a tail, an amulet can render on the body, or a global definition can render on an entity even without a specific item stack.
 
 ```java
-event.registration().registerLiving(MyItems.TAIL.get(),
+registrar.registerLiving(MyItems.TAIL.get(),
         new PLivingAttachmentDefinition(
                 PModelData.entity(
                         ResourceLocation.fromNamespaceAndPath("examplemod", "attachment/tail")),
@@ -87,7 +87,7 @@ PLivingAttachmentSources.equipmentSlotPredicate(EquipmentSlot.CHEST, entity -> e
 Global attachments use the same definition type:
 
 ```java
-event.registration().registerGlobalLiving(new PLivingAttachmentDefinition(
+registrar.registerGlobalLiving(new PLivingAttachmentDefinition(
         MODEL_DATA,
         PLivingAttachmentSources.entityPredicate(entity -> entity.isInvisible()),
         List.of(PHumanoidBindings.body("aura")),
@@ -97,7 +97,7 @@ event.registration().registerGlobalLiving(new PLivingAttachmentDefinition(
 
 ## Humanoid anchors
 
-Built-in anchors from [`PHumanoidAnchors`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidAnchors.java):
+Built-in anchors from [`PHumanoidAnchors`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidAnchors.java):
 
 * `HEAD`
 * `HAT`
@@ -107,7 +107,7 @@ Built-in anchors from [`PHumanoidAnchors`](https://github.com/ArcAnc/PulseLib/bl
 * `RIGHT_LEG`
 * `LEFT_LEG`
 
-Use [`PHumanoidBindings`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidBindings.java) for common bindings:
+Use [`PHumanoidBindings`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidBindings.java) for common bindings:
 
 ```java
 PHumanoidBindings.head("helmet");
@@ -120,7 +120,7 @@ Use `PHumanoidBindings.bind(anchor, bone, transform)` when you need offset, rota
 
 ## Custom anchors
 
-Register anchors for custom vanilla `EntityModel` classes through [`PAttachmentAnchorResolvers`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentAnchorResolvers.java):
+Register anchors for custom vanilla `EntityModel` classes through [`PAttachmentAnchorResolvers`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentAnchorResolvers.java):
 
 ```java
 public static final PAttachmentAnchor SHELL =
@@ -134,7 +134,7 @@ public static void registerAnchors() {
 
 ## Custom mesh rendering
 
-Each definition takes a [`PLivingMeshRenderResolver`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/util/attachments/PLivingMeshRenderResolver.java). The resolver receives the living entity, stack, baked bone, baked mesh, inherited render context, and partial tick.
+Each definition takes a [`PLivingMeshRenderResolver`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingMeshRenderResolver.java). The resolver receives the living entity, stack, baked bone, baked mesh, inherited render context, and partial tick.
 
 ```java
 PLivingMeshRenderResolver resolver = (entity, stack, bone, mesh, inherited, partialTick) -> {

@@ -1,10 +1,10 @@
 # Model Loaders
 
-PulseLib model loading is extensible through [`PModelLoader`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/data/PModelLoader.java). A loader resolves a registered canonical ID to physical resource candidates, selects a source, parses it, and returns a `PLoadedModel`. [`PModelCache`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/util/PModelCache.java) bakes it under the canonical ID.
+PulseLib model loading is extensible through [`PModelLoader`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/data/PModelLoader.java). A loader resolves a registered canonical ID to physical resource candidates, selects a source, parses it, and returns a `PLoadedModel`. [`PModelCache`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/PModelCache.java) bakes it under the canonical ID.
 
 ## Built-in glTF loader
 
-[`PGltfModelLoader`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/data/gltf/PGltfModelLoader.java) is registered by default. For canonical ID `examplemod:entity/robot`, it tries:
+[`PGltfModelLoader`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/data/gltf/PGltfModelLoader.java) is registered by default. For canonical ID `examplemod:entity/robot`, it tries:
 
 ```text
 assets/examplemod/glmodels/entity/robot.glb
@@ -17,17 +17,13 @@ The glTF parser gets a material texture reference from the base-colour image URI
 
 ## Gecko loader
 
-[`PGeckoModelLoader`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/data/gecko/PGeckoModelLoader.java) resolves canonical ID `examplemod:entity/robot` to:
+[`PGeckoModelLoader`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/data/gecko/PGeckoModelLoader.java) resolves canonical ID `examplemod:entity/robot` to:
 
 ```text
 assets/examplemod/geckolib/models/entity/robot.geo.json
 ```
 
-It uses the selected physical model source to find Gecko animation files and animation-event sidecars. Register it during client initialization, before PulseLib collects model-resource registrations:
-
-```java
-PModelCache.registerModelLoader(PGeckoModelLoader.INSTANCE);
-```
+It is registered by default, alongside glTF, and finds animation files and sidecars from the selected source. Do not register the built-in loader again.
 
 Use it with model data and registration:
 
@@ -35,7 +31,7 @@ Use it with model data and registration:
 PModelData robot = PModelData.entity(
         ResourceLocation.fromNamespaceAndPath("examplemod", "robot"),
         PGeckoModelLoader.INSTANCE.id());
-event.model(robot).texture("body", bodyTexture);
+registrar.model(robot).texture("body", bodyTexture);
 ```
 
 ## Custom loader
@@ -67,4 +63,4 @@ public final class MyModelLoader implements PModelLoader {
 }
 ```
 
-Register the loader during client initialization, before PulseLib collects `RegisterResourceEvent` registrations. The registration controls which models are loaded; loaders must not scan and parse every physical model file. Physical resource reloads reuse that logical registration set.
+Register the loader during client initialization, before PulseLib collects `registerModels(PModelRegistrar)` registrations. The registration controls which models are loaded; loaders must not scan and parse every physical model file. The plugin rebuilds declarations on every resource reload, while loader instances remain registered once.

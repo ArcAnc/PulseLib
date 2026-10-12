@@ -18,7 +18,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Small client-side registry for PulseLib extension types.
+ * Small platform-independent registry for PulseLib extension types.
  */
 public final class PRegistry<T>
 {

@@ -2,7 +2,15 @@
   "required": true,
   "package": "com.arcanc.pulselib.test.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": ["SmokeServerMixin"],
-  "client": ["SmokeRenderMixin", "SmokeLayerMixin"],
-  "injectors": {"defaultRequire": 1}
+  "mixins": [
+    "SmokeServerMixin"
+  ],
+  "client": [
+    "SmokeRenderMixin",
+    "SmokeLayerMixin",
+    "SmokeStagesMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }

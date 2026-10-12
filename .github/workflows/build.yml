@@ -1,56 +1,74 @@
 name: Build
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build:
+    name: ${{ matrix.loader }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        loader: [neoforge, fabric]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          fetch-tags: true
-
+        uses: actions/checkout@v6
       - name: Setup JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'
-          distribution: 'temurin'
-
+          distribution: temurin
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-
-      # This is needed to be able to run ./gradlew below
-      # You can run `git update-index --chmod +x gradlew` then remove this step.
-      - name: Make Gradle wrapper executable
-        run: chmod +x ./gradlew
-
-      - name: Build with Gradle
-        run: ./gradlew build --no-daemon
-
-      - name: Build external plugin fixture
-        run: ./gradlew :neoforge:testmodJar :fabric:testmodJar --no-daemon
-
-      - name: Dedicated server plugin smoke tests
+      - name: Build and test
+        shell: bash
         run: |
-          mkdir -p neoforge/run fabric/runs/server
-          printf 'eula=true\n' > neoforge/run/eula.txt
-          printf 'eula=true\n' > fabric/runs/server/eula.txt
-          printf 'server-ip=127.0.0.1\nonline-mode=false\nview-distance=2\nsimulation-distance=2\n' > neoforge/run/server.properties
-          printf 'server-ip=127.0.0.1\nserver-port=25566\nonline-mode=false\nview-distance=2\nsimulation-distance=2\n' > fabric/runs/server/server.properties
-          timeout 180s ./gradlew :neoforge:runServer -PpulseTestJar -PpulseSmokeAuto --no-daemon --console=plain | tee build/neoforge-server-smoke.log
-          rg -q 'PULSE TEST SERVER PASS' build/neoforge-server-smoke.log
-          timeout 180s ./gradlew :fabric:runServer -PpulseTestJar -PpulseSmokeAuto --no-daemon --console=plain | tee build/fabric-server-smoke.log
-          rg -q 'PULSE TEST SERVER PASS' build/fabric-server-smoke.log
-
-      - name: Upload loader artifacts and test results
+          set -euo pipefail
+          chmod +x gradlew
+          mkdir -p build
+          ./gradlew :common:check :${{ matrix.loader }}:build --no-daemon --console=plain 2>&1 | tee build/${{ matrix.loader }}-build.log
+      - name: Build external demo fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./gradlew :${{ matrix.loader }}:testmodJar --no-daemon --console=plain 2>&1 | tee build/${{ matrix.loader }}-fixture.log
+      - name: Dedicated server smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ '${{ matrix.loader }}' = 'neoforge' ]; then
+            run_dir=neoforge/run
+          else
+            run_dir=fabric/runs/server
+          fi
+          mkdir -p "$run_dir"
+          printf 'eula=true\n' > "$run_dir/eula.txt"
+          printf 'server-ip=127.0.0.1\nonline-mode=false\nview-distance=2\nsimulation-distance=2\n' > "$run_dir/server.properties"
+          timeout 180s ./gradlew :${{ matrix.loader }}:runServer -PpulseTestJar -PpulseSmokeAuto --no-daemon --console=plain 2>&1 | tee build/${{ matrix.loader }}-server-smoke.log
+      - name: Verify dedicated server result
+        if: ${{ always() }}
+        shell: bash
+        run: grep -Fq 'PULSE TEST SERVER PASS' build/${{ matrix.loader }}-server-smoke.log
+      - name: Upload artifacts and diagnostics
+        if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: pulselib-1.21.1
+          name: pulselib-1.21.1-${{ matrix.loader }}
+          if-no-files-found: warn
           path: |
-            neoforge/build/libs/pulselib-1.21.1-neoforge-*.jar
-            fabric/build/libs/pulselib-1.21.1-fabric-*.jar
+            ${{ matrix.loader }}/build/libs/pulselib-1.21.1-${{ matrix.loader }}-*.jar
             common/build/reports/tests/
-            fabric/build/reports/tests/
-            build/*-server-smoke.log
+            common/build/test-results/
+            ${{ matrix.loader }}/build/reports/tests/
+            ${{ matrix.loader }}/build/test-results/
+            build/${{ matrix.loader }}-*.log
+            neoforge/run/logs/
+            neoforge/run/crash-reports/
+            fabric/runs/server/logs/
+            fabric/runs/server/crash-reports/

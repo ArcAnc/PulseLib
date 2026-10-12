@@ -16,12 +16,7 @@ dependencies {
 
 def commonSources = providers.provider {
     configurations.commonJava.collect { directory ->
-        fileTree(directory) {
-            if (project.name == 'neoforge') {
-                exclude 'com/arcanc/pulselib/content/registration/PLibRegistration.java'
-                exclude 'com/arcanc/pulselib/content/animatable/PItemAnimatable.java'
-            }
-        }
+        fileTree(directory)
     }
 }
 

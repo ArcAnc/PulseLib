@@ -2,7 +2,7 @@
 
 Items need a slightly different setup from entities and block entities. Minecraft creates one `Item` object for the item type, but the player can hold many `ItemStack`s of that type. If animation state lived directly on the item object, every stack would share the same animation.
 
-PulseLib handles this by using [`AnimManagerKey`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/animatable/AnimManagerKey.java) and [`SingletonAnimationManager`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/animatable/singleton/SingletonAnimationManager.java). The item still implements [`PItemAnimatable`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/animatable/PItemAnimatable.java), but the actual manager is resolved per key.
+PulseLib handles this by using [`AnimManagerKey`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/AnimManagerKey.java) and [`SingletonAnimationManager`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/singleton/SingletonAnimationManager.java). The item still implements [`PItemAnimatable`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/PItemAnimatable.java), but the actual manager is resolved per key.
 
 ## Item model JSON
 
@@ -46,20 +46,29 @@ public class WandItem extends Item implements PItemAnimatable<WandItem> {
     }
 
     @Override
-    public IClientItemExtensions registerClientExtension() {
-        return new IClientItemExtensions() {
-            private final WandRenderer renderer = new WandRenderer(
-                    Minecraft.getInstance().getBlockEntityRenderDispatcher(),
-                    Minecraft.getInstance().getEntityModels());
+    public BlockEntityWithoutLevelRenderer getPulseItemRenderer() {
+        return WandClient.renderer();
+    }
 
-            @Override
-            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                return this.renderer;
-            }
-        };
+}
+```
+
+Keep the cached renderer and its construction in a separate client helper:
+
+```java
+public final class WandClient {
+    private static BlockEntityWithoutLevelRenderer renderer;
+    public static BlockEntityWithoutLevelRenderer renderer() {
+        if (renderer == null) {
+            Minecraft mc = Minecraft.getInstance();
+            renderer = new WandRenderer(mc.getBlockEntityRenderDispatcher(), mc.getEntityModels());
+        }
+        return renderer;
     }
 }
 ```
+
+The factory's return type matches the item method. Do not use a covariant client renderer type or construct an anonymous renderer in the shared item class: bytecode verification can otherwise load a client superclass on a dedicated server.
 
 ## Renderer
 
@@ -78,7 +87,7 @@ public class WandRenderer extends PItemRenderer<WandItem> {
 }
 ```
 
-PulseLib automatically registers item client extensions for items that implement `PItemAnimatable`, so you do not need a separate client extension event for the common case.
+Both loader adapters install the renderer for items that implement the common `PItemAnimatable` interface. No PulseLib-specific loader event subscription is needed.
 
 ## Stack-specific state
 
@@ -86,7 +95,7 @@ PulseLib automatically registers item client extensions for items that implement
 
 Classes used:
 
-* [`PItemAnimatable`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/animatable/PItemAnimatable.java)
-* [`PItemRenderer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java)
-* [`SingletonAnimationManager`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/animatable/singleton/SingletonAnimationManager.java)
-* [`PModelData`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/renderer/modelData/PModelData.java)
+* [`PItemAnimatable`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/PItemAnimatable.java)
+* [`PItemRenderer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java)
+* [`SingletonAnimationManager`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/singleton/SingletonAnimationManager.java)
+* [`PModelData`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/modelData/PModelData.java)

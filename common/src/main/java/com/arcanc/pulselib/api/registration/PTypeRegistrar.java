@@ -8,7 +8,7 @@ import com.arcanc.pulselib.content.registration.PRegistry;
 
 public class PTypeRegistrar extends PulseRegistrar
 {
-	public enum Kind { CHANNELS, EVENTS, DEFORMERS, LEGACY }
+	public enum Kind { CHANNELS, EVENTS, DEFORMERS }
 
 	private final Kind kind;
 	private final PRegistry<PAnimationChannelType<?>> channels = new PRegistry<>();
@@ -23,7 +23,7 @@ public class PTypeRegistrar extends PulseRegistrar
 	private void require(Kind expected)
 	{
 		checkOpen();
-		if (this.kind != Kind.LEGACY && this.kind != expected)
+		if (this.kind != expected)
 			throw new IllegalStateException("Cannot register " + expected + " during " + this.kind);
 	}
 

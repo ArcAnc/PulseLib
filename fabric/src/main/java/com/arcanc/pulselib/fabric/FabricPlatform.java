@@ -1,14 +1,10 @@
 package com.arcanc.pulselib.fabric;
 
-import com.arcanc.pulselib.content.model.resource.PModelResource;
 import com.arcanc.pulselib.platform.IPulsePlatform;
-import com.arcanc.pulselib.plugin.PulsePluginManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 
-import java.util.Map;
 
 public final class FabricPlatform implements IPulsePlatform
 {
@@ -24,9 +20,4 @@ public final class FabricPlatform implements IPulsePlatform
 		return true;
 	}
 
-	@Override
-	public void registerModelResources(Map<ResourceLocation, PModelResource> resources)
-	{
-		PulsePluginManager.get().registerModels(resources);
-	}
 }

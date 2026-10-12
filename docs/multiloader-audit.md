@@ -1,3 +1,5 @@
+> Historical audit of the original 1.x baseline. Stage 2 removes the compatibility adapters described during the initial migration; the current architecture is in [multiloader.md](multiloader.md).
+
 # PulseLib 1.21.1 migration audit
 
 Base: `e364f60`, branch `1.21.1-multiloader`. Baseline `compileJava` passed with ModDevGradle 2.0.140 and Gradle 9.2.1.

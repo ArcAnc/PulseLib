@@ -3,49 +3,36 @@
 > [!IMPORTANT]
 > PulseLib does not draw model textures directly from arbitrary files. It first collects them into a runtime atlas, then the baked model stores UVs for that atlas. This is why model-resource registration is a required step instead of an optional convenience.
 
-Model resources are registered through [`PulseLibEvents.RegisterResourceEvent`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/event/PulseLibEvents.java).
+Model resources are declared in `IPulseClientPlugin.registerModels(PModelRegistrar)` on both loaders.
 
 ## Register model resources
 
-Subscribe on the mod event bus and register every model together with its material texture references:
+A public annotated plugin is discovered automatically. Declare every model with its material texture references:
 
 ```java
-@Mod.EventBusSubscriber(modid = ExampleMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-public final class ExampleClientEvents {
-    @SubscribeEvent
-    public static void registerPulseResources(PulseLibEvents.RegisterResourceEvent event) {
+@PulsePlugin
+public final class ExamplePlugin implements IPulseClientPlugin {
+    @Override
+    public ResourceLocation getPluginId() {
+        return ResourceLocation.fromNamespaceAndPath("examplemod", "main");
+    }
+
+    @Override
+    public void registerModels(PModelRegistrar registrar) {
         PModelData robot = PModelData.entity(
-                ResourceLocation.fromNamespaceAndPath(ExampleMod.MOD_ID, "robot"));
-        event.model(robot)
-                .texture("textures/body", ResourceLocation.fromNamespaceAndPath(
-                        ExampleMod.MOD_ID, "entity/robot/body"))
-                .texture("textures/eyes", ResourceLocation.fromNamespaceAndPath(
-                        ExampleMod.MOD_ID, "entity/robot/eyes"));
+                ResourceLocation.fromNamespaceAndPath("examplemod", "robot"));
+        registrar.model(robot)
+                .texture("textures/body", ResourceLocation.fromNamespaceAndPath("examplemod", "entity/robot/body"))
+                .texture("textures/eyes", ResourceLocation.fromNamespaceAndPath("examplemod", "entity/robot/eyes"));
     }
 }
 ```
 
-`event.model(PModelData)` uses both the canonical ID and the loader selected by that object. Repeated calls for one canonical model extend the same registration. A resource registration is also what makes PulseLib load and bake that model.
-
-PulseLib collects these registrations when client reload listeners are registered, before the first model and atlas reload. The resulting logical model and texture map is shared by model baking and the runtime atlas. Later resource reloads such as `F3+T` reload physical models, textures, and sidecars using that same registration set; they do not repost `RegisterResourceEvent`. Register listeners during normal mod initialization, before client resources first load.
-
-The glTF loader tries `.glb` and then `.gltf` for every canonical model. Both `PModelData` and `PModelCache` keep the canonical ID, so changing the existing physical file from `.glb` to `.gltf` does not change renderer lookup or texture registration. If neither candidate exists, resource reload fails with the canonical ID and both physical candidates.
-
-Each `texture` key is the reference stored in the model material. For glTF it comes from the base-colour image URI, image name, or texture name. It preserves its complete directory path, while a final `.png` is ignored: `body/claws.png` becomes `body/claws`, and remains distinct from `armor/claws`. The value is a Minecraft resource location relative to `textures` without `.png`. Anonymous GLB `bufferView` images have no such key and are rejected during baking; use an image URI or a stable image or texture name:
-
-```text
-assets/examplemod/textures/entity/robot/body.png
-```
-
-becomes:
-
-```java
-ResourceLocation.fromNamespaceAndPath("examplemod", "entity/robot/body")
-```
+`registrar.model(PModelData)` uses the canonical ID and loader selected by the object. PulseLib collects fresh declarations before atlas work on every client resource reload. F3+T reuses plugin instances and reruns only the model callback; one-time type/attachment/player registrations remain intact. Do not retain the registrar or cached atlas sprites across reloads.
 
 ## Animation-event sidecars
 
-An animation-event sidecar is optional and needs no `RegisterResourceEvent` entry: the model loader finds it while loading its model or animation file. The first existing candidate is used, so keep only one sidecar for a model unless you deliberately want the earlier path to take precedence. Its contents use the `animations` JSON object described in [Animation events](animation-events.md).
+An animation-event sidecar is optional and needs no separate model declaration: the model loader finds it while loading its model or animation file. The first existing candidate is used, so keep only one sidecar for a model unless you deliberately want the earlier path to take precedence. Its contents use the `animations` JSON object described in [Animation events](animation-events.md).
 
 For a glTF model at `assets/examplemod/glmodels/entity/robot.glb` or `.gltf`, PulseLib checks these paths in order:
 
@@ -159,18 +146,18 @@ When a cube in a Gecko model has no `texture` field, PulseLib assigns the materi
 PModelData robot = PModelData.entity(
         ResourceLocation.fromNamespaceAndPath("examplemod", "robot"),
         PGeckoModelLoader.INSTANCE.id());
-event.model(robot)
+registrar.model(robot)
         .texture("0", ResourceLocation.fromNamespaceAndPath("examplemod", "entity/robot/fallback"));
 ```
 
 ## Runtime atlas
 
-The atlas is registered by PulseLib itself. Your mod contributes model-resource texture mappings through `RegisterResourceEvent`. `RuntimeLoader` consumes those prepared mappings to rebuild atlas sprites; it does not create or clear model registrations.
+The atlas is registered by PulseLib itself. Your mod contributes model-resource texture mappings through `registerModels(PModelRegistrar)`. `RuntimeLoader` consumes those prepared mappings to rebuild atlas sprites; it does not create or clear model registrations.
 
 Runtime atlas classes:
 
-* [`PResourceCache`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/util/PResourceCache.java)
-* [`RuntimeLoader`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/model/textures/atlas/RuntimeLoader.java)
+* [`PResourceCache`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/PResourceCache.java)
+* [`RuntimeLoader`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/textures/atlas/RuntimeLoader.java)
 
 PulseLib registers the atlas at:
 
@@ -225,7 +212,7 @@ Prefer `withColor(...)`, `withPackedLight(...)`, `withPackedOverlay(...)`, and t
 
 ## Emissive textures
 
-Emissive textures are useful for eyes, screens, lamps, energy parts, and other pieces that should ignore normal light. PulseLib reads this flag from texture metadata through [`PLibMetadata`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/model/textures/atlas/PLibMetadata.java).
+Emissive textures are useful for eyes, screens, lamps, energy parts, and other pieces that should ignore normal light. PulseLib reads this flag from texture metadata through [`PLibMetadata`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/textures/atlas/PLibMetadata.java).
 
 To mark a texture as emissive, add a `.png.mcmeta` file next to it:
 
@@ -260,9 +247,9 @@ Direct `PBakedBone.instantDraw(...)` accepts the same render-type functions. Use
 
 Classes used:
 
-* [`PResourceCache`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/util/PResourceCache.java)
-* [`RuntimeLoader`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/model/textures/atlas/RuntimeLoader.java)
-* [`PLibMetadata`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/model/textures/atlas/PLibMetadata.java)
-* [`PAlphaMode`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/model/textures/PAlphaMode.java)
-* [`PTextureAlphaClassifier`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/model/textures/PTextureAlphaClassifier.java)
-* [`PRenderTypes`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java)
+* [`PResourceCache`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/PResourceCache.java)
+* [`RuntimeLoader`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/textures/atlas/RuntimeLoader.java)
+* [`PLibMetadata`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/textures/atlas/PLibMetadata.java)
+* [`PAlphaMode`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/textures/PAlphaMode.java)
+* [`PTextureAlphaClassifier`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/textures/PTextureAlphaClassifier.java)
+* [`PRenderTypes`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java)

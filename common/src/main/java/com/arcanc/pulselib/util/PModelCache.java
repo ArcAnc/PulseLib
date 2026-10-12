@@ -95,6 +95,7 @@ public class PModelCache
 	                                             Executor backgroundExecutor,
 	                                             Executor gameExecutor)
 	{
+		long start = System.nanoTime();
 		Map<ResourceLocation, PModel> models = new java.util.concurrent.ConcurrentHashMap<>();
 		return loadModels(backgroundExecutor, resourceManager, models :: put).
 				thenCompose(stage :: wait).
@@ -103,6 +104,7 @@ public class PModelCache
 					if (PModelCache.MODELS != null)
 						clearCaches();
 					PModelCache.MODELS = bakeModels(models);
+					PLibDatabase.LOGGER.info("PulseLib model reload: baked {} models in {} ms", MODELS.size(), (System.nanoTime() - start) / 1_000_000);
 				},
 				gameExecutor);
 	}
@@ -281,6 +283,7 @@ public class PModelCache
 				if (!loaded.modelId().equals(resource.modelId()))
 					throw new IllegalStateException("Model loader " + loader.id() + " returned " + loaded.modelId()
 							+ " while loading " + resource.modelId());
+				PLibDatabase.LOGGER.debug("PulseLib loaded model {} from {} using {}", loaded.modelId(), loaded.source(), loader.id());
 				elementConsumer.accept(loaded.modelId(), loaded.model());
 			}));
 		}

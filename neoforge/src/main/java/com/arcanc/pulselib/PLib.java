@@ -23,7 +23,7 @@ public class PLib
 {
     public PLib(IEventBus modEventBus, ModContainer modContainer)
     {
-	    PLibRegistration.init(modEventBus);
+	    PLibRegistration.init();
 	    
 	    setupEvents(modEventBus);
     }

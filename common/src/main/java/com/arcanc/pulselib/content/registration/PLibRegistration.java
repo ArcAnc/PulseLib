@@ -15,18 +15,9 @@ import com.arcanc.pulselib.content.model.animation.PAnimationEventType;
 import com.arcanc.pulselib.content.model.animation.PAnimationEventTypes;
 import com.arcanc.pulselib.content.model.deformer.*;
 import com.arcanc.pulselib.util.PLibDatabase;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockBehaviour;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import java.util.Set;
 
 public class PLibRegistration
 {

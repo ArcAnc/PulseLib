@@ -71,14 +71,22 @@ Keep renderer construction in a separate client class. For example, the item met
 
 Armor items can implement `PArmorModelProvider` to return a `HumanoidModel` and set up its animations on either loader. Living attachments, vanilla armor hiding and additional layers use the existing attachment definitions. NeoForge's existing `IClientItemExtensions` custom/generic models remain supported; the common provider exposes humanoid models, while arbitrary generic NeoForge models retain their platform-specific API.
 
-## Migrating NeoForge integrations
+## Migrating from PulseLib 1.x
 
-1. Move each `PulseLibEvents` registration listener's body into the matching plugin method from the table.
-2. Add `@PulsePlugin`, implement `IPulseClientPlugin`, supply an ID and a public no-argument constructor.
-3. Remove the old listener for registrations you moved. Do not register the same content through both APIs.
-4. Replace `registerClientExtension()` custom renderer overrides with `getPulseItemRenderer()` and move renderer construction into a client helper.
-5. Compile shared sources against Common/Mojang mappings; put remaining loader event listeners in the loader module.
+PulseLib 2.0 deliberately removes the NeoForge compatibility layer. There is no source or binary compatibility promise with 1.x.
 
-`PulseLibEvents` remains on NeoForge with its original packages and nested registration classes, deprecated as a compatibility adapter. Resource events still run on reload; types/attachments/player animations/animated attachments run once. Event registrar changes are committed after dispatch, so a listener must not read a just-declared type from the backing registry during that same dispatch.
+| Removed API | Replacement |
+| --- | --- |
+| `PulseLibEvents` and its five registration event classes | `@PulsePlugin` with the corresponding callback from the phase table |
+| `TypeRegistrationEvent` / mixed `PTypeRegistrar.Kind.LEGACY` | Separate `registerAnimationChannels`, `registerAnimationEvents`, `registerDeformers` |
+| `RegisterResourceEvent` / `PResourceCache.postEvent()` | `registerModels(PModelRegistrar)` |
+| Attachment/player/animated attachment events | The matching `IPulseClientPlugin` callbacks |
+| `PLibRegistration.init(IEventBus)` and demo game-object registries | Common `PLibRegistration.init()`; ordinary loader registration for Minecraft content |
+| NeoForge-specific `PItemAnimatable.registerClientExtension()` | Common `getPulseItemRenderer()` with a separate client factory |
+| Historical event-handler signatures on library managers | Loader callbacks call the common runtime operations; extensions use plugin callbacks |
 
-`PLib`, NeoForge `PLibRegistration.init(IEventBus)`, `PRegistry`, model/animation/rendering packages, and `PItemAnimatable.registerClientExtension()` remain available on NeoForge. The latter is deprecated and still honors existing overrides. Classes containing loader lifecycle handlers (`ClientEvents`, `CommonEvents`, `PRenderStagesHandler`, animation ticker/manager event methods, `PLibArmorHandler`) now delegate to common runtime methods; directly calling their old event-handler signatures requires source migration. Their new signatures describe the operation rather than a loader event.
+Move registration bodies into a public annotated plugin, implement the appropriate interface, and supply a unique ID plus a public no-argument constructor. Remove old listeners; do not manually call plugin registration. Register ordinary game blocks/items/entities with the loader, then contribute their PulseLib models/attachments through the plugin. Both loaders use the same plugin class.
+
+A fatal discovery error is terminal for that manager: its flag is reset in `finally`, no partial list is published, and later calls report the original failure without rescanning or reconstructing plugins. A fatal one-time phase enters `FAILED`, clears the active phase and requires a restart. Successfully applied earlier batches are never replayed. Model phases can retry after a failed reload; declarations publish only after the full phase succeeds. External plugin batches that throw are discarded, while healthy extensions continue.
+
+The [external demo mod](../tests/testmod/README.md) contains the library's original block, entity, armor, tail and player demos, with one shared implementation and ordinary loader adapters. Its `ClientTestPlugin` shows all client callbacks without any PulseLib-specific loader entrypoint.

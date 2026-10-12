@@ -1,0 +1,106 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"idle": {
+			"loop": true,
+			"animation_length": 2,
+			"bones": {
+				"body": {
+					"position": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"1.0": {
+							"vector": [0, 1, 0]
+						},
+						"2.0": {
+							"vector": [0, 0, 0]
+						}
+					}
+				}
+			}
+		},
+		"walk": {
+			"loop": true,
+			"animation_length": 1.5,
+			"bones": {
+				"leg_left": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.5": {
+							"vector": [-52.5, 0, 0]
+						},
+						"1.0": {
+							"vector": [50, 0, 0]
+						},
+						"1.5": {
+							"vector": [0, 0, 0]
+						}
+					}
+				},
+				"leg_right": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.5": {
+							"vector": [52.5, 0, 0]
+						},
+						"1.0": {
+							"vector": [-50, 0, 0]
+						},
+						"1.5": {
+							"vector": [0, 0, 0]
+						}
+					}
+				},
+				"hand_left": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.5": {
+							"vector": [20, 0, 0]
+						},
+						"1.0": {
+							"vector": [-20, 0, 0]
+						},
+						"1.5": {
+							"vector": [0, 0, 0]
+						}
+					}
+				},
+				"hand_right": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.5": {
+							"vector": [-20, 0, 0]
+						},
+						"1.0": {
+							"vector": [20, 0, 0]
+						},
+						"1.5": {
+							"vector": [0, 0, 0]
+						}
+					}
+				}
+			},
+			"sound_effects": {
+				"0.5": {
+					"effect": "minecraft:entity.player.burp",
+					"locator": "headh_attach_point"
+				}
+			},
+			"particle_effects": {
+				"0.5": {
+					"effect": "minecraft:poof",
+					"locator": "headh_attach_point"
+				}
+			}
+		}
+	}
+}

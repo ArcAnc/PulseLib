@@ -16,7 +16,9 @@ public abstract class LevelRendererMixin
 {
 	@Shadow private RenderTarget weatherTarget;
 
-	@Inject(method = "renderLevel", at = @At(value = "CONSTANT", args = "stringValue=destroyProgress"))
+	// After block-entity batches and outline processing, immediately before destruction rendering.
+	@Inject(method = "renderLevel", at = @At(value = "INVOKE",
+			target = "Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;long2ObjectEntrySet()Lit/unimi/dsi/fastutil/objects/ObjectSet;"))
 	private void pulselib$afterBlockEntities(CallbackInfo callback)
 	{
 		PRenderStagesHandler.afterBlockEntities();

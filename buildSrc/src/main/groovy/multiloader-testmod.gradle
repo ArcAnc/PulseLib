@@ -29,6 +29,12 @@ if (project.name == 'neoforge') {
             if (providers.gradleProperty('pulseSmokeAuto').isPresent()) {
                 systemProperty 'pulselib.test.auto', 'true'
             }
+            if (providers.gradleProperty('pulseSmokeWorldSwitch').isPresent()) {
+                systemProperty 'pulselib.test.worldSwitch', 'true'
+            }
+            if (providers.gradleProperty('pulseGeckoDemo').isPresent()) {
+                systemProperty 'pulselib.test.geckoEntity', 'true'
+            }
             if (name == 'client' && providers.gradleProperty('pulseSmokeWorld').isPresent()) {
                 systemProperty 'pulselib.test.world', 'true'
                 programArguments.addAll '--quickPlaySingleplayer', 'pulselib-smoke'
@@ -55,6 +61,12 @@ if (project.name == 'neoforge') {
         runs.configureEach {
             if (providers.gradleProperty('pulseSmokeAuto').isPresent()) {
                 vmArg '-Dpulselib.test.auto=true'
+            }
+            if (providers.gradleProperty('pulseSmokeWorldSwitch').isPresent()) {
+                vmArg '-Dpulselib.test.worldSwitch=true'
+            }
+            if (providers.gradleProperty('pulseGeckoDemo').isPresent()) {
+                vmArg '-Dpulselib.test.geckoEntity=true'
             }
             if (name == 'client' && providers.gradleProperty('pulseSmokeWorld').isPresent()) {
                 vmArg '-Dpulselib.test.world=true'

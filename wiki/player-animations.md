@@ -8,17 +8,16 @@ First-person output is opt-in with `firstPerson(PPlayerFirstPersonSettings.ENABL
 
 `Builder.itemRenderPolicy(...)` decides whether a physical `InteractionHand` item is suppressed: `ItemRenderPolicy.RENDER` is the default and `HIDE` hides it. `Builder.itemVisibility(controller, policy)` adds a phase-based decision using the named controller's interpolated time in seconds. Either policy produces a per-hand hidden presentation while preserving vanilla map handling and equip/swing/use transforms for visible items.
 
-Register custom first-person anchor renderers on `PulseLibEvents.PlayerAnimatedAttachmentRegistrationEvent`. The callback receives the animated transform, its weight, `PoseStack`, `MultiBufferSource`, and a `firstPerson` flag.
+Register custom first-person anchor renderers in `IPulseClientPlugin.registerAnimatedAttachments(PAnimatedAttachmentRegistrar)`. The callback receives the animated transform, its weight, `PoseStack`, `MultiBufferSource`, and a `firstPerson` flag.
 
 Player animations modify the vanilla player model after Minecraft has prepared its normal walk, swim, crouch, and item-use pose. They work for both classic and slim skins, including hats, jackets, sleeves, and pants layers.
 
-The API is client-only. Register definitions on the mod event bus through `PulseLibEvents.PlayerAnimationRegistrationEvent`:
+The API is client-only. Register definitions in `IPulseClientPlugin.registerPlayerAnimations(PPlayerAnimationRegistrar)`:
 
 ```java
-@Mod.EventBusSubscriber(modid = ExampleMod.MOD_ID,
-        bus = Mod.EventBusSubscriber.Bus.MOD,
-        value = Dist.CLIENT)
-public final class ExamplePlayerAnimations {
+@PulsePlugin
+public final class ExamplePlayerAnimations implements IPulseClientPlugin {
+    @Override public ResourceLocation getPluginId() { return ResourceLocation.fromNamespaceAndPath("examplemod", "players"); }
     private static final PModelData COMBAT_MODEL = PModelData.direct(
             ResourceLocation.fromNamespaceAndPath(ExampleMod.MOD_ID, "player/combat"),
             PGeckoModelLoader.INSTANCE.id());
@@ -27,9 +26,9 @@ public final class ExamplePlayerAnimations {
             .thenLoop("animation.combat.idle")
             .build();
 
-    @SubscribeEvent
-    public static void register(PulseLibEvents.PlayerAnimationRegistrationEvent event) {
-        event.registration().register(
+    @Override
+    public void registerPlayerAnimations(PPlayerAnimationRegistrar animations) {
+        animations.register(
                 ResourceLocation.fromNamespaceAndPath(ExampleMod.MOD_ID, "combat_pose"),
                 PPlayerAnimationDefinition.builder(COMBAT_MODEL)
                         .when(player -> player.getMainHandItem().is(MyItems.KATANA.get()))
@@ -47,7 +46,7 @@ public final class ExamplePlayerAnimations {
 }
 ```
 
-The example uses the Gecko loader. Register `PGeckoModelLoader.INSTANCE` during client initialization, before PulseLib collects `RegisterResourceEvent` registrations, as described in [Model loaders](model-loaders.md). Register `COMBAT_MODEL` in that resource event with all of its material texture references.
+The Gecko loader is built in. Declare `COMBAT_MODEL` and its material textures in the same plugin's `registerModels(PModelRegistrar)` callback.
 
 Controllers receive a `PPlayerAnimationInstance` as their animatable. Use `state.animatable().player()` to read the current player. PulseLib creates one instance for every `(player UUID, definition id)` pair, so remote players and multiple definitions never share a controller timeline.
 

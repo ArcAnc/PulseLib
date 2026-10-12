@@ -14,7 +14,7 @@ NeoForge, with ModDevGradle:
 
 ```gradle
 dependencies {
-    implementation "com.arcanc.pulselib:pulselib-neoforge:1.21.1-1.1.5.3"
+    implementation "com.arcanc.pulselib:pulselib-neoforge:1.21.1-2.0.0-rc.1"
 }
 ```
 
@@ -22,11 +22,11 @@ Fabric, with Loom and official Mojang/Parchment mappings:
 
 ```gradle
 dependencies {
-    modImplementation "com.arcanc.pulselib:pulselib-fabric:1.21.1-1.1.5.3"
+    modImplementation "com.arcanc.pulselib:pulselib-fabric:1.21.1-2.0.0-rc.1"
 }
 ```
 
-These coordinates describe the MultiLoader build; use a version actually published to the repository. Refresh Gradle after changing dependencies. `common` is a development module, not an installable mod or Maven dependency published by this build.
+These coordinates describe the unpublished 2.0.0-rc.1 candidate; use a version actually published to the repository. Refresh Gradle after changing dependencies. `common` is a development module, not an installable mod or Maven dependency published by this build.
 
 Declare PulseLib as a required mod dependency in your loader metadata. For Fabric this is the ordinary `depends.pulselib` declaration; [PulseLib plugins](plugins.md) require no extra entrypoint. Ordinary mod initialization for registering Minecraft items/blocks still uses the loader's normal lifecycle.
 
@@ -49,7 +49,7 @@ Game artifacts are in `neoforge/build/libs` and `fabric/build/libs`, alongside s
 To test Maven output without uploading a release:
 
 ```sh
-./gradlew :neoforge:publish :fabric:publish -PmavenRepoDir=/tmp/pulselib-maven
+./gradlew :neoforge:publish :fabric:publish -PmavenRepoDir=/tmp/pulselib-maven-stage2
 ```
 
 Modrinth/CurseForge tasks are `:<loader>:modrinth` and `:<loader>:publishCurseForge`. `publishMods` uploads both loader variants, and `publishAll` also writes Maven artifacts. These are explicit release operations requiring the relevant credentials; building does not invoke them.

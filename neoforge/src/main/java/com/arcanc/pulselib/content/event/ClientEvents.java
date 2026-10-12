@@ -13,7 +13,6 @@ import com.arcanc.pulselib.util.attachments.humanoid.armor.PArmorModelProvider;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.ModLoader;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.RegisterSpriteSourceTypesEvent;
@@ -46,20 +45,7 @@ public class ClientEvents
 		if (pulseClientContentRegistered)
 			return;
 		PAttachmentAnchorResolvers.init();
-		PulsePluginManager.get().registerCommon();
-		PulseLibEvents.TypeRegistrationEvent types = new PulseLibEvents.TypeRegistrationEvent();
-		ModLoader.postEvent(types);
-		types.apply();
 		PulsePluginManager.get().registerClient();
-		PulseLibEvents.AttachmentRegistrationEvent attachments = new PulseLibEvents.AttachmentRegistrationEvent();
-		ModLoader.postEvent(attachments);
-		attachments.registration().apply();
-		PulseLibEvents.PlayerAnimationRegistrationEvent animations = new PulseLibEvents.PlayerAnimationRegistrationEvent();
-		ModLoader.postEvent(animations);
-		animations.registration().apply();
-		PulseLibEvents.PlayerAnimatedAttachmentRegistrationEvent animated = new PulseLibEvents.PlayerAnimatedAttachmentRegistrationEvent();
-		ModLoader.postEvent(animated);
-		animated.registration().apply();
 		pulseClientContentRegistered = true;
 	}
 
@@ -69,7 +55,20 @@ public class ClientEvents
 		BuiltInRegistries.ITEM.stream().filter(item -> item instanceof PItemAnimatable<?> || item instanceof PArmorModelProvider || PLivingAttachments.contains(item)).forEach(item -> {
 			if (event.isItemRegistered(item))
 				return;
-			IClientItemExtensions base = item instanceof PItemAnimatable<?> animatable ? animatable.registerClientExtension() : IClientItemExtensions.DEFAULT;
+			IClientItemExtensions base = IClientItemExtensions.DEFAULT;
+			if (item instanceof PItemAnimatable<?> animatable)
+			{
+				var renderer = animatable.getPulseItemRenderer();
+				if (renderer != null)
+					base = new IClientItemExtensions()
+					{
+						@Override
+						public net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer getCustomRenderer()
+						{
+							return renderer;
+						}
+					};
+			}
 			IClientItemExtensions extension = PArmorClientExtensions.buildFor(item, base);
 			if (extension != IClientItemExtensions.DEFAULT)
 				event.registerItem(extension, item);

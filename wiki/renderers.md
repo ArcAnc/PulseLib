@@ -2,7 +2,7 @@
 
 A PulseLib renderer is the bridge between Minecraft's render call and PulseLib's baked animated model. It gets the current animatable, asks for model data, binds the animation manager to the baked model, and submits every posed bone to the render queue. Static baked meshes go through the geometry-arena path; supported deformer stacks add per-instance GPU deformation data, while unsupported stacks use the CPU dynamic-geometry fallback. See [Render backend](render-backend.md) for the execution details.
 
-All built-in renderers implement [`PRenderer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/renderer/PRenderer.java) and use the same submit lifecycle:
+All built-in renderers implement [`PRenderer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderer.java) and use the same submit lifecycle:
 
 * `preSubmit(...)` - hook before PulseLib submits model meshes.
 * `trueSubmit(...)` - default PulseLib model submission.
@@ -16,7 +16,7 @@ The built-in entity, block entity, and item renderers prepare a Molang context o
 
 ## Block renderer
 
-Use [`PBlockRenderer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/renderer/PBlockRenderer.java) for block entities. The block itself should hide vanilla rendering; the block entity renderer becomes the visible model.
+Use [`PBlockRenderer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PBlockRenderer.java) for block entities. The block itself should hide vanilla rendering; the block entity renderer becomes the visible model.
 
 ```java
 public class CrusherRenderer extends PBlockRenderer<CrusherBlockEntity> {
@@ -39,7 +39,7 @@ public static void registerRenderers(EntityRenderersEvent.RegisterRenderers even
 
 ## Item renderer
 
-Use [`PItemRenderer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java) when the item model needs real animation instead of a static baked item JSON. The item must implement [`PItemAnimatable`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/animatable/PItemAnimatable.java) and return client extensions.
+Use [`PItemRenderer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java) when the item model needs real animation instead of a static baked item JSON. The item must implement [`PItemAnimatable`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/PItemAnimatable.java) and return client extensions.
 
 ```java
 public class WandRenderer extends PItemRenderer<WandItem> {
@@ -57,7 +57,7 @@ In GUI context, `PItemRenderer` uses `trianglesGui` and immediate drawing. It de
 
 ## Entity renderer
 
-Use [`PEntityRenderer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java) when the entire entity model is a PulseLib model.
+Use [`PEntityRenderer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java) when the entire entity model is a PulseLib model.
 
 ```java
 public class RobotRenderer extends PEntityRenderer<RobotEntity> {
@@ -74,7 +74,7 @@ For `LivingEntity` subclasses, `PEntityRenderer` applies vanilla body rotation, 
 
 ## Render type requirement
 
-PulseLib models are triangle meshes. Use [`PRenderTypes.RenderTypeProvider`](https://github.com/ArcAnc/PulseLib/blob/1.21.1/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java):
+PulseLib models are triangle meshes. Use [`PRenderTypes.RenderTypeProvider`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java):
 
 ```java
 PRenderTypes.RenderTypeProvider::trianglesSolid

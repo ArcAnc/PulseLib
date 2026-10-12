@@ -10,6 +10,7 @@
 package com.arcanc.pulselib.util;
 
 import com.arcanc.pulselib.content.model.PTextureReference;
+import com.arcanc.pulselib.plugin.PulsePluginManager;
 import com.arcanc.pulselib.content.model.resource.PModelResource;
 import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
 import net.minecraft.client.renderer.texture.TextureAtlas;
@@ -64,8 +65,12 @@ public final class PResourceCache
 	@ApiStatus.Internal
 	public static void reloadRegistrations()
 	{
-		clear();
-		postEvent();
+		Map<ResourceLocation, PModelResource> staged = new LinkedHashMap<>();
+		PulsePluginManager.get().registerModels(staged);
+		resources.clear();
+		resources.putAll(staged);
+		textures = null;
+		PLibDatabase.LOGGER.info("PulseLib resource reload: collected {} model declarations", resources.size());
 	}
 
 	/**
@@ -94,9 +99,4 @@ public final class PResourceCache
 		return PLibDatabase.rl(SPRITE_PREFIX + texture.getNamespace() + "/" + texture.getPath());
 	}
 
-	@ApiStatus.Internal
-	public static void postEvent()
-	{
-		com.arcanc.pulselib.platform.PulseServices.PLATFORM.registerModelResources(resources);
-	}
 }

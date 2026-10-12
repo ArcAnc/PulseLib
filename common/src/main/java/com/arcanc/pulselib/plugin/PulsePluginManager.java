@@ -21,6 +21,7 @@ public final class PulsePluginManager
 	private final PulsePluginLifecycle lifecycle = new PulsePluginLifecycle();
 	private List<LoadedPlugin> plugins;
 	private boolean discovering;
+	private Throwable discoveryFailure;
 
 	public PulsePluginManager(IPulsePluginFinder finder, boolean client, ClassLoader classLoader)
 	{
@@ -44,48 +45,63 @@ public final class PulsePluginManager
 	{
 		if (this.plugins != null)
 			return;
+		if (this.discoveryFailure != null)
+			throw new IllegalStateException("PulseLib plugin discovery previously failed; restart is required", this.discoveryFailure);
 		if (this.discovering)
-			throw new IllegalStateException("Plugin discovery cannot be called from a plugin constructor");
+			throw new IllegalStateException("Plugin discovery cannot be called recursively");
 		this.discovering = true;
-		long start = System.nanoTime();
-		Map<String, PulsePluginCandidate> candidates = new TreeMap<>();
-		this.finder.findPlugins().stream().sorted(Comparator.comparing(PulsePluginCandidate::modId)
-				.thenComparing(PulsePluginCandidate::className)).forEach(candidate -> candidates.putIfAbsent(candidate.className(), candidate));
-		Map<ResourceLocation, LoadedPlugin> ids = new TreeMap<>();
-		for (PulsePluginCandidate candidate : candidates.values())
+		try
 		{
-			// This check MUST precede class loading, including loading interfaces and constructors.
-			if (!candidate.side().matches(this.client))
-				continue;
-			try
+			long start = System.nanoTime();
+			Map<String, PulsePluginCandidate> candidates = new TreeMap<>();
+			this.finder.findPlugins().stream().sorted(Comparator.comparing(PulsePluginCandidate::modId)
+					.thenComparing(PulsePluginCandidate::className)).forEach(candidate -> candidates.putIfAbsent(candidate.className(), candidate));
+			Map<ResourceLocation, LoadedPlugin> ids = new TreeMap<>();
+			for (PulsePluginCandidate candidate : candidates.values())
 			{
-				Class<?> type = Class.forName(candidate.className(), false, this.classLoader);
-				PulsePlugin annotation = type.getAnnotation(PulsePlugin.class);
-				if (annotation == null || annotation.value() != candidate.side())
-					throw new IllegalArgumentException("Plugin annotation disagrees with discovery metadata");
-				if (!Modifier.isPublic(type.getModifiers()) || Modifier.isAbstract(type.getModifiers()) || type.isInterface())
-					throw new IllegalArgumentException("Plugin must be a public concrete class");
-				if (!IPulseCommonPlugin.class.isAssignableFrom(type))
-					throw new IllegalArgumentException("Plugin must implement IPulseCommonPlugin or IPulseClientPlugin");
-				boolean clientPlugin = IPulseClientPlugin.class.isAssignableFrom(type);
-				if ((candidate.side() == PulsePlugin.Side.CLIENT) != clientPlugin)
-					throw new IllegalArgumentException("CLIENT requires IPulseClientPlugin; SERVER/BOTH require IPulseCommonPlugin without IPulseClientPlugin");
-				IPulseCommonPlugin instance = (IPulseCommonPlugin) type.getConstructor().newInstance();
-				ResourceLocation id = Objects.requireNonNull(instance.getPluginId(), "plugin id");
-				LoadedPlugin plugin = new LoadedPlugin(candidate, id, instance);
-				LoadedPlugin previous = ids.putIfAbsent(id, plugin);
-				if (previous != null)
-					throw new IllegalArgumentException("Duplicate plugin id " + id + "; already used by " + previous.candidate);
+				// This check MUST precede class loading, including loading interfaces and constructors.
+				if (!candidate.side().matches(this.client))
+					continue;
+				try
+				{
+					Class<?> type = Class.forName(candidate.className(), false, this.classLoader);
+					PulsePlugin annotation = type.getAnnotation(PulsePlugin.class);
+					if (annotation == null || annotation.value() != candidate.side())
+						throw new IllegalArgumentException("Plugin annotation disagrees with discovery metadata");
+					if (!Modifier.isPublic(type.getModifiers()) || Modifier.isAbstract(type.getModifiers()) || type.isInterface())
+						throw new IllegalArgumentException("Plugin must be a public concrete class");
+					if (!IPulseCommonPlugin.class.isAssignableFrom(type))
+						throw new IllegalArgumentException("Plugin must implement IPulseCommonPlugin or IPulseClientPlugin");
+					boolean clientPlugin = IPulseClientPlugin.class.isAssignableFrom(type);
+					if ((candidate.side() == PulsePlugin.Side.CLIENT) != clientPlugin)
+						throw new IllegalArgumentException("CLIENT requires IPulseClientPlugin; SERVER/BOTH require IPulseCommonPlugin without IPulseClientPlugin");
+					IPulseCommonPlugin instance = (IPulseCommonPlugin) type.getConstructor().newInstance();
+					ResourceLocation id = Objects.requireNonNull(instance.getPluginId(), "plugin id");
+					LoadedPlugin plugin = new LoadedPlugin(candidate, id, instance);
+					LoadedPlugin previous = ids.putIfAbsent(id, plugin);
+					if (previous != null)
+						throw new IllegalArgumentException("Duplicate plugin id " + id + "; already used by " + previous.candidate);
+				}
+				catch (Throwable exception)
+				{
+					failure(candidate, "discovery", exception);
+				}
 			}
-			catch (Throwable exception)
-			{
-				failure(candidate, "discovery", exception);
-			}
+			List<LoadedPlugin> loaded = List.copyOf(ids.values());
+			PLibDatabase.LOGGER.info("PulseLib discovered {} plugin(s) from {} candidate(s) in {} ms: {}",
+					loaded.size(), candidates.size(), (System.nanoTime() - start) / 1_000_000,
+					loaded.stream().map(plugin -> plugin.id + " (" + plugin.candidate.modId() + ": " + plugin.candidate.className() + ")").toList());
+			this.plugins = loaded;
 		}
-		this.plugins = List.copyOf(ids.values());
-		this.discovering = false;
-		PLibDatabase.LOGGER.info("PulseLib discovered {} plugin(s) from {} candidate(s) in {} ms",
-				this.plugins.size(), candidates.size(), (System.nanoTime() - start) / 1_000_000);
+		catch (RuntimeException | Error exception)
+		{
+			this.discoveryFailure = exception;
+			throw exception;
+		}
+		finally
+		{
+			this.discovering = false;
+		}
 	}
 
 	public synchronized List<ResourceLocation> pluginIds()
@@ -154,36 +170,48 @@ public final class PulsePluginManager
 	public synchronized void registerModels(Map<ResourceLocation, PModelResource> resources)
 	{
 		registerClient();
+		Map<ResourceLocation, PModelResource> staged = new LinkedHashMap<>(resources);
 		phase(PulsePluginLifecycle.Phase.MODELS, plugin -> {
 			if (plugin.instance instanceof IPulseClientPlugin extension)
 				try (PModelRegistrar registrar = new PModelRegistrar())
 				{
 					extension.registerModels(registrar);
-					registrar.apply(resources);
+					registrar.apply(staged);
 				}
 		});
+		resources.putAll(staged);
 	}
 
 	private void phase(PulsePluginLifecycle.Phase phase, Consumer<LoadedPlugin> action)
 	{
 		if (!this.lifecycle.begin(phase))
 			return;
-		for (LoadedPlugin plugin : this.plugins)
+		try
 		{
-			if (plugin.disabled)
-				continue;
-			try
+			for (LoadedPlugin plugin : this.plugins)
 			{
-				action.accept(plugin);
+				if (plugin.disabled)
+					continue;
+				try
+				{
+					action.accept(plugin);
+				}
+				catch (Throwable exception)
+				{
+					if (phase != PulsePluginLifecycle.Phase.MODELS)
+						plugin.disabled = true;
+					failure(plugin.candidate, phase.name(), exception);
+				}
 			}
-			catch (Throwable exception)
-			{
-				if (phase != PulsePluginLifecycle.Phase.MODELS)
-					plugin.disabled = true;
-				failure(plugin.candidate, phase.name(), exception);
-			}
+			this.lifecycle.complete(phase);
 		}
-		this.lifecycle.complete(phase);
+		catch (RuntimeException | Error exception)
+		{
+			this.lifecycle.fail(phase, exception);
+			PLibDatabase.LOGGER.error("PulseLib registration phase {} failed", phase, exception);
+			throw exception;
+		}
+
 	}
 
 	private static void failure(PulsePluginCandidate candidate, String phase, Throwable exception)
