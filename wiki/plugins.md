@@ -71,9 +71,9 @@ Keep renderer construction in a separate client class. For example, the item met
 
 Armor items can implement `PArmorModelProvider` to return a `HumanoidModel` and set up its animations on either loader. Living attachments, vanilla armor hiding and additional layers use the existing attachment definitions. NeoForge's existing `IClientItemExtensions` custom/generic models remain supported; the common provider exposes humanoid models, while arbitrary generic NeoForge models retain their platform-specific API.
 
-## Migrating from PulseLib 1.x
+## Migrating from PulseLib 1.1.x
 
-PulseLib 2.0 deliberately removes the NeoForge compatibility layer. There is no source or binary compatibility promise with 1.x.
+PulseLib 1.2.0 adds Fabric support and deliberately removes the old NeoForge-specific extension registration mechanism. Existing mods may require source adaptation; source and binary compatibility with 1.1.x is not guaranteed. `@PulsePlugin` is the only extension registration API on both loaders.
 
 | Removed API | Replacement |
 | --- | --- |

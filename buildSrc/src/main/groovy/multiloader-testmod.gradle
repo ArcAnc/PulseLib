@@ -1,3 +1,5 @@
+import net.fabricmc.loom.task.RemapJarTask
+
 sourceSets {
     testmod {
         java.srcDir rootProject.file('tests/testmod/src/main/java')
@@ -45,7 +47,7 @@ if (project.name == 'neoforge') {
         dependencies { runtimeOnly files(testmodJar) }
     }
 } else {
-    tasks.register('remapTestmodJar', net.fabricmc.loom.task.RemapJarTask) {
+    tasks.register('remapTestmodJar', RemapJarTask) {
         inputFile = testmodJar.flatMap { it.archiveFile }
         archiveBaseName = 'pulselib-testmod-intermediary'
         archiveClassifier = 'fabric'

@@ -1,3 +1,12 @@
+/**
+ * @author ArcAnc
+ * Created at: 12.10.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
 package com.arcanc.pulselib.test.mixin;
 
 import com.arcanc.pulselib.test.SmokeHarness;
@@ -8,10 +17,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(GameRenderer.class)
+@Mixin (GameRenderer.class)
 public abstract class SmokeRenderMixin
 {
-	@Inject(method = "render", at = @At("TAIL"))
+	@Inject (method = "render", at = @At ("TAIL"))
 	private void pulselibtest$checkResources(CallbackInfo callback)
 	{
 		if (Boolean.getBoolean("pulselib.test.auto"))

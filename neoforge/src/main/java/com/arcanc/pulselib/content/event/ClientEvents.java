@@ -1,3 +1,12 @@
+/**
+ * @author ArcAnc
+ * Created at: 27.01.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
 package com.arcanc.pulselib.content.event;
 
 import com.arcanc.pulselib.content.animatable.PItemAnimatable;
@@ -10,6 +19,7 @@ import com.arcanc.pulselib.util.attachments.PAttachmentAnchorResolvers;
 import com.arcanc.pulselib.util.attachments.PLivingAttachments;
 import com.arcanc.pulselib.util.attachments.humanoid.armor.PArmorClientExtensions;
 import com.arcanc.pulselib.util.attachments.humanoid.armor.PArmorModelProvider;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
@@ -27,17 +37,17 @@ public class ClientEvents
 
 	public static void registerClientEvents(IEventBus bus)
 	{
-		bus.addListener(EventPriority.HIGHEST, ClientEvents::registerSpriteSources);
-		bus.addListener(ClientEvents::registerReloadListeners);
-		bus.addListener(ClientEvents::clientSetup);
-		bus.addListener(ClientEvents::registerClientExtensions);
-		NeoForge.EVENT_BUS.addListener(ClientEvents::playerDisconnected);
+		bus.addListener(EventPriority.HIGHEST, ClientEvents :: registerSpriteSources);
+		bus.addListener(ClientEvents :: registerReloadListeners);
+		bus.addListener(ClientEvents :: clientSetup);
+		bus.addListener(ClientEvents :: registerClientExtensions);
+		NeoForge.EVENT_BUS.addListener(ClientEvents :: playerDisconnected);
 		NeoForgeClientLifecycle.register(bus);
 	}
 
 	private static void clientSetup(FMLClientSetupEvent event)
 	{
-		event.enqueueWork(ClientEvents::ensurePulseClientContentRegistered);
+		event.enqueueWork(ClientEvents :: ensurePulseClientContentRegistered);
 	}
 
 	public static synchronized void ensurePulseClientContentRegistered()
@@ -52,32 +62,35 @@ public class ClientEvents
 	private static void registerClientExtensions(RegisterClientExtensionsEvent event)
 	{
 		ensurePulseClientContentRegistered();
-		BuiltInRegistries.ITEM.stream().filter(item -> item instanceof PItemAnimatable<?> || item instanceof PArmorModelProvider || PLivingAttachments.contains(item)).forEach(item -> {
-			if (event.isItemRegistered(item))
-				return;
-			IClientItemExtensions base = IClientItemExtensions.DEFAULT;
-			if (item instanceof PItemAnimatable<?> animatable)
+		BuiltInRegistries.ITEM.stream().
+				filter(item -> item instanceof PItemAnimatable<?> || item instanceof PArmorModelProvider || PLivingAttachments.contains(item)).
+				forEach(item ->
 			{
-				var renderer = animatable.getPulseItemRenderer();
-				if (renderer != null)
-					base = new IClientItemExtensions()
-					{
-						@Override
-						public net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer getCustomRenderer()
+				if (event.isItemRegistered(item))
+					return;
+				IClientItemExtensions base = IClientItemExtensions.DEFAULT;
+				if (item instanceof PItemAnimatable<?> animatable)
+				{
+					var renderer = animatable.getPulseItemRenderer();
+					if (renderer != null)
+						base = new IClientItemExtensions()
 						{
-							return renderer;
-						}
-					};
-			}
-			IClientItemExtensions extension = PArmorClientExtensions.buildFor(item, base);
-			if (extension != IClientItemExtensions.DEFAULT)
-				event.registerItem(extension, item);
-		});
+							@Override
+							public BlockEntityWithoutLevelRenderer getCustomRenderer()
+							{
+								return renderer;
+							}
+						};
+				}
+				IClientItemExtensions extension = PArmorClientExtensions.buildFor(item, base);
+				if (extension != IClientItemExtensions.DEFAULT)
+					event.registerItem(extension, item);
+			});
 	}
 
 	private static void registerReloadListeners(RegisterClientReloadListenersEvent event)
 	{
-		event.registerReloadListener(PModelCache::reload);
+		event.registerReloadListener(PModelCache :: reload);
 	}
 
 	private static void playerDisconnected(LevelEvent.Unload event)

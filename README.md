@@ -24,7 +24,7 @@ All code and artwork is licensed under the [Arc's License of Common Sense](/LICE
 
 Welcome to our [Wiki][wiki].
 
-See [automatic plugins and migration to PulseLib 2.0](wiki/plugins.md), [installation/building](wiki/installation.md), and the [MultiLoader architecture and verification report](docs/multiloader.md).
+See [automatic plugins and migration to PulseLib 1.2.0](wiki/plugins.md), [installation/building](wiki/installation.md), and the [MultiLoader architecture and verification report](docs/multiloader.md).
 
 ### Maven
 

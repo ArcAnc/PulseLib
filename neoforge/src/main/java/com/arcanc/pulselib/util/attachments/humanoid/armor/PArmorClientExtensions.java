@@ -33,6 +33,8 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 public class PArmorClientExtensions implements IClientItemExtensions
 {
 	private static final Model EMPTY_ARMOR_MODEL = new Model(RenderType :: entityCutoutNoCull)
@@ -96,7 +98,7 @@ public class PArmorClientExtensions implements IClientItemExtensions
 		
 		HumanoidModel<?> model = this.base.getHumanoidArmorModel(livingEntity, itemStack, equipmentSlot, original);
 		return itemStack.getItem() instanceof PArmorModelProvider provider ?
-				java.util.Objects.requireNonNull(provider.getPulseArmorModel(livingEntity, itemStack, equipmentSlot, model), "Pulse armor model") : model;
+				Objects.requireNonNull(provider.getPulseArmorModel(livingEntity, itemStack, equipmentSlot, model), "Pulse armor model") : model;
 	}
 	
 	@Override

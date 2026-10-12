@@ -14,7 +14,7 @@ NeoForge, with ModDevGradle:
 
 ```gradle
 dependencies {
-    implementation "com.arcanc.pulselib:pulselib-neoforge:1.21.1-2.0.0-rc.1"
+    implementation "com.arcanc.pulselib:pulselib-neoforge:1.21.1-1.2.0"
 }
 ```
 
@@ -22,11 +22,11 @@ Fabric, with Loom and official Mojang/Parchment mappings:
 
 ```gradle
 dependencies {
-    modImplementation "com.arcanc.pulselib:pulselib-fabric:1.21.1-2.0.0-rc.1"
+    modImplementation "com.arcanc.pulselib:pulselib-fabric:1.21.1-1.2.0"
 }
 ```
 
-These coordinates describe the unpublished 2.0.0-rc.1 candidate; use a version actually published to the repository. Refresh Gradle after changing dependencies. `common` is a development module, not an installable mod or Maven dependency published by this build.
+These coordinates describe the prepared 1.2.0 beta; it has not been published by this update. Use a version actually published to the repository. Refresh Gradle after changing dependencies. `common` is a development module, not an installable mod or Maven dependency published by this build. Mods using the old NeoForge API may need [source adaptation](plugins.md#migrating-from-pulselib-11x).
 
 Declare PulseLib as a required mod dependency in your loader metadata. For Fabric this is the ordinary `depends.pulselib` declaration; [PulseLib plugins](plugins.md) require no extra entrypoint. Ordinary mod initialization for registering Minecraft items/blocks still uses the loader's normal lifecycle.
 
@@ -37,14 +37,21 @@ Download the artifact matching your loader from [CurseForge](https://www.cursefo
 ## Building PulseLib
 
 ```sh
-./gradlew build
+./gradlew build --no-daemon
+```
+
+This is also the standard CI command: it compiles all three modules, runs JUnit tests and builds both loader JARs. CI uploads the JARs and test reports; it does not start Minecraft or the demo mod.
+
+Client/server runs are manual:
+
+```sh
 ./gradlew :neoforge:runClient
 ./gradlew :fabric:runClient
 ./gradlew :neoforge:runServer
 ./gradlew :fabric:runServer
 ```
 
-Game artifacts are in `neoforge/build/libs` and `fabric/build/libs`, alongside source and Javadoc artifacts. Fabric's installable JAR is the remapped artifact without a sources/Javadoc suffix.
+Game artifacts are `neoforge/build/libs/pulselib-1.21.1-neoforge-1.2.0.jar` and `fabric/build/libs/pulselib-1.21.1-fabric-1.2.0.jar`, alongside source and Javadoc artifacts. Fabric's installable JAR is the remapped artifact without a sources/Javadoc suffix. The [existing demo mod](../tests/testmod/README.md) remains available for opt-in manual runs.
 
 To test Maven output without uploading a release:
 

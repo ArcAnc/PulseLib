@@ -11,6 +11,7 @@ package com.arcanc.pulselib.content.renderer.plan;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -125,7 +126,7 @@ public final class PFrameCompiler<S>
 	private record DrawKey(PPipelineHandle pipeline, PMeshHandle mesh, PDrawCommand command)
 	{
 		@Override
-		public boolean equals(Object object)
+		public boolean equals(@Nullable Object object)
 		{
 			return this == object || object instanceof DrawKey that &&
 					this.pipeline == that.pipeline && this.mesh == that.mesh && this.command.equals(that.command);

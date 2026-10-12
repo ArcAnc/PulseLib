@@ -1,3 +1,12 @@
+/**
+ * @author ArcAnc
+ * Created at: 12.10.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
 package com.arcanc.pulselib.api.registration;
 
 import com.arcanc.pulselib.content.model.PTextureReference;
@@ -30,19 +39,23 @@ public class PModelRegistrar extends PulseRegistrar
 		checkOpen();
 		Objects.requireNonNull(id, "model id");
 		Objects.requireNonNull(loader, "loader id");
-		PModelCache.getModelLoader(loader).orElseThrow(() -> new IllegalStateException("No model loader registered for " + loader));
+		PModelCache.getModelLoader(loader).
+				orElseThrow(() -> new IllegalStateException("No model loader registered for " + loader));
 		ModelRegistration registration = this.models.computeIfAbsent(id, key -> new ModelRegistration(key, loader));
 		if (!registration.loader.equals(loader))
 			throw new IllegalStateException("Conflicting model loaders registered for " + id);
 		return registration;
 	}
 
-	/** Validates all changes before applying a plugin's declarations. */
+	/**
+	 * Validates all changes before applying a plugin's declarations.
+	 */
 	public void apply(Map<ResourceLocation, PModelResource> target)
 	{
 		checkOpen();
 		Map<ResourceLocation, PModelResource> staged = new LinkedHashMap<>();
-		this.models.forEach((id, registration) -> {
+		this.models.forEach((id, registration) ->
+		{
 			Map<String, ResourceLocation> textures = new LinkedHashMap<>();
 			PModelResource previous = target.get(id);
 			if (previous != null)
@@ -51,7 +64,8 @@ public class PModelRegistrar extends PulseRegistrar
 					throw new IllegalStateException("Conflicting model loaders registered for " + id);
 				textures.putAll(previous.textures());
 			}
-			registration.textures.forEach((reference, texture) -> {
+			registration.textures.forEach((reference, texture) ->
+			{
 				ResourceLocation old = textures.putIfAbsent(reference, texture);
 				if (old != null && !old.equals(texture))
 					throw new IllegalStateException("Conflicting texture for model " + id + ": " + reference);

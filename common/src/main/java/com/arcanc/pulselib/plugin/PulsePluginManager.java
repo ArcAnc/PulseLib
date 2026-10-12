@@ -1,3 +1,12 @@
+/**
+ * @author ArcAnc
+ * Created at: 12.10.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
 package com.arcanc.pulselib.plugin;
 
 import com.arcanc.pulselib.api.plugin.IPulseClientPlugin;
@@ -8,7 +17,9 @@ import com.arcanc.pulselib.content.model.resource.PModelResource;
 import com.arcanc.pulselib.platform.PulseServices;
 import com.arcanc.pulselib.util.PLibDatabase;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.Consumer;
@@ -19,9 +30,9 @@ public final class PulsePluginManager
 	private final boolean client;
 	private final ClassLoader classLoader;
 	private final PulsePluginLifecycle lifecycle = new PulsePluginLifecycle();
-	private List<LoadedPlugin> plugins;
+	private @Nullable List<LoadedPlugin> plugins;
 	private boolean discovering;
-	private Throwable discoveryFailure;
+	private @Nullable Throwable discoveryFailure;
 
 	public PulsePluginManager(IPulsePluginFinder finder, boolean client, ClassLoader classLoader)
 	{
@@ -33,7 +44,7 @@ public final class PulsePluginManager
 	private static final class Holder
 	{
 		private static final PulsePluginManager INSTANCE = new PulsePluginManager(
-				PulseServices.load(IPulsePluginFinder.class), PulseServices.PLATFORM.isClient(), PulsePluginManager.class.getClassLoader());
+			PulseServices.load(IPulsePluginFinder.class), PulseServices.PLATFORM.isClient(), PulsePluginManager.class.getClassLoader());
 	}
 
 	public static PulsePluginManager get()
@@ -54,8 +65,9 @@ public final class PulsePluginManager
 		{
 			long start = System.nanoTime();
 			Map<String, PulsePluginCandidate> candidates = new TreeMap<>();
-			this.finder.findPlugins().stream().sorted(Comparator.comparing(PulsePluginCandidate::modId)
-					.thenComparing(PulsePluginCandidate::className)).forEach(candidate -> candidates.putIfAbsent(candidate.className(), candidate));
+			this.finder.findPlugins().stream().sorted(Comparator.comparing(PulsePluginCandidate :: modId).
+					thenComparing(PulsePluginCandidate :: className)).
+					forEach(candidate -> candidates.putIfAbsent(candidate.className(), candidate));
 			Map<ResourceLocation, LoadedPlugin> ids = new TreeMap<>();
 			for (PulsePluginCandidate candidate : candidates.values())
 			{
@@ -75,7 +87,7 @@ public final class PulsePluginManager
 					boolean clientPlugin = IPulseClientPlugin.class.isAssignableFrom(type);
 					if ((candidate.side() == PulsePlugin.Side.CLIENT) != clientPlugin)
 						throw new IllegalArgumentException("CLIENT requires IPulseClientPlugin; SERVER/BOTH require IPulseCommonPlugin without IPulseClientPlugin");
-					IPulseCommonPlugin instance = (IPulseCommonPlugin) type.getConstructor().newInstance();
+					IPulseCommonPlugin instance = (IPulseCommonPlugin)type.getConstructor().newInstance();
 					ResourceLocation id = Objects.requireNonNull(instance.getPluginId(), "plugin id");
 					LoadedPlugin plugin = new LoadedPlugin(candidate, id, instance);
 					LoadedPlugin previous = ids.putIfAbsent(id, plugin);
@@ -89,8 +101,10 @@ public final class PulsePluginManager
 			}
 			List<LoadedPlugin> loaded = List.copyOf(ids.values());
 			PLibDatabase.LOGGER.info("PulseLib discovered {} plugin(s) from {} candidate(s) in {} ms: {}",
-					loaded.size(), candidates.size(), (System.nanoTime() - start) / 1_000_000,
-					loaded.stream().map(plugin -> plugin.id + " (" + plugin.candidate.modId() + ": " + plugin.candidate.className() + ")").toList());
+				loaded.size(), candidates.size(), (System.nanoTime() - start) / 1_000_000,
+				loaded.stream().
+						map(plugin -> plugin.id + " (" + plugin.candidate.modId() + ": " + plugin.candidate.className() + ")").
+						toList());
 			this.plugins = loaded;
 		}
 		catch (RuntimeException | Error exception)
@@ -113,21 +127,24 @@ public final class PulsePluginManager
 	public synchronized void registerCommon()
 	{
 		discover();
-		phase(PulsePluginLifecycle.Phase.CHANNELS, plugin -> {
+		phase(PulsePluginLifecycle.Phase.CHANNELS, plugin ->
+		{
 			try (PTypeRegistrar registrar = new PTypeRegistrar(PTypeRegistrar.Kind.CHANNELS))
 			{
 				plugin.instance.registerAnimationChannels(registrar);
 				registrar.apply();
 			}
 		});
-		phase(PulsePluginLifecycle.Phase.EVENTS, plugin -> {
+		phase(PulsePluginLifecycle.Phase.EVENTS, plugin ->
+		{
 			try (PTypeRegistrar registrar = new PTypeRegistrar(PTypeRegistrar.Kind.EVENTS))
 			{
 				plugin.instance.registerAnimationEvents(registrar);
 				registrar.apply();
 			}
 		});
-		phase(PulsePluginLifecycle.Phase.DEFORMERS, plugin -> {
+		phase(PulsePluginLifecycle.Phase.DEFORMERS, plugin ->
+		{
 			try (PTypeRegistrar registrar = new PTypeRegistrar(PTypeRegistrar.Kind.DEFORMERS))
 			{
 				plugin.instance.registerDeformers(registrar);
@@ -141,7 +158,8 @@ public final class PulsePluginManager
 		if (!this.client)
 			throw new IllegalStateException("Client registration attempted on dedicated server");
 		registerCommon();
-		phase(PulsePluginLifecycle.Phase.ATTACHMENTS, plugin -> {
+		phase(PulsePluginLifecycle.Phase.ATTACHMENTS, plugin ->
+		{
 			if (plugin.instance instanceof IPulseClientPlugin extension)
 				try (PAttachmentRegistrar registrar = new PAttachmentRegistrar())
 				{
@@ -149,7 +167,8 @@ public final class PulsePluginManager
 					registrar.apply();
 				}
 		});
-		phase(PulsePluginLifecycle.Phase.PLAYER_ANIMATIONS, plugin -> {
+		phase(PulsePluginLifecycle.Phase.PLAYER_ANIMATIONS, plugin ->
+		{
 			if (plugin.instance instanceof IPulseClientPlugin extension)
 				try (PPlayerAnimationRegistrar registrar = new PPlayerAnimationRegistrar())
 				{
@@ -157,7 +176,8 @@ public final class PulsePluginManager
 					registrar.apply();
 				}
 		});
-		phase(PulsePluginLifecycle.Phase.ANIMATED_ATTACHMENTS, plugin -> {
+		phase(PulsePluginLifecycle.Phase.ANIMATED_ATTACHMENTS, plugin ->
+		{
 			if (plugin.instance instanceof IPulseClientPlugin extension)
 				try (PAnimatedAttachmentRegistrar registrar = new PAnimatedAttachmentRegistrar())
 				{
@@ -171,7 +191,8 @@ public final class PulsePluginManager
 	{
 		registerClient();
 		Map<ResourceLocation, PModelResource> staged = new LinkedHashMap<>(resources);
-		phase(PulsePluginLifecycle.Phase.MODELS, plugin -> {
+		phase(PulsePluginLifecycle.Phase.MODELS, plugin ->
+		{
 			if (plugin.instance instanceof IPulseClientPlugin extension)
 				try (PModelRegistrar registrar = new PModelRegistrar())
 				{
@@ -211,12 +232,11 @@ public final class PulsePluginManager
 			PLibDatabase.LOGGER.error("PulseLib registration phase {} failed", phase, exception);
 			throw exception;
 		}
-
 	}
 
 	private static void failure(PulsePluginCandidate candidate, String phase, Throwable exception)
 	{
-		Throwable cause = exception instanceof java.lang.reflect.InvocationTargetException invocation ? invocation.getCause() : exception;
+		Throwable cause = exception instanceof InvocationTargetException invocation ? invocation.getCause() : exception;
 		if (cause instanceof VirtualMachineError fatal)
 			throw fatal;
 		if (cause instanceof ThreadDeath fatal)

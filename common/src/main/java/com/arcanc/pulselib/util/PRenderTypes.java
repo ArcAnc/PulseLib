@@ -399,7 +399,8 @@ public final class PRenderTypes
 		                                   VertexFormat format,
 		                                   Consumer<ShaderInstance> setter) throws IOException
 		{
-			event.register(PLibDatabase.rl(name), format, shader -> {
+			event.register(PLibDatabase.rl(name), format, shader ->
+			{
 				setter.accept(shader);
 				PLibDatabase.LOGGER.debug("PulseLib initialized shader {}", name);
 			});

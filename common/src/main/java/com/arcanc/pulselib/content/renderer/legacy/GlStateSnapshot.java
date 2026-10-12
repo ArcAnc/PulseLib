@@ -1,19 +1,25 @@
+/**
+ * @author ArcAnc
+ * Created at: 12.10.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
 package com.arcanc.pulselib.content.renderer.legacy;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import org.lwjgl.opengl.ARBDrawBuffersBlend;
-import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL14;
-import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL30;
-import org.lwjgl.opengl.GL40;
+import org.jetbrains.annotations.Nullable;
+import org.lwjgl.opengl.*;
 
-/** Restores the state touched by OIT, including indexed blend state and Minecraft's cache. */
+/**
+ * Restores the state touched by OIT, including indexed blend state and Minecraft's cache.
+ */
 final class GlStateSnapshot
 {
-	private boolean[] blend;
-	private int[][] factors;
+	private @Nullable boolean[] blend;
+	private @Nullable int[][] factors;
 	private boolean depth;
 	private boolean depthMask;
 	private boolean scissor;
@@ -31,8 +37,8 @@ final class GlStateSnapshot
 		{
 			this.blend[i] = GL30.glIsEnabledi(GL11.GL_BLEND, i);
 			int[] parameters = {GL14.GL_BLEND_SRC_RGB, GL14.GL_BLEND_DST_RGB,
-					GL14.GL_BLEND_SRC_ALPHA, GL14.GL_BLEND_DST_ALPHA,
-					GL20.GL_BLEND_EQUATION_RGB, GL20.GL_BLEND_EQUATION_ALPHA};
+				GL14.GL_BLEND_SRC_ALPHA, GL14.GL_BLEND_DST_ALPHA,
+				GL20.GL_BLEND_EQUATION_RGB, GL20.GL_BLEND_EQUATION_ALPHA};
 			for (int j = 0; j < parameters.length; j++)
 				this.factors[i][j] = GL30.glGetIntegeri(parameters[j], i);
 		}

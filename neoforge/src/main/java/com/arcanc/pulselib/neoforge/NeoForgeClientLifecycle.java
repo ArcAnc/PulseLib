@@ -1,3 +1,12 @@
+/**
+ * @author ArcAnc
+ * Created at: 12.10.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
 package com.arcanc.pulselib.neoforge;
 
 import com.arcanc.pulselib.content.animatable.PLibAnimationTicker;
@@ -10,11 +19,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.client.event.RegisterMaterialAtlasesEvent;
-import net.neoforged.neoforge.client.event.RegisterShadersEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
@@ -25,13 +30,13 @@ public final class NeoForgeClientLifecycle
 {
 	public static void register(IEventBus bus)
 	{
-		bus.addListener(NeoForgeClientLifecycle::shaders);
-		bus.addListener(NeoForgeClientLifecycle::atlases);
-		bus.addListener(NeoForgeClientLifecycle::layers);
-		NeoForge.EVENT_BUS.addListener(NeoForgeClientLifecycle::tick);
-		NeoForge.EVENT_BUS.addListener(NeoForgeClientLifecycle::afterTick);
-		NeoForge.EVENT_BUS.addListener(NeoForgeClientLifecycle::entityRemoved);
-		NeoForge.EVENT_BUS.addListener(NeoForgeClientLifecycle::render);
+		bus.addListener(NeoForgeClientLifecycle :: shaders);
+		bus.addListener(NeoForgeClientLifecycle :: atlases);
+		bus.addListener(NeoForgeClientLifecycle :: layers);
+		NeoForge.EVENT_BUS.addListener(NeoForgeClientLifecycle :: tick);
+		NeoForge.EVENT_BUS.addListener(NeoForgeClientLifecycle :: afterTick);
+		NeoForge.EVENT_BUS.addListener(NeoForgeClientLifecycle :: entityRemoved);
+		NeoForge.EVENT_BUS.addListener(NeoForgeClientLifecycle :: render);
 	}
 
 	private static void shaders(RegisterShadersEvent event)
@@ -39,7 +44,7 @@ public final class NeoForgeClientLifecycle
 		try
 		{
 			PRenderTypes.ShadersProvider.registerShaders((id, format, setter) ->
-					event.registerShader(new ShaderInstance(event.getResourceProvider(), id, format), setter));
+				event.registerShader(new ShaderInstance(event.getResourceProvider(), id, format), setter));
 		}
 		catch (IOException exception)
 		{
@@ -54,7 +59,8 @@ public final class NeoForgeClientLifecycle
 
 	private static void layers(EntityRenderersEvent.AddLayers event)
 	{
-		event.getSkins().forEach(skin -> {
+		event.getSkins().forEach(skin ->
+		{
 			var renderer = event.getSkin(skin);
 			if (renderer != null)
 				PLibArmorHandler.addLayers(renderer);
@@ -88,7 +94,8 @@ public final class NeoForgeClientLifecycle
 		else if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_WEATHER)
 		{
 			var destination = event.getLevelRenderer().getWeatherTarget();
-			PRenderStagesHandler.afterWeather(destination == null ? Minecraft.getInstance().getMainRenderTarget() : destination);
+			PRenderStagesHandler.afterWeather(destination == null ? Minecraft.getInstance().
+					getMainRenderTarget() : destination);
 		}
 	}
 }

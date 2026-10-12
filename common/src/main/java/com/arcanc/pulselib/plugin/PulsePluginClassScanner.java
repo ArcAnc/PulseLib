@@ -1,12 +1,18 @@
+/**
+ * @author ArcAnc
+ * Created at: 12.10.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
 package com.arcanc.pulselib.plugin;
 
 import com.arcanc.pulselib.api.plugin.PulsePlugin;
 import com.arcanc.pulselib.util.PLibDatabase;
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
+import org.jetbrains.annotations.Nullable;
+import org.objectweb.asm.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,7 +22,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Reads bytecode only. Roots must be supplied by the mod loader. */
+/**
+ * Reads bytecode only. Roots must be supplied by the mod loader.
+ */
 public final class PulsePluginClassScanner
 {
 	public static final String ANNOTATION_DESCRIPTOR = Type.getDescriptor(PulsePlugin.class);
@@ -31,7 +39,8 @@ public final class PulsePluginClassScanner
 		List<PulsePluginCandidate> result = new ArrayList<>();
 		try (var paths = Files.walk(root))
 		{
-			var iterator = paths.filter(path -> path.toString().endsWith(".class") && Files.isRegularFile(path)).iterator();
+			var iterator = paths.filter(path -> path.toString().endsWith(".class") && Files.isRegularFile(path)).
+					iterator();
 			while (iterator.hasNext())
 			{
 				Path file = iterator.next();
@@ -52,7 +61,7 @@ public final class PulsePluginClassScanner
 		return List.copyOf(result);
 	}
 
-	public PulsePluginCandidate read(String modId, InputStream input) throws IOException
+	public @Nullable PulsePluginCandidate read(String modId, InputStream input) throws IOException
 	{
 		PluginVisitor visitor = new PluginVisitor();
 		new ClassReader(input).accept(visitor, ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
@@ -61,7 +70,7 @@ public final class PulsePluginClassScanner
 
 	private static final class PluginVisitor extends ClassVisitor
 	{
-		private String className;
+		private @Nullable String className;
 		private boolean annotated;
 		private PulsePlugin.Side side = PulsePlugin.Side.CLIENT;
 
@@ -71,13 +80,13 @@ public final class PulsePluginClassScanner
 		}
 
 		@Override
-		public void visit(int version, int access, String name, String signature, String superName, String[] interfaces)
+		public void visit(int version, int access, String name, @Nullable String signature, @Nullable String superName, @Nullable String[] interfaces)
 		{
 			this.className = name.replace('/', '.');
 		}
 
 		@Override
-		public AnnotationVisitor visitAnnotation(String descriptor, boolean visible)
+		public @Nullable AnnotationVisitor visitAnnotation(String descriptor, boolean visible)
 		{
 			if (!ANNOTATION_DESCRIPTOR.equals(descriptor))
 				return null;

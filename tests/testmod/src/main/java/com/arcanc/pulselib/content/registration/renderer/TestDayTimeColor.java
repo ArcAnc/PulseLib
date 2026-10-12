@@ -11,6 +11,7 @@ package com.arcanc.pulselib.content.registration.renderer;
 
 
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
 public final class TestDayTimeColor
 {
@@ -18,7 +19,7 @@ public final class TestDayTimeColor
 	{
 	}
 	
-	public static int color(Level level, float partialTick)
+	public static int color(@Nullable Level level, float partialTick)
 	{
 		if (level == null)
 			return -1;

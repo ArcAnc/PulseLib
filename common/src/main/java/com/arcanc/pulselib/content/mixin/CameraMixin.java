@@ -9,9 +9,10 @@
 
 package com.arcanc.pulselib.content.mixin;
 
+import com.arcanc.pulselib.content.animatable.PAnimationCameraShake;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
 import com.arcanc.pulselib.content.player.animation.firstPerson.PFirstPersonCameraSpace;
-import com.arcanc.pulselib.content.animatable.PAnimationCameraShake;
+import com.arcanc.pulselib.platform.PulseClientServices;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -23,6 +24,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -30,12 +32,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Camera.class)
 public abstract class CameraMixin
 {
-	@Shadow protected abstract void setPosition(Vec3 pos);
+	@Shadow
+	protected abstract void setPosition(Vec3 pos);
 
-	@org.spongepowered.asm.mixin.Unique
+	@Unique
 	private void pulselib$setRotation(float yaw, float pitch, float roll)
 	{
-		com.arcanc.pulselib.platform.PulseClientServices.CAMERA.setRotation((Camera)(Object)this, yaw, pitch, roll);
+		PulseClientServices.CAMERA.setRotation((Camera)(Object)this, yaw, pitch, roll);
 	}
 
 	@Inject(method = "setup", at = @At("TAIL"))
@@ -66,7 +69,8 @@ public abstract class CameraMixin
 		Vector3f positionOffset = PFirstPersonCameraSpace.toMinecraftOffset(pose.positionOffset(player.getEyeHeight())).rotate(bodyRotation);
 		this.setPosition(camera.getPosition().add(positionOffset.x, positionOffset.y, positionOffset.z));
 
-		if (!pose.hasRotation()) return;
+		if (!pose.hasRotation())
+			return;
 		Quaternionf modelRotation = PFirstPersonCameraSpace.toMinecraftRotation(pose.rotation());
 		Quaternionf worldRotation = new Quaternionf(bodyRotation).
 				mul(modelRotation).

@@ -34,6 +34,7 @@ public interface VertexBufferAccessor
 	void pulselib$setIndexType(VertexFormat.IndexType type);
 	
 	@Accessor("indexType")
+	@Nullable
 	VertexFormat.IndexType pulselib$getIndexType();
 	
 	@Invoker ("uploadIndexBuffer")
@@ -41,5 +42,6 @@ public interface VertexBufferAccessor
 	RenderSystem.AutoStorageIndexBuffer pulselib$UploadIndexBuffer(MeshData.DrawState drawState, @Nullable ByteBuffer buffer);
 	
 	@Accessor("mode")
+	@Nullable
 	VertexFormat.Mode pulselib$getMode();
 }

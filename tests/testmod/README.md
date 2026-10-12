@@ -2,6 +2,8 @@
 
 This opt-in external mod is built from the original NeoForge examples: TestBlock, TestBlockEntity/Renderer, TestEntity/Render, TestBlockItem/Renderer, TestArmor, TestTailItem, PTestArmor, TestDayTimeColor, PPlayerBallDemo and PPlayerAcrobaticDemo. Their implementations live once in src/main/java; small Fabric/NeoForge adapters handle vanilla registries, renderer factories, attributes and keys. No demo classes/assets are included in release PulseLib JARs.
 
+These game/demo checks are run manually. Standard CI only runs `./gradlew build --no-daemon` for the library and JUnit tests; it does not build or launch this mod, accept Minecraft's EULA or create worlds.
+
 Original GLB/glTF/Gecko assets were unpacked from the library's resource ZIPs without changing their geometry or animation. The acrobatic skin texture was recovered from the existing Blockbench player template. Small vanilla item/blockstate descriptors make the previously disabled game objects usable on 1.21.1. The synthetic triangle/cube/items of stage 1 were removed.
 
 CommonTestPlugin exercises all three type registrars using existing built-in implementations. ClientTestPlugin contributes models, armor/tail attachments, both player demos and an observation callback on the ball's animated hand anchor through @PulsePlugin alone. No PulseLib entrypoints or event registrations are used. Loader initializers only register Minecraft content and ordinary renderer/key/tick callbacks.
@@ -29,7 +31,7 @@ Build first, then launch in a separate Gradle invocation so Loom resolves fresh 
 ./gradlew :fabric:runClient -PpulseTestJar -PpulseSmokeAuto
 ```
 
-Production Fabric uses :fabric:remapTestmodJar (pulselib-testmod-intermediary-2.0.0-rc.1-fabric.jar), the remapped PulseLib JAR and Fabric API. Its regular testmodJar uses named development mappings. NeoForge's fixture JAR needs no remap. The demo mod version in loader metadata is an internal fixture version independent of library publication.
+Production Fabric uses :fabric:remapTestmodJar (pulselib-testmod-intermediary-1.2.0-fabric.jar), the remapped PulseLib JAR and Fabric API. Its regular testmodJar uses named development mappings. NeoForge's fixture JAR needs no remap. The demo mod version in loader metadata is an internal fixture version independent of library publication.
 
 ## In-world checks and manual examples
 

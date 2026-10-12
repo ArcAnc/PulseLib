@@ -1,17 +1,46 @@
+/**
+ * @author ArcAnc
+ * Created at: 12.10.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
 package com.arcanc.pulselib.plugin;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumMap;
 import java.util.Objects;
 
-/** Ordered registration state. Failed one-time phases require a restart; models can retry. */
+/**
+ * Ordered registration state. Failed one-time phases require a restart; models can retry.
+ */
 public final class PulsePluginLifecycle
 {
-	public enum Phase { CHANNELS, EVENTS, DEFORMERS, ATTACHMENTS, PLAYER_ANIMATIONS, ANIMATED_ATTACHMENTS, MODELS }
-	public enum State { PENDING, ACTIVE, COMPLETE, FAILED }
+	public enum Phase
+	{
+		CHANNELS,
+		EVENTS,
+		DEFORMERS,
+		ATTACHMENTS,
+		PLAYER_ANIMATIONS,
+		ANIMATED_ATTACHMENTS,
+		MODELS
+	}
+
+	public enum State
+	{
+		PENDING,
+		ACTIVE,
+		COMPLETE,
+		FAILED
+	}
 
 	private final EnumMap<Phase, State> states = new EnumMap<>(Phase.class);
 	private final EnumMap<Phase, Throwable> failures = new EnumMap<>(Phase.class);
-	private Phase active;
+	private @Nullable Phase active;
 
 	public State state(Phase phase)
 	{

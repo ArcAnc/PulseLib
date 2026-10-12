@@ -1,3 +1,12 @@
+/**
+ * @author ArcAnc
+ * Created at: 12.10.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
 package com.arcanc.pulselib.fabric.mixin;
 
 import com.arcanc.pulselib.util.PResourceCache;
@@ -10,11 +19,11 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@Mixin(ModelManager.class)
+@Mixin (ModelManager.class)
 public abstract class ModelManagerMixin
 {
-	@ModifyArg(method = "<init>", at = @At(value = "INVOKE",
-			target = "Lnet/minecraft/client/resources/model/AtlasSet;<init>(Ljava/util/Map;Lnet/minecraft/client/renderer/texture/TextureManager;)V"), index = 0)
+	@ModifyArg (method = "<init>", at = @At (value = "INVOKE",
+		target = "Lnet/minecraft/client/resources/model/AtlasSet;<init>(Ljava/util/Map;Lnet/minecraft/client/renderer/texture/TextureManager;)V"), index = 0)
 	private Map<ResourceLocation, ResourceLocation> pulselib$addAtlas(Map<ResourceLocation, ResourceLocation> original)
 	{
 		Map<ResourceLocation, ResourceLocation> atlases = new LinkedHashMap<>(original);

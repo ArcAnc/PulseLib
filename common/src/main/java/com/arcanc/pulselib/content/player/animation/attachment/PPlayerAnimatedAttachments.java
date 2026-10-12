@@ -20,12 +20,16 @@ import net.minecraft.client.renderer.MultiBufferSource;
 
 import java.util.*;
 
-/** Registry and third-person dispatcher for semantic player-animation anchors. */
+/**
+ * Registry and third-person dispatcher for semantic player-animation anchors.
+ */
 public final class PPlayerAnimatedAttachments
 {
 	private static final Map<PPlayerAnimationAnchor, List<PPlayerAnimatedAttachmentRenderer>> RENDERERS = new HashMap<>();
 
-	private PPlayerAnimatedAttachments() {}
+	private PPlayerAnimatedAttachments()
+	{
+	}
 
 	public static void register(PPlayerAnimatedAttachmentRenderer renderer)
 	{
@@ -40,39 +44,51 @@ public final class PPlayerAnimatedAttachments
 		for (PPlayerAnimationAnchorPose pose : PPlayerAnimations.animationAnchorPoses(player, partialTick))
 		{
 			List<PPlayerAnimatedAttachmentRenderer> renderers = RENDERERS.get(pose.anchor());
-			if (renderers == null) continue;
-			for (PPlayerAnimatedAttachmentRenderer renderer : renderers.stream().sorted(Comparator.comparing(value -> value.getClass().getName())).toList())
+			if (renderers == null)
+				continue;
+			for (PPlayerAnimatedAttachmentRenderer renderer : renderers.stream().
+					sorted(Comparator.comparing(value -> value.getClass().getName())).toList())
 			{
 				poseStack.pushPose();
 				try
 				{
 					poseStack.mulPose(pose.transform().matrix());
 					renderer.render(new PPlayerAnimatedAttachmentContext(player, pose.animation(), pose.anchor(), pose.transform(),
-							pose.weight(), false, poseStack, buffers, packedLight, partialTick));
+						pose.weight(), false, poseStack, buffers, packedLight, partialTick));
 				}
-				finally { poseStack.popPose(); }
+				finally
+				{
+					poseStack.popPose();
+				}
 			}
 		}
 	}
 
-	/** Renders animation-owned anchors from an already resolved first-person presentation. */
+	/**
+	 * Renders animation-owned anchors from an already resolved first-person presentation.
+	 */
 	public static void renderFirstPerson(AbstractClientPlayer player, PFirstPersonRenderPresentation presentation,
 	                                     PoseStack poseStack, MultiBufferSource buffers, int packedLight, float partialTick)
 	{
 		for (PPlayerFirstPersonAnchorPose pose : presentation.animationAnchors())
 		{
 			List<PPlayerAnimatedAttachmentRenderer> renderers = RENDERERS.get(pose.anchor());
-			if (renderers == null) continue;
-			for (PPlayerAnimatedAttachmentRenderer renderer : renderers.stream().sorted(Comparator.comparing(value -> value.getClass().getName())).toList())
+			if (renderers == null)
+				continue;
+			for (PPlayerAnimatedAttachmentRenderer renderer : renderers.stream().
+					sorted(Comparator.comparing(value -> value.getClass().getName())).toList())
 			{
 				poseStack.pushPose();
 				try
 				{
 					poseStack.mulPose(pose.transform().matrix());
 					renderer.render(new PPlayerAnimatedAttachmentContext(player, pose.animation(), pose.anchor(), pose.transform(),
-							pose.weight(), true, poseStack, buffers, packedLight, partialTick));
+						pose.weight(), true, poseStack, buffers, packedLight, partialTick));
 				}
-				finally { poseStack.popPose(); }
+				finally
+				{
+					poseStack.popPose();
+				}
 			}
 		}
 	}

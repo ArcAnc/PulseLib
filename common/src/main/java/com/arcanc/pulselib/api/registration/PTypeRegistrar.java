@@ -1,3 +1,12 @@
+/**
+ * @author ArcAnc
+ * Created at: 12.10.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
 package com.arcanc.pulselib.api.registration;
 
 import com.arcanc.pulselib.content.model.animation.PAnimationChannelType;
@@ -8,7 +17,12 @@ import com.arcanc.pulselib.content.registration.PRegistry;
 
 public class PTypeRegistrar extends PulseRegistrar
 {
-	public enum Kind { CHANNELS, EVENTS, DEFORMERS }
+	public enum Kind
+	{
+		CHANNELS,
+		EVENTS,
+		DEFORMERS
+	}
 
 	private final Kind kind;
 	private final PRegistry<PAnimationChannelType<?>> channels = new PRegistry<>();

@@ -20,6 +20,7 @@ import com.arcanc.pulselib.content.renderer.PRenderQueue;
 import com.arcanc.pulselib.content.renderer.legacy.GlGeometryDataFactory;
 import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
 import com.arcanc.pulselib.data.PModelLoader;
+import com.arcanc.pulselib.data.gecko.PGeckoModelLoader;
 import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -41,7 +42,9 @@ import org.joml.Vector3f;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -49,7 +52,7 @@ import java.util.stream.Stream;
 public class PModelCache
 {
 	private static @Nullable Map<ResourceLocation, PBakedModel> MODELS;
-	private static final Map<ResourceLocation, PModelLoader> MODEL_LOADERS = Stream.of(PGltfModelLoader.INSTANCE, com.arcanc.pulselib.data.gecko.PGeckoModelLoader.INSTANCE).
+	private static final Map<ResourceLocation, PModelLoader> MODEL_LOADERS = Stream.of(PGltfModelLoader.INSTANCE, PGeckoModelLoader.INSTANCE).
 			collect(Collectors.toMap(
 			PModelLoader :: id,
 			Function.identity(),
@@ -96,7 +99,7 @@ public class PModelCache
 	                                             Executor gameExecutor)
 	{
 		long start = System.nanoTime();
-		Map<ResourceLocation, PModel> models = new java.util.concurrent.ConcurrentHashMap<>();
+		Map<ResourceLocation, PModel> models = new ConcurrentHashMap<>();
 		return loadModels(backgroundExecutor, resourceManager, models :: put).
 				thenCompose(stage :: wait).
 				thenAcceptAsync(empty ->
@@ -271,7 +274,7 @@ public class PModelCache
 	
 	private static CompletableFuture<Void> loadModels(Executor backgroundExecutor,
 	                                                  ResourceManager resourceManager,
-	                                                  java.util.function.BiConsumer<ResourceLocation, PModel> elementConsumer)
+	                                                  BiConsumer<ResourceLocation, PModel> elementConsumer)
 	{
 		List<CompletableFuture<?>> tasks = new ArrayList<>();
 		for (PModelResource resource : PResourceCache.getResourceCache().values())

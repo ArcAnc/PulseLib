@@ -1,3 +1,12 @@
+/**
+ * @author ArcAnc
+ * Created at: 12.10.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
 package com.arcanc.pulselib.api.registration;
 
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationDefinition;
@@ -25,12 +34,14 @@ public class PPlayerAnimationRegistrar extends PulseRegistrar
 	public void apply()
 	{
 		checkOpen();
-		this.definitions.forEach((id, definition) -> {
+		this.definitions.forEach((id, definition) ->
+		{
 			PPlayerAnimationDefinition previous = PPlayerAnimations.get(id);
 			if (previous != null && previous != definition)
 				throw new IllegalArgumentException("Conflicting player animation definition: " + id);
 		});
-		this.definitions.forEach((id, definition) -> {
+		this.definitions.forEach((id, definition) ->
+		{
 			if (PPlayerAnimations.get(id) == null)
 				PPlayerAnimations.register(id, definition);
 		});

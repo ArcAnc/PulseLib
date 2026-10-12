@@ -9,7 +9,6 @@
 
 package com.arcanc.pulselib.content.registration;
 
-
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
 
@@ -45,7 +44,8 @@ public final class PRegistry<T>
 
 	public void validateAll(Map<ResourceLocation, ? extends T> additions)
 	{
-		additions.forEach((id, value) -> {
+		additions.forEach((id, value) ->
+		{
 			Objects.requireNonNull(id, "id");
 			Objects.requireNonNull(value, "value");
 			T previous = this.values.get(id);

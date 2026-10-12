@@ -1,3 +1,12 @@
+/**
+ * @author ArcAnc
+ * Created at: 12.10.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
 package com.arcanc.pulselib.fabric;
 
 import com.arcanc.pulselib.plugin.IPulsePluginFinder;
@@ -5,9 +14,11 @@ import com.arcanc.pulselib.plugin.PulsePluginCandidate;
 import com.arcanc.pulselib.plugin.PulsePluginClassScanner;
 import com.arcanc.pulselib.util.PLibDatabase;
 import net.fabricmc.loader.api.FabricLoader;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -15,7 +26,7 @@ import java.util.regex.Pattern;
 
 public final class FabricPulsePluginFinder implements IPulsePluginFinder
 {
-	private List<PulsePluginCandidate> candidates;
+	private @Nullable List<PulsePluginCandidate> candidates;
 
 	@Override
 	public synchronized List<PulsePluginCandidate> findPlugins()
@@ -27,7 +38,8 @@ public final class FabricPulsePluginFinder implements IPulsePluginFinder
 		PulsePluginClassScanner scanner = new PulsePluginClassScanner();
 		Set<PulsePluginCandidate> found = new LinkedHashSet<>();
 		Set<Path> scanned = new HashSet<>();
-		for (var mod : loader.getAllMods().stream().sorted(Comparator.comparing(value -> value.getMetadata().getId())).toList())
+		for (var mod : loader.getAllMods().stream().sorted(Comparator.comparing(value -> value.getMetadata().getId())).
+				toList())
 		{
 			if (mod.getMetadata().getType().equals("builtin"))
 				continue;
@@ -52,14 +64,16 @@ public final class FabricPulsePluginFinder implements IPulsePluginFinder
 				}
 			}
 		}
-		this.candidates = found.stream().sorted(Comparator.comparing(PulsePluginCandidate::modId)
-				.thenComparing(PulsePluginCandidate::className)).toList();
+		this.candidates = found.stream().sorted(Comparator.comparing(PulsePluginCandidate :: modId).
+				thenComparing(PulsePluginCandidate :: className)).toList();
 		PLibDatabase.LOGGER.info("PulseLib Fabric ASM scan: {} roots, {} candidates, {} ms", scanned.size(), this.candidates.size(),
-				(System.nanoTime() - start) / 1_000_000);
+			(System.nanoTime() - start) / 1_000_000);
 		return this.candidates;
 	}
 
-	/** Only loader-declared path groups and compiled siblings of known mod resource roots. */
+	/**
+	 * Only loader-declared path groups and compiled siblings of known mod resource roots.
+	 */
 	static Set<Path> developmentRoots(Set<Path> modRoots, String pathGroups)
 	{
 		Set<Path> known = new HashSet<>();
@@ -71,12 +85,12 @@ public final class FabricPulsePluginFinder implements IPulsePluginFinder
 			for (String entry : group.split(Pattern.quote(File.pathSeparator)))
 				if (!entry.isBlank())
 					paths.add(Path.of(entry).toAbsolutePath().normalize());
-			if (paths.stream().anyMatch(known::contains))
-				paths.stream().filter(Files::isDirectory).forEach(result::add);
+			if (paths.stream().anyMatch(known :: contains))
+				paths.stream().filter(Files :: isDirectory).forEach(result :: add);
 		}
 		for (Path root : known)
 		{
-			if (root.getFileSystem() != java.nio.file.FileSystems.getDefault() || !Files.isDirectory(root))
+			if (root.getFileSystem() != FileSystems.getDefault() || !Files.isDirectory(root))
 				continue;
 			// Gradle/IntelliJ commonly separate build/resources/main from build/classes/<language>/main.
 			if (root.endsWith(Path.of("build", "resources", "main")))

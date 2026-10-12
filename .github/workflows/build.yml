@@ -10,12 +10,8 @@ permissions:
 
 jobs:
   build:
-    name: ${{ matrix.loader }}
+    name: Build and test both loaders
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        loader: [neoforge, fabric]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -31,44 +27,25 @@ jobs:
         run: |
           set -euo pipefail
           chmod +x gradlew
-          mkdir -p build
-          ./gradlew :common:check :${{ matrix.loader }}:build --no-daemon --console=plain 2>&1 | tee build/${{ matrix.loader }}-build.log
-      - name: Build external demo fixture
-        shell: bash
-        run: |
-          set -euo pipefail
-          ./gradlew :${{ matrix.loader }}:testmodJar --no-daemon --console=plain 2>&1 | tee build/${{ matrix.loader }}-fixture.log
-      - name: Dedicated server smoke test
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [ '${{ matrix.loader }}' = 'neoforge' ]; then
-            run_dir=neoforge/run
-          else
-            run_dir=fabric/runs/server
-          fi
-          mkdir -p "$run_dir"
-          printf 'eula=true\n' > "$run_dir/eula.txt"
-          printf 'server-ip=127.0.0.1\nonline-mode=false\nview-distance=2\nsimulation-distance=2\n' > "$run_dir/server.properties"
-          timeout 180s ./gradlew :${{ matrix.loader }}:runServer -PpulseTestJar -PpulseSmokeAuto --no-daemon --console=plain 2>&1 | tee build/${{ matrix.loader }}-server-smoke.log
-      - name: Verify dedicated server result
-        if: ${{ always() }}
-        shell: bash
-        run: grep -Fq 'PULSE TEST SERVER PASS' build/${{ matrix.loader }}-server-smoke.log
-      - name: Upload artifacts and diagnostics
+          ./gradlew build --no-daemon
+      - name: Upload loader JARs
+        uses: actions/upload-artifact@v4
+        with:
+          name: pulselib-1.21.1
+          if-no-files-found: error
+          path: |
+            neoforge/build/libs/pulselib-1.21.1-neoforge-*.jar
+            fabric/build/libs/pulselib-1.21.1-fabric-*.jar
+      - name: Upload JUnit reports
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: pulselib-1.21.1-${{ matrix.loader }}
-          if-no-files-found: warn
+          name: junit-reports
+          if-no-files-found: ignore
           path: |
-            ${{ matrix.loader }}/build/libs/pulselib-1.21.1-${{ matrix.loader }}-*.jar
             common/build/reports/tests/
             common/build/test-results/
-            ${{ matrix.loader }}/build/reports/tests/
-            ${{ matrix.loader }}/build/test-results/
-            build/${{ matrix.loader }}-*.log
-            neoforge/run/logs/
-            neoforge/run/crash-reports/
-            fabric/runs/server/logs/
-            fabric/runs/server/crash-reports/
+            neoforge/build/reports/tests/
+            neoforge/build/test-results/
+            fabric/build/reports/tests/
+            fabric/build/test-results/

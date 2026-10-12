@@ -9,6 +9,7 @@
 
 package com.arcanc.pulselib.content.model.textures;
 
+import com.arcanc.pulselib.content.mixin.SpriteContentsAccessor;
 import com.arcanc.pulselib.content.model.textures.atlas.PLibMetadata;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.renderer.texture.SpriteContents;
@@ -42,7 +43,7 @@ public final class PTextureAlphaClassifier
 		if (configured != PAlphaMode.AUTO)
 			return configured;
 
-		NativeImage image = ((com.arcanc.pulselib.content.mixin.SpriteContentsAccessor) contents).pulselib$getOriginalImage();
+		NativeImage image = ((SpriteContentsAccessor) contents).pulselib$getOriginalImage();
 		boolean transparent = false;
 		for (int y = 0; y < image.getHeight(); y++)
 			for (int x = 0; x < image.getWidth(); x++)

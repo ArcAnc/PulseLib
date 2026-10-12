@@ -10,6 +10,7 @@
 package com.arcanc.pulselib.content.renderer.modelData;
 
 import com.arcanc.pulselib.content.model.baked.PBakedModel;
+import com.arcanc.pulselib.data.PModelLoader;
 import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
 import com.arcanc.pulselib.util.PModelCache;
 import net.minecraft.resources.ResourceLocation;
@@ -21,7 +22,7 @@ import java.util.Objects;
  * Renderer-facing description of a logical model.
  *
  * <p>The model id is canonical: it never includes a loader root or a physical
- * file extension. A {@link com.arcanc.pulselib.data.PModelLoader} resolves it
+ * file extension. A {@link PModelLoader} resolves it
  * to the resource-pack file it loads.</p>
  */
 public class PModelData

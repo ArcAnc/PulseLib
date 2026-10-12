@@ -1,3 +1,12 @@
+/**
+ * @author ArcAnc
+ * Created at: 12.10.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
 package com.arcanc.pulselib.test;
 
 import com.arcanc.pulselib.api.plugin.IPulseCommonPlugin;
@@ -7,8 +16,10 @@ import com.arcanc.pulselib.content.registration.PLibRegistration;
 import com.arcanc.pulselib.util.PLibDatabase;
 import net.minecraft.resources.ResourceLocation;
 
-/** Exercises each registrar using existing built-in implementations, without invented types. */
-@PulsePlugin(PulsePlugin.Side.BOTH)
+/**
+ * Exercises each registrar using existing built-in implementations, without invented types.
+ */
+@PulsePlugin (PulsePlugin.Side.BOTH)
 public class CommonTestPlugin implements IPulseCommonPlugin
 {
 	public static int constructions;
@@ -23,23 +34,33 @@ public class CommonTestPlugin implements IPulseCommonPlugin
 		PLibDatabase.LOGGER.info("PULSE TEST common plugin constructed");
 	}
 
-	@Override public ResourceLocation getPluginId() { return DemoContent.id("common"); }
-
-	@Override public void registerAnimationChannels(PTypeRegistrar registrar)
+	@Override
+	public ResourceLocation getPluginId()
 	{
-		if (++registrations != 1) throw new AssertionError("Channel phase repeated");
+		return DemoContent.id("common");
+	}
+
+	@Override
+	public void registerAnimationChannels(PTypeRegistrar registrar)
+	{
+		if (++registrations != 1)
+			throw new AssertionError("Channel phase repeated");
 		registrar.registerAnimationChannel(PLibRegistration.AnimationChannelReg.POSITION);
 	}
 
-	@Override public void registerAnimationEvents(PTypeRegistrar registrar)
+	@Override
+	public void registerAnimationEvents(PTypeRegistrar registrar)
 	{
-		if (++events != 1) throw new AssertionError("Event phase repeated");
+		if (++events != 1)
+			throw new AssertionError("Event phase repeated");
 		registrar.registerAnimationEvent(PLibRegistration.AnimationEventReg.SOUND);
 	}
 
-	@Override public void registerDeformers(PTypeRegistrar registrar)
+	@Override
+	public void registerDeformers(PTypeRegistrar registrar)
 	{
-		if (++deformers != 1) throw new AssertionError("Deformer phase repeated");
+		if (++deformers != 1)
+			throw new AssertionError("Deformer phase repeated");
 		registrar.registerMeshDeformer(PLibRegistration.MeshDeformerReg.BEND);
 	}
 }

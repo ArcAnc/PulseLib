@@ -1,3 +1,12 @@
+/**
+ * @author ArcAnc
+ * Created at: 12.10.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
 package com.arcanc.pulselib.content.event;
 
 import com.arcanc.pulselib.content.animatable.instance.InstanceAnimationManager;
@@ -8,8 +17,11 @@ import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
 import com.arcanc.pulselib.content.renderer.PRenderQueue;
 import com.arcanc.pulselib.util.PResourceCache;
+import com.mojang.blaze3d.systems.RenderSystem;
 
-/** Client runtime entry points. Call only from physical-client adapters. */
+/**
+ * Client runtime entry points. Call only from physical-client adapters.
+ */
 public final class PulseRuntime
 {
 	private PulseRuntime()
@@ -23,7 +35,7 @@ public final class PulseRuntime
 
 	public static void disconnected()
 	{
-		com.mojang.blaze3d.systems.RenderSystem.assertOnRenderThread();
+		RenderSystem.assertOnRenderThread();
 		PRenderQueue.cleanup();
 		PDeformedMeshBuffers.cleanup();
 		PGpuDeformedMeshBuffers.cleanup();

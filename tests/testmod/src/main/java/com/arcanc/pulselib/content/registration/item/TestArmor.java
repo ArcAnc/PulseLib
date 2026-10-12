@@ -13,13 +13,14 @@ package com.arcanc.pulselib.content.registration.item;
 import com.arcanc.pulselib.content.model.baked.PBakedBone;
 import com.arcanc.pulselib.content.model.baked.PBakedMesh;
 import com.arcanc.pulselib.content.model.baked.PMeshRenderContext;
+import com.arcanc.pulselib.content.registration.renderer.TestDayTimeColor;
 import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.arcanc.pulselib.util.attachments.humanoid.armor.PArmorModelProvider;
 import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
@@ -35,7 +36,7 @@ public class TestArmor extends ArmorItem implements PArmorModelProvider
 	{
 		super(material, type, properties);
 	}
-	
+
 	@Override
 	public HumanoidModel<?> getPulseArmorModel(LivingEntity entity, ItemStack stack, EquipmentSlot slot, HumanoidModel<?> original)
 	{
@@ -61,9 +62,9 @@ public class TestArmor extends ArmorItem implements PArmorModelProvider
 				inherited.packedLight(),
 				inherited.packedOverlay());
 	}
-	
+
 	private static int dayTimeColor(LivingEntity entity, float partialTick)
 	{
-		return com.arcanc.pulselib.content.registration.renderer.TestDayTimeColor.color(entity.level(), partialTick);
+		return TestDayTimeColor.color(entity.level(), partialTick);
 	}
 }

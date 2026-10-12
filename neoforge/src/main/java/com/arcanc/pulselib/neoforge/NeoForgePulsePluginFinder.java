@@ -1,3 +1,12 @@
+/**
+ * @author ArcAnc
+ * Created at: 12.10.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
 package com.arcanc.pulselib.neoforge;
 
 import com.arcanc.pulselib.api.plugin.PulsePlugin;
@@ -7,6 +16,7 @@ import com.arcanc.pulselib.util.PLibDatabase;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.modscan.ModAnnotation;
 import net.neoforged.neoforgespi.language.ModFileScanData;
+import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Type;
 
 import java.lang.annotation.ElementType;
@@ -18,7 +28,7 @@ import java.util.stream.Collectors;
 
 public final class NeoForgePulsePluginFinder implements IPulsePluginFinder
 {
-	private List<PulsePluginCandidate> candidates;
+	private @Nullable List<PulsePluginCandidate> candidates;
 
 	@Override
 	public synchronized List<PulsePluginCandidate> findPlugins()
@@ -29,8 +39,8 @@ public final class NeoForgePulsePluginFinder implements IPulsePluginFinder
 		var found = new LinkedHashSet<PulsePluginCandidate>();
 		for (ModFileScanData data : ModList.get().getAllScanData())
 		{
-			String modId = data.getIModInfoData().stream().flatMap(file -> file.getMods().stream())
-					.map(info -> info.getModId()).sorted().collect(Collectors.joining(","));
+			String modId = data.getIModInfoData().stream().flatMap(file -> file.getMods().stream()).
+					map(info -> info.getModId()).sorted().collect(Collectors.joining(","));
 			for (ModFileScanData.AnnotationData annotation : data.getAnnotations())
 			{
 				if (!annotation.annotationType().equals(annotationType) || annotation.targetType() != ElementType.TYPE)
@@ -40,7 +50,7 @@ public final class NeoForgePulsePluginFinder implements IPulsePluginFinder
 				{
 					Object value = annotation.annotationData().get("value");
 					PulsePlugin.Side side = value == null ? PulsePlugin.Side.CLIENT :
-							PulsePlugin.Side.valueOf(((ModAnnotation.EnumHolder) value).value());
+						PulsePlugin.Side.valueOf(((ModAnnotation.EnumHolder)value).value());
 					found.add(new PulsePluginCandidate(name, modId, side));
 				}
 				catch (RuntimeException exception)
@@ -51,8 +61,8 @@ public final class NeoForgePulsePluginFinder implements IPulsePluginFinder
 				}
 			}
 		}
-		this.candidates = found.stream().sorted(Comparator.comparing(PulsePluginCandidate::modId)
-				.thenComparing(PulsePluginCandidate::className)).toList();
+		this.candidates = found.stream().sorted(Comparator.comparing(PulsePluginCandidate :: modId).
+				thenComparing(PulsePluginCandidate :: className)).toList();
 		return this.candidates;
 	}
 }

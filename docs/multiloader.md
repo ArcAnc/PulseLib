@@ -1,4 +1,4 @@
-# PulseLib 1.21.1 MultiLoader — 2.0.0-rc.1
+# PulseLib 1.21.1 MultiLoader — 1.2.0
 
 Branch: 1.21.1-multiloader. Original baseline: 1.21.1 / e364f60. The [initial audit](multiloader-audit.md) is historical; stage 2 deliberately removes the compatibility decisions from stage 1. See [plugins and removed APIs](../wiki/plugins.md), [installation](../wiki/installation.md), and the [demo/smoke commands](../tests/testmod/README.md).
 
@@ -13,6 +13,8 @@ Branch: 1.21.1-multiloader. Original baseline: 1.21.1 / e364f60. The [initial au
 ServiceLoader supplies the physical-side/platform policy, plugin finder and lazy client camera service. Exactly one provider is required. Plugin registration is common code, not a platform service or a loader event bridge.
 
 PLibRegistration and PItemAnimatable each exist only in common. The former owns built-in channel/event/deformer registries and init(); the latter exposes getPulseItemRenderer(). PulseLibEvents, five registration events, registerClientExtension(), the mixed LEGACY type registrar, compatibility source substitutions and PResourceCache.postEvent() are removed. Native IClientItemExtensions remains an internal NeoForge adapter for the current common item/armor API.
+
+Version 1.2.0 intentionally contains incompatible API changes. Existing NeoForge mods may require source adaptation: replace old extension registration events with `@PulsePlugin` callbacks and `PItemAnimatable.registerClientExtension()` with `getPulseItemRenderer()`. No deprecated compatibility adapters are provided.
 
 Java 21, Minecraft 1.21.1, Mojang/Parchment 2024.11.17, Gradle 9.2.1, ModDevGradle 2.0.140, Loom 1.12.7, Fabric Loader 0.19.5 and Fabric API 0.116.17+1.21.1 are retained. Existing jgltf/Jackson versions are preserved. There is no Forge module or common installable mod.
 
@@ -38,18 +40,22 @@ Logging covers measured scans, plugin identities/origins, phase failure causes, 
 
 ## Artifacts and release configuration
 
-- neoforge/build/libs/pulselib-1.21.1-neoforge-2.0.0-rc.1.jar
-- fabric/build/libs/pulselib-1.21.1-fabric-2.0.0-rc.1.jar
+- neoforge/build/libs/pulselib-1.21.1-neoforge-1.2.0.jar
+- fabric/build/libs/pulselib-1.21.1-fabric-1.2.0.jar
 
-Coordinates: com.arcanc.pulselib:pulselib-neoforge:1.21.1-2.0.0-rc.1 and com.arcanc.pulselib:pulselib-fabric:1.21.1-2.0.0-rc.1. The proposed stable version is 2.0.0 because the old API is intentionally removed. RC uses beta release metadata; final release requires changing version/release type after approval.
+Coordinates: com.arcanc.pulselib:pulselib-neoforge:1.21.1-1.2.0 and com.arcanc.pulselib:pulselib-fabric:1.21.1-1.2.0. Release metadata remains beta. Maven group and artifact IDs are unchanged; Maven, Modrinth and CurseForge versions derive from mod_version.
 
-Both game JARs include six nested libraries (jgltf model/impl-v1/impl-v2 and Jackson annotations/core/databind), platform services and their resources/Mixins. Sources and Javadoc are assembled; Fabric sources are remapped for publication. Common code/resources are compiled into each loader JAR; the Common JAR is not published as a standalone mod. All demo code/assets are excluded from library artifacts. Local Maven checks use /tmp/pulselib-maven-stage2 and do not overwrite 1.x coordinates.
+PulseLib uses the author's version scheme rather than strict Semantic Versioning: 1.1.x is for small updates/fixes, 1.2.x is for major updates including MultiLoader and architecture changes, and 2.0.x is a future stage defined by the author. Removing an old API does not automatically increase the major version. Releases require separate authorization.
 
-GitHub Actions has independent neoforge/fabric matrix jobs with fail-fast false, set -euo pipefail, stdout/stderr captured through tee, separate grep -Fq PASS verification and always-upload artifacts containing build/server logs plus XML/HTML tests. The existing Maven Pages release workflow publishes both artifacts only when explicitly triggered. Modrinth/CurseForge retain project IDs, distinct loader versions/files and the Fabric API requirement. No release upload has been executed.
+Both game JARs include six nested libraries (jgltf model/impl-v1/impl-v2 and Jackson annotations/core/databind), platform services and their resources/Mixins. Sources and Javadoc are assembled; Fabric sources are remapped for publication. Common code/resources are compiled into each loader JAR; the Common JAR is not published as a standalone mod. All demo code/assets are excluded from library artifacts. The new Maven version is 1.21.1-1.2.0; previous versions must not be overwritten.
+
+Standard GitHub Actions uses one job with Java 21, Gradle and `./gradlew build --no-daemon`. It compiles Common, NeoForge and Fabric, runs JUnit and assembles both loader JARs plus sources/Javadoc. Loader JARs are uploaded after a successful build; XML/HTML test reports are retained even on failure. There are no Minecraft launches, EULA acceptance, temporary worlds, demo runs or game PASS-marker checks in CI. Compilation output remains available in the Gradle step log. The existing Maven Pages release workflow remains separate. Modrinth/CurseForge retain project IDs, distinct loader versions/files and the Fabric API requirement. No release upload has been executed.
 
 Runtime logs/crash reports/JVM diagnostic logs are ignored. The accidentally tracked common/logs files are removed. Useful original demo resources remain in the external test mod.
 
 ## Verification
+
+The game checks below were performed manually during stage 2. They are not standard CI steps and were not repeated for this version/CI-only update. Manual commands remain available in the demo module.
 
 Environment: Linux x86_64, Temurin Java 21, NVIDIA GTX 1660 Ti. Both development libraries and packaged JARs were checked; production Fabric uses official Minecraft/intermediary mappings, while isolated NeoForge uses ModDevGradle-prepared Minecraft/loader artifacts with mods loaded from JARs. jgltf/Jackson were excluded from isolated launch classpaths.
 
