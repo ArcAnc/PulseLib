@@ -163,11 +163,21 @@ class PPlayerHierarchyTest
 
 		Fixture(Vector3f rootBind)
 		{
-			PBakedBone root = bone("root", rootBind, null);
+			this(rootBind, false);
+		}
+
+		Fixture(Vector3f rootBind, boolean cameraUnderArm)
+		{
+			this(rootBind, cameraUnderArm, new Quaternionf(), new Quaternionf());
+		}
+
+		Fixture(Vector3f rootBind, boolean cameraUnderArm, Quaternionf rootBindRotation, Quaternionf cameraBindRotation)
+		{
+			PBakedBone root = bone("root", rootBind, rootBindRotation, null);
 			PBakedBone body = bone("body", new Vector3f(0, 0.5f, 0), root);
 			PBakedBone arm = bone("arm", new Vector3f(0.5f, 0, 0), body);
 			bone("item", new Vector3f(0, 0.5f, 0), arm);
-			bone("camera", new Vector3f(0.2f, 1.5f, 0.3f), root);
+			bone("camera", new Vector3f(0.2f, 1.5f, 0.3f), cameraBindRotation, cameraUnderArm ? arm : root);
 			this.model = new PBakedModel(List.of(root), Map.of());
 			this.pose = this.model.bindPose();
 			PModelData data = new PModelData(ResourceLocation.fromNamespaceAndPath("pulselibtest", "hierarchy"),
@@ -221,7 +231,17 @@ class PPlayerHierarchyTest
 
 		Matrix4f cameraMatrix()
 		{
-			return localMatrix(0).mul(localMatrix(4));
+			List<Integer> chain = new ArrayList<>();
+			for (int index = 4; index >= 0; index = this.model.parentIndex(index))
+			{
+				chain.addFirst(index);
+			}
+			Matrix4f matrix = new Matrix4f();
+			for (int index : chain)
+			{
+				matrix.mul(localMatrix(index));
+			}
+			return matrix;
 		}
 
 		private Matrix4f localMatrix(int index)
@@ -231,7 +251,12 @@ class PPlayerHierarchyTest
 
 		private static PBakedBone bone(String name, Vector3f position, @Nullable PBakedBone parent)
 		{
-			PBakedBone bone = new PBakedBone(name, position, new Quaternionf(), new ArrayList<>(), parent, List.of());
+			return bone(name, position, new Quaternionf(), parent);
+		}
+
+		private static PBakedBone bone(String name, Vector3f position, Quaternionf rotation, @Nullable PBakedBone parent)
+		{
+			PBakedBone bone = new PBakedBone(name, position, rotation, new ArrayList<>(), parent, List.of());
 			if (parent != null)
 			{
 				parent.children().add(bone);

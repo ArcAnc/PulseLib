@@ -8,6 +8,7 @@
   "client": [
     "H14QueueMixin",
     "PlayerMotionQueueMixin",
+    "PlayerMotionCameraMixin",
     "SmokeRenderMixin",
     "SmokeLifecycleMixin",
     "OitTimingMixin",

@@ -219,14 +219,73 @@ public final class PPlayerAnimationFrame
 		return bone == null ? null : transform(bone);
 	}
 
-	/** Returns the animated first-person camera anchor relative to its bind pose. */
+	/**
+	 * Camera-origin displacement and orientation relative to bind, in the same
+	 * normalized source-model frame used by the native player. This is a pose
+	 * delta at the camera point, not the affine delta's translation at zero.
+	 */
 	public @Nullable PTransform cameraAnchorModelDelta()
 	{
 		String cameraBone = this.definition.anchors().get(PPlayerAnimationAnchors.FIRST_PERSON_CAMERA);
-		if (cameraBone == null) return null;
+		if (cameraBone == null)
+		{
+			return null;
+		}
 		PTransform current = transform(cameraBone);
 		PTransform bind = bindTransform(cameraBone);
-		return current == null || bind == null ? null : current.compose(bind.inverse());
+		Matrix4f currentMatrix = new Matrix4f();
+		Matrix4f bindMatrix = new Matrix4f();
+		if (current == null || bind == null || !currentRootRelativeMatrix(cameraBone, currentMatrix) ||
+				!bindMatrix(cameraBone, bindMatrix))
+		{
+			return null;
+		}
+		Quaternionf currentRotation = current.rotation();
+		Quaternionf bindRotation = bind.rotation();
+		String reference = this.rootBone == null ? this.definition.bindings().get(PPlayerPart.HEAD) : this.rootBone;
+		if (reference != null)
+		{
+			PTransform referenceBind = bindTransform(reference);
+			Matrix4f referenceMatrix = new Matrix4f();
+			if (referenceBind == null || !bindMatrix(reference, referenceMatrix))
+			{
+				return null;
+			}
+			referenceMatrix.invert().mul(bindMatrix, bindMatrix);
+			bindRotation.premul(referenceBind.rotation().invert());
+			if (this.rootBone == null)
+			{
+				currentRotation.premul(referenceBind.rotation().invert());
+			}
+			else
+			{
+				PTransform root = transform(reference);
+				if (root == null)
+				{
+					return null;
+				}
+				currentRotation.premul(root.rotation().invert());
+				PPlayerBonePose rootDelta = canonicalModelDelta(reference);
+				if (rootDelta != null)
+				{
+					PPlayerAnimationSpace.visualRootMatrix(rootDelta, this.definition.rootPivot(), 1, referenceMatrix);
+					referenceMatrix.mul(currentMatrix, currentMatrix);
+					currentRotation.premul(rootDelta.rotation());
+				}
+			}
+		}
+		/*
+		 * D = C_visual * inverse(B_visual), p_bind = B_visual * (0,0,0,1).
+		 * Displacement = D * p_bind - p_bind. Both operands use the same
+		 * reference frame; parent/pivot/scale effects are already in C_visual.
+		 */
+		Vector3f bindPoint = bindMatrix.getTranslation(new Vector3f());
+		Matrix4f affineDelta = currentMatrix.mul(new Matrix4f(bindMatrix).invert());
+		Vector3f displacement = affineDelta.transformPosition(new Vector3f(bindPoint)).sub(bindPoint);
+		Quaternionf rotation = currentRotation.mul(bindRotation.invert()).normalize();
+		Vector3f scale = new Vector3f(ratio(current.scale().x, bind.scale().x),
+				ratio(current.scale().y, bind.scale().y), ratio(current.scale().z, bind.scale().z));
+		return new PTransform(displacement, rotation, scale);
 	}
 
 	private @Nullable PTransform transform(String boneName)

@@ -199,7 +199,8 @@ public final class PPlayerAutomaticMeshAttachments
 	private static void findRoots(PBakedBone bone, Set<String> skeleton, Set<String> animated,
 	                              boolean animatedParent, List<PBakedBone> roots)
 	{
-		boolean inheritsAnimation = animatedParent || animated.contains(bone.name());
+		// A static mesh on the active rig still moves in VIEW space when only the camera animates.
+		boolean inheritsAnimation = animatedParent || skeleton.contains(bone.name()) || animated.contains(bone.name());
 		if (!skeleton.contains(bone.name()) && (inheritsAnimation || containsAnimated(bone, animated)) && containsMesh(bone))
 		{
 			roots.add(bone);

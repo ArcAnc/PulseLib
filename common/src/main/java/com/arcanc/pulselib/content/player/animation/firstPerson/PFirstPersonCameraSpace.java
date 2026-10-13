@@ -21,6 +21,13 @@ public final class PFirstPersonCameraSpace
 	{
 	}
 
+	/** Reconstructs Minecraft yaw/pitch/roll using the native NeoForge camera convention. */
+	public static Quaternionf fromMinecraftAngles(float yaw, float pitch, float roll, Quaternionf destination)
+	{
+		return destination.rotationYXZ((float)Math.PI - (float)Math.toRadians(yaw),
+				-(float)Math.toRadians(pitch), -(float)Math.toRadians(roll));
+	}
+
 	/**
 	 * Performs the to minecraft offset operation.
 	 * @param value the value to use.

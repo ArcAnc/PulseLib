@@ -3,7 +3,7 @@
   "branch": "1.21.1-multiloader",
   "head": "4b22a67bcf3e1091de92dc5f8e2c94de9ac48eaf",
   "version": "1.2.0",
-  "basis": "M-P2/M-P3 work based on committed HEAD 4b22a67; historical evidence and C1/H14/H17/L38 fixes preserved.",
+  "basis": "M-P2 Phase A committed at 5c22705; Phase B validated after M-P2 stabilization; historical evidence and C1/H14/H17/L38 preserved. Both IDs remain IN PROGRESS because normal game JVM termination and full visual/multiplayer validation are incomplete.",
   "counts": {
     "FIXED": 4,
     "CONFIRMED BUG": 37,
@@ -1204,10 +1204,10 @@
       ],
       "current_report": "player-motion-camera-regressions-2026-10-13.md",
       "current_evidence": [
-        "Visual-only ROOT; model-space action sockets and bind-relative API retained; exact current-root-relative render path removes repeated ROOT and keeps intermediate parent matrices.",
-        "8 hierarchy JUnit tests pass; 5 baseline witnesses fail on HEAD; C1/plugin tests preserved.",
-        "Fabric and NeoForge each report 244 in-game matrix/physics assertions PASS, with reload, weights, five blend modes, two definitions, respawn and two client observer actors.",
-        "Normal JVM termination after PASS remains unverified; no screenshot/pixel or real multi-client multiplayer equivalence claim."
+        "Visual-only ROOT; full model-space action sockets and bind-relative public API retained; exact current-root-relative render matrices prevent repeated ROOT and preserve all parents.",
+        "8 hierarchy JUnit tests pass; original Phase A baseline has 5 failing witnesses; C1/plugin production and regression files unchanged.",
+        "Expanded Phase A game run passes 953 matrix/physics checks per loader; combined Phase A/B passes Fabric 1680, NeoForge 1682, including all five blend modes, three weights, crossfade frames, ROOT masks, part/bone weights, two definitions, reload, respawn and two rendered client observers.",
+        "Normal JVM exit remains unverified after PASS/save; screenshot/pixel and real multi-client multiplayer equivalence not exercised. ID stays IN PROGRESS."
       ]
     },
     {
@@ -1215,7 +1215,7 @@
       "status": "IN PROGRESS",
       "evidence": "current∘bind^-1 действительно содержит (I-R)·bindTranslation. Это корректный affine delta, но может быть неподходящей camera displacement. Нужно решить, камера следует за authored frame/pivot или только разницей positions; автоматическая замена на current.t-bind.t меняет эту семантику.",
       "historical_status": "NEEDS DESIGN DECISION",
-      "current_status": "CONTRACT ACCEPTED — CAMERA REGRESSION AND FIX PENDING",
+      "current_status": "CONTRACT ACCEPTED — IMPLEMENTED, VALIDATION INCOMPLETE",
       "historical_places": [
         [
           "common/src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationFrame.java",
@@ -1234,7 +1234,11 @@
       ],
       "current_report": "player-motion-camera-regressions-2026-10-13.md",
       "current_evidence": [
-        "Author accepted visual-only camera hierarchy contract; phase B starts after M-P2 assertion stabilization."
+        "Camera point displacement is D*p_bind-p_bind in the shared visual ROOT/pivot frame; inherited quaternion channels supply orientation; camera-only rotation has zero false displacement.",
+        "7 of 8 camera tests fail with the Phase A HEAD method; all 8 corrected tests pass, including rotated/scaled parent hierarchy, bind frames, pivot, rootless reference and Minecraft yaw/pitch/roll round-trip.",
+        "Fabric passes 856 actual Camera.setup assertions; NeoForge 851. Gecko/embedded glTF F/G/H/I, VANILLA, perspectives and reload exercised; physics snapshots unchanged.",
+        "Required ./gradlew build --no-daemon succeeds with 58 JUnit tests. C1/H14/H17/L38 source and regression files unchanged.",
+        "Normal JVM exit remains unverified after PASS/save; screenshot/pixel and real multi-client multiplayer equivalence not exercised. ID stays IN PROGRESS."
       ]
     },
     {

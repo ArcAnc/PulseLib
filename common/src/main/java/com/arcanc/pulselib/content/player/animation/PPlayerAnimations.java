@@ -242,17 +242,8 @@ public final class PPlayerAnimations
 	{
 		applyDefinitions(player, partialTick, Set.of(PPlayerPart.ROOT), (part, pose, definition, weight) ->
 		{
-			PPlayerBonePose modelPose = playerModelSpace(pose, definition);
-			Vector3f translation = new Vector3f(modelPose.translation()).mul(weight);
-			Vector3f pivot = playerModelSpace(definition.rootPivot(), definition);
-			Quaternionf rotation = new Quaternionf().slerp(modelPose.rotation(), weight);
-			Vector3f scale = new Vector3f(1.0f).lerp(pose.scale(), weight);
-
-			poseStack.translate(translation.x, translation.y, translation.z);
-			poseStack.translate(pivot.x, pivot.y, pivot.z);
-			poseStack.mulPose(rotation);
-			poseStack.scale(scale.x, scale.y, scale.z);
-			poseStack.translate(-pivot.x, -pivot.y, -pivot.z);
+			Matrix4f root = PPlayerAnimationSpace.visualRootMatrix(pose, definition.rootPivot(), weight, new Matrix4f());
+			poseStack.mulPose(PPlayerAnimationSpace.toPlayerSpace(root, definition));
 		});
 	}
 	
@@ -304,7 +295,8 @@ public final class PPlayerAnimations
 			PPlayerAnimationFrame frame = instance.sampleFrame(partialTick);
 			PTransform delta = frame == null ? null : frame.cameraAnchorModelDelta();
 			if (delta != null)
-				cameraPose.addCamera(delta, definition.blendMode(), definitionWeight * instance.firstPersonActivationWeight(partialTick));
+				cameraPose.addCamera(PPlayerAnimationSpace.toPlayerSpace(delta, definition), definition.blendMode(),
+						definitionWeight * instance.firstPersonActivationWeight(partialTick));
 		}
 		return cameraPose.isEmpty() ? null : cameraPose;
 	}

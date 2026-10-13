@@ -65,6 +65,16 @@ public final class PPlayerAnimationSpace
 		return usesGltfCoordinates(definition) ? GLTF_TO_PLAYER_GEOMETRY.compose(toPlayerGeometrySpace(transform, definition)) : transform;
 	}
 
+	/** The visual ROOT matrix in source axes; the native player and camera share this pivot convention. */
+	public static Matrix4f visualRootMatrix(PPlayerBonePose pose, Vector3f pivot, float weight, Matrix4f destination)
+	{
+		Vector3f translation = pose.translation().mul(weight);
+		Quaternionf rotation = new Quaternionf().slerp(pose.rotation(), weight);
+		Vector3f scale = new Vector3f(1).lerp(pose.scale(), weight);
+		return destination.identity().translate(translation).translate(pivot).rotate(rotation).scale(scale).
+				translate(-pivot.x, -pivot.y, -pivot.z);
+	}
+
 	/** Changes both the transform input and output basis for native anchor geometry. */
 	public static Matrix4f toPlayerSpace(Matrix4f matrix, PPlayerAnimationDefinition definition)
 	{
