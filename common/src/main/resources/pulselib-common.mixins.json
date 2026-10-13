@@ -17,6 +17,7 @@
     "GameRendererMixin",
     "ItemInHandRendererMixin",
     "LivingEntityRendererMixin",
+    "LevelRendererTransparencyMixin",
     "ModelPartCubesMixin",
     "RenderTypeAccessor$CompositeRenderTypeAccessor",
     "RenderTypeAccessor$CompositeStateAccessor",

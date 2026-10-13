@@ -10,6 +10,7 @@
 package com.arcanc.pulselib.content.renderer.legacy;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.vertex.BufferUploader;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.*;
 
@@ -24,6 +25,71 @@ final class GlStateSnapshot
 	private boolean depthMask;
 	private boolean scissor;
 	private int depthFunc;
+	private int program;
+	private int vertexArray;
+	private int arrayBuffer;
+	private int elementBuffer;
+	private int activeTexture;
+	private int activeTextureBinding;
+	private int[] textures = new int[0];
+
+	void captureBindings(int textureUnits)
+	{
+		this.program = GL11.glGetInteger(GL20.GL_CURRENT_PROGRAM);
+		this.vertexArray = GL11.glGetInteger(GL30.GL_VERTEX_ARRAY_BINDING);
+		this.arrayBuffer = GL11.glGetInteger(GL15.GL_ARRAY_BUFFER_BINDING);
+		this.elementBuffer = GL11.glGetInteger(GL15.GL_ELEMENT_ARRAY_BUFFER_BINDING);
+		this.activeTexture = GL11.glGetInteger(GL13.GL_ACTIVE_TEXTURE);
+		this.activeTextureBinding = GL11.glGetInteger(GL11.GL_TEXTURE_BINDING_2D);
+		if (this.textures.length != textureUnits)
+		{
+			this.textures = new int[textureUnits];
+		}
+		for (int unit = 0; unit < this.textures.length; unit++)
+		{
+			activeTexture(GL13.GL_TEXTURE0 + unit);
+			this.textures[unit] = GL11.glGetInteger(GL11.GL_TEXTURE_BINDING_2D);
+		}
+		activeTexture(this.activeTexture);
+	}
+
+	void restoreBindings()
+	{
+		// Composite shader.clear() invalidates ShaderInstance's program cache.
+		GL20.glUseProgram(this.program);
+		BufferUploader.invalidate();
+		GL30.glBindVertexArray(this.vertexArray);
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.arrayBuffer);
+		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, this.elementBuffer);
+		for (int unit = 0; unit < this.textures.length; unit++)
+		{
+			activeTexture(GL13.GL_TEXTURE0 + unit);
+			bindTexture(this.textures[unit]);
+		}
+		activeTexture(this.activeTexture);
+		if (this.activeTexture < GL13.GL_TEXTURE0 + 12)
+		{
+			bindTexture(this.activeTextureBinding);
+		}
+		else
+		{
+			// Minecraft 1.21.1 caches only twelve units; other GL callers may use more.
+			GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.activeTextureBinding);
+		}
+	}
+
+	private static void activeTexture(int unit)
+	{
+		GL13.glActiveTexture(unit);
+		GlStateManager._activeTexture(unit);
+	}
+
+	private static void bindTexture(int texture)
+	{
+		GlStateManager._bindTexture(0);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture);
+		GlStateManager._bindTexture(texture);
+	}
 
 	void capture()
 	{

@@ -1,0 +1,136 @@
+HEAD 87052baf1c7dc281aea3d6714eafa9ac26545110 + local H14 diff; 2026-10-13
+
+Baseline before production changes
+[13:43:49] [Render thread/INFO] (Pulse Lib) H14 weather before vanilla: RGB 0.5019608,0.0,0.0 alpha 0.5019608 depth 1.0
+[13:43:49] [Render thread/INFO] (Pulse Lib) H14 BASELINE REPRODUCED: Fancy opaque RGB 0.6,0.09803922,0.09803922; Fabulous opaque RGB 0.2,0.2,0.2; Fabulous sky RGB 0.54901963,0.1254902,0.24705882
+BUILD SUCCESSFUL in 19s
+
+Fabric final
+[14:28:47] [Render thread/INFO] (Pulse Lib) H14 WORLD world-fancy-control: stone RGB 0.37254903,0.37254903,0.37254903; sky RGB 0.70980394,0.81960785,1.0
+[14:28:47] [Render thread/INFO] (Pulse Lib) H14 WORLD world-fancy-front: stone RGB 0.6862745,0.18431373,0.18431373; sky RGB 0.85490197,0.40784314,0.49803922
+[14:28:47] [Render thread/INFO] (Pulse Lib) H14 WORLD world-fancy-behind: stone RGB 0.37254903,0.37254903,0.37254903; sky RGB 0.3529412,0.40784314,1.0
+[14:28:48] [Render thread/INFO] (Pulse Lib) H14 WORLD world-fabulous-control: stone RGB 0.37254903,0.37254903,0.37254903; sky RGB 0.70980394,0.81960785,1.0
+[14:28:48] [Render thread/INFO] (Pulse Lib) H14 WORLD world-fabulous-front: stone RGB 0.6862745,0.18431373,0.18431373; sky RGB 0.85490197,0.40784314,0.49803922
+[14:28:48] [Render thread/INFO] (Pulse Lib) H14 WORLD world-fabulous-behind: stone RGB 0.37254903,0.37254903,0.37254903; sky RGB 0.3529412,0.40784314,1.0
+[14:28:48] [Render thread/INFO] (Pulse Lib) H14 WORLD PIXEL PASS: stone wall, front/behind emissive surfaces, sky; 24 common Fabulous hooks
+[14:28:53] [Render thread/INFO] (Pulse Lib) H14 WORLD world-rain-fancy-control: stone RGB 0.30588236,0.30588236,0.32941177; sky RGB 0.34901962,0.39607844,0.56078434
+[14:28:53] [Render thread/INFO] (Pulse Lib) H14 WORLD world-rain-fancy-front: stone RGB 0.654902,0.15294118,0.16470589; sky RGB 0.6745098,0.19607843,0.2784314
+[14:28:53] [Render thread/INFO] (Pulse Lib) H14 WORLD world-rain-fancy-behind: stone RGB 0.30588236,0.30588236,0.32941177; sky RGB 0.14117648,0.18039216,0.80784315
+[14:28:53] [Render thread/INFO] (Pulse Lib) H14 WORLD world-rain-fabulous-control: stone RGB 0.30588236,0.30588236,0.32941177; sky RGB 0.34901962,0.39607844,0.56078434
+[14:28:54] [Render thread/INFO] (Pulse Lib) H14 WORLD world-rain-fabulous-front: stone RGB 0.654902,0.15294118,0.16470589; sky RGB 0.6745098,0.19607843,0.2784314
+[14:28:54] [Render thread/INFO] (Pulse Lib) H14 WORLD world-rain-fabulous-behind: stone RGB 0.30588236,0.30588236,0.32941177; sky RGB 0.17254902,0.19607843,0.78039217
+[14:28:54] [Render thread/INFO] (Pulse Lib) H14 WEATHER PIXEL PASS: live rain and clouds, Fancy/Fabulous, same-frame ordered-alpha reference
+[14:28:54] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-front: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.54901963,0.1254902,0.24705882
+[14:28:54] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-behind: opaque RGB 0.2,0.2,0.2; sky RGB 0.54901963,0.1254902,0.24705882
+[14:28:54] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-crossing: opaque RGB 0.54901963,0.29803923,0.047058824; sky RGB 0.27450982,0.5647059,0.12156863
+[14:28:54] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-four-layers: opaque RGB 0.41960785,0.35686275,0.20392157; sky RGB 0.38431373,0.37254903,0.29803923
+[14:28:54] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-emissive: opaque RGB 0.2901961,0.47843137,0.6; sky RGB 0.23921569,0.5019608,0.7490196
+[14:28:54] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-lit: opaque RGB 0.3529412,0.09803922,0.09803922; sky RGB 0.3019608,0.1254902,0.24705882
+[14:28:54] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-translucent-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[14:28:54] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-translucent-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[14:28:54] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-itemEntity-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[14:28:54] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-itemEntity-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[14:28:54] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-particles-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[14:28:54] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-particles-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[14:28:54] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-weather-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[14:28:54] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-weather-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[14:28:54] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-clouds-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[14:28:54] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-clouds-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[14:28:54] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-interleaved: opaque RGB 0.7294118,0.38039216,0.02745098; sky RGB 0.72156864,0.41568628,0.13333334
+[14:28:54] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-opaque-particle: opaque RGB 0.0,0.0,1.0; sky RGB 0.0,0.0,1.0
+[14:28:58] [Render thread/INFO] (Pulse Lib) H14 WORLD world-reloaded-resized-rain-fabulous-control: stone RGB 0.30588236,0.30588236,0.32941177; sky RGB 0.34901962,0.39607844,0.56078434
+[14:28:58] [Render thread/INFO] (Pulse Lib) H14 WORLD world-reloaded-resized-rain-fabulous-front: stone RGB 0.654902,0.15294118,0.16470589; sky RGB 0.6745098,0.19607843,0.2784314
+[14:28:58] [Render thread/INFO] (Pulse Lib) H14 WORLD world-reloaded-resized-rain-fabulous-behind: stone RGB 0.30588236,0.30588236,0.32941177; sky RGB 0.17254902,0.19607843,0.78039217
+[14:28:58] [Render thread/INFO] (Pulse Lib) H14 WEATHER PIXEL PASS: live rain and clouds, Fancy/Fabulous, same-frame ordered-alpha reference
+[14:28:58] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-front: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.54901963,0.1254902,0.24705882
+[14:28:58] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-behind: opaque RGB 0.2,0.2,0.2; sky RGB 0.54901963,0.1254902,0.24705882
+[14:28:58] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-crossing: opaque RGB 0.54901963,0.29803923,0.047058824; sky RGB 0.27450982,0.5647059,0.12156863
+[14:28:58] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-four-layers: opaque RGB 0.41960785,0.35686275,0.20392157; sky RGB 0.38431373,0.37254903,0.29803923
+[14:28:58] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-emissive: opaque RGB 0.2901961,0.47843137,0.6; sky RGB 0.23921569,0.5019608,0.7490196
+[14:28:58] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-lit: opaque RGB 0.3529412,0.09803922,0.09803922; sky RGB 0.3019608,0.1254902,0.24705882
+[14:28:58] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-translucent-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[14:28:58] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-translucent-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[14:28:58] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-itemEntity-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[14:28:58] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-itemEntity-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[14:28:58] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-particles-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[14:28:58] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-particles-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[14:28:58] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-weather-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[14:28:58] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-weather-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[14:28:58] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-clouds-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[14:28:58] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-clouds-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[14:28:58] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-interleaved: opaque RGB 0.7294118,0.38039216,0.02745098; sky RGB 0.72156864,0.41568628,0.13333334
+[14:28:58] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-opaque-particle: opaque RGB 0.0,0.0,1.0; sky RGB 0.0,0.0,1.0
+[14:28:58] [Render thread/INFO] (Pulse Lib) H14 PIXEL PASS: 38 cases, vanilla Fabulous chain, Fancy reference, GL state, resource reload and window resize
+BUILD SUCCESSFUL in 41s
+
+NeoForge final
+[14:30:51] [Render thread/INFO] [Pulse Lib/]: H14 WORLD world-fancy-control: stone RGB 0.37254903,0.37254903,0.37254903; sky RGB 0.70980394,0.81960785,1.0
+[14:30:51] [Render thread/INFO] [Pulse Lib/]: H14 WORLD world-fancy-front: stone RGB 0.6862745,0.18431373,0.18431373; sky RGB 0.85490197,0.40784314,0.49803922
+[14:30:52] [Render thread/INFO] [Pulse Lib/]: H14 WORLD world-fancy-behind: stone RGB 0.37254903,0.37254903,0.37254903; sky RGB 0.3529412,0.40784314,1.0
+[14:30:52] [Render thread/INFO] [Pulse Lib/]: H14 WORLD world-fabulous-control: stone RGB 0.37254903,0.37254903,0.37254903; sky RGB 0.70980394,0.81960785,1.0
+[14:30:52] [Render thread/INFO] [Pulse Lib/]: H14 WORLD world-fabulous-front: stone RGB 0.6862745,0.18431373,0.18431373; sky RGB 0.85490197,0.40784314,0.49803922
+[14:30:52] [Render thread/INFO] [Pulse Lib/]: H14 WORLD world-fabulous-behind: stone RGB 0.37254903,0.37254903,0.37254903; sky RGB 0.3529412,0.40784314,1.0
+[14:30:52] [Render thread/INFO] [Pulse Lib/]: H14 WORLD PIXEL PASS: stone wall, front/behind emissive surfaces, sky; 24 common Fabulous hooks
+[14:30:57] [Render thread/INFO] [Pulse Lib/]: H14 WORLD world-rain-fancy-control: stone RGB 0.30588236,0.30588236,0.32941177; sky RGB 0.34901962,0.39607844,0.56078434
+[14:30:57] [Render thread/INFO] [Pulse Lib/]: H14 WORLD world-rain-fancy-front: stone RGB 0.654902,0.15294118,0.16470589; sky RGB 0.6745098,0.19607843,0.2784314
+[14:30:57] [Render thread/INFO] [Pulse Lib/]: H14 WORLD world-rain-fancy-behind: stone RGB 0.30588236,0.30588236,0.32941177; sky RGB 0.17254902,0.19607843,0.78039217
+[14:30:58] [Render thread/INFO] [Pulse Lib/]: H14 WORLD world-rain-fabulous-control: stone RGB 0.30588236,0.30588236,0.32941177; sky RGB 0.34901962,0.39607844,0.56078434
+[14:30:58] [Render thread/INFO] [Pulse Lib/]: H14 WORLD world-rain-fabulous-front: stone RGB 0.62352943,0.15294118,0.25882354; sky RGB 0.6745098,0.19607843,0.2784314
+[14:30:58] [Render thread/INFO] [Pulse Lib/]: H14 WORLD world-rain-fabulous-behind: stone RGB 0.30588236,0.30588236,0.32941177; sky RGB 0.17254902,0.19607843,0.78039217
+[14:30:58] [Render thread/INFO] [Pulse Lib/]: H14 WEATHER PIXEL PASS: live rain and clouds, Fancy/Fabulous, same-frame ordered-alpha reference
+[14:30:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-front: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.54901963,0.1254902,0.24705882
+[14:30:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-behind: opaque RGB 0.2,0.2,0.2; sky RGB 0.54901963,0.1254902,0.24705882
+[14:30:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-crossing: opaque RGB 0.54901963,0.29803923,0.047058824; sky RGB 0.27450982,0.5647059,0.12156863
+[14:30:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-four-layers: opaque RGB 0.41960785,0.35686275,0.20392157; sky RGB 0.38431373,0.37254903,0.29803923
+[14:30:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-emissive: opaque RGB 0.2901961,0.47843137,0.6; sky RGB 0.23921569,0.5019608,0.7490196
+[14:30:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-lit: opaque RGB 0.3529412,0.09803922,0.09803922; sky RGB 0.3019608,0.1254902,0.24705882
+[14:30:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-translucent-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[14:30:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-translucent-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[14:30:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-itemEntity-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[14:30:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-itemEntity-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[14:30:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-particles-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[14:30:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-particles-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[14:30:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-weather-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[14:30:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-weather-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[14:30:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-clouds-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[14:30:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-clouds-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[14:30:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-interleaved: opaque RGB 0.7294118,0.38039216,0.02745098; sky RGB 0.72156864,0.41568628,0.13333334
+[14:30:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-opaque-particle: opaque RGB 0.0,0.0,1.0; sky RGB 0.0,0.0,1.0
+[14:31:02] [Render thread/INFO] [Pulse Lib/]: H14 WORLD world-reloaded-resized-rain-fabulous-control: stone RGB 0.30588236,0.30588236,0.32941177; sky RGB 0.3254902,0.38039216,0.58431375
+[14:31:02] [Render thread/INFO] [Pulse Lib/]: H14 WORLD world-reloaded-resized-rain-fabulous-front: stone RGB 0.654902,0.15294118,0.16470589; sky RGB 0.6745098,0.19607843,0.2784314
+[14:31:02] [Render thread/INFO] [Pulse Lib/]: H14 WORLD world-reloaded-resized-rain-fabulous-behind: stone RGB 0.30588236,0.30588236,0.32941177; sky RGB 0.17254902,0.19607843,0.78039217
+[14:31:02] [Render thread/INFO] [Pulse Lib/]: H14 WEATHER PIXEL PASS: live rain and clouds, Fancy/Fabulous, same-frame ordered-alpha reference
+[14:31:02] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-front: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.54901963,0.1254902,0.24705882
+[14:31:02] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-behind: opaque RGB 0.2,0.2,0.2; sky RGB 0.54901963,0.1254902,0.24705882
+[14:31:02] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-crossing: opaque RGB 0.54901963,0.29803923,0.047058824; sky RGB 0.27450982,0.5647059,0.12156863
+[14:31:02] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-four-layers: opaque RGB 0.41960785,0.35686275,0.20392157; sky RGB 0.38431373,0.37254903,0.29803923
+[14:31:02] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-emissive: opaque RGB 0.2901961,0.47843137,0.6; sky RGB 0.23921569,0.5019608,0.7490196
+[14:31:02] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-lit: opaque RGB 0.3529412,0.09803922,0.09803922; sky RGB 0.3019608,0.1254902,0.24705882
+[14:31:02] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-translucent-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[14:31:02] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-translucent-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[14:31:02] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-itemEntity-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[14:31:02] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-itemEntity-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[14:31:02] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-particles-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[14:31:02] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-particles-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[14:31:02] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-weather-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[14:31:02] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-weather-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[14:31:02] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-clouds-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[14:31:02] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-clouds-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[14:31:02] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-interleaved: opaque RGB 0.7294118,0.38039216,0.02745098; sky RGB 0.72156864,0.41568628,0.13333334
+[14:31:02] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-opaque-particle: opaque RGB 0.0,0.0,1.0; sky RGB 0.0,0.0,1.0
+[14:31:02] [Render thread/INFO] [Pulse Lib/]: H14 PIXEL PASS: 38 cases, vanilla Fabulous chain, Fancy reference, GL state, resource reload and window resize
+BUILD SUCCESSFUL in 38s
+
+Standard build
+> Task :neoforge:testClasses UP-TO-DATE
+> Task :neoforge:test NO-SOURCE
+> Task :common:testClasses UP-TO-DATE
+> Task :fabric:testClasses UP-TO-DATE
+> Task :fabric:test
+> Task :common:test
+BUILD SUCCESSFUL in 20s
+
+Documented baseline option (replays former routing on current code)
+[14:39:25] [Render thread/INFO] (Pulse Lib) H14 weather before vanilla: RGB 0.5019608,0.0,0.0 alpha 0.5019608 depth 1.0
+[14:39:25] [Render thread/INFO] (Pulse Lib) H14 BASELINE REPRODUCED: Fancy opaque 0.6,0.09803922,0.09803922; Fabulous opaque 0.2,0.2,0.2; Fabulous sky 0.54901963,0.1254902,0.24705882
+BUILD SUCCESSFUL in 19s

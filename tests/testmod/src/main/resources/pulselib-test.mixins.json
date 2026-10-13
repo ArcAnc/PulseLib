@@ -6,7 +6,13 @@
     "SmokeServerMixin"
   ],
   "client": [
+    "H14QueueMixin",
     "SmokeRenderMixin",
+    "SmokeLifecycleMixin",
+    "OitTimingMixin",
+    "StreamAllocationMixin",
+    "InstanceAllocationMixin",
+    "IndirectAllocationMixin",
     "SmokeLayerMixin",
     "SmokeStagesMixin"
   ],

@@ -17,6 +17,7 @@ import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.renderer.ShaderInstance;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.ARBDrawBuffersBlend;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
@@ -26,6 +27,8 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL32;
 import org.lwjgl.opengl.GL40;
+
+import java.util.List;
 
 public final class GlWeightedBlendedOit
 {
@@ -46,6 +49,7 @@ public final class GlWeightedBlendedOit
 	private int width = -1;
 	private int height = -1;
 	private int depthTexture = -1;
+	private int fabulousMetadataTexture = -1;
 	private boolean frameOpen;
 	private Pass pass = Pass.NONE;
 	private int activeLayer = -1;
@@ -144,7 +148,31 @@ public final class GlWeightedBlendedOit
 
 	public void composite(RenderTarget destination)
 	{
-		ShaderInstance shader = PRenderTypes.ShadersProvider.oitComposite();
+		composite(destination, PRenderTypes.ShadersProvider.oitComposite(), List.of());
+	}
+
+	/**
+	 * Vanilla has already composed its targets. For each OIT depth, the shader
+	 * preserves the premultiplied contribution of vanilla surfaces in front.
+	 * No collapsed OIT depth is written into a vanilla target.
+	 */
+	public void compositeFabulous(RenderTarget destination, List<RenderTarget> targets)
+	{
+		if (targets.size() != 5)
+		{
+			throw new IllegalArgumentException("Fabulous composition requires five translucent targets");
+		}
+		if (PRenderTypes.ShadersProvider.oitFabulousMetadata() == null)
+		{
+			finishFrame();
+			return;
+		}
+		composite(destination, PRenderTypes.ShadersProvider.oitFabulousComposite(), targets);
+	}
+
+	private void composite(RenderTarget destination, @Nullable ShaderInstance shader,
+	                       List<RenderTarget> targets)
+	{
 		if (shader == null || !this.frameOpen || this.framebuffer < 0)
 		{
 			finishFrame();
@@ -154,29 +182,56 @@ public final class GlWeightedBlendedOit
 			throw new IllegalStateException("Cannot composite weighted blended OIT while a pass is active");
 
 		captureFramebufferState();
-		destination.bindWrite(true);
-		RenderSystem.disableDepthTest();
-		RenderSystem.depthMask(false);
-		RenderSystem.enableBlend();
-		RenderSystem.defaultBlendFunc();
 		try
 		{
+			this.previousGlState.captureBindings(targets.isEmpty() ? 3 : 12);
+			BufferUploader.invalidate();
+			destination.bindWrite(true);
+			RenderSystem.disableDepthTest();
+			RenderSystem.depthMask(false);
+			RenderSystem.enableBlend();
+			RenderSystem.blendEquation(GL14.GL_FUNC_ADD);
+			if (targets.isEmpty())
+			{
+				RenderSystem.defaultBlendFunc();
+			}
+			else
+			{
+				if (this.fabulousMetadataTexture < 0)
+				{
+					this.fabulousMetadataTexture = createTexture(GL30.GL_RG32F, GL30.GL_RG, this.width, this.height);
+				}
+				// Preserve the alpha of the already resolved vanilla image.
+				RenderSystem.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ZERO, GL11.GL_ONE);
+				String[] names = {"Translucent", "ItemEntity", "Particles", "Weather", "Clouds"};
+				for (int index = 0; index < names.length; index++)
+				{
+					shader.setSampler(names[index] + "Sampler", targets.get(index).getColorTextureId());
+					shader.setSampler(names[index] + "DepthSampler", targets.get(index).getDepthTextureId());
+				}
+			}
 			for (int layer = LAYER_COUNT - 1; layer >= 0; layer--)
 			{
 				if (!this.hasContent[layer])
 					continue;
 				shader.setSampler("AccumSampler", this.accumulationTextures[layer]);
-				shader.setSampler("RevealSampler", this.revealageTextures[layer]);
-				shader.setSampler("DepthSampler", this.layerDepthTextures[layer]);
-				shader.apply();
+				if (targets.isEmpty())
+				{
+					shader.setSampler("RevealSampler", this.revealageTextures[layer]);
+					shader.setSampler("DepthSampler", this.layerDepthTextures[layer]);
+				}
+				else
+				{
+					resolveFabulousMetadata(layer);
+					destination.bindWrite(true);
+					RenderSystem.enableBlend();
+					RenderSystem.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ZERO, GL11.GL_ONE);
+					shader.setSampler("OitMetadataSampler", this.fabulousMetadataTexture);
+				}
 				try
 				{
-					BufferBuilder buffer = RenderSystem.renderThreadTesselator().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.BLIT_SCREEN);
-					buffer.addVertex(0f, 0f, 0f);
-					buffer.addVertex(1f, 0f, 0f);
-					buffer.addVertex(1f, 1f, 0f);
-					buffer.addVertex(0f, 1f, 0f);
-					BufferUploader.draw(buffer.buildOrThrow());
+					shader.apply();
+					drawScreen();
 				}
 				finally
 				{
@@ -186,17 +241,54 @@ public final class GlWeightedBlendedOit
 		}
 		finally
 		{
-			RenderSystem.disableBlend();
-			RenderSystem.depthMask(true);
-			RenderSystem.enableDepthTest();
-			restoreFramebufferState();
-			finishFrame();
+			try
+			{
+				restoreFramebufferState();
+			}
+			finally
+			{
+				this.previousGlState.restoreBindings();
+				finishFrame();
+			}
 		}
+	}
+
+	private void resolveFabulousMetadata(int layer)
+	{
+		ShaderInstance shader = PRenderTypes.ShadersProvider.oitFabulousMetadata();
+		GL30.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, this.framebuffer);
+		attachColor(0, this.fabulousMetadataTexture);
+		attachColor(1, 0);
+		GL20.glDrawBuffers(new int[]{GL30.GL_COLOR_ATTACHMENT0});
+		RenderSystem.disableBlend();
+		shader.setSampler("RevealSampler", this.revealageTextures[layer]);
+		shader.setSampler("DepthSampler", this.layerDepthTextures[layer]);
+		try
+		{
+			shader.apply();
+			drawScreen();
+		}
+		finally
+		{
+			shader.clear();
+		}
+	}
+
+	private static void drawScreen()
+	{
+		BufferBuilder buffer = RenderSystem.renderThreadTesselator().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.BLIT_SCREEN);
+		buffer.addVertex(0f, 0f, 0f);
+		buffer.addVertex(1f, 0f, 0f);
+		buffer.addVertex(1f, 1f, 0f);
+		buffer.addVertex(0f, 1f, 0f);
+		BufferUploader.draw(buffer.buildOrThrow());
 	}
 
 	public void close()
 	{
 		endPass();
+		deleteTexture(this.fabulousMetadataTexture);
+		this.fabulousMetadataTexture = -1;
 		for (int layer = 0; layer < LAYER_COUNT; layer++)
 		{
 			deleteTexture(this.accumulationTextures[layer]);

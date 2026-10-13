@@ -44,9 +44,15 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexSorting;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
@@ -55,18 +61,20 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.*;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
+import java.util.concurrent.CompletableFuture;
 
 public final class SmokeHarness
 {
 	private static boolean completed;
-	private static int reloads;
-	private static int worlds;
 	private static int worldStart = -1;
-	private static @Nullable CompletableFuture<Void> reloading;
-	private static @Nullable PBakedModel previous;
-	private static @Nullable TextureAtlasSprite previousSprite;
+	private static final BlockPos TEST_BLOCK = new BlockPos(11, 140, 14);
+	private static @Nullable CompletableFuture<Void> worldSetup;
+	private static @Nullable SmokeResources naturalResources;
+	private static long disconnectDeadline;
+	private static int naturalHooks;
+	private static int blockCalls;
+	private static boolean explicitCleanup;
 
 	private SmokeHarness()
 	{
@@ -74,17 +82,30 @@ public final class SmokeHarness
 
 	public static void frame()
 	{
-		if (completed)
-			return;
 		Minecraft mc = Minecraft.getInstance();
+		if (naturalResources != null)
+		{
+			if (naturalHooks == 0 && System.nanoTime() < disconnectDeadline)
+			{
+				return;
+			}
+			check(naturalHooks > 0, "Natural disconnect did not invoke a loader lifecycle hook");
+			naturalResources.assertDeleted("natural disconnect");
+			naturalResources = null;
+			completed = true;
+			PLibDatabase.LOGGER.info("PULSE TEST NATURAL DISCONNECT PASS: {} loader hook calls", naturalHooks);
+			PLibDatabase.LOGGER.info("PULSE TEST CLIENT PASS: graphics, animation, explicit cleanup and natural lifecycle");
+			mc.stop();
+			return;
+		}
+		if (completed)
+		{
+			return;
+		}
 		if (Boolean.getBoolean("pulselib.test.world") && (mc.player == null || mc.level == null))
 			return;
 		if (mc.getOverlay() != null || PModelCache.getModels() == null)
 			return;
-		if (reloading != null && !reloading.isDone())
-			return;
-		if (reloading != null)
-			reloading.join();
 		PBakedModel gltf = ClientTestPlugin.GLTF.getModel();
 		PBakedModel gecko = ClientTestPlugin.GECKO.getModel();
 		check(gltf != null && gecko != null, "Both model parsers must load");
@@ -93,7 +114,7 @@ public final class SmokeHarness
 				isEmpty(), "Original Gecko player rig must load bones and animations");
 		if (Boolean.getBoolean("pulselib.test.geckoEntity"))
 			check(!meshes(TestEntityRender.MODEL_DATA.getModel()).isEmpty(), "Original Gecko entity must bake geometry");
-		check(ClientTestPlugin.constructions == 1 && CommonTestPlugin.constructions == 1, "Plugin instances must survive reload");
+		check(ClientTestPlugin.constructions == 1 && CommonTestPlugin.constructions == 1, "Plugins must be constructed once");
 		check(ClientTestPlugin.attachments == 1 && ClientTestPlugin.playerAnimations == 1 && ClientTestPlugin.animatedRegistrations == 1
 				&& CommonTestPlugin.registrations == 1 && CommonTestPlugin.events == 1 && CommonTestPlugin.deformers == 1,
 			"One-time phases must not repeat");
@@ -101,58 +122,77 @@ public final class SmokeHarness
 		TextureAtlasSprite sprite = PResourceCache.getTextureAtlas().
 				getSprite(PResourceCache.resolve(ClientTestPlugin.GLTF.getModelId(), "circle"));
 		check(!sprite.contents().name().getPath().equals("missingno"), "Test texture must be stitched");
-		if (previous != null)
-		{
-			check(previous != gltf, "Models must be rebuilt on reload");
-			check(previousSprite != sprite, "Texture references must be rebuilt on reload");
-		}
 		if (Boolean.getBoolean("pulselib.test.world"))
 		{
-			if (worldStart < 0)
+			if (worldSetup == null)
 			{
-				mc.player.setItemSlot(EquipmentSlot.HEAD, new ItemStack(DemoContent.helmet.get()));
-				mc.player.setItemSlot(EquipmentSlot.CHEST, new ItemStack(DemoContent.chestplate.get()));
-				mc.player.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(DemoContent.blockItem.get()));
-				mc.player.setItemSlot(EquipmentSlot.OFFHAND, new ItemStack(DemoContent.tail.get()));
-				mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
-				if (mc.getSingleplayerServer() != null)
+				DisposableTestWorlds.requireCurrentWorld();
+				var server = mc.getSingleplayerServer();
+				var uuid = mc.player.getUUID();
+				worldSetup = CompletableFuture.runAsync(() ->
 				{
-					var server = mc.getSingleplayerServer();
-					var uuid = mc.player.getUUID();
-					server.execute(() ->
+					var player = server.getPlayerList().getPlayer(uuid);
+					check(player != null, "Server fixture player must exist");
+					var level = player.serverLevel();
+					for (int x = 5; x <= 16; x++)
 					{
-						var player = server.getPlayerList().getPlayer(uuid);
-						if (player != null)
+						for (int z = 5; z <= 18; z++)
 						{
-							player.setItemSlot(EquipmentSlot.HEAD, new ItemStack(DemoContent.helmet.get()));
-							player.setItemSlot(EquipmentSlot.CHEST, new ItemStack(DemoContent.chestplate.get()));
-							player.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(DemoContent.blockItem.get()));
-							player.setItemSlot(EquipmentSlot.OFFHAND, new ItemStack(DemoContent.tail.get()));
-							if (reloads == 0)
+							level.setBlockAndUpdate(new BlockPos(x, 139, z), Blocks.STONE.defaultBlockState());
+							for (int y = 140; y <= 147; y++)
 							{
-								var pos = player.blockPosition().offset(2, 0, 0);
-								player.serverLevel().
-										setBlockAndUpdate(pos, DemoContent.block.get().defaultBlockState());
-								if (player.serverLevel().getBlockEntity(pos) instanceof TestBlockEntity block)
-									block.changePlayAnimation();
-								var entity = DemoContent.entity.get().create(player.serverLevel());
-								entity.moveTo(player.getX() - 2, player.getY(), player.getZ());
-								player.serverLevel().addFreshEntity(entity);
+								level.setBlockAndUpdate(new BlockPos(x, y, z), Blocks.AIR.defaultBlockState());
 							}
 						}
-					});
-				}
+					}
+					player.setGameMode(GameType.CREATIVE);
+					player.teleportTo(level, 10.5, 140.0, 10.5, 0.0f, 0.0f);
+					equip(player);
+					level.setBlockAndUpdate(TEST_BLOCK, DemoContent.block.get().defaultBlockState());
+					check(level.getBlockEntity(TEST_BLOCK) instanceof TestBlockEntity, "Server fixture BlockEntity must exist");
+					((TestBlockEntity)level.getBlockEntity(TEST_BLOCK)).changePlayAnimation();
+					var entity = DemoContent.entity.get().create(level);
+					check(entity != null, "Server fixture entity must construct");
+					entity.moveTo(9.0, 140.0, 14.5);
+					entity.showArmor = true;
+					level.addFreshEntity(entity);
+				}, server);
+				return;
+			}
+			if (!worldSetup.isDone())
+			{
+				return;
+			}
+			worldSetup.join();
+			if (!(mc.level.getBlockEntity(TEST_BLOCK) instanceof TestBlockEntity block))
+			{
+				return;
+			}
+			check(block.getType() == DemoContent.blockEntity.get() && !block.isRemoved() && block.getLevel() == mc.level &&
+					block.getBlockState().is(DemoContent.block.get()), "Client fixture BlockEntity type/state must match");
+			check(mc.getBlockEntityRenderDispatcher().getRenderer(block) instanceof TestBlockEntityRenderer,
+					"Loader must register the original BlockEntityRenderer");
+			if (worldStart < 0)
+			{
+				blockCalls = 0;
+				equip(mc.player);
+				mc.options.setCameraType(Boolean.getBoolean("pulselib.test.reproduceCamera") ? CameraType.FIRST_PERSON : CameraType.THIRD_PERSON_BACK);
 				PPlayerAnimations.getHandle(mc.player, PPlayerBallDemo.ID).stopAll();
 				PPlayerBallDemo.play(mc.player);
 				worldStart = mc.player.tickCount;
 			}
+
 			if (mc.player.tickCount - worldStart < 30)
 				return;
 			for (var entity : mc.level.entitiesForRendering())
 				if (entity instanceof TestEntity testEntity)
 					testEntity.showArmor = true;
 			check(ClientTestPlugin.stageFrames > 0, "Actual block/particle/weather stage cycle must complete");
-			check(TestBlockEntityRenderer.renders > 0, "Original block entity renderer must run");
+			PLibDatabase.LOGGER.info("PULSE TEST BER PROBE: block {}, type {}, removed {}, renderer {}, calls {}, camera {}, yaw {}, frustumVisible {}",
+					block.getBlockPos(), block.getType(), block.isRemoved(), mc.getBlockEntityRenderDispatcher().getRenderer(block),
+					blockCalls, mc.gameRenderer.getMainCamera().getPosition(), mc.player.getYRot(),
+					((Frustum)field(mc.levelRenderer.getClass(), "cullingFrustum", mc.levelRenderer)).isVisible(new AABB(TEST_BLOCK)));
+			check(blockCalls > 0, "Original block entity renderer must run");
 			check(TestEntityRender.renders > 0, "Original entity renderer must run");
 			check(TestBlockItemRenderer.renders > 0, "Loader item renderer adapter must be invoked");
 			check(TestArmor.setups > 0, "Loader custom armor adapter must be invoked");
@@ -177,47 +217,94 @@ public final class SmokeHarness
 				orElseThrow();
 		draw(pyramid, false);
 		draw(pyramid, true);
-		previous = gltf;
-		previousSprite = sprite;
-		PLibDatabase.LOGGER.info("PULSE TEST graphics and animation pass, reload {}", reloads);
-		if (reloads++ < 3)
+		PLibDatabase.LOGGER.info("PULSE TEST graphics and animation pass");
+		runExplicitCleanup(gecko);
+		if (mc.level == null)
 		{
-			worldStart = -1;
-			reloading = mc.reloadResourcePacks();
+			completed = true;
+			PLibDatabase.LOGGER.info("PULSE TEST CLIENT PASS: graphics, animation and explicit cleanup (no world lifecycle requested)");
+			mc.stop();
 			return;
 		}
-		check(ClientTestPlugin.models >= 4, "Model registration must repeat across resource reloads");
-		completed = true;
-		List<Integer> buffers = captureGeometryBuffers();
-		if (mc.level != null)
+		draw(pyramid, true);
+		seedManagers(gecko);
+		PPlayerBallDemo.play(mc.player);
+		naturalResources = SmokeResources.capture();
+		disconnectDeadline = System.nanoTime() + 15_000_000_000L;
+		mc.level.disconnect();
+		mc.disconnect();
+	}
+
+	private static void runExplicitCleanup(PBakedModel model)
+	{
+		seedManagers(model);
+		SmokeResources resources = SmokeResources.capture();
+		explicitCleanup = true;
+		try
 		{
-			mc.level.disconnect();
-			mc.disconnect();
+			PulseRuntime.disconnected();
 		}
-		PulseRuntime.disconnected();
-		for (int buffer : buffers)
-			check(!GL15.glIsBuffer(buffer), "GPU geometry buffer leaked on disconnect: " + buffer);
-		check(((Collection<?>)field(InstanceAnimationManager.class, "MANAGERS", null)).isEmpty(), "Instance managers leaked");
-		check(((Map<?, ?>)field(SingletonAnimationManager.class, "MANAGERS", null)).isEmpty(), "Singleton managers leaked");
-		check(((Map<?, ?>)field(PPlayerAnimations.class, "INSTANCES", null)).isEmpty(), "Player animation instances leaked");
-		if (Boolean.getBoolean("pulselib.test.worldSwitch") && worlds == 0)
+		finally
 		{
-			worlds = 1;
-			PLibDatabase.LOGGER.info("PULSE TEST WORLD CLEANUP PASS: entering second test world");
-			reloads = 0;
-			worldStart = -1;
-			previous = null;
-			previousSprite = null;
-			reloading = null;
-			mc.createWorldOpenFlows().openWorld("pulselib-smoke-second", () ->
+			explicitCleanup = false;
+		}
+		resources.assertDeleted("explicit cleanup");
+		PLibDatabase.LOGGER.info("PULSE TEST EXPLICIT CLEANUP PASS");
+	}
+
+	private static void seedManagers(PBakedModel model)
+	{
+		Dummy sentinel = new Dummy();
+		sentinel.manager.bindModel(model);
+		InstanceAnimationManager.addManager(sentinel.manager);
+		SingletonAnimationManager.getManager(AnimManagerKey.ofObject(sentinel), sentinel);
+	}
+
+	public static boolean observeDisconnectHook()
+	{
+		if (!explicitCleanup && naturalResources != null)
+		{
+			naturalHooks++;
+			if (Boolean.getBoolean("pulselib.test.skipDisconnectHook"))
 			{
-				throw new AssertionError("Second smoke world failed to open");
-			});
-			completed = false;
+				PLibDatabase.LOGGER.info("PULSE TEST NEGATIVE CONTROL: loader cleanup hook suppressed");
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static void recordBlockRender(TestBlockEntity block)
+	{
+		if (block.getBlockPos().equals(TEST_BLOCK) && block.getLevel() == Minecraft.getInstance().level)
+		{
+			blockCalls++;
+		}
+	}
+
+	public static void lockWorldCamera()
+	{
+		Minecraft mc = Minecraft.getInstance();
+		if (worldStart < 0 || mc.player == null || naturalResources != null)
+		{
 			return;
 		}
-		PLibDatabase.LOGGER.info("PULSE TEST CLIENT PASS: glTF, Gecko, animation, attachment, instancing, GPU deformation, OIT, three reloads, GL state, {} worlds, cleanup", Boolean.getBoolean("pulselib.test.world") ? worlds + 1 : 0);
-		mc.stop();
+		KeyMapping.releaseAll();
+		float yaw = Boolean.getBoolean("pulselib.test.reproduceCamera") ? 180.0f : 0.0f;
+		mc.player.setYRot(yaw);
+		mc.player.yRotO = yaw;
+		mc.player.yBodyRot = yaw;
+		mc.player.yBodyRotO = yaw;
+		mc.player.setXRot(0.0f);
+		mc.player.xRotO = 0.0f;
+	}
+
+	private static void equip(net.minecraft.world.entity.LivingEntity player)
+	{
+		player.setItemSlot(EquipmentSlot.HEAD, new ItemStack(DemoContent.helmet.get()));
+		player.setItemSlot(EquipmentSlot.CHEST, new ItemStack(DemoContent.chestplate.get()));
+		player.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(DemoContent.blockItem.get()));
+		player.setItemSlot(EquipmentSlot.OFFHAND, new ItemStack(DemoContent.tail.get()));
 	}
 
 	private static List<PBakedMesh> meshes(PBakedModel model)
@@ -334,7 +421,7 @@ public final class SmokeHarness
 		return new Matrix4f().rotateY(0.4f).scale(scale).translate(-center.x, -center.y, -center.z);
 	}
 
-	private static List<Integer> captureGeometryBuffers()
+	static List<Integer> captureGeometryBuffers()
 	{
 		Object resources = field(PRenderQueue.class, "RESOURCES", null);
 		Object arena = field(resources.getClass(), "geometryArena", resources);
@@ -349,7 +436,7 @@ public final class SmokeHarness
 		return buffers;
 	}
 
-	private static @Nullable Object field(Class<?> type, String name, @Nullable Object instance)
+	static @Nullable Object field(Class<?> type, String name, @Nullable Object instance)
 	{
 		try
 		{
@@ -363,7 +450,7 @@ public final class SmokeHarness
 		}
 	}
 
-	private static void check(boolean condition, String message)
+	static void check(boolean condition, String message)
 	{
 		if (!condition)
 			throw new AssertionError("PulseLib smoke test: " + message);

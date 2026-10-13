@@ -1,0 +1,9 @@
+{
+  "vertex": "pulselib:oit_composite",
+  "fragment": "pulselib:oit_fabulous_metadata",
+  "samplers": [
+    { "name": "RevealSampler" },
+    { "name": "DepthSampler" }
+  ],
+  "uniforms": []
+}

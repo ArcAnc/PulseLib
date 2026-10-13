@@ -17,7 +17,7 @@ CommonTestPlugin exercises all three type registrars using existing built-in imp
 ./gradlew :fabric:runClient -PpulseTestMod -PpulseSmokeAuto
 ```
 
-Accept Minecraft's EULA in each disposable server run directory. Server assertions check one construction, channels/events/deformers registered once, one common plugin and no CLIENT class initialization. Clients load original models, sample the animation-only Gecko player rig, draw eight GPU-deformed instances of the original item pyramid, verify solid/OIT pixels, compare indexed blend/depth/scissor state, reload three times and verify actual GPU buffer deletion.
+Accept Minecraft's EULA in each disposable server run directory. Server assertions check one construction, channels/events/deformers registered once, one common plugin and no CLIENT class initialization. Clients load original models, sample the animation-only Gecko player rig, draw eight GPU-deformed instances of the original item pyramid, verify solid/OIT pixels, compare indexed blend/depth/scissor state and verify actual GPU buffer deletion. Automatic smoke tests perform one pass and exit after explicit cleanup. With pulseSmokeWorld they additionally disconnect through the actual loader lifecycle and verify cleanup independently.
 
 ## Discover an installed JAR
 
@@ -35,17 +35,74 @@ Production Fabric uses :fabric:remapTestmodJar (pulselib-testmod-intermediary-1.
 
 ## In-world checks and manual examples
 
-Create disposable saves named pulselib-smoke and pulselib-smoke-second in the client run directory. Use only test saves: automatic mode equips demo items and spawns/places the original demo entity/block. Never point it at an important save.
+Automated launches use a fresh, marked run directory under `<loader>/build/pulselib-tests/<UUID>`. With `pulseSmokeWorld`, the harness creates a new, seeded `pulselib-smoke` world itself; no manual save preparation or Quick Play is used. Existing saves are never adopted, overwritten, restored or deleted. The client refuses a missing/mismatched run marker, an unexpected world path or a missing disposable-world marker before scene changes. Both `pulseTestMod` and `pulseTestJar` are supported; automation without either fails during Gradle configuration. Normal manual `runClient` and demo launches keep their existing directories and behavior.
 
 ```sh
-./gradlew :neoforge:runClient -PpulseTestJar -PpulseSmokeAuto -PpulseSmokeWorld -PpulseSmokeWorldSwitch
-./gradlew :fabric:runClient -PpulseTestJar -PpulseSmokeAuto -PpulseSmokeWorld -PpulseSmokeWorldSwitch
+./gradlew :neoforge:runClient -PpulseTestJar -PpulseSmokeAuto -PpulseSmokeWorld
+./gradlew :fabric:runClient -PpulseTestJar -PpulseSmokeAuto -PpulseSmokeWorld
 ```
 
-Both clients exercise the block/entity/item renderers, armor adapter and hiding, living/tail attachments, ball-toss player animation and animated hand callback. Probe Mixins verify block-entity → particles → weather hook order. Three resource reloads per world retain plugin identity and one-time registrations, replace models/sprites and preserve rendering. Normal disconnect deletes captured geometry buffer IDs and empties instance/singleton/player animation managers before entering the second world.
+Both clients exercise the block/entity/item renderers, armor adapter and hiding, living/tail attachments, ball-toss player animation and animated hand callback in a single world. Probe Mixins verify block-entity → particles → weather hook order. The fixture prepares a level platform and fixes the camera, waits for server/client BlockEntity creation, verifies registry/renderer mapping, and counts actual calls for that block. It tests explicit `PulseRuntime.disconnected()` first. It then repopulates managers and GPU resources, performs a real disconnect without calling cleanup itself, and checks geometry/instance/indirect/deformer buffer IDs, OIT textures/FBO, deformation caches and instance/singleton/player managers. Require separate `PULSE TEST EXPLICIT CLEANUP PASS` and `PULSE TEST NATURAL DISCONNECT PASS` markers.
 
-Add -PpulseGeckoDemo to select the existing Gecko entity/armor resources instead of their glTF variants. The item remains glTF, so both parsers still run. Equivalent direct-launch VM properties are pulselib.test.auto, pulselib.test.world, pulselib.test.worldSwitch and pulselib.test.geckoEntity.
+Add -PpulseGeckoDemo to select the existing Gecko entity/armor resources instead of their glTF variants. The item remains glTF, so both parsers still run. Equivalent direct-launch VM properties are pulselib.test.auto, pulselib.test.world and pulselib.test.geckoEntity.
 
 Without pulseSmokeAuto, the mod is a manual demo. Give pulselibtest:test_block, test_hat, test_chest, test_leggings or test_tail; summon pulselibtest:test_entity. Right-click the block to toggle its random animation and the entity to toggle PTestArmor. V plays the original ball toss; B plays acrobatics with knee deformation. Tail controllers are cleared when client worlds change.
 
-PASS markers: PULSE TEST SERVER PASS, PULSE TEST WORLD PASS, PULSE TEST WORLD CLEANUP PASS, PULSE TEST CLIENT PASS. Always require the marker as well as a successful process exit: loaders can catch a server exception while Gradle exits successfully. Diagnostic reflection is confined to the smoke harness; library runtime handlers do no scanning/reflection.
+PASS markers: PULSE TEST SERVER PASS, PULSE TEST WORLD PASS, PULSE TEST CLIENT PASS. Always require the marker as well as a successful process exit: loaders can catch a server exception while Gradle exits successfully. Diagnostic reflection is confined to the smoke harness; library runtime handlers do no scanning/reflection.
+
+## H14 Fabulous OIT regression
+
+The opt-in GPU fixture renders real PulseLib meshes through the queue/compiler/executor and Minecraft 1.21.1's actual `transparency.json` chain. It checks final RGB pixels against an independently sorted alpha reference, rather than checking only nonempty OIT textures. Its opaque half-plane is at depth 0.5 and sky at 1.0. It covers front/behind occlusion, crossing surfaces, all four OIT layers, lit and emissive meshes, all five vanilla translucent targets on either side, interleaved targets and an opaque particle. It also asserts caller framebuffer/viewport/program/VAO/buffer/texture/depth/indexed blend/scissor state, depth attachments and exception restoration.
+
+```sh
+./gradlew :fabric:runClient -PpulseTestMod -PpulseOitTest --no-daemon
+./gradlew :neoforge:runClient -PpulseTestMod -PpulseOitTest --no-daemon
+```
+
+This mode performs 38 cases, including one explicit resource reload (equivalent to F3+T) and one window resize, then exits. These operations are confined to this regression mode. Ordinary demos and smoke tests do not repeatedly reload resources or switch worlds. Minecraft is never added to normal CI.
+
+For the real `LevelRenderer.renderLevel` integration test, the harness creates a fresh **disposable** save in its isolated run directory. The following commands alter only that marked test save: the harness clears a small volume, builds a stone wall, moves the player to spectator mode, fixes the camera, selects Fancy/Fabulous and enables rain. It compares final world pixels with the same-frame native color/depth targets, saves screenshots with and without front/behind surfaces, and then runs the 38 offscreen cases. It loads only one world. Scene preparation requires the expected path and both run/world markers; it refuses existing or unmarked saves.
+
+```sh
+./gradlew :fabric:runClient -PpulseTestMod -PpulseOitTest -PpulseSmokeWorld --no-daemon
+./gradlew :neoforge:runClient -PpulseTestMod -PpulseOitTest -PpulseSmokeWorld --no-daemon
+```
+
+Require `H14 WORLD PIXEL PASS`, `H14 WEATHER PIXEL PASS`, `H14 PIXEL PASS` and successful exit. Output PNGs are in `<loader>/build/reports/h14`. The harness restores window size, graphics mode, camera mode and HUD settings on successful completion; the disposable scene and weather remain in the test save. Do not open an important save with these flags.
+
+Adding `-PpulseOitBaseline` to the commands **without** `pulseSmokeWorld` deliberately replays the former weather-target routing, asserts the known H14 disappearance and writes `fancy-before.png` / `fabulous-before.png`. It is a diagnostic reproduction, not a successful fix regression; its marker is `H14 BASELINE REPRODUCED`.
+
+Native target fixtures make particle/depth overlap deterministic. The world fixture exercises actual clouds and rain; it does not make a claim about shader mods or every particle renderer. Repeat visual checks with those configurations separately.
+
+## Smoke negative controls
+
+These are intentionally failing opt-in game tests. They must exit unsuccessfully with the expected assertion; they never belong in mandatory CI.
+
+```sh
+./gradlew :neoforge:runClient -PpulseTestMod -PpulseSmokeAuto -PpulseSmokeWorld -PpulseSmokeReproduce --no-daemon
+./gradlew :fabric:runClient -PpulseTestMod -PpulseSmokeAuto -PpulseSmokeWorld -PpulseSmokeSkipHook --no-daemon
+./gradlew :neoforge:runClient -PpulseTestMod -PpulseSmokeAuto -PpulseSmokeWorld -PpulseSmokeSkipHook --no-daemon
+```
+
+`pulseSmokeReproduce` points the camera away from the existing, registered fixture block and reproduces `Original block entity renderer must run`. The BER probe reports the block state, renderer, call count, camera and frustum visibility. Normal smoke uses a visible fixed scene.
+
+`pulseSmokeSkipHook` cancels loader cleanup only during natural disconnect. Explicit cleanup remains enabled. The natural resource assertion must fail on retained GPU resources; a genuinely missing callback also fails the hook-observation deadline. This prevents manual cleanup from making broken lifecycle integration pass.
+
+## H14 GPU profiling
+
+```sh
+./gradlew :fabric:runClient -PpulseTestMod -PpulseOitPerf --no-daemon
+./gradlew :neoforge:runClient -PpulseTestMod -PpulseOitPerf --no-daemon
+./gradlew :fabric:runClient -PpulseTestMod -PpulseOitPerf -PpulseSmokeWorld --no-daemon
+./gradlew :neoforge:runClient -PpulseTestMod -PpulseOitPerf -PpulseSmokeWorld --no-daemon
+```
+
+Profiling hides its disposable window while retaining the live GL context; this prevents manual input from replacing a measured scene. Ordinary manual/demo windows are unaffected. Profiling disables pause-on-lost-focus only in the disposable run.
+
+The offscreen series measures the existing H14 quad/queue/executor and actual vanilla transparency chain at 1920×1080, 2560×1440 and 3840×2160. Fancy/Fabulous each have 0/1/16/128 overlapping quads, with 32 warmup and 80 measured frames per scenario. Resources persist across frames. A following empty frame must execute zero OIT depth/metadata/fullscreen passes, even with retained allocations. `gpu-performance.csv` contains GPU frame mean/p95, depth, accumulation, metadata, compositor and vanilla-chain intervals; texture payloads, driver NVX VRAM delta (or -1 when unsupported), fullscreen counts, texture allocations and buffer-storage calls are separate fields.
+
+The world series uses a fresh marked world, fixed camera/stone fixture, six 1080p scenarios and 64 warmup + 80 measured frames. `world-gpu-performance.csv` measures the entire `GameRenderer.render` GPU interval, including terrain/UI rendering. Higher resolutions are offscreen fixtures, not claims of full world/presentation testing on a larger monitor.
+
+Test-only Mixins issue paired OpenGL/ARB timer timestamps. Nested passes use separate timestamp pairs; results are collected asynchronously only after `GL_QUERY_RESULT_AVAILABLE`. No CPU Java-call duration, glFinish or pixel readback is substituted for GPU execution time. Texture footprint is measured from allocated channel sizes; NVX available-memory delta is a global driver counter and includes allocations other than OIT. Query overhead, CPU submission gaps and background GPU work can affect elapsed timestamps, so compare repeated controlled runs before applying an optimization.
+
+Require `H14 GPU PERFORMANCE PASS` / `H14 WORLD GPU PERFORMANCE PASS` and successful exit. CSV output is in `<loader>/build/reports/h14`. Current results and limitations are recorded in the stabilization report. Functional H14 pixel regressions remain separate and mandatory before any OIT optimization.

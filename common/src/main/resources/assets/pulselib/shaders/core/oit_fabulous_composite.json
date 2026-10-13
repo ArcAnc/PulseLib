@@ -1,0 +1,19 @@
+{
+  "vertex": "pulselib:oit_composite",
+  "fragment": "pulselib:oit_fabulous_composite",
+  "samplers": [
+    { "name": "AccumSampler" },
+    { "name": "OitMetadataSampler" },
+    { "name": "TranslucentSampler" },
+    { "name": "TranslucentDepthSampler" },
+    { "name": "ItemEntitySampler" },
+    { "name": "ItemEntityDepthSampler" },
+    { "name": "ParticlesSampler" },
+    { "name": "ParticlesDepthSampler" },
+    { "name": "WeatherSampler" },
+    { "name": "WeatherDepthSampler" },
+    { "name": "CloudsSampler" },
+    { "name": "CloudsDepthSampler" }
+  ],
+  "uniforms": []
+}

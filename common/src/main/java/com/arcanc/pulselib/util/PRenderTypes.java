@@ -301,6 +301,10 @@ public final class PRenderTypes
 		private static ShaderInstance TRIANGLES_OIT_DEPTH_PEEL_EMISSIVE_SHADER;
 		@Nullable
 		private static ShaderInstance OIT_COMPOSITE_SHADER;
+		@Nullable
+		private static ShaderInstance OIT_FABULOUS_COMPOSITE_SHADER;
+		@Nullable
+		private static ShaderInstance OIT_FABULOUS_METADATA_SHADER;
 		
 		public static @Nullable ShaderInstance trianglesSolid()
 		{
@@ -350,6 +354,18 @@ public final class PRenderTypes
 			return emissive ? TRIANGLES_OIT_DEPTH_PEEL_EMISSIVE_SHADER : TRIANGLES_OIT_DEPTH_PEEL_SHADER;
 		}
 
+		@Nullable
+		public static ShaderInstance oitFabulousComposite()
+		{
+			return OIT_FABULOUS_COMPOSITE_SHADER;
+		}
+
+		@Nullable
+		public static ShaderInstance oitFabulousMetadata()
+		{
+			return OIT_FABULOUS_METADATA_SHADER;
+		}
+
 		public static @Nullable ShaderInstance oitComposite()
 		{
 			return OIT_COMPOSITE_SHADER;
@@ -391,6 +407,10 @@ public final class PRenderTypes
 						shader -> TRIANGLES_OIT_DEPTH_PEEL_EMISSIVE_SHADER = shader);
 				registerShader(event, "oit_composite", DefaultVertexFormat.BLIT_SCREEN,
 						shader -> OIT_COMPOSITE_SHADER = shader);
+				registerShader(event, "oit_fabulous_composite", DefaultVertexFormat.BLIT_SCREEN,
+						shader -> OIT_FABULOUS_COMPOSITE_SHADER = shader);
+				registerShader(event, "oit_fabulous_metadata", DefaultVertexFormat.BLIT_SCREEN,
+						shader -> OIT_FABULOUS_METADATA_SHADER = shader);
 			}
 		}
 

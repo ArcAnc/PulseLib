@@ -10,7 +10,9 @@
 package com.arcanc.pulselib.content.mixin;
 
 import com.arcanc.pulselib.content.animatable.instance.InstanceAnimationManager;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -22,6 +24,10 @@ public abstract class BlockEntityMixin
 	@Inject(method = "setRemoved", at = @At("HEAD"))
 	private void pulselib$removeAnimationManager(CallbackInfo callback)
 	{
-		InstanceAnimationManager.removeManager(this);
+		@Nullable Level level = ((BlockEntity)(Object)this).getLevel();
+		if (level != null && level.isClientSide())
+		{
+			InstanceAnimationManager.removeManager(this);
+		}
 	}
 }

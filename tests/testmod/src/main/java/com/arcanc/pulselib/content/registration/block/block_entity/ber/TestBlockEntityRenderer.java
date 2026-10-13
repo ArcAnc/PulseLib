@@ -11,6 +11,7 @@ package com.arcanc.pulselib.content.registration.block.block_entity.ber;
 
 
 import com.arcanc.pulselib.content.model.baked.PBakedBone;
+import com.arcanc.pulselib.test.SmokeHarness;
 import com.arcanc.pulselib.content.model.baked.PMeshRenderContext;
 import com.arcanc.pulselib.content.model.textures.PAlphaMode;
 import com.arcanc.pulselib.content.registration.block.block_entity.TestBlockEntity;
@@ -44,6 +45,7 @@ public class TestBlockEntityRenderer extends PBlockRenderer<TestBlockEntity>
 	                                               float partialTick)
 	{
 		renders++;
+		SmokeHarness.recordBlockRender(animatable);
 		return bone.parent() == null ? inherited.withAlphaMode(PAlphaMode.AUTO) : inherited;
 	}
 }

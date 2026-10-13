@@ -155,6 +155,11 @@ public final class GlDrawExecutor implements PRenderExecutor
 		this.weightedBlendedOit.composite(destination);
 	}
 
+	public void compositeFabulousOit(RenderTarget destination, List<RenderTarget> targets)
+	{
+		this.weightedBlendedOit.compositeFabulous(destination, targets);
+	}
+
 	@Override
 	public void cleanup()
 	{

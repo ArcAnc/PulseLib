@@ -65,9 +65,23 @@ public final class PAnimationGraphRuntime
 	
 	public List<EventTrack> tick(@Nullable PBakedModel model, float delta)
 	{
+		return tickPrecise(model, delta).stream().
+				map(track -> new EventTrack(track.animation(), (float)track.from(), (float)track.to(), track.animationType())).
+				toList();
+	}
+
+	/**
+	 * Advances the graph once and retains double precision for event dispatch.
+	 * The existing tick/EventTrack API remains a float view for its callers.
+	 * @param model the model used for phase/transition evaluation.
+	 * @param delta the elapsed ticks.
+	 * @return precise event windows for this tick.
+	 */
+	public List<PreciseEventTrack> tickPrecise(@Nullable PBakedModel model, float delta)
+	{
 		if (!Float.isFinite(delta))
 			throw new IllegalArgumentException("Animation graph tick delta must be finite");
-		List<EventTrack> eventTracks = new ArrayList<>();
+		List<PreciseEventTrack> eventTracks = new ArrayList<>();
 		float elapsed = Math.max(delta, 0.0f);
 		if (this.transition == null)
 			advance(this.current, elapsed, eventTracks);
@@ -127,12 +141,12 @@ public final class PAnimationGraphRuntime
 		Playback playback = this.transition == null ? this.current : this.transition.target;
 		PAnimationState state = this.graph.states().get(playback.stateIndex);
 		float alpha = Math.clamp(partialTick, 0.0f, 1.0f);
-		return (playback.previousTime + (playback.time - playback.previousTime) * alpha) * state.speed();
+		return (float)((playback.previousTime + (playback.time - playback.previousTime) * alpha) * state.speed());
 	}
 
 	public float time()
 	{
-		return (this.transition == null ? this.current : this.transition.target).time;
+		return (float)(this.transition == null ? this.current : this.transition.target).time;
 	}
 
 	public void syncCycle(PBakedModel model, float phase)
@@ -216,13 +230,13 @@ public final class PAnimationGraphRuntime
 	{
 		PAnimation animation = model.animations().get(animationName);
 		if (animation == null || animation.length() <= 0.0f)
-			return playback.time * state.speed();
-		float time = playback.time * state.speed();
+			return (float)(playback.time * state.speed());
+		double time = playback.time * state.speed();
 		if (state.synchronizedCycle() && state.animationType() == PAnimationType.CYCLE)
 			time = phase(playback, model) * animation.length();
 		if (state.animationType() == PAnimationType.CYCLE)
-			return time % animation.length();
-		return Math.min(time, animation.length());
+			return (float)(time % animation.length());
+		return (float)Math.min(time, animation.length());
 	}
 
 	private float phase(Playback playback, @Nullable PBakedModel model)
@@ -236,8 +250,9 @@ public final class PAnimationGraphRuntime
 		PAnimation animation = model.animations().get(sample.animation());
 		if (animation == null || animation.length() <= 0.0f)
 			return 0.0f;
-		float raw = playback.time * state.speed() / animation.length();
-		return state.animationType() == PAnimationType.CYCLE ? raw - (float)Math.floor(raw) : Math.clamp(raw, 0.0f, 1.0f);
+		double raw = playback.time * state.speed();
+		return (float)(state.animationType() == PAnimationType.CYCLE ? (raw % animation.length()) / animation.length() :
+				Math.clamp(raw / animation.length(), 0.0, 1.0));
 	}
 
 	private void syncPlayback(Playback playback, float phase, @Nullable PBakedModel model)
@@ -251,7 +266,7 @@ public final class PAnimationGraphRuntime
 		PAnimation animation = sample == null ? null : model.animations().get(sample.animation());
 		if (animation == null || animation.length() <= 0.0f)
 			return;
-		playback.time = phase * animation.length() / state.speed();
+		playback.time = (double)phase * animation.length() / state.speed();
 		playback.previousTime = playback.time;
 	}
 
@@ -268,7 +283,7 @@ public final class PAnimationGraphRuntime
 		PAnimation animation = model.animations().get(overlay.overlay.animation());
 		if (animation == null)
 			return 0.0f;
-		float time = overlay.playback.time;
+		float time = (float)overlay.playback.time;
 		float weight = overlay.overlay.fadeInDuration() <= 0.0f ? 1.0f : Math.min(time / overlay.overlay.fadeInDuration(), 1.0f);
 		float remaining = animation.length() / Math.max(overlay.overlay.speed(), 1.0e-6f) - time;
 		if (overlay.overlay.fadeOutDuration() > 0.0f)
@@ -276,31 +291,44 @@ public final class PAnimationGraphRuntime
 		return weight;
 	}
 
-	private void advance(Playback playback, float delta, List<EventTrack> tracks)
+	private void advance(Playback playback, float delta, List<PreciseEventTrack> tracks)
 	{
 		PAnimationState state = this.graph.states().get(playback.stateIndex);
 		playback.previousTime = playback.time;
-		playback.time += delta;
+		double nextTime = playback.time + delta;
+		if (!Double.isFinite(nextTime) || delta > 0.0f && nextTime <= playback.time)
+		{
+			throw new IllegalArgumentException("Animation graph time cannot advance precisely: state=" +
+					state.name() + ", time=" + playback.time + ", delta=" + delta);
+		}
+		playback.time = nextTime;
 		if (state.speed() == 0.0f)
 			return;
-		float from = playback.previousTime * state.speed();
-		float to = playback.time * state.speed();
+		double from = playback.previousTime * state.speed();
+		double to = playback.time * state.speed();
 		for (PAnimationSample sample : state.samples(this.parameters))
 			if (sample.weight() > 0.0f)
-				tracks.add(new EventTrack(sample.animation(), from, to, state.animationType()));
+				tracks.add(new PreciseEventTrack(sample.animation(), from, to, state.animationType()));
 	}
 
 	public record Layer(String animation, float time, PInterpolationType interpolation, float weight, boolean overlay)
 	{
 	}
 	
-	public record EventTrack(String animation, float from, float to, PAnimationType animationType) { }
+	public record EventTrack(String animation, float from, float to, PAnimationType animationType)
+	{
+	}
+
+	/** A continuous event window; never round this back to float before dispatch. */
+	public record PreciseEventTrack(String animation, double from, double to, PAnimationType animationType)
+	{
+	}
 
 	private static final class Playback
 	{
 		private final int stateIndex;
-		private float time;
-		private float previousTime;
+		private double time;
+		private double previousTime;
 
 		private Playback(int stateIndex)
 		{

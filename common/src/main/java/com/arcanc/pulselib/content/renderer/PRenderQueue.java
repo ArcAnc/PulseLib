@@ -162,6 +162,15 @@ public final class PRenderQueue
 		EXECUTOR.compositeOit(destination);
 	}
 
+	/**
+	 * Inserts OIT layers after the vanilla Fabulous transparency chain.
+	 * Targets are ordered as terrain, items, particles, weather and clouds.
+	 */
+	public static void compositeFabulousTranslucency(RenderTarget destination, List<RenderTarget> targets)
+	{
+		EXECUTOR.compositeFabulousOit(destination, targets);
+	}
+
 	public static void cleanup()
 	{
 		COMPILER.clear();

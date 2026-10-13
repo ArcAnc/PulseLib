@@ -1,5 +1,33 @@
 import net.fabricmc.loom.task.RemapJarTask
 
+def automatedTest = ['pulseSmokeAuto', 'pulseSmokeWorld', 'pulseOitTest', 'pulseOitPerf'].any {
+    providers.gradleProperty(it).isPresent()
+}
+if (automatedTest && !providers.gradleProperty('pulseTestMod').isPresent() && !providers.gradleProperty('pulseTestJar').isPresent()) {
+    throw new GradleException('Automated PulseLib tests require -PpulseTestMod or -PpulseTestJar')
+}
+def testRunDirectory = layout.buildDirectory.dir("pulselib-tests/${UUID.randomUUID()}").get().asFile
+def testProperties = [:]
+if (automatedTest) {
+    testProperties['pulselib.test.runDirectory'] = testRunDirectory.absolutePath
+    ['pulseOitPerf': 'oitPerf', 'pulseSmokeSkipHook': 'skipDisconnectHook',
+     'pulseSmokeReproduce': 'reproduceCamera'].each { property, suffix ->
+        if (providers.gradleProperty(property).isPresent()) {
+            testProperties["pulselib.test.${suffix}"] = 'true'
+        }
+    }
+    tasks.matching { it.name in ['runClient', 'runServer'] }.configureEach {
+        doFirst {
+            def marker = new File(testRunDirectory, '.pulselib-test-run')
+            if (new File(testRunDirectory, 'saves').exists() && !marker.isFile()) {
+                throw new GradleException('Refusing existing saves without a PulseLib test-run marker')
+            }
+            testRunDirectory.mkdirs()
+            marker.text = 'PulseLib disposable test run\n'
+        }
+    }
+}
+
 sourceSets {
     testmod {
         java.srcDir rootProject.file('tests/testmod/src/main/java')
@@ -28,18 +56,25 @@ if (project.name == 'neoforge') {
             mods { pulselibtest { sourceSet sourceSets.testmod } }
         }
         runs.configureEach {
+            if (automatedTest) {
+                gameDirectory = testRunDirectory
+                testProperties.each { key, value -> systemProperty key, value }
+            }
+            if (providers.gradleProperty('pulseOitTest').isPresent() || providers.gradleProperty('pulseOitPerf').isPresent()) {
+                systemProperty 'pulselib.test.oit', 'true'
+                systemProperty 'pulselib.test.oitOutput', layout.buildDirectory.dir('reports/h14').get().asFile.absolutePath
+                if (providers.gradleProperty('pulseOitBaseline').isPresent()) {
+                    systemProperty 'pulselib.test.oitBaseline', 'true'
+                }
+            }
             if (providers.gradleProperty('pulseSmokeAuto').isPresent()) {
                 systemProperty 'pulselib.test.auto', 'true'
-            }
-            if (providers.gradleProperty('pulseSmokeWorldSwitch').isPresent()) {
-                systemProperty 'pulselib.test.worldSwitch', 'true'
             }
             if (providers.gradleProperty('pulseGeckoDemo').isPresent()) {
                 systemProperty 'pulselib.test.geckoEntity', 'true'
             }
             if (name == 'client' && providers.gradleProperty('pulseSmokeWorld').isPresent()) {
                 systemProperty 'pulselib.test.world', 'true'
-                programArguments.addAll '--quickPlaySingleplayer', 'pulselib-smoke'
             }
         }
     }
@@ -61,18 +96,25 @@ if (project.name == 'neoforge') {
             }
         }
         runs.configureEach {
+            if (automatedTest) {
+                runDir project.relativePath(testRunDirectory)
+                testProperties.each { key, value -> vmArg "-D${key}=${value}" }
+            }
+            if (providers.gradleProperty('pulseOitTest').isPresent() || providers.gradleProperty('pulseOitPerf').isPresent()) {
+                vmArg '-Dpulselib.test.oit=true'
+                vmArg "-Dpulselib.test.oitOutput=${layout.buildDirectory.dir('reports/h14').get().asFile.absolutePath}"
+                if (providers.gradleProperty('pulseOitBaseline').isPresent()) {
+                    vmArg '-Dpulselib.test.oitBaseline=true'
+                }
+            }
             if (providers.gradleProperty('pulseSmokeAuto').isPresent()) {
                 vmArg '-Dpulselib.test.auto=true'
-            }
-            if (providers.gradleProperty('pulseSmokeWorldSwitch').isPresent()) {
-                vmArg '-Dpulselib.test.worldSwitch=true'
             }
             if (providers.gradleProperty('pulseGeckoDemo').isPresent()) {
                 vmArg '-Dpulselib.test.geckoEntity=true'
             }
             if (name == 'client' && providers.gradleProperty('pulseSmokeWorld').isPresent()) {
                 vmArg '-Dpulselib.test.world=true'
-                programArgs '--quickPlaySingleplayer', 'pulselib-smoke'
             }
         }
     }

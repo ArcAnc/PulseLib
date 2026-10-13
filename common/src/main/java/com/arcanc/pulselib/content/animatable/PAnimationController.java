@@ -360,7 +360,7 @@ public class PAnimationController<T extends PAnimatable<T>>
 		if (this.graphRuntime != null)
 		{
 			if (this.state == ControllerState.PLAY)
-				for (PAnimationGraphRuntime.EventTrack track : this.graphRuntime.tick(model, tickCount))
+				for (PAnimationGraphRuntime.PreciseEventTrack track : this.graphRuntime.tickPrecise(model, tickCount))
 				{
 					PAnimation animation = model == null ? null : model.animations().get(track.animation());
 					if (animation != null)
@@ -417,6 +417,7 @@ public class PAnimationController<T extends PAnimatable<T>>
 		}
 		
 		float length = animation.length();
+		boolean includeReverseStart = !this.stageStarted || stage.speed() >= 0.0f;
 		if (this.stageStarted)
 		{
 			this.time = stage.speed() < 0.0f ? length : 0.0f;
@@ -456,11 +457,13 @@ public class PAnimationController<T extends PAnimatable<T>>
 			{
 				if (length > 0)
 				{
+					double cyclicTime = this.time + (double)tickCount * stage.speed();
 					this.interpolationFrom = this.time;
-					this.interpolationTo = nextTime;
+					this.interpolationTo = (float)cyclicTime;
 					this.interpolationCycleLength = length;
-					fireEvents(animatable, model, poseControllers, animation, this.prevTime, nextTime, PAnimationType.CYCLE);
-					this.time = floorMod(nextTime, length);
+					fireCyclicEvents(animatable, model, poseControllers, animation, this.prevTime, cyclicTime, includeReverseStart);
+					double wrapped = cyclicTime % length;
+					this.time = (float)(wrapped < 0.0 ? wrapped + length : wrapped);
 				}
 				else
 				{
@@ -487,16 +490,16 @@ public class PAnimationController<T extends PAnimatable<T>>
 	                        PBakedModel model,
 	                        Collection<PAnimationController<T>> poseControllers,
 	                        PAnimation animation,
-	                        float from,
-	                        float to,
+	                        double from,
+	                        double to,
 	                        PAnimationType type)
 	{
 		if (type == PAnimationType.CYCLE && animation.length() > 0.0f)
-			fireCyclicEvents(animatable, model, poseControllers, animation, from, to);
+			fireCyclicEvents(animatable, model, poseControllers, animation, from, to, true);
 		else if (to >= from)
-			animation.eventsBetween(from, to).forEach(event -> PAnimationEventDispatcher.dispatch(animatable, this, event, model, poseControllers));
+			animation.eventsBetween((float)from, (float)to).forEach(event -> PAnimationEventDispatcher.dispatch(animatable, this, event, model, poseControllers));
 		else
-			animation.eventsBetweenReverse(from, to).forEach(event -> PAnimationEventDispatcher.dispatch(animatable, this, event, model, poseControllers));
+			animation.eventsBetweenReverse((float)from, (float)to).forEach(event -> PAnimationEventDispatcher.dispatch(animatable, this, event, model, poseControllers));
 	}
 
 	/**
@@ -507,43 +510,13 @@ public class PAnimationController<T extends PAnimatable<T>>
 	 * @param animation the animation to use.
 	 * @param from the from to use.
 	 * @param to the to to use.
+	 * @param includeReverseStart whether to include the reverse departure marker.
 	 */
 	private void fireCyclicEvents(T animatable, PBakedModel model, Collection<PAnimationController<T>> controllers,
-	                              PAnimation animation, float from, float to)
+	                              PAnimation animation, double from, double to, boolean includeReverseStart)
 	{
-		float length = animation.length();
-		if (to >= from)
-		{
-			for (float cursor = from; cursor < to; )
-			{
-				float boundary = ((float)Math.floor(cursor / length) + 1.0f) * length;
-				float end = Math.min(to, boundary);
-				float localFrom = floorMod(cursor, length);
-				float localTo = end == boundary ? length : floorMod(end, length);
-				animation.eventsBetween(localFrom, localTo).forEach(event -> PAnimationEventDispatcher.dispatch(animatable, this, event, model, controllers));
-				if (end >= to) break;
-				cursor = end;
-			}
-		}
-		else
-		{
-			boolean wrapped = false;
-			for (float cursor = from; cursor > to; )
-			{
-				float boundary = ((float)Math.ceil(cursor / length) - 1.0f) * length;
-				float end = Math.max(to, boundary);
-				float localFrom = floorMod(cursor, length);
-				if (localFrom == 0.0f && (cursor > 0.0f || wrapped)) localFrom = length;
-				float localTo = end == boundary ? 0.0f : floorMod(end, length);
-				animation.eventsBetweenReverse(localFrom, localTo).forEach(event -> PAnimationEventDispatcher.dispatch(animatable, this, event, model, controllers));
-				if (end <= to) break;
-				// Crossing zero wraps onto the end marker of the previous cycle.
-				animation.eventsBetween(length - 1.0e-6f, length).forEach(event ->
-						PAnimationEventDispatcher.dispatch(animatable, this, event, model, controllers));
-				wrapped = true;
-				cursor = end;
-			}
-		}
+		animation.forEachCyclicEvent(from, to, includeReverseStart, event ->
+				PAnimationEventDispatcher.dispatch(animatable, this, event, model, controllers));
 	}
 
 	/**

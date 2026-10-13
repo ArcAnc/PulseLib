@@ -18,6 +18,7 @@ import org.joml.Vector3f;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Immutable value object representing animation.
@@ -178,6 +179,33 @@ public record PAnimation(String name,
 				translation == null ? new Vector3f() : translation,
 				rotation == null ? new Quaternionf() : rotation,
 				scale == null ? new Vector3f(1f) : scale);
+	}
+
+	/**
+	 * Visits all crossed cyclic events, including distinct zero/end markers.
+	 * Empty and zero-length clips do not iterate. Pathological ranges fail with
+	 * a diagnostic before dispatch rather than silently dropping events.
+	 * @param from the previous playback time, in ticks.
+	 * @param to the next playback time, in ticks.
+	 * @param consumer the event receiver.
+	 */
+	public void forEachCyclicEvent(double from, double to, Consumer<PAnimationEvent<?>> consumer)
+	{
+		forEachCyclicEvent(from, to, true, consumer);
+	}
+
+	/**
+	 * Visits a cyclic window, optionally excluding the initial reverse end marker.
+	 * Raw reverse playback excludes that marker on stage entry; subsequent wraps
+	 * include it. All later windows retain the ordinary seam semantics.
+	 * @param from the previous playback time, in ticks.
+	 * @param to the next playback time, in ticks.
+	 * @param includeReverseStart whether to include an end marker on departure.
+	 * @param consumer the event receiver.
+	 */
+	public void forEachCyclicEvent(double from, double to, boolean includeReverseStart, Consumer<PAnimationEvent<?>> consumer)
+	{
+		PCyclicAnimationEvents.visit(this, from, to, includeReverseStart, consumer);
 	}
 
 	/**
