@@ -11,6 +11,7 @@ package com.arcanc.pulselib.content.player.animation;
 
 import com.arcanc.pulselib.content.model.animation.PTransform;
 import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
+import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector3f;
@@ -62,6 +63,38 @@ public final class PPlayerAnimationSpace
 	public static PTransform toFirstPersonGeometrySpace(PTransform transform, PPlayerAnimationDefinition definition)
 	{
 		return usesGltfCoordinates(definition) ? GLTF_TO_PLAYER_GEOMETRY.compose(toPlayerGeometrySpace(transform, definition)) : transform;
+	}
+
+	/** Changes both the transform input and output basis for native anchor geometry. */
+	public static Matrix4f toPlayerSpace(Matrix4f matrix, PPlayerAnimationDefinition definition)
+	{
+		if (usesGltfCoordinates(definition))
+		{
+			matrix.scale(-1, -1, 1).scaleLocal(-1, -1, 1);
+		}
+		return matrix;
+	}
+
+	/** Changes the output basis while imported mesh vertices retain their source basis. */
+	public static Matrix4f toPlayerGeometrySpace(Matrix4f matrix, PPlayerAnimationDefinition definition)
+	{
+		if (usesGltfCoordinates(definition))
+		{
+			matrix.scaleLocal(-1, -1, 1);
+		}
+		return matrix;
+	}
+
+	/** Preserves a caller's command edits while restoring the exact frame matrix underneath its TRS channels. */
+	public static Matrix4f applyChannelOverride(Matrix4f exact, PTransform command, PTransform sampled)
+	{
+		Matrix4f authored = command.matrix();
+		Matrix4f baseline = sampled.matrix();
+		if (!authored.equals(baseline, 1.0e-5f))
+		{
+			authored.mul(baseline.invert()).mul(exact, exact);
+		}
+		return exact;
 	}
 
 	private static boolean usesGltfCoordinates(PPlayerAnimationDefinition definition)

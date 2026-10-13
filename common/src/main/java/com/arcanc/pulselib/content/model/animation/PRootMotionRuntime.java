@@ -9,21 +9,28 @@
 
 package com.arcanc.pulselib.content.model.animation;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Objects;
 
+/**
+ * Extracts animation-space motion for callers. PulseLib applies ROOT to visual
+ * poses only; using the extracted delta for entity movement, collisions or
+ * server synchronization is the consuming mod's responsibility.
+ */
 public final class PRootMotionRuntime
 {
 	private final PAnimation animation;
 	private final String rootBoneName;
 	private final PInterpolationType interpolation;
-	private final Object data;
+	private final @Nullable Object data;
 
 	public PRootMotionRuntime(PAnimation animation, String rootBoneName, PInterpolationType interpolation)
 	{
 		this(animation, rootBoneName, interpolation, null);
 	}
 
-	public PRootMotionRuntime(PAnimation animation, String rootBoneName, PInterpolationType interpolation, Object data)
+	public PRootMotionRuntime(PAnimation animation, String rootBoneName, PInterpolationType interpolation, @Nullable Object data)
 	{
 		this.animation = Objects.requireNonNull(animation, "animation");
 		this.rootBoneName = Objects.requireNonNull(rootBoneName, "rootBoneName");

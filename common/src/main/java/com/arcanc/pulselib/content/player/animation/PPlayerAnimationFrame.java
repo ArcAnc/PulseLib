@@ -12,6 +12,7 @@ package com.arcanc.pulselib.content.player.animation;
 import com.arcanc.pulselib.content.model.animation.BoneFrame;
 import com.arcanc.pulselib.content.model.animation.PAnimationPoseResolver;
 import com.arcanc.pulselib.content.model.animation.PTransform;
+import com.arcanc.pulselib.content.model.baked.PBakedModel;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -30,7 +31,9 @@ public final class PPlayerAnimationFrame
 {
 	private final PPlayerAnimationDefinition definition;
 	private final PAnimationPoseResolver<PPlayerAnimationInstance> resolver;
-	private final String rootBone;
+	private final @Nullable String rootBone;
+	private final Map<String, Matrix4f> modelMatrices = new HashMap<>();
+	private final Map<String, Matrix4f> bindMatrices = new HashMap<>();
 	private final Map<String, PTransform> transforms = new HashMap<>();
 	private final Set<String> missingTransforms = new HashSet<>();
 
@@ -42,8 +45,15 @@ public final class PPlayerAnimationFrame
 		this.rootBone = definition.bindings().get(PPlayerPart.ROOT);
 	}
 
-	public PPlayerAnimationDefinition definition() { return this.definition; }
-	public PAnimationPoseResolver<PPlayerAnimationInstance> resolver() { return this.resolver; }
+	public PPlayerAnimationDefinition definition()
+	{
+		return this.definition;
+	}
+
+	public PAnimationPoseResolver<PPlayerAnimationInstance> resolver()
+	{
+		return this.resolver;
+	}
 
 	public @Nullable BoneFrame localTransform(String boneName)
 	{
@@ -63,8 +73,20 @@ public final class PPlayerAnimationFrame
 			PTransform rootBind = bindTransform(this.rootBone);
 			if (rootCurrent == null || rootBind == null)
 				return null;
-			current = rootCurrent.inverse().compose(current);
-			bind = rootBind.inverse().compose(bind);
+			Matrix4f currentMatrix = new Matrix4f();
+			Matrix4f bindMatrix = new Matrix4f();
+			Matrix4f rootMatrix = new Matrix4f();
+			if (!modelMatrix(boneName, currentMatrix) || !bindMatrix(boneName, bindMatrix) ||
+					!modelMatrix(this.rootBone, rootMatrix))
+			{
+				return null;
+			}
+			current = PTransform.fromMatrix(rootMatrix.invert().mul(currentMatrix));
+			if (!bindMatrix(this.rootBone, rootMatrix))
+			{
+				return null;
+			}
+			bind = PTransform.fromMatrix(rootMatrix.invert().mul(bindMatrix));
 		}
 		Vector3f translation = current.translation().sub(bind.translation());
 		Quaternionf rotation = new Quaternionf(bind.rotation()).invert().premul(current.rotation());
@@ -76,13 +98,58 @@ public final class PPlayerAnimationFrame
 		return translated || rotated || scaled ? new PPlayerBonePose(translation, rotation, scale, translated, rotated, scaled) : null;
 	}
 
-	public @Nullable PTransform modelTransform(String boneName) { return transform(boneName); }
+	public @Nullable PTransform modelTransform(String boneName)
+	{
+		return transform(boneName);
+	}
 
+	/** Writes the exact parent matrix product, including inherited nonuniform scale. */
 	public boolean modelMatrix(String boneName, Matrix4f destination)
 	{
-		PTransform transform = transform(boneName);
-		if (transform == null) return false;
-		transform.matrix(destination);
+		return hierarchyMatrix(boneName, destination, false);
+	}
+
+	/** Writes the exact bind hierarchy in the same source-model basis. */
+	public boolean bindMatrix(String boneName, Matrix4f destination)
+	{
+		return hierarchyMatrix(boneName, destination, true);
+	}
+
+	private boolean hierarchyMatrix(String boneName, Matrix4f destination, boolean bind)
+	{
+		Map<String, Matrix4f> matrices = bind ? this.bindMatrices : this.modelMatrices;
+		Matrix4f cached = matrices.get(boneName);
+		if (cached != null)
+		{
+			destination.set(cached);
+			return true;
+		}
+		PBakedModel model = this.definition.modelData().getModel();
+		if (model == null || model.boneIndex(boneName) < 0)
+		{
+			return false;
+		}
+		int index = model.boneIndex(boneName);
+		int parent = model.parentIndex(index);
+		destination.identity();
+		if (parent >= 0 && !hierarchyMatrix(model.bone(parent).name(), destination, bind))
+		{
+			return false;
+		}
+		if (bind)
+		{
+			destination.translate(model.bone(index).basePosition()).rotate(model.bone(index).baseRotation());
+		}
+		else
+		{
+			BoneFrame local = localTransform(boneName);
+			if (local == null)
+			{
+				return false;
+			}
+			destination.translate(local.translation()).rotate(local.rotation()).scale(local.scale());
+		}
+		matrices.put(boneName, new Matrix4f(destination));
 		return true;
 	}
 
@@ -93,21 +160,59 @@ public final class PPlayerAnimationFrame
 	}
 
 	/**
-	 * Returns a bone transform relative to the animation root, or to the head
-	 * bind pose when the definition has no explicit root binding.
+	 * Returns the current MODEL transform in the ROOT bind frame (or HEAD bind
+	 * frame for rootless rigs). This includes animated ROOT motion and is for
+	 * callers whose outer stack has not already applied that motion.
 	 */
 	public @Nullable PTransform rootRelativeTransform(String boneName)
 	{
-		PTransform transform = transform(boneName);
-		if (transform == null) return null;
-		String referenceBone = this.rootBone == null
-				? this.definition.bindings().get(PPlayerPart.HEAD)
-				: this.rootBone;
-		if (referenceBone == null) return transform;
-		PTransform rootBind = bindTransform(referenceBone);
-		return rootBind == null ? transform : rootBind.inverse().compose(transform);
+		Matrix4f matrix = new Matrix4f();
+		if (!modelMatrix(boneName, matrix))
+		{
+			return null;
+		}
+		String reference = this.rootBone == null ? this.definition.bindings().get(PPlayerPart.HEAD) : this.rootBone;
+		Matrix4f bind = new Matrix4f();
+		if (reference != null && bindMatrix(reference, bind))
+		{
+			bind.invert().mul(matrix, matrix);
+		}
+		return PTransform.fromMatrix(matrix);
 	}
 
+	/**
+	 * Returns a bone in the current ROOT frame for a PoseStack that already
+	 * contains visual ROOT motion. Without ROOT, the head bind frame remains
+	 * the reference used by existing rootless player rigs.
+	 */
+	public @Nullable PTransform currentRootRelativeTransform(String boneName)
+	{
+		Matrix4f matrix = new Matrix4f();
+		return currentRootRelativeMatrix(boneName, matrix) ? PTransform.fromMatrix(matrix) : null;
+	}
+
+	/** Exact rendering form of {@link #currentRootRelativeTransform(String)}. */
+	public boolean currentRootRelativeMatrix(String boneName, Matrix4f destination)
+	{
+		if (!modelMatrix(boneName, destination))
+		{
+			return false;
+		}
+		String reference = this.rootBone == null ? this.definition.bindings().get(PPlayerPart.HEAD) : this.rootBone;
+		if (reference == null)
+		{
+			return true;
+		}
+		Matrix4f root = new Matrix4f();
+		boolean resolved = this.rootBone == null ? bindMatrix(reference, root) : modelMatrix(reference, root);
+		if (resolved)
+		{
+			root.invert().mul(destination, destination);
+		}
+		return true;
+	}
+
+	/** Returns the full MODEL-space socket, including ROOT and every parent. */
 	public @Nullable PTransform actionTransform(PPlayerAnimationAnchor anchor)
 	{
 		String bone = this.definition.anchors().get(anchor);
@@ -136,6 +241,11 @@ public final class PPlayerAnimationFrame
 			return null;
 		}
 		PTransform transform = pose.modelTransform();
+		Matrix4f matrix = new Matrix4f();
+		if (modelMatrix(boneName, matrix))
+		{
+			transform = new PTransform(matrix.getTranslation(new Vector3f()), transform.rotation(), transform.scale());
+		}
 		this.transforms.put(boneName, transform);
 		return transform;
 	}

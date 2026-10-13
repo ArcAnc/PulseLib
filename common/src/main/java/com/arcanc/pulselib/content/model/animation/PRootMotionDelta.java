@@ -12,6 +12,7 @@ package com.arcanc.pulselib.content.model.animation;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+/** Animation-space displacement data. Extracting it never moves an entity or its hitbox. */
 public record PRootMotionDelta(
 		Vector3f translation,
 		Quaternionf rotation)

@@ -9,6 +9,8 @@
 
 package com.arcanc.pulselib.content.player.animation.attachment;
 
+import com.arcanc.pulselib.content.model.animation.PTransform;
+import com.arcanc.pulselib.content.player.animation.PPlayerAnimationSpace;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationAnchor;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationAnchorPose;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
@@ -17,6 +19,7 @@ import com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPers
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import org.joml.Matrix4f;
 
 import java.util.*;
 
@@ -46,13 +49,18 @@ public final class PPlayerAnimatedAttachments
 			List<PPlayerAnimatedAttachmentRenderer> renderers = RENDERERS.get(pose.anchor());
 			if (renderers == null)
 				continue;
+			Matrix4f matrix = new Matrix4f();
+			if (!PPlayerAnimations.attachmentMatrix(player, pose.animation(), pose.anchor(), partialTick, matrix))
+			{
+				continue;
+			}
 			for (PPlayerAnimatedAttachmentRenderer renderer : renderers.stream().
 					sorted(Comparator.comparing(value -> value.getClass().getName())).toList())
 			{
 				poseStack.pushPose();
 				try
 				{
-					poseStack.mulPose(pose.transform().matrix());
+					poseStack.mulPose(matrix);
 					renderer.render(new PPlayerAnimatedAttachmentContext(player, pose.animation(), pose.anchor(), pose.transform(),
 						pose.weight(), false, poseStack, buffers, packedLight, partialTick));
 				}
@@ -81,7 +89,16 @@ public final class PPlayerAnimatedAttachments
 				poseStack.pushPose();
 				try
 				{
-					poseStack.mulPose(pose.transform().matrix());
+					Matrix4f matrix = new Matrix4f();
+					if (PPlayerAnimations.firstPersonAttachmentMatrix(player, pose.animation(), pose.anchor(), partialTick, matrix))
+					{
+						PPlayerAnimationSpace.applyChannelOverride(matrix, pose.transform(), PTransform.fromMatrix(matrix));
+					}
+					else
+					{
+						pose.transform().matrix(matrix);
+					}
+					poseStack.mulPose(matrix);
 					renderer.render(new PPlayerAnimatedAttachmentContext(player, pose.animation(), pose.anchor(), pose.transform(),
 						pose.weight(), true, poseStack, buffers, packedLight, partialTick));
 				}

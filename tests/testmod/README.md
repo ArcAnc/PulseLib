@@ -106,3 +106,14 @@ The world series uses a fresh marked world, fixed camera/stone fixture, six 1080
 Test-only Mixins issue paired OpenGL/ARB timer timestamps. Nested passes use separate timestamp pairs; results are collected asynchronously only after `GL_QUERY_RESULT_AVAILABLE`. No CPU Java-call duration, glFinish or pixel readback is substituted for GPU execution time. Texture footprint is measured from allocated channel sizes; NVX available-memory delta is a global driver counter and includes allocations other than OIT. Query overhead, CPU submission gaps and background GPU work can affect elapsed timestamps, so compare repeated controlled runs before applying an optimization.
 
 Require `H14 GPU PERFORMANCE PASS` / `H14 WORLD GPU PERFORMANCE PASS` and successful exit. CSV output is in `<loader>/build/reports/h14`. Current results and limitations are recorded in the stabilization report. Functional H14 pixel regressions remain separate and mandatory before any OIT optimization.
+
+## Player visual Root Motion and animated camera (M-P2 / M-P3)
+
+```sh
+./gradlew :fabric:runClient -PpulseTestMod -PpulsePlayerMotionTest -PpulseMotionPhase=mp2 --no-daemon
+./gradlew :neoforge:runClient -PpulseTestMod -PpulsePlayerMotionTest -PpulseMotionPhase=mp2 --no-daemon
+```
+
+This opt-in mode creates a fresh marked disposable world and hides its window to prevent manual demo keys from changing a controlled scenario. It loads equivalent Gecko and embedded, indexed glTF group/mesh rigs. Matrix probes observe actual custom-anchor stacks and entity/first-person mesh submissions. A–D run with all five blend modes and three weights, E runs two active definitions, and the suite repeats after one resource reload. Physics snapshots bracket the animation tick and render/extraction APIs. Two client observer actors exercise separate player instances and native world rendering; an actual integrated-server respawn checks player replacement. These observers are not networked multiplayer clients.
+
+Require `PLAYER MOTION M-P2 PASS` **and** normal successful process completion. A PASS followed by a stalled JVM shutdown is only assertion evidence, not a fully successful game run. Current verification and remaining limitations are recorded in `docs/reviews/player-motion-camera-regressions-2026-10-13.md`. This mode is never part of mandatory CI.

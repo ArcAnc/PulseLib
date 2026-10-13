@@ -46,7 +46,7 @@ public final class DisposableTestWorlds
 		{
 			Minecraft.getInstance().options.pauseOnLostFocus = false;
 		}
-		if (Boolean.getBoolean("pulselib.test.oitPerf") && !profilingWindowHidden)
+		if ((Boolean.getBoolean("pulselib.test.oitPerf") || Boolean.getBoolean("pulselib.test.playerMotion")) && !profilingWindowHidden)
 		{
 			Minecraft mc = Minecraft.getInstance();
 			// Hiding preserves the GL context/framebuffer, but prevents UI input

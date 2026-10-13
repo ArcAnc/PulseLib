@@ -1,6 +1,6 @@
 import net.fabricmc.loom.task.RemapJarTask
 
-def automatedTest = ['pulseSmokeAuto', 'pulseSmokeWorld', 'pulseOitTest', 'pulseOitPerf'].any {
+def automatedTest = ['pulseSmokeAuto', 'pulseSmokeWorld', 'pulseOitTest', 'pulseOitPerf', 'pulsePlayerMotionTest'].any {
     providers.gradleProperty(it).isPresent()
 }
 if (automatedTest && !providers.gradleProperty('pulseTestMod').isPresent() && !providers.gradleProperty('pulseTestJar').isPresent()) {
@@ -15,6 +15,11 @@ if (automatedTest) {
         if (providers.gradleProperty(property).isPresent()) {
             testProperties["pulselib.test.${suffix}"] = 'true'
         }
+    }
+    if (providers.gradleProperty('pulsePlayerMotionTest').isPresent()) {
+        testProperties['pulselib.test.playerMotion'] = 'true'
+        testProperties['pulselib.test.world'] = 'true'
+        testProperties['pulselib.test.motionPhase'] = providers.gradleProperty('pulseMotionPhase').getOrElse('all')
     }
     tasks.matching { it.name in ['runClient', 'runServer'] }.configureEach {
         doFirst {

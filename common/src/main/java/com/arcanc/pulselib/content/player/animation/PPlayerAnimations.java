@@ -93,6 +93,41 @@ public final class PPlayerAnimations
 		return List.copyOf(poses);
 	}
 
+	/** Writes a semantic socket for the third-person stack after visual ROOT motion. */
+	@ApiStatus.Internal
+	public static boolean attachmentMatrix(Player player, ResourceLocation animation,
+	                                       PPlayerAnimationAnchor anchor, float partialTick, Matrix4f destination)
+	{
+		PPlayerAnimationDefinition definition = DEFINITIONS.get(animation);
+		if (definition == null)
+		{
+			return false;
+		}
+		String bone = definition.anchors().get(anchor);
+		PPlayerAnimationFrame frame = instance(player, animation, definition).sampleFrame(partialTick);
+		if (bone == null || frame == null || !frame.currentRootRelativeMatrix(bone, destination))
+		{
+			return false;
+		}
+		PPlayerAnimationSpace.toPlayerSpace(destination, definition);
+		return true;
+	}
+
+	/** Writes an already camera-relative socket; the native hand stack adds no camera motion. */
+	@ApiStatus.Internal
+	public static boolean firstPersonAttachmentMatrix(Player player, ResourceLocation animation,
+	                                                  PPlayerAnimationAnchor anchor, float partialTick, Matrix4f destination)
+	{
+		PPlayerAnimationDefinition definition = DEFINITIONS.get(animation);
+		if (definition == null)
+		{
+			return false;
+		}
+		PPlayerAnimationFrame frame = instance(player, animation, definition).sampleFrame(partialTick);
+		PFirstPersonPresentation presentation = frame == null ? null : PFirstPersonPresentation.create(frame);
+		return presentation != null && presentation.anchorMatrix(anchor, destination);
+	}
+
 	/** Returns mesh subtrees selected from the same evaluated player-animation frames. */
 	public static List<PPlayerAnimationMeshAttachmentPose> meshAttachmentPoses(Player player, float partialTick)
 	{
@@ -107,7 +142,7 @@ public final class PPlayerAnimations
 			if (frame == null) continue;
 			for (var root : PPlayerAutomaticMeshAttachments.roots(frame))
 			{
-				PTransform transform = frame.rootRelativeTransform(root.name());
+				PTransform transform = frame.currentRootRelativeTransform(root.name());
 				if (transform != null)
 					poses.add(new PPlayerAnimationMeshAttachmentPose(entry.getKey(), definition.modelData(), root, frame,
 							PPlayerAnimationSpace.toPlayerGeometrySpace(transform, definition), weight));

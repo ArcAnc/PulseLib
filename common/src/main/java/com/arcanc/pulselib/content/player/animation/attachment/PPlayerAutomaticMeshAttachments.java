@@ -18,6 +18,8 @@ import com.arcanc.pulselib.content.model.baked.PMeshRenderContext;
 import com.arcanc.pulselib.content.model.baked.PMeshRenderMaterial;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationDefinition;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationFrame;
+import com.arcanc.pulselib.content.player.animation.PPlayerAnimationSpace;
+import com.arcanc.pulselib.content.player.animation.firstPerson.PFirstPersonPresentation;
 import com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonMeshAttachmentPose;
 import com.arcanc.pulselib.content.renderer.PRenderQueue;
 import com.arcanc.pulselib.content.renderer.plan.PInstanceHeader;
@@ -54,21 +56,45 @@ public final class PPlayerAutomaticMeshAttachments
 			return List.copyOf(roots);
 		}
 		Set<String> skeleton = new HashSet<>(definition.bindings().values());
-		for (PBakedBone bone : definition.modelData().getModel().bones()) findRoots(bone, skeleton, frame.resolver().activeAnimationBones(), roots);
+		for (PBakedBone bone : definition.modelData().getModel().bones())
+		{
+			findRoots(bone, skeleton, frame.resolver().activeAnimationBones(), false, roots);
+		}
 		return List.copyOf(roots);
 	}
 
 	public static void renderThirdPerson(List<PPlayerAnimationMeshAttachmentPose> poses, PoseStack poseStack, int packedLight)
 	{
 		for (PPlayerAnimationMeshAttachmentPose pose : poses)
-			if (pose.weight() > 1.0e-4f) submit(pose.root(), pose.frame(), pose.transform(), poseStack, packedLight);
+			if (pose.weight() > 1.0e-4f)
+			{
+				Matrix4f matrix = new Matrix4f();
+				if (pose.frame().currentRootRelativeMatrix(pose.root().name(), matrix))
+				{
+					PPlayerAnimationSpace.toPlayerGeometrySpace(matrix, pose.frame().definition());
+					PTransform sampled = PPlayerAnimationSpace.toPlayerGeometrySpace(
+							pose.frame().currentRootRelativeTransform(pose.root().name()), pose.frame().definition());
+					PPlayerAnimationSpace.applyChannelOverride(matrix, pose.transform(), sampled);
+					submit(pose.root(), pose.frame(), matrix, poseStack, packedLight);
+				}
+			}
 	}
 
 	/** Draws model mesh attachments after their first-person presentation has been resolved. */
 	public static void renderFirstPerson(List<PPlayerFirstPersonMeshAttachmentPose> poses, PoseStack poseStack, int packedLight)
 	{
 		for (PPlayerFirstPersonMeshAttachmentPose pose : poses)
-			if (pose.weight() > 1.0e-4f) submitFirstPerson(pose.root(), pose.frame(), pose.transform(), poseStack, packedLight);
+			if (pose.weight() > 1.0e-4f)
+			{
+				PFirstPersonPresentation presentation = PFirstPersonPresentation.create(pose.frame());
+				Matrix4f matrix = new Matrix4f();
+				if (presentation != null && presentation.boneMatrix(pose.root().name(), matrix))
+				{
+					PTransform sampled = PPlayerAnimationSpace.toFirstPersonGeometrySpace(PTransform.fromMatrix(matrix), pose.frame().definition());
+					PPlayerAnimationSpace.applyChannelOverride(matrix, pose.transform(), sampled);
+					submitFirstPerson(pose.root(), pose.frame(), matrix, poseStack, packedLight);
+				}
+			}
 	}
 
 	/**
@@ -76,7 +102,7 @@ public final class PPlayerAutomaticMeshAttachments
 	 * immediate draw here would still test against the world depth buffer.
 	 */
 	private static void submitFirstPerson(PBakedBone root, PPlayerAnimationFrame frame,
-	                                      PTransform transform,
+	                                      Matrix4f transform,
 	                                      PoseStack poseStack, int packedLight)
 	{
 		BoneFrame local = frame.localTransform(root.name());
@@ -84,7 +110,7 @@ public final class PPlayerAutomaticMeshAttachments
 		poseStack.pushPose();
 		try
 		{
-			poseStack.mulPose(transform.matrix());
+			poseStack.mulPose(transform);
 			poseStack.scale(inverse(local.scale().x), inverse(local.scale().y), inverse(local.scale().z));
 			poseStack.mulPose(new Quaternionf(local.rotation()).invert());
 			poseStack.translate(-local.translation().x, -local.translation().y, -local.translation().z);
@@ -95,7 +121,7 @@ public final class PPlayerAutomaticMeshAttachments
 	}
 
 	private static void submit(PBakedBone root, PPlayerAnimationFrame frame,
-	                           PTransform transform,
+	                           Matrix4f transform,
 	                           PoseStack poseStack, int packedLight)
 	{
 		BoneFrame local = frame.localTransform(root.name());
@@ -103,7 +129,7 @@ public final class PPlayerAutomaticMeshAttachments
 		poseStack.pushPose();
 		try
 		{
-			poseStack.mulPose(transform.matrix());
+			poseStack.mulPose(transform);
 			poseStack.scale(inverse(local.scale().x), inverse(local.scale().y), inverse(local.scale().z));
 			poseStack.mulPose(new Quaternionf(local.rotation()).invert());
 			poseStack.translate(-local.translation().x, -local.translation().y, -local.translation().z);
@@ -170,12 +196,21 @@ public final class PPlayerAutomaticMeshAttachments
 		for (PBakedBone parent = bone.parent(); parent != null; parent = parent.parent()) if (configured.contains(parent.name())) return true;
 		return false;
 	}
-	private static void findRoots(PBakedBone bone, Set<String> skeleton, Set<String> animated, List<PBakedBone> roots)
+	private static void findRoots(PBakedBone bone, Set<String> skeleton, Set<String> animated,
+	                              boolean animatedParent, List<PBakedBone> roots)
 	{
-		if (skeleton.contains(bone.name()) || !containsAnimated(bone, animated)) return;
-		if (containsMesh(bone)) { roots.add(bone); return; }
-		for (PBakedBone child : bone.children()) findRoots(child, skeleton, animated, roots);
+		boolean inheritsAnimation = animatedParent || animated.contains(bone.name());
+		if (!skeleton.contains(bone.name()) && (inheritsAnimation || containsAnimated(bone, animated)) && containsMesh(bone))
+		{
+			roots.add(bone);
+			return;
+		}
+		for (PBakedBone child : bone.children())
+		{
+			findRoots(child, skeleton, animated, inheritsAnimation, roots);
+		}
 	}
+
 	private static boolean containsAnimated(PBakedBone bone, Set<String> animated)
 	{
 		return animated.contains(bone.name()) || bone.children().stream().anyMatch(child -> containsAnimated(child, animated));

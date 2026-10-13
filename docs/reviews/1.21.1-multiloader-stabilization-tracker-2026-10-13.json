@@ -1,18 +1,19 @@
 {
   "date": "2026-10-13",
   "branch": "1.21.1-multiloader",
-  "head": "87052baf1c7dc281aea3d6714eafa9ac26545110",
+  "head": "4b22a67bcf3e1091de92dc5f8e2c94de9ac48eaf",
   "version": "1.2.0",
-  "basis": "Current working tree; preserves pre-existing uncommitted H14/H17 patches. Historical evidence is retained in historical_status/evidence, not rewritten.",
+  "basis": "M-P2/M-P3 work based on committed HEAD 4b22a67; historical evidence and C1/H14/H17/L38 fixes preserved.",
   "counts": {
     "FIXED": 4,
     "CONFIRMED BUG": 37,
     "UNSUPPORTED FEATURE": 12,
     "INTENDED BEHAVIOR": 2,
     "POTENTIAL BUG": 21,
-    "NEEDS DESIGN DECISION": 16,
+    "NEEDS DESIGN DECISION": 14,
     "FALSE POSITIVE": 2,
-    "FIXED BEFORE STABILIZATION": 2
+    "FIXED BEFORE STABILIZATION": 2,
+    "IN PROGRESS": 2
   },
   "findings": [
     {
@@ -1181,10 +1182,10 @@
     },
     {
       "id": "M-P2",
-      "status": "NEEDS DESIGN DECISION",
+      "status": "IN PROGRESS",
       "evidence": "rootRelativeTransform использует rootBind^-1, anchors возвращаются в model space. Это доказанные разные пространства, но actionTransform документирован как canonical model socket, а смысл attachments при root motion требует контракта автора. Не менять обе функции на rootCurrent^-1 глобально без эталона.",
       "historical_status": "NEEDS DESIGN DECISION",
-      "current_status": "NEEDS DESIGN DECISION",
+      "current_status": "CONTRACT ACCEPTED — IMPLEMENTED, VALIDATION INCOMPLETE",
       "historical_places": [
         [
           "common/src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimations.java",
@@ -1200,14 +1201,21 @@
       "files": [
         "common/src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimations.java",
         "common/src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationFrame.java"
+      ],
+      "current_report": "player-motion-camera-regressions-2026-10-13.md",
+      "current_evidence": [
+        "Visual-only ROOT; model-space action sockets and bind-relative API retained; exact current-root-relative render path removes repeated ROOT and keeps intermediate parent matrices.",
+        "8 hierarchy JUnit tests pass; 5 baseline witnesses fail on HEAD; C1/plugin tests preserved.",
+        "Fabric and NeoForge each report 244 in-game matrix/physics assertions PASS, with reload, weights, five blend modes, two definitions, respawn and two client observer actors.",
+        "Normal JVM termination after PASS remains unverified; no screenshot/pixel or real multi-client multiplayer equivalence claim."
       ]
     },
     {
       "id": "M-P3",
-      "status": "NEEDS DESIGN DECISION",
+      "status": "IN PROGRESS",
       "evidence": "current∘bind^-1 действительно содержит (I-R)·bindTranslation. Это корректный affine delta, но может быть неподходящей camera displacement. Нужно решить, камера следует за authored frame/pivot или только разницей positions; автоматическая замена на current.t-bind.t меняет эту семантику.",
       "historical_status": "NEEDS DESIGN DECISION",
-      "current_status": "NEEDS DESIGN DECISION",
+      "current_status": "CONTRACT ACCEPTED — CAMERA REGRESSION AND FIX PENDING",
       "historical_places": [
         [
           "common/src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationFrame.java",
@@ -1223,6 +1231,10 @@
       "files": [
         "common/src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimationFrame.java",
         "common/src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimations.java"
+      ],
+      "current_report": "player-motion-camera-regressions-2026-10-13.md",
+      "current_evidence": [
+        "Author accepted visual-only camera hierarchy contract; phase B starts after M-P2 assertion stabilization."
       ]
     },
     {
