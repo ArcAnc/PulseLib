@@ -23,6 +23,16 @@ Important classes:
 
 PulseLib adds attachment render layers for players and living entities automatically through [`PLibArmorHandler`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PLibArmorHandler.java). Attachment definitions are contributed in `IPulseClientPlugin.registerAttachments(PAttachmentRegistrar)`.
 
+## Player-animation anchors and meshes
+
+The player-animation system also exposes semantic anchors through `PPlayerAnimationDefinition.Builder.anchor(...)` and additional mesh subtrees through `Builder.meshAttachment(...)` or automatic discovery. These use the evaluated animation skeleton. See [Player animations](player-animations.md#animated-anchors-and-automatic-meshes) for registration and [transform spaces](player-animations.md#transform-spaces).
+
+For `ROOT → BODY → RIGHT_ARM → ITEM_ANCHOR`, the anchor inherits every parent transform. The native third-person stack already includes visual ROOT, so PulseLib supplies the current-root-relative child matrix and applies ROOT once. In first person, arms, items, custom anchors, automatic meshes, and persistent arm attachments use the shared camera-relative presentation. Their VIEW-space transforms do not receive another ROOT or camera transform.
+
+An animated anchor renderer receives `PPlayerAnimatedAttachmentContext.poseStack()` already positioned at the attachment origin. Render local geometry with that stack. `context.transform()` is the full source MODEL-space socket in third person and a camera-relative VIEW-space transform in first person; applying it again to the supplied stack duplicates the transform. Automatic meshes retain their parent's hierarchy even without their own animation channel, including active rigs where only the camera animates.
+
+Root Motion and animated camera movement are visual only. Attachments do not move the entity, its bounding box, collisions, or server position. The `PTransform` used by this page's `PAttachmentBinding` examples belongs to `com.arcanc.pulselib.util.attachments`; evaluated animation sockets use the separate `com.arcanc.pulselib.content.model.animation.PTransform` TRS record.
+
 ## Armor item example
 
 Armor is the most direct use case: register a living attachment definition for the armor item, say which equipment slot owns it, and map PulseLib bones to humanoid anchors.

@@ -2,9 +2,11 @@
 
 ## First-person integration (Minecraft 1.21.1)
 
-First-person output is opt-in with `firstPerson(PPlayerFirstPersonSettings.ENABLED)` and requires the `FIRST_PERSON_CAMERA` anchor. Bind `RIGHT_ARM` and `LEFT_ARM` for the physical arms, and use `RIGHT_ITEM` and `LEFT_ITEM` anchors for held items. PulseLib preserves the native 1.21.1 `ItemInHandRenderer` equip, swing, use, map, display-context, and left/right hand pipeline; it replaces only the final arm or item spatial submission when the presentation supplies an animated pose.
+First-person output is opt-in with `firstPerson(PPlayerFirstPersonSettings.ENABLED)` and requires the `FIRST_PERSON_CAMERA` anchor. Bind `RIGHT_ARM` and `LEFT_ARM` for the vanilla arms, and use `RIGHT_ITEM` and `LEFT_ITEM` anchors for held items. PulseLib preserves the native 1.21.1 `ItemInHandRenderer` equip, swing, use, map, display-context, and left/right hand pipeline; it replaces only the final arm or item spatial submission when the presentation supplies an animated pose.
 
 `PFirstPersonRenderContexts` carries a per-hand presentation through the renderer. `PVanillaFirstPersonArmResolver` and `PVanillaFirstPersonItemResolver` adapt camera-relative animation transforms to the vanilla arm and item origins. `PPlayerFirstPersonRenderer` draws first-person anchor and mesh attachments before the native buffer batch closes. `PFirstPersonCameraMode.ANIMATED` applies the `FIRST_PERSON_CAMERA` delta in `Camera.setup`; `VANILLA` leaves the camera unchanged.
+
+Arms, items, custom anchors, and additional meshes share one `PFirstPersonPresentation`: each transform is `inverse(currentCameraModelMatrix) * currentBoneModelMatrix`. Both matrices include the full parent hierarchy. The resulting commands are already in VIEW space; ROOT and camera motion are not applied again by the hand or extras renderer. See [Animated camera](#animated-camera) for camera-origin displacement and [Transform spaces](#transform-spaces) for the public frame APIs.
 
 `Builder.itemRenderPolicy(...)` decides whether a physical `InteractionHand` item is suppressed: `ItemRenderPolicy.RENDER` is the default and `HIDE` hides it. `Builder.itemVisibility(controller, policy)` adds a phase-based decision using the named controller's interpolated time in seconds. Either policy produces a per-hand hidden presentation while preserving vanilla map handling and equip/swing/use transforms for visible items.
 
@@ -66,7 +68,7 @@ if (animation != null)
 
 `bind(part, boneName)` maps a bone in the animation model to a semantic player part. `PPlayerPart` values are `ROOT`, `HEAD`, `BODY`, `RIGHT_ARM`, `LEFT_ARM`, `RIGHT_LEG`, and `LEFT_LEG`.
 
-`ROOT` applies the bone transform to the complete third-person player render, including its feature layers. Use it for an emote that moves or rotates the whole player, such as a flip. `rootPivot(x, y, z)` selects its rotation pivot in model-space blocks; a value close to `(0, 0.9, 0)` rotates around the centre of a standing player. In first person, `ROOT` and `HEAD` drive the local camera, while arms use only their local arm transforms. The root transform is deliberately not applied a second time to the first-person hand renderer. An empty off-hand is rendered when its `LEFT_ARM` or `RIGHT_ARM` binding has an active sampled transform.
+`ROOT` applies a visual animation delta to the complete third-person player render, including its feature layers. Use it for an emote that moves or rotates the visible model, such as a flip. `rootPivot(x, y, z)` selects its rotation/scale pivot in source-model blocks. Choose the pivot in the rig's own coordinate basis. In first person, `FIRST_PERSON_CAMERA` supplies the shared view frame; arms, items, and meshes inherit every parent in their own model-space chains before conversion to that frame. An empty off-hand is rendered when its `LEFT_ARM` or `RIGHT_ARM` binding has an active sampled transform.
 
 Each semantic part applies to both the base part and the matching outer skin layer. For example, `RIGHT_ARM` transforms `rightArm` and `rightSleeve` together.
 
@@ -76,6 +78,60 @@ Each semantic part applies to both the base part and the matching outer skin lay
 .mask((player, part, partialTick) ->
         part != PPlayerPart.HEAD || !player.isUsingItem())
 ```
+
+## Visual Root Motion
+
+PulseLib applies Root Motion to visual model translation, rotation, and scale only. Even if an animation moves the visible model several blocks away, `Entity.position()`, `getDeltaMovement()`, the bounding box, collision dimensions, and server position stay unchanged by PulseLib. Animated camera movement is also client-side and visual; it does not change the player's physical eye position.
+
+`PRootMotionRuntime` and `PRootMotionDelta` extract animation-space displacement data. The consuming mod decides whether and how to use those values for gameplay movement, collision handling, or synchronization. PulseLib does not automatically apply the extracted delta to an entity or provide a server Root Motion movement system.
+
+For a hierarchy such as `ROOT → BODY → RIGHT_ARM → ITEM_ANCHOR`, model-space sockets inherit ROOT and every intermediate parent. The native third-person player stack already contains the weighted visual ROOT delta, including `rootPivot`. Native anchors and extra meshes therefore use a current-root-relative matrix on that stack, so ROOT contributes exactly once. This also holds when several definitions contribute weighted ROOT transforms. The existing masks, part/bone weights, blend modes, and crossfades retain their behavior.
+
+## Transform spaces
+
+`PPlayerAnimationInstance.sampleFrame(partialTick)` returns the evaluated frame used by the player-animation consumers. Let `C_b` and `B_b` denote the full current and bind hierarchy matrices of bone `b`, and let `R` be the bound ROOT.
+
+| API / consumer | Space | ROOT handling |
+|---|---|---|
+| `canonicalModelDelta(b)` | TRS channel delta between `C_R^-1 * C_b` and `B_R^-1 * B_b` for children; ROOT itself supplies a model-space channel delta | Excluded from child deltas |
+| `rootRelativeTransform(b)` | Current pose in the ROOT bind frame: `B_R^-1 * C_b` | Animated ROOT included; use when the outer stack has not already applied it |
+| `currentRootRelativeTransform(b)` / `currentRootRelativeMatrix(b, destination)` | Current ROOT frame: `C_R^-1 * C_b` | Excluded; use with an outer stack that already contains visual ROOT |
+| `actionTransform(anchor)` | Full source MODEL-space TRS socket | ROOT and all intermediate parents included; this public contract is unchanged |
+| `modelMatrix(b, destination)` / `bindMatrix(b, destination)` | Exact current / bind model-space hierarchy product | Included |
+| Native third-person animated anchors and automatic meshes | Current-root-relative, converted to the appropriate player/geometry axes | Outer player stack applies visual ROOT once |
+| First-person arms, items, anchors, and meshes | Source-model camera-relative VIEW frame: `C_camera^-1 * C_b` | Shared hierarchy is removed once by the camera frame; no additional ROOT/camera application |
+
+For a rootless rig, the root-relative APIs retain the HEAD bind frame as their reference when HEAD is bound; otherwise they retain model space. MODEL-space sockets are not entity world-space positions. Source glTF matrices also need the player-axis conversion at native rendering boundaries; the built-in consumers perform this conversion.
+
+`com.arcanc.pulselib.content.model.animation.PTransform` stores translation, quaternion rotation, and scale channels. Rotated nonuniform scales can produce shear, which a TRS snapshot cannot represent. Use the frame's matrix APIs for exact hierarchy products in custom matrix rendering; built-in animated anchor and mesh consumers retain those matrices. Vanilla `ModelPart` and arm/item command blending keep their existing TRS representation.
+
+## Animated camera
+
+`FIRST_PERSON_CAMERA` can be a descendant of ROOT or of intermediate bones. In `PFirstPersonCameraMode.ANIMATED`, its position and orientation inherit the full animated hierarchy. The camera uses the same visual ROOT/pivot convention as the native player. Camera definition weight and first-person activation still control how its pose contributes.
+
+`cameraAnchorModelDelta()` returns displacement **at the camera origin**, plus inherited orientation and scale channels. Its translation is no longer the translation column of the affine delta at model zero. Bind and current camera matrices are first expressed in the same normalized visual reference frame. For those matrices `B_visual` and `C_visual`:
+
+```text
+D = C_visual * inverse(B_visual)
+p_bind = B_visual * (0, 0, 0, 1)
+displacement = D * p_bind - p_bind
+```
+
+With ROOT, `C_visual = V_ROOT * inverse(C_ROOT) * C_camera` and `B_visual = inverse(B_ROOT) * B_camera`; `V_ROOT` is the visual ROOT delta with the definition's `rootPivot`. A rootless rig uses the constant HEAD bind reference for both poses, or keeps model space when HEAD is absent. Orientation is the inherited current quaternion relative to the inherited bind quaternion in that same reference frame.
+
+Rotating the camera bone around its own origin changes orientation without moving the camera. Rotating ROOT moves an offset camera anchor along its actual arc about the visual ROOT pivot. This retains inherited translation, rotation, and scale effects without introducing a second displacement from rotation about the bind offset.
+
+The native camera boundary converts Gecko/glTF source axes through player axes into Minecraft camera axes and composes the animated orientation with the vanilla camera orientation. Fabric and NeoForge use the same signed-roll convention. Export glTF using its normal axes; the player pipeline performs the conversion.
+
+With `PFirstPersonCameraMode.VANILLA`, the animated anchor does not modify the actual camera position or rotation. `FIRST_PERSON_CAMERA` still supplies the authored model-to-VIEW frame for first-person animation output. Choose the mode through `new PPlayerFirstPersonSettings(true, transitionIn, transitionOut, cameraMode)`; transition durations are in ticks.
+
+## Animated anchors and automatic meshes
+
+Register custom anchor renderers through `IPulseClientPlugin.registerAnimatedAttachments(PAnimatedAttachmentRegistrar)`. PulseLib passes a `PPlayerAnimatedAttachmentContext` with a `PoseStack` already positioned at the anchor. Render geometry relative to that local origin. Applying `context.transform()` to the supplied stack again repeats the anchor transform.
+
+In third person, `context.transform()` retains the full source MODEL-space socket contract even though the supplied stack uses a current-root-relative matrix over the outer visual ROOT. In first person, the context transform is already camera-relative VIEW-space. The `firstPerson()` flag identifies the path; see [Armor and attachments](armor-and-attachments.md#player-animation-anchors-and-meshes).
+
+Mesh subtrees that are not mapped to vanilla player parts can be discovered automatically from an active animation rig. A static mesh such as `ROOT → RIGHT_ARM → BALL` follows its animated parents without needing its own BALL channel. Static mesh descendants on an active bound rig are also included when only the camera animates, so first-person meshes stay in the same view frame as arms and items. `Builder.meshAttachment(boneName)` selects explicit attachment subtrees when automatic discovery is unsuitable.
 
 ## Blending and weights
 
