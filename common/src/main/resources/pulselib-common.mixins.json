@@ -16,6 +16,7 @@
     "EntityModelSetMixin",
     "GameRendererMixin",
     "ItemInHandRendererMixin",
+    "ItemStackMixin",
     "LivingEntityRendererMixin",
     "LevelRendererTransparencyMixin",
     "ModelPartCubesMixin",

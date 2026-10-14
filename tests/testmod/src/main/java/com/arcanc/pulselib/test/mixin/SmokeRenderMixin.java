@@ -15,6 +15,7 @@ import com.arcanc.pulselib.test.OitPerformanceHarness;
 import com.arcanc.pulselib.test.WorldOitPerformanceHarness;
 import com.arcanc.pulselib.test.SmokeHarness;
 import com.arcanc.pulselib.test.PlayerMotionHarness;
+import com.arcanc.pulselib.test.ItemStackIdentityHarness;
 
 import net.minecraft.client.renderer.GameRenderer;
 import org.spongepowered.asm.mixin.Mixin;
@@ -42,7 +43,11 @@ public abstract class SmokeRenderMixin
 	{
 		DisposableTestWorlds.loadIfRequested();
 		WorldOitPerformanceHarness.endFrame();
-		if (Boolean.getBoolean("pulselib.test.playerMotion"))
+		if (Boolean.getBoolean("pulselib.test.itemIdentity"))
+		{
+			ItemStackIdentityHarness.frame();
+		}
+		else if (Boolean.getBoolean("pulselib.test.playerMotion"))
 		{
 			PlayerMotionHarness.frame();
 		}

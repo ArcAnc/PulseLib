@@ -123,6 +123,19 @@ This opt-in mode creates a fresh marked disposable world and hides its window to
 Require `PLAYER MOTION M-P2 PASS`, plus `PLAYER MOTION M-P3 PASS` for `all`, **and** normal successful process completion. A PASS followed by a stalled JVM shutdown is only assertion evidence, not a fully successful game run. Current verification and remaining limitations are recorded in `docs/reviews/player-motion-camera-regressions-2026-10-13.md`. This mode is never part of mandatory CI.
 
 
+## ItemStack runtime animation identity
+
+```sh
+./gradlew :fabric:runClient -PpulseTestMod -PpulseItemIdentityTest --no-daemon
+./gradlew :neoforge:runClient -PpulseTestMod -PpulseItemIdentityTest --no-daemon
+```
+
+This opt-in mode uses the existing external mod, creates a marked disposable world and hides its window. It runs all sixteen ItemStack regressions against the actual loader-transformed class, including eight concurrent readers/copy callers, 100,000 copies with unchanged manager count, actual tool damage, NBT/network round trips and vanilla merging. It checks inherited identity before first rendering, the deliberate shared identity of separate copies, separate managers/controllers/phases, and preservation of a temporary copy's phase. JUnit independently checks monotonic/concurrent allocation and exhaustion; it does not replace these transformed-stack tests.
+
+The world fixture uses Survival so the vanilla inventory screen keeps its normal slot numbering. Actual client menu actions and click packets exercise hotbar transfers, both hands, partial/full splitting, merging, inventory reopening, a server-opened chest, throwing and vanilla pickup. It then disconnects through the loader lifecycle, checks an empty manager cache and collectable manager/controllers, and reopens only its own marked disposable save. The runtime ID survives cache cleanup on a retained Java object, while deserialization creates a new identity.
+
+Require all `ITEM IDENTITY REGRESSION 1` through `16 PASS`, `ITEM IDENTITY REGRESSIONS PASS`, `ITEM IDENTITY WORLD OPERATIONS PASS`, `ITEM IDENTITY REENTRY PASS`, `ITEM IDENTITY CLIENT PASS`, and successful process completion. The copy benchmark is diagnostic wall-clock time, not an allocation profile or a comparison to uninstrumented Minecraft. Client prediction is checked at each operation; network replacement can still create a new Java stack/identity. No assertion promises persistent identity across packets or logical copies.
+
 ## L1 overlay lifecycle / L4 RESTART snapshot
 
 The existing opt-in client smoke now also samples the original entity rig's `idle` and `walk` clips with a graph interrupted at 40%. It compares every bone's translation, quaternion rotation, nonuniform scale and visibility immediately across RESTART, with forward, reverse and paused overlays. Reverse starts at the loaded clip end and its cursor must decrease. It repeats an overlay trigger 1000 times, checks the runtime instance identity/count, cancels a paused overlay with fade-out, and verifies cleanup. This runs after resources load on the actual client; the model parsers and existing graphics smoke remain in use.

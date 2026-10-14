@@ -14,6 +14,7 @@ import com.arcanc.pulselib.content.animatable.AnimManagerKey;
 import com.arcanc.pulselib.content.animatable.PAnimatable;
 import com.arcanc.pulselib.content.animatable.PAnimationController;
 import com.arcanc.pulselib.content.animatable.PAnimationManager;
+import com.arcanc.pulselib.content.animatable.PItemAnimatable;
 import com.arcanc.pulselib.content.model.animation.PPose;
 import com.arcanc.pulselib.content.model.baked.*;
 import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
@@ -56,34 +57,36 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>> extends Blo
 		this.modelData = data;
 		this.renderType = renderType;
 	}
-	
+
 	@Override
 	public PModelData getModelData(T animatable)
 	{
 		return this.modelData;
 	}
-	
+
 	@Override
 	public @Nullable PBakedModel getModel(T animatable)
 	{
 		return getModelData(animatable).getModel();
 	}
-	
+
 	@Override
 	public RenderType getRenderType(ResourceLocation texture)
 	{
 		return this.renderType.apply(texture);
 	}
-	
+
 	@Override
 	public void renderByItem(ItemStack stack, ItemDisplayContext displayContext, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay)
 	{
+		if (stack.isEmpty())
+			return;
 		@SuppressWarnings("unchecked")
-		T animatable = stack.getItem() instanceof PAnimatable ? (T) stack.getItem() : null;
+		T animatable = stack.getItem() instanceof PItemAnimatable<?> ? (T) stack.getItem() : null;
 		if (animatable == null)
 			return;
 		float partialTick = PLibRenderHelper.mc().isPaused() ? 0f : PLibRenderHelper.mc().getTimer().getGameTimeDeltaPartialTick(false);
-		
+
 		poseStack.pushPose();
 		PModelLoader modelLoader = PModelCache.getModelLoader(this.modelData.getModelLoaderId()).orElse(PGltfModelLoader.INSTANCE);
 		modelLoader.applyItemTransform(poseStack);
@@ -92,24 +95,24 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>> extends Blo
 		postSubmit(poseStack, animatable, this :: getRenderType, buffer, packedLight, packedOverlay, partialTick, displayContext);
 		poseStack.popPose();
 	}
-	
+
 	@Override
 	public void preSubmit(PoseStack poseStack, T animatable, Function<ResourceLocation, RenderType> renderType, MultiBufferSource bufferSource, int packedLight, int packedOverlay, float partialTick, @Nullable Object... additionalData)
 	{
 	}
-	
+
 	@Override
 	public void trueSubmit(PoseStack poseStack, T animatable, Function<ResourceLocation, RenderType> renderType, MultiBufferSource bufferSource, int packedLight, int packedOverlay, float partialTick, @Nullable Object... additionalData)
 	{
 		PBakedModel model = this.getModelData(animatable).getModel();
 		if (model == null)
 			return;
-		
+
 		ItemStack stack = (ItemStack) additionalData[1];
-		
+
 		PAnimationManager<T> manager = animatable.getAnimationManager(AnimManagerKey.of(stack));
 		manager.bindModel(model);
-		
+
 		Collection<PAnimationController<T>> controllers = manager.getControllers().values();
 		Map<PAnimationController<T>, MolangParser.Context> molangContexts = prepareMolangContexts(animatable, manager.key(), controllers, partialTick);
 		ItemDisplayContext context = (ItemDisplayContext)additionalData[0];
@@ -129,13 +132,13 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>> extends Blo
 		PPose pose = model.evaluate(controllers, molangContexts, partialTick);
 		model.bones().forEach(bone -> perBoneSubmit(animatable, stack, poseStack, bone, pose, controllers, molangContexts, renderType, -1, packedLight, packedOverlay, partialTick, context));
 	}
-	
+
 	@Override
 	public void postSubmit(PoseStack poseStack, T animatable, Function<ResourceLocation, RenderType> renderType, MultiBufferSource bufferSource, int packedLight, int packedOverlay, float partialTick, @Nullable Object... additionalData)
 	{
-	
+
 	}
-	
+
 	protected void perBoneSubmit(T animatable, ItemStack stack, PoseStack poseStack, PBakedBone bone, PPose pose, Collection<PAnimationController<T>> controllers, Map<PAnimationController<T>, MolangParser.Context> molangContexts, Function<ResourceLocation, RenderType> renderType, int packedColor, int packedLight, int packedOverlay, float partialTick, ItemDisplayContext context)
 	{
 		PMeshRenderContext inherited = new PMeshRenderContext(
@@ -154,13 +157,13 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>> extends Blo
 		poseStack.translate(pose.translation(boneIndex).x(), pose.translation(boneIndex).y(), pose.translation(boneIndex).z());
 		poseStack.mulPose(pose.rotation(boneIndex));
 		poseStack.scale(pose.scale(boneIndex).x(), pose.scale(boneIndex).y(), pose.scale(boneIndex).z());
-		
+
 		PMeshRenderContext boneContext = resolveBoneRender(animatable, stack, context, bone, inherited, partialTick);
 		this.submitBone(animatable, stack, bone, poseStack, data, controllers, boneContext, partialTick, context);
-		
+
 		if (!bone.children().isEmpty())
 			bone.children().forEach(child -> perBoneSubmit(animatable, stack, poseStack, child, pose, controllers, molangContexts, boneContext, partialTick, context));
-		
+
 		poseStack.popPose();
 	}
 
@@ -187,7 +190,7 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>> extends Blo
 	                                    float partialTick)
 	{
 	}
-	
+
 	protected void submitBone(T animatable,
 	                          ItemStack stack,
 	                          PBakedBone bone,
@@ -216,17 +219,17 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>> extends Blo
 	                          ItemDisplayContext context)
 	{
 		Matrix4f matrix4fstack = new Matrix4f(poseStack.last().pose());
-		
+
 		bone.meshes().forEach(mesh ->
 		{
 			if (mesh.textureReference().isEmpty())
 				return;
-			
+
 			PMeshRenderContext meshContext = resolveMeshRender(animatable, stack, context, bone, mesh, inherited, partialTick);
 			PMeshRenderMaterial material = PMeshRenderMaterial.resolve(mesh, meshContext);
-			
+
 			RenderType type = material.resolveRenderType(meshContext, PResourceCache.ATLAS_LOCATION);
-			
+
 			PGpuDeformerBuffers.Submission deformation = PGpuDeformerBuffers.submit(meshContext.deformation());
 			PInstanceHeader instance = new PInstanceHeader(matrix4fstack, meshContext.color(), material.packedLight(), meshContext.packedOverlay(),
 					deformation.operationOffset(), deformation.valueOffset(), deformation.operationCount());
@@ -265,7 +268,7 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>> extends Blo
 	{
 		return inherited;
 	}
-	
+
 	protected PMeshRenderContext resolveMeshRender(T animatable,
 	                                               ItemStack stack,
 	                                               ItemDisplayContext context,

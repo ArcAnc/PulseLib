@@ -91,7 +91,15 @@ Both loader adapters install the renderer for items that implement the common `P
 
 ## Stack-specific state
 
-`AnimManagerKey.of(ItemStack)` uses item id, stack count, and component data. If your item animation should differ by custom data, store it in item components so the key changes. If two stacks have identical key data, they can reuse the same cached manager.
+`AnimManagerKey.of(ItemStack)` uses a lazily assigned client runtime ID stored in a transient field of the Java stack object. Independently constructed stacks have independent managers even when their item, count and components match. Changing count, damage or components on the same object retains its ID. Empty and nonanimated stacks do not receive IDs; requesting an animation key for one is unsupported.
+
+`copy()` and `copyWithCount()` inherit the source ID. Copying an animated stack before its first render assigns the source ID and transfers it to the copy without creating a manager. A temporary copy therefore reuses the existing manager and phase. Two separately used copies of the same source deliberately share this identity: a runtime field cannot determine whether a copy is a temporary representation or an independent logical item.
+
+A partial `split()` gives the detached part a new ID and retains the source ID. A full split transfers the old ID and clears the emptied source. Vanilla merging keeps the destination stack's identity; the consumed source's animation does not merge into it. These fields do not participate in component comparison or vanilla stacking.
+
+The ID is neither a Data Component nor serialized NBT/network data. A reconstructed stack gets a new ID, including after reconnecting or receiving a replacement stack from server synchronization. Mods that reconstruct stacks rather than copying them can therefore restart animation. Client-only identity does not guarantee continuity across every inventory/network operation.
+
+The existing manager timeout and world-disconnect cleanup remain unchanged. An ID can outlive its cached manager: displaying the same object after timeout creates a new manager and restarts animation. Factory-generated item keys reserve the negative `long` domain, while other factories return nonnegative keys. Manually constructed `AnimManagerKey(long)` values remain the caller's responsibility; existing hash collisions between nonitem types are outside this change.
 
 Classes used:
 

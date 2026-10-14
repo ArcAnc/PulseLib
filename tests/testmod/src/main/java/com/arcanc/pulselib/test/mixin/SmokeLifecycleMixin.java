@@ -11,6 +11,7 @@ package com.arcanc.pulselib.test.mixin;
 
 import com.arcanc.pulselib.content.event.PulseRuntime;
 import com.arcanc.pulselib.test.SmokeHarness;
+import com.arcanc.pulselib.test.ItemStackIdentityHarness;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -22,6 +23,10 @@ public abstract class SmokeLifecycleMixin
 	@Inject (method = "disconnected", at = @At ("HEAD"), cancellable = true)
 	private static void pulselibtest$observeCleanup(CallbackInfo callback)
 	{
+		if (Boolean.getBoolean("pulselib.test.itemIdentity"))
+		{
+			ItemStackIdentityHarness.observeDisconnectHook();
+		}
 		if (SmokeHarness.observeDisconnectHook())
 		{
 			callback.cancel();

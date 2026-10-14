@@ -11,7 +11,6 @@ package com.arcanc.pulselib.content.animatable;
 
 
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
@@ -26,22 +25,29 @@ public record AnimManagerKey(long key)
 			case ItemStack stack -> of(stack);
 			case BlockEntity be -> of(be);
 			case Entity entity -> of(entity);
-			default -> new AnimManagerKey(animatable.hashCode());
+			default -> new AnimManagerKey(Integer.toUnsignedLong(animatable.hashCode()));
 		};
 	}
 	
+	/**
+	 * Gets a client runtime identity. The sign bit reserves item keys without changing
+	 * the public long-key API; other factory methods always return nonnegative keys.
+	 * @throws IllegalArgumentException if the stack is empty or is not animated.
+	 */
 	public static AnimManagerKey of(ItemStack stack)
 	{
-		int itemId = Item.getId(stack.getItem());
-		int count = stack.getCount();
-		int dataMap = stack.getComponents().hashCode();
-		return new AnimManagerKey(Objects.hash(itemId, count, dataMap));
+		long id = ((PItemStackAnimationData)(Object)stack).pulselib$getOrCreateAnimationId();
+		if (stack.isEmpty() || id == 0)
+		{
+			throw new IllegalArgumentException("Animation keys require a nonempty PItemAnimatable stack");
+		}
+		return new AnimManagerKey(Long.MIN_VALUE | id);
 	}
 	
 	public static AnimManagerKey of (Entity entity)
 	{
-		return new AnimManagerKey(entity.getUUID().getMostSignificantBits() ^
-				entity.getUUID().getLeastSignificantBits());
+		return new AnimManagerKey((entity.getUUID().getMostSignificantBits() ^
+				entity.getUUID().getLeastSignificantBits()) & Long.MAX_VALUE);
 	}
 	
 	public static AnimManagerKey of(BlockEntity blockEntity)
@@ -50,7 +56,7 @@ public record AnimManagerKey(long key)
 		long blockPos = blockEntity.getBlockPos().asLong();
 		int levelId = blockEntity.hasLevel() ? blockEntity.getLevel().dimension().hashCode() : 0;
 		
-		return new AnimManagerKey(Objects.hash(type, blockPos, levelId));
+		return new AnimManagerKey(Integer.toUnsignedLong(Objects.hash(type, blockPos, levelId)));
 	}
 	
 	@Override

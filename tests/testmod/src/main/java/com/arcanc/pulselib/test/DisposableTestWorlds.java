@@ -46,7 +46,8 @@ public final class DisposableTestWorlds
 		{
 			Minecraft.getInstance().options.pauseOnLostFocus = false;
 		}
-		if ((Boolean.getBoolean("pulselib.test.oitPerf") || Boolean.getBoolean("pulselib.test.playerMotion")) && !profilingWindowHidden)
+		if ((Boolean.getBoolean("pulselib.test.oitPerf") || Boolean.getBoolean("pulselib.test.playerMotion") ||
+				Boolean.getBoolean("pulselib.test.itemIdentity")) && !profilingWindowHidden)
 		{
 			Minecraft mc = Minecraft.getInstance();
 			// Hiding preserves the GL context/framebuffer, but prevents UI input
@@ -109,6 +110,28 @@ public final class DisposableTestWorlds
 		{
 			throw new IllegalStateException("Disposable world marker is missing", exception);
 		}
+	}
+
+	/** Reopens only the save created and marked by this harness in the current run. */
+	public static void reopenCurrentTestWorld()
+	{
+		Path world = runDirectory().resolve("saves").resolve(WORLD);
+		try
+		{
+			if (!started || Files.isSymbolicLink(world) ||
+					!Files.readString(world.resolve(".pulselib-disposable")).equals(MARKER))
+			{
+				throw new IllegalStateException("Refusing an unmarked test world: " + world);
+			}
+		}
+		catch (IOException exception)
+		{
+			throw new IllegalStateException("Disposable world marker is missing", exception);
+		}
+		Minecraft.getInstance().createWorldOpenFlows().openWorld(WORLD, () ->
+		{
+			throw new IllegalStateException("Cannot reopen the disposable test world");
+		});
 	}
 
 	private static Path runDirectory()
