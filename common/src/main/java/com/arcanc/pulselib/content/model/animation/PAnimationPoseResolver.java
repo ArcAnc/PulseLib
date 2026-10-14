@@ -34,6 +34,7 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	private final MolangContextProvider<T> molangContexts;
 	private final float partialTick;
 	private final PPose localPose;
+	private final Set<String> activeBones = new HashSet<>();
 	private final PModelPose modelPose;
 	private final PModelPose bindModelPose;
 
@@ -53,7 +54,7 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 		this.controllers = Objects.requireNonNull(controllers);
 		this.molangContexts = Objects.requireNonNull(molangContexts);
 		this.partialTick = partialTick;
-		this.localPose = PAnimationRuntime.evaluate(this.model, this.controllers, this.molangContexts, this.partialTick);
+		this.localPose = PAnimationRuntime.evaluate(this.model, this.controllers, this.molangContexts, this.partialTick, this.activeBones);
 		this.modelPose = new PModelPose(this.model.boneCount());
 		this.modelPose.update(this.model, this.localPose);
 		this.bindModelPose = new PModelPose(this.model.boneCount());
@@ -102,33 +103,7 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	 */
 	public boolean isVisible(PBakedBone bone)
 	{
-		for (PAnimationController<T> controller : this.controllers)
-		{
-			if (controller.isStopped())
-				continue;
-
-			var layers = controller.graphLayers(this.model);
-			if (!layers.isEmpty())
-			{
-				for (PAnimationGraphRuntime.Layer layer : layers)
-				{
-					if (layer.weight() <= 0.0f)
-						continue;
-					PAnimation animation = this.model.animations().get(layer.animation());
-					if (animation != null && !animation.isBoneVisible(bone.name(), layer.time()))
-						return false;
-				}
-				continue;
-			}
-
-			PAnimationStagePlayback stage = controller.getCurrentStage();
-			if (stage == null || stage.isWaiting())
-				continue;
-			PAnimation animation = this.model.animations().get(stage.animationName());
-			if (animation != null && !animation.isBoneVisible(bone.name(), controller.getInterpolatedTime(this.partialTick)))
-				return false;
-		}
-		return true;
+		return this.localPose.isVisible(this.model.boneIndex(bone));
 	}
 
 	/**
@@ -137,42 +112,7 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	 */
 	public Set<String> activeAnimationBones()
 	{
-		Set<String> result = new HashSet<>();
-		for (PAnimationController<T> controller : this.controllers)
-		{
-			if (controller.isStopped())
-				continue;
-
-			var layers = controller.graphLayers(this.model);
-			if (!layers.isEmpty())
-			{
-				for (PAnimationGraphRuntime.Layer layer : layers)
-				{
-					if (layer.weight() <= 0.0f)
-						continue;
-					addAnimationBones(result, this.model.animations().get(layer.animation()));
-				}
-				continue;
-			}
-
-			PAnimationStagePlayback stage = controller.getCurrentStage();
-			if (stage != null && !stage.isWaiting())
-				addAnimationBones(result, this.model.animations().get(stage.animationName()));
-		}
-		return Set.copyOf(result);
-	}
-
-	/**
-	 * Adds the animation bones.
-	 * @param destination the destination to use.
-	 * @param animation the animation to use.
-	 */
-	private static void addAnimationBones(Set<String> destination, @Nullable PAnimation animation)
-	{
-		if (animation == null)
-			return;
-		destination.addAll(animation.boneAnimations().keySet());
-		destination.addAll(animation.visibilityTracks().keySet());
+		return Set.copyOf(this.activeBones);
 	}
 
 	/**

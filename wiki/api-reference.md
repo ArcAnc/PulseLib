@@ -60,3 +60,14 @@ This page is a compact map of the current PulseLib public API. Classes marked in
 
 * `@PulsePlugin`, `IPulseClientPlugin`, `IPulseCommonPlugin` and specialized registrars are the extension API on both loaders; see [plugins](plugins.md).
 * [`PLibHelper`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/helpers/PLibHelper.java), [`PLibCodecs`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/helpers/PLibCodecs.java), and [`PLibDatabase`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/PLibDatabase.java) are common integration helpers.
+
+
+Runtime overlay methods on `PAnimationGraphRuntime`: `overlaySpeed`, `setOverlaySpeed`, `restartOverlay`, `stopOverlay`, each with state-name and state-index overloads. Graph sampling adds `sampleBasePose`, `samplePose`, an interpolated `layers` overload, and a `tickPrecise` overload accepting a base snapshot sampler. Existing graph, state, controller, layer and event-track signatures remain available. See [overlay control and RESTART snapshots](animatables-and-controllers.md#runtime-overlay-control) for timing, errors and custom consumers.
+
+`PPose.copy()` deeply copies TRS, channel masks, scalar values, visibility and dirty/valid flags. `hasTranslation`, `hasRotation`, `hasScale`, `hasScalarChannel`, `hasVisibility`, `isVisible`, `visibility` and `scalarChannelCount` expose the corresponding metadata. `PPoseMixer.blend` blends resolved poses; `PPoseMixer.Transition(mixer, referencePose, initialLayer)` supplies the actual reference/hierarchy for RESTART while preserving the existing constructor.
+
+Nonidentity values written through the original mutable TRS getters still contribute to mixing. Use the `PPoseWriter` setters (or `set` / `setAnimated`) when declaring explicitly animated identity channels, so their presence can be distinguished from an absent channel.
+
+`PAnimationController.setGraphSnapshotContexts(provider)` supplies fresh game-specific queries for tick-boundary capture. `PAnimationRuntime.captureGraphBase` also accepts a context provider for custom controller integrations. Persistent variable storage stays local to each controller.
+
+Overlay definition/runtime speeds are signed. Activation/restart uses the clip end for negative speed and the beginning for positive speed; zero pauses and retains the last direction. A speed change preserves the cursor; `NaN`/Infinity are rejected. Reverse completion, fade-out and event dispatch follow the zero endpoint. See [runtime overlay control](animatables-and-controllers.md#runtime-overlay-control).

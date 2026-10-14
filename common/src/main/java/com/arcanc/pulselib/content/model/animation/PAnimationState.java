@@ -148,6 +148,10 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 		}
 	}
 	
+	/**
+	 * Immutable overlay definition with a signed playback speed. Positive starts at the beginning,
+	 * negative starts at the clip end, and zero pauses. Runtime speed changes never seek the clip.
+	 */
 	record OneShotOverlay(String name, String trigger, String animation, float fadeInDuration, float fadeOutDuration,
 	                     PInterpolationType interpolation, float speed, boolean synchronizedCycle) implements PAnimationState
 	{
@@ -158,11 +162,17 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 
 		public OneShotOverlay
 		{
-			validate(name, PAnimationType.PLAY_ONCE, interpolation, speed);
+			validate(name, PAnimationType.PLAY_ONCE, interpolation);
 			trigger = require(trigger, "Overlay trigger");
 			animation = require(animation, "Animation name");
-			if (fadeInDuration < 0.0f || fadeOutDuration < 0.0f)
-				throw new IllegalArgumentException("Overlay fade durations must be non-negative");
+			if (!Float.isFinite(speed))
+			{
+				throw new IllegalArgumentException("Overlay speed must be finite");
+			}
+			if (!Float.isFinite(fadeInDuration) || !Float.isFinite(fadeOutDuration) || fadeInDuration < 0.0f || fadeOutDuration < 0.0f)
+			{
+				throw new IllegalArgumentException("Overlay fade durations must be finite and non-negative");
+			}
 		}
 
 		@Override
@@ -197,11 +207,18 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 
 	private static void validate(String name, PAnimationType type, PInterpolationType interpolation, float speed)
 	{
+		validate(name, type, interpolation);
+		if (speed < 0.0f)
+		{
+			throw new IllegalArgumentException("Animation state speed must be non-negative");
+		}
+	}
+
+	private static void validate(String name, PAnimationType type, PInterpolationType interpolation)
+	{
 		require(name, "State name");
 		Objects.requireNonNull(type);
 		Objects.requireNonNull(interpolation);
-		if (speed < 0.0f)
-			throw new IllegalArgumentException("Animation state speed must be non-negative");
 	}
 
 	private static String require(String value, String what)

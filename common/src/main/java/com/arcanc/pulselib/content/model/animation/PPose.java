@@ -22,6 +22,12 @@ public final class PPose implements PPoseWriter
 	private final float[] scalarChannels;
 	private final BitSet dirtyBones;
 	private final BitSet validBones;
+	private final BitSet translationChannels = new BitSet();
+	private final BitSet rotationChannels = new BitSet();
+	private final BitSet scaleChannels = new BitSet();
+	private final BitSet validScalars = new BitSet();
+	private final BitSet visibilityChannels = new BitSet();
+	private final BitSet invisibleBones = new BitSet();
 
 	public PPose(int boneCount)
 	{
@@ -31,7 +37,9 @@ public final class PPose implements PPoseWriter
 	public PPose(int boneCount, int scalarChannelCount)
 	{
 		if (boneCount < 0 || scalarChannelCount < 0)
+		{
 			throw new IllegalArgumentException("Pose sizes must be non-negative");
+		}
 		this.translations = new Vector3f[boneCount];
 		this.rotations = new Quaternionf[boneCount];
 		this.scales = new Vector3f[boneCount];
@@ -44,6 +52,102 @@ public final class PPose implements PPoseWriter
 		this.scalarChannels = new float[scalarChannelCount];
 		this.dirtyBones = new BitSet(boneCount);
 		this.validBones = new BitSet(boneCount);
+	}
+
+	/** Deep copy, including channel presence, scalar values, visibility and dirty/valid flags. */
+	public PPose copy()
+	{
+		return copy(scalarChannelCount());
+	}
+
+	PPose copy(int scalarChannelCount)
+	{
+		PPose copy = new PPose(boneCount(), Math.max(scalarChannelCount, scalarChannelCount()));
+		for (int bone = 0; bone < boneCount(); bone++)
+		{
+			copy.translations[bone].set(this.translations[bone]);
+			copy.rotations[bone].set(this.rotations[bone]);
+			copy.scales[bone].set(this.scales[bone]);
+		}
+		System.arraycopy(this.scalarChannels, 0, copy.scalarChannels, 0, this.scalarChannels.length);
+		copy.dirtyBones.or(this.dirtyBones);
+		copy.validBones.or(this.validBones);
+		copy.translationChannels.or(this.translationChannels);
+		copy.rotationChannels.or(this.rotationChannels);
+		copy.scaleChannels.or(this.scaleChannels);
+		copy.validScalars.or(this.validScalars);
+		copy.visibilityChannels.or(this.visibilityChannels);
+		copy.invisibleBones.or(this.invisibleBones);
+		return copy;
+	}
+
+	public int scalarChannelCount()
+	{
+		return this.scalarChannels.length;
+	}
+
+	public boolean hasScalarChannel(int channel)
+	{
+		return this.validScalars.get(channel);
+	}
+
+	public boolean hasTranslation(int bone)
+	{
+		Vector3f value = this.translations[bone];
+		return this.translationChannels.get(bone) || value.x != 0.0f || value.y != 0.0f || value.z != 0.0f;
+	}
+
+	public boolean hasRotation(int bone)
+	{
+		Quaternionf value = this.rotations[bone];
+		return this.rotationChannels.get(bone) || value.x != 0.0f || value.y != 0.0f || value.z != 0.0f || value.w != 1.0f;
+	}
+
+	public boolean hasScale(int bone)
+	{
+		Vector3f value = this.scales[bone];
+		return this.scaleChannels.get(bone) || value.x != 1.0f || value.y != 1.0f || value.z != 1.0f;
+	}
+
+	public boolean hasVisibility(int bone)
+	{
+		return this.visibilityChannels.get(bone);
+	}
+
+	public boolean isVisible(int bone)
+	{
+		return !this.invisibleBones.get(bone);
+	}
+
+	public void visibility(int bone, boolean visible)
+	{
+		this.visibilityChannels.set(bone);
+		this.invisibleBones.set(bone, !visible);
+	}
+
+	void markDirty(int bone)
+	{
+		this.dirtyBones.set(bone);
+	}
+
+	void includeChannels(PPose source, int bone)
+	{
+		if (source.hasTranslation(bone))
+		{
+			this.translationChannels.set(bone);
+		}
+		if (source.hasRotation(bone))
+		{
+			this.rotationChannels.set(bone);
+		}
+		if (source.hasScale(bone))
+		{
+			this.scaleChannels.set(bone);
+		}
+		if (source.isValid(bone) || source.hasTranslation(bone) || source.hasRotation(bone) || source.hasScale(bone))
+		{
+			this.validBones.set(bone);
+		}
 	}
 
 	public int boneCount()
@@ -74,6 +178,7 @@ public final class PPose implements PPoseWriter
 	public void scalarChannel(int channelIndex, float value)
 	{
 		this.scalarChannels[channelIndex] = value;
+		this.validScalars.set(channelIndex);
 	}
 
 	public boolean isDirty(int boneIndex)
@@ -101,6 +206,9 @@ public final class PPose implements PPoseWriter
 		this.translations[boneIndex].set(translation);
 		this.rotations[boneIndex].set(rotation);
 		this.scales[boneIndex].set(scale);
+		this.translationChannels.set(boneIndex);
+		this.rotationChannels.set(boneIndex);
+		this.scaleChannels.set(boneIndex);
 		this.validBones.set(boneIndex);
 	}
 	
@@ -114,6 +222,7 @@ public final class PPose implements PPoseWriter
 	public void translation(int boneIndex, Vector3f value)
 	{
 		this.translations[boneIndex].set(value);
+		this.translationChannels.set(boneIndex);
 		this.validBones.set(boneIndex);
 		this.dirtyBones.set(boneIndex);
 	}
@@ -122,6 +231,7 @@ public final class PPose implements PPoseWriter
 	public void rotation(int boneIndex, Quaternionf value)
 	{
 		this.rotations[boneIndex].set(value);
+		this.rotationChannels.set(boneIndex);
 		this.validBones.set(boneIndex);
 		this.dirtyBones.set(boneIndex);
 	}
@@ -130,6 +240,7 @@ public final class PPose implements PPoseWriter
 	public void scale(int boneIndex, Vector3f value)
 	{
 		this.scales[boneIndex].set(value);
+		this.scaleChannels.set(boneIndex);
 		this.validBones.set(boneIndex);
 		this.dirtyBones.set(boneIndex);
 	}

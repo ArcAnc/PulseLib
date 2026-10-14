@@ -205,6 +205,7 @@ public final class SmokeHarness
 				TestBlockItemRenderer.renders, TestArmor.setups, ClientTestPlugin.layerRenders, ClientTestPlugin.animatedRenders);
 		}
 
+		AnimationLifecycleHarness.run(TestEntityRender.MODEL_DATA.getModel());
 		Dummy dummy = new Dummy();
 		dummy.manager.bindModel(gecko);
 		var controller = dummy.manager.getControllers().get("idle");

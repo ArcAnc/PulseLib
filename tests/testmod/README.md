@@ -121,3 +121,17 @@ This opt-in mode creates a fresh marked disposable world and hides its window to
 `pulseMotionPhase=all` additionally checks F/G/H against the actual `Camera.setup` position and quaternion, plus I with unchanged VANILLA camera position/rotation. The independent oracle includes the definition's first-person activation during transitions. Gecko/glTF axes, inherited ROOT/pivot, nonzero camera bind offsets and signed roll are included. Mesh/anchor commands remain in the shared camera-relative VIEW frame. `PPlayerCameraTest` separately covers rotated/scaled intermediate camera parents, rotated bind frames and rootless rigs without launching Minecraft.
 
 Require `PLAYER MOTION M-P2 PASS`, plus `PLAYER MOTION M-P3 PASS` for `all`, **and** normal successful process completion. A PASS followed by a stalled JVM shutdown is only assertion evidence, not a fully successful game run. Current verification and remaining limitations are recorded in `docs/reviews/player-motion-camera-regressions-2026-10-13.md`. This mode is never part of mandatory CI.
+
+
+## L1 overlay lifecycle / L4 RESTART snapshot
+
+The existing opt-in client smoke now also samples the original entity rig's `idle` and `walk` clips with a graph interrupted at 40%. It compares every bone's translation, quaternion rotation, nonuniform scale and visibility immediately across RESTART, with forward, reverse and paused overlays. Reverse starts at the loaded clip end and its cursor must decrease. It repeats an overlay trigger 1000 times, checks the runtime instance identity/count, cancels a paused overlay with fade-out, and verifies cleanup. This runs after resources load on the actual client; the model parsers and existing graphics smoke remain in use.
+
+```sh
+./gradlew :fabric:runClient -PpulseTestMod -PpulseSmokeAuto --no-daemon
+./gradlew :neoforge:runClient -PpulseTestMod -PpulseSmokeAuto --no-daemon
+./gradlew :fabric:runClient -PpulseTestMod -PpulseSmokeAuto -PpulseGeckoDemo --no-daemon
+./gradlew :neoforge:runClient -PpulseTestMod -PpulseSmokeAuto -PpulseGeckoDemo --no-daemon
+```
+
+Require `PULSE TEST L1/L4 PASS`, `PULSE TEST CLIENT PASS` and successful process exit. The default entity uses glTF; `pulseGeckoDemo` selects the equivalent Gecko rig. These checks are independent of the JUnit numeric regressions and stay outside mandatory CI. They sample resolved transformations on loaded game models; they do not assert interruption screenshots or exercise multiplayer.

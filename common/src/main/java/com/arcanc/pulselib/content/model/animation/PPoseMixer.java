@@ -19,25 +19,30 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 public final class PPoseMixer
 {
 	private static final float EPSILON = 1.0e-6f;
 
 	private final int boneCount;
-	private final int[] parents;
+	private final int @Nullable [] parents;
 
 	public PPoseMixer(int boneCount)
 	{
 		this(boneCount, null);
 	}
 
-	public PPoseMixer(int boneCount, @Nullable int[] parents)
+	public PPoseMixer(int boneCount, int @Nullable [] parents)
 	{
 		if (boneCount < 0)
+		{
 			throw new IllegalArgumentException("Bone count must be non-negative");
+		}
 		if (parents != null && parents.length != boneCount)
+		{
 			throw new IllegalArgumentException("Parent hierarchy must have one entry per bone");
+		}
 		this.boneCount = boneCount;
 		this.parents = parents == null ? null : parents.clone();
 	}
@@ -46,9 +51,16 @@ public final class PPoseMixer
 	{
 		Objects.requireNonNull(referencePose);
 		if (referencePose.boneCount() != this.boneCount)
+		{
 			throw new IllegalArgumentException("Reference pose does not belong to this mixer");
+		}
 
-		PPose result = copy(referencePose);
+		int scalarChannels = referencePose.scalarChannelCount();
+		for (Layer layer : layers)
+		{
+			scalarChannels = Math.max(scalarChannels, layer.pose().scalarChannelCount());
+		}
+		PPose result = referencePose.copy(scalarChannels);
 		List<Layer> ordered = new ArrayList<>(layers);
 		ordered.removeIf(layer -> layer.weight() <= 0.0f);
 		ordered.sort(Comparator.comparingInt(Layer :: priority));
@@ -58,7 +70,9 @@ public final class PPoseMixer
 			int priority = ordered.get(offset).priority();
 			int end = offset + 1;
 			while (end < ordered.size() && ordered.get(end).priority() == priority)
+			{
 				end++;
+			}
 			mixPriority(result, referencePose, ordered.subList(offset, end));
 			offset = end;
 		}
@@ -80,19 +94,91 @@ public final class PPoseMixer
 		return List.of(outgoing.withWeight(outgoing.weight() * (1.0f - alpha)), incoming.withWeight(incoming.weight() * alpha));
 	}
 
+	/**
+	 * Blends resolved poses against their reference without promoting absent channels to identity.
+	 * Only the endpoints' channel masks participate; scalar values and visibility are retained.
+	 */
+	public static PPose blend(PPose reference, PPose source, PPose target, float alpha)
+	{
+		if (source.boneCount() != reference.boneCount() || target.boneCount() != reference.boneCount())
+		{
+			throw new IllegalArgumentException("Blended poses must have equal bone counts");
+		}
+		alpha = Math.clamp(alpha, 0.0f, 1.0f);
+		if (alpha == 0.0f)
+		{
+			return source.copy();
+		}
+		if (alpha == 1.0f)
+		{
+			return target.copy();
+		}
+		int scalars = Math.max(reference.scalarChannelCount(), Math.max(source.scalarChannelCount(), target.scalarChannelCount()));
+		PPose result = new PPose(reference.boneCount(), scalars);
+		for (int bone = 0; bone < reference.boneCount(); bone++)
+		{
+			if (source.hasTranslation(bone) || target.hasTranslation(bone))
+			{
+				result.translation(bone, new Vector3f(source.hasTranslation(bone) ? source.translation(bone) : reference.translation(bone)).
+						lerp(target.hasTranslation(bone) ? target.translation(bone) : reference.translation(bone), alpha));
+			}
+			if (source.hasRotation(bone) || target.hasRotation(bone))
+			{
+				Quaternionf rotation = new Quaternionf(source.hasRotation(bone) ? source.rotation(bone) : reference.rotation(bone));
+				shortestSlerp(rotation, target.hasRotation(bone) ? target.rotation(bone) : reference.rotation(bone), alpha);
+				result.rotation(bone, rotation);
+			}
+			if (source.hasScale(bone) || target.hasScale(bone))
+			{
+				result.scale(bone, new Vector3f(source.hasScale(bone) ? source.scale(bone) : reference.scale(bone)).
+						lerp(target.hasScale(bone) ? target.scale(bone) : reference.scale(bone), alpha));
+			}
+			if (source.hasVisibility(bone) || target.hasVisibility(bone))
+			{
+				result.visibility(bone, source.isVisible(bone) && target.isVisible(bone));
+			}
+		}
+		for (int channel = 0; channel < scalars; channel++)
+		{
+			boolean from = channel < source.scalarChannelCount() && source.hasScalarChannel(channel);
+			boolean to = channel < target.scalarChannelCount() && target.hasScalarChannel(channel);
+			if (from || to)
+			{
+				float base = channel < reference.scalarChannelCount() ? reference.scalarChannel(channel) : 0.0f;
+				float start = from ? source.scalarChannel(channel) : base;
+				float end = to ? target.scalarChannel(channel) : base;
+				result.scalarChannel(channel, start + (end - start) * alpha);
+			}
+		}
+		return result;
+	}
+
 	/** Stateful crossfade helper with explicit interruption semantics. */
 	public static final class Transition
 	{
-		private List<Layer> sourceLayers;
+		private List<Supplier<Layer>> sourceLayers;
 		private Layer target;
+		private final PPoseMixer mixer;
+		private final PPose reference;
+		private boolean snapshotBlend;
 		private float elapsed;
 		private float duration;
 		private PPoseEasing easing;
 
+		/** Uses the initial layer's reference, or identity, and a hierarchy-free mixer. */
 		public Transition(Layer initial)
 		{
-			this.sourceLayers = List.of(Objects.requireNonNull(initial));
-			this.target = initial;
+			this(new PPoseMixer(initial.pose().boneCount()),
+					initial.referencePose() == null ? new PPose(initial.pose().boneCount(), initial.pose().scalarChannelCount()) : initial.referencePose(), initial);
+		}
+
+		/** Supplies the actual reference/hierarchy for additive and mesh-space snapshot capture. */
+		public Transition(PPoseMixer mixer, PPose reference, Layer initial)
+		{
+			this.mixer = Objects.requireNonNull(mixer);
+			this.reference = Objects.requireNonNull(reference).copy();
+			this.target = Objects.requireNonNull(initial);
+			this.sourceLayers = List.of();
 			this.elapsed = 1.0f;
 			this.duration = 0.0f;
 			this.easing = PPoseEasing.LINEAR;
@@ -107,23 +193,40 @@ public final class PPoseMixer
 			Objects.requireNonNull(easing);
 			Objects.requireNonNull(interruptionPolicy);
 			if (isTransitioning() && interruptionPolicy == PTransitionInterruptionPolicy.COMPLETE_CURRENT)
+			{
 				return false;
-			if (isTransitioning() && interruptionPolicy == PTransitionInterruptionPolicy.FROM_CURRENT)
-				this.sourceLayers = List.copyOf(layers());
-			else if (interruptionPolicy == PTransitionInterruptionPolicy.RESTART)
-				this.sourceLayers = List.of();
-			else if (!isTransitioning())
-				this.sourceLayers = List.of(this.target);
+			}
+			if (duration > 0.0f && interruptionPolicy == PTransitionInterruptionPolicy.RESTART)
+			{
+				PPoseSnapshot snapshot = new PPoseSnapshot(this.mixer.mix(this.reference, layers()));
+				this.sourceLayers = List.of(() -> new Layer(snapshot.sample(), PPoseBlendMode.OVERRIDE, 0, 1.0f));
+				this.snapshotBlend = true;
+			}
+			else
+			{
+				this.sourceLayers = currentSources();
+				this.snapshotBlend = false;
+			}
 			this.target = target;
 			this.elapsed = 0.0f;
 			this.duration = Math.max(duration, 0.0f);
 			this.easing = easing;
+			if (!isTransitioning())
+			{
+				this.sourceLayers = List.of();
+				this.snapshotBlend = false;
+			}
 			return true;
 		}
 
 		public void advance(float delta)
 		{
 			this.elapsed = Math.min(this.elapsed + Math.max(delta, 0.0f), this.duration);
+			if (!isTransitioning())
+			{
+				this.sourceLayers = List.of();
+				this.snapshotBlend = false;
+			}
 		}
 
 		public boolean isTransitioning()
@@ -131,14 +234,56 @@ public final class PPoseMixer
 			return this.elapsed < this.duration;
 		}
 
+		private List<Supplier<Layer>> currentSources()
+		{
+			Layer currentTarget = this.target;
+			if (!isTransitioning())
+			{
+				return List.of(() -> currentTarget);
+			}
+			float alpha = this.easing.transform(this.elapsed / this.duration);
+			if (this.snapshotBlend)
+			{
+				Supplier<Layer> source = this.sourceLayers.getFirst();
+				return List.of(() -> resolvedBlend(source.get().pose(), currentTarget, alpha));
+			}
+			List<Supplier<Layer>> sources = new ArrayList<>(this.sourceLayers.size() + 1);
+			for (Supplier<Layer> source : this.sourceLayers)
+			{
+				sources.add(() ->
+				{
+					Layer layer = source.get();
+					return layer.withWeight(layer.weight() * (1.0f - alpha));
+				});
+			}
+			sources.add(() -> currentTarget.withWeight(currentTarget.weight() * alpha));
+			return List.copyOf(sources);
+		}
+
+		private Layer resolvedBlend(PPose snapshot, Layer target, float alpha)
+		{
+			PPose targetPose = this.mixer.mix(this.reference, List.of(target));
+			PPose pose = blend(this.reference, snapshot, targetPose, alpha);
+			return new Layer(pose, PPoseBlendMode.OVERRIDE, target.priority(), 1.0f);
+		}
+
 		public List<Layer> layers()
 		{
 			if (!isTransitioning())
+			{
 				return List.of(this.target);
-			float alpha = this.duration <= 0.0f ? 1.0f : this.easing.transform(this.elapsed / this.duration);
+			}
+			float alpha = this.easing.transform(this.elapsed / this.duration);
+			if (this.snapshotBlend)
+			{
+				return List.of(resolvedBlend(this.sourceLayers.getFirst().get().pose(), this.target, alpha));
+			}
 			List<Layer> layers = new ArrayList<>(this.sourceLayers.size() + 1);
-			for (Layer source : this.sourceLayers)
-				layers.add(source.withWeight(source.weight() * (1.0f - alpha)));
+			for (Supplier<Layer> source : this.sourceLayers)
+			{
+				Layer layer = source.get();
+				layers.add(layer.withWeight(layer.weight() * (1.0f - alpha)));
+			}
 			layers.add(this.target.withWeight(this.target.weight() * alpha));
 			return List.copyOf(layers);
 		}
@@ -146,16 +291,49 @@ public final class PPoseMixer
 
 	private void mixPriority(PPose result, PPose reference, List<Layer> layers)
 	{
+		for (int channel = 0; channel < result.scalarChannelCount(); channel++)
+		{
+			float total = 0.0f;
+			float value = 0.0f;
+			for (Layer layer : layers)
+			{
+				if (layer.mode() == PPoseBlendMode.OVERRIDE && channel < layer.pose().scalarChannelCount() && layer.pose().hasScalarChannel(channel))
+				{
+					value += layer.pose().scalarChannel(channel) * layer.weight();
+					total += layer.weight();
+				}
+			}
+			if (total > 0.0f)
+			{
+				float initial = result.scalarChannel(channel);
+				result.scalarChannel(channel, initial + (value / total - initial) * Math.min(total, 1.0f));
+			}
+		}
 		for (int bone = 0; bone < this.boneCount; bone++)
 		{
 			mixOverrides(result, layers, bone);
 			for (Layer layer : layers)
 			{
+				if (layer.boneWeight(bone) > 0.0f)
+				{
+					result.includeChannels(layer.pose(), bone);
+					if (layer.pose().hasVisibility(bone))
+					{
+						result.visibility(bone, result.isVisible(bone) && layer.pose().isVisible(bone));
+					}
+				}
+			}
+			for (Layer layer : layers)
+			{
 				if (layer.mode() == PPoseBlendMode.OVERRIDE)
+				{
 					continue;
+				}
 				float weight = layer.boneWeight(bone);
 				if (weight <= 0.0f)
+				{
 					continue;
+				}
 				apply(result, reference, layer, bone, weight);
 			}
 		}
@@ -163,7 +341,9 @@ public final class PPoseMixer
 
 	private void mixOverrides(PPose result, List<Layer> layers, int bone)
 	{
-		float totalWeight = 0.0f;
+		float translationWeight = 0.0f;
+		float scaleWeight = 0.0f;
+		float rotationWeight = 0.0f;
 		Vector3f translation = new Vector3f();
 		Vector3f scale = new Vector3f();
 		Quaternionf anchor = null;
@@ -174,42 +354,62 @@ public final class PPoseMixer
 		for (Layer layer : layers)
 		{
 			if (layer.mode() != PPoseBlendMode.OVERRIDE)
+			{
 				continue;
+			}
 			float weight = layer.boneWeight(bone);
 			if (weight <= 0.0f)
+			{
 				continue;
+			}
 			PPose pose = layer.pose();
-			translation.fma(weight, pose.translation(bone));
-			scale.fma(weight, pose.scale(bone));
-			Quaternionf rotation = pose.rotation(bone);
-			if (anchor == null)
-				anchor = rotation;
-			float sign = anchor.dot(rotation) < 0.0f ? -1.0f : 1.0f;
-			qx += rotation.x * weight * sign;
-			qy += rotation.y * weight * sign;
-			qz += rotation.z * weight * sign;
-			qw += rotation.w * weight * sign;
-			totalWeight += weight;
+			if (pose.hasTranslation(bone))
+			{
+				translation.fma(weight, pose.translation(bone));
+				translationWeight += weight;
+			}
+			if (pose.hasScale(bone))
+			{
+				scale.fma(weight, pose.scale(bone));
+				scaleWeight += weight;
+			}
+			if (pose.hasRotation(bone))
+			{
+				Quaternionf rotation = pose.rotation(bone);
+				if (anchor == null)
+				{
+					anchor = rotation;
+				}
+				float sign = anchor.dot(rotation) < 0.0f ? -1.0f : 1.0f;
+				qx += rotation.x * weight * sign;
+				qy += rotation.y * weight * sign;
+				qz += rotation.z * weight * sign;
+				qw += rotation.w * weight * sign;
+				rotationWeight += weight;
+			}
 		}
-		if (totalWeight <= 0.0f)
-			return;
-		float inverseWeight = 1.0f / totalWeight;
-		translation.mul(inverseWeight);
-		scale.mul(inverseWeight);
-		Quaternionf rotation = new Quaternionf(qx * inverseWeight, qy * inverseWeight, qz * inverseWeight, qw * inverseWeight).normalize();
-		float alpha = Math.min(totalWeight, 1.0f);
-		result.translation(bone).lerp(translation, alpha);
-		result.scale(bone).lerp(scale, alpha);
-		shortestSlerp(result.rotation(bone), rotation, alpha);
+		if (translationWeight > 0.0f)
+		{
+			result.translation(bone).lerp(translation.div(translationWeight), Math.min(translationWeight, 1.0f));
+		}
+		if (scaleWeight > 0.0f)
+		{
+			result.scale(bone).lerp(scale.div(scaleWeight), Math.min(scaleWeight, 1.0f));
+		}
+		if (rotationWeight > 0.0f)
+		{
+			Quaternionf rotation = new Quaternionf(qx, qy, qz, qw).normalize();
+			shortestSlerp(result.rotation(bone), rotation, Math.min(rotationWeight, 1.0f));
+		}
 	}
 
 	private void apply(PPose result, PPose reference, Layer layer, int bone, float weight)
 	{
 		PPose pose = layer.pose();
 		PPose layerReference = layer.referencePose() == null ? reference : layer.referencePose();
-		Vector3f translationDelta = new Vector3f(pose.translation(bone)).sub(layerReference.translation(bone));
-		Quaternionf rotationDelta = new Quaternionf(layerReference.rotation(bone)).invert().premul(pose.rotation(bone)).normalize();
-		Vector3f scaleFactor = divide(pose.scale(bone), layerReference.scale(bone));
+		Vector3f translationDelta = pose.hasTranslation(bone) ? new Vector3f(pose.translation(bone)).sub(layerReference.translation(bone)) : new Vector3f();
+		Quaternionf rotationDelta = pose.hasRotation(bone) ? new Quaternionf(layerReference.rotation(bone)).invert().premul(pose.rotation(bone)).normalize() : new Quaternionf();
+		Vector3f scaleFactor = pose.hasScale(bone) ? divide(pose.scale(bone), layerReference.scale(bone)) : new Vector3f(1.0f);
 		switch (layer.mode())
 		{
 			case ADDITIVE_LOCAL -> addLocal(result, bone, translationDelta, rotationDelta, scaleFactor, weight, false);
@@ -232,11 +432,15 @@ public final class PPoseMixer
 		result.translation(bone).fma(direction, translation);
 		Quaternionf delta = weightedRotation(rotation, weight);
 		if (inverse)
+		{
 			delta.invert();
+		}
 		result.rotation(bone).premul(delta).normalize();
 		Vector3f factor = weightedScale(scale, weight);
 		if (inverse)
+		{
 			factor.set(safeInverse(factor.x), safeInverse(factor.y), safeInverse(factor.z));
+		}
 		result.scale(bone).mul(factor);
 	}
 
@@ -257,19 +461,16 @@ public final class PPoseMixer
 	{
 		Quaternionf result = new Quaternionf();
 		if (this.parents == null)
+		{
 			return result;
+		}
 		for (int parent = this.parents[bone]; parent >= 0; parent = this.parents[parent])
+		{
 			result.premul(pose.rotation(parent));
+		}
 		return result.normalize();
 	}
 
-	private static PPose copy(PPose source)
-	{
-		PPose copy = new PPose(source.boneCount());
-		for (int bone = 0; bone < source.boneCount(); bone++)
-			copy.set(bone, source.translation(bone), source.rotation(bone), source.scale(bone));
-		return copy;
-	}
 
 	private static void markDirty(PPose reference, PPose result)
 	{
@@ -277,14 +478,16 @@ public final class PPoseMixer
 			if (result.translation(bone).distanceSquared(reference.translation(bone)) > EPSILON * EPSILON ||
 					Math.abs(Math.abs(result.rotation(bone).dot(reference.rotation(bone))) - 1.0f) > EPSILON ||
 					result.scale(bone).distanceSquared(reference.scale(bone)) > EPSILON * EPSILON)
-				result.setAnimated(bone, result.translation(bone), result.rotation(bone), result.scale(bone));
+				result.markDirty(bone);
 	}
 
 	private static void shortestSlerp(Quaternionf destination, Quaternionf target, float alpha)
 	{
 		Quaternionf shortestTarget = new Quaternionf(target);
 		if (destination.dot(shortestTarget) < 0.0f)
+		{
 			shortestTarget.set(-shortestTarget.x, -shortestTarget.y, -shortestTarget.z, -shortestTarget.w);
+		}
 		destination.slerp(shortestTarget, alpha).normalize();
 	}
 
@@ -292,7 +495,9 @@ public final class PPoseMixer
 	{
 		Quaternionf shortestRotation = new Quaternionf(rotation);
 		if (shortestRotation.w < 0.0f)
+		{
 			shortestRotation.set(-shortestRotation.x, -shortestRotation.y, -shortestRotation.z, -shortestRotation.w);
+		}
 		return new Quaternionf().slerp(shortestRotation, Math.clamp(weight, 0.0f, 1.0f)).normalize();
 	}
 
@@ -335,7 +540,9 @@ public final class PPoseMixer
 			mode = Objects.requireNonNull(mode);
 			weight = Math.clamp(weight, 0.0f, 1.0f);
 			if (referencePose != null && referencePose.boneCount() != pose.boneCount())
+			{
 				throw new IllegalArgumentException("Layer and reference poses must have equal bone counts");
+			}
 		}
 
 		public Layer(PPose pose, PPoseBlendMode mode, int priority, float weight)
