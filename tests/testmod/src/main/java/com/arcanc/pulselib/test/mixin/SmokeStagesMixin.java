@@ -12,6 +12,7 @@ package com.arcanc.pulselib.test.mixin;
 import com.arcanc.pulselib.content.renderer.PRenderStagesHandler;
 import com.arcanc.pulselib.test.ClientTestPlugin;
 import com.arcanc.pulselib.test.H14Harness;
+import com.arcanc.pulselib.test.WorldRenderRegressionHarness;
 import com.arcanc.pulselib.test.WorldOitPerformanceHarness;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,7 +35,14 @@ public abstract class SmokeStagesMixin
 			throw new AssertionError("Block-entity stage out of order: " + phase);
 		phase = 1;
 		H14Harness.queueWorldSurface();
+		WorldRenderRegressionHarness.submit();
 		WorldOitPerformanceHarness.queue();
+	}
+
+	@Inject (method = "afterBlockEntities", at = @At ("TAIL"))
+	private static void pulselibtest$earlyDepth(CallbackInfo callback)
+	{
+		WorldRenderRegressionHarness.earlyDepth();
 	}
 
 	@Inject (method = "afterParticles", at = @At ("HEAD"))

@@ -14,31 +14,32 @@ import com.arcanc.pulselib.content.animatable.AnimManagerKey;
 import com.arcanc.pulselib.content.animatable.ControllerState;
 import com.arcanc.pulselib.content.animatable.PAnimationManager;
 import com.arcanc.pulselib.content.animatable.PItemAnimatable;
-import com.arcanc.pulselib.content.animatable.singleton.SingletonAnimationManager;
 import com.arcanc.pulselib.content.model.animation.PRawAnimation;
+import com.arcanc.pulselib.content.registration.item.renderer.TestBlockItemClient;
+import com.arcanc.pulselib.util.helpers.PLibHelper;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
-import com.arcanc.pulselib.content.registration.item.renderer.TestBlockItemClient;
 import org.jetbrains.annotations.NotNull;
 
 public class TestBlockItem extends BlockItem implements PItemAnimatable<TestBlockItem>
 {
+	private final PAnimationManager<TestBlockItem> animationManager = PLibHelper.createManager(this);
 	private final PRawAnimation idle = PRawAnimation.begin().
 			thenLoop("idle").
 			build();
-	
+
 	public TestBlockItem(Block block, Properties properties)
 	{
 		super(block, properties);
 	}
-	
+
 	@Override
 	public @NotNull PAnimationManager<TestBlockItem> getAnimationManager(AnimManagerKey key)
 	{
-		return SingletonAnimationManager.getManager(key, this);
+		return this.animationManager.getManager(key);
 	}
-	
+
 	@Override
 	public void registerAnimationControllers(PAnimationManager.@NotNull PAnimationRegistrar<TestBlockItem> registrar)
 	{
@@ -48,7 +49,7 @@ public class TestBlockItem extends BlockItem implements PItemAnimatable<TestBloc
 			return ControllerState.PLAY;
 		});
 	}
-	
+
 	@Override
 	public BlockEntityWithoutLevelRenderer getPulseItemRenderer()
 	{

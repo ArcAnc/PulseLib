@@ -16,13 +16,27 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
 
 public final class PFrameCompiler<S>
 {
 	private final Map<S, Map<DrawKey, List<PInstanceHeader>>> opaque = new Object2ObjectOpenHashMap<>();
 	private final Map<S, List<TransparentSubmission>> translucent = new Object2ObjectOpenHashMap<>();
+
+	private final ToDoubleFunction<PInstanceHeader> sortDepth;
+
+	public PFrameCompiler()
+	{
+		this(PFrameCompiler :: distanceSquared);
+	}
+
+	public PFrameCompiler(ToDoubleFunction<PInstanceHeader> sortDepth)
+	{
+		this.sortDepth = sortDepth;
+	}
 
 	public void submit(S stage,
 	                   PPipelineHandle pipeline,
@@ -45,7 +59,7 @@ public final class PFrameCompiler<S>
 		if (transparent)
 		{
 			this.translucent.computeIfAbsent(stage, ignored -> new ObjectArrayList<>()).add(
-					new TransparentSubmission(key, instance, distanceSquared(instance)));
+					new TransparentSubmission(key, instance, this.sortDepth.applyAsDouble(instance)));
 			return;
 		}
 		this.opaque.computeIfAbsent(stage, ignored -> new Object2ObjectOpenHashMap<>()).
@@ -59,8 +73,37 @@ public final class PFrameCompiler<S>
 
 	public PRenderPlan compile(S stage, Predicate<PPipelineHandle> canBatchWithOit)
 	{
-		Map<DrawKey, List<PInstanceHeader>> opaqueGroups = this.opaque.remove(stage);
-		List<TransparentSubmission> translucentGroups = this.translucent.remove(stage);
+		return compileCombined(List.of(stage), canBatchWithOit);
+	}
+
+	/** Consumes only opaque submissions, leaving transparency for its later pass. */
+	public PRenderPlan compileOpaque(S stage)
+	{
+		return compile(this.opaque.remove(stage), null, ignored -> false);
+	}
+
+	/** Sorts ordinary transparency across all requested sources before forming batches. */
+	public PRenderPlan compileCombined(List<S> stages, Predicate<PPipelineHandle> canBatchWithOit)
+	{
+		Map<DrawKey, List<PInstanceHeader>> opaqueGroups = new Object2ObjectOpenHashMap<>();
+		List<TransparentSubmission> translucentGroups = new ObjectArrayList<>();
+		for (S stage : stages)
+		{
+			Map<DrawKey, List<PInstanceHeader>> opaqueStage = this.opaque.remove(stage);
+			if (opaqueStage != null)
+				opaqueStage.forEach((key, instances) -> opaqueGroups.computeIfAbsent(key,
+						ignored -> new ObjectArrayList<>()).addAll(instances));
+			List<TransparentSubmission> translucentStage = this.translucent.remove(stage);
+			if (translucentStage != null)
+				translucentGroups.addAll(translucentStage);
+		}
+		return compile(opaqueGroups, translucentGroups, canBatchWithOit);
+	}
+
+	private PRenderPlan compile(@Nullable Map<DrawKey, List<PInstanceHeader>> opaqueGroups,
+	                           @Nullable List<TransparentSubmission> translucentGroups,
+	                           Predicate<PPipelineHandle> canBatchWithOit)
+	{
 		if (opaqueGroups == null && translucentGroups == null)
 			return PRenderPlan.EMPTY;
 
@@ -85,7 +128,7 @@ public final class PFrameCompiler<S>
 			for (Map.Entry<DrawKey, List<PInstanceHeader>> entry : oitGroups.entrySet())
 				groups.add(group(entry.getKey(), entry.getValue(), false));
 
-			sortedGroups.sort(Comparator.comparingDouble(TransparentSubmission :: distanceSquared).reversed());
+			sortedGroups.sort(Comparator.comparingDouble(TransparentSubmission :: sortDepth).reversed());
 			DrawKey activeKey = null;
 			List<PInstanceHeader> activeInstances = new ObjectArrayList<>();
 			for (TransparentSubmission submission : sortedGroups)
@@ -102,6 +145,29 @@ public final class PFrameCompiler<S>
 				groups.add(group(activeKey, activeInstances, false));
 		}
 		return groups.isEmpty() ? PRenderPlan.EMPTY : new PRenderPlan(groups);
+	}
+
+	/** Consumes every stage of a compiler owned by one local context. */
+	public PRenderPlan compileAll(Predicate<PPipelineHandle> canBatchWithOit)
+	{
+		var stages = new LinkedHashSet<>(this.opaque.keySet());
+		stages.addAll(this.translucent.keySet());
+		return compileCombined(new ArrayList<>(stages), canBatchWithOit);
+	}
+
+	/** Discards selected stages without compiling a draw plan. */
+	public void discard(List<S> stages)
+	{
+		for (S stage : stages)
+		{
+			this.opaque.remove(stage);
+			this.translucent.remove(stage);
+		}
+	}
+
+	public boolean isEmpty()
+	{
+		return this.opaque.isEmpty() && this.translucent.isEmpty();
 	}
 
 	public void clear()
@@ -139,7 +205,7 @@ public final class PFrameCompiler<S>
 		}
 	}
 
-	private record TransparentSubmission(DrawKey key, PInstanceHeader instance, float distanceSquared)
+	private record TransparentSubmission(DrawKey key, PInstanceHeader instance, double sortDepth)
 	{
 	}
 }

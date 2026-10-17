@@ -9,7 +9,10 @@
 
 package com.arcanc.pulselib.content.mixin;
 
+import com.arcanc.pulselib.content.renderer.PRenderContexts;
 import com.arcanc.pulselib.content.renderer.PRenderQueue;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
@@ -22,6 +25,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin
 {
+	@WrapMethod (method = "renderItemInHand")
+	private void pulselib$handContext(Camera camera, float partialTick, Matrix4f view, Operation<Void> original)
+	{
+		try (var scope = PRenderContexts.enter(PRenderContexts.Context.FIRST_PERSON))
+		{
+			original.call(camera, partialTick, view);
+		}
+	}
+
 	@Inject(method = "renderItemInHand", at = @At(
 			value = "INVOKE",
 			target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;renderHandsWithItems(FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/player/LocalPlayer;I)V",

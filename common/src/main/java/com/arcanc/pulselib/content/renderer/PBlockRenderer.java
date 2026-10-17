@@ -24,6 +24,7 @@ import com.arcanc.pulselib.content.renderer.plan.PInstanceHeader;
 import com.arcanc.pulselib.data.gecko.MolangParser;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.arcanc.pulselib.util.PResourceCache;
+import com.arcanc.pulselib.util.helpers.PLibHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -97,7 +98,7 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>>
 		PBakedModel model = this.getModelData(animatable).getModel();
 		if (model == null)
 			return;
-		PAnimationManager<T> manager = animatable.getAnimationManager(AnimManagerKey.of(animatable));
+		PAnimationManager<T> manager = PLibHelper.getManager(animatable);
 		manager.bindModel(model);
 		Collection<PAnimationController<T>> controllers = manager.getControllers().values();
 		Map<PAnimationController<T>, MolangParser.Context> molangContexts = prepareMolangContexts(animatable, manager.key(), controllers, partialTick);

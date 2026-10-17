@@ -17,23 +17,20 @@ public final class PRenderStagesHandler
 {
 	public static void afterBlockEntities()
 	{
-		PRenderQueue.flush(PRenderQueue.RenderStage.SOLID_BLOCKS);
+		PRenderQueue.flushOpaque(PRenderQueue.RenderStage.ENTITIES);
+		PRenderQueue.flushOpaque(PRenderQueue.RenderStage.SOLID_BLOCKS);
 	}
 
 	public static void afterParticles()
 	{
-		PRenderQueue.flushCombined(PRenderQueue.RenderStage.ENTITIES, PRenderQueue.RenderStage.TRANSLUCENT_BLOCKS);
+		PRenderQueue.flushCombined(PRenderQueue.RenderStage.ENTITIES, PRenderQueue.RenderStage.SOLID_BLOCKS, PRenderQueue.RenderStage.TRANSLUCENT_BLOCKS);
 		PGpuDeformerBuffers.finishFrame();
 	}
 
 	public static void afterWeather(RenderTarget destination)
 	{
-		// Fabulous still has to combine rain, clouds, particles and terrain.
-		// Keep the OIT layers until that composition has completed.
 		if (destination == Minecraft.getInstance().levelRenderer.getWeatherTarget())
-		{
 			return;
-		}
 		PRenderQueue.compositeTranslucency(destination);
 	}
 }

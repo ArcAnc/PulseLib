@@ -26,6 +26,7 @@ import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
 import com.arcanc.pulselib.util.PModelCache;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.arcanc.pulselib.util.PResourceCache;
+import com.arcanc.pulselib.util.helpers.PLibHelper;
 import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -110,7 +111,7 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>> extends Blo
 
 		ItemStack stack = (ItemStack) additionalData[1];
 
-		PAnimationManager<T> manager = animatable.getAnimationManager(AnimManagerKey.of(stack));
+		PAnimationManager<T> manager = PLibHelper.getManager(animatable, AnimManagerKey.of(stack));
 		manager.bindModel(model);
 
 		Collection<PAnimationController<T>> controllers = manager.getControllers().values();

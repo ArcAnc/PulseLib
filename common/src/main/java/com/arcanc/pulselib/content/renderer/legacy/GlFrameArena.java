@@ -37,6 +37,15 @@ public final class GlFrameArena
 		return -1;
 	}
 
+	/** Local previews must complete their submission even when the ring is busy. */
+	public int beginWaiting(boolean persistent)
+	{
+		int slot = (int)(this.submissionIndex++ % this.fences.length);
+		if (persistent)
+			await(slot);
+		return slot;
+	}
+
 	public void finish(int slot, boolean persistent)
 	{
 		if (persistent)

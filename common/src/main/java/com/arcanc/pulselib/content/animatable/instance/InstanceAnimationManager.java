@@ -13,12 +13,10 @@ package com.arcanc.pulselib.content.animatable.instance;
 import com.arcanc.pulselib.content.animatable.AnimManagerKey;
 import com.arcanc.pulselib.content.animatable.PAnimatable;
 import com.arcanc.pulselib.content.animatable.PAnimationManager;
-import com.arcanc.pulselib.util.PLibDatabase;
 import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.Util;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.world.entity.Entity;
 
 import java.util.Objects;
 import java.util.Set;
@@ -40,7 +38,6 @@ public class InstanceAnimationManager<T extends PAnimatable<T>> extends PAnimati
 	public InstanceAnimationManager(T animatable, AnimManagerKey key)
 	{
 		super(animatable, key);
-		createControllers();
 	}
 	
 	public static void tickAll()

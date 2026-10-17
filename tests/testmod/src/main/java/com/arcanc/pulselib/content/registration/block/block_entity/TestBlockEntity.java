@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 public class TestBlockEntity extends BlockEntity implements PAnimatable<TestBlockEntity>
 {
 	private final PAnimationManager<TestBlockEntity> animationManager = PLibHelper.createManager(this);
+	private final Object registrationReady = new Object();
 	private final PRawAnimation ANIMATION = PRawAnimation.begin().
 			thenRandomLoop(random -> random.
 					add("animation", 5).
@@ -69,7 +70,7 @@ public class TestBlockEntity extends BlockEntity implements PAnimatable<TestBloc
 	@Override
 	public PAnimationManager<TestBlockEntity> getAnimationManager(AnimManagerKey key)
 	{
-		return this.animationManager;
+		return this.animationManager.getManager(key);
 	}
 	
 	/**
@@ -79,6 +80,11 @@ public class TestBlockEntity extends BlockEntity implements PAnimatable<TestBloc
 	@Override
 	public void registerAnimationControllers(PAnimationManager.@NotNull PAnimationRegistrar<TestBlockEntity> registrar)
 	{
+		if (this.registrationReady == null || this.animationManager == null)
+		{
+			throw new AssertionError("Controller registration ran during owner field initialization");
+		}
+
 		registrar.add(() -> animatableState ->
 		{
 			TestBlockEntity blockEntity = animatableState.animatable();

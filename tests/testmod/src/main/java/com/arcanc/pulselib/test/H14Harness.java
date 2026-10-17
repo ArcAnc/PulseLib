@@ -721,7 +721,7 @@ public final class H14Harness
 		return result;
 	}
 
-	private static int[] glState()
+	static int[] glState()
 	{
 		List<Integer> state = new ArrayList<>();
 		int[] parameters = {GL30.GL_DRAW_FRAMEBUFFER_BINDING, GL30.GL_READ_FRAMEBUFFER_BINDING,
@@ -798,7 +798,7 @@ public final class H14Harness
 		return new float[]{((color >> 16) & 255) / 255f, ((color >> 8) & 255) / 255f, (color & 255) / 255f, ((color >>> 24) & 255) / 255f};
 	}
 
-	private static float[] pixels(RenderTarget target)
+	static float[] pixels(RenderTarget target)
 	{
 		GL30.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, target.frameBufferId);
 		FloatBuffer pixel = BufferUtils.createFloatBuffer(4);
@@ -812,7 +812,7 @@ public final class H14Harness
 		return result;
 	}
 
-	private static float depth(RenderTarget target, int x)
+	static float depth(RenderTarget target, int x)
 	{
 		int previous = GL11.glGetInteger(GL30.GL_READ_FRAMEBUFFER_BINDING);
 		GL30.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, target.frameBufferId);

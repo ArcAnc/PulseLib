@@ -40,7 +40,7 @@ public final class GlDrawExecutor implements PRenderExecutor
 {
 	private static final int STRIDE = 12 * 4 + 4 * 4 + 2 * 4 + 2 * 4 + 4 * 4;
 	private static final int FRAMES_IN_FLIGHT = 3;
-	private static final int STAGE_SUBMISSIONS_PER_FRAME = 3;
+	private static final int STAGE_SUBMISSIONS_PER_FRAME = 4;
 	private static final int RING_SLOTS = FRAMES_IN_FLIGHT * STAGE_SUBMISSIONS_PER_FRAME;
 	private static final int MAX_INDIRECT_DRAWS_PER_EXECUTION = 1 + GlWeightedBlendedOit.LAYER_COUNT * 2;
 	private static final boolean MULTI_DRAW_INDIRECT_ENABLED = true;
@@ -50,6 +50,7 @@ public final class GlDrawExecutor implements PRenderExecutor
 	private final InstanceBuffer instanceBuffer = new InstanceBuffer();
 	private final IndirectBuffer indirectBuffer = new IndirectBuffer();
 	private final GlWeightedBlendedOit weightedBlendedOit = new GlWeightedBlendedOit();
+	private @Nullable GlRenderState localTarget;
 	private boolean capabilitiesResolved;
 	private PRenderCapabilityMatrix capabilityMatrix = PRenderCapabilityMatrix.NONE;
 	private boolean persistentMapping;
@@ -83,10 +84,30 @@ public final class GlDrawExecutor implements PRenderExecutor
 
 	public void execute(PRenderPlan plan, PRenderFrame frame, RenderTarget depthSource)
 	{
+		execute(plan, frame, depthSource, true);
+	}
+
+	/** Draws sorted local transparency directly into the caller's bound target. */
+	public void executeLocal(PRenderPlan plan, PRenderFrame frame, GlRenderState target)
+	{
+		GlRenderState previous = this.localTarget;
+		this.localTarget = target;
+		try
+		{
+			execute(plan, frame, null, false);
+		}
+		finally
+		{
+			this.localTarget = previous;
+		}
+	}
+
+	private void execute(PRenderPlan plan, PRenderFrame frame, @Nullable RenderTarget depthSource, boolean useOit)
+	{
 		if (plan.isEmpty())
 			return;
 		resolveCapabilities();
-		int frameSlot = this.frameArena.begin(this.persistentMapping);
+		int frameSlot = useOit ? this.frameArena.begin(this.persistentMapping) : this.frameArena.beginWaiting(this.persistentMapping);
 		if (frameSlot < 0)
 			return;
 		this.instanceBuffer.upload(plan.instances(), frameSlot, this.persistentMapping, this.frameArena);
@@ -101,7 +122,7 @@ public final class GlDrawExecutor implements PRenderExecutor
 			for (PDrawGroup group : plan.groups())
 			{
 				RenderType type = this.resources.pipeline(group.pipeline());
-				if (!group.writeDepth() && PRenderTypes.RenderTypeProvider.usesOit(type) &&
+				if (useOit && !group.writeDepth() && PRenderTypes.RenderTypeProvider.usesOit(type) &&
 						PRenderTypes.ShadersProvider.trianglesOit(PRenderTypes.RenderTypeProvider.usesEmissiveOit(type)) != null)
 					oitGroups.add(group);
 				else
@@ -208,6 +229,11 @@ public final class GlDrawExecutor implements PRenderExecutor
 		boolean geometryArena = this.resources.isGeometry(group.mesh());
 		VertexBuffer vertexBuffer = geometryArena ? null : this.resources.mesh(group.mesh());
 		type.setupRenderState();
+		if (this.localTarget != null)
+		{
+			this.localTarget.bindTarget();
+			RenderSystem.depthMask(group.writeDepth());
+		}
 		if (oitPass != OitPass.NONE)
 			this.weightedBlendedOit.bindForDraw();
 		if (!group.writeDepth())
@@ -259,6 +285,11 @@ public final class GlDrawExecutor implements PRenderExecutor
 		RenderType type = this.resources.pipeline(first.pipeline());
 		GlGeometryArena.Slice geometry = this.resources.geometry(first.mesh());
 		type.setupRenderState();
+		if (this.localTarget != null)
+		{
+			this.localTarget.bindTarget();
+			RenderSystem.depthMask(first.writeDepth());
+		}
 		if (oitPass != OitPass.NONE)
 			this.weightedBlendedOit.bindForDraw();
 		if (!first.writeDepth())

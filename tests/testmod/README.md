@@ -148,3 +148,37 @@ The existing opt-in client smoke now also samples the original entity rig's `idl
 ```
 
 Require `PULSE TEST L1/L4 PASS`, `PULSE TEST CLIENT PASS` and successful process exit. The default entity uses glTF; `pulseGeckoDemo` selects the equivalent Gecko rig. These checks are independent of the JUnit numeric regressions and stay outside mandatory CI. They sample resolved transformations on loaded game models; they do not assert interruption screenshots or exercise multiplayer.
+
+## H18 manager access / H13 world depth / H15 GUI and offscreen
+
+The existing opt-in smoke now includes these regressions (no new CI or launch flags):
+
+```sh
+./gradlew :fabric:runClient -PpulseTestMod -PpulseSmokeAuto -PpulseSmokeWorld --no-daemon
+./gradlew :neoforge:runClient -PpulseTestMod -PpulseSmokeAuto -PpulseSmokeWorld --no-daemon
+```
+
+After the original world smoke assertions, the harness modifies only its marked disposable save to build a sealed water tank and a blue stained-glass wall. Twelve cases use the real loader stages and actual terrain in Fast/Fancy/Fabulous. They read opaque entity-queue RGB and depth immediately after `afterBlockEntities`, then verify front/behind tinting in the final world pixels. The fixture restores graphics mode, camera mode and HUD settings before cleanup. The tank/wall remain only in the disposable save.
+
+The additional 41 GPU cases cover early opaque depth, 32 instances of one mesh, lit/emissive materials, crossing transparency, combined Entity/BlockEntity alpha sorting, orthographic GUI depth, separate world/GUI queues, a successful nested framebuffer render, nested exceptions, and nondefault indexed blend/depth/scissor state. They also render the original Entity model through actual `EntityRenderDispatcher` and `InventoryScreen` entry points with opaque and translucent materials, and throw from the real renderer after a partial submission to verify discard and restoration. Offscreen/GUI transparency uses sorted alpha and does not touch world OIT accumulation.
+
+H18 checks actual Entity/BlockEntity field initializers, automatic instance/singleton selection, explicit factory overrides, stable instance ownership, initialized controllers and ItemStack helper access with independent runtime IDs and intentional copy identity. JUnit separately checks generic non-Item singleton owners, equal keys across equal/unequal owner types, direct manager constructors and independent graph runtimes. The existing ItemStack identity and Animation Graph regressions retain their expectations.
+
+TestBlockItem, TestEntity and TestBlockEntity use the same owner pattern:
+
+```java
+private final PAnimationManager<MyAnimatable> animationManager =
+		PLibHelper.createManager(this);
+
+@Override
+public PAnimationManager<MyAnimatable> getAnimationManager(AnimManagerKey key)
+{
+	return this.animationManager.getManager(key);
+}
+```
+
+The automatic factory selects an instance manager for Entity/BlockEntity and a singleton manager for other owners. Custom owners can choose `PLibHelper.createInstanceManager(this)` or `PLibHelper.createSingletonManager(this)` explicitly; the boolean overload remains available. Creation does not invoke owner callbacks. The keyed getter runs after owner construction and initializes each context once. Singleton contexts stay in the shared owner-identity/key cache, so the item's field does not share one animation state among all stacks. External code uses `PLibHelper.getManager(owner)`, `getManager(owner, key)` or `getManager(stack)`. Existing direct instance getters and `SingletonAnimationManager.getManager(key, owner)` continue to work. A plain custom object with an instance lifetime should use the explicit instance factory.
+
+Require `H13 WORLD PIXEL PASS`, `H18 GAME PASS`, `H15 ENTITY PIXEL PASS`, `H13/H15 PIXEL PASS`, `PULSE TEST EXPLICIT CLEANUP PASS`, `PULSE TEST NATURAL DISCONNECT PASS`, `PULSE TEST CLIENT PASS`, and successful process exit. Without `pulseSmokeWorld`, smoke runs the synthetic GPU cases but skips real-world/Entity checks. H14 remains a separate mandatory regression with its unchanged 38-case expectations.
+
+Automated clients also use synchronous OpenGL debug callbacks and fail on any GL API error at the next safe frame boundary, retaining the original Java call stack. This applies only to disposable automated runs. It prevents the observed NVIDIA shutdown deadlock between a driver callback's JNI detach and VM exit; errors are asserted rather than suppressed. Arena allocation invalidates Minecraft's VAO binding cache before the next vanilla draw. No forced Minecraft exit is added.

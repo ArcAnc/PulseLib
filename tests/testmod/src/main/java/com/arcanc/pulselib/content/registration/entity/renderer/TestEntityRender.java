@@ -11,6 +11,8 @@ package com.arcanc.pulselib.content.registration.entity.renderer;
 
 
 import com.arcanc.pulselib.content.model.baked.PBakedBone;
+import com.arcanc.pulselib.content.model.textures.PAlphaMode;
+import org.jetbrains.annotations.Nullable;
 import com.arcanc.pulselib.data.gecko.PGeckoModelLoader;
 import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
 import com.arcanc.pulselib.content.model.baked.PBakedMesh;
@@ -30,6 +32,8 @@ import java.util.List;
 public class TestEntityRender extends PEntityRenderer<TestEntity>
 {
 	public static int renders;
+	public static @Nullable PAlphaMode regressionAlphaMode;
+	public static int regressionFailAfter = -1;
 	public static final ResourceLocation SPHERE = PLibDatabase.rl("entity/test_entity/sphere");
 	public static final ResourceLocation TORUS = PLibDatabase.rl("entity/test_entity/torus");
 	public static final ResourceLocation TUBE = PLibDatabase.rl("entity/test_entity/tube");
@@ -65,8 +69,17 @@ public class TestEntityRender extends PEntityRenderer<TestEntity>
 	                                               PMeshRenderContext inherited,
 	                                               float partialTick)
 	{
+		if (regressionFailAfter == 0)
+		{
+			throw new IllegalStateException("Intentional H15 renderer failure");
+		}
+		if (regressionFailAfter > 0)
+		{
+			regressionFailAfter--;
+		}
 		renders++;
-		PMeshRenderContext context = inherited;
+		PMeshRenderContext context = regressionAlphaMode == null ? inherited : inherited.withAlphaMode(regressionAlphaMode).
+				withColor(regressionAlphaMode == PAlphaMode.TRANSLUCENT ? 0x80FFFFFF : -1);
 		if (bone.name().equals("head"))
 		{
 			boolean alternateMaterial = (animatable.tickCount / 40 & 1) == 0;

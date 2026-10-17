@@ -12,9 +12,7 @@ package com.arcanc.pulselib.content.animatable.singleton;
 
 import com.arcanc.pulselib.content.animatable.AnimManagerKey;
 import com.arcanc.pulselib.content.animatable.PAnimatable;
-import com.arcanc.pulselib.content.animatable.PAnimationController;
 import com.arcanc.pulselib.content.animatable.PAnimationManager;
-import com.arcanc.pulselib.util.PLibDatabase;
 import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.Util;
@@ -30,7 +28,7 @@ import java.util.Map;
 
 public class SingletonAnimationManager<T extends PAnimatable<T>> extends PAnimationManager<T>
 {
-	private static final Map<AnimManagerKey, AnimationManagerContainer<?>> MANAGERS = new Object2ObjectOpenHashMap<>();
+	private static final Map<OwnerKey, AnimationManagerContainer<?>> MANAGERS = new Object2ObjectOpenHashMap<>();
 	
 	public SingletonAnimationManager(T animatable)
 	{
@@ -41,23 +39,30 @@ public class SingletonAnimationManager<T extends PAnimatable<T>> extends PAnimat
 	{
 		super(animatable, key);
 	}
+
+	/** Resolves a context in the shared cache, including for non-Item singleton owners. */
+	@Override
+	public PAnimationManager<T> getManager(AnimManagerKey key)
+	{
+		return getManager(key, this.animatable);
+	}
 	
 	@SuppressWarnings("unchecked")
-	public static <T extends PAnimatable<T>> PAnimationManager<T> getManager(AnimManagerKey id, T animatable)
+	public static synchronized <T extends PAnimatable<T>> PAnimationManager<T> getManager(AnimManagerKey id, T animatable)
 	{
-		AnimationManagerContainer<?> cont = MANAGERS.compute(id, (key, container) ->
+		AnimationManagerContainer<?> cont = MANAGERS.compute(new OwnerKey(animatable, id), (key, container) ->
 		{
 			if (container == null)
 			{
-				SingletonAnimationManager<T> man = new SingletonAnimationManager<>(animatable, key);
-				man.createControllers();
+				SingletonAnimationManager<T> man = new SingletonAnimationManager<>(animatable, id);
 				return new AnimationManagerContainer<>(Util.getEpochMillis(), man);
 			}
 			container.lastUsedTick = Util.getEpochMillis();
 			return container;
 		});
 		
-		return (SingletonAnimationManager<T>)cont.manager();
+		// OwnerKey compares owner references, so this localized cast preserves T.
+		return ((SingletonAnimationManager<T>)cont.manager()).initializeControllers();
 	}
 	
 	public static void tickAll()
@@ -86,6 +91,21 @@ public class SingletonAnimationManager<T extends PAnimatable<T>> extends PAnimat
 		MANAGERS.clear();
 	}
 	
+	private record OwnerKey(PAnimatable<?> owner, AnimManagerKey key)
+	{
+		@Override
+		public boolean equals(Object object)
+		{
+			return object instanceof OwnerKey other && this.owner == other.owner && this.key.equals(other.key);
+		}
+
+		@Override
+		public int hashCode()
+		{
+			return 31 * System.identityHashCode(this.owner) + this.key.hashCode();
+		}
+	}
+
 	static class AnimationManagerContainer<T extends PAnimatable<T>>
 	{
 		long lastUsedTick;

@@ -60,7 +60,11 @@ final class GlStateSnapshot
 		BufferUploader.invalidate();
 		GL30.glBindVertexArray(this.vertexArray);
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.arrayBuffer);
-		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, this.elementBuffer);
+		// In a core profile the element binding belongs to a nonzero VAO.
+		if (this.vertexArray != 0)
+		{
+			GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, this.elementBuffer);
+		}
 		for (int unit = 0; unit < this.textures.length; unit++)
 		{
 			activeTexture(GL13.GL_TEXTURE0 + unit);

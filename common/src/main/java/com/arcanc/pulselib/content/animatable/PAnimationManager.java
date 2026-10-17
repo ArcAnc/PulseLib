@@ -14,9 +14,11 @@ import com.arcanc.pulselib.content.model.animation.PAnimationGraph;
 import com.arcanc.pulselib.content.model.baked.PBakedModel;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
@@ -27,23 +29,26 @@ import java.util.function.Supplier;
 public class PAnimationManager<T extends PAnimatable<T>>
 {
 	protected static final long THRESHOLD_TIME = 5_000;
-	
+
 	protected final T animatable;
 	protected final AnimManagerKey key;
-	protected PBakedModel model;
+	protected @Nullable PBakedModel model;
+	private boolean initialized;
+	private boolean initializing;
 	protected final Map<String, Supplier<PAnimationController.StateHandler<T>>> factories = new Object2ObjectArrayMap<>();
 	protected final Map<String, Supplier<PAnimationGraph>> graphFactories = new Object2ObjectArrayMap<>();
 	protected final Map<String, PAnimationController<T>> controllers = new Object2ObjectArrayMap<>();
-	
+
 	/**
 	 * Returns the controllers.
 	 * @return the value produced by this operation.
 	 */
 	public Map<String, PAnimationController<T>> getControllers()
 	{
+		initializeControllers();
 		return this.controllers;
 	}
-	
+
 	/**
 	 * Returns the animatable.
 	 * @return the value produced by this operation.
@@ -52,7 +57,7 @@ public class PAnimationManager<T extends PAnimatable<T>>
 	{
 		return this.animatable;
 	}
-	
+
 	/**
 	 * Creates an instance of the enclosing type.
 	 * @param animatable the animatable to use.
@@ -69,26 +74,61 @@ public class PAnimationManager<T extends PAnimatable<T>>
 	 */
 	public PAnimationManager(final T animatable, final AnimManagerKey key)
 	{
-		this.animatable = animatable;
-		this.key = key;
-		
-		PAnimationRegistrar<T> registrar = new PAnimationRegistrar<>(new ObjectArrayList<>());
-		
-		this.animatable.registerAnimationControllers(registrar);
-		
-		registrar.entries.forEach(entry -> this.factories.put(entry.name(), entry.factory()));
-		registrar.graphEntries.forEach(entry -> this.graphFactories.put(entry.name(), entry.factory()));
+		this.animatable = Objects.requireNonNull(animatable);
+		this.key = Objects.requireNonNull(key);
 	}
 
 	/**
-	 * Creates the controllers.
+	 * Returns the initialized manager for a rendering context.
+	 * Instance-owned managers reuse this object regardless of the supplied context key.
+	 * Singleton managers override this method to resolve the owner's keyed cache.
+	 * Call after the owner's construction, not from its field initializers.
+	 * @param key the animation context key.
+	 * @return the initialized manager for that context.
 	 */
+	public PAnimationManager<T> getManager(AnimManagerKey key)
+	{
+		Objects.requireNonNull(key);
+		return initializeControllers();
+	}
+
+	/**
+	 * Registers and creates controllers on first use, after owner construction.
+	 * Constructors deliberately never call the owner's overridable registration method.
+	 * @return this manager with its controllers ready for use.
+	 */
+	public final synchronized PAnimationManager<T> initializeControllers()
+	{
+		if (this.initialized)
+			return this;
+		if (this.initializing)
+			throw new IllegalStateException("Recursive animation controller initialization");
+		this.initializing = true;
+		try
+		{
+			PAnimationRegistrar<T> registrar = new PAnimationRegistrar<>(new ObjectArrayList<>());
+			this.animatable.registerAnimationControllers(registrar);
+			Map<String, PAnimationController<T>> created = new Object2ObjectArrayMap<>();
+			registrar.entries.forEach(entry -> created.put(entry.name(),
+					new PAnimationController<>(entry.name(), entry.factory().get(), randomSeedFor(entry.name()))));
+			registrar.graphEntries.forEach(entry -> created.put(entry.name(),
+					new PAnimationController<>(entry.name(), entry.factory().get())));
+			registrar.entries.forEach(entry -> this.factories.put(entry.name(), entry.factory()));
+			registrar.graphEntries.forEach(entry -> this.graphFactories.put(entry.name(), entry.factory()));
+			this.controllers.putAll(created);
+			this.initialized = true;
+			return this;
+		}
+		finally
+		{
+			this.initializing = false;
+		}
+	}
+
+	/** Creates the controllers once; retained for subclasses using the original API. */
 	protected final void createControllers()
 	{
-		this.factories.forEach((name, supplier) -> this.controllers.put(name,
-				new PAnimationController<>(name, supplier.get(), randomSeedFor(name))));
-		this.graphFactories.forEach((name, supplier) -> this.controllers.put(name,
-				new PAnimationController<>(name, supplier.get())));
+		initializeControllers();
 	}
 
 	/**
@@ -110,7 +150,7 @@ public class PAnimationManager<T extends PAnimatable<T>>
 	{
 		return this.key;
 	}
-	
+
 	/**
 	 * Binds the model.
 	 * @param model the model to use.
@@ -120,19 +160,20 @@ public class PAnimationManager<T extends PAnimatable<T>>
 		if (model != this.model)
 			this.model = model;
 	}
-	
+
 	/**
 	 * Performs the tick operation.
 	 */
 	public void tick()
 	{
+		initializeControllers();
 		for (PAnimationController<T> controller : this.controllers.values())
 			controller.tick(this.animatable, 1, this.model, this.controllers.values());
 	}
-	
-/**
- * Immutable value object representing animation registrar.
- */
+
+	/**
+	 * Immutable value object representing animation registrar.
+    */
 	public record PAnimationRegistrar<T extends PAnimatable<T>>(List<Entry<T>> entries, List<GraphEntry> graphEntries)
 	{
 		/**
@@ -153,7 +194,7 @@ public class PAnimationManager<T extends PAnimatable<T>>
 		{
 			return add("default", factory);
 		}
-		
+
 		/**
 		 * Performs the add operation.
 		 * @param name the name to use.
@@ -198,18 +239,18 @@ public class PAnimationManager<T extends PAnimatable<T>>
 			this.graphEntries.add(new GraphEntry(name, factory));
 			return this;
 		}
-		
-/**
- * Immutable value object representing entry.
- */
+
+		/**
+		 * Immutable value object representing entry.
+        */
 		public record Entry<T extends PAnimatable<T>>(String name, Supplier<PAnimationController.StateHandler<T>> factory)
 		{
-		
+
 		}
 
-/**
- * Immutable value object representing graph entry.
- */
+		/**
+		 * Immutable value object representing graph entry.
+        */
 		public record GraphEntry(String name, Supplier<PAnimationGraph> factory)
 		{
 		}

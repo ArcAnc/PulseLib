@@ -45,6 +45,7 @@ public class TestEntity extends PathfinderMob implements PAnimatable<TestEntity>
 	private static final PRawAnimation DEATH = PRawAnimation.begin().thenHold("death").build();
 	
 	private final PAnimationManager<TestEntity> animationManager = PLibHelper.createManager(this);
+	private final Object registrationReady = new Object();
 	
 	public boolean showArmor = false;
 	
@@ -77,12 +78,17 @@ public class TestEntity extends PathfinderMob implements PAnimatable<TestEntity>
 	@Override
 	public PAnimationManager<TestEntity> getAnimationManager(AnimManagerKey key)
 	{
-		return this.animationManager;
+		return this.animationManager.getManager(key);
 	}
 	
 	@Override
 	public void registerAnimationControllers(PAnimationManager.@NotNull PAnimationRegistrar<TestEntity> registrar)
 	{
+		if (this.registrationReady == null || this.animationManager == null)
+		{
+			throw new AssertionError("Controller registration ran during owner field initialization");
+		}
+
 		registrar.add("animController", () -> state ->
 		{
 			TestEntity animatable = state.animatable();

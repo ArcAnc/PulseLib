@@ -67,6 +67,7 @@ import java.util.concurrent.CompletableFuture;
 public final class SmokeHarness
 {
 	private static boolean completed;
+	private static boolean worldVerified;
 	private static int worldStart = -1;
 	private static final BlockPos TEST_BLOCK = new BlockPos(11, 140, 14);
 	private static @Nullable CompletableFuture<Void> worldSetup;
@@ -122,7 +123,7 @@ public final class SmokeHarness
 		TextureAtlasSprite sprite = PResourceCache.getTextureAtlas().
 				getSprite(PResourceCache.resolve(ClientTestPlugin.GLTF.getModelId(), "circle"));
 		check(!sprite.contents().name().getPath().equals("missingno"), "Test texture must be stitched");
-		if (Boolean.getBoolean("pulselib.test.world"))
+		if (Boolean.getBoolean("pulselib.test.world") && !worldVerified)
 		{
 			if (worldSetup == null)
 			{
@@ -205,6 +206,12 @@ public final class SmokeHarness
 				TestBlockItemRenderer.renders, TestArmor.setups, ClientTestPlugin.layerRenders, ClientTestPlugin.animatedRenders);
 		}
 
+		worldVerified = true;
+		if (mc.level != null && !WorldRenderRegressionHarness.frame())
+		{
+			return;
+		}
+		RenderRegressionHarness.run();
 		AnimationLifecycleHarness.run(TestEntityRender.MODEL_DATA.getModel());
 		Dummy dummy = new Dummy();
 		dummy.manager.bindModel(gecko);

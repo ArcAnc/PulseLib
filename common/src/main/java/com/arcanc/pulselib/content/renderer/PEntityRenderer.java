@@ -23,6 +23,7 @@ import com.arcanc.pulselib.content.renderer.plan.PInstanceHeader;
 import com.arcanc.pulselib.data.gecko.MolangParser;
 import com.arcanc.pulselib.platform.PulseServices;
 import com.arcanc.pulselib.util.PResourceCache;
+import com.arcanc.pulselib.util.helpers.PLibHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -94,15 +95,33 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>> extends
 	@Override
 	public void render(T entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight)
 	{
-		super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
+		try (var scope = PRenderContexts.enterEntity())
+		{
+			try
+			{
+				super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
 
-		int packedOverlay = entity instanceof LivingEntity living ? LivingEntityRenderer.getOverlayCoords(living, 0.0f) : OverlayTexture.NO_OVERLAY;
-		preSubmit(poseStack, entity, this :: getRenderType, bufferSource, packedLight, packedOverlay, partialTick);
-		poseStack.pushPose();
-		poseStack.mulPose(Axis.YP.rotationDegrees(180));
-		trueSubmit(poseStack, entity, this :: getRenderType, bufferSource, packedLight, packedOverlay, partialTick);
-		poseStack.popPose();
-		postSubmit(poseStack, entity, this :: getRenderType, bufferSource, packedLight, packedOverlay, partialTick);
+				int packedOverlay = entity instanceof LivingEntity living ? LivingEntityRenderer.getOverlayCoords(living, 0.0f) : OverlayTexture.NO_OVERLAY;
+				preSubmit(poseStack, entity, this :: getRenderType, bufferSource, packedLight, packedOverlay, partialTick);
+				poseStack.pushPose();
+				try
+				{
+					poseStack.mulPose(Axis.YP.rotationDegrees(180));
+					trueSubmit(poseStack, entity, this :: getRenderType, bufferSource, packedLight, packedOverlay, partialTick);
+				}
+				finally
+				{
+					poseStack.popPose();
+				}
+				postSubmit(poseStack, entity, this :: getRenderType, bufferSource, packedLight, packedOverlay, partialTick);
+			}
+			catch (Throwable exception)
+			{
+				if (scope != null)
+					scope.discard();
+				throw exception;
+			}
+		}
 	}
 
 	@Override
@@ -124,7 +143,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>> extends
 		if (model == null)
 			return;
 
-		PAnimationManager<T> manager = animatable.getAnimationManager(AnimManagerKey.of(animatable));
+		PAnimationManager<T> manager = PLibHelper.getManager(animatable);
 		manager.bindModel(model);
 		InstanceAnimationManager.addManager(manager);
 

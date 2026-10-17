@@ -26,6 +26,13 @@ public abstract class MinecraftMixin
 	@Shadow
 	public @Nullable ClientLevel level;
 
+	@Inject (method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;Z)V", at = @At ("HEAD"))
+	private void pulselib$disconnect(CallbackInfo callback)
+	{
+		if (this.level != null)
+			PulseRuntime.disconnected();
+	}
+
 	@Inject (method = "setLevel", at = @At ("HEAD"))
 	private void pulselib$worldChanged(@Nullable ClientLevel next, ReceivingLevelScreen.Reason reason, CallbackInfo callback)
 	{

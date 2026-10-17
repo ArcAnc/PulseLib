@@ -89,6 +89,7 @@ public final class GlGeometryArena
 			this.vertexBuffer = GL15.glGenBuffers();
 			this.indexBuffer = GL15.glGenBuffers();
 			this.vertexArray = GL30.glGenVertexArrays();
+			BufferUploader.invalidate();
 			GL30.glBindVertexArray(this.vertexArray);
 			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.vertexBuffer);
 			GL15.glBufferData(GL15.GL_ARRAY_BUFFER, vertexCapacity, GL15.GL_STATIC_DRAW);

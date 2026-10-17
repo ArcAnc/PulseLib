@@ -9,7 +9,9 @@
 
 package com.arcanc.pulselib.content.renderer;
 
+import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
 import com.arcanc.pulselib.content.renderer.legacy.GlDrawExecutor;
+import com.arcanc.pulselib.content.renderer.legacy.GlRenderState;
 import com.arcanc.pulselib.content.renderer.legacy.GlResourceRegistry;
 import com.arcanc.pulselib.content.renderer.legacy.McLegacyGlHostBridge;
 import com.arcanc.pulselib.content.renderer.plan.*;
@@ -19,7 +21,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.item.ItemDisplayContext;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public final class PRenderQueue
@@ -69,12 +70,12 @@ public final class PRenderQueue
 
 	public static void submitEntityMesh(RenderType renderType, PDynamicGeometry geometry, PInstanceHeader data)
 	{
-		submit(RenderStage.ENTITIES, renderType, geometry, data);
+		submit(PRenderContexts.entityStage(), renderType, geometry, data);
 	}
 
 	public static void submitEntityMesh(RenderType renderType, PGeometryData geometry, PInstanceHeader data)
 	{
-		submit(RenderStage.ENTITIES, renderType, geometry, data);
+		submit(PRenderContexts.entityStage(), renderType, geometry, data);
 	}
 
 	/** Queues geometry for the depth buffer produced by Minecraft's hand pass. */
@@ -102,7 +103,7 @@ public final class PRenderQueue
 		PPipelineHandle pipeline = RESOURCES.pipeline(type);
 		PMeshHandle mesh = RESOURCES.dynamic(geometry);
 		int indexCount = RESOURCES.indexCount(geometry);
-		COMPILER.submit(stage, pipeline, mesh, RESOURCES.resolveCommand(mesh, indexCount, 1), data, transparent);
+		compiler().submit(stage, pipeline, mesh, RESOURCES.resolveCommand(mesh, indexCount, 1), data, transparent);
 	}
 
 	private static void submit(RenderStage stage,
@@ -113,7 +114,37 @@ public final class PRenderQueue
 	{
 		PPipelineHandle pipeline = RESOURCES.pipeline(type);
 		PMeshHandle mesh = RESOURCES.geometry(geometry);
-		COMPILER.submit(stage, pipeline, mesh, RESOURCES.resolveCommand(mesh, geometry.indexCount(), 1), data, transparent);
+		compiler().submit(stage, pipeline, mesh, RESOURCES.resolveCommand(mesh, geometry.indexCount(), 1), data, transparent);
+	}
+
+	private static PFrameCompiler<RenderStage> compiler()
+	{
+		PRenderContexts.Scope local = PRenderContexts.localScope();
+		return local == null ? COMPILER : local.compiler;
+	}
+
+	static void flushLocal(PFrameCompiler<RenderStage> compiler, PRenderFrame frame, GlRenderState state)
+	{
+		try
+		{
+			EXECUTOR.executeLocal(compiler.compileAll(ignored -> false), frame, state);
+		}
+		finally
+		{
+			compiler.clear();
+		}
+	}
+
+	static void finishLocalFrame()
+	{
+		if (COMPILER.isEmpty())
+			PGpuDeformerBuffers.finishFrame();
+	}
+
+	/** Drops unconsumed world commands, including when world rendering throws. */
+	public static void endWorldFrame()
+	{
+		COMPILER.discard(List.of(RenderStage.ENTITIES, RenderStage.SOLID_BLOCKS, RenderStage.TRANSLUCENT_BLOCKS));
 	}
 
 	private static void submitTranslucent(RenderStage stage, RenderType type, PDynamicGeometry geometry, PInstanceHeader data)
@@ -148,13 +179,16 @@ public final class PRenderQueue
 		EXECUTOR.execute(plan, HOST.captureFrame(), depthSource);
 	}
 
+	/** Writes world depth before vanilla starts its translucent terrain pass. */
+	public static void flushOpaque(RenderStage stage)
+	{
+		EXECUTOR.execute(COMPILER.compileOpaque(stage), HOST.captureFrame());
+	}
+
 	public static void flushCombined(RenderStage... stages)
 	{
-		List<PDrawGroup> groups = new ArrayList<>();
-		for (RenderStage stage : stages)
-			groups.addAll(COMPILER.compile(stage, PRenderQueue :: canBatchWithOit).groups());
-		if (!groups.isEmpty())
-			EXECUTOR.execute(new PRenderPlan(groups), HOST.captureFrame());
+		PRenderPlan plan = COMPILER.compileCombined(List.of(stages), PRenderQueue :: canBatchWithOit);
+		EXECUTOR.execute(plan, HOST.captureFrame());
 	}
 
 	public static void compositeTranslucency(RenderTarget destination)

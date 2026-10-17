@@ -10,6 +10,8 @@
 package com.arcanc.pulselib.test.mixin;
 
 import com.arcanc.pulselib.test.H14Harness;
+import com.arcanc.pulselib.test.GlErrors;
+import com.arcanc.pulselib.test.WorldRenderRegressionHarness;
 import com.arcanc.pulselib.test.DisposableTestWorlds;
 import com.arcanc.pulselib.test.OitPerformanceHarness;
 import com.arcanc.pulselib.test.WorldOitPerformanceHarness;
@@ -32,6 +34,7 @@ public abstract class SmokeRenderMixin
 		DisposableTestWorlds.prepareAutomationWindow();
 		H14Harness.lockWorldCamera();
 		SmokeHarness.lockWorldCamera();
+		WorldRenderRegressionHarness.lockCamera();
 		if (Boolean.getBoolean("pulselib.test.oitPerf") && Boolean.getBoolean("pulselib.test.world"))
 		{
 			WorldOitPerformanceHarness.beginFrame();
@@ -41,6 +44,7 @@ public abstract class SmokeRenderMixin
 	@Inject (method = "render", at = @At ("TAIL"))
 	private void pulselibtest$checkResources(CallbackInfo callback)
 	{
+		GlErrors.check();
 		DisposableTestWorlds.loadIfRequested();
 		WorldOitPerformanceHarness.endFrame();
 		if (Boolean.getBoolean("pulselib.test.itemIdentity"))
