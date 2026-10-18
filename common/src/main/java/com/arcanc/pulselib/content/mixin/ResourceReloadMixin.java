@@ -19,6 +19,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+/**
+ * Clears runtime state before vanilla resource reload replaces model and texture resources.
+ */
 @Mixin (ReloadableResourceManager.class)
 public abstract class ResourceReloadMixin
 {
@@ -26,6 +29,11 @@ public abstract class ResourceReloadMixin
 	@Final
 	private PackType type;
 
+	/**
+	 * Clears stale runtime state and refreshes plugin model declarations before resource reload.
+	 *
+	 * @param callback the Mixin callback used to inspect or replace the intercepted result
+	 */
 	@Inject (method = "createReload", at = @At ("HEAD"))
 	private void pulselib$collectModelDeclarations(CallbackInfoReturnable<?> callback)
 	{

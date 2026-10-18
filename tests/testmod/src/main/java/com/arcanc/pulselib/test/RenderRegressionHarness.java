@@ -31,6 +31,7 @@ import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexSorting;
 import net.minecraft.client.GraphicsStatus;
 import net.minecraft.client.Minecraft;
@@ -117,7 +118,7 @@ public final class RenderRegressionHarness
 	{
 		// Conventional alpha pipeline deliberately outside the built-in OIT membership set.
 		return RenderType.create("pulselibtest:sorted_alpha", PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL,
-				com.mojang.blaze3d.vertex.VertexFormat.Mode.TRIANGLES, 1536, false, false,
+				VertexFormat.Mode.TRIANGLES, 1536, false, false,
 				RenderType.CompositeState.builder().
 						setShaderState(new RenderStateShard.ShaderStateShard(PRenderTypes.ShadersProvider::trianglesTranslucentEmissive)).
 						setTextureState(new RenderStateShard.TextureStateShard(WHITE, false, false)).

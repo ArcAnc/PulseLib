@@ -27,13 +27,16 @@ PulseLib is a modern animation library for Minecraft designed to deliver high pe
 
 ---
 
-Minecraft 1.21.1 supports NeoForge and Fabric with Java 21. Start with [installation](installation.md) and [automatic plugins](plugins.md).
+PulseLib supports Minecraft 1.21.1 on NeoForge and Fabric with Java 21. Both loaders share the animation, model, and rendering implementation in `common`.
 
-Installation instructions are available [here](https://github.com/ArcAnc/PulseLib/wiki/Installation).
+## Contents
 
----
-
-To get started and explore the documentation, check it out [here](https://github.com/ArcAnc/PulseLib/wiki/Getting-Started).
+* Setup: [Installation](installation.md), [Getting started](getting-started.md), [Plugins](plugins.md).
+* Models: [Model basics](basic.md), [Resources](resources.md), [Model data](modeldata.md), [Model loaders](model-loaders.md).
+* Animation: [Animatables and controllers](animatables-and-controllers.md), [Molang](molang-animations.md), [Animation events](animation-events.md), [Mesh deformers](mesh-deformers.md).
+* Integrations: [Items](pulselib-items.md), [Entities](pulselib-entities.md), [Block entities](pulselib-blocks.md), [Entity render layers](entity-render-layers.md), [Armor and attachments](armor-and-attachments.md), [Player animations](player-animations.md).
+* Rendering: [Renderers](renderers.md), [GUI rendering](gui-rendering.md), [Render types and queue](render-types-and-queue.md), [Render backend](render-backend.md), [Shaders](shaders.md).
+* Code: [API reference](api-reference.md).
 
 ---
 
@@ -48,4 +51,4 @@ If you would like to support the development of PulseLib, you can do so through 
 ---
 
 All code and artwork are distributed under the  
-[![Static Badge](https://img.shields.io/badge/license-Arc's_License_of_Common_Sense-black?style=for-the-badge)](https://github.com/ArcAnc/PulseLib/blob/1.21.1/LICENSE.txt)
+[![Static Badge](https://img.shields.io/badge/license-Arc's_License_of_Common_Sense-black?style=for-the-badge)](../LICENSE.txt)

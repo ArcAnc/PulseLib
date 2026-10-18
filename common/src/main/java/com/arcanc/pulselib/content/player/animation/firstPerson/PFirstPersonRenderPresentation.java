@@ -16,6 +16,13 @@ import java.util.Objects;
  * Render commands for the first-person bridge.  These are VIEW-space outputs
  * of {@link PFirstPersonPresentation}; this type deliberately owns no
  * alternative skeletal pose or animation channels.
+ *
+ * @param rightArm the right arm
+ * @param leftArm the left arm
+ * @param rightItem the right item
+ * @param leftItem the left item
+ * @param animationAnchors the animation anchors
+ * @param meshAttachments the mesh attachments
  */
 public record PFirstPersonRenderPresentation(
 		PFirstPersonArmPose rightArm,
@@ -26,13 +33,14 @@ public record PFirstPersonRenderPresentation(
 		List<PPlayerFirstPersonMeshAttachmentPose> meshAttachments)
 {
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param rightArm the right arm to use.
-	 * @param leftArm the left arm to use.
-	 * @param rightItem the right item to use.
-	 * @param leftItem the left item to use.
-	 * @param animationAnchors the animation anchors to use.
-	 * @param meshAttachments the mesh attachments to use.
+	 * Copies the selected arm, item, action-anchor and mesh attachment commands.
+	 *
+	 * @param rightArm the right arm
+	 * @param leftArm the left arm
+	 * @param rightItem the right item
+	 * @param leftItem the left item
+	 * @param animationAnchors the animation anchors
+	 * @param meshAttachments the mesh attachments
 	 */
 	public PFirstPersonRenderPresentation
 	{

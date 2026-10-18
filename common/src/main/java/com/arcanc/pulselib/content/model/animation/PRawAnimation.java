@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 /**
- * Provides support for raw animation playback recipes.
+ * Immutable sequence of clip, wait and weighted-random animation stage definitions.
  */
 public class PRawAnimation
 {
@@ -242,6 +242,14 @@ public class PRawAnimation
 		}
 	}
 
+	/**
+	 * Raw-animation stage that plays a selected clip.
+	 *
+	 * @param animationName the animation name
+	 * @param animationType the animation loop and completion policy
+	 * @param interpolationType the keyframe interpolation policy
+	 * @param speed the playback speed multiplier
+	 */
 	private record ClipStage(
 			String animationName,
 			PAnimationType animationType,
@@ -254,6 +262,9 @@ public class PRawAnimation
 			PAnimationStagePlayback.clip(animationName, animationType, interpolationType, speed);
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public PAnimationStagePlayer createPlayer(PAnimationStageContext context)
 		{
@@ -261,12 +272,18 @@ public class PRawAnimation
 					this.animationName, this.animationType, this.interpolationType, this.speed));
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public PIAnimationStage withInterpolation(PInterpolationType interpolation)
 		{
 			return new ClipStage(this.animationName, this.animationType, interpolation, this.speed);
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public PIAnimationStage withSpeed(float speed)
 		{
@@ -274,6 +291,11 @@ public class PRawAnimation
 		}
 	}
 
+	/**
+	 * Raw-animation stage that delays advancement for a fixed number of ticks.
+	 *
+	 * @param ticks the duration in game ticks
+	 */
 	private record WaitStage(int ticks) implements PIAnimationStage
 	{
 		private WaitStage
@@ -281,12 +303,18 @@ public class PRawAnimation
 			PAnimationStagePlayback.waitFor(ticks);
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public PAnimationStagePlayer createPlayer(PAnimationStageContext context)
 		{
 			return new StaticStagePlayer(PAnimationStagePlayback.waitFor(this.ticks));
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public PIAnimationStage withInterpolation(PInterpolationType interpolation)
 		{
@@ -295,6 +323,9 @@ public class PRawAnimation
 			return this;
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public PIAnimationStage withSpeed(float speed)
 		{
@@ -304,6 +335,15 @@ public class PRawAnimation
 		}
 	}
 
+	/**
+	 * Raw-animation stage that chooses from weighted clip entries.
+	 *
+	 * @param entries the collected controller factory declarations
+	 * @param loop the loop
+	 * @param preventImmediateRepeat the prevent immediate repeat
+	 * @param interpolationType the keyframe interpolation policy
+	 * @param speed the playback speed multiplier
+	 */
 	private record RandomStage(
 			List<RandomEntry> entries,
 			boolean loop,
@@ -334,18 +374,27 @@ public class PRawAnimation
 				throw new IllegalArgumentException("Total animation weight must be positive and finite");
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public PAnimationStagePlayer createPlayer(PAnimationStageContext context)
 		{
 			return new RandomStagePlayer(this, context.randomSeed());
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public PIAnimationStage withInterpolation(PInterpolationType interpolation)
 		{
 			return new RandomStage(this.entries, this.loop, this.preventImmediateRepeat, interpolation, this.speed);
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public PIAnimationStage withSpeed(float speed)
 		{
@@ -353,6 +402,12 @@ public class PRawAnimation
 		}
 	}
 
+	/**
+	 * Weighted clip entry in a random animation stage.
+	 *
+	 * @param animationName the animation name
+	 * @param weight the contribution weight
+	 */
 	private record RandomEntry(String animationName, float weight)
 	{
 		private RandomEntry
@@ -364,14 +419,29 @@ public class PRawAnimation
 		}
 	}
 
+	/**
+	 * Stage playback that advances to the next sequence stage after completion.
+	 *
+	 * @param playback the playback
+	 */
 	private record StaticStagePlayer(PAnimationStagePlayback playback) implements PAnimationStagePlayer
 	{
+		/**
+		 * Returns the current playback.
+		 *
+		 * @return the current playback
+		 */
 		@Override
 		public PAnimationStagePlayback currentPlayback()
 		{
 			return this.playback;
 		}
 
+		/**
+		 * Returns the complete.
+		 *
+		 * @return the complete
+		 */
 		@Override
 		public PAnimationStageTransition complete()
 		{
@@ -379,6 +449,9 @@ public class PRawAnimation
 		}
 	}
 
+	/**
+	 * Per-controller random-stage selection and repeat state.
+	 */
 	private static class RandomStagePlayer implements PAnimationStagePlayer
 	{
 		private final RandomStage stage;
@@ -394,6 +467,9 @@ public class PRawAnimation
 			selectNext();
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public PAnimationStagePlayback currentPlayback()
 		{
@@ -401,6 +477,9 @@ public class PRawAnimation
 					this.stage.interpolationType(), this.stage.speed());
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public PAnimationStageTransition complete()
 		{

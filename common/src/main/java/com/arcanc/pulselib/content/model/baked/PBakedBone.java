@@ -41,6 +41,13 @@ import java.util.function.Function;
 
 /**
  * WARNING! Name should be unique per bone!
+ *
+ * @param name the name
+ * @param basePosition the unanimated local bone position
+ * @param baseRotation the unanimated local bone rotation
+ * @param children the child bones in hierarchy order
+ * @param parent the parent; may be {@code null}
+ * @param meshes the meshes
  */
 public record PBakedBone(String name,
                          Vector3f basePosition,
@@ -49,6 +56,17 @@ public record PBakedBone(String name,
                          @Nullable PBakedBone parent,
                          List<PBakedMesh> meshes)
 {
+	/**
+	 * Submits this bone's meshes and child bones using the supplied animation pose and material resolution.
+	 *
+	 * @param poseStack the current model-to-render pose stack
+	 * @param model the baked model supplying indexed bones and animations
+	 * @param pose the indexed bone pose
+	 * @param renderType the render type
+	 * @param color the packed ARGB vertex color
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param packedOverlay the packed overlay texture coordinates
+	 */
 	public void instantDraw(PoseStack poseStack,
 	                        PBakedModel model,
 	                        PPose pose,
@@ -61,6 +79,15 @@ public record PBakedBone(String name,
 		instantDraw(poseStack, model, pose, (bone, mesh, inherited) -> inherited, context);
 	}
 
+	/**
+	 * Submits this bone's meshes and child bones using the supplied animation pose and material resolution.
+	 *
+	 * @param poseStack the current model-to-render pose stack
+	 * @param model the baked model supplying indexed bones and animations
+	 * @param pose the indexed bone pose
+	 * @param resolver the resolver
+	 * @param inherited the render inputs inherited from the parent bone or renderer
+	 */
 	public void instantDraw(PoseStack poseStack,
 	                        PBakedModel model,
 	                        PPose pose,
@@ -81,6 +108,19 @@ public record PBakedBone(String name,
 		poseStack.popPose();
 	}
 
+	/**
+	 * Submits this bone's meshes and child bones using the supplied animation pose and material resolution.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param poseStack the current model-to-render pose stack
+	 * @param modelData the canonical model and loader selection
+	 * @param controllers the animation controllers in pose composition order
+	 * @param renderType the render type
+	 * @param color the packed ARGB vertex color
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param packedOverlay the packed overlay texture coordinates
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 */
 	public <T extends PAnimatable<T>> void instantDraw(PoseStack poseStack,
 	                                                   PModelData modelData,
 	                                                   Collection<PAnimationController<T>> controllers,
@@ -93,6 +133,20 @@ public record PBakedBone(String name,
 		instantDraw(poseStack, modelData, controllers, Map.of(), renderType, color, packedLight, packedOverlay, partialTick);
 	}
 
+	/**
+	 * Submits this bone's meshes and child bones using the supplied animation pose and material resolution.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param poseStack the current model-to-render pose stack
+	 * @param modelData the canonical model and loader selection
+	 * @param controllers the animation controllers in pose composition order
+	 * @param molangContexts the frame-specific Molang context of each controller
+	 * @param renderType the render type
+	 * @param color the packed ARGB vertex color
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param packedOverlay the packed overlay texture coordinates
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 */
 	public <T extends PAnimatable<T>> void instantDraw(PoseStack poseStack,
 	                                                   PModelData modelData,
 	                                                   Collection<PAnimationController<T>> controllers,
@@ -111,6 +165,17 @@ public record PBakedBone(String name,
 		instantDraw(poseStack, modelData, controllers, molangContexts, (bone, mesh, inherited) -> inherited, context, partialTick);
 	}
 	
+	/**
+	 * Submits this bone's meshes and child bones using the supplied animation pose and material resolution.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param poseStack the current model-to-render pose stack
+	 * @param modelData the canonical model and loader selection
+	 * @param controllers the animation controllers in pose composition order
+	 * @param resolver the resolver
+	 * @param inherited the render inputs inherited from the parent bone or renderer
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 */
 	public <T extends PAnimatable<T>> void instantDraw(PoseStack poseStack,
 	                                                   PModelData modelData,
 	                                                   Collection<PAnimationController<T>> controllers,
@@ -121,6 +186,18 @@ public record PBakedBone(String name,
 		instantDraw(poseStack, modelData, controllers, Map.of(), resolver, inherited, partialTick);
 	}
 
+	/**
+	 * Submits this bone's meshes and child bones using the supplied animation pose and material resolution.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param poseStack the current model-to-render pose stack
+	 * @param modelData the canonical model and loader selection
+	 * @param controllers the animation controllers in pose composition order
+	 * @param molangContexts the frame-specific Molang context of each controller
+	 * @param resolver the resolver
+	 * @param inherited the render inputs inherited from the parent bone or renderer
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 */
 	public <T extends PAnimatable<T>> void instantDraw(PoseStack poseStack,
 	                                                   PModelData modelData,
 	                                                   Collection<PAnimationController<T>> controllers,
@@ -141,7 +218,14 @@ public record PBakedBone(String name,
 		instantDraw(poseStack, poseResolver, resolver, inherited);
 	}
 
-	/** Renders this subtree from one resolved animation pose. */
+	/**
+	 * Renders this subtree from one resolved animation pose.
+	 *
+	 * @param poseStack the current model-to-render pose stack
+	 * @param poseResolver the pose resolver
+	 * @param resolver the resolver
+	 * @param inherited the render inputs inherited from the parent bone or renderer
+	 */
 	public void instantDraw(PoseStack poseStack,
 	                        PAnimationPoseResolver<?> poseResolver,
 	                        PMeshRenderResolver resolver,
@@ -164,6 +248,15 @@ public record PBakedBone(String name,
 		poseStack.popPose();
 	}
 	
+	/**
+	 * Samples the ordered controller contributions for this bone.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param model the baked model supplying indexed bones and animations
+	 * @param controllers the animation controllers in pose composition order
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the accumulated controller transform for this bone, or {@code null} when no animation channels contribute to the bone
+	 */
 	public <T extends PAnimatable<T>>@Nullable BoneFrame mixBone(
 			PBakedModel model,
 			Collection<PAnimationController<T>> controllers, float partialTick)
@@ -171,6 +264,16 @@ public record PBakedBone(String name,
 		return mixBone(model, controllers, Map.of(), partialTick);
 	}
 
+	/**
+	 * Samples the ordered controller contributions for this bone.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param model the baked model supplying indexed bones and animations
+	 * @param controllers the animation controllers in pose composition order
+	 * @param molangContexts the frame-specific Molang context of each controller
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the accumulated controller transform for this bone, or {@code null} when no animation channels contribute to the bone
+	 */
 	public <T extends PAnimatable<T>>@Nullable BoneFrame mixBone(
 			PBakedModel model,
 			Collection<PAnimationController<T>> controllers,
@@ -190,17 +293,49 @@ public record PBakedBone(String name,
 		return pose.hasTranslation() || pose.hasRotation() || pose.hasScale() ? pose.localTransform() : null;
 	}
 	
+	/**
+	 * Mutable hierarchy node used while converting source bones into baked render bones.
+	 */
 	public static final class PBakedBoneBuilder
 	{
+		/**
+		 * Source-model identity retained while linking the hierarchy.
+		 */
 		public final UUID uuid;
+		/**
+		 * Bone name used by animation tracks and attachment lookup.
+		 */
 		public final String name;
+		/**
+		 * Unanimated local bone position.
+		 */
 		public final Vector3f basePosition;
+		/**
+		 * Unanimated local bone rotation.
+		 */
 		public final Quaternionf baseRotation;
 		
+		/**
+		 * Parent builder node, or {@code null} for a root bone.
+		 */
 		public PBakedBoneBuilder parent;
+		/**
+		 * Child builder nodes linked below this bone.
+		 */
 		public final List<PBakedBoneBuilder> children = new ArrayList<>();
+		/**
+		 * Render-ready meshes attached to this bone.
+		 */
 		public final List<PBakedMesh> meshes = new ArrayList<>();
 		
+		/**
+		 * Creates a mutable baked-bone hierarchy node with the supplied bind transform.
+		 *
+		 * @param uuid the stable source-model bone identity
+		 * @param name the name
+		 * @param basePosition the unanimated local bone position
+		 * @param baseRotation the unanimated local bone rotation
+		 */
 		public PBakedBoneBuilder(
 				UUID uuid,
 				String name,

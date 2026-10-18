@@ -29,6 +29,13 @@ public abstract class LevelRendererTransparencyMixin
 	@Shadow
 	private @Nullable PostChain transparencyChain;
 
+	/**
+	 * Composites PulseLib translucency together with vanilla Fabulous transparency targets.
+	 *
+	 * @param chain the chain
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param original the original implementation or unmodified value supplied by the render hook
+	 */
 	@WrapOperation (method = "renderLevel", at = @At (value = "INVOKE",
 			target = "Lnet/minecraft/client/renderer/PostChain;process(F)V"))
 	private void pulselib$compositeFabulous(PostChain chain, float partialTick, Operation<Void> original)

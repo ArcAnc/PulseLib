@@ -29,9 +29,24 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Objects;
 
+/**
+ * Integrates PulseLib armor animation, attachment replacement and player deformation with the loader armor
+ * render path.
+ */
 @Mixin (HumanoidArmorLayer.class)
 public abstract class HumanoidArmorLayerMixin
 {
+	/**
+	 * Selects and animates the armor model supplied by a PulseLib armor provider.
+	 *
+	 * @param poses the poses
+	 * @param buffers the vanilla vertex buffer source
+	 * @param entity the entity being animated or rendered
+	 * @param slot the equipment slot being inspected
+	 * @param light the packed block and sky light coordinates
+	 * @param model the model
+	 * @param original the original implementation or unmodified value supplied by the render hook
+	 */
 	@WrapMethod (method = "renderArmorPiece")
 	private void pulselib$armorModel(PoseStack poses, MultiBufferSource buffers, LivingEntity entity,
 	                                 EquipmentSlot slot, int light, HumanoidModel<?> model, Operation<Void> original)
@@ -42,6 +57,17 @@ public abstract class HumanoidArmorLayerMixin
 		original.call(poses, buffers, entity, slot, light, model);
 	}
 
+	/**
+	 * Skips vanilla armor geometry replaced by an eligible living attachment.
+	 *
+	 * @param poses the poses
+	 * @param buffers the vanilla vertex buffer source
+	 * @param entity the entity being animated or rendered
+	 * @param slot the equipment slot being inspected
+	 * @param light the packed block and sky light coordinates
+	 * @param model the model
+	 * @param callback the Mixin callback used to inspect or replace the intercepted result
+	 */
 	@Inject (method = "renderArmorPiece", at = @At ("HEAD"), cancellable = true)
 	private void pulselib$hideVanillaArmor(PoseStack poses, MultiBufferSource buffers, LivingEntity entity,
 	                                       EquipmentSlot slot, int light, HumanoidModel<?> model, CallbackInfo callback)
@@ -50,6 +76,17 @@ public abstract class HumanoidArmorLayerMixin
 			callback.cancel();
 	}
 
+	/**
+	 * Applies provider animation and active player deformation to the selected armor model.
+	 *
+	 * @param poses the poses
+	 * @param buffers the vanilla vertex buffer source
+	 * @param entity the entity being animated or rendered
+	 * @param slot the equipment slot being inspected
+	 * @param light the packed block and sky light coordinates
+	 * @param model the model
+	 * @param callback the Mixin callback used to inspect or replace the intercepted result
+	 */
 	@Inject (method = "renderArmorPiece", at = @At (value = "INVOKE",
 		target = "Lnet/minecraft/client/renderer/entity/layers/HumanoidArmorLayer;setPartVisibility(Lnet/minecraft/client/model/HumanoidModel;Lnet/minecraft/world/entity/EquipmentSlot;)V", shift = At.Shift.AFTER))
 	private void pulselib$deformArmor(PoseStack poses, MultiBufferSource buffers, LivingEntity entity,

@@ -20,6 +20,9 @@ import net.minecraft.client.renderer.RenderType;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
+/**
+ * Maps render pipelines and geometry objects to stable handles used in render plans.
+ */
 public final class GlResourceRegistry
 {
 	private final Map<RenderType, PPipelineHandle> pipelines = new IdentityHashMap<>();
@@ -32,6 +35,12 @@ public final class GlResourceRegistry
 	private final GlGeometryArena geometryArena = new GlGeometryArena();
 	private long nextHandle;
 
+	/**
+	 * Registers a render pipeline or resolves an existing pipeline handle.
+	 *
+	 * @param pipeline the pipeline
+	 * @return the registered pipeline handle or resolved render type
+	 */
 	public PPipelineHandle pipeline(RenderType pipeline)
 	{
 		return this.pipelines.computeIfAbsent(pipeline, resource ->
@@ -42,6 +51,12 @@ public final class GlResourceRegistry
 		});
 	}
 
+	/**
+	 * Registers dynamic geometry and returns its render-plan mesh handle.
+	 *
+	 * @param geometry the dynamically updated geometry
+	 * @return the mesh handle registered for the dynamic geometry
+	 */
 	public PMeshHandle dynamic(PDynamicGeometry geometry)
 	{
 		if (!(geometry instanceof GlDynamicGeometry mesh))
@@ -54,6 +69,12 @@ public final class GlResourceRegistry
 		});
 	}
 
+	/**
+	 * Registers a render pipeline or resolves an existing pipeline handle.
+	 *
+	 * @param handle the handle
+	 * @return the registered pipeline handle or resolved render type
+	 */
 	public RenderType pipeline(PPipelineHandle handle)
 	{
 		RenderType result = this.pipelineResources.get(handle);
@@ -62,6 +83,12 @@ public final class GlResourceRegistry
 		return result;
 	}
 
+	/**
+	 * Resolves the vanilla vertex buffer associated with a dynamic mesh handle.
+	 *
+	 * @param handle the handle
+	 * @return the vertex buffer associated with the dynamic mesh handle
+	 */
 	public VertexBuffer mesh(PMeshHandle handle)
 	{
 		GlDynamicGeometry result = this.meshResources.get(handle);
@@ -70,6 +97,12 @@ public final class GlResourceRegistry
 		return result.vertexBuffer();
 	}
 
+	/**
+	 * Returns the draw index count of the supplied dynamic geometry.
+	 *
+	 * @param geometry the dynamically updated geometry
+	 * @return the draw index count of the supplied dynamic geometry
+	 */
 	public int indexCount(PDynamicGeometry geometry)
 	{
 		if (!(geometry instanceof GlDynamicGeometry mesh))
@@ -77,6 +110,12 @@ public final class GlResourceRegistry
 		return mesh.indexCount();
 	}
 
+	/**
+	 * Registers immutable geometry or resolves its shared arena slice.
+	 *
+	 * @param mesh the immutable indexed mesh geometry
+	 * @return the registered mesh handle or resolved shared arena slice
+	 */
 	public PMeshHandle geometry(PGeometryData mesh)
 	{
 		return this.geometry.computeIfAbsent(mesh, resource ->
@@ -88,6 +127,12 @@ public final class GlResourceRegistry
 		});
 	}
 
+	/**
+	 * Registers immutable geometry or resolves its shared arena slice.
+	 *
+	 * @param handle the handle
+	 * @return the registered mesh handle or resolved shared arena slice
+	 */
 	public GlGeometryArena.Slice geometry(PMeshHandle handle)
 	{
 		GlGeometryArena.Slice result = this.geometryResources.get(handle);
@@ -96,11 +141,25 @@ public final class GlResourceRegistry
 		return result;
 	}
 
+	/**
+	 * Returns whether a mesh handle refers to immutable arena geometry.
+	 *
+	 * @param handle the handle
+	 * @return whether a mesh handle refers to immutable arena geometry
+	 */
 	public boolean isGeometry(PMeshHandle handle)
 	{
 		return this.geometryResources.containsKey(handle);
 	}
 
+	/**
+	 * Builds a draw command with arena offsets and the supplied instance count.
+	 *
+	 * @param handle the handle
+	 * @param indexCount the number of indices to draw
+	 * @param instanceCount the number of instances to draw
+	 * @return the draw command containing resolved geometry and instance offsets
+	 */
 	public PDrawCommand resolveCommand(PMeshHandle handle, int indexCount, int instanceCount)
 	{
 		GlGeometryArena.Slice slice = this.geometryResources.get(handle);
@@ -112,6 +171,9 @@ public final class GlResourceRegistry
 		return new PDrawCommand(indexCount, instanceCount, slice.firstIndex(data.indexType()), slice.baseVertex(), 0);
 	}
 
+	/**
+	 * Releases registered geometry and clears pipeline and mesh handle mappings.
+	 */
 	public void clear()
 	{
 		this.pipelines.clear();

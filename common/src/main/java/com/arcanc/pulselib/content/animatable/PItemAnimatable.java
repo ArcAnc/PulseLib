@@ -12,8 +12,18 @@ package com.arcanc.pulselib.content.animatable;
 
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 
+/**
+ * Animatable item contract that exposes the PulseLib item renderer.
+ *
+ * @param <T> the animatable owner type
+ */
 public interface PItemAnimatable<T extends PAnimatable<T>> extends PAnimatable<T>
 {
+	/**
+	 * Returns the custom item renderer used for this animatable item.
+	 *
+	 * @return the custom item renderer used for this animatable item
+	 */
 	default BlockEntityWithoutLevelRenderer getPulseItemRenderer()
 	{
 		return null;

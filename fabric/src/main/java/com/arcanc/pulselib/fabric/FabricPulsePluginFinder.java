@@ -24,10 +24,16 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Pattern;
 
+/**
+ * Finds PulseLib plugin annotations in Fabric mod roots and loader-declared development class roots.
+ */
 public final class FabricPulsePluginFinder implements IPulsePluginFinder
 {
 	private @Nullable List<PulsePluginCandidate> candidates;
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public synchronized List<PulsePluginCandidate> findPlugins()
 	{
@@ -73,6 +79,10 @@ public final class FabricPulsePluginFinder implements IPulsePluginFinder
 
 	/**
 	 * Only loader-declared path groups and compiled siblings of known mod resource roots.
+	 *
+	 * @param modRoots the resource roots declared by Fabric mod containers
+	 * @param pathGroups the loader-declared development classpath groups
+	 * @return the loader-owned development class roots and compiled siblings of known resource roots
 	 */
 	static Set<Path> developmentRoots(Set<Path> modRoots, String pathGroups)
 	{

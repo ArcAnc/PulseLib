@@ -26,6 +26,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Set;
 
+/**
+ * Creates deformable cuboids while baking player model layers inside the deformation bake scope.
+ */
 @Mixin(CubeDefinition.class)
 public class CubeDefinitionMixin
 {
@@ -44,6 +47,13 @@ public class CubeDefinitionMixin
 	@Shadow @Final
 	private Set<Direction> visibleFaces;
 
+	/**
+	 * Replaces a player-scope baked cube with geometry that supports vertex deformation.
+	 *
+	 * @param textureWidth the texture width
+	 * @param textureHeight the texture height
+	 * @param callback the Mixin callback used to inspect or replace the intercepted result
+	 */
 	@Inject(method = "bake", at = @At("HEAD"), cancellable = true)
 	private void pulselib$bakePlayerDeformedCube(int textureWidth, int textureHeight,
 												CallbackInfoReturnable<ModelPart.Cube> callback)

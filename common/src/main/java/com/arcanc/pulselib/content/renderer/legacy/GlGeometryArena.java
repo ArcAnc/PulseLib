@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Allocates immutable mesh geometry into shared OpenGL pages.
+ */
 public final class GlGeometryArena
 {
 	private static final int PAGE_BYTES = 4 * 1024 * 1024;
@@ -30,11 +33,20 @@ public final class GlGeometryArena
 	private final Map<PGeometryData, Slice> slices = new Object2ObjectOpenHashMap<>();
 	private final List<Page> pages = new ArrayList<>();
 
+	/**
+	 * Uploads or reuses geometry and returns its page slice.
+	 *
+	 * @param geometry the immutable indexed mesh geometry
+	 * @return the geometry page slice containing the registered mesh
+	 */
 	public Slice register(PGeometryData geometry)
 	{
 		return this.slices.computeIfAbsent(geometry, this :: append);
 	}
 
+	/**
+	 * Releases all arena pages and registered geometry slices.
+	 */
 	public void clear()
 	{
 		for (Page page : this.pages)
@@ -56,14 +68,31 @@ public final class GlGeometryArena
 		return page.append(geometry);
 	}
 
+	/**
+	 * Vertex and index range occupied by a mesh in a shared geometry page.
+	 *
+	 * @param vertexArray the vertex array
+	 * @param indexOffset the index offset
+	 * @param indexType the unsigned index element representation
+	 * @param baseVertex the vertex offset added to each index
+	 */
 	public record Slice(int vertexArray, long indexOffset, int indexType, int baseVertex)
 	{
+		/**
+		 * Binds the arena page containing this geometry slice.
+		 */
 		public void bind()
 		{
 			BufferUploader.invalidate();
 			GL30.glBindVertexArray(this.vertexArray);
 		}
 
+		/**
+		 * Returns the index-element offset for the supplied index width.
+		 *
+		 * @param type the type
+		 * @return the index-element offset for the supplied index width
+		 */
 		public int firstIndex(PGeometryData.IndexType type)
 		{
 			if (this.indexOffset % type.bytes() != 0)
@@ -72,6 +101,9 @@ public final class GlGeometryArena
 		}
 	}
 
+	/**
+	 * OpenGL vertex and index storage allocated for a group of immutable meshes.
+	 */
 	private static final class Page
 	{
 		private final int vertexBuffer;

@@ -9,6 +9,9 @@
 
 package com.arcanc.pulselib.content.renderer.plan;
 
+/**
+ * Marker for geometry whose backing vertex data can change between render submissions.
+ */
 public interface PDynamicGeometry
 {
 }

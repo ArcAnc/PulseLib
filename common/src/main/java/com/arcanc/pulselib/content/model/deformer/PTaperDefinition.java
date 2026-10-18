@@ -15,9 +15,21 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.joml.Vector3f;
 
+/**
+ * Serializable taper configuration with longitudinal extents and an animated tip scale.
+ *
+ * @param origin the local pivot or origin of the deformation
+ * @param lengthAxis the axis along which the deformation extent is measured
+ * @param positiveExtent the positive-axis deformation extent
+ * @param negativeExtent the negative-axis deformation extent
+ * @param tipScale the tip scale channel reference and its fallback value
+ */
 public record PTaperDefinition(Vector3f origin, Vector3f lengthAxis, float positiveExtent, float negativeExtent,
 								PChannelReference<Float> tipScale)
 {
+	/**
+	 * Serialization codec for taper definition.
+	 */
 	public static final MapCodec<PTaperDefinition> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.
 			group(
 					PLibCodecs.VECTOR3F_CODEC.fieldOf("origin").forGetter(PTaperDefinition::origin),
@@ -27,6 +39,15 @@ public record PTaperDefinition(Vector3f origin, Vector3f lengthAxis, float posit
 					PChannelReference.FLOAT.fieldOf("tip_scale").forGetter(PTaperDefinition::tipScale)).
 			apply(instance, PTaperDefinition::new));
 
+	/**
+	 * Creates the deformation configuration and copies its local origin and axis inputs.
+	 *
+	 * @param origin the local pivot or origin of the deformation
+	 * @param lengthAxis the axis along which the deformation extent is measured
+	 * @param positiveExtent the positive-axis deformation extent
+	 * @param negativeExtent the negative-axis deformation extent
+	 * @param tipScale the tip scale channel reference and its fallback value
+	 */
 	public PTaperDefinition
 	{
 		origin = new Vector3f(origin);

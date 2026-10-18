@@ -38,6 +38,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Converts Gecko geometry, bone hierarchy, locators, UVs and animation tracks into the common source-model
+ * representation.
+ */
 public class PGeckoModelParser
 {
 	private static final float MODEL_SCALE = 1f / 16f;
@@ -105,6 +109,14 @@ public class PGeckoModelParser
 				}
 			});
 	
+	/**
+	 * Parses geometry and optional animation streams into one source model.
+	 *
+	 * @param modelStream the geometry input stream
+	 * @param animationStream the optional animation input stream
+	 * @return the parsed source-model hierarchy and geometry
+	 * @throws IOException if the source resource cannot be read
+	 */
 	public static PModel parse(InputStream modelStream, InputStream animationStream) throws IOException
 	{
 		PModel model = parseModel(modelStream);
@@ -112,6 +124,13 @@ public class PGeckoModelParser
 		return model;
 	}
 	
+	/**
+	 * Parses a Gecko geometry stream into source bones and mesh primitives.
+	 *
+	 * @param stream the source resource input stream
+	 * @return the parsed source-model hierarchy and geometry
+	 * @throws IOException if the source resource cannot be read
+	 */
 	public static PModel parseModel(InputStream stream) throws IOException
 	{
 		JsonElement root = parseJson(stream);
@@ -158,11 +177,26 @@ public class PGeckoModelParser
 		return model;
 	}
 	
+	/**
+	 * Decodes named Gecko animations against the supplied model hierarchy.
+	 *
+	 * @param stream the source resource input stream
+	 * @param model the parsed source-model hierarchy and geometry
+	 * @return the decoded animation clips indexed by source name
+	 * @throws IOException if the source resource cannot be read
+	 */
 	public static Map<String, PAnimation> parseAnimations(InputStream stream, PModel model) throws IOException
 	{
 		return parseAnimations(parseJson(stream), model);
 	}
 	
+	/**
+	 * Decodes named Gecko animations against the supplied model hierarchy.
+	 *
+	 * @param root the root
+	 * @param model the parsed source-model hierarchy and geometry
+	 * @return the decoded animation clips indexed by source name
+	 */
 	public static Map<String, PAnimation> parseAnimations(JsonElement root, PModel model)
 	{
 		Map<String, PAnimation> animations = new LinkedHashMap<>();
@@ -678,32 +712,89 @@ public class PGeckoModelParser
 		return element != null && element.isJsonArray();
 	}
 	
+	/**
+	 * Source bone and its unresolved parent-name link.
+	 *
+	 * @param childName the child name
+	 * @param parentName the parent name
+	 */
 	private record BoneLink(String childName, String parentName)
 	{
 	}
 	
+	/**
+	 * Decoded Gecko bone data retained while the hierarchy is linked.
+	 *
+	 * @param name the name
+	 * @param parentName the parent name
+	 * @param absolutePivot the absolute pivot
+	 * @param rotation the local quaternion rotation
+	 * @param cubes the cubes
+	 * @param locators the locators
+	 */
 	private record RawBone(String name, String parentName, Vector3f absolutePivot, Vector3f rotation, JsonElement cubes, JsonElement locators)
 	{
 	}
 	
+	/**
+	 * Source locator translation and rotation relative to its parent bone.
+	 *
+	 * @param position the position
+	 * @param rotation the local quaternion rotation
+	 */
 	private record LocatorTransform(Vector3f position, Quaternionf rotation)
 	{
 	}
 	
+	/**
+	 * Texture-coordinate configuration for a Gecko cuboid.
+	 *
+	 * @param north the north
+	 * @param south the south
+	 * @param east the east
+	 * @param west the west
+	 * @param up the local up basis direction
+	 * @param down the down
+	 */
 	private record CubeUv(FaceUv north, FaceUv south, FaceUv east, FaceUv west, FaceUv up, FaceUv down)
 	{
 	}
 	
+	/**
+	 * Texture-coordinate rectangle and orientation for one cuboid face.
+	 *
+	 * @param min the min
+	 * @param max the max
+	 */
 	private record FaceUv(Vector2f min, Vector2f max)
 	{
 	}
 	
+	/**
+	 * Texture dimensions used to normalize Gecko UV coordinates.
+	 *
+	 * @param width the width
+	 * @param height the height
+	 */
 	private record TextureSize(float width, float height)
 	{
 	}
 
+	/**
+	 * Three component expressions sampled into a source-format vector.
+	 *
+	 * @param x the Molang expression for the x component
+	 * @param y the Molang expression for the y component
+	 * @param z the Molang expression for the z component
+	 */
 	private record VectorExpression(MolangParser.Expression x, MolangParser.Expression y, MolangParser.Expression z)
 	{
+		/**
+		 * Evaluates the three source component expressions into a vector.
+		 *
+		 * @param data the optional expression context used to sample source-format animation values
+		 * @return the three-component vector
+		 */
 		Vector3f evaluate(Object data)
 		{
 			return new Vector3f(
@@ -720,6 +811,9 @@ public class PGeckoModelParser
 		}
 	}
 	
+	/**
+	 * Growable vertex attributes and triangle indices collected during Gecko geometry conversion.
+	 */
 	private static class GeometryBuffers
 	{
 		private final List<Float> positions = new ArrayList<>();
@@ -727,6 +821,13 @@ public class PGeckoModelParser
 		private final List<Float> uvs = new ArrayList<>();
 		private final List<Integer> indices = new ArrayList<>();
 		
+		/**
+		 * Appends one vertex position, normal and texture coordinate.
+		 *
+		 * @param position the position
+		 * @param normal the local surface normal
+		 * @param uv the uv
+		 */
 		void addVertex(Vector3f position, Vector3f normal, Vector2f uv)
 		{
 			this.positions.add(position.x());
@@ -739,6 +840,13 @@ public class PGeckoModelParser
 			this.uvs.add(uv.y());
 		}
 		
+		/**
+		 * Appends a triangle using the supplied vertex indices.
+		 *
+		 * @param a the a
+		 * @param b the b
+		 * @param c the c
+		 */
 		void addTriangle(int a, int b, int c)
 		{
 			this.indices.add(a);
@@ -746,31 +854,61 @@ public class PGeckoModelParser
 			this.indices.add(c);
 		}
 		
+		/**
+		 * Returns the number of vertices collected in the geometry buffers.
+		 *
+		 * @return the number of vertices collected in the geometry buffers
+		 */
 		int vertexCount()
 		{
 			return this.positions.size() / 3;
 		}
 		
+		/**
+		 * Returns the number of collected triangle indices.
+		 *
+		 * @return the number of collected triangle indices
+		 */
 		int indexCount()
 		{
 			return this.indices.size();
 		}
 		
+		/**
+		 * Returns the collected vertex positions as packed float data.
+		 *
+		 * @return the collected vertex positions as packed float data
+		 */
 		FloatBuffer positions()
 		{
 			return floatBuffer(this.positions);
 		}
 		
+		/**
+		 * Returns the collected vertex normals as packed float data.
+		 *
+		 * @return the collected vertex normals as packed float data
+		 */
 		FloatBuffer normals()
 		{
 			return floatBuffer(this.normals);
 		}
 		
+		/**
+		 * Returns the collected texture coordinates as packed float data.
+		 *
+		 * @return the collected texture coordinates as packed float data
+		 */
 		FloatBuffer uvs()
 		{
 			return floatBuffer(this.uvs);
 		}
 		
+		/**
+		 * Returns the vertex or buffer output.
+		 *
+		 * @return the vertex or buffer output
+		 */
 		ByteBuffer indices()
 		{
 			ByteBuffer buffer = ByteBuffer.allocateDirect(this.indices.size() * Integer.BYTES).order(ByteOrder.nativeOrder());

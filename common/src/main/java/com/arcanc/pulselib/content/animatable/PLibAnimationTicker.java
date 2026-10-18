@@ -14,8 +14,16 @@ import com.arcanc.pulselib.content.animatable.singleton.SingletonAnimationManage
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
 import net.minecraft.client.multiplayer.ClientLevel;
 
+/**
+ * Advances client animation managers and periodically removes unused owner state.
+ */
 public final class PLibAnimationTicker
 {
+	/**
+	 * Ticks animation state for the supplied client level.
+	 *
+	 * @param level the level
+	 */
 	public static void clientTick(ClientLevel level)
 	{
 		SingletonAnimationManager.tickAll();
@@ -24,6 +32,9 @@ public final class PLibAnimationTicker
 		PPlayerAnimations.tick(level);
 	}
 
+	/**
+	 * Runs animation manager maintenance after the client tick.
+	 */
 	public static void afterClientTick()
 	{
 		SingletonAnimationManager.removeUnused();

@@ -42,8 +42,14 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
+/**
+ * Fabric client entry point for shader, atlas, reload, attachment and animation lifecycle integration.
+ */
 public final class PulseLibFabricClient implements ClientModInitializer
 {
+	/**
+	 * Installs Fabric client registrations, reload listeners, render hooks and animation lifecycle callbacks.
+	 */
 	@Override
 	public void onInitializeClient()
 	{
@@ -68,20 +74,44 @@ public final class PulseLibFabricClient implements ClientModInitializer
 		});
 	}
 
+	/**
+	 * Fabric resource reload adapter that loads PulseLib models after the required atlas resources.
+	 */
 	private static final class ModelReloadListener implements IdentifiableResourceReloadListener
 	{
+		/**
+		 * Returns the stable identifier of the PulseLib model reload listener.
+		 *
+		 * @return the stable identifier of the PulseLib model reload listener
+		 */
 		@Override
 		public ResourceLocation getFabricId()
 		{
 			return PLibDatabase.rl("models");
 		}
 
+		/**
+		 * Returns reload listener dependencies required before models can be baked.
+		 *
+		 * @return reload listener dependencies required before models can be baked
+		 */
 		@Override
 		public Collection<ResourceLocation> getFabricDependencies()
 		{
 			return List.of(ResourceReloadListenerKeys.MODELS, ResourceReloadListenerKeys.TEXTURES);
 		}
 
+		/**
+		 * Delegates model preparation and application to the shared model cache.
+		 *
+		 * @param barrier the barrier separating reload preparation from application
+		 * @param manager the manager
+		 * @param prepareProfiler the profiler for reload preparation
+		 * @param applyProfiler the profiler for applying prepared reload data
+		 * @param prepareExecutor the executor used for background reload preparation
+		 * @param applyExecutor the executor used to apply prepared reload results
+		 * @return a future completing when PulseLib models have been published
+		 */
 		@Override
 		public CompletableFuture<Void> reload(PreparationBarrier barrier, ResourceManager manager,
 		                                      ProfilerFiller prepareProfiler, ProfilerFiller applyProfiler,

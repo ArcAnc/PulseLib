@@ -14,7 +14,12 @@ import com.arcanc.pulselib.content.player.animation.PPlayerAnimationAnchor;
 import net.minecraft.resources.ResourceLocation;
 
 /**
- * Immutable value object representing player first person anchor pose.
+ * Resolved animated action anchor in first-person player presentation.
+ *
+ * @param animation the namespaced resource or registry identifier
+ * @param anchor the anchor
+ * @param transform the transform
+ * @param weight the contribution weight
  */
 public record PPlayerFirstPersonAnchorPose(
 		ResourceLocation animation,

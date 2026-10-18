@@ -20,6 +20,12 @@ public final class PTextureReference
 	{
 	}
 
+	/**
+	 * Converts a source texture reference into the canonical override lookup form.
+	 *
+	 * @param reference the reference value or channel used by this operation
+	 * @return the normalized texture override lookup key
+	 */
 	public static String normalize(String reference)
 	{
 		Objects.requireNonNull(reference);

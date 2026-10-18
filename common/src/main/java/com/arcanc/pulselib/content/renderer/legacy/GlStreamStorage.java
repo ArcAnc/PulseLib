@@ -18,6 +18,9 @@ import org.lwjgl.opengl.*;
 import java.nio.FloatBuffer;
 import java.util.List;
 
+/**
+ * Uploads pose and deformer streams and binds their storage to the active shader.
+ */
 public final class GlStreamStorage
 {
 	private static int operationsBuffer = -1;
@@ -29,6 +32,12 @@ public final class GlStreamStorage
 	{
 	}
 
+	/**
+	 * Uploads changed frame streams and binds the shader resources they require.
+	 *
+	 * @param shader the shader instance receiving frame stream bindings
+	 * @param streams the pose and deformer streams for the current frame
+	 */
 	public static void bind(ShaderInstance shader, PFrameStreams streams)
 	{
 		upload(streams.deformers());
@@ -39,6 +48,9 @@ public final class GlStreamStorage
 		GL13.glActiveTexture(activeTexture);
 	}
 
+	/**
+	 * Releases GPU storage allocated for frame streams.
+	 */
 	public static void cleanup()
 	{
 		if (operationsTexture != -1)

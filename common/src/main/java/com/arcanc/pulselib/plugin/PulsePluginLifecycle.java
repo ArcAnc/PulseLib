@@ -19,22 +19,61 @@ import java.util.Objects;
  */
 public final class PulsePluginLifecycle
 {
+	/**
+	 * Ordered common and client plugin registration phases.
+	 */
 	public enum Phase
 	{
+		/**
+		 * Common animation channel registration phase.
+		 */
 		CHANNELS,
+		/**
+		 * Common animation event registration phase.
+		 */
 		EVENTS,
+		/**
+		 * Common mesh deformer registration phase.
+		 */
 		DEFORMERS,
+		/**
+		 * Client living attachment registration phase.
+		 */
 		ATTACHMENTS,
+		/**
+		 * Client player animation definition registration phase.
+		 */
 		PLAYER_ANIMATIONS,
+		/**
+		 * Client animated attachment renderer registration phase.
+		 */
 		ANIMATED_ATTACHMENTS,
+		/**
+		 * Reloadable client model resource registration phase.
+		 */
 		MODELS
 	}
 
+	/**
+	 * Execution state of one plugin registration phase.
+	 */
 	public enum State
 	{
+		/**
+		 * The registration phase has not started.
+		 */
 		PENDING,
+		/**
+		 * Registration callbacks for the phase are running.
+		 */
 		ACTIVE,
+		/**
+		 * The phase completed successfully.
+		 */
 		COMPLETE,
+		/**
+		 * The phase failed and subsequent lifecycle checks retain its failure.
+		 */
 		FAILED
 	}
 
@@ -42,11 +81,23 @@ public final class PulsePluginLifecycle
 	private final EnumMap<Phase, Throwable> failures = new EnumMap<>(Phase.class);
 	private @Nullable Phase active;
 
+	/**
+	 * Returns the current state of the requested registration phase.
+	 *
+	 * @param phase the normalized animation cycle phase
+	 * @return the current state of the requested registration phase
+	 */
 	public State state(Phase phase)
 	{
 		return this.states.getOrDefault(Objects.requireNonNull(phase), State.PENDING);
 	}
 
+	/**
+	 * Starts a registration phase when permitted and reports whether its callbacks should run.
+	 *
+	 * @param phase the normalized animation cycle phase
+	 * @return whether its callbacks should run
+	 */
 	public boolean begin(Phase phase)
 	{
 		Objects.requireNonNull(phase);
@@ -64,6 +115,11 @@ public final class PulsePluginLifecycle
 		return true;
 	}
 
+	/**
+	 * Marks the active registration phase as successfully completed.
+	 *
+	 * @param phase the normalized animation cycle phase
+	 */
 	public void complete(Phase phase)
 	{
 		requireActive(phase);
@@ -72,6 +128,12 @@ public final class PulsePluginLifecycle
 		this.active = null;
 	}
 
+	/**
+	 * Marks the active phase as failed and retains the failure for subsequent lifecycle checks.
+	 *
+	 * @param phase the normalized animation cycle phase
+	 * @param failure the failure that prevents the registration phase from completing
+	 */
 	public void fail(Phase phase, Throwable failure)
 	{
 		requireActive(phase);

@@ -7,6 +7,9 @@
  * Details can be found in the license file in the root folder of this project
  */
 
+/**
+ * Serializable mesh deformer definitions and CPU position, normal and local-frame evaluation.
+ */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @FieldsAreNonnullByDefault

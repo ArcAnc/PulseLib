@@ -16,9 +16,17 @@ import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
+/**
+ * Exposes Fabric sprite-source type registration in the vanilla atlas source registry.
+ */
 @Mixin (SpriteSources.class)
 public interface SpriteSourcesAccessor
 {
+	/**
+	 * Returns the sprite source type registry used by vanilla atlas definitions.
+	 *
+	 * @return the sprite source type registry used by vanilla atlas definitions
+	 */
 	@Accessor ("TYPES")
 	static BiMap<ResourceLocation, SpriteSourceType> pulselib$getTypes()
 	{

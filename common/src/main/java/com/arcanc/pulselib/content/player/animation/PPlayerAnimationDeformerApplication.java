@@ -12,6 +12,12 @@ package com.arcanc.pulselib.content.player.animation;
 import com.arcanc.pulselib.content.model.deformer.PDeformerStack;
 import com.arcanc.pulselib.content.player.deformer.PPlayerDeformerValueSource;
 
+/**
+ * Prepared player deformation contribution and its sampled activation weight.
+ *
+ * @param stack the item stack supplying render or animation state
+ * @param values the values
+ */
 public record PPlayerAnimationDeformerApplication(PDeformerStack stack, PPlayerDeformerValueSource values)
 {
 }

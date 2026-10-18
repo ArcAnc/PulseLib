@@ -10,11 +10,20 @@
 package com.arcanc.pulselib.content.player.animation.firstPerson;
 
 /**
- * Enumerates the available first person render mode values.
+ * Choice between vanilla, animation-driven and hidden first-person geometry.
  */
 public enum PFirstPersonRenderMode
 {
+	/**
+	 * Renders using the original vanilla hand-pass transform.
+	 */
 	VANILLA,
+	/**
+	 * Renders using the sampled animation transform.
+	 */
 	ANIMATED,
+	/**
+	 * Suppresses the selected first-person geometry.
+	 */
 	HIDDEN
 }

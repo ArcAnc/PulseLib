@@ -19,8 +19,26 @@ import net.minecraft.world.item.ItemStack;
  */
 public interface PArmorModelProvider
 {
+	/**
+	 * Selects the non-null humanoid model used to render the current armor piece.
+	 *
+	 * @param entity the entity being animated or rendered
+	 * @param stack the item stack supplying render or animation state
+	 * @param slot the equipment slot being inspected
+	 * @param original the original implementation or unmodified value supplied by the render hook
+	 * @return the non-null humanoid model to render for this armor piece
+	 */
 	HumanoidModel<?> getPulseArmorModel(LivingEntity entity, ItemStack stack, EquipmentSlot slot, HumanoidModel<?> original);
 
+	/**
+	 * Updates the selected armor model for the current entity and render sample.
+	 *
+	 * @param entity the entity being animated or rendered
+	 * @param stack the item stack supplying render or animation state
+	 * @param slot the equipment slot being inspected
+	 * @param model the model
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 */
 	default void setupPulseArmorAnimations(LivingEntity entity, ItemStack stack, EquipmentSlot slot,
 	                                       HumanoidModel<?> model, float partialTick)
 	{

@@ -21,13 +21,25 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Provides support for animation controller.
+ * Owns raw-animation or graph playback for one animatable controller. Playback positions are measured in
+ * game ticks; the persistent Molang context keeps instance variables across evaluations.
+ *
+ * @param <T> the animatable owner type
  */
 public class PAnimationController<T extends PAnimatable<T>>
 {
+	/**
+	 * Returns the registration name of this controller.
+	 */
 	protected final String name;
+	/**
+	 * Callback that requests the controller state on each owner tick.
+	 */
 	protected final StateHandler<T> stateHandler;
 	
+	/**
+	 * Selected raw animation sequence, or {@code null} when no raw sequence is active.
+	 */
 	protected @Nullable PRawAnimation currentAnimation;
 	
 	private int stageIndex;
@@ -46,8 +58,9 @@ public class PAnimationController<T extends PAnimatable<T>>
 	private @Nullable PAnimationPoseResolver.MolangContextProvider<T> graphSnapshotContexts;
 	
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param stateHandler the state handler to use.
+	 * Creates a controller with the supplied state handler or graph and controller identity.
+	 *
+	 * @param stateHandler the callback selecting the controller playback state
 	 */
 	public PAnimationController(StateHandler<T> stateHandler)
 	{
@@ -55,9 +68,10 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 	
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param name the name to use.
-	 * @param stateHandler the state handler to use.
+	 * Creates a controller with the supplied state handler or graph and controller identity.
+	 *
+	 * @param name the registered controller name
+	 * @param stateHandler the callback selecting the controller playback state
 	 */
 	public PAnimationController(String name, StateHandler<T> stateHandler)
 	{
@@ -65,10 +79,11 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param name the name to use.
-	 * @param stateHandler the state handler to use.
-	 * @param randomSeed deterministic seed for runtime animation stages.
+	 * Creates a controller with the supplied state handler or graph and controller identity.
+	 *
+	 * @param name the registered controller name
+	 * @param stateHandler the callback selecting the controller playback state
+	 * @param randomSeed the deterministic seed used by runtime animation stages
 	 */
 	public PAnimationController(String name, StateHandler<T> stateHandler, long randomSeed)
 	{
@@ -79,8 +94,9 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 	
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param graph the graph to use.
+	 * Creates a controller with the supplied state handler or graph and controller identity.
+	 *
+	 * @param graph the immutable animation state graph
 	 */
 	public PAnimationController(PAnimationGraph graph)
 	{
@@ -88,9 +104,10 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 	
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param name the name to use.
-	 * @param graph the graph to use.
+	 * Creates a controller with the supplied state handler or graph and controller identity.
+	 *
+	 * @param name the registered controller name
+	 * @param graph the immutable animation state graph
 	 */
 	public PAnimationController(String name, PAnimationGraph graph)
 	{
@@ -99,8 +116,9 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 	
 	/**
-	 * Performs the play operation.
-	 * @param graph the graph to use.
+	 * Switches to the supplied animation graph and resets playback, transitions and interpolation history.
+	 *
+	 * @param graph the immutable animation state graph
 	 */
 	public void play(PAnimationGraph graph)
 	{
@@ -119,8 +137,9 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Performs the graph runtime operation.
-	 * @return the value produced by this operation.
+	 * Returns the active graph runtime, or {@code null} while this controller uses raw animation playback.
+	 *
+	 * @return the active graph runtime, or {@code null} while this controller uses raw animation playback
 	 */
 	public @Nullable PAnimationGraphRuntime graphRuntime()
 	{
@@ -141,10 +160,11 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Sets the parameter.
-	 * @param name the name to use.
-	 * @param value the value to use.
-	 * @return the value produced by this operation.
+	 * Updates a named parameter of the active animation graph.
+	 *
+	 * @param name the graph parameter name
+	 * @param value the value written by this operation
+	 * @return this instance
 	 */
 	public PAnimationController<T> setParameter(String name, float value)
 	{
@@ -155,10 +175,11 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Sets the parameter.
-	 * @param name the name to use.
-	 * @param value the value to use.
-	 * @return the value produced by this operation.
+	 * Updates a named parameter of the active animation graph.
+	 *
+	 * @param name the graph parameter name
+	 * @param value the value written by this operation
+	 * @return this instance
 	 */
 	public PAnimationController<T> setParameter(String name, boolean value)
 	{
@@ -169,9 +190,10 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Performs the trigger operation.
-	 * @param name the name to use.
-	 * @return the value produced by this operation.
+	 * Raises a named trigger in the active animation graph.
+	 *
+	 * @param name the graph parameter name
+	 * @return this instance
 	 */
 	public PAnimationController<T> trigger(String name)
 	{
@@ -182,8 +204,10 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 	
 	/**
-	 * Performs the play operation.
-	 * @param animation the animation to use.
+	 * Selects a raw animation sequence, retaining an already active identical sequence when its playback state
+	 * allows it.
+	 *
+	 * @param animation the raw animation sequence to play
 	 */
 	public void play(PRawAnimation animation)
 	{
@@ -205,7 +229,7 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 	
 	/**
-	 * Performs the pause operation.
+	 * Pauses an actively playing controller without clearing its playback position.
 	 */
 	public void pause()
 	{
@@ -214,7 +238,7 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 	
 	/**
-	 * Performs the resume operation.
+	 * Resumes a paused controller from its current playback position.
 	 */
 	public void resume()
 	{
@@ -223,7 +247,7 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 	
 	/**
-	 * Performs the stop operation.
+	 * Clears raw playback state and resets the controller clock to zero.
 	 */
 	public void stop()
 	{
@@ -241,8 +265,9 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 	
 	/**
-	 * Returns the state.
-	 * @return the value produced by this operation.
+	 * Returns the current controller playback state.
+	 *
+	 * @return the current controller playback state
 	 */
 	public ControllerState getState()
 	{
@@ -250,8 +275,9 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 	
 	/**
-	 * Determines whether playing.
-	 * @return the value produced by this operation.
+	 * Returns whether the controller is advancing playback.
+	 *
+	 * @return whether the controller is advancing playback
 	 */
 	public boolean isPlaying()
 	{
@@ -259,8 +285,9 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 	
 	/**
-	 * Determines whether paused.
-	 * @return the value produced by this operation.
+	 * Returns whether playback is paused at its current position.
+	 *
+	 * @return whether playback is paused at its current position
 	 */
 	public boolean isPaused()
 	{
@@ -268,8 +295,9 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 	
 	/**
-	 * Determines whether stopped.
-	 * @return the value produced by this operation.
+	 * Returns whether the controller is stopped.
+	 *
+	 * @return whether the controller is stopped
 	 */
 	public boolean isStopped()
 	{
@@ -277,13 +305,14 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 	
 	/**
-	 * Calculates the bone transformations.
-	 * @param boneName the bone name to use.
-	 * @param model the model to use.
-	 * @param partialTick the partial tick to use.
-	 * @param molangContext the molang context to use.
-	 * @param accumulatedFrame the accumulated frame to use.
-	 * @return the value produced by this operation.
+	 * Samples this controller's transform contribution for one bone at the interpolated playback position.
+	 *
+	 * @param boneName the animation bone name
+	 * @param model the baked model supplying indexed bones and animations
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param molangContext the Molang values used for this animation sample
+	 * @param accumulatedFrame the transform contributed by preceding controllers; may be {@code null}
+	 * @return the sampled transform contribution for the selected bone, or {@code null} when playback or the selected bone track has no contribution
 	 */
 	public @Nullable BoneFrame calculateBoneTransformations(String boneName,
 	                                                        PBakedModel model,
@@ -313,13 +342,14 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Calculates the bone transformations.
-	 * @param animation the animation to use.
-	 * @param boneIndex the bone index to use.
-	 * @param partialTick the partial tick to use.
-	 * @param molangContext the molang context to use.
-	 * @param accumulatedFrame the accumulated frame to use.
-	 * @return the value produced by this operation.
+	 * Samples this controller's transform contribution for one bone at the interpolated playback position.
+	 *
+	 * @param animation the animation
+	 * @param boneIndex the zero-based baked-model bone index
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param molangContext the Molang values used for this animation sample
+	 * @param accumulatedFrame the transform contributed by preceding controllers; may be {@code null}
+	 * @return the sampled transform contribution for the selected bone, or {@code null} when playback or the selected bone track has no contribution
 	 */
 	public @Nullable BoneFrame calculateBoneTransformations(PCompiledAnimation animation,
 	                                                        int boneIndex,
@@ -341,8 +371,9 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Performs the persistent molang context operation.
-	 * @return the value produced by this operation.
+	 * Returns the controller-owned Molang context whose instance variables persist between samples.
+	 *
+	 * @return the controller-owned Molang context whose instance variables persist between samples
 	 */
 	public MolangParser.Context persistentMolangContext()
 	{
@@ -350,10 +381,11 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Performs the tick operation.
-	 * @param animatable the animatable to use.
-	 * @param tickCount the tick count to use.
-	 * @param model the model to use.
+	 * Updates the requested controller state and advances playback using the owner tick count and bound model.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param tickCount the owner tick count used to advance controller playback
+	 * @param model the baked model supplying indexed bones and animations
 	 */
 	public void tick(T animatable, float tickCount, PBakedModel model)
 	{
@@ -361,11 +393,12 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 	
 	/**
-	 * Performs the tick operation.
-	 * @param animatable the animatable to use.
-	 * @param tickCount the tick count to use.
-	 * @param model the model to use.
-	 * @param poseControllers the pose controllers to use.
+	 * Updates the requested controller state and advances playback using the owner tick count and bound model.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param tickCount the owner tick count used to advance controller playback
+	 * @param model the baked model supplying indexed bones and animations
+	 * @param poseControllers the controllers contributing to locator or pose resolution
 	 */
 	public void tick(T animatable, float tickCount, PBakedModel model, Collection<PAnimationController<T>> poseControllers)
 	{
@@ -537,10 +570,11 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Performs the floor mod operation.
-	 * @param value the value to use.
-	 * @param modulus the modulus to use.
-	 * @return the value produced by this operation.
+	 * Wraps a tick position into a non-negative cycle interval.
+	 *
+	 * @param value the value written by this operation
+	 * @param modulus the modulus
+	 * @return the tick position wrapped into the cycle interval
 	 */
 	private static float floorMod(float value, float modulus)
 	{
@@ -549,7 +583,7 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 	
 	/**
-	 * Performs the next stage operation.
+	 * Advances the raw sequence to its next stage or stops when no stages remain.
 	 */
 	private void nextStage()
 	{
@@ -610,9 +644,10 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 	
 	/**
-	 * Returns the interpolated time.
-	 * @param partialTick the partial tick to use.
-	 * @return the value produced by this operation.
+	 * Returns the render-time playback position in game ticks, accounting for cycle seams.
+	 *
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the render-time playback position in game ticks, accounting for cycle seams
 	 */
 	public float getInterpolatedTime(float partialTick)
 	{
@@ -623,8 +658,9 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 	
 	/**
-	 * Returns the time.
-	 * @return the value produced by this operation.
+	 * Returns the current playback position in game ticks.
+	 *
+	 * @return the current playback position in game ticks
 	 */
 	public float getTime()
 	{
@@ -634,9 +670,10 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 	
 	/**
-	 * Performs the cycle phase operation.
-	 * @param model the model to use.
-	 * @return the value produced by this operation.
+	 * Returns the normalized position within the active animation cycle.
+	 *
+	 * @param model the baked model supplying indexed bones and animations
+	 * @return the normalized position within the active animation cycle
 	 */
 	public float cyclePhase(PBakedModel model)
 	{
@@ -675,6 +712,12 @@ public class PAnimationController<T extends PAnimatable<T>>
 		this.stageStarted = false;
 	}
 
+	/**
+	 * Moves playback to the supplied animation time without advancing the owner tick count.
+	 *
+	 * @param model the baked model supplying indexed bones and animations
+	 * @param animationTime the animation playback position supplied to this operation
+	 */
 	public void seek(PBakedModel model, float animationTime)
 	{
 		if (this.graphRuntime != null)
@@ -704,9 +747,10 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Performs the graph layers operation.
-	 * @param model the model to use.
-	 * @return the value produced by this operation.
+	 * Returns the animation layers contributed by the active graph for the supplied model.
+	 *
+	 * @param model the baked model supplying indexed bones and animations
+	 * @return the animation layers contributed by the active graph for the supplied model
 	 */
 	public List<PAnimationGraphRuntime.Layer> graphLayers(PBakedModel model)
 	{
@@ -715,6 +759,11 @@ public class PAnimationController<T extends PAnimatable<T>>
 		return this.graphRuntime.layers(model);
 	}
 	
+	/**
+	 * Chooses the playback state of a controller from the current animatable state.
+	 *
+	 * @param <T> the animatable owner type
+	 */
 	@FunctionalInterface
 /**
  * Defines the contract for state handler.
@@ -722,16 +771,18 @@ public class PAnimationController<T extends PAnimatable<T>>
 	public interface StateHandler<T extends PAnimatable<T>>
 	{
 		/**
-		 * Performs the handle operation.
-		 * @param state the state to use.
-		 * @return the value produced by this operation.
+		 * Evaluates the owner state and returns the requested controller playback state.
+		 *
+		 * @param state the state
+		 * @return the playback state requested for this owner tick
 		 */
 		ControllerState handle(AnimatableState<T> state);
 	}
 
 	/**
-	 * Performs the name operation.
-	 * @return the value produced by this operation.
+	 * Returns the registration name of this controller.
+	 *
+	 * @return the registration name of this controller
 	 */
 	public String name()
 	{
@@ -739,8 +790,12 @@ public class PAnimationController<T extends PAnimatable<T>>
 	}
 	
 /**
- * Immutable value object representing animatable state.
- */
+	 * Owner, controller, tick and model values supplied to a controller state handler.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param animatable the owner whose animation state is being processed
+	 * @param controller the controller supplying playback and persistent expression state
+	 */
 	public record AnimatableState<T extends PAnimatable<T>>(T animatable, PAnimationController<T> controller)
 	{
 	}

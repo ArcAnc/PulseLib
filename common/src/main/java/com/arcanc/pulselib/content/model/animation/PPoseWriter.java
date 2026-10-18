@@ -12,11 +12,32 @@ package com.arcanc.pulselib.content.model.animation;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+/**
+ * Receives sampled translation, rotation and scale values for indexed bones.
+ */
 public interface PPoseWriter
 {
+	/**
+	 * Writes the translation channel of the selected bone.
+	 *
+	 * @param boneIndex the zero-based baked-model bone index
+	 * @param value the new local translation value
+	 */
 	void translation(int boneIndex, Vector3f value);
 
+	/**
+	 * Writes the rotation channel of the selected bone.
+	 *
+	 * @param boneIndex the zero-based baked-model bone index
+	 * @param value the new local rotation value
+	 */
 	void rotation(int boneIndex, Quaternionf value);
 
+	/**
+	 * Writes the scale channel of the selected bone.
+	 *
+	 * @param boneIndex the zero-based baked-model bone index
+	 * @param value the new local scale value
+	 */
 	void scale(int boneIndex, Vector3f value);
 }

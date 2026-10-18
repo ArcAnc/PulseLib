@@ -10,13 +10,16 @@
 package com.arcanc.pulselib.content.registration.block.block_entity.ber;
 
 
+import com.arcanc.pulselib.content.animatable.PAnimationController;
 import com.arcanc.pulselib.content.model.baked.PBakedBone;
-import com.arcanc.pulselib.test.SmokeHarness;
 import com.arcanc.pulselib.content.model.baked.PMeshRenderContext;
 import com.arcanc.pulselib.content.model.textures.PAlphaMode;
 import com.arcanc.pulselib.content.registration.block.block_entity.TestBlockEntity;
 import com.arcanc.pulselib.content.renderer.PBlockRenderer;
 import com.arcanc.pulselib.content.renderer.modelData.PModelData;
+import com.arcanc.pulselib.data.gecko.MolangParser;
+import com.arcanc.pulselib.test.AnimationSamplingHarness;
+import com.arcanc.pulselib.test.SmokeHarness;
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.arcanc.pulselib.util.PRenderTypes;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -31,13 +34,22 @@ public class TestBlockEntityRenderer extends PBlockRenderer<TestBlockEntity>
 	public static final ResourceLocation CUBE = PLibDatabase.rl("block/test_block/cube_texture");
 	public static final ResourceLocation ZERO = PLibDatabase.rl("block/test_block/0");
 	public static final PModelData MODEL_DATA = PModelData.block(PLibDatabase.rl("test_block"));
-	
+
 	public TestBlockEntityRenderer(final BlockEntityRendererProvider.Context ctx)
 	{
 		super(MODEL_DATA,
 				PRenderTypes.RenderTypeProvider :: trianglesTranslucent);
 	}
-	
+
+	@Override
+	protected void populateMolangContext(TestBlockEntity animatable,
+	                                    PAnimationController<TestBlockEntity> controller,
+	                                    MolangParser.Context context,
+	                                    float partialTick)
+	{
+		AnimationSamplingHarness.checkTime(controller, context, partialTick);
+	}
+
 	@Override
 	protected PMeshRenderContext resolveBoneRender(TestBlockEntity animatable,
 	                                               PBakedBone bone,

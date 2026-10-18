@@ -15,6 +15,7 @@ import com.arcanc.pulselib.content.animatable.PAnimatable;
 import com.arcanc.pulselib.content.animatable.PAnimationController;
 import com.arcanc.pulselib.content.animatable.PAnimationManager;
 import com.arcanc.pulselib.content.animatable.instance.InstanceAnimationManager;
+import com.arcanc.pulselib.content.model.animation.PAnimationEvaluationContext;
 import com.arcanc.pulselib.content.model.animation.PPose;
 import com.arcanc.pulselib.content.model.baked.*;
 import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
@@ -49,6 +50,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * Base entity renderer that samples PulseLib animation, submits bone meshes and renders bound model layers.
+ *
+ * @param <T> the animatable owner type
+ */
 public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>> extends EntityRenderer<T>
 	implements PRenderer<T>
 {
@@ -56,6 +62,13 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>> extends
 	private final Function<ResourceLocation, RenderType> renderType;
 	private final Map<String, List<PEntityRenderLayer<T>>> renderLayers = new Object2ObjectOpenHashMap<>();
 
+	/**
+	 * Creates an entity renderer using the loader context, model selection and pipeline resolver.
+	 *
+	 * @param context the vanilla entity renderer construction context
+	 * @param modelData the canonical model and loader selection
+	 * @param renderType the render type
+	 */
 	public PEntityRenderer(EntityRendererProvider.Context context, PModelData modelData, Function<ResourceLocation, RenderType> renderType)
 	{
 		super(context);
@@ -63,24 +76,39 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>> extends
 		this.renderType = renderType;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public PModelData getModelData(T animatable)
 	{
 		return this.modelData;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public @Nullable PBakedModel getModel(T animatable)
 	{
 		return getModelData(animatable).getModel();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public RenderType getRenderType(ResourceLocation texture)
 	{
 		return this.renderType.apply(texture);
 	}
 
+	/**
+	 * Attaches an additional model render layer to the named entity bone.
+	 *
+	 * @param boneName the animation bone name
+	 * @param renderLayer the render layer
+	 */
 	public void addRenderLayer(String boneName, PEntityRenderLayer<T> renderLayer)
 	{
 		this.renderLayers.compute(boneName, (bone, listLayers) ->
@@ -92,6 +120,17 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>> extends
 		});
 	}
 
+	/**
+	 * Samples entity animation, submits model and bound layer geometry, and preserves vanilla entity-render
+	 * integration.
+	 *
+	 * @param entity the entity being animated or rendered
+	 * @param entityYaw the entity yaw in degrees
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param poseStack the current model-to-render pose stack
+	 * @param bufferSource the vanilla vertex buffer source
+	 * @param packedLight the packed block and sky light coordinates
+	 */
 	@Override
 	public void render(T entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight)
 	{
@@ -124,18 +163,30 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>> extends
 		}
 	}
 
+	/**
+	 * Returns {@code null} because textures are resolved separately for each baked mesh.
+	 *
+	 * @param entity the entity being animated or rendered
+	 * @return {@code null}; each baked mesh supplies its own texture selection
+	 */
 	@Override
 	public @Nullable ResourceLocation getTextureLocation(T entity)
 	{
 		return null;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void preSubmit(PoseStack poseStack, T animatable, Function<ResourceLocation, RenderType> renderType, MultiBufferSource bufferSource, int packedLight, int packedOverlay, float partialTick, @Nullable Object... additionalData)
 	{
 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void trueSubmit(PoseStack poseStack, T animatable, Function<ResourceLocation, RenderType> renderType, MultiBufferSource bufferSource, int packedLight, int packedOverlay, float partialTick, @Nullable Object... additionalData)
 	{
@@ -172,12 +223,36 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>> extends
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void postSubmit(PoseStack poseStack, T animatable, Function<ResourceLocation, RenderType> renderType, MultiBufferSource bufferSource, int packedLight, int packedOverlay, float partialTick, @Nullable Object... additionalData)
 	{
 
 	}
 
+	/**
+	 * Submits the selected bone and its descendants using the sampled pose and inherited mesh render context.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param poseStack the current model-to-render pose stack
+	 * @param bone the baked bone being sampled or submitted
+	 * @param pose the indexed bone pose
+	 * @param controllers the animation controllers in pose composition order
+	 * @param data the canonical model and loader selection
+	 * @param renderType the render type
+	 * @param packedColor the packed ARGB vertex color
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param packedOverlay the packed overlay texture coordinates
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param headRotation the interpolated head rotation used by bone-specific rendering; may be {@code null}
+	 * @param renderLayer the render layer; may be {@code null}
+	 * @param entityBonePoses the exact entity bone matrices captured for attached render layers; may be {@code null}
+	 * @param layerTransform the additional local transform of an entity render layer; may be {@code null}
+	 * @param deferredLayers the render layers waiting for their bound entity bone transforms; may be {@code null}
+	 * @param molangContexts the frame-specific Molang context of each controller
+	 */
 	protected void perBoneSubmit(T animatable,
 	                             PoseStack poseStack,
 	                             PBakedBone bone,
@@ -205,6 +280,24 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>> extends
 				headRotation, renderLayer, entityBonePoses, layerTransform, deferredLayers, molangContexts);
 	}
 
+	/**
+	 * Submits the selected bone and its descendants using the sampled pose and inherited mesh render context.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param poseStack the current model-to-render pose stack
+	 * @param bone the baked bone being sampled or submitted
+	 * @param pose the indexed bone pose
+	 * @param controllers the animation controllers in pose composition order
+	 * @param data the canonical model and loader selection
+	 * @param inherited the render inputs inherited from the parent bone or renderer
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param headRotation the interpolated head rotation used by bone-specific rendering; may be {@code null}
+	 * @param renderLayer the render layer; may be {@code null}
+	 * @param entityBonePoses the exact entity bone matrices captured for attached render layers; may be {@code null}
+	 * @param layerTransform the additional local transform of an entity render layer; may be {@code null}
+	 * @param deferredLayers the render layers waiting for their bound entity bone transforms; may be {@code null}
+	 * @param molangContexts the frame-specific Molang context of each controller
+	 */
 	protected void perBoneSubmit(T animatable,
 	                             PoseStack poseStack,
 	                             PBakedBone bone,
@@ -322,7 +415,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>> extends
 		for (PAnimationController<T> controller : controllers)
 		{
 			MolangParser.Context context = new MolangParser.Context().
-					query("anim_time", controller.getInterpolatedTime(partialTick)).
+					query("anim_time", PAnimationEvaluationContext.ticksToSeconds(controller.getInterpolatedTime(partialTick))).
 					randomSeed(key.key());
 			populateMolangContext(animatable, controller, context, partialTick);
 			contexts.put(controller, context);
@@ -330,6 +423,14 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>> extends
 		return contexts;
 	}
 
+	/**
+	 * Populates owner-specific Molang queries for this controller and render sample.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param controller the controller supplying playback and persistent expression state
+	 * @param context the Molang context containing current frame and instance values
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 */
 	protected void populateMolangContext(T animatable,
 	                                    PAnimationController<T> controller,
 	                                    MolangParser.Context context,
@@ -356,6 +457,20 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>> extends
 			pose.mul(layerTransform);
 	}
 
+	/**
+	 * Submits one bone hierarchy using the supplied model and controller inputs.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param bone the baked bone being sampled or submitted
+	 * @param poseStack the current model-to-render pose stack
+	 * @param modelData the canonical model and loader selection
+	 * @param controllers the animation controllers in pose composition order
+	 * @param renderType the render type
+	 * @param color the packed ARGB vertex color
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param packedOverlay the packed overlay texture coordinates
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 */
 	protected void submitBone(T animatable,
 	                          PBakedBone bone,
 	                          PoseStack poseStack,
@@ -369,6 +484,21 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>> extends
 	{
 		submitBone(animatable, bone, poseStack, modelData, controllers, renderType, color, packedLight, packedOverlay, partialTick, null);
 	}
+	/**
+	 * Submits one bone hierarchy using the supplied model and controller inputs.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param bone the baked bone being sampled or submitted
+	 * @param poseStack the current model-to-render pose stack
+	 * @param modelData the canonical model and loader selection
+	 * @param controllers the animation controllers in pose composition order
+	 * @param renderType the render type
+	 * @param color the packed ARGB vertex color
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param packedOverlay the packed overlay texture coordinates
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param renderLayer the render layer; may be {@code null}
+	 */
 	protected void submitBone(T animatable,
 	                          PBakedBone bone,
 	                          PoseStack poseStack,
@@ -385,6 +515,17 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>> extends
 				new PMeshRenderContext(renderType, color, packedLight, packedOverlay), partialTick, renderLayer);
 	}
 
+	/**
+	 * Submits one bone hierarchy using the supplied model and controller inputs.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param bone the baked bone being sampled or submitted
+	 * @param poseStack the current model-to-render pose stack
+	 * @param modelData the canonical model and loader selection
+	 * @param controllers the animation controllers in pose composition order
+	 * @param inherited the render inputs inherited from the parent bone or renderer
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 */
 	protected void submitBone(T animatable,
 	                          PBakedBone bone,
 	                          PoseStack poseStack,
@@ -396,6 +537,18 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>> extends
 		submitBone(animatable, bone, poseStack, modelData, controllers, inherited, partialTick, null);
 	}
 
+	/**
+	 * Submits one bone hierarchy using the supplied model and controller inputs.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param bone the baked bone being sampled or submitted
+	 * @param poseStack the current model-to-render pose stack
+	 * @param modelData the canonical model and loader selection
+	 * @param controllers the animation controllers in pose composition order
+	 * @param inherited the render inputs inherited from the parent bone or renderer
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param renderLayer the render layer; may be {@code null}
+	 */
 	protected void submitBone(T animatable,
 	                          PBakedBone bone,
 	                          PoseStack poseStack,
@@ -432,6 +585,15 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>> extends
 		}
 	}
 
+	/**
+	 * Resolves render overrides inherited by the selected bone and its meshes.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param bone the baked bone being sampled or submitted
+	 * @param inherited the render inputs inherited from the parent bone or renderer
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the inherited or overridden mesh render inputs
+	 */
 	protected PMeshRenderContext resolveBoneRender(T animatable,
 	                                               PBakedBone bone,
 	                                               PMeshRenderContext inherited,
@@ -440,6 +602,16 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>> extends
 		return inherited;
 	}
 
+	/**
+	 * Resolves final render overrides for one mesh of the selected bone.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param bone the baked bone being sampled or submitted
+	 * @param mesh the baked mesh geometry and material
+	 * @param inherited the render inputs inherited from the parent bone or renderer
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the inherited or overridden mesh render inputs
+	 */
 	protected PMeshRenderContext resolveMeshRender(T animatable,
 	                                               PBakedBone bone,
 	                                               PBakedMesh mesh,
@@ -449,6 +621,14 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>> extends
 		return inherited;
 	}
 
+	/**
+	 * Applies entity positioning and returns the interpolated head rotation inputs.
+	 *
+	 * @param entity the entity being animated or rendered
+	 * @param poseStack the current model-to-render pose stack
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the interpolated relative head yaw and pitch
+	 */
 	protected HeadRotation applyPositioning(LivingEntity entity, PoseStack poseStack, float partialTick)
 	{
 		/// Vanilla copy paste
@@ -491,6 +671,16 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>> extends
 		return new HeadRotation(diffAngle, headPitch);
 	}
 
+	/**
+	 * Applies living-entity body, death, sleeping and movement rotations to the render pose.
+	 *
+	 * @param entity the entity being animated or rendered
+	 * @param poseStack the current model-to-render pose stack
+	 * @param bob the bob
+	 * @param yBodyRot the interpolated body yaw in degrees
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param scale the model scale factor
+	 */
 	protected void setupRotations(LivingEntity entity, PoseStack poseStack, float bob, float yBodyRot, float partialTick, float scale)
 	{
 		if (entity.isFullyFrozen())
@@ -539,10 +729,19 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>> extends
 		};
 	}
 
+	/**
+	 * Interpolated head yaw and pitch used while submitting entity bones.
+	 *
+	 * @param headYaw the head yaw
+	 * @param headPitch the head pitch in degrees
+	 */
 	public record HeadRotation(float headYaw, float headPitch)
 	{
 	}
 
+	/**
+	 * Captured entity layer submission deferred until the required parent bone pose is known.
+	 */
 	protected final class DeferredLayerSubmit
 	{
 		private final PEntityRenderLayer<T> layer;

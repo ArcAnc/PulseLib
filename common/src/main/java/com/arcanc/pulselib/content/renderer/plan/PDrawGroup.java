@@ -11,6 +11,15 @@ package com.arcanc.pulselib.content.renderer.plan;
 
 import java.util.List;
 
+/**
+ * Compatible render pipeline, geometry, draw command and instance data grouped for execution.
+ *
+ * @param pipeline the pipeline
+ * @param mesh the mesh
+ * @param command the command
+ * @param writeDepth whether this draw group writes depth
+ * @param instances the instances
+ */
 public record PDrawGroup(
 		PPipelineHandle pipeline,
 		PMeshHandle mesh,
@@ -18,6 +27,15 @@ public record PDrawGroup(
 		boolean writeDepth,
 		List<PInstanceHeader> instances)
 {
+	/**
+	 * Copies the instances belonging to one compatible pipeline and geometry draw.
+	 *
+	 * @param pipeline the pipeline
+	 * @param mesh the mesh
+	 * @param command the command
+	 * @param writeDepth whether this draw group writes depth
+	 * @param instances the instances
+	 */
 	public PDrawGroup
 	{
 		if (command.instanceCount() != instances.size())
@@ -25,6 +43,12 @@ public record PDrawGroup(
 		instances = List.copyOf(instances);
 	}
 
+	/**
+	 * Returns a draw-group copy using the supplied resolved draw command.
+	 *
+	 * @param command the command
+	 * @return a draw-group copy using the supplied resolved draw command
+	 */
 	public PDrawGroup withCommand(PDrawCommand command)
 	{
 		return new PDrawGroup(this.pipeline, this.mesh, command, this.writeDepth, this.instances);

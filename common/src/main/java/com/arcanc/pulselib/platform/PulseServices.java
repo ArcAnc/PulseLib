@@ -11,14 +11,27 @@ package com.arcanc.pulselib.platform;
 
 import java.util.ServiceLoader;
 
+/**
+ * ServiceLoader access to loader-specific implementations required by common code.
+ */
 public final class PulseServices
 {
+	/**
+	 * Loader-provided physical-side and entity behavior service.
+	 */
 	public static final IPulsePlatform PLATFORM = load(IPulsePlatform.class);
 
 	private PulseServices()
 	{
 	}
 
+	/**
+	 * Loads the required implementation of the supplied platform service interface.
+	 *
+	 * @param <T> the value type carried by this contract
+	 * @param service the platform service interface to resolve
+	 * @return the active loader's required service implementation
+	 */
 	public static <T> T load(Class<T> service)
 	{
 		var providers = ServiceLoader.load(service).stream().toList();

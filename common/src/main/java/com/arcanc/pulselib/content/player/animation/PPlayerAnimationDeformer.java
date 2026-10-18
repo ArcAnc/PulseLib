@@ -13,11 +13,25 @@ import com.arcanc.pulselib.content.model.deformer.PDeformerStack;
 
 import java.util.Objects;
 
+/**
+ * Player model part, prepared mesh deformer stack and animation-aware channel value provider.
+ *
+ * @param part the player model part receiving the contribution
+ * @param stack the item stack supplying render or animation state
+ * @param values the values
+ */
 public record PPlayerAnimationDeformer(
 		PPlayerPart part,
 		PDeformerStack stack,
 		PPlayerAnimationDeformerValueSource values)
 {
+	/**
+	 * Binds an animation-aware deformation stack to a player model part.
+	 *
+	 * @param part the player model part receiving the contribution
+	 * @param stack the item stack supplying render or animation state
+	 * @param values the values
+	 */
 	public PPlayerAnimationDeformer
 	{
 		Objects.requireNonNull(part);

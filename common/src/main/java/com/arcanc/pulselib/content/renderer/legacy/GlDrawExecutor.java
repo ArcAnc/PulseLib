@@ -36,6 +36,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Executes compiled render plans using OpenGL geometry arenas, instancing and weighted transparency.
+ */
 public final class GlDrawExecutor implements PRenderExecutor
 {
 	private static final int STRIDE = 12 * 4 + 4 * 4 + 2 * 4 + 2 * 4 + 4 * 4;
@@ -57,11 +60,21 @@ public final class GlDrawExecutor implements PRenderExecutor
 	private boolean persistentIndirectMapping;
 	private boolean multiDrawIndirect;
 
+	/**
+	 * Creates an OpenGL executor backed by the supplied resource registry.
+	 *
+	 * @param resources the resources
+	 */
 	public GlDrawExecutor(GlResourceRegistry resources)
 	{
 		this.resources = resources;
 	}
 
+	/**
+	 * Returns the storage, draw submission and upload modes selected by this executor.
+	 *
+	 * @return the storage, draw submission and upload modes selected by this executor
+	 */
 	@Override
 	public PRenderCapabilities capabilities()
 	{
@@ -71,23 +84,47 @@ public final class GlDrawExecutor implements PRenderExecutor
 		return this.capabilityMatrix.selectedCapabilities(PRenderCapabilities.StorageMode.TEXEL_BUFFER, this.persistentMapping);
 	}
 
+	/**
+	 * Returns the detected OpenGL feature matrix.
+	 *
+	 * @return the detected OpenGL feature matrix
+	 */
 	public PRenderCapabilityMatrix capabilityMatrix()
 	{
 		return this.capabilityMatrix;
 	}
 
+	/**
+	 * Executes the supplied render plan with the captured frame matrices and optional depth source.
+	 *
+	 * @param plan the plan
+	 * @param frame the frame matrices or sampled animation values used by this operation
+	 */
 	@Override
 	public void execute(PRenderPlan plan, PRenderFrame frame)
 	{
 		execute(plan, frame, Minecraft.getInstance().getMainRenderTarget());
 	}
 
+	/**
+	 * Executes the supplied render plan with the captured frame matrices and optional depth source.
+	 *
+	 * @param plan the plan
+	 * @param frame the frame matrices or sampled animation values used by this operation
+	 * @param depthSource the render target supplying opaque scene depth
+	 */
 	public void execute(PRenderPlan plan, PRenderFrame frame, RenderTarget depthSource)
 	{
 		execute(plan, frame, depthSource, true);
 	}
 
-	/** Draws sorted local transparency directly into the caller's bound target. */
+	/**
+	 * Draws sorted local transparency directly into the caller's bound target.
+	 *
+	 * @param plan the plan
+	 * @param frame the frame matrices or sampled animation values used by this operation
+	 * @param target the target
+	 */
 	public void executeLocal(PRenderPlan plan, PRenderFrame frame, GlRenderState target)
 	{
 		GlRenderState previous = this.localTarget;
@@ -171,16 +208,30 @@ public final class GlDrawExecutor implements PRenderExecutor
 		}
 	}
 
+	/**
+	 * Composites accumulated weighted transparency into the destination target.
+	 *
+	 * @param destination the mutable object receiving the result
+	 */
 	public void compositeOit(RenderTarget destination)
 	{
 		this.weightedBlendedOit.composite(destination);
 	}
 
+	/**
+	 * Composites weighted transparency with the supplied Fabulous render targets.
+	 *
+	 * @param destination the mutable object receiving the result
+	 * @param targets the vanilla Fabulous transparency targets
+	 */
 	public void compositeFabulousOit(RenderTarget destination, List<RenderTarget> targets)
 	{
 		this.weightedBlendedOit.compositeFabulous(destination, targets);
 	}
 
+	/**
+	 * Releases instance, indirect-draw, stream and transparency resources owned by this executor.
+	 */
 	@Override
 	public void cleanup()
 	{
@@ -470,18 +521,42 @@ public final class GlDrawExecutor implements PRenderExecutor
 		}
 	}
 
+	/**
+	 * Batch identity for draw groups sharing a geometry arena and compatible render state.
+	 *
+	 * @param vertexArray the vertex array
+	 * @param indexType the unsigned index element representation
+	 */
 	private record ArenaBatchKey(int vertexArray, int indexType)
 	{
 	}
 
+	/**
+	 * Transparency subpass selected while executing a render plan.
+	 */
 	private enum OitPass
 	{
+		/**
+		 * Uses conventional rendering without an OIT subpass.
+		 */
 		NONE,
+		/**
+		 * Finds the nearest translucent depth layer.
+		 */
 		DEPTH,
+		/**
+		 * Finds the next translucent depth layer behind a preceding layer.
+		 */
 		DEPTH_PEEL,
+		/**
+		 * Accumulates weighted translucent color and revealage.
+		 */
 		ACCUMULATION
 	}
 
+	/**
+	 * Streaming storage for per-instance transforms, colors, light and deformation offsets.
+	 */
 	private static final class InstanceBuffer
 	{
 		private int vbo = -1;
@@ -617,6 +692,9 @@ public final class GlDrawExecutor implements PRenderExecutor
 		}
 	}
 
+	/**
+	 * Streaming storage for packed indirect draw commands.
+	 */
 	private static final class IndirectBuffer
 	{
 		private static final int INTS_PER_COMMAND = 5;

@@ -11,12 +11,20 @@ package com.arcanc.pulselib.content.renderer.legacy;
 
 import org.lwjgl.opengl.GL32;
 
+/**
+ * Rotating frame slots guarded by GPU fences for safe streamed-buffer reuse.
+ */
 public final class GlFrameArena
 {
 	private static final long MAX_REUSE_WAIT_NANOS = 1_000_000L;
 	private final long[] fences;
 	private long submissionIndex;
 
+	/**
+	 * Allocates rotating frame slots with GPU completion tracking.
+	 *
+	 * @param slots the number of rotating GPU frame slots
+	 */
 	public GlFrameArena(int slots)
 	{
 		if (slots < 1)
@@ -24,6 +32,12 @@ public final class GlFrameArena
 		this.fences = new long[slots];
 	}
 
+	/**
+	 * Acquires a reusable frame slot with a bounded wait when persistent storage is active.
+	 *
+	 * @param persistent whether the upload storage uses persistent mapping
+	 * @return the reusable frame slot, or the busy-slot sentinel when no slot is available
+	 */
 	public int begin(boolean persistent)
 	{
 		if (!persistent)
@@ -37,7 +51,12 @@ public final class GlFrameArena
 		return -1;
 	}
 
-	/** Local previews must complete their submission even when the ring is busy. */
+	/**
+	 * Local previews must complete their submission even when the ring is busy.
+	 *
+	 * @param persistent whether the upload storage uses persistent mapping
+	 * @return the reusable slot after any required GPU wait
+	 */
 	public int beginWaiting(boolean persistent)
 	{
 		int slot = (int)(this.submissionIndex++ % this.fences.length);
@@ -46,12 +65,23 @@ public final class GlFrameArena
 		return slot;
 	}
 
+	/**
+	 * Marks the submitted slot for GPU completion tracking when persistent storage is used.
+	 *
+	 * @param slot the zero-based GPU frame-arena slot index
+	 * @param persistent whether the upload storage uses persistent mapping
+	 */
 	public void finish(int slot, boolean persistent)
 	{
 		if (persistent)
 			this.markSubmitted(slot);
 	}
 
+	/**
+	 * Waits until the GPU has finished using the selected frame slot.
+	 *
+	 * @param slot the zero-based GPU frame-arena slot index
+	 */
 	public void await(int slot)
 	{
 		long fence = this.fences[slot];
@@ -83,12 +113,18 @@ public final class GlFrameArena
 		return true;
 	}
 
+	/**
+	 * Waits for all pending frame slots before storage is replaced.
+	 */
 	public void awaitAll()
 	{
 		for (int slot = 0; slot < this.fences.length; slot++)
 			this.await(slot);
 	}
 
+	/**
+	 * Deletes pending synchronization state and resets slot selection.
+	 */
 	public void reset()
 	{
 		this.awaitAll();

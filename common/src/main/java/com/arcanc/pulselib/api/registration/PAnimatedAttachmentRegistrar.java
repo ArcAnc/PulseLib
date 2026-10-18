@@ -16,10 +16,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Collects animated player attachment renderers during a client plugin callback.
+ */
 public class PAnimatedAttachmentRegistrar extends PulseRegistrar
 {
 	private final List<Runnable> actions = new ArrayList<>();
 
+	/**
+	 * Queues an animated attachment renderer for installation.
+	 *
+	 * @param renderer the renderer
+	 */
 	public void register(PPlayerAnimatedAttachmentRenderer renderer)
 	{
 		checkOpen();
@@ -27,6 +35,9 @@ public class PAnimatedAttachmentRegistrar extends PulseRegistrar
 		this.actions.add(() -> PPlayerAnimatedAttachments.register(renderer));
 	}
 
+	/**
+	 * Installs the collected renderers and closes this registration scope.
+	 */
 	public void apply()
 	{
 		checkOpen();

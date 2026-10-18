@@ -42,6 +42,7 @@ public class TestEntity extends PathfinderMob implements PAnimatable<TestEntity>
 	private static final PRawAnimation ATTACK = PRawAnimation.begin().thenPlay("attack").build();
 	private static final PRawAnimation WALK = PRawAnimation.begin().thenLoop("walk").build();
 	private static final PRawAnimation IDLE = PRawAnimation.begin().thenLoop("idle").build();
+	private static final PRawAnimation SAMPLING_DEMO = PRawAnimation.begin().thenLoop("sampling_demo").build();
 	private static final PRawAnimation DEATH = PRawAnimation.begin().thenHold("death").build();
 	
 	private final PAnimationManager<TestEntity> animationManager = PLibHelper.createManager(this);
@@ -95,7 +96,7 @@ public class TestEntity extends PathfinderMob implements PAnimatable<TestEntity>
 			if (animatable.swinging)
 				state.controller().play(ATTACK);
 			else
-				state.controller().play(animatable.walkAnimation.isMoving() ? WALK : IDLE);
+				state.controller().play(Boolean.getBoolean("pulselib.test.geckoEntity") ? SAMPLING_DEMO : animatable.walkAnimation.isMoving() ? WALK : IDLE);
 			return state.controller().getState();
 		}).
 				add("deathController", () -> state ->

@@ -19,11 +19,22 @@ import java.util.Objects;
 
 /**
  * A registered model and its model-local material texture references.
+ *
+ * @param modelId the canonical model identifier
+ * @param modelLoaderId the identifier of the loader responsible for this model
+ * @param textures the texture overrides indexed by normalized reference
  */
 public record PModelResource(ResourceLocation modelId,
                              ResourceLocation modelLoaderId,
                              Map<String, ResourceLocation> textures)
 {
+	/**
+	 * Copies canonical model and loader identifiers together with normalized texture overrides.
+	 *
+	 * @param modelId the canonical model identifier
+	 * @param modelLoaderId the identifier of the loader responsible for this model
+	 * @param textures the texture overrides indexed by normalized reference
+	 */
 	public PModelResource
 	{
 		Objects.requireNonNull(modelId);

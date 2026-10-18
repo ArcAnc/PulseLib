@@ -9,6 +9,11 @@
 
 package com.arcanc.pulselib.content.renderer.plan;
 
+/**
+ * Opaque identifier of a render pipeline registered with a render backend.
+ *
+ * @param value the value written by this operation
+ */
 public record PPipelineHandle(long value)
 {
 }

@@ -17,6 +17,17 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.UUID;
 
+/**
+ * Render-ready mesh pairing triangle geometry, atlas texture and material properties.
+ *
+ * @param uuid the stable source-model bone identity
+ * @param geometry the immutable indexed mesh geometry
+ * @param textureReference the source-model texture reference used for override lookup
+ * @param isEmissive the is emissive
+ * @param alphaMode the material alpha handling policy
+ * @param source the source
+ * @param textureLocation the texture location
+ */
 public record PBakedMesh(
 		UUID uuid,
 		PGeometryData geometry,

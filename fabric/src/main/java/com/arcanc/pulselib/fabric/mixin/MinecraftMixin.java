@@ -20,12 +20,23 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+/**
+ * Clears client animation and rendering state when Fabric disconnects or changes client levels.
+ */
 @Mixin (Minecraft.class)
 public abstract class MinecraftMixin
 {
+	/**
+	 * Current client level, or {@code null} while disconnected.
+	 */
 	@Shadow
 	public @Nullable ClientLevel level;
 
+	/**
+	 * Clears shared runtime state when disconnecting from an active client level.
+	 *
+	 * @param callback the Mixin callback used to inspect or replace the intercepted result
+	 */
 	@Inject (method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;Z)V", at = @At ("HEAD"))
 	private void pulselib$disconnect(CallbackInfo callback)
 	{
@@ -33,6 +44,13 @@ public abstract class MinecraftMixin
 			PulseRuntime.disconnected();
 	}
 
+	/**
+	 * Clears shared runtime state before replacing the current client level.
+	 *
+	 * @param next the next; may be {@code null}
+	 * @param reason the reason
+	 * @param callback the Mixin callback used to inspect or replace the intercepted result
+	 */
 	@Inject (method = "setLevel", at = @At ("HEAD"))
 	private void pulselib$worldChanged(@Nullable ClientLevel next, ReceivingLevelScreen.Reason reason, CallbackInfo callback)
 	{

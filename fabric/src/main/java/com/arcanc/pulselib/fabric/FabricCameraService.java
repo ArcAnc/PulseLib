@@ -14,8 +14,14 @@ import com.arcanc.pulselib.content.player.animation.firstPerson.PFirstPersonCame
 import com.arcanc.pulselib.platform.IPulseCameraService;
 import net.minecraft.client.Camera;
 
+/**
+ * Fabric camera rotation bridge that applies yaw, pitch and roll and refreshes orientation vectors.
+ */
 public final class FabricCameraService implements IPulseCameraService
 {
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void setRotation(Camera camera, float yaw, float pitch, float roll)
 	{

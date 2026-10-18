@@ -23,8 +23,9 @@ public final class PModelPose
 	private final BitSet validBones = new BitSet();
 
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param boneCount the bone count to use.
+	 * Allocates model-space transform storage for the requested number of bones.
+	 *
+	 * @param boneCount the number of indexed bones
 	 */
 	public PModelPose(int boneCount)
 	{
@@ -33,16 +34,22 @@ public final class PModelPose
 			this.transforms[index] = PTransform.IDENTITY;
 	}
 
-	/** Returns a resolved MODEL-space bone transform. */
+	/**
+	 * Returns a resolved MODEL-space bone transform.
+	 *
+	 * @param boneIndex the zero-based baked-model bone index
+	 * @return a resolved MODEL-space bone transform
+	 */
 	public PTransform transform(int boneIndex)
 	{
 		return this.transforms[boneIndex];
 	}
 	
 	/**
-	 * Performs the update operation.
-	 * @param model the model to use.
-	 * @param localPose the local pose to use.
+	 * Recomputes model-space transforms from the local pose and baked parent hierarchy.
+	 *
+	 * @param model the baked model supplying indexed bones and animations
+	 * @param localPose the local pose
 	 */
 	public void update(PBakedModel model, PPose localPose)
 	{

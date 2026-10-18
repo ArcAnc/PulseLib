@@ -21,7 +21,14 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 /**
- * Immutable value object representing animation.
+ * Animation clip containing per-bone tracks, timed events and visibility tracks. Playback positions and
+ * clip length are measured in game ticks.
+ *
+ * @param name the animation clip name
+ * @param length the animation clip length in game ticks
+ * @param boneAnimations the animation tracks associated with model bones
+ * @param events the events scheduled on this animation timeline
+ * @param visibilityTracks the step-sampled visibility tracks indexed by bone name
  */
 public record PAnimation(String name,
                          float length,
@@ -30,10 +37,11 @@ public record PAnimation(String name,
                          Map<String, PAnimationVisibilityTrack> visibilityTracks)
 {
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param name the name to use.
-	 * @param length the length to use.
-	 * @param boneAnimations the bone animations to use.
+	 * Creates an animation clip with bone tracks and any supplied event and visibility timelines.
+	 *
+	 * @param name the animation clip name
+	 * @param length the animation clip length in game ticks
+	 * @param boneAnimations the animation tracks associated with model bones
 	 */
 	public PAnimation(String name, float length, Map<String, PBoneAnimation> boneAnimations)
 	{
@@ -41,11 +49,12 @@ public record PAnimation(String name,
 	}
 
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param name the name to use.
-	 * @param length the length to use.
-	 * @param boneAnimations the bone animations to use.
-	 * @param events the events to use.
+	 * Creates an animation clip with bone tracks and any supplied event and visibility timelines.
+	 *
+	 * @param name the animation clip name
+	 * @param length the animation clip length in game ticks
+	 * @param boneAnimations the animation tracks associated with model bones
+	 * @param events the events scheduled on this animation timeline
 	 */
 	public PAnimation(String name, float length, Map<String, PBoneAnimation> boneAnimations, List<PAnimationEvent<?>> events)
 	{
@@ -53,12 +62,13 @@ public record PAnimation(String name,
 	}
 
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param name the name to use.
-	 * @param length the length to use.
-	 * @param boneAnimations the bone animations to use.
-	 * @param events the events to use.
-	 * @param visibilityTracks the visibility tracks to use.
+	 * Creates an animation clip with bone tracks and any supplied event and visibility timelines.
+	 *
+	 * @param name the animation clip name
+	 * @param length the animation clip length in game ticks
+	 * @param boneAnimations the animation tracks associated with model bones
+	 * @param events the events scheduled on this animation timeline
+	 * @param visibilityTracks the step-sampled visibility tracks indexed by bone name
 	 */
 	public PAnimation
 	{
@@ -67,10 +77,11 @@ public record PAnimation(String name,
 	}
 
 	/**
-	 * Determines whether bone visible.
-	 * @param boneName the bone name to use.
-	 * @param time the time to use.
-	 * @return the value produced by this operation.
+	 * Samples the named bone visibility track, treating bones without a track as visible.
+	 *
+	 * @param boneName the animation bone name
+	 * @param time the animation position in game ticks
+	 * @return whether the bone is visible at this animation position
 	 */
 	public boolean isBoneVisible(String boneName, float time)
 	{
@@ -79,10 +90,11 @@ public record PAnimation(String name,
 	}
 	
 	/**
-	 * Performs the root motion operation.
-	 * @param rootBoneName the root bone name to use.
-	 * @param interpolation the interpolation to use.
-	 * @return the value produced by this operation.
+	 * Creates a root-motion sampler for the named root bone.
+	 *
+	 * @param rootBoneName the bone used as the root-motion or relative-transform reference
+	 * @param interpolation the keyframe interpolation policy
+	 * @return the root-motion sampler for this clip and root bone
 	 */
 	public PRootMotionRuntime rootMotion(String rootBoneName, PInterpolationType interpolation)
 	{
@@ -90,11 +102,12 @@ public record PAnimation(String name,
 	}
 	
 	/**
-	 * Performs the root motion operation.
-	 * @param rootBoneName the root bone name to use.
-	 * @param interpolation the interpolation to use.
-	 * @param data the data to use.
-	 * @return the value produced by this operation.
+	 * Creates a root-motion sampler for the named root bone.
+	 *
+	 * @param rootBoneName the bone used as the root-motion or relative-transform reference
+	 * @param interpolation the keyframe interpolation policy
+	 * @param data the optional expression context used to sample source-format animation values
+	 * @return the root-motion sampler for this clip and root bone
 	 */
 	public PRootMotionRuntime rootMotion(String rootBoneName, PInterpolationType interpolation, Object data)
 	{
@@ -102,11 +115,12 @@ public record PAnimation(String name,
 	}
 
 	/**
-	 * Calculates the bone transformations.
-	 * @param boneName the bone name to use.
-	 * @param time the time to use.
-	 * @param interpolation the interpolation to use.
-	 * @return the value produced by this operation.
+	 * Samples translation, rotation and scale tracks for one bone at the supplied tick position.
+	 *
+	 * @param boneName the animation bone name
+	 * @param time the animation position in game ticks
+	 * @param interpolation the keyframe interpolation policy
+	 * @return the sampled local transform of the selected bone, or {@code null} when the selected bone has no animation tracks
 	 */
 	public @Nullable BoneFrame calculateBoneTransformations(String boneName, float time, PInterpolationType interpolation)
 	{
@@ -114,12 +128,13 @@ public record PAnimation(String name,
 	}
 
 	/**
-	 * Calculates the bone transformations.
-	 * @param boneName the bone name to use.
-	 * @param time the time to use.
-	 * @param interpolation the interpolation to use.
-	 * @param data the data to use.
-	 * @return the value produced by this operation.
+	 * Samples translation, rotation and scale tracks for one bone at the supplied tick position.
+	 *
+	 * @param boneName the animation bone name
+	 * @param time the animation position in game ticks
+	 * @param interpolation the keyframe interpolation policy
+	 * @param data the optional expression context used to sample source-format animation values
+	 * @return the sampled local transform of the selected bone, or {@code null} when the selected bone has no animation tracks
 	 */
 	public @Nullable BoneFrame calculateBoneTransformations(String boneName, float time, PInterpolationType interpolation, Object data)
 	{
@@ -127,13 +142,14 @@ public record PAnimation(String name,
 	}
 
 	/**
-	 * Calculates the bone transformations.
-	 * @param boneName the bone name to use.
-	 * @param time the time to use.
-	 * @param interpolation the interpolation to use.
-	 * @param data the data to use.
-	 * @param accumulatedFrame the accumulated frame to use.
-	 * @return the value produced by this operation.
+	 * Samples translation, rotation and scale tracks for one bone at the supplied tick position.
+	 *
+	 * @param boneName the animation bone name
+	 * @param time the animation position in game ticks
+	 * @param interpolation the keyframe interpolation policy
+	 * @param data the optional expression context used to sample source-format animation values
+	 * @param accumulatedFrame the transform contributed by preceding controllers; may be {@code null}
+	 * @return the sampled local transform of the selected bone, or {@code null} when the selected bone has no animation tracks
 	 */
 	public @Nullable BoneFrame calculateBoneTransformations(String boneName,
 	                                                        float time,
@@ -146,13 +162,14 @@ public record PAnimation(String name,
 	}
 
 	/**
-	 * Calculates the bone transformations.
-	 * @param boneAnimation the bone animation to use.
-	 * @param time the time to use.
-	 * @param interpolation the interpolation to use.
-	 * @param data the data to use.
-	 * @param accumulatedFrame the accumulated frame to use.
-	 * @return the value produced by this operation.
+	 * Samples translation, rotation and scale tracks for one bone at the supplied tick position.
+	 *
+	 * @param boneAnimation the bone animation; may be {@code null}
+	 * @param time the animation position in game ticks
+	 * @param interpolation the keyframe interpolation policy
+	 * @param data the optional expression context used to sample source-format animation values
+	 * @param accumulatedFrame the transform contributed by preceding controllers; may be {@code null}
+	 * @return the sampled local transform of the selected bone, or {@code null} when the selected bone has no animation tracks
 	 */
 	public @Nullable BoneFrame calculateBoneTransformations(@Nullable PBoneAnimation boneAnimation,
 	                                                        float time,
@@ -164,7 +181,8 @@ public record PAnimation(String name,
 			return null;
 
 		PAnimationEvaluationContext context = new PAnimationEvaluationContext(
-				data instanceof MolangParser.Context molang ? molang : new MolangParser.Context(), time);
+				data instanceof MolangParser.Context molang ? molang : new MolangParser.Context().
+						query("anim_time", PAnimationEvaluationContext.ticksToSeconds(time)), time);
 		Vector3f accumulatedTranslation = accumulatedFrame == null ? new Vector3f() : accumulatedFrame.translation();
 		Vector3f accumulatedScale = accumulatedFrame == null ? new Vector3f(1f) : accumulatedFrame.scale();
 		Vector3f accumulatedRotation = accumulatedFrame == null ? new Vector3f() :
@@ -209,10 +227,11 @@ public record PAnimation(String name,
 	}
 
 	/**
-	 * Performs the events between operation.
-	 * @param from the from to use.
-	 * @param to the to to use.
-	 * @return the value produced by this operation.
+	 * Collects events crossed by a forward playback interval.
+	 *
+	 * @param from the preceding animation tick position
+	 * @param to the current animation tick position
+	 * @return the events crossed in forward playback order
 	 */
 	public List<PAnimationEvent<?>> eventsBetween(float from, float to)
 	{
@@ -222,10 +241,11 @@ public record PAnimation(String name,
 	}
 
 	/**
-	 * Performs the events between reverse operation.
-	 * @param from the from to use.
-	 * @param to the to to use.
-	 * @return the value produced by this operation.
+	 * Collects events crossed by a reverse playback interval.
+	 *
+	 * @param from the preceding animation tick position
+	 * @param to the current animation tick position
+	 * @return the events crossed in reverse playback order
 	 */
 	public List<PAnimationEvent<?>> eventsBetweenReverse(float from, float to)
 	{
@@ -236,13 +256,15 @@ public record PAnimation(String name,
 	}
 
 	/**
-	 * Performs the sample operation.
-	 * @param boneAnimation the bone animation to use.
-	 * @param channel the channel to use.
-	 * @param time the time to use.
-	 * @param context the context to use.
-	 * @param thisValue the this value to use.
-	 * @return the value produced by this operation.
+	 * Samples the selected typed bone track with the current evaluation and accumulated component values.
+	 *
+	 * @param <T> the value type carried by this contract
+	 * @param boneAnimation the bone animation
+	 * @param channel the typed channel controlling interpolation and pose application
+	 * @param time the animation position in game ticks
+	 * @param context the animation sampling context and reusable scratch values
+	 * @param thisValue the this value
+	 * @return the sampled selected typed bone track with the current evaluation and accumulated component values, or {@code null} when the selected bone has no animation tracks
 	 */
 	private static <T> @Nullable T sample(PBoneAnimation boneAnimation,
 	                                      PAnimationChannelType<T> channel,
@@ -254,46 +276,6 @@ public record PAnimation(String name,
 		if (track == null || track.keyframes().isEmpty())
 			return null;
 		context.thisValues(thisValue);
-		List<PKeyframe<T>> keyframes = track.keyframes();
-		if (keyframes.size() == 1)
-			return evaluate(keyframes.getFirst().post(), channel, context);
-
-		PKeyframe<T> previous = null;
-		PKeyframe<T> next = null;
-		for (PKeyframe<T> keyframe : keyframes)
-		{
-			if (keyframe.time() <= time)
-				previous = keyframe;
-			if (keyframe.time() > time)
-			{
-				next = keyframe;
-				break;
-			}
-		}
-		if (previous == null)
-			return evaluate(keyframes.getFirst().pre(), channel, context);
-		if (next == null)
-			return evaluate(previous.post(), channel, context);
-
-		T from = evaluate(previous.post(), channel, context);
-		T to = evaluate(next.pre(), channel, context);
-		T destination = channel.defaultValue();
-		float alpha = (time - previous.time()) / (next.time() - previous.time());
-		channel.interpolate(from, to, Math.clamp(alpha, 0f, 1f), previous.interpolation(), destination);
-		return destination;
-	}
-
-	/**
-	 * Performs the evaluate operation.
-	 * @param value the value to use.
-	 * @param channel the channel to use.
-	 * @param context the context to use.
-	 * @return the value produced by this operation.
-	 */
-	private static <T> T evaluate(PAnimationValue<T> value, PAnimationChannelType<T> channel, PAnimationEvaluationContext context)
-	{
-		T destination = channel.defaultValue();
-		value.evaluate(context, destination);
-		return destination;
+		return PAnimationTrackSampler.sample(track, time, context);
 	}
 }

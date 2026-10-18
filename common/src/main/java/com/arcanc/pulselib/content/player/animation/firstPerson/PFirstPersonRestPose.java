@@ -16,6 +16,11 @@ import org.joml.Vector3f;
 
 /**
  * Canonical camera-space sockets at animation delta identity.
+ *
+ * @param rightHand the right hand
+ * @param leftHand the left hand
+ * @param rightItem the right item
+ * @param leftItem the left item
  */
 public record PFirstPersonRestPose(
         PTransform rightHand,
@@ -23,14 +28,18 @@ public record PFirstPersonRestPose(
         PTransform rightItem,
         PTransform leftItem)
 {
+	/**
+	 * Default reference pose matching vanilla first-person arm and item rendering.
+	 */
 	public static final PFirstPersonRestPose VANILLA = new PFirstPersonRestPose(
 				handTransform(HumanoidArm.RIGHT), handTransform(HumanoidArm.LEFT),
 				itemTransform(HumanoidArm.RIGHT), itemTransform(HumanoidArm.LEFT));
 
 	/**
-	 * Performs the item operation.
-	 * @param arm the arm to use.
-	 * @return the value produced by this operation.
+	 * Returns the vanilla held-item rest transform for the selected arm.
+	 *
+	 * @param arm the humanoid arm whose geometry is being processed
+	 * @return the vanilla held-item rest transform for the selected arm
 	 */
 	public static PTransform item(HumanoidArm arm)
 	{
@@ -38,9 +47,10 @@ public record PFirstPersonRestPose(
 	}
 
 	/**
-	 * Performs the arm rig operation.
-	 * @param arm the arm to use.
-	 * @return the value produced by this operation.
+	 * Returns the vanilla arm-origin and hand-socket reference rig for the selected arm.
+	 *
+	 * @param arm the humanoid arm whose geometry is being processed
+	 * @return the vanilla arm-origin and hand-socket reference rig for the selected arm
 	 */
 	public static PFirstPersonArmRig armRig(HumanoidArm arm)
 	{
@@ -55,9 +65,10 @@ public record PFirstPersonRestPose(
 	}
 
 	/**
-	 * Performs the item rig operation.
-	 * @param arm the arm to use.
-	 * @return the value produced by this operation.
+	 * Returns the vanilla item-origin and attachment-socket reference rig for the selected arm.
+	 *
+	 * @param arm the humanoid arm whose geometry is being processed
+	 * @return the vanilla item-origin and attachment-socket reference rig for the selected arm
 	 */
 	public static PFirstPersonItemRig itemRig(HumanoidArm arm)
 	{
@@ -65,9 +76,10 @@ public record PFirstPersonRestPose(
 	}
 
 	/**
-	 * Performs the arm transform operation.
-	 * @param arm the arm to use.
-	 * @return the value produced by this operation.
+	 * Builds the canonical rest transform of the selected vanilla arm origin.
+	 *
+	 * @param arm the humanoid arm whose geometry is being processed
+	 * @return the constructed canonical rest transform of the selected vanilla arm origin
 	 */
 	private static PTransform armTransform(HumanoidArm arm)
 	{
@@ -83,9 +95,10 @@ public record PFirstPersonRestPose(
 	}
 
 	/**
-	 * Performs the hand transform operation.
-	 * @param arm the arm to use.
-	 * @return the value produced by this operation.
+	 * Builds the canonical hand socket transform of the selected arm.
+	 *
+	 * @param arm the humanoid arm whose geometry is being processed
+	 * @return the constructed canonical hand socket transform of the selected arm
 	 */
 	private static PTransform handTransform(HumanoidArm arm)
 	{
@@ -94,9 +107,10 @@ public record PFirstPersonRestPose(
 	}
 
 	/**
-	 * Performs the item transform operation.
-	 * @param arm the arm to use.
-	 * @return the value produced by this operation.
+	 * Builds the canonical rest transform of the selected held-item socket.
+	 *
+	 * @param arm the humanoid arm whose geometry is being processed
+	 * @return the constructed canonical rest transform of the selected held-item socket
 	 */
 	private static PTransform itemTransform(HumanoidArm arm)
 	{
@@ -104,7 +118,12 @@ public record PFirstPersonRestPose(
 		return PTransform.translation(new Vector3f(side * 0.56f, -0.52f, -0.72f));
 	}
 
-	/** Bind transform applied by the vanilla arm ModelPart after AvatarRenderer receives the PoseStack. */
+	/**
+	 * Bind transform applied by the vanilla arm ModelPart after AvatarRenderer receives the PoseStack.
+	 *
+	 * @param arm the humanoid arm whose geometry is being processed
+	 * @return the unanimated vanilla arm ModelPart transform
+	 */
 	public static PTransform armModelPartBind(HumanoidArm arm)
 	{
 		float side = arm == HumanoidArm.RIGHT ? -1.0f : 1.0f;

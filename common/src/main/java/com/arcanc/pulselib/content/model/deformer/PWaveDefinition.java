@@ -15,6 +15,19 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.joml.Vector3f;
 
+/**
+ * Serializable configuration and animation channel references for wave displacement along a configurable
+ * axis.
+ *
+ * @param origin the local pivot or origin of the deformation
+ * @param lengthAxis the axis along which the deformation extent is measured
+ * @param displacementAxis the axis along which the wave displaces vertices
+ * @param positiveExtent the positive-axis deformation extent
+ * @param negativeExtent the negative-axis deformation extent
+ * @param wavelength the local distance between repeated wave crests
+ * @param amplitude the amplitude channel reference and its fallback value
+ * @param phase the phase channel reference and its fallback value
+ */
 public record PWaveDefinition(Vector3f origin,
                               Vector3f lengthAxis,
                               Vector3f displacementAxis,
@@ -24,6 +37,9 @@ public record PWaveDefinition(Vector3f origin,
 							  PChannelReference<Float> amplitude,
 							  PChannelReference<Float> phase)
 {
+	/**
+	 * Serialization codec for wave definition.
+	 */
 	public static final MapCodec<PWaveDefinition> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.
 			group(
 					PLibCodecs.VECTOR3F_CODEC.fieldOf("origin").forGetter(PWaveDefinition::origin),
@@ -36,6 +52,18 @@ public record PWaveDefinition(Vector3f origin,
 					PChannelReference.FLOAT.fieldOf("phase").forGetter(PWaveDefinition::phase)).
 			apply(instance, PWaveDefinition::new));
 
+	/**
+	 * Creates the deformation configuration and copies its local origin and axis inputs.
+	 *
+	 * @param origin the local pivot or origin of the deformation
+	 * @param lengthAxis the axis along which the deformation extent is measured
+	 * @param displacementAxis the axis along which the wave displaces vertices
+	 * @param positiveExtent the positive-axis deformation extent
+	 * @param negativeExtent the negative-axis deformation extent
+	 * @param wavelength the local distance between repeated wave crests
+	 * @param amplitude the amplitude channel reference and its fallback value
+	 * @param phase the phase channel reference and its fallback value
+	 */
 	public PWaveDefinition
 	{
 		origin = new Vector3f(origin);

@@ -25,6 +25,9 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
+/**
+ * Caches dynamic render geometry for CPU-deformed baked meshes.
+ */
 public final class PDeformedMeshBuffers
 {
 	private static final Object STATIC_CACHE_KEY = new Object();
@@ -35,6 +38,13 @@ public final class PDeformedMeshBuffers
 	{
 	}
 
+	/**
+	 * Returns dynamic geometry for the mesh and current deformation values.
+	 *
+	 * @param mesh the baked mesh geometry and material
+	 * @param deformation the prepared mesh deformation and its current sampled values
+	 * @return dynamic geometry for the mesh and current deformation values
+	 */
 	public static GlDynamicGeometry resolve(PBakedMesh mesh, PMeshDeformation deformation)
 	{
 		IdentityHashMap<Object, GlDynamicGeometry> buffers = BUFFERS.computeIfAbsent(mesh, ignored -> new IdentityHashMap<>());
@@ -51,6 +61,11 @@ public final class PDeformedMeshBuffers
 		return geometry;
 	}
 
+	/**
+	 * Releases the cached dynamic geometry associated with the supplied mesh.
+	 *
+	 * @param mesh the baked mesh geometry and material
+	 */
 	public static void close(PBakedMesh mesh)
 	{
 		SUBDIVIDED_SOURCES.remove(mesh);
@@ -59,6 +74,9 @@ public final class PDeformedMeshBuffers
 			buffers.values().forEach(GlDynamicGeometry::close);
 	}
 
+	/**
+	 * Releases all cached CPU-deformed mesh geometry.
+	 */
 	public static void cleanup()
 	{
 		for (IdentityHashMap<Object, GlDynamicGeometry> buffers : BUFFERS.values())

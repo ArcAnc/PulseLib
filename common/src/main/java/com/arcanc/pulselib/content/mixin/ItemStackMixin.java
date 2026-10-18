@@ -19,18 +19,28 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+/**
+ * Stores transient item animation identities and preserves or separates them during copy and split
+ * operations.
+ */
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin implements PItemStackAnimationData
 {
 	@Unique
 	private transient volatile long pulselib$animationId;
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public long pulselib$getAnimationId()
 	{
 		return this.pulselib$animationId;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public synchronized void pulselib$setAnimationId(long id)
 	{
@@ -40,6 +50,9 @@ public abstract class ItemStackMixin implements PItemStackAnimationData
 			this.pulselib$animationId = id;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public long pulselib$getOrCreateAnimationId()
 	{
@@ -57,6 +70,11 @@ public abstract class ItemStackMixin implements PItemStackAnimationData
 		}
 	}
 
+	/**
+	 * Copies a live animation identity to a nonempty copy without creating animation controllers.
+	 *
+	 * @param callback the Mixin callback used to inspect or replace the intercepted result
+	 */
 	@Inject(method = "copy", at = @At("RETURN"))
 	private void pulselib$copyAnimationId(CallbackInfoReturnable<ItemStack> callback)
 	{
@@ -69,6 +87,11 @@ public abstract class ItemStackMixin implements PItemStackAnimationData
 		}
 	}
 
+	/**
+	 * Separates live animation identities after a split unless the source stack was fully transferred.
+	 *
+	 * @param callback the Mixin callback used to inspect or replace the intercepted result
+	 */
 	@Inject(method = "split", at = @At("RETURN"))
 	private void pulselib$splitAnimationId(CallbackInfoReturnable<ItemStack> callback)
 	{

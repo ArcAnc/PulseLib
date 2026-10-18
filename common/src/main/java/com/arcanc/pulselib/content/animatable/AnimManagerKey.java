@@ -16,8 +16,19 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.Objects;
 
+/**
+ * Identity used to select animation state for an entity, block entity, item stack or arbitrary owner.
+ *
+ * @param key the key
+ */
 public record AnimManagerKey(long key)
 {
+	/**
+	 * Builds an animation manager key from the identity of an arbitrary owner.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @return the identity key for the supplied owner
+	 */
 	public static AnimManagerKey ofObject(Object animatable)
 	{
 		return switch (animatable)
@@ -33,6 +44,9 @@ public record AnimManagerKey(long key)
 	 * Gets a client runtime identity. The sign bit reserves item keys without changing
 	 * the public long-key API; other factory methods always return nonnegative keys.
 	 * @throws IllegalArgumentException if the stack is empty or is not animated.
+	 *
+	 * @param stack the item stack supplying render or animation state
+	 * @return the identity key for the supplied owner
 	 */
 	public static AnimManagerKey of(ItemStack stack)
 	{
@@ -44,12 +58,24 @@ public record AnimManagerKey(long key)
 		return new AnimManagerKey(Long.MIN_VALUE | id);
 	}
 	
+	/**
+	 * Builds an animation manager key for the supplied owner.
+	 *
+	 * @param entity the entity being animated or rendered
+	 * @return the identity key for the supplied owner
+	 */
 	public static AnimManagerKey of (Entity entity)
 	{
 		return new AnimManagerKey((entity.getUUID().getMostSignificantBits() ^
 				entity.getUUID().getLeastSignificantBits()) & Long.MAX_VALUE);
 	}
 	
+	/**
+	 * Builds an animation manager key for the supplied owner.
+	 *
+	 * @param blockEntity the block entity
+	 * @return the identity key for the supplied owner
+	 */
 	public static AnimManagerKey of(BlockEntity blockEntity)
 	{
 		int type = blockEntity.getType().hashCode();
@@ -59,6 +85,9 @@ public record AnimManagerKey(long key)
 		return new AnimManagerKey(Integer.toUnsignedLong(Objects.hash(type, blockPos, levelId)));
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean equals(Object o)
 	{
@@ -67,6 +96,11 @@ public record AnimManagerKey(long key)
 		return key() == other;
 	}
 	
+	/**
+	 * Returns the hash code.
+	 *
+	 * @return the hash code
+	 */
 	@Override
 	public int hashCode()
 	{

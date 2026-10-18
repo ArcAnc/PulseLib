@@ -16,8 +16,14 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 
+/**
+ * Fabric common entry point that initializes built-in types and common plugin registration.
+ */
 public final class PulseLibFabric implements ModInitializer
 {
+	/**
+	 * Initializes built-in registries and invokes common plugin registration on Fabric.
+	 */
 	@Override
 	public void onInitialize()
 	{

@@ -11,7 +11,11 @@ package com.arcanc.pulselib.content.player.animation;
 
 import net.minecraft.resources.ResourceLocation;
 
-/** A named socket in an animated player model. */
+/**
+ * A named socket in an animated player model.
+ *
+ * @param id the namespaced resource or registration identifier
+ */
 public record PPlayerAnimationAnchor(ResourceLocation id)
 {
 }

@@ -1,26 +1,29 @@
 # Entity Render Layers
 
-[`PEntityRenderLayer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderLayer.java) renders an additional PulseLib model on top of a [`PEntityRenderer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java).
+[`PEntityRenderLayer`](../common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderLayer.java) renders an additional PulseLib model on top of a [`PEntityRenderer`](../common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java).
 
 Layers are useful for armor pieces, equipment, accessories, conditional attachments, or model variants.
 
 ## Layer class
 
 ```java
-public class RobotChestLayer extends PEntityRenderLayer<RobotEntity> {
-    public static final PModelData MODEL = PModelData.entityLayer(
-            MyEntities.ROBOT.getId(),
-            ResourceLocation.fromNamespaceAndPath("examplemod", "armor"));
+public class RobotChestLayer extends PEntityRenderLayer<RobotEntity>
+{
+	public static final PModelData MODEL = PModelData.entityLayer(
+			MyEntities.ROBOT.getId(),
+			ResourceLocation.fromNamespaceAndPath("examplemod", "armor"));
 
-    public RobotChestLayer() {
-        super(MODEL,
-                PRenderTypes.RenderTypeProvider::trianglesSolid);
-    }
+	public RobotChestLayer()
+	{
+		super(MODEL,
+				PRenderTypes.RenderTypeProvider::trianglesSolid);
+	}
 
-    @Override
-    public boolean shouldRender(RobotEntity animatable) {
-        return animatable.hasChestPlate();
-    }
+	@Override
+	public boolean shouldRender(RobotEntity animatable)
+	{
+		return animatable.hasChestPlate();
+	}
 }
 ```
 
@@ -29,15 +32,17 @@ Register the same `MODEL` object in `registerModels(PModelRegistrar)` with the l
 ## Add layer to renderer
 
 ```java
-public class RobotRenderer extends PEntityRenderer<RobotEntity> {
-    public RobotRenderer(EntityRendererProvider.Context context) {
-        super(context, ROBOT_MODEL_DATA, PRenderTypes.RenderTypeProvider::trianglesSolid);
+public class RobotRenderer extends PEntityRenderer<RobotEntity>
+{
+	public RobotRenderer(EntityRendererProvider.Context context)
+	{
+		super(context, ROBOT_MODEL_DATA, PRenderTypes.RenderTypeProvider::trianglesSolid);
 
-        addRenderLayer("body",
-                new RobotChestLayer()
-                        .bindBone("armor_body", "body")
-                        .bindBone("armor_head", "head"));
-    }
+		addRenderLayer("body",
+				new RobotChestLayer().
+						bindBone("armor_body", "body").
+						bindBone("armor_head", "head"));
+	}
 }
 ```
 
@@ -48,10 +53,10 @@ public class RobotRenderer extends PEntityRenderer<RobotEntity> {
 Layer bone bindings copy base entity bone poses into layer bones:
 
 ```java
-new RobotChestLayer()
-        .bindBone("layer_right_arm", "right_arm")
-        .bindMatchingBone("head")
-        .bindMatchingBones("left_leg", "right_leg");
+new RobotChestLayer().
+		bindBone("layer_right_arm", "right_arm").
+		bindMatchingBone("head").
+		bindMatchingBones("left_leg", "right_leg");
 ```
 
 Use this when the layer model should follow animated limbs from the base model.
@@ -69,19 +74,21 @@ Override appearance hooks:
 
 ```java
 @Override
-public int getColor(RobotEntity entity, PBakedBone bone, PBakedMesh mesh, int packedColor) {
-    return entity.isPowered() ? 0xFF80FFFF : packedColor;
+public int getColor(RobotEntity entity, PBakedBone bone, PBakedMesh mesh, int packedColor)
+{
+	return entity.isPowered() ? 0xFF80FFFF : packedColor;
 }
 
 @Override
-public int getPackedLight(RobotEntity entity, int packedLight) {
-    return entity.isPowered() ? LightTexture.FULL_BRIGHT : packedLight;
+public int getPackedLight(RobotEntity entity, int packedLight)
+{
+	return entity.isPowered() ? LightTexture.FULL_BRIGHT : packedLight;
 }
 ```
 
 Classes used:
 
-* [`PEntityRenderLayer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderLayer.java)
-* [`PModelData`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/modelData/PModelData.java)
-* [`PBakedBone`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java)
-* [`PBakedMesh`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedMesh.java)
+* [`PEntityRenderLayer`](../common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderLayer.java)
+* [`PModelData`](../common/src/main/java/com/arcanc/pulselib/content/renderer/modelData/PModelData.java)
+* [`PBakedBone`](../common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java)
+* [`PBakedMesh`](../common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedMesh.java)

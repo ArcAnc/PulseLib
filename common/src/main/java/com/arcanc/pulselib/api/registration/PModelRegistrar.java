@@ -20,20 +20,42 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Collects canonical model declarations and their per-reference texture overrides.
+ */
 public class PModelRegistrar extends PulseRegistrar
 {
 	private final Map<ResourceLocation, ModelRegistration> models = new LinkedHashMap<>();
 
+	/**
+	 * Declares a canonical model and returns its texture override configuration.
+	 *
+	 * @param data the canonical model and loader selection
+	 * @return the model registration whose texture overrides can be configured
+	 */
 	public ModelRegistration model(PModelData data)
 	{
 		return model(data.getModelId(), data.getModelLoaderId());
 	}
 
+	/**
+	 * Declares a canonical model and returns its texture override configuration.
+	 *
+	 * @param id the namespaced resource or registration identifier
+	 * @return the model registration whose texture overrides can be configured
+	 */
 	public ModelRegistration model(ResourceLocation id)
 	{
 		return model(id, PGltfModelLoader.INSTANCE.id());
 	}
 
+	/**
+	 * Declares a canonical model and returns its texture override configuration.
+	 *
+	 * @param id the namespaced resource or registration identifier
+	 * @param loader the loader
+	 * @return the model registration whose texture overrides can be configured
+	 */
 	public ModelRegistration model(ResourceLocation id, ResourceLocation loader)
 	{
 		checkOpen();
@@ -49,6 +71,8 @@ public class PModelRegistrar extends PulseRegistrar
 
 	/**
 	 * Validates all changes before applying a plugin's declarations.
+	 *
+	 * @param target the target
 	 */
 	public void apply(Map<ResourceLocation, PModelResource> target)
 	{
@@ -76,6 +100,9 @@ public class PModelRegistrar extends PulseRegistrar
 		close();
 	}
 
+	/**
+	 * Texture override configuration for one canonical model registration.
+	 */
 	public final class ModelRegistration
 	{
 		private final ResourceLocation id;
@@ -88,6 +115,13 @@ public class PModelRegistrar extends PulseRegistrar
 			this.loader = loader;
 		}
 
+		/**
+		 * Associates a model texture reference with the resource to use during baking.
+		 *
+		 * @param reference the reference value or channel used by this operation
+		 * @param texture the texture resource location
+		 * @return this builder
+		 */
 		public ModelRegistration texture(String reference, ResourceLocation texture)
 		{
 			checkOpen();

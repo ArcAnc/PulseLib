@@ -30,16 +30,17 @@ public final class PFirstPersonRenderContexts
 			ThreadLocal.withInitial(ArrayDeque::new);
 
 	/**
-	 * Creates an instance of the enclosing type.
+	 * Creates a first person render contexts.
 	 */
 	private PFirstPersonRenderContexts()
 	{
 	}
 
 	/**
-	 * Performs the begin pass operation.
-	 * @param player the player to use.
-	 * @param partialTick the partial tick to use.
+	 * Samples and stores the first-person presentation for one complete hand render pass.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
 	 */
 	public static void beginPass(LocalPlayer player, float partialTick)
 	{
@@ -47,7 +48,7 @@ public final class PFirstPersonRenderContexts
 	}
 
 	/**
-	 * Performs the end pass operation.
+	 * Clears hand contexts and the sampled first-person pass presentation.
 	 */
 	public static void endPass()
 	{
@@ -62,8 +63,9 @@ public final class PFirstPersonRenderContexts
 	}
 
 	/**
-	 * Performs the pass presentation operation.
-	 * @return the value produced by this operation.
+	 * Returns the first-person presentation captured for the active hand render pass.
+	 *
+	 * @return the first-person presentation captured for the active hand render pass, or {@code null} when no frame presentation has been captured
 	 */
 	public static @Nullable PFirstPersonRenderPresentation passPresentation()
 	{
@@ -72,11 +74,12 @@ public final class PFirstPersonRenderContexts
 	}
 
 	/**
-	 * Performs the push operation.
-	 * @param hand the hand to use.
-	 * @param arm the arm to use.
-	 * @param stack the stack to use.
-	 * @param poseStack the pose stack to use.
+	 * Captures the current hand-pass basis and pushes a scoped hand render context.
+	 *
+	 * @param hand the interaction hand being rendered
+	 * @param arm the humanoid arm whose geometry is being processed
+	 * @param stack the item stack supplying render or animation state
+	 * @param poseStack the current model-to-render pose stack
 	 */
 	public static void push(InteractionHand hand,
 	                        HumanoidArm arm,
@@ -91,7 +94,7 @@ public final class PFirstPersonRenderContexts
 	}
 
 	/**
-	 * Performs the pop operation.
+	 * Restores the preceding first-person hand render context.
 	 */
 	public static void pop()
 	{
@@ -103,8 +106,9 @@ public final class PFirstPersonRenderContexts
 	}
 
 	/**
-	 * Performs the current operation.
-	 * @return the value produced by this operation.
+	 * Returns the active first-person hand render context, or {@code null} outside a hand scope.
+	 *
+	 * @return the active first-person hand render context, or {@code null} outside a hand scope
 	 */
 	public static @Nullable PFirstPersonRenderContext current()
 	{

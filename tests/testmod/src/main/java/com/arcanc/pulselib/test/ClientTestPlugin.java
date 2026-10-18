@@ -82,6 +82,7 @@ public class ClientTestPlugin implements IPulseClientPlugin
 	{
 		models++;
 		PlayerMotionHarness.registerModels(registrar);
+		registrar.model(AnimationSamplingHarness.MODEL_DATA).texture("0", TestEntityRender.ZERO);
 		registrar.model(TestEntityRender.MODEL_DATA).texture("tube", TestEntityRender.TUBE).
 				texture("sphere", TestEntityRender.SPHERE).
 				texture("torus", TestEntityRender.TORUS).texture("0", TestEntityRender.ZERO).

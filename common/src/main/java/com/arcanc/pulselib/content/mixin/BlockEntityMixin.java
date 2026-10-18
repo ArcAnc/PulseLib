@@ -18,9 +18,17 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+/**
+ * Removes instance animation state when a client block entity is removed.
+ */
 @Mixin(BlockEntity.class)
 public abstract class BlockEntityMixin
 {
+	/**
+	 * Removes client animation state before the block entity is marked as removed.
+	 *
+	 * @param callback the Mixin callback used to inspect or replace the intercepted result
+	 */
 	@Inject(method = "setRemoved", at = @At("HEAD"))
 	private void pulselib$removeAnimationManager(CallbackInfo callback)
 	{

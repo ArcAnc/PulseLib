@@ -13,8 +13,16 @@ import com.arcanc.pulselib.plugin.PulsePluginManager;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 
+/**
+ * NeoForge common setup bridge for side-safe plugin type registration.
+ */
 public class CommonEvents
 {
+	/**
+	 * Installs the NeoForge common setup listener that runs common plugin registration.
+	 *
+	 * @param bus the NeoForge mod lifecycle event bus
+	 */
 	public static void registerCommonEvents(IEventBus bus)
 	{
 		bus.addListener(CommonEvents :: setup);

@@ -16,12 +16,18 @@ public abstract class PulseRegistrar implements AutoCloseable
 {
 	private boolean open = true;
 
+	/**
+	 * Rejects registration after this callback scope has been closed.
+	 */
 	protected final void checkOpen()
 	{
 		if (!this.open)
 			throw new IllegalStateException("PulseLib registration phase has already ended");
 	}
 
+	/**
+	 * Closes this registration scope so it can no longer accept declarations.
+	 */
 	@Override
 	public final void close()
 	{

@@ -24,10 +24,19 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Decodes Gecko animation event timelines into typed PulseLib events.
+ */
 public class PGeckoAnimationEventParser
 {
 	private static final float SECONDS_TO_TICKS = 20f;
 	
+	/**
+	 * Reads supported event timelines from one Gecko animation node.
+	 *
+	 * @param animationNode the animation node
+	 * @return the decoded events in animation timeline order
+	 */
 	public static List<PAnimationEvent<?>> parseAnimationEvents(JsonElement animationNode)
 	{
 		List<PAnimationEvent<?>> events = new ArrayList<>();
@@ -37,6 +46,12 @@ public class PGeckoAnimationEventParser
 		return events;
 	}
 	
+	/**
+	 * Returns the largest scheduled event time, or zero when there are no events.
+	 *
+	 * @param events the events scheduled on this animation timeline
+	 * @return the largest scheduled event time, or zero when there are no events
+	 */
 	public static float maxEventTime(List<PAnimationEvent<?>> events)
 	{
 		float maxTime = 0f;
@@ -215,8 +230,18 @@ public class PGeckoAnimationEventParser
 		return element != null && element.isJsonArray();
 	}
 	
+	/**
+	 * Creates a typed event from one Gecko event timeline entry.
+	 */
 	private interface EventFactory
 	{
+		/**
+		 * Decodes an event entry scheduled at the supplied animation tick position.
+		 *
+		 * @param time the animation position in game ticks
+		 * @param node the node
+		 * @return the decoded typed animation event
+		 */
 		PAnimationEvent<?> create(float time, JsonElement node);
 	}
 }

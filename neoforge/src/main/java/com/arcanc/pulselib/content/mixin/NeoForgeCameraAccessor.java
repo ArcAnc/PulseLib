@@ -13,9 +13,19 @@ import net.minecraft.client.Camera;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
+/**
+ * Exposes NeoForge's camera rotation method with roll support.
+ */
 @Mixin (Camera.class)
 public interface NeoForgeCameraAccessor
 {
+	/**
+	 * Invokes the NeoForge camera rotation method with yaw, pitch and roll in degrees.
+	 *
+	 * @param yaw the yaw angle in degrees
+	 * @param pitch the pitch angle in degrees
+	 * @param roll the roll angle in degrees
+	 */
 	@Invoker ("setRotation")
 	void pulselib$setRotationWithRoll(float yaw, float pitch, float roll);
 }

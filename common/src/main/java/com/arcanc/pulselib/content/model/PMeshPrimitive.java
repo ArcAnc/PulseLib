@@ -15,7 +15,18 @@ import java.nio.FloatBuffer;
 import java.util.List;
 import java.util.Objects;
 
-/** Geometry and material of one model primitive. */
+/**
+ * Geometry and material of one model primitive.
+ *
+ * @param vertexCount the vertex count
+ * @param positions the packed vertex positions
+ * @param normals the normals
+ * @param uvs the uvs
+ * @param indicesCount the indices count
+ * @param indices the indices
+ * @param glIndexType the gl index type
+ * @param material the material
+ */
 public record PMeshPrimitive(int vertexCount,
                              FloatBuffer positions,
                              FloatBuffer normals,
@@ -25,6 +36,12 @@ public record PMeshPrimitive(int vertexCount,
                              int glIndexType,
                              PMaterial material)
 {
+	/**
+	 * Combines primitives into one geometry buffer while rebasing their vertex indices.
+	 *
+	 * @param primitives the primitives
+	 * @return the combined primitive with rebased vertex indices
+	 */
 	public static PMeshPrimitive merge(List<PMeshPrimitive> primitives)
 	{
 		if (primitives.isEmpty())

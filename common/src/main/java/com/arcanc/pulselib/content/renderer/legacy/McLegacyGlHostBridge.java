@@ -13,8 +13,16 @@ import com.arcanc.pulselib.content.renderer.plan.PRenderFrame;
 import com.arcanc.pulselib.content.renderer.plan.PRenderHost;
 import com.mojang.blaze3d.systems.RenderSystem;
 
+/**
+ * Captures vanilla Minecraft render matrices for the shared render-plan backend.
+ */
 public final class McLegacyGlHostBridge implements PRenderHost
 {
+	/**
+	 * Copies the current model-view and projection matrices into a render frame.
+	 *
+	 * @return copies of the current host model-view and projection matrices
+	 */
 	@Override
 	public PRenderFrame captureFrame()
 	{

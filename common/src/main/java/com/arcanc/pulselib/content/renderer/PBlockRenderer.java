@@ -15,6 +15,7 @@ import com.arcanc.pulselib.content.animatable.PAnimatable;
 import com.arcanc.pulselib.content.animatable.PAnimationController;
 import com.arcanc.pulselib.content.animatable.PAnimationManager;
 import com.arcanc.pulselib.content.animatable.instance.InstanceAnimationManager;
+import com.arcanc.pulselib.content.model.animation.PAnimationEvaluationContext;
 import com.arcanc.pulselib.content.model.animation.PPose;
 import com.arcanc.pulselib.content.model.baked.*;
 import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
@@ -44,36 +45,67 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * Base renderer for animatable block entities with per-bone submission and Molang query hooks.
+ *
+ * @param <T> the animatable owner type
+ */
 public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>>
 		implements PRenderer<T>, BlockEntityRenderer<T>
 {
 	private final PModelData modelData;
 	private final Function<ResourceLocation, RenderType> renderType;
 	
+	/**
+	 * Creates a block-entity renderer using the supplied model and texture-to-pipeline resolver.
+	 *
+	 * @param modelData the canonical model and loader selection
+	 * @param renderType the render type
+	 */
 	public PBlockRenderer(PModelData modelData, Function<ResourceLocation, RenderType> renderType)
 	{
 		this.modelData = modelData;
 		this.renderType = renderType;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public PModelData getModelData(T animatable)
 	{
 		return this.modelData;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public @Nullable PBakedModel getModel(T animatable)
 	{
 		return getModelData(animatable).getModel();
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public RenderType getRenderType(ResourceLocation texture)
 	{
 		return this.renderType.apply(texture);
 	}
 	
+	/**
+	 * Samples block-entity animation and submits the model with the block-facing orientation and render
+	 * inputs.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param poseStack the current model-to-render pose stack
+	 * @param bufferSource the vanilla vertex buffer source
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param packedOverlay the packed overlay texture coordinates
+	 */
 	@Override
 	public void render(T animatable, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay)
 	{
@@ -86,12 +118,18 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>>
 		poseStack.popPose();
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void preSubmit(PoseStack poseStack, T animatable, Function<ResourceLocation, RenderType> renderType, MultiBufferSource bufferSource, int packedLight, int packedOverlay, float partialTick, @Nullable Object... additionalData)
 	{
 	
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void trueSubmit(PoseStack poseStack, T animatable, Function<ResourceLocation, RenderType> renderType, MultiBufferSource bufferSource, int packedLight, int packedOverlay, float partialTick, @Nullable Object... additionalData)
 	{
@@ -108,12 +146,30 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>>
 		model.bones().forEach(bone -> perBoneSubmit(animatable, poseStack, bone, pose, controllers, molangContexts, renderType, -1, packedLight, packedOverlay, partialTick));
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void postSubmit(PoseStack poseStack, T animatable, Function<ResourceLocation, RenderType> renderType, MultiBufferSource bufferSource, int packedLight, int packedOverlay, float partialTick, @Nullable Object... additionalData)
 	{
 	
 	}
 	
+	/**
+	 * Submits the selected bone and its descendants using the sampled pose and inherited mesh render context.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param poseStack the current model-to-render pose stack
+	 * @param bone the baked bone being sampled or submitted
+	 * @param pose the indexed bone pose
+	 * @param controllers the animation controllers in pose composition order
+	 * @param molangContexts the frame-specific Molang context of each controller
+	 * @param renderType the render type
+	 * @param packedColor the packed ARGB vertex color
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param packedOverlay the packed overlay texture coordinates
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 */
 	protected void perBoneSubmit(T animatable, PoseStack poseStack, PBakedBone bone, PPose pose, Collection<PAnimationController<T>> controllers, Map<PAnimationController<T>, MolangParser.Context> molangContexts, Function<ResourceLocation, RenderType> renderType, int packedColor, int packedLight, int packedOverlay, float partialTick)
 	{
 		PMeshRenderContext inherited = new PMeshRenderContext(
@@ -124,6 +180,18 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>>
 		perBoneSubmit(animatable, poseStack, bone, pose, controllers, molangContexts, inherited, partialTick);
 	}
 
+	/**
+	 * Submits the selected bone and its descendants using the sampled pose and inherited mesh render context.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param poseStack the current model-to-render pose stack
+	 * @param bone the baked bone being sampled or submitted
+	 * @param pose the indexed bone pose
+	 * @param controllers the animation controllers in pose composition order
+	 * @param molangContexts the frame-specific Molang context of each controller
+	 * @param inherited the render inputs inherited from the parent bone or renderer
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 */
 	protected void perBoneSubmit(T animatable, PoseStack poseStack, PBakedBone bone, PPose pose, Collection<PAnimationController<T>> controllers, Map<PAnimationController<T>, MolangParser.Context> molangContexts, PMeshRenderContext inherited, float partialTick)
 	{
 		PModelData data = this.getModelData(animatable);
@@ -151,7 +219,7 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>>
 		for (PAnimationController<T> controller : controllers)
 		{
 			MolangParser.Context context = new MolangParser.Context().
-					query("anim_time", controller.getInterpolatedTime(partialTick)).
+					query("anim_time", PAnimationEvaluationContext.ticksToSeconds(controller.getInterpolatedTime(partialTick))).
 					randomSeed(key.key());
 			populateMolangContext(animatable, controller, context, partialTick);
 			contexts.put(controller, context);
@@ -159,6 +227,14 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>>
 		return contexts;
 	}
 
+	/**
+	 * Populates owner-specific Molang queries for this controller and render sample.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param controller the controller supplying playback and persistent expression state
+	 * @param context the Molang context containing current frame and instance values
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 */
 	protected void populateMolangContext(T animatable,
 	                                    PAnimationController<T> controller,
 	                                    MolangParser.Context context,
@@ -166,6 +242,12 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>>
 	{
 	}
 	
+	/**
+	 * Applies the block-facing orientation to the current render pose.
+	 *
+	 * @param poseStack the current model-to-render pose stack
+	 * @param facing the facing
+	 */
 	protected void tryRotateToRealRotation(PoseStack poseStack, Direction facing)
 	{
 		if (facing.getAxis().isHorizontal())
@@ -174,6 +256,12 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>>
 			poseStack.mulPose(Axis.XP.rotationDegrees(90 * facing.getNormal().getY()));
 	}
 	
+	/**
+	 * Returns the block-facing direction used to orient the animatable model.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @return the block-facing direction used to orient the animatable model
+	 */
 	protected Direction getAnimatableFacing(T animatable)
 	{
 		BlockState blockState = animatable.getBlockState();
@@ -190,6 +278,20 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>>
 		return dir;
 	}
 	
+	/**
+	 * Submits one bone hierarchy using the supplied model and controller inputs.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param bone the baked bone being sampled or submitted
+	 * @param poseStack the current model-to-render pose stack
+	 * @param modelData the canonical model and loader selection
+	 * @param controllers the animation controllers in pose composition order
+	 * @param renderType the render type
+	 * @param color the packed ARGB vertex color
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param packedOverlay the packed overlay texture coordinates
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 */
 	protected void submitBone(T animatable,
 	                          PBakedBone bone,
 	                          PoseStack poseStack,
@@ -205,6 +307,17 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>>
 				new PMeshRenderContext(renderType, color, packedLight, packedOverlay), partialTick);
 	}
 
+	/**
+	 * Submits one bone hierarchy using the supplied model and controller inputs.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param bone the baked bone being sampled or submitted
+	 * @param poseStack the current model-to-render pose stack
+	 * @param modelData the canonical model and loader selection
+	 * @param controllers the animation controllers in pose composition order
+	 * @param inherited the render inputs inherited from the parent bone or renderer
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 */
 	protected void submitBone(T animatable,
 	                          PBakedBone bone,
 	                          PoseStack poseStack,
@@ -259,6 +372,15 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>>
 		});
 	}
 
+	/**
+	 * Resolves render overrides inherited by the selected bone and its meshes.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param bone the baked bone being sampled or submitted
+	 * @param inherited the render inputs inherited from the parent bone or renderer
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the inherited or overridden mesh render inputs
+	 */
 	protected PMeshRenderContext resolveBoneRender(T animatable,
 	                                               PBakedBone bone,
 	                                               PMeshRenderContext inherited,
@@ -267,6 +389,16 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>>
 		return inherited;
 	}
 	
+	/**
+	 * Resolves final render overrides for one mesh of the selected bone.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param bone the baked bone being sampled or submitted
+	 * @param mesh the baked mesh geometry and material
+	 * @param inherited the render inputs inherited from the parent bone or renderer
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the inherited or overridden mesh render inputs
+	 */
 	protected PMeshRenderContext resolveMeshRender(T animatable,
 	                                               PBakedBone bone,
 	                                               PBakedMesh mesh,

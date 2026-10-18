@@ -15,6 +15,12 @@ package com.arcanc.pulselib.content.model.animation;
  */
 public enum PAnimationStageTransition
 {
+	/**
+	 * Continues with the next stage in the raw animation sequence.
+	 */
 	NEXT_STAGE,
+	/**
+	 * Resolves another playback from the same stage player.
+	 */
 	REPEAT_PLAYBACK
 }

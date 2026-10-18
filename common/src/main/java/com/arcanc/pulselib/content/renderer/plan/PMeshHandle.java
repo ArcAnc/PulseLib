@@ -9,6 +9,11 @@
 
 package com.arcanc.pulselib.content.renderer.plan;
 
+/**
+ * Opaque identifier of geometry registered with a render backend.
+ *
+ * @param value the value written by this operation
+ */
 public record PMeshHandle(long value)
 {
 }

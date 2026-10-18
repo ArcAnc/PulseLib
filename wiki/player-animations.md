@@ -18,37 +18,52 @@ The API is client-only. Register definitions in `IPulseClientPlugin.registerPlay
 
 ```java
 @PulsePlugin
-public final class ExamplePlayerAnimations implements IPulseClientPlugin {
-    @Override public ResourceLocation getPluginId() { return ResourceLocation.fromNamespaceAndPath("examplemod", "players"); }
-    private static final PModelData COMBAT_MODEL = PModelData.direct(
-            ResourceLocation.fromNamespaceAndPath(ExampleMod.MOD_ID, "player/combat"),
-            PGeckoModelLoader.INSTANCE.id());
+public final class ExamplePlayerAnimations implements IPulseClientPlugin
+{
+	private static final PModelData COMBAT_MODEL = PModelData.direct(
+			ResourceLocation.fromNamespaceAndPath(ExampleMod.MOD_ID, "player/combat"),
+			PGeckoModelLoader.INSTANCE.id());
 
-    private static final PRawAnimation IDLE = PRawAnimation.begin()
-            .thenLoop("animation.combat.idle")
-            .build();
+	private static final PRawAnimation IDLE = PRawAnimation.begin().
+			thenLoop("animation.combat.idle").
+			build();
 
-    @Override
-    public void registerPlayerAnimations(PPlayerAnimationRegistrar animations) {
-        animations.register(
-                ResourceLocation.fromNamespaceAndPath(ExampleMod.MOD_ID, "combat_pose"),
-                PPlayerAnimationDefinition.builder(COMBAT_MODEL)
-                        .when(player -> player.getMainHandItem().is(MyItems.KATANA.get()))
-                        .bind(PPlayerPart.BODY, "body")
-                        .bind(PPlayerPart.RIGHT_ARM, "right_arm")
-                        .mask(PPlayerPart.BODY, PPlayerPart.RIGHT_ARM)
-                        .blendMode(PPlayerAnimationBlendMode.ADDITIVE_LOCAL)
-                        .weight(0.75f)
-                        .controllers(registrar -> registrar.add("combat", () -> state -> {
-                            state.controller().play(IDLE);
-                            return ControllerState.PLAY;
-                        }))
-                        .build());
-    }
+	@Override
+	public ResourceLocation getPluginId()
+	{
+		return ResourceLocation.fromNamespaceAndPath("examplemod", "players");
+	}
+
+	@Override
+	public void registerModels(PModelRegistrar registrar)
+	{
+		registrar.model(COMBAT_MODEL).texture("0",
+				ResourceLocation.fromNamespaceAndPath(ExampleMod.MOD_ID, "player/combat"));
+	}
+
+	@Override
+	public void registerPlayerAnimations(PPlayerAnimationRegistrar animations)
+	{
+		animations.register(
+				ResourceLocation.fromNamespaceAndPath(ExampleMod.MOD_ID, "combat_pose"),
+				PPlayerAnimationDefinition.builder(COMBAT_MODEL).
+						when(player -> player.getMainHandItem().is(MyItems.KATANA.get())).
+						bind(PPlayerPart.BODY, "body").
+						bind(PPlayerPart.RIGHT_ARM, "right_arm").
+						mask(PPlayerPart.BODY, PPlayerPart.RIGHT_ARM).
+						blendMode(PPlayerAnimationBlendMode.ADDITIVE_LOCAL).
+						weight(0.75f).
+						controllers(registrar -> registrar.add("combat", () -> state ->
+						{
+							state.controller().play(IDLE);
+							return ControllerState.PLAY;
+						})).
+						build());
+	}
 }
 ```
 
-The Gecko loader is built in. Declare `COMBAT_MODEL` and its material textures in the same plugin's `registerModels(PModelRegistrar)` callback.
+The Gecko loader is built in. This example registers its fallback material reference `0` as `assets/examplemod/textures/player/combat.png`. Declare every material reference used by your own model in the same `registerModels(PModelRegistrar)` callback.
 
 Controllers receive a `PPlayerAnimationInstance` as their animatable. Use `state.animatable().player()` to read the current player. PulseLib creates one instance for every `(player UUID, definition id)` pair, so remote players and multiple definitions never share a controller timeline.
 
@@ -59,7 +74,9 @@ For a client packet handler or another explicit client action, use a runtime han
 ```java
 PPlayerAnimationHandle animation = PPlayerAnimations.getHandle(player, COMBAT_POSE_ID);
 if (animation != null)
-    animation.play("combat", ATTACK);
+{
+	animation.play("combat", ATTACK);
+}
 ```
 
 `play`, `stop`, `pause`, `resume`, `stopAll`, and state checks address a named controller. `controller(name)` is available for advanced controller-specific operations without exposing an `AnimManagerKey`. Game-state synchronization itself remains the owning mod's responsibility.
@@ -76,7 +93,7 @@ Each semantic part applies to both the base part and the matching outer skin lay
 
 ```java
 .mask((player, part, partialTick) ->
-        part != PPlayerPart.HEAD || !player.isUsingItem())
+		part != PPlayerPart.HEAD || !player.isUsingItem())
 ```
 
 ## Visual Root Motion
@@ -161,10 +178,10 @@ For a dynamic blend, provide a function evaluated every render pass:
 `partWeight(...)` multiplies that definition weight only for the selected part. It accepts either a constant or the same dynamic weight function:
 
 ```java
-.weight(0.8f)
-.partWeight(PPlayerPart.HEAD, 0.25f)
-.partWeight(PPlayerPart.RIGHT_ARM,
-        (player, partialTick) -> player.isUsingItem() ? 1.0f : 0.0f)
+.weight(0.8f).
+partWeight(PPlayerPart.HEAD, 0.25f).
+partWeight(PPlayerPart.RIGHT_ARM,
+		(player, partialTick) -> player.isUsingItem() ? 1.0f : 0.0f)
 ```
 
 Layer several definitions with different masks, priorities, modes, definition weights, and part weights to combine independent actions.
@@ -193,17 +210,20 @@ Attach a `PDeformerStack` directly to a definition with `deform(part, stack, val
 
 ```java
 private static final PChannelReference<Float> KNEE_BEND =
-        new PChannelReference<>("knee_bend", 0.0f);
+		new PChannelReference<>("knee_bend", 0.0f);
 
 // `BENT_LEG` is a compiled PDeformerStack, for example one PBendDeformer.
-PPlayerAnimationDefinition.builder(MODEL)
-        .bind(PPlayerPart.RIGHT_LEG, "right_leg")
-        .deform(PPlayerPart.RIGHT_LEG, BENT_LEG, (context, reference) -> {
-            if (!reference.name().equals(KNEE_BEND.name()))
-                return reference.defaultValue();
-            return sampleKnee(context.controllerSeconds("combat"));
-        })
-        .build();
+PPlayerAnimationDefinition.builder(MODEL).
+		bind(PPlayerPart.RIGHT_LEG, "right_leg").
+		deform(PPlayerPart.RIGHT_LEG, BENT_LEG, (context, reference) ->
+		{
+			if (!reference.name().equals(KNEE_BEND.name()))
+			{
+				return reference.defaultValue();
+			}
+			return sampleKnee(context.controllerSeconds("combat"));
+		}).
+		build();
 ```
 
 The callback receives `PPlayerAnimationDeformerContext`: `player()`, `definition()`, `partialTick()`, `weight()`, `isPlaying(name)`, `controllerTicks(name)`, and `controllerSeconds(name)`. More than one deformer may target the same part; they run in declaration order. The lower-level global `PPlayerMeshDeformers.register(...)` remains available for a deformation that is not part of an animation definition.
@@ -212,7 +232,7 @@ See [Mesh deformers](mesh-deformers.md) for built-in operations, subdivision, no
 
 ## Model conventions and limitations
 
-The model only needs a skeleton and animations; mesh data is optional. Bone positions from Gecko animations are converted from blocks to vanilla model pixels automatically. Rotation, position, and scale channels are supported. Standard glTF assets keep their normal right-handed Y-up coordinates: the player pipeline converts their position and quaternion axes to Minecraft's mirrored player render space. Do not pre-flip an exported glTF player animation. The skeleton resolver evaluates bind pose and parent transforms; a bound child therefore inherits transforms of intermediate animation bones. A bound `ROOT` is applied once to the render stack and is excluded from child deltas.
+The model only needs a skeleton and animations; mesh data is optional. Gecko positions are authored in model pixels and converted to blocks by the loader; the player boundary converts those positions to vanilla model pixels. Rotation, position, and scale channels are supported. Standard glTF assets keep their normal right-handed Y-up coordinates: the player pipeline converts their position and quaternion axes to Minecraft's mirrored player render space. Do not pre-flip an exported glTF player animation. The skeleton resolver evaluates bind pose and parent transforms; a bound child therefore inherits transforms of intermediate animation bones. A bound `ROOT` is applied once to the render stack and is excluded from child deltas.
 
 The API affects the whole player model in third person and arms in first person. It restores position, rotation, and scale immediately after every draw, preventing a pose from leaking into a different player or another render layer.
 
@@ -220,7 +240,7 @@ The API affects the whole player model in third person and arms in first person.
 
 ```java
 .populateMolangContext((player, instance, controller, context, partialTick) ->
-        context.query("is_sneaking", player.isCrouching() ? 1.0f : 0.0f))
+		context.query("is_sneaking", player.isCrouching() ? 1.0f : 0.0f))
 ```
 
 As with other client-side animation state, multiplayer gameplay events are the owning mod's responsibility to synchronize. The animation definition observes only state available on that client.

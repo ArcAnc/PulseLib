@@ -13,7 +13,15 @@ import net.minecraft.client.model.geom.ModelPart;
 
 import java.util.List;
 
+/**
+ * Mixin-accessible view of the cubes belonging to a vanilla model part.
+ */
 public interface PModelPartCubes
 {
+	/**
+	 * Returns the model part's cubes for player mesh deformation.
+	 *
+	 * @return the model part's cubes for player mesh deformation
+	 */
 	List<ModelPart.Cube> pulselib$cubes();
 }

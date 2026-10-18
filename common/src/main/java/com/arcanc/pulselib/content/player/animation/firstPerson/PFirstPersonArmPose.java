@@ -15,15 +15,21 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-/** VIEW-space arm render command produced from the canonical skeleton. */
+/**
+ * VIEW-space arm render command produced from the canonical skeleton.
+ *
+ * @param mode the rule used to combine the layer with the accumulated value
+ * @param transform the transform; may be {@code null}
+ */
 public record PFirstPersonArmPose(
 		PFirstPersonRenderMode mode,
 		@Nullable PTransform transform)
 {
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param mode the mode to use.
-	 * @param transform the transform to use.
+	 * Creates an arm render command with the supplied mode and optional animated transform.
+	 *
+	 * @param mode the rule used to combine the layer with the accumulated value
+	 * @param transform the transform; may be {@code null}
 	 */
 	public PFirstPersonArmPose
 	{
@@ -35,8 +41,9 @@ public record PFirstPersonArmPose(
 	}
 
 	/**
-	 * Performs the vanilla operation.
-	 * @return the value produced by this operation.
+	 * Creates an arm presentation that retains vanilla first-person rendering.
+	 *
+	 * @return an arm command retaining vanilla rendering
 	 */
 	public static PFirstPersonArmPose vanilla()
 	{
@@ -44,9 +51,10 @@ public record PFirstPersonArmPose(
 	}
 
 	/**
-	 * Performs the animated operation.
-	 * @param transform the transform to use.
-	 * @return the value produced by this operation.
+	 * Creates an arm presentation driven by the supplied animation transform.
+	 *
+	 * @param transform the transform
+	 * @return an arm command using the supplied animation transform
 	 */
 	public static PFirstPersonArmPose animated(PTransform transform)
 	{

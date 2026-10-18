@@ -9,7 +9,15 @@
 
 package com.arcanc.pulselib.content.renderer.plan;
 
+/**
+ * Provides the host application frame matrices needed by a render backend.
+ */
 public interface PRenderHost
 {
+	/**
+	 * Captures the current host render matrices into an independent render frame.
+	 *
+	 * @return the captured host model-view and projection matrices
+	 */
 	PRenderFrame captureFrame();
 }

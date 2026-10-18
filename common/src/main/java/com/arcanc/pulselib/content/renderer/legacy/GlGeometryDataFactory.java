@@ -16,12 +16,23 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 
 import java.nio.ByteBuffer;
 
+/**
+ * Captures baked mesh bytes into renderer-independent geometry data.
+ */
 public final class GlGeometryDataFactory
 {
 	private GlGeometryDataFactory()
 	{
 	}
 
+	/**
+	 * Copies vertex and index data from a baked mesh into portable geometry storage.
+	 *
+	 * @param meshData the mesh data
+	 * @param mesh the mesh
+	 * @param vertexStride the number of bytes occupied by one vertex
+	 * @return the immutable indexed mesh geometry
+	 */
 	public static PGeometryData capture(MeshData meshData, PMeshPrimitive mesh, int vertexStride)
 	{
 		ByteBuffer vertices = meshData.vertexBuffer().duplicate();

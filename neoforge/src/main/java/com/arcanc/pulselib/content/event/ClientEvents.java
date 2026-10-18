@@ -31,10 +31,19 @@ import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsE
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.LevelEvent;
 
+/**
+ * NeoForge client mod-bus registrations for plugin content, atlas sources, resource reloads and item
+ * extensions.
+ */
 public class ClientEvents
 {
 	private static boolean pulseClientContentRegistered;
 
+	/**
+	 * Installs NeoForge client lifecycle and registration event listeners.
+	 *
+	 * @param bus the NeoForge mod lifecycle event bus
+	 */
 	public static void registerClientEvents(IEventBus bus)
 	{
 		bus.addListener(EventPriority.HIGHEST, ClientEvents :: registerSpriteSources);
@@ -50,6 +59,9 @@ public class ClientEvents
 		event.enqueueWork(ClientEvents :: ensurePulseClientContentRegistered);
 	}
 
+	/**
+	 * Registers built-in anchors and client plugin content once before consumers require it.
+	 */
 	public static synchronized void ensurePulseClientContentRegistered()
 	{
 		if (pulseClientContentRegistered)

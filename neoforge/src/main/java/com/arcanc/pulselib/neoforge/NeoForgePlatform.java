@@ -13,14 +13,23 @@ import com.arcanc.pulselib.platform.IPulsePlatform;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.fml.loading.FMLLoader;
 
+/**
+ * NeoForge implementation of common physical-side and entity riding queries.
+ */
 public final class NeoForgePlatform implements IPulsePlatform
 {
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean isClient()
 	{
 		return FMLLoader.getDist().isClient();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean shouldRiderSit(Entity mount)
 	{

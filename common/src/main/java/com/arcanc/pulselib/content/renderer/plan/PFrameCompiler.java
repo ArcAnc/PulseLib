@@ -21,6 +21,11 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 
+/**
+ * Collects staged instance submissions and compiles opaque batches and ordered translucent draw groups.
+ *
+ * @param <S> the render-stage identifier type
+ */
 public final class PFrameCompiler<S>
 {
 	private final Map<S, Map<DrawKey, List<PInstanceHeader>>> opaque = new Object2ObjectOpenHashMap<>();
@@ -28,16 +33,34 @@ public final class PFrameCompiler<S>
 
 	private final ToDoubleFunction<PInstanceHeader> sortDepth;
 
+	/**
+	 * Creates a staged submission compiler using the default or supplied translucent-depth function.
+	 */
 	public PFrameCompiler()
 	{
 		this(PFrameCompiler :: distanceSquared);
 	}
 
+	/**
+	 * Creates a staged submission compiler using the default or supplied translucent-depth function.
+	 *
+	 * @param sortDepth the callback calculating translucent instance sort depth
+	 */
 	public PFrameCompiler(ToDoubleFunction<PInstanceHeader> sortDepth)
 	{
 		this.sortDepth = sortDepth;
 	}
 
+	/**
+	 * Queues one instance under a stage, pipeline and mesh draw description.
+	 *
+	 * @param stage the stage
+	 * @param pipeline the pipeline
+	 * @param mesh the mesh
+	 * @param indexCount the number of indices to draw
+	 * @param instance the instance
+	 * @param transparent whether the submission requires translucent rendering
+	 */
 	public void submit(S stage,
 	                   PPipelineHandle pipeline,
 	                   PMeshHandle mesh,
@@ -48,6 +71,16 @@ public final class PFrameCompiler<S>
 		this.submit(stage, pipeline, mesh, new PDrawCommand(indexCount, 1, 0, 0, 0), instance, transparent);
 	}
 
+	/**
+	 * Queues one instance under a stage, pipeline and mesh draw description.
+	 *
+	 * @param stage the stage
+	 * @param pipeline the pipeline
+	 * @param mesh the mesh
+	 * @param command the command
+	 * @param instance the instance
+	 * @param transparent whether the submission requires translucent rendering
+	 */
 	public void submit(S stage,
 	                   PPipelineHandle pipeline,
 	                   PMeshHandle mesh,
@@ -66,23 +99,47 @@ public final class PFrameCompiler<S>
 				computeIfAbsent(key, ignored -> new ObjectArrayList<>()).add(instance);
 	}
 
+	/**
+	 * Compiles queued submissions for one stage into an executable render plan.
+	 *
+	 * @param stage the stage
+	 * @return the compiled draw groups and packed instance data
+	 */
 	public PRenderPlan compile(S stage)
 	{
 		return compile(stage, ignored -> false);
 	}
 
+	/**
+	 * Compiles queued submissions for one stage into an executable render plan.
+	 *
+	 * @param stage the stage
+	 * @param canBatchWithOit the predicate identifying pipelines compatible with weighted transparency batching
+	 * @return the compiled draw groups and packed instance data
+	 */
 	public PRenderPlan compile(S stage, Predicate<PPipelineHandle> canBatchWithOit)
 	{
 		return compileCombined(List.of(stage), canBatchWithOit);
 	}
 
-	/** Consumes only opaque submissions, leaving transparency for its later pass. */
+	/**
+	 * Consumes only opaque submissions, leaving transparency for its later pass.
+	 *
+	 * @param stage the stage
+	 * @return the compiled draw groups and packed instance data
+	 */
 	public PRenderPlan compileOpaque(S stage)
 	{
 		return compile(this.opaque.remove(stage), null, ignored -> false);
 	}
 
-	/** Sorts ordinary transparency across all requested sources before forming batches. */
+	/**
+	 * Sorts ordinary transparency across all requested sources before forming batches.
+	 *
+	 * @param stages the stages
+	 * @param canBatchWithOit the predicate identifying pipelines compatible with weighted transparency batching
+	 * @return the compiled draw groups and packed instance data
+	 */
 	public PRenderPlan compileCombined(List<S> stages, Predicate<PPipelineHandle> canBatchWithOit)
 	{
 		Map<DrawKey, List<PInstanceHeader>> opaqueGroups = new Object2ObjectOpenHashMap<>();
@@ -147,7 +204,12 @@ public final class PFrameCompiler<S>
 		return groups.isEmpty() ? PRenderPlan.EMPTY : new PRenderPlan(groups);
 	}
 
-	/** Consumes every stage of a compiler owned by one local context. */
+	/**
+	 * Consumes every stage of a compiler owned by one local context.
+	 *
+	 * @param canBatchWithOit the predicate identifying pipelines compatible with weighted transparency batching
+	 * @return the compiled draw groups and packed instance data
+	 */
 	public PRenderPlan compileAll(Predicate<PPipelineHandle> canBatchWithOit)
 	{
 		var stages = new LinkedHashSet<>(this.opaque.keySet());
@@ -155,7 +217,11 @@ public final class PFrameCompiler<S>
 		return compileCombined(new ArrayList<>(stages), canBatchWithOit);
 	}
 
-	/** Discards selected stages without compiling a draw plan. */
+	/**
+	 * Discards selected stages without compiling a draw plan.
+	 *
+	 * @param stages the stages
+	 */
 	public void discard(List<S> stages)
 	{
 		for (S stage : stages)
@@ -165,11 +231,19 @@ public final class PFrameCompiler<S>
 		}
 	}
 
+	/**
+	 * Returns whether no render submissions remain queued.
+	 *
+	 * @return whether no render submissions remain queued
+	 */
 	public boolean isEmpty()
 	{
 		return this.opaque.isEmpty() && this.translucent.isEmpty();
 	}
 
+	/**
+	 * Discards all queued stage submissions.
+	 */
 	public void clear()
 	{
 		this.opaque.clear();
@@ -189,8 +263,18 @@ public final class PFrameCompiler<S>
 				instance.transform().m32() * instance.transform().m32();
 	}
 
+	/**
+	 * Batch identity for submissions sharing pipeline, mesh and draw-command parameters.
+	 *
+	 * @param pipeline the pipeline
+	 * @param mesh the mesh
+	 * @param command the command
+	 */
 	private record DrawKey(PPipelineHandle pipeline, PMeshHandle mesh, PDrawCommand command)
 	{
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public boolean equals(@Nullable Object object)
 		{
@@ -198,6 +282,11 @@ public final class PFrameCompiler<S>
 					this.pipeline == that.pipeline && this.mesh == that.mesh && this.command.equals(that.command);
 		}
 
+		/**
+		 * Returns the hash code.
+		 *
+		 * @return the hash code
+		 */
 		@Override
 		public int hashCode()
 		{
@@ -205,6 +294,13 @@ public final class PFrameCompiler<S>
 		}
 	}
 
+	/**
+	 * One translucent draw submission retaining its sort depth and insertion order.
+	 *
+	 * @param key the key
+	 * @param instance the instance
+	 * @param sortDepth the callback calculating translucent instance sort depth
+	 */
 	private record TransparentSubmission(DrawKey key, PInstanceHeader instance, double sortDepth)
 	{
 	}

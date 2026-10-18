@@ -13,7 +13,12 @@ package com.arcanc.pulselib.content.player.animation.firstPerson;
 import java.util.Objects;
 
 /**
- * Immutable value object representing player first person settings.
+ * First-person enablement, activation transition durations and camera mode.
+ *
+ * @param enabled whether animation can contribute to first-person presentation
+ * @param transitionIn the first-person activation fade-in duration in game ticks
+ * @param transitionOut the first-person activation fade-out duration in game ticks
+ * @param cameraMode the animated or vanilla first-person camera policy
  */
 public record PPlayerFirstPersonSettings(
 		boolean enabled,
@@ -21,18 +26,25 @@ public record PPlayerFirstPersonSettings(
 		float transitionOut,
 		PFirstPersonCameraMode cameraMode)
 {
+	/**
+	 * Settings that disable animated first-person presentation.
+	 */
 	public static final PPlayerFirstPersonSettings DISABLED =
 			new PPlayerFirstPersonSettings(false, 0.0f, 0.0f, PFirstPersonCameraMode.VANILLA);
 
+	/**
+	 * Default settings that enable animated first-person presentation.
+	 */
 	public static final PPlayerFirstPersonSettings ENABLED =
 			new PPlayerFirstPersonSettings(true, 3.0f, 3.0f, PFirstPersonCameraMode.ANIMATED);
 
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param enabled the enabled to use.
-	 * @param transitionIn the transition in to use.
-	 * @param transitionOut the transition out to use.
-	 * @param cameraMode the camera mode to use.
+	 * Creates first-person settings with finite, non-negative transition durations.
+	 *
+	 * @param enabled whether animation can contribute to first-person presentation
+	 * @param transitionIn the first-person activation fade-in duration in game ticks
+	 * @param transitionOut the first-person activation fade-out duration in game ticks
+	 * @param cameraMode the animated or vanilla first-person camera policy
 	 */
 	public PPlayerFirstPersonSettings
 	{

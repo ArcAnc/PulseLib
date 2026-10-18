@@ -11,6 +11,11 @@ package com.arcanc.pulselib.data.gecko;
 
 import com.arcanc.pulselib.content.model.animation.PAnimationDecodeContext;
 
+/**
+ * Gecko source-format conversion and interpolation inputs available to channel decoders.
+ *
+ * @param modelScale the model scale
+ */
 public record PGeckoDecodeContext(float modelScale) implements PAnimationDecodeContext
 {
 }

@@ -9,10 +9,25 @@
 
 package com.arcanc.pulselib.content.model.animation;
 
+/**
+ * Logical-side policy used to decide whether an animation event should execute.
+ */
 public enum PEventSide
 {
+	/**
+	 * Executes in client levels.
+	 */
 	CLIENT,
+	/**
+	 * Executes in server levels.
+	 */
 	SERVER,
+	/**
+	 * Executes on both logical sides.
+	 */
 	BOTH,
+	/**
+	 * Executes only as a client presentation effect.
+	 */
 	PRESENTATION_ONLY
 }

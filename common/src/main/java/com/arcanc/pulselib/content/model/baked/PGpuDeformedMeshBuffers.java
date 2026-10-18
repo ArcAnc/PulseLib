@@ -22,6 +22,9 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
+/**
+ * Caches subdivided source geometry used by GPU mesh deformation.
+ */
 public final class PGpuDeformedMeshBuffers
 {
 
@@ -31,6 +34,13 @@ public final class PGpuDeformedMeshBuffers
 	{
 	}
 
+	/**
+	 * Returns the mesh geometry subdivided to the requested deformation level.
+	 *
+	 * @param mesh the baked mesh geometry and material
+	 * @param subdivisionLevel the triangle subdivision level applied before deformation
+	 * @return the mesh geometry subdivided to the requested deformation level
+	 */
 	public static PGeometryData resolve(PBakedMesh mesh, int subdivisionLevel)
 	{
 		if (subdivisionLevel < 0)
@@ -41,11 +51,19 @@ public final class PGpuDeformedMeshBuffers
 				subdivisionLevel, level -> bake(mesh, PMeshTessellator.subdivide(mesh.source(), level)));
 	}
 
+	/**
+	 * Removes cached GPU deformation geometry for the supplied mesh.
+	 *
+	 * @param mesh the baked mesh geometry and material
+	 */
 	public static void close(PBakedMesh mesh)
 	{
 		GEOMETRIES.remove(mesh);
 	}
 
+	/**
+	 * Clears all cached GPU deformation geometry.
+	 */
 	public static void cleanup()
 	{
 		GEOMETRIES.clear();

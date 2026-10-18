@@ -16,16 +16,34 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
+/**
+ * Vertex buffer builder that remaps texture coordinates into one atlas sprite.
+ */
 public class AtlasBufferBuilder extends BufferBuilder
 {
 	private final TextureAtlasSprite sprite;
 	
+	/**
+	 * Creates a vertex builder whose local UVs are mapped into the selected atlas sprite.
+	 *
+	 * @param buffer the vertex or buffer output
+	 * @param mode the rule used to combine the layer with the accumulated value
+	 * @param format the vertex layout used to interpret vertex bytes
+	 * @param sprite the sprite
+	 */
 	public AtlasBufferBuilder(ByteBufferBuilder buffer, VertexFormat.Mode mode, VertexFormat format, TextureAtlasSprite sprite)
 	{
 		super(buffer, mode, format);
 		this.sprite = sprite;
 	}
 	
+	/**
+	 * Maps local texture coordinates into the selected atlas sprite before writing the vertex.
+	 *
+	 * @param u the u
+	 * @param v the v
+	 * @return this builder
+	 */
 	@Override
 	public VertexConsumer setUv(float u, float v)
 	{

@@ -14,9 +14,17 @@ import net.minecraft.client.renderer.texture.SpriteContents;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
+/**
+ * Exposes original sprite pixels for texture alpha classification.
+ */
 @Mixin (SpriteContents.class)
 public interface SpriteContentsAccessor
 {
+	/**
+	 * Returns the original sprite image used for alpha classification.
+	 *
+	 * @return the original sprite image used for alpha classification
+	 */
 	@Accessor ("originalImage")
 	NativeImage pulselib$getOriginalImage();
 }

@@ -42,6 +42,9 @@ public final class GlRenderState implements AutoCloseable
 	private final float[] shaderColor = RenderSystem.getShaderColor().clone();
 	private final @Nullable ShaderInstance shader = RenderSystem.getShader();
 
+	/**
+	 * Captures the caller's current render target and OpenGL state for later restoration.
+	 */
 	public GlRenderState()
 	{
 		RenderSystem.assertOnRenderThread();
@@ -59,12 +62,18 @@ public final class GlRenderState implements AutoCloseable
 		GL13.glActiveTexture(activeTexture);
 	}
 
+	/**
+	 * Binds the captured render target for local model rendering.
+	 */
 	public void bindTarget()
 	{
 		GL30.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, this.drawFramebuffer);
 		GL11.glViewport(this.viewport[0], this.viewport[1], this.viewport[2], this.viewport[3]);
 	}
 
+	/**
+	 * Restores the render state captured when this scope was created.
+	 */
 	@Override
 	public void close()
 	{

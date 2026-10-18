@@ -1,6 +1,6 @@
 # PulseLib Entities
 
-Entities are the most natural fit for PulseLib: each entity already has its own lifetime, position, rotation, and tick state. The entity implements [`PAnimatable`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimatable.java), and [`PEntityRenderer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java) renders the animated model.
+Entities are the most natural fit for PulseLib: each entity already has its own lifetime, position, rotation, and tick state. The entity implements [`PAnimatable`](../common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimatable.java), and [`PEntityRenderer`](../common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java) renders the animated model.
 
 Use entity controllers to translate gameplay state into animation state. Do not put rendering decisions into the AI goals or renderer when a controller can express the same rule cleanly.
 
@@ -9,34 +9,42 @@ Use entity controllers to translate gameplay state into animation state. Do not 
 This example chooses attack, walk, or idle from normal entity state. The animation names must exist in the exported model.
 
 ```java
-public class RobotEntity extends PathfinderMob implements PAnimatable<RobotEntity> {
-    private static final PRawAnimation WALK = PRawAnimation.begin().thenLoop("walk").build();
-    private static final PRawAnimation IDLE = PRawAnimation.begin().thenLoop("idle").build();
-    private static final PRawAnimation ATTACK = PRawAnimation.begin().thenPlay("attack").build();
+public class RobotEntity extends PathfinderMob implements PAnimatable<RobotEntity>
+{
+	private static final PRawAnimation WALK = PRawAnimation.begin().thenLoop("walk").build();
+	private static final PRawAnimation IDLE = PRawAnimation.begin().thenLoop("idle").build();
+	private static final PRawAnimation ATTACK = PRawAnimation.begin().thenPlay("attack").build();
 
-    private final PAnimationManager<RobotEntity> manager = PLibHelper.createManager(this);
+	private final PAnimationManager<RobotEntity> manager = PLibHelper.createManager(this);
 
-    public RobotEntity(EntityType<? extends PathfinderMob> type, Level level) {
-        super(type, level);
-    }
+	public RobotEntity(EntityType<? extends PathfinderMob> type, Level level)
+	{
+		super(type, level);
+	}
 
-    @Override
-    public PAnimationManager<RobotEntity> getAnimationManager(AnimManagerKey key) {
-        return this.manager;
-    }
+	@Override
+	public PAnimationManager<RobotEntity> getAnimationManager(AnimManagerKey key)
+	{
+		return this.manager.getManager(key);
+	}
 
-    @Override
-    public void registerAnimationControllers(PAnimationManager.PAnimationRegistrar<RobotEntity> registrar) {
-        registrar.add("main", () -> state -> {
-            RobotEntity entity = state.animatable();
-            if (entity.swinging) {
-                state.controller().play(ATTACK);
-            } else {
-                state.controller().play(entity.walkAnimation.isMoving() ? WALK : IDLE);
-            }
-            return ControllerState.PLAY;
-        });
-    }
+	@Override
+	public void registerAnimationControllers(PAnimationManager.PAnimationRegistrar<RobotEntity> registrar)
+	{
+		registrar.add("main", () -> state ->
+		{
+			RobotEntity entity = state.animatable();
+			if (entity.swinging)
+			{
+				state.controller().play(ATTACK);
+			}
+			else
+			{
+				state.controller().play(entity.walkAnimation.isMoving() ? WALK : IDLE);
+			}
+			return ControllerState.PLAY;
+		});
+	}
 }
 ```
 
@@ -45,24 +53,35 @@ public class RobotEntity extends PathfinderMob implements PAnimatable<RobotEntit
 The renderer is mostly declarative: model data plus render type. Living entity rotation and scaling are handled by `PEntityRenderer`.
 
 ```java
-public class RobotRenderer extends PEntityRenderer<RobotEntity> {
-    public RobotRenderer(EntityRendererProvider.Context context) {
-        super(context,
-                PModelData.entity(
-                        ResourceLocation.fromNamespaceAndPath("examplemod", "robot")),
-                PRenderTypes.RenderTypeProvider::trianglesSolid);
-    }
+public class RobotRenderer extends PEntityRenderer<RobotEntity>
+{
+	public RobotRenderer(EntityRendererProvider.Context context)
+	{
+		super(context,
+				PModelData.entity(
+						ResourceLocation.fromNamespaceAndPath("examplemod", "robot")),
+				PRenderTypes.RenderTypeProvider::trianglesSolid);
+	}
 }
 ```
 
-Register it:
+Register it on the NeoForge mod event bus, on the client:
 
 ```java
 @SubscribeEvent
-public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
-    event.registerEntityRenderer(MyEntities.ROBOT.get(), RobotRenderer::new);
+public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event)
+{
+	event.registerEntityRenderer(MyEntities.ROBOT.get(), RobotRenderer::new);
 }
 ```
+
+On Fabric, register it from your client initializer instead:
+
+```java
+EntityRendererRegistry.register(MyEntities.ROBOT.get(), RobotRenderer::new);
+```
+
+The registry holder names are examples; pass your registered `EntityType<RobotEntity>` using your mod's registry API.
 
 ## LivingEntity behavior
 
@@ -75,10 +94,10 @@ For `LivingEntity`, `PEntityRenderer` follows several vanilla transforms so cust
 
 ## Layers
 
-Use [`PEntityRenderLayer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderLayer.java) for extra model parts attached to entity bones: armor plates, backpacks, equipment, or conditional body parts. See [Entity Render Layers](entity-render-layers.md).
+Use [`PEntityRenderLayer`](../common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderLayer.java) for extra model parts attached to entity bones: armor plates, backpacks, equipment, or conditional body parts. See [Entity Render Layers](entity-render-layers.md).
 
 Classes used:
 
-* [`PEntityRenderer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java)
-* [`PModelData`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/modelData/PModelData.java)
-* [`PAnimationController`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimationController.java)
+* [`PEntityRenderer`](../common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java)
+* [`PModelData`](../common/src/main/java/com/arcanc/pulselib/content/renderer/modelData/PModelData.java)
+* [`PAnimationController`](../common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimationController.java)

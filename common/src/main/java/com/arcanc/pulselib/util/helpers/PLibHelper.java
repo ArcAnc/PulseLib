@@ -30,9 +30,13 @@ import java.util.Collection;
 import java.util.function.Function;
 
 /**
+ * Animation manager lookup helpers and GUI model rendering entry points.
+ * <p>
  * Part of this code copied from Geckolib: <a href="https://github.com/bernie-g/geckolib/blob/1.21.1/common/src/main/java/software/bernie/geckolib/util/GeckoLibUtil.java">GeckoLibUtil</a>
  * <p>Stop crying, Tslat!</p>
  * <p>Modified by ArcAnc</p>
+ *
+
  */
 public class PLibHelper
 {
@@ -40,6 +44,10 @@ public class PLibHelper
 	 * Creates an instance manager for Entity/BlockEntity owners and a singleton manager otherwise.
 	 * Use an explicit factory when a custom owner's lifetime differs from this default.
 	 * Controller registration is deferred, so this is safe in an owner's field initializer.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param animatable the owner whose animation state is being processed
+	 * @return the newly created manager with the requested ownership policy
 	 */
 	public static <T extends PAnimatable<T>> PAnimationManager<T> createManager(T animatable)
 	{
@@ -48,13 +56,25 @@ public class PLibHelper
 		return createSingletonManager(animatable);
 	}
 
-	/** Creates a new directly owned manager without invoking owner callbacks. */
+	/**
+	 * Creates a new directly owned manager without invoking owner callbacks.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param animatable the owner whose animation state is being processed
+	 * @return the newly created manager with the requested ownership policy
+	 */
 	public static <T extends PAnimatable<T>> InstanceAnimationManager<T> createInstanceManager(T animatable)
 	{
 		return new InstanceAnimationManager<>(animatable);
 	}
 
-	/** Creates access to the owner's keyed singleton contexts without invoking owner callbacks. */
+	/**
+	 * Creates access to the owner's keyed singleton contexts without invoking owner callbacks.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param animatable the owner whose animation state is being processed
+	 * @return the newly created manager with the requested ownership policy
+	 */
 	public static <T extends PAnimatable<T>> SingletonAnimationManager<T> createSingletonManager(T animatable)
 	{
 		return new SingletonAnimationManager<>(animatable);
@@ -63,19 +83,37 @@ public class PLibHelper
 	/**
 	 * Creates a new manager with an explicitly selected ownership strategy.
 	 * Prefer getManager for access to an existing context.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param animatable the owner whose animation state is being processed
+	 * @param singleton whether the manager is owned by a shared animatable
+	 * @return the newly created manager with the requested ownership policy
 	 */
 	public static <T extends PAnimatable<T>> PAnimationManager<T> createManager(T animatable, boolean singleton)
 	{
 		return singleton ? createSingletonManager(animatable) : createInstanceManager(animatable);
 	}
 
-	/** Resolves the owner's strategy and initializes controllers after owner construction. */
+	/**
+	 * Resolves the owner's strategy and initializes controllers after owner construction.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param animatable the owner whose animation state is being processed
+	 * @return the initialized animation manager selected by the owner's storage strategy
+	 */
 	public static <T extends PAnimatable<T>> PAnimationManager<T> getManager(T animatable)
 	{
 		return getManager(animatable, AnimManagerKey.ofObject(animatable));
 	}
 
-	/** Resolves a context without choosing or replacing the owner's storage strategy. */
+	/**
+	 * Resolves a context without choosing or replacing the owner's storage strategy.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param animatable the owner whose animation state is being processed
+	 * @param key the key
+	 * @return the initialized animation manager selected by the owner's storage strategy
+	 */
 	public static <T extends PAnimatable<T>> PAnimationManager<T> getManager(T animatable, AnimManagerKey key)
 	{
 		return animatable.getAnimationManager(key).getManager(key);
@@ -84,6 +122,9 @@ public class PLibHelper
 	/**
 	 * Resolves the registered item's strategy with the stack's existing runtime identity.
 	 * @throws IllegalArgumentException if the stack is empty or is not animated.
+	 *
+	 * @param stack the item stack supplying render or animation state
+	 * @return the initialized animation manager selected by the owner's storage strategy
 	 */
 	public static PAnimationManager<?> getManager(ItemStack stack)
 	{
@@ -93,6 +134,22 @@ public class PLibHelper
 		return animatable.getAnimationManager(key).getManager(key);
 	}
 
+	/**
+	 * Renders an animated model in an isolated GUI render scope at the supplied screen position.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param guiGraphics the GUI drawing context
+	 * @param modelData the canonical model and loader selection
+	 * @param controllers the animation controllers in pose composition order
+	 * @param renderType the render type
+	 * @param x the GUI x coordinate in screen pixels
+	 * @param y the GUI y coordinate in screen pixels
+	 * @param scale the local scale vector
+	 * @param packedColor the packed ARGB vertex color
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param packedOverlay the packed overlay texture coordinates
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 */
 	public static <T extends PAnimatable<T>> void renderModelInGui(GuiGraphics guiGraphics,
 	                                   PModelData modelData,
 									   Collection<PAnimationController<T>> controllers,

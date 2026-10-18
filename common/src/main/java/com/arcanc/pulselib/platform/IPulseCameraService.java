@@ -11,7 +11,18 @@ package com.arcanc.pulselib.platform;
 
 import net.minecraft.client.Camera;
 
+/**
+ * Loader-specific bridge for updating camera rotation, including animated roll.
+ */
 public interface IPulseCameraService
 {
+	/**
+	 * Sets camera yaw, pitch and roll in degrees and updates the camera orientation vectors.
+	 *
+	 * @param camera the camera
+	 * @param yaw the yaw angle in degrees
+	 * @param pitch the pitch angle in degrees
+	 * @param roll the roll angle in degrees
+	 */
 	void setRotation(Camera camera, float yaw, float pitch, float roll);
 }

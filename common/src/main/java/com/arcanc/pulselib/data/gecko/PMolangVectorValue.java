@@ -14,6 +14,9 @@ import com.arcanc.pulselib.content.model.animation.PAnimationValue;
 import com.arcanc.pulselib.content.model.animation.PVectorConversion;
 import org.joml.Vector3f;
 
+/**
+ * Three Molang expressions sampled component-wise and converted to animation vector coordinates.
+ */
 public final class PMolangVectorValue implements PAnimationValue<Vector3f>
 {
 	private final MolangParser.Expression x;
@@ -21,6 +24,14 @@ public final class PMolangVectorValue implements PAnimationValue<Vector3f>
 	private final MolangParser.Expression z;
 	private final PVectorConversion conversion;
 
+	/**
+	 * Creates a component-wise Molang vector value with source-format coordinate conversion.
+	 *
+	 * @param x the Molang expression for the x component
+	 * @param y the Molang expression for the y component
+	 * @param z the Molang expression for the z component
+	 * @param conversion the conversion
+	 */
 	public PMolangVectorValue(MolangParser.Expression x, MolangParser.Expression y, MolangParser.Expression z, PVectorConversion conversion)
 	{
 		this.x = x;
@@ -29,6 +40,12 @@ public final class PMolangVectorValue implements PAnimationValue<Vector3f>
 		this.conversion = conversion;
 	}
 
+	/**
+	 * Evaluates the component expressions and writes the converted vector into the destination.
+	 *
+	 * @param context the animation sampling context and reusable scratch values
+	 * @param destination the mutable object receiving the result
+	 */
 	@Override
 	public void evaluate(PAnimationEvaluationContext context, Vector3f destination)
 	{

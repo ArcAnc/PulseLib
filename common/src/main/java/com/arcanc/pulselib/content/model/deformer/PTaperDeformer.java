@@ -14,8 +14,14 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector3f;
 
+/**
+ * Prepares deformation that varies transverse scale along a longitudinal axis.
+ */
 public final class PTaperDeformer implements PMeshDeformer<PTaperDefinition>
 {
+	/**
+	 * Shared instance of this stateless implementation.
+	 */
 	public static final PTaperDeformer INSTANCE = new PTaperDeformer();
 	private static final float EPSILON = 1.0e-5f;
 
@@ -23,18 +29,34 @@ public final class PTaperDeformer implements PMeshDeformer<PTaperDefinition>
 	{
 	}
 
+	/**
+	 * Returns the namespaced identifier of the taper deformer.
+	 *
+	 * @return the namespaced identifier of the taper deformer
+	 */
 	@Override
 	public ResourceLocation id()
 	{
 		return PLibDatabase.rl("taper");
 	}
 
+	/**
+	 * Returns the taper configuration codec.
+	 *
+	 * @return the taper configuration codec
+	 */
 	@Override
 	public MapCodec<PTaperDefinition> codec()
 	{
 		return PTaperDefinition.CODEC;
 	}
 
+	/**
+	 * Appends a prepared taper operation to the supplied context.
+	 *
+	 * @param context the destination collecting prepared deformation operations
+	 * @param definition the immutable configuration to register or evaluate
+	 */
 	@Override
 	public void prepare(PDeformerPrepareContext context, PTaperDefinition definition)
 	{
@@ -45,9 +67,24 @@ public final class PTaperDeformer implements PMeshDeformer<PTaperDefinition>
 				definition.negativeExtent(), definition.tipScale()));
 	}
 
+	/**
+	 * Prepared taper operation with resolved axes and channel reference.
+	 *
+	 * @param origin the local pivot or origin of the deformation
+	 * @param axis the normalized deformation axis
+	 * @param positiveExtent the positive-axis deformation extent
+	 * @param negativeExtent the negative-axis deformation extent
+	 * @param tipScale the tip scale channel reference and its fallback value
+	 */
 	private record Operation(Vector3f origin, Vector3f axis, float positiveExtent, float negativeExtent,
 								 PChannelReference<Float> tipScale) implements PPreparedDeformer
 	{
+		/**
+		 * Applies longitudinally varying transverse scale to the position in place.
+		 *
+		 * @param position the position
+		 * @param values the source of current animated deformation channel values
+		 */
 		@Override
 		public void deform(Vector3f position, PDeformerValueSource values)
 		{

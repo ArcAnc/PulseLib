@@ -14,10 +14,25 @@ import com.arcanc.pulselib.util.PLibDatabase;
 /** Standard semantic sockets exposed by player animations. */
 public final class PPlayerAnimationAnchors
 {
+	/**
+	 * Animated first-person camera action anchor.
+	 */
 	public static final PPlayerAnimationAnchor FIRST_PERSON_CAMERA = of("first_person_camera");
+	/**
+	 * Animated right-hand action anchor.
+	 */
 	public static final PPlayerAnimationAnchor RIGHT_HAND = of("right_hand");
+	/**
+	 * Animated left-hand action anchor.
+	 */
 	public static final PPlayerAnimationAnchor LEFT_HAND = of("left_hand");
+	/**
+	 * Animated right held-item action anchor.
+	 */
 	public static final PPlayerAnimationAnchor RIGHT_ITEM = of("right_item");
+	/**
+	 * Animated left held-item action anchor.
+	 */
 	public static final PPlayerAnimationAnchor LEFT_ITEM = of("left_item");
 
 	private PPlayerAnimationAnchors()

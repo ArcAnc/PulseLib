@@ -12,8 +12,16 @@ package com.arcanc.pulselib.util.helpers;
 
 import net.minecraft.client.Minecraft;
 
+/**
+ * Client rendering convenience helpers.
+ */
 public class PLibRenderHelper
 {
+	/**
+	 * Returns the current Minecraft client instance.
+	 *
+	 * @return the current Minecraft client instance
+	 */
 	public static Minecraft mc()
 	{
 		return Minecraft.getInstance();

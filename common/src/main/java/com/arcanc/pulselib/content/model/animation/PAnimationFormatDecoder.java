@@ -13,7 +13,17 @@ import com.google.gson.JsonElement;
 
 import java.util.Map;
 
+/**
+ * Decodes the animation tracks of a source-format bone node.
+ */
 public interface PAnimationFormatDecoder
 {
+	/**
+	 * Decodes supported channel tracks from one bone animation node.
+	 *
+	 * @param context the context
+	 * @param boneNode the source-format JSON node containing one bone's animation tracks
+	 * @return the supported channel tracks indexed by channel name
+	 */
 	Map<String, PAnimationTrack<?>> decodeBoneTracks(PAnimationDecodeContext context, JsonElement boneNode);
 }

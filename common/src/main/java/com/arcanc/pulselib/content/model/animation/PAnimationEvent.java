@@ -10,8 +10,23 @@ package com.arcanc.pulselib.content.model.animation;
 
 import java.util.Objects;
 
+/**
+ * Typed event payload scheduled at an animation position measured in game ticks.
+ *
+ * @param <T> the decoded animation event payload type
+ * @param time the event position in animation game ticks
+ * @param type the registered animation event type
+ * @param data the decoded event payload
+ */
 public record PAnimationEvent<T>(float time, PAnimationEventType<T> type, T data)
 {
+	/**
+	 * Creates a typed event scheduled at a finite, non-negative animation tick position.
+	 *
+	 * @param time the event position in animation game ticks
+	 * @param type the registered animation event type
+	 * @param data the decoded event payload
+	 */
 	public PAnimationEvent
 	{
 		if (!Float.isFinite(time) || time < 0.0f)

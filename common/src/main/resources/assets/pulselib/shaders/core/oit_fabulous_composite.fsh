@@ -1,12 +1,5 @@
 #version 150
 
-/*
- * @author ArcAnc
- * Created at: 13.10.2026
- * Copyright (c) 2026
- * Licensed under "Arc's License of Common Sense"; see the root license file.
- */
-
 uniform sampler2D AccumSampler;
 uniform sampler2D OitMetadataSampler;
 uniform sampler2D TranslucentSampler;

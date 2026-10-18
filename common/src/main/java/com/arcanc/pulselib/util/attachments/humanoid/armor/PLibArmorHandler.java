@@ -18,8 +18,16 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 
+/**
+ * Installs living, humanoid and animated-player attachment layers on compatible renderers.
+ */
 public final class PLibArmorHandler
 {
+	/**
+	 * Adds the PulseLib attachment layers supported by the supplied entity renderer.
+	 *
+	 * @param renderer the renderer
+	 */
 	@SuppressWarnings ( {"rawtypes", "unchecked"})
 	public static void addLayers(EntityRenderer<?> renderer)
 	{

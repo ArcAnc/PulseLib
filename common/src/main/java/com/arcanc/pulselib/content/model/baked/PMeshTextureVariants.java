@@ -29,6 +29,9 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
+/**
+ * Caches baked mesh variants that use overridden texture resources.
+ */
 public final class PMeshTextureVariants
 {
 	private static final Map<PBakedMesh, Map<ResourceLocation, PBakedMesh>> VARIANTS = new IdentityHashMap<>();
@@ -37,6 +40,13 @@ public final class PMeshTextureVariants
 	{
 	}
 
+	/**
+	 * Returns a mesh variant using the supplied texture.
+	 *
+	 * @param mesh the baked mesh geometry and material
+	 * @param texture the texture resource location; may be {@code null}
+	 * @return a mesh variant using the supplied texture
+	 */
 	public static PBakedMesh resolve(PBakedMesh mesh, @Nullable ResourceLocation texture)
 	{
 		if (texture == null)
@@ -48,6 +58,9 @@ public final class PMeshTextureVariants
 				location -> bake(mesh, location));
 	}
 
+	/**
+	 * Discards cached mesh texture variants.
+	 */
 	@ApiStatus.Internal
 	public static void clear()
 	{

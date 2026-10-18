@@ -10,8 +10,17 @@
 package com.arcanc.pulselib.content.model.animation;
 
 
+/**
+ * Rule used to combine a sampled channel value with the accumulated pose.
+ */
 public enum PBlendMode
 {
+	/**
+	 * Adds the weighted layer contribution to the accumulated transform.
+	 */
 	ADDITIVE,
+	/**
+	 * Interpolates the accumulated transform toward the layer value.
+	 */
 	REPLACE
 }

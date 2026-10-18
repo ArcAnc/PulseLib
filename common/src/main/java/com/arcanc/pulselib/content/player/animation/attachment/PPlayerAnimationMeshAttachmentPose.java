@@ -15,7 +15,16 @@ import com.arcanc.pulselib.content.player.animation.PPlayerAnimationFrame;
 import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import net.minecraft.resources.ResourceLocation;
 
-/** A selected animated mesh subtree and its canonical player frame. */
+/**
+ * A selected animated mesh subtree and its canonical player frame.
+ *
+ * @param animation the namespaced resource or registry identifier
+ * @param modelData the canonical model and loader selection
+ * @param root the root
+ * @param frame the frame matrices or sampled animation values used by this operation
+ * @param transform the transform
+ * @param weight the contribution weight
+ */
 public record PPlayerAnimationMeshAttachmentPose(ResourceLocation animation, PModelData modelData,
                                                  PBakedBone root, PPlayerAnimationFrame frame,
                                                  PTransform transform, float weight)

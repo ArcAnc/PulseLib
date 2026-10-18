@@ -182,3 +182,24 @@ The automatic factory selects an instance manager for Entity/BlockEntity and a s
 Require `H13 WORLD PIXEL PASS`, `H18 GAME PASS`, `H15 ENTITY PIXEL PASS`, `H13/H15 PIXEL PASS`, `PULSE TEST EXPLICIT CLEANUP PASS`, `PULSE TEST NATURAL DISCONNECT PASS`, `PULSE TEST CLIENT PASS`, and successful process exit. Without `pulseSmokeWorld`, smoke runs the synthetic GPU cases but skips real-world/Entity checks. H14 remains a separate mandatory regression with its unchanged 38-case expectations.
 
 Automated clients also use synchronous OpenGL debug callbacks and fail on any GL API error at the next safe frame boundary, retaining the original Java call stack. This applies only to disposable automated runs. It prevents the observed NVIDIA shutdown deadlock between a driver callback's JNI detach and VM exit; errors are asserted rather than suppressed. Arena allocation invalidates Minecraft's VAO binding cache before the next vanilla draw. No forced Minecraft exit is added.
+
+## Animation sampling and instance lifetime (M-A3 / M-A4 / H2 / H1 / L25)
+
+`pulseSmokeAuto` checks loaded Gecko 360°/720° intermediate poses, fixed uniform
+Catmull-Rom reference samples and independent Molang frame contexts. JUnit also
+checks a decoded glTF rotation track against its original quaternion SLERP.
+
+For the visible multi-turn Gecko entity demo and the longer lifecycle assertions:
+
+```bash
+./gradlew :fabric:runClient -PpulseTestMod -PpulseSmokeAuto -PpulseSmokeWorld -PpulseGeckoDemo --no-daemon
+./gradlew :neoforge:runClient -PpulseTestMod -PpulseSmokeAuto -PpulseSmokeWorld -PpulseGeckoDemo --no-daemon
+```
+
+The existing disposable-world harness watches the rendered Entity/BlockEntity
+managers for at least 21 seconds and two real scheduled cleanup cycles. It checks
+controller identity and persistent Molang state, entity removal, client chunk
+unload and world disconnect. Require `L25 WORLD PASS`, `L25 REMOVAL PASS`,
+`M-A3/M-A4/H2/H1 PASS`, `NATURAL DISCONNECT PASS` and successful process exit.
+No existing saves are opened or modified. Without `pulseSmokeAuto`, use
+`-PpulseTestMod -PpulseGeckoDemo` to inspect the spinning/bobbing entity manually.

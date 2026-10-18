@@ -7,6 +7,9 @@
  * Details can be found in the license file in the root folder of this project
  */
 
+/**
+ * Animatable renderers, model submission hooks and scoped render queues.
+ */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @FieldsAreNonnullByDefault

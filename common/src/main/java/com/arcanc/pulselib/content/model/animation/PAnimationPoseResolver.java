@@ -25,7 +25,9 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * Resolves animation pose.
+ * Resolves accumulated controller animation into local, model-space and relative bone transforms.
+ *
+ * @param <T> the animatable owner type
  */
 public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 {
@@ -39,11 +41,12 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	private final PModelPose bindModelPose;
 
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param model the model to use.
-	 * @param controllers the controllers to use.
-	 * @param molangContexts the molang contexts to use.
-	 * @param partialTick the partial tick to use.
+	 * Creates pose resolution for the supplied model, ordered controllers and render sample.
+	 *
+	 * @param model the baked model supplying indexed bones and animations
+	 * @param controllers the animation controllers in pose composition order
+	 * @param molangContexts the frame-specific Molang context of each controller
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
 	 */
 	public PAnimationPoseResolver(PBakedModel model,
 	                              Collection<PAnimationController<T>> controllers,
@@ -62,9 +65,10 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Performs the resolve operation.
-	 * @param boneName the bone name to use.
-	 * @return the value produced by this operation.
+	 * Resolves the selected bone into local and accumulated animation transform data.
+	 *
+	 * @param boneName the name of a bone in the baked model hierarchy
+	 * @return the selected bone's resolved pose data, or {@code null} when the requested bone or reference bone does not exist
 	 */
 	public @Nullable BonePose resolve(String boneName)
 	{
@@ -73,9 +77,10 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Performs the resolve operation.
-	 * @param bone the bone to use.
-	 * @return the value produced by this operation.
+	 * Resolves the selected bone into local and accumulated animation transform data.
+	 *
+	 * @param bone the baked bone being sampled or submitted
+	 * @return the selected bone's resolved pose data
 	 */
 	public BonePose resolve(PBakedBone bone)
 	{
@@ -97,9 +102,10 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Determines whether visible.
-	 * @param bone the bone to use.
-	 * @return the value produced by this operation.
+	 * Returns whether the selected bone is visible in the sampled pose.
+	 *
+	 * @param bone the baked bone being sampled or submitted
+	 * @return whether the selected bone is visible in the sampled pose
 	 */
 	public boolean isVisible(PBakedBone bone)
 	{
@@ -107,8 +113,9 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Performs the active animation bones operation.
-	 * @return the value produced by this operation.
+	 * Returns the bone names to which active controller animation can contribute.
+	 *
+	 * @return the bone names to which active controller animation can contribute
 	 */
 	public Set<String> activeAnimationBones()
 	{
@@ -116,10 +123,11 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Performs the animation delta operation.
-	 * @param boneName the bone name to use.
-	 * @param rootBoneName the root bone name to use.
-	 * @return the value produced by this operation.
+	 * Returns the named bone's sampled animation delta relative to the selected root bone.
+	 *
+	 * @param boneName the name of a bone in the baked model hierarchy
+	 * @param rootBoneName the bone used as the root-motion or relative-transform reference; may be {@code null}
+	 * @return the named bone's sampled animation delta relative to the selected root bone, or {@code null} when the requested bone or reference bone does not exist
 	 */
 	public @Nullable AnimationDelta animationDelta(String boneName, @Nullable String rootBoneName)
 	{
@@ -186,9 +194,10 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Performs the model transform operation.
-	 * @param boneName the bone name to use.
-	 * @return the value produced by this operation.
+	 * Returns the sampled model-space transform of the selected bone.
+	 *
+	 * @param boneName the name of a bone in the baked model hierarchy
+	 * @return the sampled model-space transform of the selected bone, or {@code null} when the requested bone or reference bone does not exist
 	 */
 	public @Nullable PTransform modelTransform(String boneName)
 	{
@@ -197,25 +206,32 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Performs the model transform operation.
-	 * @param bone the bone to use.
-	 * @return the value produced by this operation.
+	 * Returns the sampled model-space transform of the selected bone.
+	 *
+	 * @param bone the baked bone being sampled or submitted
+	 * @return the sampled model-space transform of the selected bone
 	 */
 	public PTransform modelTransform(PBakedBone bone)
 	{
 		return modelTransform(this.model.boneIndex(bone));
 	}
 
-	/** Returns the canonical resolved MODEL-space transform for a bone. */
+	/**
+	 * Returns the canonical resolved MODEL-space transform for a bone.
+	 *
+	 * @param boneIndex the zero-based baked-model bone index
+	 * @return the canonical resolved MODEL-space transform for a bone
+	 */
 	public PTransform modelTransform(int boneIndex)
 	{
 		return this.modelPose.transform(boneIndex);
 	}
 
 	/**
-	 * Binds the model transform.
-	 * @param boneName the bone name to use.
-	 * @return the value produced by this operation.
+	 * Returns the selected bone's unanimated model-space transform.
+	 *
+	 * @param boneName the name of a bone in the baked model hierarchy
+	 * @return the selected bone's unanimated model-space transform, or {@code null} when the requested bone or reference bone does not exist
 	 */
 	public @Nullable PTransform bindModelTransform(String boneName)
 	{
@@ -224,9 +240,10 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Binds the model transform.
-	 * @param bone the bone to use.
-	 * @return the value produced by this operation.
+	 * Returns the selected bone's unanimated model-space transform.
+	 *
+	 * @param bone the baked bone being sampled or submitted
+	 * @return the selected bone's unanimated model-space transform
 	 */
 	public PTransform bindModelTransform(PBakedBone bone)
 	{
@@ -234,9 +251,10 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Binds the model transform.
-	 * @param boneIndex the bone index to use.
-	 * @return the value produced by this operation.
+	 * Returns the selected bone's unanimated model-space transform.
+	 *
+	 * @param boneIndex the zero-based baked-model bone index
+	 * @return the selected bone's unanimated model-space transform
 	 */
 	public PTransform bindModelTransform(int boneIndex)
 	{
@@ -244,10 +262,11 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Performs the relative transform operation.
-	 * @param boneName the bone name to use.
-	 * @param referenceBoneName the reference bone name to use.
-	 * @return the value produced by this operation.
+	 * Returns the sampled bone transform relative to the selected reference bone.
+	 *
+	 * @param boneName the name of a bone in the baked model hierarchy
+	 * @param referenceBoneName the reference bone used to calculate a relative transform
+	 * @return the sampled bone transform relative to the selected reference bone, or {@code null} when the requested bone or reference bone does not exist
 	 */
 	public @Nullable PTransform relativeTransform(String boneName, String referenceBoneName)
 	{
@@ -261,10 +280,11 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Performs the relative transform operation.
-	 * @param boneIndex the bone index to use.
-	 * @param referenceIndex the reference index to use.
-	 * @return the value produced by this operation.
+	 * Returns the sampled bone transform relative to the selected reference bone.
+	 *
+	 * @param boneIndex the zero-based baked-model bone index
+	 * @param referenceIndex the zero-based reference bone index
+	 * @return the sampled bone transform relative to the selected reference bone
 	 */
 	public PTransform relativeTransform(int boneIndex, int referenceIndex)
 	{
@@ -272,10 +292,11 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Performs the relative bind transform operation.
-	 * @param boneName the bone name to use.
-	 * @param referenceBoneName the reference bone name to use.
-	 * @return the value produced by this operation.
+	 * Returns the unanimated bone transform relative to the selected reference bone.
+	 *
+	 * @param boneName the name of a bone in the baked model hierarchy
+	 * @param referenceBoneName the reference bone used to calculate a relative transform
+	 * @return the unanimated bone transform relative to the selected reference bone, or {@code null} when the requested bone or reference bone does not exist
 	 */
 	public @Nullable PTransform relativeBindTransform(String boneName, String referenceBoneName)
 	{
@@ -289,10 +310,11 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Performs the relative bind transform operation.
-	 * @param boneIndex the bone index to use.
-	 * @param referenceIndex the reference index to use.
-	 * @return the value produced by this operation.
+	 * Returns the unanimated bone transform relative to the selected reference bone.
+	 *
+	 * @param boneIndex the zero-based baked-model bone index
+	 * @param referenceIndex the zero-based reference bone index
+	 * @return the unanimated bone transform relative to the selected reference bone
 	 */
 	public PTransform relativeBindTransform(int boneIndex, int referenceIndex)
 	{
@@ -300,9 +322,10 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Binds the parent transform.
-	 * @param boneName the bone name to use.
-	 * @return the value produced by this operation.
+	 * Returns the unanimated model-space transform of the named bone's parent.
+	 *
+	 * @param boneName the name of a bone in the baked model hierarchy
+	 * @return the unanimated model-space transform of the named bone's parent, or {@code null} when the requested bone or reference bone does not exist
 	 */
 	@Nullable
 	public PTransform bindParentTransform(String boneName)
@@ -322,13 +345,15 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Resolves the local.
-	 * @param bone the bone to use.
-	 * @param model the model to use.
-	 * @param controllers the controllers to use.
-	 * @param molangContexts the molang contexts to use.
-	 * @param partialTick the partial tick to use.
-	 * @return the value produced by this operation.
+	 * Samples and combines the supplied controllers into one bone-local pose.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param bone the baked bone being sampled or submitted
+	 * @param model the baked model supplying indexed bones and animations
+	 * @param controllers the animation controllers in pose composition order
+	 * @param molangContexts the frame-specific Molang context of each controller
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the combined local transform and channel presence of the selected bone
 	 */
 	public static <T extends PAnimatable<T>> LocalPose resolveLocal(PBakedBone bone,
 	                                                                PBakedModel model,
@@ -398,27 +423,35 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Performs the default contexts operation.
-	 * @return the value produced by this operation.
+	 * Creates a context provider using controller-owned Molang state and interpolated animation time.
+	 *
+	 * @param <T> the animatable owner type
+	 * @return the provider using controller-owned Molang contexts and interpolated animation time
 	 */
 	public static <T extends PAnimatable<T>> MolangContextProvider<T> defaultContexts()
 	{
 		return (controller, partialTick) -> new MolangParser.Context().
-				query("anim_time", controller.getInterpolatedTime(partialTick) / 20.0f).
+				query("anim_time", PAnimationEvaluationContext.ticksToSeconds(controller.getInterpolatedTime(partialTick))).
 				randomSeed(0L);
 	}
 
 	/**
-	 * Performs the ratio operation.
-	 * @param value the value to use.
-	 * @param base the base to use.
-	 * @return the value produced by this operation.
+	 * Calculates a scale ratio while avoiding division by a zero bind value.
+	 *
+	 * @param value the value written by this operation
+	 * @param base the accumulated channel value before the current layer
+	 * @return the scale ratio, using the implementation's zero-bind fallback
 	 */
 	private static float ratio(float value, float base)
 	{
 		return Math.abs(base) < 1.0e-6f ? value : value / base;
 	}
 
+	/**
+	 * Supplies per-controller Molang values for one interpolated animation sample.
+	 *
+	 * @param <T> the animatable owner type
+	 */
 	@FunctionalInterface
 /**
  * Defines the contract for molang context provider.
@@ -426,17 +459,24 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	public interface MolangContextProvider<T extends PAnimatable<T>>
 	{
 		/**
-		 * Performs the context operation.
-		 * @param controller the controller to use.
-		 * @param partialTick the partial tick to use.
-		 * @return the value produced by this operation.
+		 * Returns the Molang values used to sample the supplied controller at this render fraction.
+		 *
+		 * @param controller the controller supplying playback and persistent expression state
+		 * @param partialTick the interpolation fraction between the previous and current game ticks
+		 * @return the Molang values used to sample the supplied controller at this render fraction
 		 */
 		MolangParser.Context context(PAnimationController<T> controller, float partialTick);
 	}
 
 /**
- * Immutable value object representing local pose.
- */
+	 * Accumulated local bone transform and its contributing animation channels.
+	 *
+	 * @param animationTransform the animation transform
+	 * @param localTransform the local transform
+	 * @param hasTranslation whether the translation channel contributes an animated value
+	 * @param hasRotation whether the rotation channel contributes an animated value
+	 * @param hasScale whether the scale channel contributes an animated value
+	 */
 	public record LocalPose(BoneFrame animationTransform,
 	                        BoneFrame localTransform,
 	                        boolean hasTranslation,
@@ -446,8 +486,16 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	}
 
 /**
- * Immutable value object representing bone pose.
- */
+	 * Resolved animated bone transform with channel-presence information.
+	 *
+	 * @param animationTransform the animation transform
+	 * @param localTransform the local transform
+	 * @param bindTransform the bind transform
+	 * @param modelTransform the model transform
+	 * @param hasTranslation whether the translation channel contributes an animated value
+	 * @param hasRotation whether the rotation channel contributes an animated value
+	 * @param hasScale whether the scale channel contributes an animated value
+	 */
 	public record BonePose(BoneFrame animationTransform,
 	                       BoneFrame localTransform,
 	                       PTransform bindTransform,
@@ -457,8 +505,9 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	                       boolean hasScale)
 	{
 		/**
-		 * Determines whether animated.
-		 * @return the value produced by this operation.
+		 * Returns whether any local transform channel contributes animation.
+		 *
+		 * @return whether any local transform channel contributes animation
 		 */
 		public boolean isAnimated()
 		{
@@ -467,8 +516,15 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	}
 
 /**
- * Immutable value object representing animation delta.
- */
+	 * Animation-only bone transform relative to a selected root reference.
+	 *
+	 * @param translation the local translation vector
+	 * @param rotation the local quaternion rotation
+	 * @param scale the local scale vector
+	 * @param hasTranslation whether the translation channel contributes an animated value
+	 * @param hasRotation whether the rotation channel contributes an animated value
+	 * @param hasScale whether the scale channel contributes an animated value
+	 */
 	public record AnimationDelta(Vector3f translation,
 	                             Quaternionf rotation,
 	                             Vector3f scale,
@@ -477,8 +533,9 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	                             boolean hasScale)
 	{
 		/**
-		 * Determines whether animated.
-		 * @return the value produced by this operation.
+		 * Returns whether this delta contains an animated transform contribution.
+		 *
+		 * @return whether this delta contains an animated transform contribution
 		 */
 		public boolean isAnimated()
 		{

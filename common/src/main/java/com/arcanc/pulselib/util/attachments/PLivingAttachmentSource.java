@@ -14,8 +14,19 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 
+/**
+ * Decides whether a living attachment applies to an entity, equipment slot and stack.
+ */
 @FunctionalInterface
 public interface PLivingAttachmentSource
 {
+	/**
+	 * Tests whether the attachment should render for the current equipment context.
+	 *
+	 * @param entity the entity being animated or rendered
+	 * @param slot the equipment slot being inspected
+	 * @param stack the item stack supplying render or animation state
+	 * @return whether the attachment should render for the current equipment context
+	 */
 	boolean shouldRender(LivingEntity entity, EquipmentSlot slot, ItemStack stack);
 }

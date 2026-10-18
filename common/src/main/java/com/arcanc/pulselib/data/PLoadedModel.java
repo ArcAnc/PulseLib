@@ -17,9 +17,20 @@ import java.util.Objects;
 /**
  * A model resolved by a loader. {@code modelId} is the canonical cache key;
  * {@code source} is the physical resource used for parsing and sidecars.
+ *
+ * @param modelId the canonical model identifier
+ * @param source the physical resource selected by the model loader
+ * @param model the parsed source-model hierarchy and geometry
  */
 public record PLoadedModel(ResourceLocation modelId, ResourceLocation source, PModel model)
 {
+	/**
+	 * Associates a parsed model with its canonical id and selected physical source resource.
+	 *
+	 * @param modelId the canonical model identifier
+	 * @param source the physical resource selected by the model loader
+	 * @param model the parsed source-model hierarchy and geometry
+	 */
 	public PLoadedModel
 	{
 		Objects.requireNonNull(modelId);

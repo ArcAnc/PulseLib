@@ -11,5 +11,7 @@ package com.arcanc.pulselib.content.model.animation;
 
 /**
  * Services available while creating an animation stage player.
+ *
+ * @param randomSeed the deterministic seed used by runtime animation stages
  */
 public record PAnimationStageContext(long randomSeed) {}

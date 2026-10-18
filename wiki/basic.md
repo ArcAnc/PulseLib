@@ -1,12 +1,13 @@
 # Basic
 
 ## Table of Content
-* [Full Video Tutorial](https://github.com/ArcAnc/PulseLib/wiki/Basic#full-video-tutorial)
-* [Rigging](https://github.com/ArcAnc/PulseLib/wiki/Basic#rigging)
-    - [Grouping](https://github.com/ArcAnc/PulseLib/wiki/Basic#rigging)
-    - [Parenting and Pivots](https://github.com/ArcAnc/PulseLib/wiki/Basic#parenting-and-pivots)
-* [Animating a Model in Blockbench](https://github.com/ArcAnc/PulseLib/wiki/Basic#animating-a-model-in-blockbench)
-* [Exporting the Model](https://github.com/ArcAnc/PulseLib/wiki/Basic#exporting-model)
+
+* [Full Video Tutorial](#full-video-tutorial)
+* [Rigging](#rigging)
+    - [Grouping](#grouping)
+    - [Parenting and Pivots](#parenting-and-pivots)
+* [Animating a Model in Blockbench](#animating-a-model-in-blockbench)
+* [Exporting the Model](#exporting-model)
 
 ## Full Video Tutorial
 
@@ -58,6 +59,8 @@ PulseLib animations follow the same principles as Bedrock entity animations, so 
 ## Exporting model
 
 Once your model is ready, export it as **`.gltf` with external PNG files** or as a **`.glb`** whose images have a URI or a name. PulseLib needs a material texture reference in order to map every image into the Minecraft resource atlas. A `.glb` containing anonymous images only as binary `bufferView` data cannot be used by the current loader, even though that representation is valid glTF.
+
+For `.gltf`, embed the geometry buffer as a data URI: the loader does not resolve external `.bin` files. GLB stores the geometry in its binary chunk. In either case, texture names are resolved through your registered Minecraft resources; the loader does not import arbitrary external image files. See [Model loaders](model-loaders.md#built-in-gltf-loader) for the supported primitive and animation features.
 
 For Blockbench, prefer an export that keeps texture files external. Place the exported PNG files under `assets/<modid>/textures/` and register the exact texture references as described in [Resources](resources.md#register-model-resources). If you use `.glb`, verify that each base-colour image has a non-blank URI or name; resource reload otherwise fails with `Primitive has no texture reference`.
 

@@ -9,6 +9,15 @@
 
 package com.arcanc.pulselib.content.model.animation;
 
+/**
+ * Timed incoming and outgoing channel values with the interpolation policy for a keyframe segment.
+ *
+ * @param <T> the sampled animation channel value type
+ * @param time the animation position in game ticks
+ * @param pre the pre
+ * @param post the post
+ * @param interpolation the keyframe interpolation policy
+ */
 public record PKeyframe<T>(float time,
                             PAnimationValue<T> pre,
                             PAnimationValue<T> post,

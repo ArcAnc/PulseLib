@@ -15,8 +15,14 @@ import net.minecraft.resources.ResourceLocation;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+/**
+ * Prepares CPU mesh deformation operations for twisting around a longitudinal axis.
+ */
 public final class PTwistDeformer implements PMeshDeformer<PTwistDefinition>
 {
+	/**
+	 * Shared instance of this stateless implementation.
+	 */
 	public static final PTwistDeformer INSTANCE = new PTwistDeformer();
 	private static final float EPSILON = 1.0e-5f;
 
@@ -24,18 +30,34 @@ public final class PTwistDeformer implements PMeshDeformer<PTwistDefinition>
 	{
 	}
 
+	/**
+	 * Returns the namespaced identifier of this mesh deformer type.
+	 *
+	 * @return the namespaced identifier of this mesh deformer type
+	 */
 	@Override
 	public ResourceLocation id()
 	{
 		return PLibDatabase.rl("twist");
 	}
 
+	/**
+	 * Returns the codec for this deformer's configuration.
+	 *
+	 * @return the codec for this deformer's configuration
+	 */
 	@Override
 	public MapCodec<PTwistDefinition> codec()
 	{
 		return PTwistDefinition.CODEC;
 	}
 
+	/**
+	 * Compiles the supplied definition into operations appended to the preparation context.
+	 *
+	 * @param context the destination collecting prepared deformation operations
+	 * @param definition the immutable configuration to register or evaluate
+	 */
 	@Override
 	public void prepare(PDeformerPrepareContext context, PTwistDefinition definition)
 	{
@@ -45,9 +67,24 @@ public final class PTwistDeformer implements PMeshDeformer<PTwistDefinition>
 		context.add(new Operation(new Vector3f(definition.origin()), length.normalize(), definition.positiveExtent(), definition.negativeExtent(), definition.angle()));
 	}
 
+	/**
+	 * Prepared mesh operation for twisting around a longitudinal axis.
+	 *
+	 * @param origin the local pivot or origin of the deformation
+	 * @param length the animation clip length in game ticks
+	 * @param positiveExtent the positive-axis deformation extent
+	 * @param negativeExtent the negative-axis deformation extent
+	 * @param angle the angle channel reference and its fallback value
+	 */
 	private record Operation(Vector3f origin, Vector3f length, float positiveExtent, float negativeExtent,
 							 PChannelReference<Float> angle) implements PPreparedDeformer
 	{
+		/**
+		 * Applies this operation to the supplied position in place using current channel values.
+		 *
+		 * @param position the position
+		 * @param values the source of current animated deformation channel values
+		 */
 		@Override
 		public void deform(Vector3f position, PDeformerValueSource values)
 		{

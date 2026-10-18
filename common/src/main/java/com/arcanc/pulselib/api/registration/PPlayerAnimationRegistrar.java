@@ -17,10 +17,19 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Collects named player animation definitions during a client plugin callback.
+ */
 public class PPlayerAnimationRegistrar extends PulseRegistrar
 {
 	private final Map<ResourceLocation, PPlayerAnimationDefinition> definitions = new LinkedHashMap<>();
 
+	/**
+	 * Queues a player animation definition under its namespaced identifier.
+	 *
+	 * @param id the namespaced resource or registration identifier
+	 * @param definition the immutable configuration to register or evaluate
+	 */
 	public void register(ResourceLocation id, PPlayerAnimationDefinition definition)
 	{
 		checkOpen();
@@ -31,6 +40,9 @@ public class PPlayerAnimationRegistrar extends PulseRegistrar
 			throw new IllegalArgumentException("Conflicting player animation definition: " + id);
 	}
 
+	/**
+	 * Installs the collected animation definitions and closes this registration scope.
+	 */
 	public void apply()
 	{
 		checkOpen();

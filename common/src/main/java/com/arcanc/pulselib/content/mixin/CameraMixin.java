@@ -29,9 +29,17 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+/**
+ * Applies animated player camera motion and event-driven camera shake after vanilla camera setup.
+ */
 @Mixin(Camera.class)
 public abstract class CameraMixin
 {
+	/**
+	 * Updates the vanilla camera position in world coordinates.
+	 *
+	 * @param pos the pos
+	 */
 	@Shadow
 	protected abstract void setPosition(Vec3 pos);
 
@@ -41,6 +49,16 @@ public abstract class CameraMixin
 		PulseClientServices.CAMERA.setRotation((Camera)(Object)this, yaw, pitch, roll);
 	}
 
+	/**
+	 * Adds local-player animation camera offsets, rotation and camera shake after vanilla setup.
+	 *
+	 * @param level the level
+	 * @param entity the entity being animated or rendered
+	 * @param detached the detached
+	 * @param thirdPersonReverse the third person reverse
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param ci the Mixin callback for the intercepted method
+	 */
 	@Inject(method = "setup", at = @At("TAIL"))
 	private void pulselib$followAnimatedHead(BlockGetter level,
 	                                          Entity entity,

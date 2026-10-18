@@ -7,6 +7,9 @@
  * Details can be found in the license file in the root folder of this project
  */
 
+/**
+ * Runtime atlas sprite discovery and PulseLib texture metadata decoding.
+ */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @FieldsAreNonnullByDefault

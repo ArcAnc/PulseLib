@@ -22,9 +22,30 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+/**
+ * Integrates PulseLib armor animation, attachment replacement and player deformation with the loader armor
+ * render path.
+ */
 @Mixin(HumanoidArmorLayer.class)
 public class HumanoidArmorLayerMixin
 {
+	/**
+	 * Applies player deformation after NeoForge has configured armor model animation.
+	 *
+	 * @param poseStack the current model-to-render pose stack
+	 * @param buffers the vanilla vertex buffer source
+	 * @param entity the entity being animated or rendered
+	 * @param slot the equipment slot being inspected
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param model the model
+	 * @param limbSwing the entity limb animation position
+	 * @param limbSwingAmount the entity limb animation amplitude
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param ageInTicks the entity age used by vanilla render animation
+	 * @param netHeadYaw the head yaw relative to the body in degrees
+	 * @param headPitch the head pitch in degrees
+	 * @param callback the Mixin callback used to inspect or replace the intercepted result
+	 */
 	@Inject(
 			method = "renderArmorPiece(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/EquipmentSlot;ILnet/minecraft/client/model/HumanoidModel;FFFFFF)V",
 			at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/client/extensions/common/IClientItemExtensions;setupModelAnimations(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/EquipmentSlot;Lnet/minecraft/client/model/Model;FFFFFF)V", shift = At.Shift.AFTER))

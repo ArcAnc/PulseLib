@@ -33,7 +33,9 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 
 import java.nio.FloatBuffer;
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 /** Uses real water/glass terrain and real loader stages in the marked disposable smoke save. */
 public final class WorldRenderRegressionHarness
@@ -77,7 +79,7 @@ public final class WorldRenderRegressionHarness
 			white.setPixelRGBA(0, 0, -1);
 			mc.getTextureManager().register(WHITE, new DynamicTexture(white));
 			started = true;
-			deadline = System.nanoTime() + java.util.concurrent.TimeUnit.MINUTES.toNanos(1);
+			deadline = System.nanoTime() + TimeUnit.MINUTES.toNanos(1);
 		}
 		if (setup == null)
 		{
@@ -98,12 +100,12 @@ public final class WorldRenderRegressionHarness
 		if (behind)
 		{
 			check(pixel[0] < 0.98f && pixel[1] + pixel[2] > 0.015f,
-					"Real translucent terrain must tint the opaque entity behind it: " + java.util.Arrays.toString(pixel));
+					"Real translucent terrain must tint the opaque entity behind it: " + Arrays.toString(pixel));
 		}
 		else
 		{
 			check(pixel[0] > 0.97f && pixel[1] + pixel[2] < 0.025f,
-					"Opaque entity before translucent terrain stays red: " + java.util.Arrays.toString(pixel));
+					"Opaque entity before translucent terrain stays red: " + Arrays.toString(pixel));
 		}
 		PLibDatabase.LOGGER.info("H13 WORLD CASE PASS {} {} {}: RGB {},{},{}; {} early depth checks",
 				mc.options.graphicsMode().get(), scenario % 4 < 2 ? "water" : "blue glass", behind ? "behind" : "front",

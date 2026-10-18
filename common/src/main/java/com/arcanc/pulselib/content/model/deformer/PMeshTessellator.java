@@ -18,14 +18,27 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Subdivides triangle geometry to provide additional vertices for mesh deformation.
+ */
 public final class PMeshTessellator
 {
+	/**
+	 * Maximum supported triangle refinement level.
+	 */
 	public static final int MAX_SUBDIVISION_LEVEL = 4;
 
 	private PMeshTessellator()
 	{
 	}
 	
+	/**
+	 * Returns geometry subdivided by the requested number of triangle refinement levels.
+	 *
+	 * @param source the source
+	 * @param level the level
+	 * @return geometry subdivided by the requested number of triangle refinement levels
+	 */
 	public static PMeshPrimitive subdivide(PMeshPrimitive source, int level)
 	{
 		if (level == 0)

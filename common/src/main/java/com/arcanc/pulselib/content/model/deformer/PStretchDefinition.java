@@ -14,8 +14,18 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.joml.Vector3f;
 
+/**
+ * Serializable configuration and animation channel references for stretching along a configurable axis.
+ *
+ * @param origin the local pivot or origin of the deformation
+ * @param axis the normalized deformation axis
+ * @param scale the scale channel reference and its fallback value
+ */
 public record PStretchDefinition(Vector3f origin, Vector3f axis, PChannelReference<Float> scale)
 {
+	/**
+	 * Serialization codec for stretch definition.
+	 */
 	public static final MapCodec<PStretchDefinition> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.
 			group(
 					PLibCodecs.VECTOR3F_CODEC.fieldOf("origin").forGetter(PStretchDefinition::origin),
@@ -23,6 +33,13 @@ public record PStretchDefinition(Vector3f origin, Vector3f axis, PChannelReferen
 					PChannelReference.FLOAT.fieldOf("scale").forGetter(PStretchDefinition::scale)).
 			apply(instance, PStretchDefinition::new));
 
+	/**
+	 * Creates the deformation configuration and copies its local origin and axis inputs.
+	 *
+	 * @param origin the local pivot or origin of the deformation
+	 * @param axis the normalized deformation axis
+	 * @param scale the scale channel reference and its fallback value
+	 */
 	public PStretchDefinition
 	{
 		origin = new Vector3f(origin);

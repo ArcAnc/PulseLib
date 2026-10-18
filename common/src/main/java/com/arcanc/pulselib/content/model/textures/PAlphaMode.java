@@ -14,15 +14,38 @@ import com.mojang.serialization.DataResult;
 
 import java.util.Locale;
 
+/**
+ * Alpha handling policy selected explicitly or inferred from texture contents.
+ */
 public enum PAlphaMode
 {
+	/**
+	 * Determines alpha handling from texture pixels.
+	 */
 	AUTO,
+	/**
+	 * Renders the texture without alpha rejection or blending.
+	 */
 	OPAQUE,
+	/**
+	 * Rejects transparent pixels without blended translucency.
+	 */
 	CUTOUT,
+	/**
+	 * Renders partially transparent pixels with translucency.
+	 */
 	TRANSLUCENT;
 
+	/**
+	 * Serialization codec for alpha mode.
+	 */
 	public static final Codec<PAlphaMode> CODEC = Codec.STRING.comapFlatMap(PAlphaMode :: decode, PAlphaMode :: serializedName);
 
+	/**
+	 * Returns the lowercase identifier used to serialize this alpha policy.
+	 *
+	 * @return the lowercase identifier used to serialize this alpha policy
+	 */
 	public String serializedName()
 	{
 		return name().toLowerCase(Locale.ROOT);

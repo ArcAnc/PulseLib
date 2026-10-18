@@ -9,6 +9,9 @@
 
 package com.arcanc.pulselib.content.model.animation;
 
+/**
+ * Format-specific inputs made available to animation channel decoders.
+ */
 public interface PAnimationDecodeContext
 {
 }

@@ -32,15 +32,34 @@ public final class PRenderContexts
 	{
 	}
 
+	/**
+	 * Render environment used to select queue ownership and submission timing.
+	 */
 	public enum Context
 	{
+		/**
+		 * World rendering with stage-based queue flushing.
+		 */
 		WORLD,
+		/**
+		 * Isolated GUI rendering.
+		 */
 		GUI,
+		/**
+		 * Isolated rendering into an offscreen target.
+		 */
 		OFFSCREEN,
+		/**
+		 * First-person arm, held-item and attachment rendering.
+		 */
 		FIRST_PERSON
 	}
 
-	/** Resolves actual invocation scope and target; Entity has no ItemDisplayContext. */
+	/**
+	 * Resolves actual invocation scope and target; Entity has no ItemDisplayContext.
+	 *
+	 * @return the active render environment
+	 */
 	public static Context current()
 	{
 		RenderSystem.assertOnRenderThread();
@@ -51,6 +70,12 @@ public final class PRenderContexts
 		return framebuffer == Minecraft.getInstance().getMainRenderTarget().frameBufferId ? Context.GUI : Context.OFFSCREEN;
 	}
 
+	/**
+	 * Enters a render context and returns a scope that restores the previous context.
+	 *
+	 * @param context the context
+	 * @return the scope restoring the previous render environment
+	 */
 	public static Scope enter(Context context)
 	{
 		RenderSystem.assertOnRenderThread();
@@ -59,7 +84,11 @@ public final class PRenderContexts
 		return scope;
 	}
 
-	/** Supports direct calls to PEntityRenderer in addition to dispatcher calls. */
+	/**
+	 * Supports direct calls to PEntityRenderer in addition to dispatcher calls.
+	 *
+	 * @return the scope isolating entity rendering when required, or {@code null} when the requested value is unavailable
+	 */
 	public static @Nullable Scope enterEntity()
 	{
 		Context context = current();
@@ -70,6 +99,11 @@ public final class PRenderContexts
 		return enter(context);
 	}
 
+	/**
+	 * Returns the entity submission stage appropriate for the active render context.
+	 *
+	 * @return the entity submission stage appropriate for the active render context
+	 */
 	static PRenderQueue.RenderStage entityStage()
 	{
 		Scope scope = SCOPES.get().peek();
@@ -77,6 +111,11 @@ public final class PRenderContexts
 				PRenderQueue.RenderStage.FIRST_PERSON : PRenderQueue.RenderStage.ENTITIES;
 	}
 
+	/**
+	 * Returns the active isolated local render scope, if one exists.
+	 *
+	 * @return the active isolated local render scope, if one exists, or {@code null} when the requested value is unavailable
+	 */
 	static @Nullable Scope localScope()
 	{
 		Scope scope = SCOPES.get().peek();
@@ -113,6 +152,9 @@ public final class PRenderContexts
 				this.compiler.clear();
 		}
 
+		/**
+		 * Flushes or discards owned local submissions as configured and restores the preceding render context.
+		 */
 		@Override
 		public void close()
 		{

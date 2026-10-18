@@ -49,6 +49,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Reloads registered source models, resolves their textures and publishes baked render models.
+ */
 public class PModelCache
 {
 	private static @Nullable Map<ResourceLocation, PBakedModel> MODELS;
@@ -62,11 +65,21 @@ public class PModelCache
 			},
 			Object2ObjectOpenHashMap :: new));
 	
+	/**
+	 * Returns the currently published baked model cache.
+	 *
+	 * @return the currently published baked model cache, or {@code null} before baked models have been published
+	 */
 	public static @Nullable Map<ResourceLocation, PBakedModel> getModels()
 	{
 		return MODELS;
 	}
 	
+	/**
+	 * Registers a model loader under its declared identifier.
+	 *
+	 * @param modelLoader the model loader
+	 */
 	public static void registerModelLoader(PModelLoader modelLoader)
 	{
 		if (MODEL_LOADERS.containsKey(modelLoader.id()))
@@ -75,21 +88,49 @@ public class PModelCache
 		MODEL_LOADERS.put(modelLoader.id(), modelLoader);
 	}
 	
+	/**
+	 * Removes the loader registered under the supplied identifier.
+	 *
+	 * @param loaderId the model loader identifier
+	 */
 	public static void unregisterModelLoader(ResourceLocation loaderId)
 	{
 		MODEL_LOADERS.remove(loaderId);
 	}
 	
+	/**
+	 * Returns the currently registered model loaders.
+	 *
+	 * @return the currently registered model loaders
+	 */
 	public static List<PModelLoader> getModelLoaders()
 	{
 		return List.copyOf(MODEL_LOADERS.values());
 	}
 	
+	/**
+	 * Finds the model loader registered under the supplied identifier.
+	 *
+	 * @param loaderId the model loader identifier
+	 * @return the matching loader, or an empty optional when unregistered
+	 */
 	public static Optional<PModelLoader> getModelLoader(ResourceLocation loaderId)
 	{
 		return Optional.ofNullable(MODEL_LOADERS.get(loaderId));
 	}
 	
+	/**
+	 * Prepares source models asynchronously, waits for the reload barrier and publishes baked models on the
+	 * game executor.
+	 *
+	 * @param stage the stage
+	 * @param resourceManager the resource manager used to locate source assets
+	 * @param preparationsProfiler the profiler for background reload preparation
+	 * @param reloadProfiler the profiler for applying the resource reload
+	 * @param backgroundExecutor the executor used to read and prepare model resources
+	 * @param gameExecutor the executor used to publish game-thread reload results
+	 * @return a future completing when prepared models have been published
+	 */
 	@ApiStatus.Internal
 	public static CompletableFuture<Void> reload(PreparableReloadListener.PreparationBarrier stage,
 	                                             ResourceManager resourceManager,

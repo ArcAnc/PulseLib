@@ -13,6 +13,12 @@ package com.arcanc.pulselib.content.model;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Source-model mesh identified by UUID and composed of indexed primitives.
+ *
+ * @param uuid the stable source-model bone identity
+ * @param primitives the primitives
+ */
 public record PMesh(
 			UUID uuid,
 			List<PMeshPrimitive> primitives

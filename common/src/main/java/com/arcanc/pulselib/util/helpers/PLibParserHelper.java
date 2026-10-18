@@ -17,8 +17,17 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
+/**
+ * Helpers for reading glTF accessor buffers and source material texture references.
+ */
 public class PLibParserHelper
 {
+	/**
+	 * Reads the supplied glTF accessor as float values.
+	 *
+	 * @param accessor the glTF accessor whose packed values are read
+	 * @return the packed floating-point data
+	 */
 	public static FloatBuffer getFloatBuffer(AccessorModel accessor)
 	{
 		if (accessor == null)
@@ -40,6 +49,12 @@ public class PLibParserHelper
 		return floatBuffer;
 	}
 	
+	/**
+	 * Reads the supplied glTF accessor as packed bytes.
+	 *
+	 * @param accessor the glTF accessor whose packed values are read
+	 * @return the packed binary data
+	 */
 	public static ByteBuffer getByteBuffer(AccessorModel accessor)
 	{
 		if (accessor == null)
@@ -70,6 +85,12 @@ public class PLibParserHelper
 		return buffer;
 	}
 	
+	/**
+	 * Extracts the texture reference used by a source glTF material.
+	 *
+	 * @param material the material
+	 * @return the material's source texture reference
+	 */
 	public static String extractTextureName(MaterialModel material)
 	{
 		if (!(material instanceof MaterialModelV2 mat))

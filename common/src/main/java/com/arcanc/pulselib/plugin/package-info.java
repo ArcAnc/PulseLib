@@ -7,6 +7,9 @@
  * Details can be found in the license file in the root folder of this project
  */
 
+/**
+ * Bytecode plugin discovery and ordered, failure-aware registration lifecycle management.
+ */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @FieldsAreNonnullByDefault

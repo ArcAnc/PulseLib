@@ -13,6 +13,13 @@ package com.arcanc.pulselib.content.model.animation;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+/**
+ * Translation, rotation and scale sampled for a bone at one animation position.
+ *
+ * @param translation the local translation vector
+ * @param rotation the local quaternion rotation
+ * @param scale the local scale vector
+ */
 public record BoneFrame(
 		Vector3f translation,
 		Quaternionf rotation,

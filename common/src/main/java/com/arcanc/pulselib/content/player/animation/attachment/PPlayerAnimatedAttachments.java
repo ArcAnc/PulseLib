@@ -34,6 +34,11 @@ public final class PPlayerAnimatedAttachments
 	{
 	}
 
+	/**
+	 * Registers an attachment renderer for its declared player animation anchor.
+	 *
+	 * @param renderer the renderer
+	 */
 	public static void register(PPlayerAnimatedAttachmentRenderer renderer)
 	{
 		List<PPlayerAnimatedAttachmentRenderer> renderers = RENDERERS.computeIfAbsent(renderer.anchor(), ignored -> new ArrayList<>());
@@ -41,6 +46,15 @@ public final class PPlayerAnimatedAttachments
 			renderers.add(renderer);
 	}
 
+	/**
+	 * Renders registered attachments at the player's active third-person animation anchors.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param poseStack the current model-to-render pose stack
+	 * @param buffers the vanilla vertex buffer source
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 */
 	public static void renderThirdPerson(AbstractClientPlayer player, PoseStack poseStack,
 	                                     MultiBufferSource buffers, int packedLight, float partialTick)
 	{
@@ -74,6 +88,13 @@ public final class PPlayerAnimatedAttachments
 
 	/**
 	 * Renders animation-owned anchors from an already resolved first-person presentation.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param presentation the presentation
+	 * @param poseStack the current model-to-render pose stack
+	 * @param buffers the vanilla vertex buffer source
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
 	 */
 	public static void renderFirstPerson(AbstractClientPlayer player, PFirstPersonRenderPresentation presentation,
 	                                     PoseStack poseStack, MultiBufferSource buffers, int packedLight, float partialTick)

@@ -34,11 +34,12 @@ Override `populateMolangContext` in the renderer for the animatable type. The ho
 ```java
 @Override
 protected void populateMolangContext(RobotEntity robot,
-                                     PAnimationController<RobotEntity> controller,
-                                     MolangParser.Context context,
-                                     float partialTick) {
-    context.query("ground_speed", (float) robot.getDeltaMovement().horizontalDistance());
-    context.query("is_active", robot.isActive() ? 1f : 0f);
+		PAnimationController<RobotEntity> controller,
+		MolangParser.Context context,
+		float partialTick)
+{
+	context.query("ground_speed", (float) robot.getDeltaMovement().horizontalDistance());
+	context.query("is_active", robot.isActive() ? 1f : 0f);
 }
 ```
 
@@ -48,10 +49,37 @@ The model can then use `q.ground_speed` and `query.is_active`. Query names are n
 
 ## Language surface
 
-The parser supports numeric literals, arithmetic, comparisons, logical operators, ternary expressions, statements, assignments to `temp.*` and `variable.*`, `return`, `loop`, and `break`. It resolves the `query.*`, `variable.*`, `temp.*`, and `context.*` namespaces and their usual short aliases (`q`, `v`, `t`, and `c`).
+The parser supports numeric literals, arithmetic, comparisons, logical operators, ternary expressions, statements, assignments to `temp.*` and `variable.*`, `return`, `loop`, `break`, and `continue`. It resolves the `query.*`, `variable.*`, `temp.*`, and `context.*` namespaces and their usual short aliases (`q`, `v`, `t`, and `c`).
 
 Supported math functions include trigonometry, interpolation, clamping, rounding, powers, min/max, random and die-roll functions, plus the implemented `math.ease_*` variants. An unsupported function is reported as an error instead of silently evaluating to an arbitrary value.
 
 ## `variable.*` lifetime
 
 `variable.*` assignments persist for the lifetime of a `PAnimationController`, including across render frames. They are private to that controller, so two controllers do not overwrite each other's variables. `temp.*` remains local to one expression evaluation.
+
+## Time and sampling contract
+
+Controller time, clip lengths and keyframe timestamps remain in game ticks.
+`PAnimationEvaluationContext.ticksToSeconds` converts the already interpolated
+controller time to seconds once when filling `query.anim_time`, including player
+animations and Animation Graph contexts. Supplied custom contexts are evaluated
+as provided and are not divided again.
+
+Expression dependencies describe what a program reads; `TIME_ONLY` does not
+imply that it is independent of its context or custom `queryResolver`. Evaluation
+results are no longer cached globally or quantized. Parsed constant programs
+still fold their value when loaded. Variables, random state and resolver side
+effects stay with the actual controller context.
+
+Gecko rotations retain their original Euler XYZ degrees through interpolation
+and convert to `Quaternionf` afterwards. Authored full turns and their direction
+are preserved; glTF quaternion tracks and pose blending keep their existing SLERP.
+
+`catmullrom` samples four control points with uniform point weights, using local
+segment alpha even when timestamps are uneven. It does not use time-aware tangent
+weights. Missing outer points duplicate the nearest endpoint. For segment i→i+1,
+controls are `(i-1).post`, `i.post`, `(i+1).pre`, `(i+2).pre`; exact key times
+select the outgoing `post`. Deliberate pre/post jumps remain jumps. Duplicate
+timestamps select the last key at that time. Position, Scale and Gecko Euler
+rotation support this spline; existing custom two-point channels retain their
+interpolation API and can override the optional four-point overload.

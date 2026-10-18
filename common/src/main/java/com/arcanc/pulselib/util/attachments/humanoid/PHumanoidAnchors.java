@@ -15,16 +15,43 @@ import com.arcanc.pulselib.util.attachments.PAttachmentAnchorResolvers;
 import net.minecraft.client.model.HumanoidModel;
 import org.jetbrains.annotations.ApiStatus;
 
+/**
+ * Built-in attachment anchors for vanilla humanoid model parts.
+ */
 public class PHumanoidAnchors
 {
+	/**
+	 * Attachment anchor for the humanoid head model part.
+	 */
 	public static final PAttachmentAnchor HEAD = PAttachmentAnchor.minecraft("head");
+	/**
+	 * Attachment anchor for the humanoid hat model part.
+	 */
 	public static final PAttachmentAnchor HAT = PAttachmentAnchor.minecraft("hat");
+	/**
+	 * Attachment anchor for the humanoid body model part.
+	 */
 	public static final PAttachmentAnchor BODY = PAttachmentAnchor.minecraft("body");
+	/**
+	 * Attachment anchor for the humanoid right arm model part.
+	 */
 	public static final PAttachmentAnchor RIGHT_ARM = PAttachmentAnchor.minecraft("right_arm");
+	/**
+	 * Attachment anchor for the humanoid left arm model part.
+	 */
 	public static final PAttachmentAnchor LEFT_ARM = PAttachmentAnchor.minecraft("left_arm");
+	/**
+	 * Attachment anchor for the humanoid right leg model part.
+	 */
 	public static final PAttachmentAnchor RIGHT_LEG = PAttachmentAnchor.minecraft("right_leg");
+	/**
+	 * Attachment anchor for the humanoid left leg model part.
+	 */
 	public static final PAttachmentAnchor LEFT_LEG = PAttachmentAnchor.minecraft("left_leg");
 	
+	/**
+	 * Registers resolvers for the built-in humanoid attachment anchors.
+	 */
 	@ApiStatus.Internal
 	public static void registerDefaults()
 	{

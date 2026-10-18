@@ -9,9 +9,9 @@
 
 package com.arcanc.pulselib.content.model.animation;
 
-import com.arcanc.pulselib.content.animatable.PAnimationEventCallbacks;
 import com.arcanc.pulselib.content.animatable.PAnimationCameraShake;
 import com.arcanc.pulselib.content.animatable.PAnimationController;
+import com.arcanc.pulselib.content.animatable.PAnimationEventCallbacks;
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.arcanc.pulselib.util.helpers.PLibCodecs;
 import com.mojang.serialization.Codec;
@@ -25,10 +25,16 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import org.joml.Vector3f;
 
+/**
+ * Built-in event types for sounds, particles, camera shake, locator callbacks and graph parameters.
+ */
 public final class PAnimationEventTypes
 {
 	private PAnimationEventTypes() { }
 
+	/**
+	 * Plays a sound at an animation event locator.
+	 */
 	public static final PAnimationEventType<SoundData> SOUND = type("sound", PEventSide.PRESENTATION_ONLY,
 			RecordCodecBuilder.mapCodec(instance -> instance.group(
 					ResourceLocation.CODEC.fieldOf("sound").forGetter(SoundData::sound),
@@ -50,6 +56,9 @@ public final class PAnimationEventTypes
 						data.volume(), data.pitch(), false);
 			});
 
+	/**
+	 * Spawns a particle effect at an animation event locator.
+	 */
 	public static final PAnimationEventType<ParticleData> PARTICLE = type("particle", PEventSide.PRESENTATION_ONLY,
 			RecordCodecBuilder.mapCodec(instance -> instance.group(
 					ResourceLocation.CODEC.fieldOf("particle").forGetter(ParticleData::particle),
@@ -73,6 +82,9 @@ public final class PAnimationEventTypes
 						motion.x(), motion.y(), motion.z());
 			});
 
+	/**
+	 * Adds a temporary client camera shake.
+	 */
 	public static final PAnimationEventType<CameraShakeData> CAMERA_SHAKE = type("camera_shake", PEventSide.PRESENTATION_ONLY,
 			RecordCodecBuilder.mapCodec(instance -> instance.group(
 					Codec.FLOAT.fieldOf("strength").forGetter(CameraShakeData::strength),
@@ -81,6 +93,9 @@ public final class PAnimationEventTypes
 			apply(instance, CameraShakeData::new)),
 			(context, data) -> PAnimationCameraShake.add(data.strength(), data.duration(), data.frequency()));
 
+	/**
+	 * Invokes a registered callback with a resolved animation locator.
+	 */
 	public static final PAnimationEventType<LocatorCallbackData> LOCATOR_CALLBACK = type("locator_callback", PEventSide.BOTH,
 			RecordCodecBuilder.mapCodec(instance -> instance.group(
 					ResourceLocation.CODEC.fieldOf("callback").forGetter(LocatorCallbackData::callback),
@@ -88,6 +103,9 @@ public final class PAnimationEventTypes
 			apply(instance, LocatorCallbackData::new)),
 			(context, data) -> PAnimationEventCallbacks.dispatch(data.callback(), context, data.locator()));
 
+	/**
+	 * Updates or triggers an animation graph parameter.
+	 */
 	public static final PAnimationEventType<AnimationParameterData> ANIMATION_PARAMETER = type("animation_parameter", PEventSide.BOTH,
 			RecordCodecBuilder.mapCodec(instance -> instance.group(
 					Codec.STRING.optionalFieldOf("controller", "").forGetter(AnimationParameterData::controller),
@@ -122,12 +140,63 @@ public final class PAnimationEventTypes
 		};
 	}
 
+	/**
+	 * Handler invoked by a built-in typed animation event.
+	 *
+	 * @param <T> the decoded animation event payload type
+	 */
 	@FunctionalInterface
-	private interface EventExecutor<T> { void execute(PAnimationEventContext context, T data); }
+	private interface EventExecutor<T>
+	{
+		/**
+		 * Handles the supplied event payload in the current animation context.
+		 *
+		 * @param context the current event owner, controller, level and locator context
+		 * @param data the decoded event payload
+		 */
+		void execute(PAnimationEventContext context, T data);
+	}
 
+	/**
+	 * Sound event payload containing sound selection and playback settings.
+	 *
+	 * @param sound the registered sound event identifier
+	 * @param locator the named model locator or bone used to resolve the event position
+	 * @param volume the sound volume multiplier
+	 * @param pitch the sound playback pitch multiplier
+	 */
 	public record SoundData(ResourceLocation sound, String locator, float volume, float pitch) { }
+	/**
+	 * Particle event payload containing effect and locator settings.
+	 *
+	 * @param particle the registered simple particle identifier
+	 * @param locator the named model locator or bone used to resolve the event position
+	 * @param offset the local translation offset
+	 * @param motion the particle velocity applied at the resolved locator
+	 */
 	public record ParticleData(ResourceLocation particle, String locator, Vector3f offset, Vector3f motion) { }
+	/**
+	 * Camera shake event payload containing strength, duration and frequency.
+	 *
+	 * @param strength the strength
+	 * @param duration the duration of the effect or transition in game ticks
+	 * @param frequency the frequency
+	 */
 	public record CameraShakeData(float strength, float duration, float frequency) { }
+	/**
+	 * Locator callback event payload containing callback identity and locator selection.
+	 *
+	 * @param callback the Mixin callback used to inspect or replace the intercepted result
+	 * @param locator the named model locator or bone used to resolve the event position
+	 */
 	public record LocatorCallbackData(ResourceLocation callback, String locator) { }
+	/**
+	 * Animation event payload that updates or triggers a graph parameter.
+	 *
+	 * @param controller the controller supplying playback and persistent expression state
+	 * @param parameter the graph parameter selecting the blend-space coordinate
+	 * @param value the value written by this operation
+	 * @param trigger the trigger name that activates the overlay
+	 */
 	public record AnimationParameterData(String controller, String parameter, float value, boolean trigger) { }
 }

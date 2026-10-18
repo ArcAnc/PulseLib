@@ -24,6 +24,10 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.Consumer;
 
+/**
+ * Discovers side-compatible plugins, instantiates them deterministically and dispatches scoped registration
+ * callbacks.
+ */
 public final class PulsePluginManager
 {
 	private final IPulsePluginFinder finder;
@@ -34,6 +38,13 @@ public final class PulsePluginManager
 	private boolean discovering;
 	private @Nullable Throwable discoveryFailure;
 
+	/**
+	 * Creates plugin discovery and registration state for the selected physical side and class loader.
+	 *
+	 * @param finder the side-safe source of plugin candidates
+	 * @param client whether the current process is a physical client
+	 * @param classLoader the loader used to instantiate compatible plugin classes
+	 */
 	public PulsePluginManager(IPulsePluginFinder finder, boolean client, ClassLoader classLoader)
 	{
 		this.finder = Objects.requireNonNull(finder);
@@ -41,17 +52,28 @@ public final class PulsePluginManager
 		this.classLoader = Objects.requireNonNull(classLoader);
 	}
 
+	/**
+	 * Lazy holder for the process-wide plugin manager.
+	 */
 	private static final class Holder
 	{
 		private static final PulsePluginManager INSTANCE = new PulsePluginManager(
 			PulseServices.load(IPulsePluginFinder.class), PulseServices.PLATFORM.isClient(), PulsePluginManager.class.getClassLoader());
 	}
 
+	/**
+	 * Returns the shared plugin manager for the active loader.
+	 *
+	 * @return the shared plugin manager for the active loader
+	 */
 	public static PulsePluginManager get()
 	{
 		return Holder.INSTANCE;
 	}
 
+	/**
+	 * Discovers and instantiates plugin entry points allowed on the current physical side.
+	 */
 	public synchronized void discover()
 	{
 		if (this.plugins != null)
@@ -118,12 +140,20 @@ public final class PulsePluginManager
 		}
 	}
 
+	/**
+	 * Returns the identifiers of successfully loaded plugins.
+	 *
+	 * @return the identifiers of successfully loaded plugins
+	 */
 	public synchronized List<ResourceLocation> pluginIds()
 	{
 		discover();
 		return this.plugins.stream().map(plugin -> plugin.id).toList();
 	}
 
+	/**
+	 * Runs the ordered common channel, event and deformer registration phases.
+	 */
 	public synchronized void registerCommon()
 	{
 		discover();
@@ -153,6 +183,9 @@ public final class PulsePluginManager
 		});
 	}
 
+	/**
+	 * Runs one-time client attachment and player animation registration phases.
+	 */
 	public synchronized void registerClient()
 	{
 		if (!this.client)
@@ -187,6 +220,11 @@ public final class PulsePluginManager
 		});
 	}
 
+	/**
+	 * Runs reloadable model registration callbacks into the supplied resource map.
+	 *
+	 * @param resources the resources
+	 */
 	public synchronized void registerModels(Map<ResourceLocation, PModelResource> resources)
 	{
 		registerClient();
@@ -246,6 +284,9 @@ public final class PulsePluginManager
 		PLibDatabase.LOGGER.error("PulseLib plugin {} from mod {} failed during {}", candidate.className(), candidate.modId(), phase, cause);
 	}
 
+	/**
+	 * Instantiated plugin together with its source candidate and stable plugin identifier.
+	 */
 	private static final class LoadedPlugin
 	{
 		private final PulsePluginCandidate candidate;

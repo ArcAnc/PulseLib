@@ -26,31 +26,65 @@ public final class PPlayerAnimationSpace
 
 	private PPlayerAnimationSpace() {}
 
+	/**
+	 * Converts a source animation value into canonical player animation space.
+	 *
+	 * @param vector the vector
+	 * @param definition the immutable configuration to register or evaluate
+	 * @return the transform or value converted into the requested player coordinate space
+	 */
 	public static Vector3f toPlayerSpace(Vector3fc vector, PPlayerAnimationDefinition definition)
 	{
 		Vector3f result = new Vector3f(vector);
 		return usesGltfCoordinates(definition) ? result.mul(-1f, -1f, 1f) : result;
 	}
 
+	/**
+	 * Converts a source animation value into canonical player animation space.
+	 *
+	 * @param rotation the local quaternion rotation
+	 * @param definition the immutable configuration to register or evaluate
+	 * @return the transform or value converted into the requested player coordinate space
+	 */
 	public static Quaternionf toPlayerSpace(Quaternionfc rotation, PPlayerAnimationDefinition definition)
 	{
 		Quaternionf result = new Quaternionf(rotation);
 		return usesGltfCoordinates(definition) ? result.set(-result.x, -result.y, result.z, result.w) : result;
 	}
 
+	/**
+	 * Converts a source animation value into canonical player animation space.
+	 *
+	 * @param pose the pose
+	 * @param definition the immutable configuration to register or evaluate
+	 * @return the transform or value converted into the requested player coordinate space
+	 */
 	public static PPlayerBonePose toPlayerSpace(PPlayerBonePose pose, PPlayerAnimationDefinition definition)
 	{
 		return new PPlayerBonePose(toPlayerSpace(pose.translation(), definition), toPlayerSpace(pose.rotation(), definition),
 				pose.scale(), pose.hasTranslation(), pose.hasRotation(), pose.hasScale());
 	}
 
+	/**
+	 * Converts a source animation value into canonical player animation space.
+	 *
+	 * @param transform the transform
+	 * @param definition the immutable configuration to register or evaluate
+	 * @return the transform or value converted into the requested player coordinate space
+	 */
 	public static PTransform toPlayerSpace(PTransform transform, PPlayerAnimationDefinition definition)
 	{
 		return usesGltfCoordinates(definition) ? new PTransform(toPlayerSpace(transform.translation(), definition),
 				toPlayerSpace(transform.rotation(), definition), transform.scale()) : transform;
 	}
 
-	/** Converts a model transform for geometry rendered by vanilla player parts. */
+	/**
+	 * Converts a model transform for geometry rendered by vanilla player parts.
+	 *
+	 * @param transform the transform
+	 * @param definition the immutable configuration to register or evaluate
+	 * @return the transform or value converted into the requested player coordinate space
+	 */
 	public static PTransform toPlayerGeometrySpace(PTransform transform, PPlayerAnimationDefinition definition)
 	{
 		return usesGltfCoordinates(definition) ? GLTF_TO_PLAYER_GEOMETRY.compose(transform) : transform;
@@ -59,13 +93,25 @@ public final class PPlayerAnimationSpace
 	/**
 	 * Converts a camera-relative transform for imported mesh geometry. glTF
 	 * vertices remain in their source basis, so the two basis changes cancel.
+	 *
+	 * @param transform the transform
+	 * @param definition the immutable configuration to register or evaluate
+	 * @return the transform or value converted into the requested player coordinate space
 	 */
 	public static PTransform toFirstPersonGeometrySpace(PTransform transform, PPlayerAnimationDefinition definition)
 	{
 		return usesGltfCoordinates(definition) ? GLTF_TO_PLAYER_GEOMETRY.compose(toPlayerGeometrySpace(transform, definition)) : transform;
 	}
 
-	/** The visual ROOT matrix in source axes; the native player and camera share this pivot convention. */
+	/**
+	 * The visual ROOT matrix in source axes; the native player and camera share this pivot convention.
+	 *
+	 * @param pose the pose
+	 * @param pivot the local pivot used when composing the bone transform
+	 * @param weight the contribution weight
+	 * @param destination the mutable object receiving the result
+	 * @return the four-by-four transform matrix
+	 */
 	public static Matrix4f visualRootMatrix(PPlayerBonePose pose, Vector3f pivot, float weight, Matrix4f destination)
 	{
 		Vector3f translation = pose.translation().mul(weight);
@@ -75,7 +121,13 @@ public final class PPlayerAnimationSpace
 				translate(-pivot.x, -pivot.y, -pivot.z);
 	}
 
-	/** Changes both the transform input and output basis for native anchor geometry. */
+	/**
+	 * Changes both the transform input and output basis for native anchor geometry.
+	 *
+	 * @param matrix the matrix
+	 * @param definition the immutable configuration to register or evaluate
+	 * @return the transform or value converted into the requested player coordinate space
+	 */
 	public static Matrix4f toPlayerSpace(Matrix4f matrix, PPlayerAnimationDefinition definition)
 	{
 		if (usesGltfCoordinates(definition))
@@ -85,7 +137,13 @@ public final class PPlayerAnimationSpace
 		return matrix;
 	}
 
-	/** Changes the output basis while imported mesh vertices retain their source basis. */
+	/**
+	 * Changes the output basis while imported mesh vertices retain their source basis.
+	 *
+	 * @param matrix the matrix
+	 * @param definition the immutable configuration to register or evaluate
+	 * @return the transform or value converted into the requested player coordinate space
+	 */
 	public static Matrix4f toPlayerGeometrySpace(Matrix4f matrix, PPlayerAnimationDefinition definition)
 	{
 		if (usesGltfCoordinates(definition))
@@ -95,7 +153,14 @@ public final class PPlayerAnimationSpace
 		return matrix;
 	}
 
-	/** Preserves a caller's command edits while restoring the exact frame matrix underneath its TRS channels. */
+	/**
+	 * Preserves a caller's command edits while restoring the exact frame matrix underneath its TRS channels.
+	 *
+	 * @param exact the exact
+	 * @param command the command
+	 * @param sampled the sampled
+	 * @return the four-by-four transform matrix
+	 */
 	public static Matrix4f applyChannelOverride(Matrix4f exact, PTransform command, PTransform sampled)
 	{
 		Matrix4f authored = command.matrix();

@@ -10,9 +10,21 @@
 package com.arcanc.pulselib.content.model.animation;
 
 
+/**
+ * Completion policy used when an animation clip reaches its playback boundary.
+ */
 public enum PAnimationType
 {
+	/**
+	 * Plays the clip once and allows playback to complete.
+	 */
 	PLAY_ONCE,
+	/**
+	 * Stops advancing at the clip boundary while retaining its final pose.
+	 */
 	HOLD_LAST_FRAME,
+	/**
+	 * Wraps playback around the clip length to repeat the animation.
+	 */
 	CYCLE;
 }

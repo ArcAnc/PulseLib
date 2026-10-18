@@ -33,6 +33,11 @@ final class GlStateSnapshot
 	private int activeTextureBinding;
 	private int[] textures = new int[0];
 
+	/**
+	 * Captures buffer, vertex-array and texture bindings for the requested texture units.
+	 *
+	 * @param textureUnits the number of texture-unit bindings to capture
+	 */
 	void captureBindings(int textureUnits)
 	{
 		this.program = GL11.glGetInteger(GL20.GL_CURRENT_PROGRAM);
@@ -53,6 +58,9 @@ final class GlStateSnapshot
 		activeTexture(this.activeTexture);
 	}
 
+	/**
+	 * Restores the previously captured OpenGL bindings.
+	 */
 	void restoreBindings()
 	{
 		// Composite shader.clear() invalidates ShaderInstance's program cache.
@@ -95,6 +103,9 @@ final class GlStateSnapshot
 		GlStateManager._bindTexture(texture);
 	}
 
+	/**
+	 * Captures the OpenGL draw state needed around PulseLib rendering.
+	 */
 	void capture()
 	{
 		if (this.blend == null)
@@ -118,6 +129,9 @@ final class GlStateSnapshot
 		this.scissor = GL11.glIsEnabled(GL11.GL_SCISSOR_TEST);
 	}
 
+	/**
+	 * Restores the captured OpenGL draw state.
+	 */
 	void restore()
 	{
 		// Force the cached booleans to observe raw indexed GL changes.

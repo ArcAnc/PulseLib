@@ -9,8 +9,17 @@
 
 package com.arcanc.pulselib.content.model.animation;
 
+/**
+ * Maps interpolation progress to the weight used when sampling an animation channel.
+ */
 @FunctionalInterface
 public interface PInterpolation
 {
+	/**
+	 * Transforms normalized keyframe progress into an interpolation weight.
+	 *
+	 * @param strength the strength
+	 * @return the transformed interpolation weight
+	 */
 	double buildTransformer(double strength);
 }

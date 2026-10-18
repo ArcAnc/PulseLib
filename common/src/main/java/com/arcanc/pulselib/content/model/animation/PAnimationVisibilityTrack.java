@@ -14,13 +14,16 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Immutable value object representing animation visibility track.
+ * Step-sampled visibility keyframes for an animated model bone.
+ *
+ * @param keyframes the channel keyframes in animation time order
  */
 public record PAnimationVisibilityTrack(List<Keyframe> keyframes)
 {
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param keyframes the keyframes to use.
+	 * Copies visibility keyframes into their sampled timeline representation.
+	 *
+	 * @param keyframes the channel keyframes in animation time order
 	 */
 	public PAnimationVisibilityTrack
 	{
@@ -30,9 +33,10 @@ public record PAnimationVisibilityTrack(List<Keyframe> keyframes)
 	}
 
 	/**
-	 * Performs the visible at operation.
-	 * @param time the time to use.
-	 * @return the value produced by this operation.
+	 * Samples step visibility at the supplied animation tick position.
+	 *
+	 * @param time the animation position in game ticks
+	 * @return whether the visibility track is enabled at the supplied time
 	 */
 	public boolean visibleAt(float time)
 	{
@@ -47,8 +51,11 @@ public record PAnimationVisibilityTrack(List<Keyframe> keyframes)
 	}
 
 /**
- * Immutable value object representing keyframe.
- */
+	 * Visibility change scheduled at an animation position measured in game ticks.
+	 *
+	 * @param time the animation position in game ticks
+	 * @param visible whether the selected bone is visible
+	 */
 	public record Keyframe(float time, boolean visible)
 	{
 	}

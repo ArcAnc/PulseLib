@@ -23,8 +23,14 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
+/**
+ * Loads glTF or GLB model resources and optional animation event sidecars.
+ */
 public class PGltfModelLoader implements PModelLoader
 {
+	/**
+	 * Shared instance of this stateless implementation.
+	 */
 	public static final PGltfModelLoader INSTANCE = new PGltfModelLoader();
 
 	private static final ResourceLocation ID = PLibDatabase.rl("gltf");
@@ -39,12 +45,18 @@ public class PGltfModelLoader implements PModelLoader
 	{
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public ResourceLocation id()
 	{
 		return ID;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public List<ResourceLocation> modelResourceCandidates(ResourceLocation modelId)
 	{
@@ -52,6 +64,9 @@ public class PGltfModelLoader implements PModelLoader
 		return List.of(source.withSuffix(GLB_EXTENSION), source.withSuffix(GLTF_EXTENSION));
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public CompletableFuture<PLoadedModel> loadModel(Executor backgroundExecutor,
 	                                                 ResourceManager resourceManager,

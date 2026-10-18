@@ -19,18 +19,28 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
+/**
+ * Samples controller layers into poses and extracts root-motion deltas from animation playback.
+ */
 public final class PAnimationRuntime
 {
 	private PAnimationRuntime()
 	{
 	}
 
+	/**
+	 * Evaluates the ordered controller contributions into a model pose at the supplied render interpolation
+	 * fraction.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param model the baked model supplying indexed bones and animations
+	 * @param controllers the animation controllers in pose composition order
+	 * @param contexts the contexts
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the indexed bone pose
+	 */
 	public static <T extends PAnimatable<T>> PPose evaluate(PBakedModel model,
 	                                                        Collection<PAnimationController<T>> controllers,
 	                                                        PAnimationPoseResolver.MolangContextProvider<T> contexts,
@@ -39,6 +49,18 @@ public final class PAnimationRuntime
 		return evaluate(model, controllers, contexts, partialTick, null);
 	}
 
+	/**
+	 * Evaluates the ordered controller contributions into a model pose at the supplied render interpolation
+	 * fraction.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param model the baked model supplying indexed bones and animations
+	 * @param controllers the animation controllers in pose composition order
+	 * @param contexts the contexts
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param activeBones the bone names allowed to contribute to this pose sample; may be {@code null}
+	 * @return the indexed bone pose
+	 */
 	static <T extends PAnimatable<T>> PPose evaluate(PBakedModel model,
 	                                               Collection<PAnimationController<T>> controllers,
 	                                               PAnimationPoseResolver.MolangContextProvider<T> contexts,
@@ -124,16 +146,33 @@ public final class PAnimationRuntime
 		return pose;
 	}
 
-	/** Captures the requesting graph's base using current tick time and preceding controllers. */
+	/**
+	 * Captures the requesting graph's base using current tick time and preceding controllers.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param model the baked model supplying indexed bones and animations
+	 * @param controller the controller supplying playback and persistent expression state
+	 * @param controllers the animation controllers in pose composition order
+	 * @return the indexed bone pose
+	 */
 	public static <T extends PAnimatable<T>> PPose captureGraphBase(PBakedModel model, PAnimationController<T> controller,
 	                                                               Collection<PAnimationController<T>> controllers)
 	{
 		return captureGraphBase(model, controller, controllers, (candidate, partialTick) -> new MolangParser.Context().
 				copyFrameValuesFrom(candidate.persistentMolangContext()).
-				query("anim_time", candidate.getInterpolatedTime(partialTick) / 20.0f));
+				query("anim_time", PAnimationEvaluationContext.ticksToSeconds(candidate.getInterpolatedTime(partialTick))));
 	}
 
-	/** Resolves current procedural queries for the requesting graph and preceding controllers. */
+	/**
+	 * Resolves current procedural queries for the requesting graph and preceding controllers.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param model the baked model supplying indexed bones and animations
+	 * @param controller the controller supplying playback and persistent expression state
+	 * @param controllers the animation controllers in pose composition order
+	 * @param contexts the contexts
+	 * @return the indexed bone pose
+	 */
 	public static <T extends PAnimatable<T>> PPose captureGraphBase(PBakedModel model, PAnimationController<T> controller,
 	                                                               Collection<PAnimationController<T>> controllers,
 	                                                               PAnimationPoseResolver.MolangContextProvider<T> contexts)
@@ -157,6 +196,17 @@ public final class PAnimationRuntime
 		return controller.graphRuntime().sampleBasePose(model, 1.0f, context, accumulated);
 	}
 
+	/**
+	 * Computes the root-bone movement accumulated between two animation tick positions.
+	 *
+	 * @param animation the animation clip to sample
+	 * @param rootBoneName the bone used as the root-motion or relative-transform reference
+	 * @param previousTime the preceding animation playback position in game ticks
+	 * @param currentTime the current animation playback position in game ticks
+	 * @param interpolation the keyframe interpolation policy
+	 * @param data the optional expression context used to sample source-format animation values
+	 * @return the root-bone translation and rotation accumulated across the playback interval
+	 */
 	public static PRootMotionDelta extractRootMotion(PAnimation animation,
 	                                                 String rootBoneName,
 	                                                 float previousTime,
@@ -186,6 +236,15 @@ public final class PAnimationRuntime
 		return stage == null || stage.isWaiting() ? null : model.compiledAnimation(stage.animationName());
 	}
 
+	/**
+	 * Samples and blends graph layers over the supplied accumulated pose.
+	 *
+	 * @param model the baked model supplying indexed bones and animations
+	 * @param layers the layers
+	 * @param context the Molang context containing current frame and instance values
+	 * @param accumulatedPose the pose contributed by preceding controllers
+	 * @return the indexed bone pose
+	 */
 	static PPose sampleGraphLayers(PBakedModel model, List<PAnimationGraphRuntime.Layer> layers,
 	                              MolangParser.Context context, PPose accumulatedPose)
 	{
@@ -236,6 +295,13 @@ public final class PAnimationRuntime
 		return pose;
 	}
 
+	/**
+	 * Applies a weighted graph overlay delta to the base pose.
+	 *
+	 * @param base the accumulated channel value before the current layer
+	 * @param delta the elapsed playback interval in game ticks
+	 * @param weight the contribution weight
+	 */
 	static void applyGraphOverlay(PPose base, PPose delta, float weight)
 	{
 		for (int bone = 0; bone < base.boneCount(); bone++)
@@ -335,6 +401,12 @@ public final class PAnimationRuntime
 		return new BoneFrame(translation, rotation, scale);
 	}
 
+	/**
+	 * Sampled graph pose together with the base pose used to evaluate its overlays.
+	 *
+	 * @param layer the layer contribution being blended
+	 * @param frame the frame matrices or sampled animation values used by this operation
+	 */
 	private record GraphFrame(PAnimationGraphRuntime.Layer layer, BoneFrame frame)
 	{
 	}

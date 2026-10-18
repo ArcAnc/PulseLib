@@ -14,7 +14,7 @@ The public API is `PAnimationEvent<T>` and `PAnimationEventType<T>`. Event types
 | `locator_callback` | `BOTH` | `callback`, optional `locator` |
 | `animation_parameter` | `BOTH` | optional `controller`, `parameter`, optional `value`, `trigger` |
 
-`PRESENTATION_ONLY` means client-only and non-authoritative. `CLIENT` and `SERVER` run only on that physical side; `BOTH` runs on either side when the controller is ticked there. A server event therefore needs a server-ticked animation manager; the standard singleton/instance managers are client ticked.
+`PRESENTATION_ONLY` means client-only and non-authoritative. `CLIENT` and `SERVER` select the logical side from the event context's level; a missing level is treated as client-side. `BOTH` runs on either logical side when the controller is ticked there. An integrated server is still a logical server. Server events require an explicitly server-ticked animation manager; the standard singleton/instance manager lifecycle ticks on the client.
 
 `locator_callback` invokes a callback registered with `PAnimationEventCallbacks.register(id, callback)`. The callback receives the event context and the resolved locator position (or `null` when the animatable has no world position). `animation_parameter` targets the current graph controller when `controller` is blank; otherwise it targets a controller by name. `trigger: true` calls `trigger(parameter)`, otherwise `value` is assigned to the parameter.
 

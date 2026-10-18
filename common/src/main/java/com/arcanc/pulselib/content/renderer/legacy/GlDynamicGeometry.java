@@ -13,20 +13,36 @@ import com.arcanc.pulselib.content.mixin.VertexBufferAccessor;
 import com.arcanc.pulselib.content.renderer.plan.PDynamicGeometry;
 import com.mojang.blaze3d.vertex.VertexBuffer;
 
+/**
+ * Dynamic geometry backed by a vanilla vertex buffer and explicit index count.
+ */
 public final class GlDynamicGeometry implements PDynamicGeometry
 {
 	private final VertexBuffer vertexBuffer = new VertexBuffer(VertexBuffer.Usage.DYNAMIC);
 
+	/**
+	 * Returns the vertex buffer.
+	 *
+	 * @return the vertex buffer
+	 */
 	public VertexBuffer vertexBuffer()
 	{
 		return this.vertexBuffer;
 	}
 
+	/**
+	 * Returns the number of indices drawn from the dynamic vertex buffer.
+	 *
+	 * @return the number of indices drawn from the dynamic vertex buffer
+	 */
 	public int indexCount()
 	{
 		return ((VertexBufferAccessor)this.vertexBuffer).pulselib$getIndexCount();
 	}
 
+	/**
+	 * Closes the vertex buffer owned by this dynamic geometry.
+	 */
 	public void close()
 	{
 		this.vertexBuffer.close();

@@ -1,8 +1,8 @@
 # Shaders
 
-PulseLib has two shader paths. World models normally use the queued, instanced path; GUI rendering and explicit immediate drawing use the immediate path. Both paths consume the same baked `POSITION_TEX_NORMAL` vertex data, but they receive transforms, material data, and deformers differently.
+PulseLib has two shader paths. World models and scoped entity previews use the queued, instanced path; direct GUI model/item drawing and explicit immediate drawing use the immediate path. Both paths consume the same baked `POSITION_TEX_NORMAL` vertex data, but they receive transforms, material data, and deformers differently.
 
-Applications should select a render type through `PRenderTypes.RenderTypeProvider`. Shader instances are registered by PulseLib during NeoForge's `RegisterShadersEvent`; consumers do not need to register the built-in programs themselves.
+Applications should select a render type through `PRenderTypes.RenderTypeProvider`. PulseLib registers shader instances through NeoForge's `RegisterShadersEvent` or Fabric's `CoreShaderRegistrationCallback`; consumers do not need to register the built-in programs themselves.
 
 ## Render types and programs
 
@@ -36,7 +36,7 @@ Queued emissive types use `triangles_instanced_emissive`; direct types use `tria
 
 ## Queued instanced path
 
-The queued path is used by normal entity, block-entity, and non-GUI item rendering. `GlDrawExecutor` binds static geometry from the geometry arena or a dynamic vertex buffer, then supplies per-instance attributes at locations 4 through 10.
+The queued path is used by normal entity, block-entity, and non-GUI item rendering, as well as local GUI/offscreen entity-preview scopes. `GlDrawExecutor` binds static geometry from the geometry arena or a dynamic vertex buffer, then supplies per-instance attributes at locations 4 through 10.
 
 | Location | Input | Meaning |
 | --- | --- | --- |
@@ -97,14 +97,20 @@ Alpha-mode selection currently targets the queued world path: it resolves to `tr
 `trianglesTranslucent` and `trianglesTranslucentEmissive` are marked as OIT-capable render types. When independent blending is available through OpenGL 4.0 or `ARB_draw_buffers_blend`, `GlDrawExecutor` uses four depth-peeled layers. For every layer it first renders the nearest visible transparent fragment depth, then accumulates only fragments matching that depth. Each layer owns:
 
 * an `RGBA16F` accumulation texture;
-* an `R16F` revealage texture.
+* an `R16F` revealage texture;
 * an `R32F` transparent depth texture.
 
-`triangles_oit_depth*.fsh` produce each layer's depth. `triangles_oit*.fsh` and their emissive variants sample `LayerDepthSampler` and write weighted color and revealage only for the matching layer. `oit_composite` resolves non-empty layers from farthest to nearest after weather. It composites into Minecraft's weather target under Fabulous graphics so the result participates in the vanilla transparency chain, and into the main target otherwise. The OIT framebuffer shares the active target's depth texture, but translucent draws do not write depth.
+`triangles_oit_depth*.fsh` produce each layer's depth. `triangles_oit*.fsh` and their emissive variants sample `LayerDepthSampler` and write weighted color and revealage only for the matching layer. The OIT framebuffer shares the active target's depth texture, but translucent draws do not write depth.
+
+Fast/Fancy graphics use `oit_composite` to resolve non-empty layers from farthest to nearest into the main target after weather.
+
+Fabulous graphics defer resolution until after the vanilla transparency `PostChain.process` call. `oit_metadata` packs each layer's revealage and depth into an `RG32F` metadata texture. `oit_fabulous_composite` then composes each PulseLib layer into the main image with depth comparisons against the five native targets: translucent blocks, items/entities, particles, weather, and clouds. It preserves the foreground native contribution for each layer rather than flattening all PulseLib depths into the weather target.
+
+The Fabulous composite uses twelve samplers: `AccumSampler`, `OitMetadataSampler`, and color/depth pairs named `TranslucentSampler`/`TranslucentDepthSampler`, `ItemEntitySampler`/`ItemEntityDepthSampler`, `ParticlesSampler`/`ParticlesDepthSampler`, `WeatherSampler`/`WeatherDepthSampler`, and `CloudsSampler`/`CloudsDepthSampler`. These are internal composite inputs, separate from the mesh shader contract above.
 
 The same OIT programs are used for first-person PulseLib items. Their stage is resolved immediately after Minecraft renders the hands, rather than being retained until the world transparency pass.
 
-If OIT is unsupported, its framebuffer cannot be created, or the OIT shaders are unavailable, PulseLib falls back to the normal translucent program. OIT shader selection is internal; application code should continue to request `trianglesTranslucent` rather than using `triangles_oit` directly.
+If OIT is unsupported, its framebuffer cannot be created, or the OIT shaders are unavailable, PulseLib falls back to the normal translucent program. OIT groups have already been batched, so this fallback does not restore per-instance sorted order. GUI/offscreen preview scopes disable OIT batching and use sorted transparency. OIT shader selection is internal; application code should continue to request `trianglesTranslucent` rather than using `triangles_oit` directly.
 
 Custom translucent render types are not automatically marked as OIT-capable. They use the sorted fallback unless the backend gains an explicit registration API for them.
 

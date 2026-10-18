@@ -11,7 +11,15 @@ package com.arcanc.pulselib.plugin;
 
 import java.util.List;
 
+/**
+ * Discovers annotated plugin entry points without instantiating their classes.
+ */
 public interface IPulsePluginFinder
 {
+	/**
+	 * Returns discovered plugin class names, owning mods and physical-side restrictions.
+	 *
+	 * @return discovered plugin class names, owning mods and physical-side restrictions
+	 */
 	List<PulsePluginCandidate> findPlugins();
 }

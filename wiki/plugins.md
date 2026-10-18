@@ -33,7 +33,7 @@ public class ExamplePulsePlugin implements IPulseClientPlugin
 }
 ```
 
-The example loads `assets/example/glmodels/example.gltf` and declares `assets/example/textures/example.png` as texture `base`. For Gecko models, use `PModelData.direct(id("example"), PGeckoModelLoader.INSTANCE.id())`; place geometry under `geckolib/models` and animations under `geckolib/animations`, as described in [model loaders](model-loaders.md).
+The example loads `assets/example/glmodels/example.glb`, falling back to `example.gltf`, and declares `assets/example/textures/example.png` as texture `base`. For Gecko models, use `PModelData.direct(id("example"), PGeckoModelLoader.INSTANCE.id())`; place geometry under `geckolib/models` and animations under `geckolib/animations`, as described in [model loaders](model-loaders.md).
 
 ## Physical sides
 

@@ -17,7 +17,7 @@ import org.joml.Matrix4f;
 public final class PFirstPersonPoseStack
 {
 	/**
-	 * Creates an instance of the enclosing type.
+	 * Creates a first person pose stack.
 	 */
 	private PFirstPersonPoseStack()
 	{

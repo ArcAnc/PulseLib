@@ -12,8 +12,20 @@ package com.arcanc.pulselib.content.model.animation;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Immutable animation state graph with transitions and an initial base state.
+ *
+ * @param states the graph states in index order
+ * @param transitions the graph transition definitions
+ */
 public record PAnimationGraph(List<PAnimationState> states, List<PAnimationTransition> transitions)
 {
+	/**
+	 * Copies and validates graph states and transitions, requiring at least one non-overlay state.
+	 *
+	 * @param states the graph states in index order
+	 * @param transitions the graph transition definitions
+	 */
 	public PAnimationGraph
 	{
 		states = List.copyOf(states);
@@ -34,6 +46,11 @@ public record PAnimationGraph(List<PAnimationState> states, List<PAnimationTrans
 			throw new IllegalArgumentException("An animation graph needs one non-overlay state");
 	}
 
+	/**
+	 * Returns the index of the initial non-overlay animation state.
+	 *
+	 * @return the index of the initial non-overlay animation state
+	 */
 	public int initialState()
 	{
 		for (int index = 0; index < this.states.size(); index++)

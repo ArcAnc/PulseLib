@@ -11,8 +11,20 @@ package com.arcanc.pulselib.content.model.animation;
 
 import java.util.Objects;
 
+/**
+ * Named animation clip and its contribution weight within a graph state.
+ *
+ * @param animation the source animation clip name
+ * @param weight the contribution weight
+ */
 public record PAnimationSample(String animation, float weight)
 {
+	/**
+	 * Creates a non-negative weighted contribution from a named animation clip.
+	 *
+	 * @param animation the source animation clip name
+	 * @param weight the contribution weight
+	 */
 	public PAnimationSample
 	{
 		animation = Objects.requireNonNull(animation);

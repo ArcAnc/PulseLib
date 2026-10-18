@@ -17,6 +17,9 @@ import net.minecraft.client.renderer.texture.SpriteContents;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+/**
+ * Caches texture-pixel analysis used to choose opaque, cutout or translucent rendering.
+ */
 public final class PTextureAlphaClassifier
 {
 	private static final Map<SpriteContents, PAlphaMode> CACHE = new WeakHashMap<>();
@@ -25,11 +28,20 @@ public final class PTextureAlphaClassifier
 	{
 	}
 
+	/**
+	 * Classifies the alpha values of the supplied sprite contents.
+	 *
+	 * @param contents the contents
+	 * @return the alpha policy inferred from the sprite pixels
+	 */
 	public static synchronized PAlphaMode resolve(SpriteContents contents)
 	{
 		return CACHE.computeIfAbsent(contents, PTextureAlphaClassifier :: classify);
 	}
 
+	/**
+	 * Discards cached texture alpha classifications.
+	 */
 	public static synchronized void clear()
 	{
 		CACHE.clear();

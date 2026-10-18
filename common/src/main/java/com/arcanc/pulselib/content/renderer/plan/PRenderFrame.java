@@ -11,8 +11,20 @@ package com.arcanc.pulselib.content.renderer.plan;
 
 import org.joml.Matrix4f;
 
+/**
+ * Model-view and projection matrices captured for one render submission scope.
+ *
+ * @param modelView the captured model-view matrix
+ * @param projection the captured projection matrix
+ */
 public record PRenderFrame(Matrix4f modelView, Matrix4f projection)
 {
+	/**
+	 * Copies model-view and projection matrices for later render-plan execution.
+	 *
+	 * @param modelView the captured model-view matrix
+	 * @param projection the captured projection matrix
+	 */
 	public PRenderFrame
 	{
 		modelView = new Matrix4f(modelView);

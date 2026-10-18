@@ -12,8 +12,24 @@ package com.arcanc.pulselib.content.model.deformer;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+/**
+ * Deformed local position and right, up and forward basis vectors at a mesh attachment point.
+ *
+ * @param position the position
+ * @param right the local right basis direction
+ * @param up the local up basis direction
+ * @param forward the local forward basis direction
+ */
 public record PDeformerFrame(Vector3f position, Vector3f right, Vector3f up, Vector3f forward)
 {
+	/**
+	 * Copies a deformed position and its local basis vectors.
+	 *
+	 * @param position the position
+	 * @param right the local right basis direction
+	 * @param up the local up basis direction
+	 * @param forward the local forward basis direction
+	 */
 	public PDeformerFrame
 	{
 		position = new Vector3f(position);
@@ -22,6 +38,11 @@ public record PDeformerFrame(Vector3f position, Vector3f right, Vector3f up, Vec
 		forward = new Vector3f(forward);
 	}
 
+	/**
+	 * Builds the transform matrix represented by this deformed local frame.
+	 *
+	 * @return the four-by-four transform matrix
+	 */
 	public Matrix4f matrix()
 	{
 		return new Matrix4f().identity().

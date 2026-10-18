@@ -14,8 +14,14 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector3f;
 
+/**
+ * Prepares CPU mesh deformation operations for squashing along a configurable axis.
+ */
 public final class PSquashDeformer implements PMeshDeformer<PSquashDefinition>
 {
+	/**
+	 * Shared instance of this stateless implementation.
+	 */
 	public static final PSquashDeformer INSTANCE = new PSquashDeformer();
 	private static final float EPSILON = 1.0e-5f;
 
@@ -23,18 +29,34 @@ public final class PSquashDeformer implements PMeshDeformer<PSquashDefinition>
 	{
 	}
 
+	/**
+	 * Returns the namespaced identifier of this mesh deformer type.
+	 *
+	 * @return the namespaced identifier of this mesh deformer type
+	 */
 	@Override
 	public ResourceLocation id()
 	{
 		return PLibDatabase.rl("squash");
 	}
 
+	/**
+	 * Returns the codec for this deformer's configuration.
+	 *
+	 * @return the codec for this deformer's configuration
+	 */
 	@Override
 	public MapCodec<PSquashDefinition> codec()
 	{
 		return PSquashDefinition.CODEC;
 	}
 
+	/**
+	 * Compiles the supplied definition into operations appended to the preparation context.
+	 *
+	 * @param context the destination collecting prepared deformation operations
+	 * @param definition the immutable configuration to register or evaluate
+	 */
 	@Override
 	public void prepare(PDeformerPrepareContext context, PSquashDefinition definition)
 	{
@@ -44,8 +66,21 @@ public final class PSquashDeformer implements PMeshDeformer<PSquashDefinition>
 		context.add(new Operation(new Vector3f(definition.origin()), axis.normalize(), definition.scale()));
 	}
 
+	/**
+	 * Prepared mesh operation for squashing along a configurable axis.
+	 *
+	 * @param origin the local pivot or origin of the deformation
+	 * @param axis the normalized deformation axis
+	 * @param scale the scale channel reference and its fallback value
+	 */
 	private record Operation(Vector3f origin, Vector3f axis, PChannelReference<Float> scale) implements PPreparedDeformer
 	{
+		/**
+		 * Applies this operation to the supplied position in place using current channel values.
+		 *
+		 * @param position the position
+		 * @param values the source of current animated deformation channel values
+		 */
 		@Override
 		public void deform(Vector3f position, PDeformerValueSource values)
 		{

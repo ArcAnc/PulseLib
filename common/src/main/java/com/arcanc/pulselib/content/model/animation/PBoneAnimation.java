@@ -15,8 +15,21 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Typed animation channel tracks associated with one source-model bone.
+ *
+ * @param boneUuid the bone uuid
+ * @param tracks the tracks
+ */
 public record PBoneAnimation(UUID boneUuid, Map<String, PAnimationTrack<?>> tracks)
 {
+	/**
+	 * Returns the track registered for the supplied channel type, or {@code null} if absent.
+	 *
+	 * @param <T> the value type carried by this contract
+	 * @param type the registered animation channel type
+	 * @return the track registered for the supplied channel type, or {@code null} if absent
+	 */
 	@SuppressWarnings("unchecked")
 	public @Nullable <T> PAnimationTrack<T> track(PAnimationChannelType<T> type)
 	{
@@ -26,6 +39,12 @@ public record PBoneAnimation(UUID boneUuid, Map<String, PAnimationTrack<?>> trac
 		return null;
 	}
 
+	/**
+	 * Returns whether this bone animation contains the supplied channel type.
+	 *
+	 * @param type the registered animation channel type
+	 * @return whether this bone animation contains the supplied channel type
+	 */
 	public boolean hasChannel(PAnimationChannelType<?> type)
 	{
 		return track(type) != null;

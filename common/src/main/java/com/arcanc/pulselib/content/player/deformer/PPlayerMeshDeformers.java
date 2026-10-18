@@ -28,6 +28,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 
+/**
+ * Registers player-part deformation stacks and applies active stacks to vanilla humanoid geometry.
+ */
 public final class PPlayerMeshDeformers
 {
 	private static final Map<ResourceLocation, Binding> BINDINGS = new LinkedHashMap<>();
@@ -36,6 +39,15 @@ public final class PPlayerMeshDeformers
 	{
 	}
 
+	/**
+	 * Registers a named deformation binding for one player part.
+	 *
+	 * @param id the namespaced resource or registration identifier
+	 * @param part the player model part receiving the contribution
+	 * @param applies the applies
+	 * @param stack the item stack supplying render or animation state
+	 * @param values the values
+	 */
 	public static void register(ResourceLocation id, PPlayerPart part, Predicate<Player> applies,
 							PDeformerStack stack, PPlayerDeformerValueSource values)
 	{
@@ -44,22 +56,51 @@ public final class PPlayerMeshDeformers
 			throw new IllegalArgumentException("Duplicate player deformer binding " + id);
 	}
 
+	/**
+	 * Removes the deformation binding registered under the supplied identifier.
+	 *
+	 * @param id the namespaced resource or registration identifier
+	 */
 	public static void unregister(ResourceLocation id)
 	{
 		BINDINGS.remove(id);
 	}
 
+	/**
+	 * Clears all registered player deformation bindings.
+	 */
 	public static void clear()
 	{
 		BINDINGS.clear();
 	}
 	
+	/**
+	 * Samples a deformed local attachment frame on the selected player part.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param part the player model part receiving the contribution
+	 * @param localPosition the position in undeformed local model coordinates
+	 * @param forwardAxis the undeformed forward basis direction
+	 * @param upAxis the undeformed up basis direction
+	 * @return the deformed attachment position and local basis on the selected player part
+	 */
 	public static PDeformerFrame frameAt(Player player, PPlayerPart part, Vector3f localPosition,
 										Vector3f forwardAxis, Vector3f upAxis)
 	{
 		return frameAt(player, part, localPosition, forwardAxis, upAxis, 0.0f);
 	}
 
+	/**
+	 * Samples a deformed local attachment frame on the selected player part.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param part the player model part receiving the contribution
+	 * @param localPosition the position in undeformed local model coordinates
+	 * @param forwardAxis the undeformed forward basis direction
+	 * @param upAxis the undeformed up basis direction
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the deformed attachment position and local basis on the selected player part
+	 */
 	public static PDeformerFrame frameAt(Player player, PPlayerPart part, Vector3f localPosition,
 										Vector3f forwardAxis, Vector3f upAxis, float partialTick)
 	{
@@ -79,11 +120,24 @@ public final class PPlayerMeshDeformers
 		return new PDeformerFrame(position, right, up, forward);
 	}
 
+	/**
+	 * Configures the active vertex deformations of the supplied player or humanoid model.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param model the model
+	 */
 	public static void apply(Player player, PlayerModel<?> model)
 	{
 		apply(player, model, 0.0f);
 	}
 
+	/**
+	 * Configures the active vertex deformations of the supplied player or humanoid model.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param model the model
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 */
 	public static void apply(Player player, PlayerModel<?> model, float partialTick)
 	{
 		for (PPlayerPart part : PPlayerPart.values())
@@ -91,11 +145,24 @@ public final class PPlayerMeshDeformers
 				apply(player, part, modelPart, partialTick);
 	}
 
+	/**
+	 * Configures the active vertex deformations of the supplied player or humanoid model.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param model the model
+	 */
 	public static void apply(Player player, HumanoidModel<?> model)
 	{
 		apply(player, model, 0.0f);
 	}
 
+	/**
+	 * Configures the active vertex deformations of the supplied player or humanoid model.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param model the model
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 */
 	public static void apply(Player player, HumanoidModel<?> model, float partialTick)
 	{
 		apply(player, PPlayerPart.HEAD, model.head, partialTick);
@@ -137,6 +204,14 @@ public final class PPlayerMeshDeformers
 		return position;
 	}
 
+	/**
+	 * Registered player-part deformation stack, activation predicate and channel value source.
+	 *
+	 * @param part the player model part receiving the contribution
+	 * @param applies the applies
+	 * @param stack the item stack supplying render or animation state
+	 * @param values the values
+	 */
 	private record Binding(PPlayerPart part, Predicate<Player> applies, PDeformerStack stack, PPlayerDeformerValueSource values)
 	{
 		private Binding
@@ -148,6 +223,12 @@ public final class PPlayerMeshDeformers
 		}
 	}
 
+	/**
+	 * Player deformation binding paired with its current sampled values.
+	 *
+	 * @param stack the item stack supplying render or animation state
+	 * @param values the values
+	 */
 	private record ActiveBinding(PDeformerStack stack, PPlayerDeformerValueSource values)
 	{
 	}

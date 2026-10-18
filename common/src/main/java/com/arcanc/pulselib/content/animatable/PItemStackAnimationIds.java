@@ -20,6 +20,11 @@ public final class PItemStackAnimationIds
 	{
 	}
 
+	/**
+	 * Allocates the next transient item stack animation identity.
+	 *
+	 * @return the next positive session-local animation identity
+	 */
 	public static long nextId()
 	{
 		return NEXT_ID.updateAndGet(previous ->

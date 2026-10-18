@@ -12,7 +12,14 @@ package com.arcanc.pulselib.content.player.animation;
 import com.arcanc.pulselib.content.model.animation.PTransform;
 import net.minecraft.resources.ResourceLocation;
 
-/** The resolved transform of one player-animation anchor. */
+/**
+ * The resolved transform of one player-animation anchor.
+ *
+ * @param animation the namespaced resource or registry identifier
+ * @param anchor the anchor
+ * @param transform the transform
+ * @param weight the contribution weight
+ */
 public record PPlayerAnimationAnchorPose(ResourceLocation animation,
                                          PPlayerAnimationAnchor anchor,
                                          PTransform transform,

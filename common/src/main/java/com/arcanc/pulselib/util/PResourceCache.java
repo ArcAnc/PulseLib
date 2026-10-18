@@ -28,7 +28,13 @@ import java.util.Optional;
 public final class PResourceCache
 {
 	private static final String SPRITE_PREFIX = "runtime/";
+	/**
+	 * Runtime resource location of the PulseLib texture atlas.
+	 */
 	public static final ResourceLocation ATLAS_LOCATION = PLibDatabase.rl("textures/atlas.png");
+	/**
+	 * Resource location of the atlas source definition.
+	 */
 	@ApiStatus.Internal
 	public static final ResourceLocation ATLAS_FILE_LOCATION = PLibDatabase.rl("atlas");
 	private static @Nullable TextureAtlas textures;
@@ -38,6 +44,11 @@ public final class PResourceCache
 	{
 	}
 
+	/**
+	 * Returns the currently resolved PulseLib texture atlas.
+	 *
+	 * @return the currently resolved PulseLib texture atlas
+	 */
 	public static TextureAtlas getTextureAtlas()
 	{
 		if (textures == null)
@@ -45,12 +56,20 @@ public final class PResourceCache
 		return textures;
 	}
 
+	/**
+	 * Returns the canonical model resource declarations used by model loading.
+	 *
+	 * @return the canonical model resource declarations used by model loading
+	 */
 	@ApiStatus.Internal
 	public static Map<ResourceLocation, PModelResource> getResourceCache()
 	{
 		return resources;
 	}
 
+	/**
+	 * Clears registered model resources and cached texture-resolution state.
+	 */
 	@ApiStatus.Internal
 	public static void clear()
 	{
@@ -82,6 +101,13 @@ public final class PResourceCache
 		textures = null;
 	}
 
+	/**
+	 * Resolves a model texture reference through its registered overrides.
+	 *
+	 * @param modelId the canonical model identifier
+	 * @param textureReference the source-model texture reference used for override lookup
+	 * @return the namespaced resource or registry identifier
+	 */
 	public static ResourceLocation resolve(ResourceLocation modelId, String textureReference)
 	{
 		PModelResource resource = resources.get(modelId);
@@ -93,6 +119,12 @@ public final class PResourceCache
 		return spriteId(texture);
 	}
 
+	/**
+	 * Converts a texture resource location into the corresponding atlas sprite identifier.
+	 *
+	 * @param texture the texture resource location
+	 * @return the namespaced resource or registry identifier
+	 */
 	@ApiStatus.Internal
 	public static ResourceLocation spriteId(ResourceLocation texture)
 	{

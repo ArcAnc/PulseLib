@@ -51,6 +51,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.item.ItemStack;
@@ -207,12 +208,17 @@ public final class SmokeHarness
 		}
 
 		worldVerified = true;
+		if (mc.level != null && !AnimationSamplingHarness.frameWorld())
+		{
+			return;
+		}
 		if (mc.level != null && !WorldRenderRegressionHarness.frame())
 		{
 			return;
 		}
 		RenderRegressionHarness.run();
 		AnimationLifecycleHarness.run(TestEntityRender.MODEL_DATA.getModel());
+		AnimationSamplingHarness.run();
 		Dummy dummy = new Dummy();
 		dummy.manager.bindModel(gecko);
 		var controller = dummy.manager.getControllers().get("idle");
@@ -226,6 +232,7 @@ public final class SmokeHarness
 		draw(pyramid, false);
 		draw(pyramid, true);
 		PLibDatabase.LOGGER.info("PULSE TEST graphics and animation pass");
+		AnimationSamplingHarness.verifyRemovalHooks();
 		runExplicitCleanup(gecko);
 		if (mc.level == null)
 		{
@@ -307,7 +314,7 @@ public final class SmokeHarness
 		mc.player.xRotO = 0.0f;
 	}
 
-	private static void equip(net.minecraft.world.entity.LivingEntity player)
+	private static void equip(LivingEntity player)
 	{
 		player.setItemSlot(EquipmentSlot.HEAD, new ItemStack(DemoContent.helmet.get()));
 		player.setItemSlot(EquipmentSlot.CHEST, new ItemStack(DemoContent.chestplate.get()));

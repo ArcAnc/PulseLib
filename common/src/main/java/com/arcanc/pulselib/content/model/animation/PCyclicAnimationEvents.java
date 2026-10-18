@@ -27,6 +27,15 @@ final class PCyclicAnimationEvents
 	{
 	}
 
+	/**
+	 * Visits every event crossed by the supplied cyclic interval in playback order.
+	 *
+	 * @param animation the animation clip to sample
+	 * @param from the preceding animation tick position
+	 * @param to the current animation tick position
+	 * @param includeReverseStart whether the initial reverse interval includes an event at its starting boundary
+	 * @param consumer the callback receiving each matching event
+	 */
 	static void visit(PAnimation animation, double from, double to, boolean includeReverseStart, Consumer<PAnimationEvent<?>> consumer)
 	{
 		if (!Double.isFinite(from) || !Double.isFinite(to) || !Float.isFinite(animation.length()))
@@ -95,6 +104,11 @@ final class PCyclicAnimationEvents
 	 * FMA retains the local residual without first rounding a huge absolute
 	 * boundary. Division can round onto an adjacent integer; correct that once
 	 * using the residual, rather than stepping a floating-point cursor.
+	 *
+	 * @param animation the animation clip to sample
+	 * @param time the animation position in game ticks
+	 * @param length the animation clip length in game ticks
+	 * @return the integer cycle index and local position of the event boundary
 	 */
 	private static Position position(PAnimation animation, double time, double length)
 	{
@@ -131,6 +145,12 @@ final class PCyclicAnimationEvents
 		return new Window(from, to, length, forward, includeReverseStart);
 	}
 
+	/**
+	 * Cycle number and local clip position for a cyclic event boundary.
+	 *
+	 * @param cycle the cycle
+	 * @param local the local
+	 */
 	private record Position(long cycle, double local)
 	{
 	}
@@ -150,6 +170,12 @@ final class PCyclicAnimationEvents
 	 * Forward includes zero on departure and length on arrival; reverse includes
 	 * length on departure and zero on arrival. A seam's two distinct markers
 	 * therefore fire once each, in playback order, even across adjacent ticks.
+	 *
+	 * @param from the preceding animation tick position
+	 * @param to the current animation tick position
+	 * @param length the animation clip length in game ticks
+	 * @param forward the local forward basis direction
+	 * @param includeReverseStart whether the initial reverse interval includes an event at its starting boundary
 	 */
 	private record Window(double from, double to, double length, boolean forward, boolean includeReverseStart)
 	{

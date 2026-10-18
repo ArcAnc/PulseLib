@@ -34,6 +34,9 @@ import org.joml.Vector3f;
 
 import java.util.*;
 
+/**
+ * Registry and per-player runtime for layered animation, camera motion, action anchors and mesh deformers.
+ */
 public final class PPlayerAnimations
 {
 	private static final Map<ResourceLocation, PPlayerAnimationDefinition> DEFINITIONS = new HashMap<>();
@@ -44,6 +47,12 @@ public final class PPlayerAnimations
 	{
 	}
 
+	/**
+	 * Registers a player animation definition under its namespaced identifier.
+	 *
+	 * @param id the namespaced resource or registration identifier
+	 * @param definition the immutable configuration to register or evaluate
+	 */
 	public static void register(ResourceLocation id, PPlayerAnimationDefinition definition)
 	{
 		if (DEFINITIONS.putIfAbsent(id, definition) != null)
@@ -56,23 +65,49 @@ public final class PPlayerAnimations
 		}
 	}
 
+	/**
+	 * Returns the player animation definition registered under the supplied identifier.
+	 *
+	 * @param id the namespaced resource or registration identifier
+	 * @return the player animation definition registered under the supplied identifier, or {@code null} when the requested value is unavailable
+	 */
 	public static @Nullable PPlayerAnimationDefinition get(ResourceLocation id)
 	{
 		return DEFINITIONS.get(id);
 	}
 	
+	/**
+	 * Returns or creates playback state for the selected player and animation definition.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param id the namespaced resource or registration identifier
+	 * @return or creates playback state for the selected player and animation definition, or {@code null} when the requested value is unavailable
+	 */
 	public static @Nullable PPlayerAnimationInstance getInstance(Player player, ResourceLocation id)
 	{
 		PPlayerAnimationDefinition definition = DEFINITIONS.get(id);
 		return definition == null ? null : instance(player, id, definition);
 	}
 	
+	/**
+	 * Creates a control handle for the selected player animation.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param id the namespaced resource or registration identifier
+	 * @return a control handle for the selected player animation, or {@code null} when the requested value is unavailable
+	 */
 	public static @Nullable PPlayerAnimationHandle getHandle(Player player, ResourceLocation id)
 	{
 		return DEFINITIONS.containsKey(id) ? new PPlayerAnimationHandle(player, id) : null;
 	}
 
-	/** Returns all live semantic sockets from the same frames used for model-part animation. */
+	/**
+	 * Returns all live semantic sockets from the same frames used for model-part animation.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return all live semantic sockets from the same frames used for model-part animation
+	 */
 	public static List<PPlayerAnimationAnchorPose> animationAnchorPoses(Player player, float partialTick)
 	{
 		List<PPlayerAnimationAnchorPose> poses = new ArrayList<>();
@@ -93,7 +128,16 @@ public final class PPlayerAnimations
 		return List.copyOf(poses);
 	}
 
-	/** Writes a semantic socket for the third-person stack after visual ROOT motion. */
+	/**
+	 * Writes a semantic socket for the third-person stack after visual ROOT motion.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param animation the namespaced resource or registry identifier
+	 * @param anchor the anchor
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param destination the mutable object receiving the result
+	 * @return whether the requested transform was resolved and written to the destination
+	 */
 	@ApiStatus.Internal
 	public static boolean attachmentMatrix(Player player, ResourceLocation animation,
 	                                       PPlayerAnimationAnchor anchor, float partialTick, Matrix4f destination)
@@ -113,7 +157,16 @@ public final class PPlayerAnimations
 		return true;
 	}
 
-	/** Writes an already camera-relative socket; the native hand stack adds no camera motion. */
+	/**
+	 * Writes an already camera-relative socket; the native hand stack adds no camera motion.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param animation the namespaced resource or registry identifier
+	 * @param anchor the anchor
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param destination the mutable object receiving the result
+	 * @return whether the requested transform was resolved and written to the destination
+	 */
 	@ApiStatus.Internal
 	public static boolean firstPersonAttachmentMatrix(Player player, ResourceLocation animation,
 	                                                  PPlayerAnimationAnchor anchor, float partialTick, Matrix4f destination)
@@ -128,7 +181,13 @@ public final class PPlayerAnimations
 		return presentation != null && presentation.anchorMatrix(anchor, destination);
 	}
 
-	/** Returns mesh subtrees selected from the same evaluated player-animation frames. */
+	/**
+	 * Returns mesh subtrees selected from the same evaluated player-animation frames.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return mesh subtrees selected from the same evaluated player-animation frames
+	 */
 	public static List<PPlayerAnimationMeshAttachmentPose> meshAttachmentPoses(Player player, float partialTick)
 	{
 		List<PPlayerAnimationMeshAttachmentPose> poses = new ArrayList<>();
@@ -151,7 +210,13 @@ public final class PPlayerAnimations
 		return List.copyOf(poses);
 	}
 
-	/** Produces the version-independent first-person command set; renderer hooks consume it later. */
+	/**
+	 * Produces the version-independent first-person command set; renderer hooks consume it later.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the combined first-person arm, item and attachment commands, or {@code null} when the requested value is unavailable
+	 */
 	public static @Nullable PFirstPersonRenderPresentation firstPersonPresentation(LocalPlayer player, float partialTick)
 	{
 		FirstPersonPresentationBuilder pose = new FirstPersonPresentationBuilder();
@@ -180,6 +245,11 @@ public final class PPlayerAnimations
 		return pose.hasContributingAnimation ? pose.build() : null;
 	}
 
+	/**
+	 * Updates player animation instances for the current client level.
+	 *
+	 * @param level the level
+	 */
 	@ApiStatus.Internal
 	public static void tick(ClientLevel level)
 	{
@@ -197,12 +267,25 @@ public final class PPlayerAnimations
 		INSTANCES.keySet().removeIf(uuid -> !livePlayers.contains(uuid));
 	}
 
+	/**
+	 * Discards per-player playback and cached presentation state.
+	 */
 	@ApiStatus.Internal
 	public static void cleanUp()
 	{
 		INSTANCES.clear();
 	}
 	
+	/**
+	 * Applies eligible animation contributions to the allowed player model parts and returns restoration
+	 * state.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param model the model
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param allowedParts the player parts eligible to receive animation
+	 * @return the state needed to restore the modified vanilla model parts
+	 */
 	@ApiStatus.Internal
 	public static PPlayerModelPose apply(Player player, PlayerModel<?> model, float partialTick, Set<PPlayerPart> allowedParts)
 	{
@@ -216,6 +299,16 @@ public final class PPlayerAnimations
 		return originalPose;
 	}
 
+	/**
+	 * Applies animation contributions to one player model part and returns restoration state.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param model the model
+	 * @param playerPart the player model part receiving the contribution
+	 * @param modelPart the model part
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the state needed to restore the modified vanilla model part
+	 */
 	@ApiStatus.Internal
 	public static PPlayerModelPose applyPart(Player player,
 	                                         PlayerModel<?> model,
@@ -229,6 +322,14 @@ public final class PPlayerAnimations
 		return originalPose;
 	}
 
+	/**
+	 * Returns whether active animation contributes to the selected player model part.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param playerPart the player model part receiving the contribution
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return whether active animation contributes to the selected player model part
+	 */
 	@ApiStatus.Internal
 	public static boolean isPartAnimating(Player player, PPlayerPart playerPart, float partialTick)
 	{
@@ -237,6 +338,13 @@ public final class PPlayerAnimations
 		return animating[0];
 	}
 	
+	/**
+	 * Applies weighted root animation to the supplied player render pose stack.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param poseStack the current model-to-render pose stack
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 */
 	@ApiStatus.Internal
 	public static void applyRoot(Player player, PoseStack poseStack, float partialTick)
 	{
@@ -278,6 +386,13 @@ public final class PPlayerAnimations
 		return definition.modelData().getModelLoaderId().equals(PGltfModelLoader.INSTANCE.id());
 	}
 	
+	/**
+	 * Samples animation-driven camera rotation and root-position contributions.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the sampled camera contribution, or {@code null} when no camera animation contributes
+	 */
 	@ApiStatus.Internal
 	public static @Nullable PPlayerCameraPose cameraPose(Player player, float partialTick)
 	{
@@ -301,6 +416,14 @@ public final class PPlayerAnimations
 		return cameraPose.isEmpty() ? null : cameraPose;
 	}
 
+	/**
+	 * Collects the active deformation contributions for the selected player part.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param part the player model part receiving the contribution
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the active deformation stacks and their sampled contribution weights
+	 */
 	@ApiStatus.Internal
 	public static List<PPlayerAnimationDeformerApplication> activeDeformers(Player player,
 	                                                                        PPlayerPart part,
@@ -489,15 +612,29 @@ public final class PPlayerAnimations
 		}
 	}
 
+	/**
+	 * Receives a sampled and weighted player model part contribution.
+	 */
 	@FunctionalInterface
 	private interface PoseConsumer
 	{
+		/**
+		 * Consumes a pose contribution for the supplied player model part.
+		 *
+		 * @param part the player model part receiving the contribution
+		 * @param pose the pose
+		 * @param definition the immutable configuration to register or evaluate
+		 * @param weight the contribution weight
+		 */
 		void apply(PPlayerPart part,
 		           PPlayerBonePose pose,
 		           PPlayerAnimationDefinition definition,
 		           float weight);
 	}
 
+	/**
+	 * Aggregated camera rotation and weighted root transforms sampled from player animations.
+	 */
 	@ApiStatus.Internal
 	public static final class PPlayerCameraPose
 	{
@@ -568,11 +705,21 @@ public final class PPlayerAnimations
 			this.changed = true;
 		}
 
+		/**
+		 * Returns whether any animation contributes camera rotation.
+		 *
+		 * @return whether any animation contributes camera rotation
+		 */
 		public boolean hasRotation()
 		{
 			return this.hasCameraTransform ? this.hasCameraRotation : !this.headRotation.equals(new Quaternionf());
 		}
 		
+		/**
+		 * Returns a copy of the aggregated camera animation rotation.
+		 *
+		 * @return a copy of the aggregated camera animation rotation
+		 */
 		public Quaternionf rotation()
 		{
 			if (this.hasCameraTransform) return this.cameraTransform.rotation();
@@ -582,6 +729,12 @@ public final class PPlayerAnimations
 			return rotation.mul(this.headRotation);
 		}
 		
+		/**
+		 * Calculates the animation-driven camera position offset at the supplied eye height.
+		 *
+		 * @param eyeHeight the eye height
+		 * @return the three-component vector
+		 */
 		public Vector3f positionOffset(float eyeHeight)
 		{
 			if (this.hasCameraTransform) return this.cameraTransform.translation();
@@ -611,11 +764,22 @@ public final class PPlayerAnimations
 					Math.abs(rotation.y) >= 1.0e-5f || Math.abs(rotation.z) >= 1.0e-5f;
 		}
 
+		/**
+		 * Weighted root transform used to calculate animated camera displacement.
+		 *
+		 * @param pivot the local pivot used when composing the bone transform
+		 * @param translation the local translation vector
+		 * @param rotation the local quaternion rotation
+		 * @param scale the local scale vector
+		 */
 		private record RootTransform(Vector3f pivot, Vector3f translation, Quaternionf rotation, Vector3f scale)
 		{
 		}
 	}
 
+	/**
+	 * Restoration handle for vanilla model-part transforms temporarily changed by player animation.
+	 */
 	@ApiStatus.Internal
 	public static final class PPlayerModelPose
 	{
@@ -647,11 +811,17 @@ public final class PPlayerAnimations
 			return this.parts.get(modelPart);
 		}
 
+		/**
+		 * Restores the model-part transforms captured before player animation was applied.
+		 */
 		public void restore()
 		{
 			this.parts.forEach((part, pose) -> pose.restore(part));
 		}
 
+		/**
+		 * Saved transform of one vanilla player model part.
+		 */
 		private static final class PartPose
 		{
 			private final float x;
@@ -830,6 +1000,11 @@ public final class PPlayerAnimations
 		}
 	}
 
+	/**
+	 * Returns the set of all supported player animation parts.
+	 *
+	 * @return the set of all supported player animation parts
+	 */
 	@ApiStatus.Internal
 	public static Set<PPlayerPart> allParts()
 	{

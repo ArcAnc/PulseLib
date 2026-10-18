@@ -18,9 +18,19 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
+/**
+ * Enables deformable cube baking for vanilla regular and slim player model layers.
+ */
 @Mixin(EntityModelSet.class)
 public class EntityModelSetMixin
 {
+	/**
+	 * Bakes regular and slim player layers inside a deformable-cube scope.
+	 *
+	 * @param definition the immutable configuration to register or evaluate
+	 * @param location the location
+	 * @return the baked model root, using deformable cubes for supported player layers
+	 */
 	@Redirect(method = "bakeLayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/geom/builders/LayerDefinition;bakeRoot()Lnet/minecraft/client/model/geom/ModelPart;"))
 	private ModelPart pulselib$bakePlayerLayerWithDeformableCubes(LayerDefinition definition, ModelLayerLocation location)
 	{

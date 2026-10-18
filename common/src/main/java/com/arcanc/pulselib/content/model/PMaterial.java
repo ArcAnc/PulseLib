@@ -9,9 +9,18 @@
 
 package com.arcanc.pulselib.content.model;
 
-/** Immutable material reference for a model primitive. */
+/**
+ * Immutable material reference for a model primitive.
+ *
+ * @param textureReference the source-model texture reference used for override lookup
+ */
 public record PMaterial(String textureReference)
 {
+	/**
+	 * Creates a material using a normalized texture reference.
+	 *
+	 * @param textureReference the source-model texture reference used for override lookup
+	 */
 	public PMaterial
 	{
 		textureReference = PTextureReference.normalize(textureReference);

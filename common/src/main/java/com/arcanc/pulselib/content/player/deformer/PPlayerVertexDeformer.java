@@ -11,10 +11,21 @@ package com.arcanc.pulselib.content.player.deformer;
 
 import org.joml.Vector3f;
 
+/**
+ * In-place deformation callback for a player model vertex.
+ */
 @FunctionalInterface
 interface PPlayerVertexDeformer
 {
+	/**
+	 * Vertex deformer that leaves the position unchanged.
+	 */
 	PPlayerVertexDeformer IDENTITY = position -> {};
 
+	/**
+	 * Transforms the supplied player-local vertex position in place.
+	 *
+	 * @param position the position
+	 */
 	void deform(Vector3f position);
 }

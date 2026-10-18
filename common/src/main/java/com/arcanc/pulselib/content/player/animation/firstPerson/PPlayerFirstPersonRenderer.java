@@ -30,6 +30,16 @@ public final class PPlayerFirstPersonRenderer
 {
 	private PPlayerFirstPersonRenderer() {}
 
+	/**
+	 * Renders animated attachments and mesh extras using the sampled first-person presentation.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param presentation the presentation
+	 * @param poseStack the current model-to-render pose stack
+	 * @param buffers the vanilla vertex buffer source
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 */
 	public static void renderExtras(LocalPlayer player, PFirstPersonRenderPresentation presentation,
 	                                PoseStack poseStack, MultiBufferSource buffers, int packedLight, float partialTick)
 	{

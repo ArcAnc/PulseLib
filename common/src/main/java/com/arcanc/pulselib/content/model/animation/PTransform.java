@@ -15,17 +15,27 @@ import org.joml.Vector3f;
 
 import java.util.Objects;
 
-/** Immutable translation, rotation, and scale transform data. */
+/**
+ * Immutable translation, rotation, and scale transform data.
+ *
+ * @param translation the local translation vector
+ * @param rotation the local quaternion rotation
+ * @param scale the local scale vector
+ */
 public record PTransform(Vector3f translation, Quaternionf rotation, Vector3f scale)
 {
+	/**
+	 * Transform with zero translation, identity rotation and unit scale.
+	 */
 	public static final PTransform IDENTITY = new PTransform(
 			new Vector3f(), new Quaternionf(), new Vector3f(1.0f));
 
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param translation the translation to use.
-	 * @param rotation the rotation to use.
-	 * @param scale the scale to use.
+	 * Copies translation, rotation and scale into an independent transform value.
+	 *
+	 * @param translation the local translation vector
+	 * @param rotation the local quaternion rotation
+	 * @param scale the local scale vector
 	 */
 	public PTransform
 	{
@@ -35,8 +45,9 @@ public record PTransform(Vector3f translation, Quaternionf rotation, Vector3f sc
 	}
 
 	/**
-	 * Performs the translation operation.
-	 * @return the value produced by this operation.
+	 * Returns a defensive copy of the translation.
+	 *
+	 * @return a defensive copy of the translation
 	 */
 	@Override
 	public Vector3f translation()
@@ -45,8 +56,9 @@ public record PTransform(Vector3f translation, Quaternionf rotation, Vector3f sc
 	}
 
 	/**
-	 * Performs the rotation operation.
-	 * @return the value produced by this operation.
+	 * Returns a defensive copy of the rotation.
+	 *
+	 * @return a defensive copy of the rotation
 	 */
 	@Override
 	public Quaternionf rotation()
@@ -55,8 +67,9 @@ public record PTransform(Vector3f translation, Quaternionf rotation, Vector3f sc
 	}
 
 	/**
-	 * Performs the scale operation.
-	 * @return the value produced by this operation.
+	 * Returns a defensive copy of the scale.
+	 *
+	 * @return a defensive copy of the scale
 	 */
 	@Override
 	public Vector3f scale()
@@ -64,7 +77,11 @@ public record PTransform(Vector3f translation, Quaternionf rotation, Vector3f sc
 		return new Vector3f(this.scale);
 	}
 
-	/** Materializes this transform at the rendering boundary. */
+	/**
+	 * Materializes this transform at the rendering boundary.
+	 *
+	 * @return the four-by-four transform matrix
+	 */
 	public Matrix4f matrix()
 	{
 		return matrix(new Matrix4f());
@@ -73,6 +90,9 @@ public record PTransform(Vector3f translation, Quaternionf rotation, Vector3f sc
 	/**
 	 * Writes this LOCAL_BONE or MODEL-space TRS transform into {@code destination}.
 	 * This overload is for render hot paths that already own a matrix scratch buffer.
+	 *
+	 * @param destination the mutable object receiving the result
+	 * @return the four-by-four transform matrix
 	 */
 	public Matrix4f matrix(Matrix4f destination)
 	{
@@ -83,6 +103,9 @@ public record PTransform(Vector3f translation, Quaternionf rotation, Vector3f sc
 	 * Decomposes a matrix at a boundary where a transform must change bases.
 	 * Animation transforms are TRS, therefore this deliberately does not try to
 	 * preserve shearing matrices.
+	 *
+	 * @param matrix the matrix
+	 * @return the transform decomposed from the supplied matrix
 	 */
 	public static PTransform fromMatrix(Matrix4f matrix)
 	{
@@ -94,10 +117,11 @@ public record PTransform(Vector3f translation, Quaternionf rotation, Vector3f sc
 	}
 
 	/**
-	 * Performs the interpolate operation.
-	 * @param target the target to use.
-	 * @param weight the weight to use.
-	 * @return the value produced by this operation.
+	 * Interpolates translation, rotation and scale toward the target transform.
+	 *
+	 * @param target the target
+	 * @param weight the contribution weight
+	 * @return the interpolated translation, rotation and scale
 	 */
 	public PTransform interpolate(PTransform target, float weight)
 	{
@@ -108,7 +132,12 @@ public record PTransform(Vector3f translation, Quaternionf rotation, Vector3f sc
 				new Vector3f(this.scale).lerp(target.scale, weight));
 	}
 
-	/** Applies {@code local} after this transform using TRS channel semantics. */
+	/**
+	 * Applies {@code local} after this transform using TRS channel semantics.
+	 *
+	 * @param local the local
+	 * @return the composed parent and local transform
+	 */
 	public PTransform compose(PTransform local)
 	{
 		Objects.requireNonNull(local);
@@ -118,7 +147,11 @@ public record PTransform(Vector3f translation, Quaternionf rotation, Vector3f sc
 				new Vector3f(this.scale).mul(local.scale));
 	}
 
-	/** Returns the inverse TRS channels used by relative player-animation transforms. */
+	/**
+	 * Returns the inverse TRS channels used by relative player-animation transforms.
+	 *
+	 * @return the inverse TRS channels used by relative player-animation transforms
+	 */
 	public PTransform inverse()
 	{
 		Quaternionf inverseRotation = new Quaternionf(this.rotation).invert();
@@ -131,9 +164,10 @@ public record PTransform(Vector3f translation, Quaternionf rotation, Vector3f sc
 	}
 
 	/**
-	 * Performs the translation operation.
-	 * @param translation the translation to use.
-	 * @return the value produced by this operation.
+	 * Returns a transform copy with the supplied translation.
+	 *
+	 * @param translation the local translation vector
+	 * @return a transform copy with the supplied translation
 	 */
 	public static PTransform translation(Vector3f translation)
 	{
@@ -141,9 +175,10 @@ public record PTransform(Vector3f translation, Quaternionf rotation, Vector3f sc
 	}
 
 	/**
-	 * Performs the rotation operation.
-	 * @param rotation the rotation to use.
-	 * @return the value produced by this operation.
+	 * Returns a transform copy with the supplied rotation.
+	 *
+	 * @param rotation the local quaternion rotation
+	 * @return a transform copy with the supplied rotation
 	 */
 	public static PTransform rotation(Quaternionf rotation)
 	{
@@ -151,9 +186,10 @@ public record PTransform(Vector3f translation, Quaternionf rotation, Vector3f sc
 	}
 
 	/**
-	 * Performs the safe inverse operation.
-	 * @param value the value to use.
-	 * @return the value produced by this operation.
+	 * Returns the reciprocal of a scale component with zero handled safely.
+	 *
+	 * @param value the value written by this operation
+	 * @return the reciprocal of a scale component with zero handled safely
 	 */
 	private static float safeInverse(float value)
 	{

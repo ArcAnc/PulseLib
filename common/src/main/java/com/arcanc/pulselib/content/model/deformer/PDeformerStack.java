@@ -15,8 +15,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Ordered mesh deformation operations with helpers for positions, normals and local attachment frames.
+ */
 public final class PDeformerStack
 {
+	/**
+	 * Deformation stack that leaves mesh geometry unchanged.
+	 */
 	public static final PDeformerStack EMPTY = new PDeformerStack(List.of());
 	private static final float FRAME_EPSILON = 0.001f;
 
@@ -24,6 +30,11 @@ public final class PDeformerStack
 
 	private final List<PDeformerInstance<?>> definitions;
 
+	/**
+	 * Creates an ordered sequence of prepared mesh deformation operations.
+	 *
+	 * @param operations the prepared operations in deformation order
+	 */
 	PDeformerStack(List<PPreparedDeformer> operations)
 	{
 		this(operations, List.of());
@@ -35,6 +46,12 @@ public final class PDeformerStack
 		this.definitions = List.copyOf(definitions);
 	}
 
+	/**
+	 * Compiles deformer definitions into an executable operation stack.
+	 *
+	 * @param definitions the definitions
+	 * @return the prepared mesh deformation stack
+	 */
 	public static PDeformerStack compile(List<? extends PDeformerInstance<?>> definitions)
 	{
 		Objects.requireNonNull(definitions);
@@ -45,6 +62,12 @@ public final class PDeformerStack
 		return new PDeformerStack(prepared.operations, List.copyOf(definitions));
 	}
 
+	/**
+	 * Concatenates the supplied stacks in application order.
+	 *
+	 * @param stacks the deformation stacks in composition order
+	 * @return the prepared mesh deformation stack
+	 */
 	public static PDeformerStack compose(PDeformerStack... stacks)
 	{
 		List<PPreparedDeformer> operations = new ArrayList<>();
@@ -57,6 +80,11 @@ public final class PDeformerStack
 		return operations.isEmpty() ? EMPTY : new PDeformerStack(operations, definitions);
 	}
 
+	/**
+	 * Returns whether this stack contains no deformation operations.
+	 *
+	 * @return whether this stack contains no deformation operations
+	 */
 	public boolean isEmpty()
 	{
 		return this.operations.isEmpty();
@@ -64,12 +92,21 @@ public final class PDeformerStack
 
 	/**
 	 * MUTATE THOSE LIST IS FORBIDDEN!!!
+	 *
+	 * @return the retained source deformer definitions
 	 */
 	public List<PDeformerInstance<?>> definitions()
 	{
 		return this.definitions;
 	}
 
+	/**
+	 * Returns a deformed copy of the supplied local position.
+	 *
+	 * @param localPosition the position in undeformed local model coordinates
+	 * @param values the source of current animated deformation channel values
+	 * @return a deformed copy of the supplied local position
+	 */
 	public Vector3f deform(Vector3f localPosition, PDeformerValueSource values)
 	{
 		Vector3f result = new Vector3f(localPosition);
@@ -77,12 +114,26 @@ public final class PDeformerStack
 		return result;
 	}
 
+	/**
+	 * Applies all operations to the supplied local position in place.
+	 *
+	 * @param localPosition the position in undeformed local model coordinates
+	 * @param values the source of current animated deformation channel values
+	 */
 	public void deformInPlace(Vector3f localPosition, PDeformerValueSource values)
 	{
 		for (PPreparedDeformer operation : this.operations)
 			operation.deform(localPosition, values);
 	}
 	
+	/**
+	 * Returns a normal transformed by the local deformation around the supplied position.
+	 *
+	 * @param localPosition the position in undeformed local model coordinates
+	 * @param normal the local surface normal
+	 * @param values the source of current animated deformation channel values
+	 * @return a normal transformed by the local deformation around the supplied position
+	 */
 	public Vector3f deformNormal(Vector3f localPosition, Vector3f normal, PDeformerValueSource values)
 	{
 		if (this.operations.isEmpty())
@@ -103,6 +154,15 @@ public final class PDeformerStack
 		return result.lengthSquared() < 1.0e-12f ? new Vector3f(normal) : result.normalize();
 	}
 	
+	/**
+	 * Samples a deformed local basis at the supplied mesh attachment point.
+	 *
+	 * @param localPosition the position in undeformed local model coordinates
+	 * @param forwardAxis the undeformed forward basis direction
+	 * @param upAxis the undeformed up basis direction
+	 * @param values the source of current animated deformation channel values
+	 * @return the deformed position and local basis at the selected point
+	 */
 	public PDeformerFrame frameAt(Vector3f localPosition, Vector3f forwardAxis, Vector3f upAxis, PDeformerValueSource values)
 	{
 		Vector3f position = deform(localPosition, values);

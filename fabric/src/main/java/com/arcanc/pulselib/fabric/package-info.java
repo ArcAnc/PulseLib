@@ -7,6 +7,9 @@
  * Details can be found in the license file in the root folder of this project
  */
 
+/**
+ * Fabric entry points and loader implementations of plugin discovery, camera and platform services.
+ */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @FieldsAreNonnullByDefault

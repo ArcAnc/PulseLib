@@ -23,8 +23,18 @@ import java.util.concurrent.Executor;
  */
 public interface PModelLoader
 {
+	/**
+	 * Returns the namespaced identifier used to select this model loader.
+	 *
+	 * @return the namespaced identifier used to select this model loader
+	 */
 	ResourceLocation id();
 
+	/**
+	 * Applies the source-format transform required when rendering a loaded model as an item.
+	 *
+	 * @param poseStack the current model-to-render pose stack
+	 */
 	default void applyItemTransform(PoseStack poseStack)
 	{
 		poseStack.translate(0.5f, 0, 0.5f);
@@ -35,12 +45,22 @@ public interface PModelLoader
 	 * Returns physical resource candidates for a canonical model id, in
 	 * precedence order. This is intentionally the only place resource-path
 	 * conventions belong.
+	 *
+	 * @param modelId the canonical model identifier
+	 * @return physical resource candidates for a canonical model id, in
+ precedence order. This is intentionally the only place resource-path
+ conventions belong
 	 */
 	List<ResourceLocation> modelResourceCandidates(ResourceLocation modelId);
 
 	/**
 	 * Loads one registered canonical model. The returned source is the physical
 	 * candidate selected by this loader and must not be used as a cache key.
+	 *
+	 * @param backgroundExecutor the executor used to read and prepare model resources
+	 * @param resourceManager the resource manager used to locate source assets
+	 * @param modelId the canonical model identifier
+	 * @return a future completing with the canonical model id, selected source and parsed model
 	 */
 	CompletableFuture<PLoadedModel> loadModel(Executor backgroundExecutor,
 	                                         ResourceManager resourceManager,

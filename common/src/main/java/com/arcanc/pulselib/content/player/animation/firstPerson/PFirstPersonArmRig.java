@@ -12,13 +12,19 @@ package com.arcanc.pulselib.content.player.animation.firstPerson;
 import com.arcanc.pulselib.content.model.animation.PTransform;
 
 import java.util.Objects;
-/** Calibration from the vanilla rigid-arm render origin to an authored hand socket. */
+/**
+ * Calibration from the vanilla rigid-arm render origin to an authored hand socket.
+ *
+ * @param armOrigin the arm origin
+ * @param handSocket the hand socket
+ */
 public record PFirstPersonArmRig(PTransform armOrigin, PTransform handSocket)
 {
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param armOrigin the arm origin to use.
-	 * @param handSocket the hand socket to use.
+	 * Captures the reference arm origin and authored hand socket.
+	 *
+	 * @param armOrigin the arm origin
+	 * @param handSocket the hand socket
 	 */
 	public PFirstPersonArmRig
 	{
@@ -27,8 +33,9 @@ public record PFirstPersonArmRig(PTransform armOrigin, PTransform handSocket)
 	}
 
 	/**
-	 * Performs the arm to hand operation.
-	 * @return the value produced by this operation.
+	 * Returns the reference transform from the arm render origin to the hand socket.
+	 *
+	 * @return the reference transform from the arm render origin to the hand socket
 	 */
 	public PTransform armToHand()
 	{

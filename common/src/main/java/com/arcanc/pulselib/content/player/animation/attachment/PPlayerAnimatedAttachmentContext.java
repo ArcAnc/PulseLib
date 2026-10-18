@@ -16,7 +16,20 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.resources.ResourceLocation;
 
-/** Native 1.21.1 attachment invocation context. */
+/**
+ * Native 1.21.1 attachment invocation context.
+ *
+ * @param player the player whose animation or presentation is being processed
+ * @param animation the namespaced resource or registry identifier
+ * @param anchor the anchor
+ * @param transform the transform
+ * @param weight the contribution weight
+ * @param firstPerson the first person
+ * @param poseStack the current model-to-render pose stack
+ * @param buffers the vanilla vertex buffer source
+ * @param packedLight the packed block and sky light coordinates
+ * @param partialTick the interpolation fraction between the previous and current game ticks
+ */
 public record PPlayerAnimatedAttachmentContext(AbstractClientPlayer player, ResourceLocation animation,
                                                PPlayerAnimationAnchor anchor, PTransform transform, float weight,
                                                boolean firstPerson, PoseStack poseStack, MultiBufferSource buffers,

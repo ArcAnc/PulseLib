@@ -26,8 +26,17 @@ import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
 import java.io.IOException;
 
+/**
+ * Connects NeoForge shaders, atlases, render stages, entity removal and client ticks to shared runtime
+ * hooks.
+ */
 public final class NeoForgeClientLifecycle
 {
+	/**
+	 * Installs mod-bus and game-bus listeners needed by the shared client runtime.
+	 *
+	 * @param bus the NeoForge mod lifecycle event bus
+	 */
 	public static void register(IEventBus bus)
 	{
 		bus.addListener(NeoForgeClientLifecycle :: shaders);

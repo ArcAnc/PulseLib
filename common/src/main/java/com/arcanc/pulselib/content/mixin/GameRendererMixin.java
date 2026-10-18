@@ -22,9 +22,20 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+/**
+ * Scopes first-person model submissions and composites them after held-item rendering.
+ */
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin
 {
+	/**
+	 * Runs held-item rendering in the first-person submission context.
+	 *
+	 * @param camera the camera
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param view the view
+	 * @param original the original implementation or unmodified value supplied by the render hook
+	 */
 	@WrapMethod (method = "renderItemInHand")
 	private void pulselib$handContext(Camera camera, float partialTick, Matrix4f view, Operation<Void> original)
 	{
@@ -34,6 +45,14 @@ public abstract class GameRendererMixin
 		}
 	}
 
+	/**
+	 * Flushes first-person geometry and composites its translucency after vanilla hand rendering.
+	 *
+	 * @param camera the camera
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param modelViewMatrix the model view matrix
+	 * @param ci the Mixin callback for the intercepted method
+	 */
 	@Inject(method = "renderItemInHand", at = @At(
 			value = "INVOKE",
 			target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;renderHandsWithItems(FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/player/LocalPlayer;I)V",

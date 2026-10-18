@@ -20,12 +20,34 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Vanilla-compatible model cuboid that deforms tessellated face vertices before emission.
+ */
 public final class PDeformedCuboid extends ModelPart.Cube
 {
 	private static final float MODEL_SCALE = 1.0f / 16.0f;
 	private final List<Face> faces;
 	private volatile PPlayerVertexDeformer deformer = PPlayerVertexDeformer.IDENTITY;
 
+	/**
+	 * Creates deformable cuboid faces from vanilla dimensions, growth, UV and face-selection inputs.
+	 *
+	 * @param texCoordU the tex coord u
+	 * @param texCoordV the tex coord v
+	 * @param originX the origin x
+	 * @param originY the origin y
+	 * @param originZ the origin z
+	 * @param dimensionX the dimension x
+	 * @param dimensionY the dimension y
+	 * @param dimensionZ the dimension z
+	 * @param growX the grow x
+	 * @param growY the grow y
+	 * @param growZ the grow z
+	 * @param mirror the mirror
+	 * @param texWidth the tex width
+	 * @param texHeight the tex height
+	 * @param visibleFaces the visible faces
+	 */
 	public PDeformedCuboid(int texCoordU, int texCoordV, float originX, float originY, float originZ,
 						float dimensionX, float dimensionY, float dimensionZ, float growX, float growY, float growZ,
 						boolean mirror, float texWidth, float texHeight, Set<Direction> visibleFaces)
@@ -36,11 +58,25 @@ public final class PDeformedCuboid extends ModelPart.Cube
 				growX, growY, growZ, mirror, texWidth, texHeight, visibleFaces);
 	}
 
+	/**
+	 * Sets the vertex deformation callback used when this cuboid is rendered.
+	 *
+	 * @param deformer the deformer
+	 */
 	void setDeformer(PPlayerVertexDeformer deformer)
 	{
 		this.deformer = deformer;
 	}
 
+	/**
+	 * Emits this cuboid's deformed vertices with the supplied pose and lighting.
+	 *
+	 * @param pose the pose
+	 * @param consumer the callback receiving each matching event
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param packedOverlay the packed overlay texture coordinates
+	 * @param color the packed ARGB vertex color
+	 */
 	@Override
 	public void compile(PoseStack.Pose pose, VertexConsumer consumer, int packedLight, int packedOverlay, int color)
 	{
@@ -80,9 +116,33 @@ public final class PDeformedCuboid extends ModelPart.Cube
 		return faces;
 	}
 
+	/**
+	 * Tessellated cuboid face with UV and normal data.
+	 *
+	 * @param p00 the p00
+	 * @param p10 the p10
+	 * @param p11 the p11
+	 * @param p01 the p01
+	 * @param u0 the u0
+	 * @param v0 the v0
+	 * @param u1 the u1
+	 * @param v1 the v1
+	 * @param textureWidth the texture width
+	 * @param textureHeight the texture height
+	 */
 	private record Face(Vector3f p00, Vector3f p10, Vector3f p11, Vector3f p01,
 						float u0, float v0, float u1, float v1, float textureWidth, float textureHeight)
 	{
+		/**
+		 * Emits the face vertices after applying the current player vertex deformer.
+		 *
+		 * @param pose the pose
+		 * @param consumer the callback receiving each matching event
+		 * @param light the packed block and sky light coordinates
+		 * @param overlay the packed overlay texture coordinates
+		 * @param color the packed ARGB vertex color
+		 * @param deformer the deformer
+		 */
 		void render(PoseStack.Pose pose, VertexConsumer consumer, int light, int overlay, int color, PPlayerVertexDeformer deformer)
 		{
 			int uSegments = segments(this.p00.distance(this.p10));

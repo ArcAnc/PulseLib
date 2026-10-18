@@ -19,13 +19,34 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 
+/**
+ * Living attachment layer with first-person humanoid arm rendering support.
+ *
+ * @param <T> the entity type rendered or animated by this contract
+ * @param <M> the vanilla model type
+ */
 public class PHumanoidAttachmentLayer<T extends LivingEntity, M extends HumanoidModel<T>> extends PLivingAttachmentLayer<T, M>
 {
+	/**
+	 * Attaches humanoid equipment and arm attachment rendering to the supplied renderer.
+	 *
+	 * @param parent the parent
+	 */
 	public PHumanoidAttachmentLayer(RenderLayerParent<T, M> parent)
 	{
 		super(parent);
 	}
 	
+	/**
+	 * Renders eligible humanoid attachments on the selected first-person arm.
+	 *
+	 * @param poseStack the current model-to-render pose stack
+	 * @param light the packed block and sky light coordinates
+	 * @param entity the entity being animated or rendered
+	 * @param arm the humanoid arm whose geometry is being processed
+	 * @param armPart the vanilla model part representing the selected arm
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 */
 	public static void renderFirstPersonArm(PoseStack poseStack,
 	                                        int light,
 	                                        LivingEntity entity,

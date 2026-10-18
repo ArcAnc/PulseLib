@@ -10,10 +10,16 @@
 package com.arcanc.pulselib.content.player.animation.firstPerson;
 
 /**
- * Enumerates the available first person camera mode values.
+ * Whether first-person presentation follows animated or vanilla camera motion.
  */
 public enum PFirstPersonCameraMode
 {
+	/**
+	 * Applies animation-driven first-person camera motion.
+	 */
 	ANIMATED,
+	/**
+	 * Retains vanilla first-person camera motion.
+	 */
 	VANILLA
 }

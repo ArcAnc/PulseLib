@@ -9,9 +9,21 @@
 
 package com.arcanc.pulselib.content.animatable;
 
+/**
+ * Playback state requested by an animation controller state handler.
+ */
 public enum ControllerState
 {
+	/**
+	 * Advances and samples the active animation.
+	 */
 	PLAY,
+	/**
+	 * Keeps the active playback position without advancing it.
+	 */
 	PAUSE,
+	/**
+	 * Stops playback until another animation is selected.
+	 */
 	STOP;
 }

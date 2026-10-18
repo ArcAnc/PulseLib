@@ -16,11 +16,28 @@ import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * Selects the player model parts eligible to receive an animation contribution.
+ */
 @FunctionalInterface
 public interface PPlayerAnimationMask
 {
+	/**
+	 * Tests whether the supplied player part is included for the current frame.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param part the player model part receiving the contribution
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return whether the supplied player part is included for the current frame
+	 */
 	boolean contains(Player player, PPlayerPart part, float partialTick);
 
+	/**
+	 * Creates a mask that includes the supplied player parts.
+	 *
+	 * @param parts the player parts included by the mask
+	 * @return a mask containing the supplied player parts
+	 */
 	static PPlayerAnimationMask of(PPlayerPart... parts)
 	{
 		Objects.requireNonNull(parts);
@@ -29,6 +46,12 @@ public interface PPlayerAnimationMask
 		return of(allowed);
 	}
 
+	/**
+	 * Creates a mask that includes the supplied player parts.
+	 *
+	 * @param parts the player parts included by the mask
+	 * @return a mask containing the supplied player parts
+	 */
 	static PPlayerAnimationMask of(Set<PPlayerPart> parts)
 	{
 		Set<PPlayerPart> allowed = Set.copyOf(parts);

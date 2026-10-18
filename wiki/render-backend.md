@@ -1,6 +1,6 @@
 # Render Backend
 
-PulseLib separates model traversal from OpenGL execution. Renderers evaluate animation, walk baked bones, and submit mesh instances; the backend later compiles those submissions and draws them at the matching NeoForge render stage.
+PulseLib separates model traversal from OpenGL execution. Renderers evaluate animation, walk baked bones, and submit mesh instances; the backend later compiles those submissions and draws them at the matching render stage. Common owns the backend and stage handler; NeoForge events and Fabric mixins connect them to Minecraft's lifecycle.
 
 ```text
 renderer
@@ -72,7 +72,7 @@ Each `PInstanceHeader` contains:
 | --- | --- | --- |
 | Multi-draw indirect plus base instance | Multiple arena slices in one indirect call | Direct instanced draws |
 | Buffer storage | Persistently mapped ring buffers | `glBufferData` uploads |
-| Independent draw-buffer blending | Weighted blended OIT | Sorted alpha blending |
+| Independent draw-buffer blending | Layered weighted blended OIT | Ordinary translucent program for built-in OIT groups |
 
 The instance record occupies 96 bytes. It contains three transform rows, color, light, overlay, three deformer integers, and padding. The executor uploads all records for a plan into one instance buffer.
 
@@ -90,18 +90,28 @@ For a direct arena draw, the executor calls `glDrawElementsInstancedBaseVertex`.
 
 Before drawing, the executor applies the group's `RenderType`, binds instance attributes, sets Minecraft's default matrices and light directions, and binds the deformer texture buffers. The queued shader contract and its immediate counterpart are documented on [Shaders](shaders.md).
 
-Built-in translucent render types are separated from standard groups. When weighted OIT starts successfully, the executor first finds up to four visible transparent depth layers, then accumulates each layer into its own persistent accumulation and revealage attachments. The layers are composited back-to-front after weather, into the Fabulous weather target when available or the main target otherwise. If setup fails, the affected groups are drawn through their ordinary translucent shader.
+Built-in translucent render types are separated from standard groups. When weighted OIT starts successfully, the executor first finds up to four visible transparent depth layers, then accumulates each layer into its own persistent accumulation and revealage attachments. Fast/Fancy graphics resolve these layers into the main target after weather. Fabulous defers them until Minecraft has processed its transparency chain, then performs a separate depth-aware composition into the main target. See [Shaders](shaders.md#weighted-blended-oit) for the native-target inputs and metadata pass.
+
+If OIT setup fails, the affected groups use their ordinary translucent program. Those groups have already been batched by draw key; this fallback does not reconstruct per-instance back-to-front order. Ordinary custom translucent types and local preview scopes use the sorted path.
 
 ## Render stages and cleanup
 
 `PRenderStagesHandler` flushes:
 
-* opaque block-entity submissions after block entities;
-* entity, third-person item, and translucent block submissions together after particles;
-* the accumulated OIT target after weather, before Minecraft resolves its Fabulous transparency chain.
+* opaque `ENTITIES` and `SOLID_BLOCKS` submissions after block entities;
+* remaining `ENTITIES`, `SOLID_BLOCKS`, and `TRANSLUCENT_BLOCKS` submissions together after particles, sharing transparent sorting across those stages;
+* accumulated world OIT after weather for Fast/Fancy, or after the vanilla transparency chain for Fabulous.
 
 First-person items use `FIRST_PERSON`. `GameRendererMixin` flushes this stage and composites its OIT data immediately after Minecraft renders the hands, so those meshes use the hand depth buffer instead of waiting for the world-stage resolve.
 
 The final translucent stage also finishes the per-frame GPU deformer streams. Callers should not flush the standard stages or reset those streams manually.
+
+## GUI and offscreen scopes
+
+Entity previews use `PRenderContexts` scopes with their own compiler. Closing a scope executes its submissions against the target captured on entry, uses sorted transparency without world OIT, and restores framebuffer and OpenGL state. Nested scopes keep their submissions separate from the world frame. Minecraft's inventory/entity-preview hooks establish these scopes automatically.
+
+For a custom offscreen pass, bind the destination before entering an `OFFSCREEN` scope, submit on the render thread, and close scopes in reverse order on that same thread. Discard a scope if rendering fails before it can be completed. See [GUI rendering](gui-rendering.md#entity-previews-and-offscreen-targets).
+
+Direct `PLibHelper.renderModelInGui` calls and the item renderer's GUI branch retain the immediate path and do not create a local queued pass.
 
 `PRenderQueue.cleanup()` clears pending compiler state, waits for in-flight buffer slots, deletes executor buffers and OIT targets, and releases every registered geometry page. Model reload and client-level unload invoke this lifecycle for normal library use.

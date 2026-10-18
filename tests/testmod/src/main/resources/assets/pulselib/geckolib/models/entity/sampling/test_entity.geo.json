@@ -1,0 +1,7 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [{
+		"description": {"identifier": "geometry.sampling", "texture_width": 64, "texture_height": 64},
+		"bones": [{"name": "body", "pivot": [0, 0, 0], "cubes": [{"origin": [0, 0, 0], "size": [4, 8, 2], "uv": [0, 0]}]}]
+	}]
+}

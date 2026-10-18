@@ -13,18 +13,34 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Accumulates temporary animation-triggered camera shake contributions.
+ */
 public final class PAnimationCameraShake
 {
 	private static final List<Shake> SHAKES = new ArrayList<>();
 
 	private PAnimationCameraShake() { }
 
+	/**
+	 * Adds a camera shake contribution with the supplied strength, duration and frequency.
+	 *
+	 * @param strength the strength
+	 * @param duration the duration of the effect or transition in game ticks
+	 * @param frequency the frequency
+	 */
 	public static void add(float strength, float duration, float frequency)
 	{
 		if (Float.isFinite(strength) && Float.isFinite(duration) && Float.isFinite(frequency) && strength != 0.0f && duration > 0.0f)
 			SHAKES.add(new Shake(Math.abs(strength), duration, Math.max(frequency, 0.0f), 0.0f));
 	}
 
+	/**
+	 * Samples the combined camera shake at the interpolated tick position.
+	 *
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the combined camera shake angle at the interpolated tick position
+	 */
 	public static synchronized float sample(float partialTick)
 	{
 		float result = 0.0f;
@@ -36,6 +52,9 @@ public final class PAnimationCameraShake
 		return result;
 	}
 
+	/**
+	 * Advances active shake contributions and removes those whose duration has elapsed.
+	 */
 	public static synchronized void tick()
 	{
 		for (Iterator<Shake> iterator = SHAKES.iterator(); iterator.hasNext(); )
@@ -47,6 +66,9 @@ public final class PAnimationCameraShake
 		}
 	}
 
+	/**
+	 * Playback state for one temporary camera shake contribution.
+	 */
 	private static final class Shake
 	{
 		private final float strength, duration, frequency;

@@ -31,23 +31,25 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
- * Parses animation sidecar.
+ * Parses format-independent animation event sidecars and merges their events into loaded clips.
  */
 public final class PAnimationSidecarParser
 {
 	private static final float SECONDS_TO_TICKS = 20f;
 
 	/**
-	 * Creates an instance of the enclosing type.
+	 * Creates an animation sidecar parser.
 	 */
 	private PAnimationSidecarParser()
 	{
 	}
 
 	/**
-	 * Parses the json.
-	 * @param stream the stream to use.
-	 * @return the value produced by this operation.
+	 * Reads an animation event sidecar JSON document from the supplied stream.
+	 *
+	 * @param stream the source resource input stream
+	 * @return the parsed sidecar JSON document
+	 * @throws IOException if the source resource cannot be read
 	 */
 	public static JsonElement parseJson(InputStream stream) throws IOException
 	{
@@ -94,9 +96,10 @@ public final class PAnimationSidecarParser
 	}
 
 	/**
-	 * Parses the animation events.
-	 * @param animationNode the animation node to use.
-	 * @return the value produced by this operation.
+	 * Decodes typed animation event entries from one sidecar animation node.
+	 *
+	 * @param animationNode the animation node
+	 * @return the decoded typed event entries
 	 */
 	private static List<PAnimationEvent<?>> parseAnimationEvents(JsonElement animationNode)
 	{
@@ -107,9 +110,10 @@ public final class PAnimationSidecarParser
 	}
 
 	/**
-	 * Parses the visibility tracks.
-	 * @param animationNode the animation node to use.
-	 * @return the value produced by this operation.
+	 * Decodes per-bone step visibility tracks from one sidecar animation node.
+	 *
+	 * @param animationNode the animation node
+	 * @return the visibility tracks indexed by bone name
 	 */
 	private static Map<String, PAnimationVisibilityTrack> parseVisibilityTracks(JsonElement animationNode)
 	{
@@ -128,9 +132,10 @@ public final class PAnimationSidecarParser
 	}
 
 	/**
-	 * Parses the visibility keyframes.
-	 * @param node the node to use.
-	 * @return the value produced by this operation.
+	 * Reads visibility timeline entries into ordered keyframes.
+	 *
+	 * @param node the node
+	 * @return the decoded visibility timeline entries into ordered keyframes
 	 */
 	private static List<PAnimationVisibilityTrack.Keyframe> parseVisibilityKeyframes(JsonElement node)
 	{
@@ -176,9 +181,10 @@ public final class PAnimationSidecarParser
 	}
 
 	/**
-	 * Performs the max event time operation.
-	 * @param events the events to use.
-	 * @return the value produced by this operation.
+	 * Returns the latest scheduled animation event position.
+	 *
+	 * @param events the events scheduled on this animation timeline
+	 * @return the latest scheduled animation event position
 	 */
 	private static float maxEventTime(List<PAnimationEvent<?>> events)
 	{
@@ -189,9 +195,10 @@ public final class PAnimationSidecarParser
 	}
 
 	/**
-	 * Performs the max visibility time operation.
-	 * @param tracks the tracks to use.
-	 * @return the value produced by this operation.
+	 * Returns the latest visibility keyframe position among the supplied tracks.
+	 *
+	 * @param tracks the tracks
+	 * @return the latest visibility keyframe position among the supplied tracks
 	 */
 	private static float maxVisibilityTime(Map<String, PAnimationVisibilityTrack> tracks)
 	{
@@ -223,11 +230,12 @@ public final class PAnimationSidecarParser
 	}
 
 	/**
-	 * Performs the typed event operation.
-	 * @param time the time to use.
-	 * @param rawType the raw type to use.
-	 * @param node the node to use.
-	 * @return the value produced by this operation.
+	 * Resolves a registered event type and decodes its sidecar payload.
+	 *
+	 * @param time the animation position in game ticks
+	 * @param rawType the raw type
+	 * @param node the node
+	 * @return the resolved registered event type and decodes its sidecar payload, or {@code null} when the requested value is unavailable
 	 */
 	private static @Nullable PAnimationEvent<?> typedEvent(float time, String rawType, JsonElement node)
 	{
@@ -249,11 +257,13 @@ public final class PAnimationSidecarParser
 	}
 
 	/**
-	 * Performs the decode operation.
-	 * @param time the time to use.
-	 * @param type the type to use.
-	 * @param node the node to use.
-	 * @return the value produced by this operation.
+	 * Decodes a typed event payload at the supplied animation tick position.
+	 *
+	 * @param <T> the value type carried by this contract
+	 * @param time the animation position in game ticks
+	 * @param type the registered animation event type
+	 * @param node the node
+	 * @return the typed event at the supplied tick position, or {@code null} when the requested value is unavailable
 	 */
 	private static <T> @Nullable PAnimationEvent<T> decode(float time, PAnimationEventType<T> type, JsonElement node)
 	{
@@ -262,9 +272,10 @@ public final class PAnimationSidecarParser
 	}
 
 	/**
-	 * Performs the seconds to ticks operation.
-	 * @param seconds the seconds to use.
-	 * @return the value produced by this operation.
+	 * Converts a sidecar timeline position from seconds to game ticks.
+	 *
+	 * @param seconds the seconds
+	 * @return the supplied time converted at twenty game ticks per second
 	 */
 	private static float secondsToTicks(float seconds)
 	{
@@ -272,10 +283,11 @@ public final class PAnimationSidecarParser
 	}
 
 	/**
-	 * Performs the float value operation.
-	 * @param node the node to use.
-	 * @param fallback the fallback to use.
-	 * @return the value produced by this operation.
+	 * Reads a numeric JSON value or returns the supplied fallback.
+	 *
+	 * @param node the node
+	 * @param fallback the fallback
+	 * @return the decoded numeric JSON value or returns the supplied fallback
 	 */
 	private static float floatValue(JsonElement node, float fallback)
 	{
@@ -285,10 +297,11 @@ public final class PAnimationSidecarParser
 	}
 
 	/**
-	 * Parses the float.
-	 * @param value the value to use.
-	 * @param fallback the fallback to use.
-	 * @return the value produced by this operation.
+	 * Parses a timeline key as a float, falling back when it is not numeric.
+	 *
+	 * @param value the value written by this operation
+	 * @param fallback the fallback
+	 * @return the parsed timeline key as a float, falling back when it is not numeric
 	 */
 	private static float parseFloat(String value, float fallback)
 	{
@@ -303,9 +316,10 @@ public final class PAnimationSidecarParser
 	}
 
 	/**
-	 * Performs the boolean value operation.
-	 * @param node the node to use.
-	 * @return the value produced by this operation.
+	 * Reads the supported JSON representation of a visibility flag.
+	 *
+	 * @param node the node
+	 * @return the decoded supported JSON representation of a visibility flag, or {@code null} when the requested value is unavailable
 	 */
 	private static @Nullable Boolean booleanValue(JsonElement node)
 	{
@@ -315,10 +329,11 @@ public final class PAnimationSidecarParser
 	}
 
 	/**
-	 * Performs the string value operation.
-	 * @param node the node to use.
-	 * @param fallback the fallback to use.
-	 * @return the value produced by this operation.
+	 * Reads a string JSON value or returns the supplied fallback.
+	 *
+	 * @param node the node
+	 * @param fallback the fallback
+	 * @return the decoded string JSON value or returns the supplied fallback
 	 */
 	private static String stringValue(JsonElement node, String fallback)
 	{
@@ -328,10 +343,11 @@ public final class PAnimationSidecarParser
 	}
 
 	/**
-	 * Performs the member operation.
-	 * @param element the element to use.
-	 * @param name the name to use.
-	 * @return the value produced by this operation.
+	 * Returns a named member of a JSON object, or {@code null} when unavailable.
+	 *
+	 * @param element the source JSON channel value
+	 * @param name the name
+	 * @return a named member of a JSON object, or {@code null} when unavailable
 	 */
 	private static JsonElement member(JsonElement element, String name)
 	{
@@ -344,9 +360,10 @@ public final class PAnimationSidecarParser
 	}
 
 	/**
-	 * Determines whether missing.
-	 * @param element the element to use.
-	 * @return the value produced by this operation.
+	 * Returns whether missing.
+	 *
+	 * @param element the source JSON channel value; may be {@code null}
+	 * @return whether missing
 	 */
 	private static boolean isMissing(@Nullable JsonElement element)
 	{
@@ -354,9 +371,10 @@ public final class PAnimationSidecarParser
 	}
 
 	/**
-	 * Determines whether object.
-	 * @param element the element to use.
-	 * @return the value produced by this operation.
+	 * Returns whether object.
+	 *
+	 * @param element the source JSON channel value; may be {@code null}
+	 * @return whether object
 	 */
 	private static boolean isObject(@Nullable JsonElement element)
 	{
@@ -364,9 +382,10 @@ public final class PAnimationSidecarParser
 	}
 
 	/**
-	 * Determines whether array.
-	 * @param element the element to use.
-	 * @return the value produced by this operation.
+	 * Returns whether array.
+	 *
+	 * @param element the source JSON channel value; may be {@code null}
+	 * @return whether array
 	 */
 	private static boolean isArray(@Nullable JsonElement element)
 	{

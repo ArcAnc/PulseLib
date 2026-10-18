@@ -17,10 +17,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Collects item-specific and global living entity attachments during client plugin registration.
+ */
 public class PAttachmentRegistrar extends PulseRegistrar
 {
 	private final List<Runnable> actions = new ArrayList<>();
 
+	/**
+	 * Associates an attachment definition with the supplied item.
+	 *
+	 * @param item the item
+	 * @param definition the immutable configuration to register or evaluate
+	 */
 	public void registerLiving(ItemLike item, PLivingAttachmentDefinition definition)
 	{
 		checkOpen();
@@ -29,6 +38,11 @@ public class PAttachmentRegistrar extends PulseRegistrar
 		this.actions.add(() -> PLivingAttachments.register(value, definition));
 	}
 
+	/**
+	 * Registers an attachment that is considered for every living entity.
+	 *
+	 * @param definition the immutable configuration to register or evaluate
+	 */
 	public void registerGlobalLiving(PLivingAttachmentDefinition definition)
 	{
 		checkOpen();
@@ -36,6 +50,9 @@ public class PAttachmentRegistrar extends PulseRegistrar
 		this.actions.add(() -> PLivingAttachments.registerGlobal(definition));
 	}
 
+	/**
+	 * Installs the collected attachment definitions and closes this registration scope.
+	 */
 	public void apply()
 	{
 		checkOpen();

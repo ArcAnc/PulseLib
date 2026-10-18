@@ -14,17 +14,47 @@ import org.joml.Vector3f;
 
 import java.util.*;
 
+/**
+ * Shader-compatible encoding of a supported prepared mesh deformer stack.
+ */
 public final class PGpuDeformerStack
 {
+	/**
+	 * Maximum deformation operations accepted by the shader implementation.
+	 */
 	public static final int MAX_OPERATIONS = 8;
+	/**
+	 * Number of four-float records occupied by one encoded operation.
+	 */
 	public static final int VEC4S_PER_OPERATION = 4;
 
+	/**
+	 * Shader operation identifier for stretch deformation.
+	 */
 	public static final int STRETCH = 1;
+	/**
+	 * Shader operation identifier for squash deformation.
+	 */
 	public static final int SQUASH = 2;
+	/**
+	 * Shader operation identifier for taper deformation.
+	 */
 	public static final int TAPER = 3;
+	/**
+	 * Shader operation identifier for twist deformation.
+	 */
 	public static final int TWIST = 4;
+	/**
+	 * Shader operation identifier for bend deformation.
+	 */
 	public static final int BEND = 5;
+	/**
+	 * Shader operation identifier for wave deformation.
+	 */
 	public static final int WAVE = 6;
+	/**
+	 * Shader operation identifier for hinge deformation.
+	 */
 	public static final int HINGE = 7;
 
 	private static final float EPSILON = 1.0e-5f;
@@ -40,21 +70,42 @@ public final class PGpuDeformerStack
 		this.operationCount = operationCount;
 	}
 
+	/**
+	 * Returns packed operation metadata and static parameters in shader layout.
+	 *
+	 * @return packed operation metadata and static parameters in shader layout
+	 */
 	public float[] operationData()
 	{
 		return this.operationData;
 	}
 
+	/**
+	 * Returns the channel references whose current values must be uploaded.
+	 *
+	 * @return the channel references whose current values must be uploaded
+	 */
 	public List<PChannelReference<Float>> channels()
 	{
 		return this.channels;
 	}
 
+	/**
+	 * Returns the number of encoded shader deformation operations.
+	 *
+	 * @return the number of encoded shader deformation operations
+	 */
 	public int operationCount()
 	{
 		return this.operationCount;
 	}
 	
+	/**
+	 * Compiles supported deformation definitions, returning an empty result when GPU encoding is unavailable.
+	 *
+	 * @param stack the item stack supplying render or animation state
+	 * @return the compiled shader stack, or an empty optional when unsupported
+	 */
 	public static Optional<PGpuDeformerStack> compile(PDeformerStack stack)
 	{
 		if (stack.isEmpty())

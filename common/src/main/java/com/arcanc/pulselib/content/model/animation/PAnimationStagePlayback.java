@@ -14,6 +14,12 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Resolved command produced by a stage player.
+ *
+ * @param animationName the animation name; may be {@code null}
+ * @param animationType the animation loop and completion policy; may be {@code null}
+ * @param interpolationType the keyframe interpolation policy
+ * @param speed the playback speed multiplier
+ * @param waitTicks the stage wait duration in game ticks
  */
 public record PAnimationStagePlayback(
 		@Nullable String animationName,
@@ -23,6 +29,15 @@ public record PAnimationStagePlayback(
 		int waitTicks
 )
 {
+	/**
+	 * Creates a resolved clip or wait-stage playback command.
+	 *
+	 * @param animationName the animation name; may be {@code null}
+	 * @param animationType the animation loop and completion policy; may be {@code null}
+	 * @param interpolationType the keyframe interpolation policy
+	 * @param speed the playback speed multiplier
+	 * @param waitTicks the stage wait duration in game ticks
+	 */
 	public PAnimationStagePlayback
 	{
 		if (interpolationType == null)

@@ -20,9 +20,25 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
 
+/**
+ * Runs inventory entity previews inside an isolated GUI render context.
+ */
 @Mixin (InventoryScreen.class)
 public abstract class InventoryScreenMixin
 {
+	/**
+	 * Renders the inventory entity preview in an isolated GUI submission scope.
+	 *
+	 * @param graphics the graphics
+	 * @param x the x component or coordinate
+	 * @param y the y component or coordinate
+	 * @param scale the model scale factor
+	 * @param translation the local translation vector
+	 * @param pose the quaternion rotation
+	 * @param camera the camera; may be {@code null}
+	 * @param entity the entity being animated or rendered
+	 * @param original the original implementation or unmodified value supplied by the render hook
+	 */
 	@WrapMethod (method = "renderEntityInInventory")
 	private static void pulselib$guiContext(GuiGraphics graphics, float x, float y, float scale,
 	                                      Vector3f translation, Quaternionf pose, @Nullable Quaternionf camera,

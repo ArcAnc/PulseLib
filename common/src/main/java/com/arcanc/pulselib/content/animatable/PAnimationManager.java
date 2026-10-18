@@ -25,23 +25,48 @@ import java.util.function.Supplier;
  * Part of this code copied from Geckolib: <a href="https://github.com/bernie-g/geckolib/blob/1.21.1/common/src/main/java/software/bernie/geckolib/animatable/instance/AnimatableInstanceCache.java">AnimatableInstanceCache</a>
  * <p>Stop crying, Tslat!</p>
  * <p>Modified by ArcAnc</p>
+ * <p></p>
+ * Owns the named controllers and bound model for one animatable identity.
+ * @param <T> the animatable owner type
  */
 public class PAnimationManager<T extends PAnimatable<T>>
 {
+	/**
+	 * Maximum idle interval before an unused animation manager can be removed.
+	 */
 	protected static final long THRESHOLD_TIME = 5_000;
 
+	/**
+	 * Animatable owner used to populate controller state.
+	 */
 	protected final T animatable;
+	/**
+	 * Returns the owner identity associated with this manager.
+	 */
 	protected final AnimManagerKey key;
+	/**
+	 * Model bound for animation evaluation, or {@code null} before a model has been assigned.
+	 */
 	protected @Nullable PBakedModel model;
 	private boolean initialized;
 	private boolean initializing;
+	/**
+	 * Raw controller state-handler factories indexed by controller name.
+	 */
 	protected final Map<String, Supplier<PAnimationController.StateHandler<T>>> factories = new Object2ObjectArrayMap<>();
+	/**
+	 * Animation graph factories indexed by controller name.
+	 */
 	protected final Map<String, Supplier<PAnimationGraph>> graphFactories = new Object2ObjectArrayMap<>();
+	/**
+	 * Instantiated controllers indexed by registration name.
+	 */
 	protected final Map<String, PAnimationController<T>> controllers = new Object2ObjectArrayMap<>();
 
 	/**
-	 * Returns the controllers.
-	 * @return the value produced by this operation.
+	 * Returns the controllers registered for this animation manager.
+	 *
+	 * @return the controllers registered for this animation manager
 	 */
 	public Map<String, PAnimationController<T>> getControllers()
 	{
@@ -50,8 +75,9 @@ public class PAnimationManager<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Returns the animatable.
-	 * @return the value produced by this operation.
+	 * Returns the animatable owner whose state this manager controls.
+	 *
+	 * @return the animatable owner whose state this manager controls
 	 */
 	public T getAnimatable()
 	{
@@ -59,8 +85,9 @@ public class PAnimationManager<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param animatable the animatable to use.
+	 * Creates owner animation storage while deferring controller registration until initialization.
+	 *
+	 * @param animatable the owner whose animation state is being processed
 	 */
 	public PAnimationManager(final T animatable)
 	{
@@ -68,9 +95,10 @@ public class PAnimationManager<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param animatable the animatable to use.
-	 * @param key the key to use.
+	 * Creates owner animation storage while deferring controller registration until initialization.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param key the key
 	 */
 	public PAnimationManager(final T animatable, final AnimManagerKey key)
 	{
@@ -143,8 +171,9 @@ public class PAnimationManager<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Performs the key operation.
-	 * @return the value produced by this operation.
+	 * Returns the owner identity associated with this manager.
+	 *
+	 * @return the owner identity associated with this manager
 	 */
 	public AnimManagerKey key()
 	{
@@ -162,7 +191,7 @@ public class PAnimationManager<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Performs the tick operation.
+	 * Advances each initialized controller for the current animatable tick.
 	 */
 	public void tick()
 	{
@@ -172,13 +201,18 @@ public class PAnimationManager<T extends PAnimatable<T>>
 	}
 
 	/**
-	 * Immutable value object representing animation registrar.
-    */
+	 * Collects controller state-handler and graph factories for a newly created animation manager.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param entries the collected controller factory declarations
+	 * @param graphEntries the graph entries
+	 */
 	public record PAnimationRegistrar<T extends PAnimatable<T>>(List<Entry<T>> entries, List<GraphEntry> graphEntries)
 	{
 		/**
-		 * Creates an instance of the enclosing type.
-		 * @param entries the entries to use.
+		 * Creates a controller registrar backed by the supplied raw-controller declarations.
+		 *
+		 * @param entries the collected controller factory declarations
 		 */
 		public PAnimationRegistrar(List<Entry<T>> entries)
 		{
@@ -186,9 +220,10 @@ public class PAnimationManager<T extends PAnimatable<T>>
 		}
 
 		/**
-		 * Performs the add operation.
-		 * @param factory the factory to use.
-		 * @return the value produced by this operation.
+		 * Registers a state-handler factory for a raw animation controller.
+		 *
+		 * @param factory the factory creating an independent controller state handler or graph
+		 * @return this registrar
 		 */
 		public PAnimationRegistrar<T> add(Supplier<PAnimationController.StateHandler<T>> factory)
 		{
@@ -196,10 +231,11 @@ public class PAnimationManager<T extends PAnimatable<T>>
 		}
 
 		/**
-		 * Performs the add operation.
-		 * @param name the name to use.
-		 * @param factory the factory to use.
-		 * @return the value produced by this operation.
+		 * Registers a state-handler factory for a raw animation controller.
+		 *
+		 * @param name the registered controller name
+		 * @param factory the factory creating an independent controller state handler or graph
+		 * @return this registrar
 		 */
 		public PAnimationRegistrar<T> add(String name, Supplier<PAnimationController.StateHandler<T>> factory)
 		{
@@ -208,9 +244,10 @@ public class PAnimationManager<T extends PAnimatable<T>>
 		}
 
 		/**
-		 * Adds the graph.
-		 * @param graph the graph to use.
-		 * @return the value produced by this operation.
+		 * Registers an animation graph or graph factory for a named controller.
+		 *
+		 * @param graph the immutable animation state graph
+		 * @return this registrar
 		 */
 		public PAnimationRegistrar<T> addGraph(PAnimationGraph graph)
 		{
@@ -218,10 +255,11 @@ public class PAnimationManager<T extends PAnimatable<T>>
 		}
 
 		/**
-		 * Adds the graph.
-		 * @param name the name to use.
-		 * @param graph the graph to use.
-		 * @return the value produced by this operation.
+		 * Registers an animation graph or graph factory for a named controller.
+		 *
+		 * @param name the registered controller name
+		 * @param graph the immutable animation state graph
+		 * @return this registrar
 		 */
 		public PAnimationRegistrar<T> addGraph(String name, PAnimationGraph graph)
 		{
@@ -229,10 +267,11 @@ public class PAnimationManager<T extends PAnimatable<T>>
 		}
 
 		/**
-		 * Adds the graph.
-		 * @param name the name to use.
-		 * @param factory the factory to use.
-		 * @return the value produced by this operation.
+		 * Registers an animation graph or graph factory for a named controller.
+		 *
+		 * @param name the registered controller name
+		 * @param factory the factory creating an independent controller state handler or graph
+		 * @return this registrar
 		 */
 		public PAnimationRegistrar<T> addGraph(String name, Supplier<PAnimationGraph> factory)
 		{
@@ -241,16 +280,23 @@ public class PAnimationManager<T extends PAnimatable<T>>
 		}
 
 		/**
-		 * Immutable value object representing entry.
-        */
+		 * Named factory declaration for a raw animation controller.
+		 *
+		 * @param <T> the animatable owner type
+		 * @param name the registered controller name
+		 * @param factory the factory creating independent runtime state for this registration
+		 */
 		public record Entry<T extends PAnimatable<T>>(String name, Supplier<PAnimationController.StateHandler<T>> factory)
 		{
 
 		}
 
 		/**
-		 * Immutable value object representing graph entry.
-        */
+		 * Named factory declaration for an animation graph controller.
+		 *
+		 * @param name the registered controller name
+		 * @param factory the factory creating independent runtime state for this registration
+		 */
 		public record GraphEntry(String name, Supplier<PAnimationGraph> factory)
 		{
 		}

@@ -9,6 +9,9 @@
 
 package com.arcanc.pulselib.content.player.deformer;
 
+/**
+ * Scoped flag that enables deformable cube creation while player model layers are baked.
+ */
 public final class PDeformableCubeBakeScope
 {
 	/*
@@ -22,19 +25,35 @@ public final class PDeformableCubeBakeScope
 	{
 	}
 
+	/**
+	 * Enters a deformable cube bake scope and returns its restoration handle.
+	 *
+	 * @return the scope that restores the previous cube-baking state
+	 */
 	public static Scope begin()
 	{
 		DEPTH.set(DEPTH.get() + 1);
 		return new Scope();
 	}
 
+	/**
+	 * Returns whether deformable cube baking is enabled in the current scope.
+	 *
+	 * @return whether deformable cube baking is enabled in the current scope
+	 */
 	public static boolean isActive()
 	{
 		return DEPTH.get() > 0;
 	}
 
+	/**
+	 * Restores the previous deformable-cube baking state when closed.
+	 */
 	public static final class Scope implements AutoCloseable
 	{
+		/**
+		 * Restores the cube-baking state that was active before this scope was entered.
+		 */
 		@Override
 		public void close()
 		{

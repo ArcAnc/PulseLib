@@ -18,9 +18,19 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLLoader;
 
+/**
+ * NeoForge mod entry point that initializes built-in registrations and side-appropriate lifecycle
+ * listeners.
+ */
 @Mod(PLibDatabase.MOD_ID)
 public class PLib
 {
+	/**
+	 * Initializes built-in registries and installs side-appropriate NeoForge lifecycle listeners.
+	 *
+	 * @param modEventBus the NeoForge mod lifecycle event bus
+	 * @param modContainer the owning NeoForge mod container
+	 */
     public PLib(IEventBus modEventBus, ModContainer modContainer)
     {
 	    PLibRegistration.init();

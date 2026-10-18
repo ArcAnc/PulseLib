@@ -15,17 +15,18 @@ import net.minecraft.world.entity.HumanoidArm;
 public final class PVanillaFirstPersonItemResolver
 {
 	/**
-	 * Creates an instance of the enclosing type.
+	 * Creates a vanilla first person item resolver.
 	 */
 	private PVanillaFirstPersonItemResolver()
 	{
 	}
 
 	/**
-	 * Resolves the item origin.
-	 * @param arm the arm to use.
-	 * @param itemTarget the item target to use.
-	 * @return the value produced by this operation.
+	 * Converts the animated item socket target into the vanilla item render-origin transform.
+	 *
+	 * @param arm the humanoid arm whose geometry is being processed
+	 * @param itemTarget the item target
+	 * @return the vanilla item render-origin transform matching the target item socket
 	 */
 	public static PTransform resolveItemOrigin(HumanoidArm arm, PTransform itemTarget)
 	{

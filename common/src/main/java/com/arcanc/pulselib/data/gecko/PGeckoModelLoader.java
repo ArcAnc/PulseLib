@@ -30,6 +30,9 @@ import java.util.concurrent.Executor;
  */
 public class PGeckoModelLoader implements PModelLoader
 {
+	/**
+	 * Shared instance of this stateless implementation.
+	 */
 	public static final PGeckoModelLoader INSTANCE = new PGeckoModelLoader();
 
 	private static final ResourceLocation ID = PLibDatabase.rl("gecko");
@@ -46,24 +49,36 @@ public class PGeckoModelLoader implements PModelLoader
 	{
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public ResourceLocation id()
 	{
 		return ID;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void applyItemTransform(PoseStack poseStack)
 	{
 		poseStack.translate(0.5f, 0.51f, 0.5f);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public List<ResourceLocation> modelResourceCandidates(ResourceLocation modelId)
 	{
 		return List.of(modelId.withPrefix(MODEL_ROOT + "/").withSuffix(MODEL_EXTENSION));
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public CompletableFuture<PLoadedModel> loadModel(Executor backgroundExecutor,
 	                                                 ResourceManager resourceManager,

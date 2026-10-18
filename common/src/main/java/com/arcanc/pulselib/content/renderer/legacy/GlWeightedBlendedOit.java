@@ -30,8 +30,14 @@ import org.lwjgl.opengl.GL40;
 
 import java.util.List;
 
+/**
+ * Owns layered depth and weighted color targets used to composite translucent model geometry.
+ */
 public final class GlWeightedBlendedOit
 {
+	/**
+	 * Number of depth layers retained by the transparency compositor.
+	 */
 	public static final int LAYER_COUNT = 4;
 	private static final float[] CLEAR_ACCUMULATION = {0f, 0f, 0f, 0f};
 	private static final float[] CLEAR_DEPTH = {1f, 1f, 1f, 1f};
@@ -56,6 +62,9 @@ public final class GlWeightedBlendedOit
 	private int previousDrawFramebuffer;
 	private int previousReadFramebuffer;
 
+	/**
+	 * Creates weighted-transparency state whose render targets are allocated when needed.
+	 */
 	public GlWeightedBlendedOit()
 	{
 		for (int layer = 0; layer < LAYER_COUNT; layer++)
@@ -66,11 +75,22 @@ public final class GlWeightedBlendedOit
 		}
 	}
 
+	/**
+	 * Returns whether the current context supports the required transparency targets.
+	 *
+	 * @return whether the current context supports the required transparency targets
+	 */
 	public boolean isSupported()
 	{
 		return GL.getCapabilities().OpenGL40 || GL.getCapabilities().GL_ARB_draw_buffers_blend;
 	}
 
+	/**
+	 * Prepares transparency targets using the supplied opaque depth source.
+	 *
+	 * @param depthSource the render target supplying opaque scene depth
+	 * @return whether the operation started successfully
+	 */
 	public boolean begin(RenderTarget depthSource)
 	{
 		if (!isSupported() || PRenderTypes.ShadersProvider.oitComposite() == null)
@@ -100,16 +120,29 @@ public final class GlWeightedBlendedOit
 		}
 	}
 
+	/**
+	 * Selects the depth target for the requested translucent layer.
+	 *
+	 * @param layer the layer contribution being blended
+	 */
 	public void beginDepthPass(int layer)
 	{
 		beginPass(Pass.DEPTH, layer);
 	}
 
+	/**
+	 * Selects the weighted color accumulation target for the requested layer.
+	 *
+	 * @param layer the layer contribution being blended
+	 */
 	public void beginAccumulationPass(int layer)
 	{
 		beginPass(Pass.ACCUMULATION, layer);
 	}
 
+	/**
+	 * Completes the current transparency subpass and restores its target state.
+	 */
 	public void endPass()
 	{
 		if (this.pass == Pass.NONE)
@@ -119,6 +152,9 @@ public final class GlWeightedBlendedOit
 		restoreFramebufferState();
 	}
 
+	/**
+	 * Binds textures required to draw the current transparency layer.
+	 */
 	public void bindForDraw()
 	{
 		if (this.pass == Pass.NONE)
@@ -129,11 +165,21 @@ public final class GlWeightedBlendedOit
 			configureAccumulationPass(false);
 	}
 
+	/**
+	 * Returns the OpenGL texture id containing the active layer's depth.
+	 *
+	 * @return the OpenGL texture id containing the active layer's depth
+	 */
 	public int activeLayerDepthTexture()
 	{
 		return layerDepthTexture(this.activeLayer);
 	}
 
+	/**
+	 * Returns the OpenGL texture id containing the preceding layer's depth.
+	 *
+	 * @return the OpenGL texture id containing the preceding layer's depth
+	 */
 	public int previousLayerDepthTexture()
 	{
 		if (this.activeLayer <= 0)
@@ -141,11 +187,21 @@ public final class GlWeightedBlendedOit
 		return layerDepthTexture(this.activeLayer - 1);
 	}
 
+	/**
+	 * Records that the selected transparency layer has received geometry.
+	 *
+	 * @param layer the layer contribution being blended
+	 */
 	public void markContent(int layer)
 	{
 		this.hasContent[layer] = true;
 	}
 
+	/**
+	 * Blends accumulated translucent layers into the destination target.
+	 *
+	 * @param destination the mutable object receiving the result
+	 */
 	public void composite(RenderTarget destination)
 	{
 		composite(destination, PRenderTypes.ShadersProvider.oitComposite(), List.of());
@@ -155,6 +211,9 @@ public final class GlWeightedBlendedOit
 	 * Vanilla has already composed its targets. For each OIT depth, the shader
 	 * preserves the premultiplied contribution of vanilla surfaces in front.
 	 * No collapsed OIT depth is written into a vanilla target.
+	 *
+	 * @param destination the mutable object receiving the result
+	 * @param targets the vanilla Fabulous transparency targets
 	 */
 	public void compositeFabulous(RenderTarget destination, List<RenderTarget> targets)
 	{
@@ -284,6 +343,9 @@ public final class GlWeightedBlendedOit
 		BufferUploader.draw(buffer.buildOrThrow());
 	}
 
+	/**
+	 * Releases transparency framebuffers and textures.
+	 */
 	public void close()
 	{
 		endPass();
@@ -482,10 +544,22 @@ public final class GlWeightedBlendedOit
 			GL11.glDeleteTextures(texture);
 	}
 
+	/**
+	 * Active subpass of the weighted transparency renderer.
+	 */
 	private enum Pass
 	{
+		/**
+		 * No transparency subpass is active.
+		 */
 		NONE,
+		/**
+		 * Writes the selected translucent depth layer.
+		 */
 		DEPTH,
+		/**
+		 * Accumulates weighted translucent color for the selected layer.
+		 */
 		ACCUMULATION
 	}
 }

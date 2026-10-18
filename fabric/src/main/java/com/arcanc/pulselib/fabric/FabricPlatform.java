@@ -14,14 +14,23 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.world.entity.Entity;
 
+/**
+ * Fabric implementation of common physical-side and entity riding queries.
+ */
 public final class FabricPlatform implements IPulsePlatform
 {
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean isClient()
 	{
 		return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean shouldRiderSit(Entity mount)
 	{

@@ -60,6 +60,7 @@ import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -133,7 +134,7 @@ public final class PlayerMotionHarness
 		{
 			for (PPlayerAnimationBlendMode mode : PPlayerAnimationBlendMode.values())
 			{
-				ResourceLocation id = ClientTestPlugin.id("motion/" + format + "/" + mode.name().toLowerCase(java.util.Locale.ROOT));
+				ResourceLocation id = ClientTestPlugin.id("motion/" + format + "/" + mode.name().toLowerCase(Locale.ROOT));
 				IDS.add(id);
 				registrar.register(id, PPlayerAnimationDefinition.builder(MODELS.get(format)).
 						when(player -> id.equals(selected) || id.equals(secondary)).

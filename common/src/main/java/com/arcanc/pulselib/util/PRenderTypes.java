@@ -31,12 +31,18 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/**
+ * Built-in triangle pipelines, shader accessors and render-type material classification.
+ */
 public final class PRenderTypes
 {
 	private PRenderTypes()
 	{
 	}
 
+	/**
+	 * Creates and caches triangle render types for alpha, emissive and isolated rendering policies.
+	 */
 	public static final class RenderTypeProvider
 	{
 		private RenderTypeProvider()
@@ -152,56 +158,123 @@ public final class PRenderTypes
 					state.createCompositeState(true));
 		}
 		
+		/**
+		 * Returns the cached lit render pipeline for opaque triangle geometry.
+		 *
+		 * @param location the location
+		 * @return the cached lit render pipeline for opaque triangle geometry
+		 */
 		public static RenderType trianglesSolid(ResourceLocation location)
 		{
 			return TRIANGLES_SOLID.apply(location);
 		}
 		
+		/**
+		 * Returns the cached lit render pipeline for alpha-tested triangle geometry.
+		 *
+		 * @param location the location
+		 * @return the cached lit render pipeline for alpha-tested triangle geometry
+		 */
 		public static RenderType trianglesCutout(ResourceLocation location)
 		{
 			return TRIANGLES_CUTOUT.apply(location);
 		}
 		
+		/**
+		 * Returns the cached lit render pipeline for translucent triangle geometry.
+		 *
+		 * @param location the location
+		 * @return the cached lit render pipeline for translucent triangle geometry
+		 */
 		public static RenderType trianglesTranslucent(ResourceLocation location)
 		{
 			return TRIANGLES_TRANSLUCENT.apply(location);
 		}
 		
+		/**
+		 * Returns the cached lit render pipeline for isolated GUI triangle geometry.
+		 *
+		 * @param location the location
+		 * @return the cached lit render pipeline for isolated GUI triangle geometry
+		 */
 		public static RenderType trianglesGui(ResourceLocation location)
 		{
 			return TRIANGLES_GUI.apply(location);
 		}
 		
+		/**
+		 * Returns the cached lit render pipeline for immediate triangle geometry.
+		 *
+		 * @param location the location
+		 * @return the cached lit render pipeline for immediate triangle geometry
+		 */
 		public static RenderType trianglesImmediate(ResourceLocation location)
 		{
 			return TRIANGLES_IMMEDIATE.apply(location);
 		}
 		
+		/**
+		 * Returns the cached emissive render pipeline for opaque triangle geometry.
+		 *
+		 * @param location the location
+		 * @return the cached emissive render pipeline for opaque triangle geometry
+		 */
 		public static RenderType trianglesSolidEmissive(ResourceLocation location)
 		{
 			return TRIANGLES_SOLID_EMISSIVE.apply(location);
 		}
 		
+		/**
+		 * Returns the cached emissive render pipeline for alpha-tested triangle geometry.
+		 *
+		 * @param location the location
+		 * @return the cached emissive render pipeline for alpha-tested triangle geometry
+		 */
 		public static RenderType trianglesCutoutEmissive(ResourceLocation location)
 		{
 			return TRIANGLES_CUTOUT_EMISSIVE.apply(location);
 		}
 		
+		/**
+		 * Returns the cached emissive render pipeline for translucent triangle geometry.
+		 *
+		 * @param location the location
+		 * @return the cached emissive render pipeline for translucent triangle geometry
+		 */
 		public static RenderType trianglesTranslucentEmissive(ResourceLocation location)
 		{
 			return TRIANGLES_TRANSLUCENT_EMISSIVE.apply(location);
 		}
 		
+		/**
+		 * Returns the cached emissive render pipeline for isolated GUI triangle geometry.
+		 *
+		 * @param location the location
+		 * @return the cached emissive render pipeline for isolated GUI triangle geometry
+		 */
 		public static RenderType trianglesGuiEmissive(ResourceLocation location)
 		{
 			return TRIANGLES_GUI_EMISSIVE.apply(location);
 		}
 		
+		/**
+		 * Returns the cached emissive render pipeline for immediate triangle geometry.
+		 *
+		 * @param location the location
+		 * @return the cached emissive render pipeline for immediate triangle geometry
+		 */
 		public static RenderType trianglesImmediateEmissive(ResourceLocation location)
 		{
 			return TRIANGLES_IMMEDIATE_EMISSIVE.apply(location);
 		}
 
+		/**
+		 * Selects the built-in triangle pipeline matching the supplied alpha policy.
+		 *
+		 * @param alphaMode the material alpha handling policy
+		 * @param location the location
+		 * @return the vanilla render pipeline
+		 */
 		public static RenderType forAlphaMode(PAlphaMode alphaMode, ResourceLocation location)
 		{
 			return switch (alphaMode)
@@ -213,6 +286,13 @@ public final class PRenderTypes
 			};
 		}
 		
+		/**
+		 * Selects the emissive variant corresponding to a recognized built-in render type.
+		 *
+		 * @param renderType the render type
+		 * @param location the location
+		 * @return the vanilla render pipeline
+		 */
 		public static RenderType emissiveVariant(RenderType renderType, ResourceLocation location)
 		{
 			if (renderType == trianglesSolid(location))
@@ -228,23 +308,41 @@ public final class PRenderTypes
 			return renderType;
 		}
 
+		/**
+		 * Returns whether the pipeline participates in PulseLib weighted transparency.
+		 *
+		 * @param renderType the render type
+		 * @return whether the pipeline participates in PulseLib weighted transparency
+		 */
 		public static boolean usesOit(RenderType renderType)
 		{
 			return OIT_TRANSLUCENT_TYPES.contains(renderType) || OIT_TRANSLUCENT_EMISSIVE_TYPES.contains(renderType);
 		}
 
+		/**
+		 * Returns whether the pipeline uses emissive weighted transparency.
+		 *
+		 * @param renderType the render type
+		 * @return whether the pipeline uses emissive weighted transparency
+		 */
 		public static boolean usesEmissiveOit(RenderType renderType)
 		{
 			return OIT_TRANSLUCENT_EMISSIVE_TYPES.contains(renderType);
 		}
 	}
 	
+	/**
+	 * Vertex layouts shared by baked geometry and PulseLib shaders.
+	 */
 	public static final class VertexFormatProvider
 	{
 		private VertexFormatProvider()
 		{
 		}
 
+		/**
+		 * Triangle vertex layout containing position, texture coordinates and normal.
+		 */
 		public static final VertexFormat POSITION_TEX_NORMAL = VertexFormat.builder().
 				add("Position", VertexFormatElement.POSITION).
 				add("UV0", VertexFormatElement.UV0).
@@ -253,12 +351,18 @@ public final class PRenderTypes
 				build();
 	}
 	
+	/**
+	 * Reload-populated shader instances used by the built-in render pipelines.
+	 */
 	public static final class ShadersProvider
 	{
 		private ShadersProvider()
 		{
 		}
 
+		/**
+		 * Render-state shard used to access shader registration and selection helpers.
+		 */
 		private static final class StateShard
 		{
 			private static final RenderStateShard.ShaderStateShard TRIANGLES_SOLID_STATE_SHARD = new RenderStateShard.ShaderStateShard(() -> ShadersProvider.TRIANGLES_SOLID_SHADER);
@@ -306,71 +410,150 @@ public final class PRenderTypes
 		@Nullable
 		private static ShaderInstance OIT_FABULOUS_METADATA_SHADER;
 		
+		/**
+		 * Returns the triangles solid.
+		 *
+		 * @return the triangles solid, or {@code null} before the requested shader has been registered
+		 */
 		public static @Nullable ShaderInstance trianglesSolid()
 		{
 			return TRIANGLES_SOLID_SHADER;
 		}
+		/**
+		 * Returns the triangles cutout.
+		 *
+		 * @return the triangles cutout, or {@code null} before the requested shader has been registered
+		 */
 		public static @Nullable ShaderInstance trianglesCutout()
 		{
 			return TRIANGLES_CUTOUT_SHADER;
 		}
+		/**
+		 * Returns the triangles translucent.
+		 *
+		 * @return the triangles translucent, or {@code null} before the requested shader has been registered
+		 */
 		public static @Nullable ShaderInstance trianglesTranslucent()
 		{
 			return TRIANGLES_TRANSLUCENT_SHADER;
 		}
+		/**
+		 * Returns the triangles immediate lit.
+		 *
+		 * @return the triangles immediate lit, or {@code null} before the requested shader has been registered
+		 */
 		public static @Nullable ShaderInstance trianglesImmediateLit()
 		{
 			return TRIANGLES_IMMEDIATE_LIT_SHADER;
 		}
+		/**
+		 * Returns the triangles solid emissive.
+		 *
+		 * @return the triangles solid emissive, or {@code null} before the requested shader has been registered
+		 */
 		public static @Nullable ShaderInstance trianglesSolidEmissive()
 		{
 			return TRIANGLES_SOLID_EMISSIVE_SHADER;
 		}
+		/**
+		 * Returns the triangles cutout emissive.
+		 *
+		 * @return the triangles cutout emissive, or {@code null} before the requested shader has been registered
+		 */
 		public static @Nullable ShaderInstance trianglesCutoutEmissive()
 		{
 			return TRIANGLES_CUTOUT_EMISSIVE_SHADER;
 		}
+		/**
+		 * Returns the triangles translucent emissive.
+		 *
+		 * @return the triangles translucent emissive, or {@code null} before the requested shader has been registered
+		 */
 		public static @Nullable ShaderInstance trianglesTranslucentEmissive()
 		{
 			return TRIANGLES_TRANSLUCENT_EMISSIVE_SHADER;
 		}
+		/**
+		 * Returns the triangles immediate emissive.
+		 *
+		 * @return the triangles immediate emissive, or {@code null} before the requested shader has been registered
+		 */
 		public static @Nullable ShaderInstance trianglesImmediateEmissive()
 		{
 			return TRIANGLES_IMMEDIATE_EMISSIVE_SHADER;
 		}
 
+		/**
+		 * Returns the lit or emissive weighted-transparency accumulation shader.
+		 *
+		 * @param emissive the emissive
+		 * @return the lit or emissive weighted-transparency accumulation shader, or {@code null} before the requested shader has been registered
+		 */
 		public static @Nullable ShaderInstance trianglesOit(boolean emissive)
 		{
 			return emissive ? TRIANGLES_OIT_EMISSIVE_SHADER : TRIANGLES_OIT_SHADER;
 		}
 
+		/**
+		 * Returns the lit or emissive translucent-depth shader.
+		 *
+		 * @param emissive the emissive
+		 * @return the lit or emissive translucent-depth shader, or {@code null} before the requested shader has been registered
+		 */
 		public static @Nullable ShaderInstance trianglesOitDepth(boolean emissive)
 		{
 			return emissive ? TRIANGLES_OIT_DEPTH_EMISSIVE_SHADER : TRIANGLES_OIT_DEPTH_SHADER;
 		}
 
+		/**
+		 * Returns the lit or emissive depth-peeling shader.
+		 *
+		 * @param emissive the emissive
+		 * @return the lit or emissive depth-peeling shader, or {@code null} before the requested shader has been registered
+		 */
 		public static @Nullable ShaderInstance trianglesOitDepthPeel(boolean emissive)
 		{
 			return emissive ? TRIANGLES_OIT_DEPTH_PEEL_EMISSIVE_SHADER : TRIANGLES_OIT_DEPTH_PEEL_SHADER;
 		}
 
+		/**
+		 * Returns the oit fabulous composite.
+		 *
+		 * @return the oit fabulous composite, or {@code null} before the requested shader has been registered
+		 */
 		@Nullable
 		public static ShaderInstance oitFabulousComposite()
 		{
 			return OIT_FABULOUS_COMPOSITE_SHADER;
 		}
 
+		/**
+		 * Returns the oit fabulous metadata.
+		 *
+		 * @return the oit fabulous metadata, or {@code null} before the requested shader has been registered
+		 */
 		@Nullable
 		public static ShaderInstance oitFabulousMetadata()
 		{
 			return OIT_FABULOUS_METADATA_SHADER;
 		}
 
+		/**
+		 * Returns the oit composite.
+		 *
+		 * @return the oit composite, or {@code null} before the requested shader has been registered
+		 */
 		public static @Nullable ShaderInstance oitComposite()
 		{
 			return OIT_COMPOSITE_SHADER;
 		}
 		
+		/**
+		 * Declares every built-in shader through the active loader's shader registration bridge.
+		 *
+		 * @param event the typed animation event to dispatch
+		 * @throws IOException if the source resource cannot be read
+		 */
 		public static void registerShaders(final ShaderRegistrar event) throws IOException
 		{
 			{
@@ -427,12 +610,29 @@ public final class PRenderTypes
 		}
 	}
 	
+	/**
+	 * Loader-neutral callback for registering and receiving a shader instance.
+	 */
 	@FunctionalInterface
 	public interface ShaderRegistrar
 	{
+		/**
+		 * Registers a shader resource with its vertex layout and reload assignment callback.
+		 *
+		 * @param id the namespaced resource or registration identifier
+		 * @param format the vertex layout used to interpret vertex bytes
+		 * @param setter the setter
+		 * @throws IOException if the source resource cannot be read
+		 */
 		void register(ResourceLocation id, VertexFormat format, Consumer<ShaderInstance> setter) throws IOException;
 	}
 	
+	/**
+	 * Reads the transparency shard of a compatible composite render type.
+	 *
+	 * @param renderType the render type
+	 * @return the transparency shard, or an empty optional for an incompatible render type
+	 */
 	@ApiStatus.Internal
 	public static Optional<RenderStateShard.TransparencyStateShard> getTransparencyState(RenderType renderType)
 	{
@@ -444,6 +644,12 @@ public final class PRenderTypes
 		return Optional.empty();
 	}
 	
+	/**
+	 * Returns whether the render type uses a translucent transparency state.
+	 *
+	 * @param renderType the render type
+	 * @return whether the render type uses a translucent transparency state
+	 */
 	@ApiStatus.Internal
 	public static boolean isTranslucent(RenderType renderType)
 	{

@@ -13,16 +13,13 @@ import com.arcanc.pulselib.content.model.baked.PBakedModel;
 import com.arcanc.pulselib.data.gecko.MolangParser;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiFunction;
 
+/**
+ * Per-controller state machine that advances graph playback, blends transitions and schedules one-shot
+ * overlays.
+ */
 public final class PAnimationGraphRuntime
 {
 	private final PAnimationGraph graph;
@@ -31,56 +28,106 @@ public final class PAnimationGraphRuntime
 	private @Nullable Transition transition;
 	private final Map<Integer, OverlayPlayback> overlays = new LinkedHashMap<>();
 
+	/**
+	 * Creates independent playback, parameter and transition state for the supplied graph.
+	 *
+	 * @param graph the immutable animation state graph
+	 */
 	public PAnimationGraphRuntime(PAnimationGraph graph)
 	{
 		this.graph = Objects.requireNonNull(graph);
 		this.current = new Playback(graph.initialState());
 	}
 
+	/**
+	 * Returns the immutable graph evaluated by this runtime.
+	 *
+	 * @return the immutable graph evaluated by this runtime
+	 */
 	public PAnimationGraph graph()
 	{
 		return this.graph;
 	}
 
+	/**
+	 * Returns the mutable parameters and triggers used to evaluate graph conditions.
+	 *
+	 * @return the mutable parameters and triggers used to evaluate graph conditions
+	 */
 	public PAnimationParameters parameters()
 	{
 		return this.parameters;
 	}
 
+	/**
+	 * Returns the index of the active base state.
+	 *
+	 * @return the index of the active base state
+	 */
 	public int stateIndex()
 	{
 		return this.transition == null ? this.current.stateIndex : this.transition.target.stateIndex;
 	}
 
+	/**
+	 * Returns the active base animation state.
+	 *
+	 * @return the active base animation state
+	 */
 	public PAnimationState state()
 	{
 		return this.graph.states().get(stateIndex());
 	}
 
+	/**
+	 * Returns whether a blend between base states is active.
+	 *
+	 * @return whether a blend between base states is active
+	 */
 	public boolean isTransitioning()
 	{
 		return this.transition != null;
 	}
 
-	/** Returns the speed of an active overlay identified by its unique graph state name. */
+	/**
+	 * Returns the speed of an active overlay identified by its unique graph state name.
+	 *
+	 * @param stateName the graph state name
+	 * @return the speed of an active overlay identified by its unique graph state name
+	 */
 	public float overlaySpeed(String stateName)
 	{
 		return overlaySpeed(overlayIndex(stateName));
 	}
 
-	/** Returns the speed of an active overlay. Unknown indices and inactive states fail explicitly. */
+	/**
+	 * Returns the speed of an active overlay. Unknown indices and inactive states fail explicitly.
+	 *
+	 * @param stateIndex the graph state index
+	 * @return the speed of an active overlay. Unknown indices and inactive states fail explicitly
+	 */
 	public float overlaySpeed(int stateIndex)
 	{
 		return activeOverlay(stateIndex).speed;
 	}
 
-	/** Changes signed clip speed without seeking. Negative plays backwards; zero pauses. Fade clocks continue. */
+	/**
+	 * Changes signed clip speed without seeking. Negative plays backwards; zero pauses. Fade clocks continue.
+	 *
+	 * @param stateName the graph state name
+	 * @param speed the playback speed multiplier
+	 */
 	public void setOverlaySpeed(String stateName, float speed)
 	{
 		setOverlaySpeed(overlayIndex(stateName), speed);
 	}
 
-	/** Changes the speed of the active definition at this graph state index. */
+	/**
+	 * Changes the speed of the active definition at this graph state index.
+	 *
+	 * @param stateIndex the graph state index
+	 * @param speed the playback speed multiplier
+	 */
 	public void setOverlaySpeed(int stateIndex, float speed)
 	{
 		if (!Float.isFinite(speed))
@@ -116,13 +163,24 @@ public final class PAnimationGraphRuntime
 		overlay.speed = speed;
 	}
 
-	/** Restarts an active overlay, retaining its speed. Returns false for an inactive definition. */
+	/**
+	 * Restarts an active overlay, retaining its speed. Returns false for an inactive definition.
+	 *
+	 * @param stateName the graph state name
+	 * @return whether an active overlay was found and restarted
+	 */
 	public boolean restartOverlay(String stateName)
 	{
 		return restartOverlay(overlayIndex(stateName));
 	}
 
-	/** Restarts at the playback direction's entry boundary, retaining that direction while paused. Cancels fade-out. */
+	/**
+	 * Restarts at the playback direction's entry boundary, retaining that direction while paused. Cancels
+	 * fade-out.
+	 *
+	 * @param stateIndex the graph state index
+	 * @return whether an active overlay was found and restarted
+	 */
 	public boolean restartOverlay(int stateIndex)
 	{
 		overlayDefinition(stateIndex);
@@ -135,13 +193,23 @@ public final class PAnimationGraphRuntime
 		return true;
 	}
 
-	/** Cancels an active overlay using its fade-out duration, including paused playback. */
+	/**
+	 * Cancels an active overlay using its fade-out duration, including paused playback.
+	 *
+	 * @param stateName the graph state name
+	 * @return whether an active overlay was found to stop
+	 */
 	public boolean stopOverlay(String stateName)
 	{
 		return stopOverlay(overlayIndex(stateName));
 	}
 
-	/** Starts one fade-out, or removes the instance immediately when its duration is zero. */
+	/**
+	 * Starts one fade-out, or removes the instance immediately when its duration is zero.
+	 *
+	 * @param stateIndex the graph state index
+	 * @return whether an active overlay was found to stop
+	 */
 	public boolean stopOverlay(int stateIndex)
 	{
 		overlayDefinition(stateIndex);
@@ -206,13 +274,23 @@ public final class PAnimationGraphRuntime
 		return overlay;
 	}
 
+	/**
+	 * Restores the initial graph state and clears transition and overlay playback.
+	 */
 	public void reset()
 	{
 		this.current = new Playback(this.graph.initialState());
 		this.transition = null;
 		this.overlays.clear();
 	}
-	
+
+	/**
+	 * Advances graph playback by the supplied tick delta and reports crossed event intervals.
+	 *
+	 * @param model the baked model supplying indexed bones and animations; may be {@code null}
+	 * @param delta the elapsed playback interval in game ticks
+	 * @return the clip event intervals crossed during this update
+	 */
 	public List<EventTrack> tick(@Nullable PBakedModel model, float delta)
 	{
 		return tickPrecise(model, delta).stream().
@@ -230,13 +308,18 @@ public final class PAnimationGraphRuntime
 	public List<PreciseEventTrack> tickPrecise(@Nullable PBakedModel model, float delta)
 	{
 		return tickPrecise(model, delta, (boundModel, runtime) -> runtime.sampleBasePose(boundModel, 1.0f,
-				new MolangParser.Context().query("anim_time", runtime.interpolatedTime(1.0f) / 20.0f), boundModel.bindPose()));
+				new MolangParser.Context().query("anim_time", PAnimationEvaluationContext.ticksToSeconds(runtime.interpolatedTime(1.0f))), boundModel.bindPose()));
 	}
 
 	/**
 	 * Advances once. RESTART samples the base at the current tick boundary (partialTick = 1).
 	 * The sampler must resolve this runtime's base only, using current context and accumulated
 	 * preceding controllers. It must exclude this runtime's independent overlays.
+	 *
+	 * @param model the baked model supplying indexed bones and animations; may be {@code null}
+	 * @param delta the elapsed playback interval in game ticks
+	 * @param snapshotSampler the snapshot sampler
+	 * @return the double-precision clip event intervals crossed during this update
 	 */
 	public List<PreciseEventTrack> tickPrecise(@Nullable PBakedModel model, float delta,
 	                                        BiFunction<PBakedModel, PAnimationGraphRuntime, PPose> snapshotSampler)
@@ -285,14 +368,25 @@ public final class PAnimationGraphRuntime
 		}
 		return List.copyOf(eventTracks);
 	}
-	
-	/** Returns live clip layers at the current tick; frozen sources are available through samplePose. */
+
+	/**
+	 * Returns live clip layers at the current tick; frozen sources are available through samplePose.
+	 *
+	 * @param model the baked model supplying indexed bones and animations
+	 * @return live clip layers at the current tick; frozen sources are available through samplePose
+	 */
 	public List<Layer> layers(PBakedModel model)
 	{
 		return layers(model, 1.0f);
 	}
 
-	/** Returns interpolated live clip layers, preserving the original Layer record API. */
+	/**
+	 * Returns interpolated live clip layers, preserving the original Layer record API.
+	 *
+	 * @param model the baked model supplying indexed bones and animations
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return interpolated live clip layers, preserving the original Layer record API
+	 */
 	public List<Layer> layers(PBakedModel model, float partialTick)
 	{
 		List<Layer> result = baseLayers(model, partialTick);
@@ -338,6 +432,12 @@ public final class PAnimationGraphRuntime
 	/**
 	 * Resolves this controller's local animation delta, including independent overlays exactly once.
 	 * The accumulated pose provides Molang this-values; it is never captured as another controller's source.
+	 *
+	 * @param model the baked model supplying indexed bones and animations
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param context the Molang context containing current frame and instance values
+	 * @param accumulatedPose the pose contributed by preceding controllers
+	 * @return the indexed bone pose
 	 */
 	public PPose samplePose(PBakedModel model, float partialTick, MolangParser.Context context, PPose accumulatedPose)
 	{
@@ -371,7 +471,15 @@ public final class PAnimationGraphRuntime
 		return base;
 	}
 
-	/** Resolves only the base delta at the requested time, before independent overlays. */
+	/**
+	 * Resolves only the base delta at the requested time, before independent overlays.
+	 *
+	 * @param model the baked model supplying indexed bones and animations
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param context the Molang context containing current frame and instance values
+	 * @param accumulatedPose the pose contributed by preceding controllers
+	 * @return the indexed bone pose
+	 */
 	public PPose sampleBasePose(PBakedModel model, float partialTick, MolangParser.Context context, PPose accumulatedPose)
 	{
 		if (this.transition == null || this.transition.sourcePose == null)
@@ -403,6 +511,12 @@ public final class PAnimationGraphRuntime
 		return playback.previousTime + (playback.time - playback.previousTime) * Math.clamp(partialTick, 0.0f, 1.0f);
 	}
 
+	/**
+	 * Returns the normalized playback phase of the active base cycle.
+	 *
+	 * @param model the baked model supplying indexed bones and animations
+	 * @return the normalized playback phase of the active base cycle
+	 */
 	public float cyclePhase(PBakedModel model)
 	{
 		Playback playback = this.transition == null ? this.current : this.transition.target;
@@ -413,6 +527,12 @@ public final class PAnimationGraphRuntime
 		return phase(playback, model);
 	}
 
+	/**
+	 * Returns the base-state playback position interpolated between game ticks.
+	 *
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the base-state playback position interpolated between game ticks
+	 */
 	public float interpolatedTime(float partialTick)
 	{
 		Playback playback = this.transition == null ? this.current : this.transition.target;
@@ -421,11 +541,22 @@ public final class PAnimationGraphRuntime
 		return (float)((playback.previousTime + (playback.time - playback.previousTime) * alpha) * state.speed());
 	}
 
+	/**
+	 * Returns the current base-state playback position in game ticks.
+	 *
+	 * @return the current base-state playback position in game ticks
+	 */
 	public float time()
 	{
 		return (float)(this.transition == null ? this.current : this.transition.target).time;
 	}
 
+	/**
+	 * Aligns the active base playback with the supplied normalized cycle phase.
+	 *
+	 * @param model the baked model supplying indexed bones and animations
+	 * @param phase the normalized animation cycle phase
+	 */
 	public void syncCycle(PBakedModel model, float phase)
 	{
 		float clampedPhase = Math.clamp(phase, 0.0f, 1.0f);
@@ -746,19 +877,46 @@ public final class PAnimationGraphRuntime
 			}
 	}
 
+	/**
+	 * Weighted animation contribution sampled from a graph state.
+	 *
+	 * @param animation the source animation clip name
+	 * @param time the animation position in game ticks
+	 * @param interpolation the keyframe interpolation policy
+	 * @param weight the contribution weight
+	 * @param overlay the packed overlay texture coordinates
+	 */
 	public record Layer(String animation, float time, PInterpolationType interpolation, float weight, boolean overlay)
 	{
 	}
-	
+
+	/**
+	 * Animation event interval crossed while a graph layer advances.
+	 *
+	 * @param animation the source animation clip name
+	 * @param from the preceding animation tick position
+	 * @param to the current animation tick position
+	 * @param animationType the animation loop and completion policy
+	 */
 	public record EventTrack(String animation, float from, float to, PAnimationType animationType)
 	{
 	}
 
-	/** A continuous event window; never round this back to float before dispatch. */
+	/**
+	 * A continuous event window; never round this back to float before dispatch.
+	 *
+	 * @param animation the source animation clip name
+	 * @param from the preceding animation tick position
+	 * @param to the current animation tick position
+	 * @param animationType the animation loop and completion policy
+	 */
 	public record PreciseEventTrack(String animation, double from, double to, PAnimationType animationType)
 	{
 	}
 
+	/**
+	 * Clock and sampled clips belonging to one graph-state playback.
+	 */
 	private static final class Playback
 	{
 		private final int stateIndex;
@@ -771,16 +929,37 @@ public final class PAnimationGraphRuntime
 		}
 	}
 
+	/**
+	 * Graph playback paired with its current blend weight.
+	 *
+	 * @param playback the playback
+	 * @param weight the contribution weight
+	 */
 	private record WeightedPlayback(Playback playback, float weight)
 	{
 	}
 
+	/**
+	 * Samples the base pose needed to capture or blend a graph transition.
+	 */
 	@FunctionalInterface
 	private interface BasePoseSource
 	{
+		/**
+		 * Samples the graph base pose using the supplied model and accumulated controller pose.
+		 *
+		 * @param model the baked model supplying indexed bones and animations
+		 * @param partialTick the interpolation fraction between the previous and current game ticks
+		 * @param context the Molang context containing current frame and instance values
+		 * @param accumulatedPose the pose contributed by preceding controllers
+		 * @return the indexed bone pose
+		 */
 		PPose sample(PBakedModel model, float partialTick, MolangParser.Context context, PPose accumulatedPose);
 	}
 
+	/**
+	 * Active blend between a source pose and a destination graph playback.
+	 */
 	private static final class Transition
 	{
 		private final List<WeightedPlayback> sources;
@@ -801,6 +980,9 @@ public final class PAnimationGraphRuntime
 		}
 	}
 
+	/**
+	 * Clock and fade state of an active one-shot animation overlay.
+	 */
 	private static final class OverlayPlayback
 	{
 		private final Playback playback;

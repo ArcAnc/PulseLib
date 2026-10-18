@@ -8,6 +8,8 @@ For world-rendered PulseLib models, the built-in `bend`, `hinge`, `twist`, `stre
 
 GPU execution is automatic when every operation in a stack is built in and the stack has at most eight operations. A custom `PMeshDeformer` remains CPU-rendered; a future GPU extension point can add a shader descriptor for custom operations. CPU fallback uploads a dynamic mesh buffer for the current deformation. GUI's immediate rendering also remains on the CPU path.
 
+Scoped GUI/offscreen entity previews retain the queued GPU path. The CPU GUI rule applies to direct model drawing and the item renderer's immediate GUI branch; see [GUI rendering](gui-rendering.md).
+
 Curved deformers still need enough vertices. PulseLib creates and caches a static subdivided mesh for the requested `subdivisionLevel`; it does not rebuild that mesh each frame.
 
 Built-in operations are registered as `pulselib:bend`, `pulselib:hinge`, `pulselib:twist`, `pulselib:stretch`, `pulselib:squash`, `pulselib:taper`, and `pulselib:wave`.
@@ -18,15 +20,15 @@ Definitions use local mesh coordinates. Axes are normalized during preparation; 
 
 ```java
 private static final PChannelReference<Float> KNEE_ANGLE =
-        new PChannelReference<>("knee_angle", 0.0f);
+		new PChannelReference<>("knee_angle", 0.0f);
 
 private static final PDeformerStack KNEE_BEND = PDeformerStack.compile(List.of(
-        new PDeformerInstance<>(PBendDeformer.INSTANCE, new PBendDefinition(
-                new Vector3f(0.0f, 6.0f, 0.0f), // origin
-                new Vector3f(0.0f, 1.0f, 0.0f), // length axis
-                new Vector3f(1.0f, 0.0f, 0.0f), // bend axis
-                6.0f, 0.0f,                    // positive and negative extents
-                KNEE_ANGLE))));
+		new PDeformerInstance<>(PBendDeformer.INSTANCE, new PBendDefinition(
+				new Vector3f(0.0f, 6.0f, 0.0f), // origin
+				new Vector3f(0.0f, 1.0f, 0.0f), // length axis
+				new Vector3f(1.0f, 0.0f, 0.0f), // bend axis
+				6.0f, 0.0f,                    // positive and negative extents
+				KNEE_ANGLE))));
 ```
 
 `PChannelReference` names a runtime float input and supplies its neutral fallback. Use `PChannelReference.constant(value)` for a fixed value. Stacks are immutable after `compile(...)`; use `PDeformerStack.compose(first, second)` to make a longer stack.
@@ -53,12 +55,12 @@ Use `PMeshDeformation` with a `PMeshRenderContext` to deform a baked triangle me
 private final Object bendBufferKey = new Object();
 
 PMeshDeformation deformation = new PMeshDeformation(
-        KNEE_BEND,
-        reference -> reference.name().equals(KNEE_ANGLE.name())
-                ? currentAngleRadians()
-                : reference.defaultValue(),
-        bendBufferKey,
-        2);
+		KNEE_BEND,
+		reference -> reference.name().equals(KNEE_ANGLE.name())
+				? currentAngleRadians()
+				: reference.defaultValue(),
+		bendBufferKey,
+		2);
 
 return baseMeshRenderContext().withDeformation(deformation);
 ```
@@ -72,14 +74,17 @@ The shader deformer stream is reset after the translucent world stage. Do not ca
 Attach a stack directly to a player animation definition. It is active only while that definition contributes, samples controller time with `partialTick`, and fades every channel back to its default during an activation crossfade.
 
 ```java
-PPlayerAnimationDefinition.builder(model)
-        .bind(PPlayerPart.RIGHT_LEG, "right_leg")
-        .deform(PPlayerPart.RIGHT_LEG, KNEE_BEND, (context, reference) -> {
-            if (!reference.name().equals(KNEE_ANGLE.name()))
-                return reference.defaultValue();
-            return kneeCurve(context.controllerSeconds("acrobatics"));
-        })
-        .build();
+PPlayerAnimationDefinition.builder(model).
+		bind(PPlayerPart.RIGHT_LEG, "right_leg").
+		deform(PPlayerPart.RIGHT_LEG, KNEE_BEND, (context, reference) ->
+		{
+			if (!reference.name().equals(KNEE_ANGLE.name()))
+			{
+				return reference.defaultValue();
+			}
+			return kneeCurve(context.controllerSeconds("acrobatics"));
+		}).
+		build();
 ```
 
 `PPlayerAnimationDeformerContext` exposes `player()`, `definition()`, `partialTick()`, `weight()`, `isPlaying(controller)`, `controllerTicks(controller)`, and `controllerSeconds(controller)`. `weight()` already includes definition, activation-fade, and part weights. Several `.deform(...)` calls may target one part and run in declaration order. Player deformations apply to outer skin layers and compatible armor model parts.
@@ -91,25 +96,37 @@ PPlayerAnimationDefinition.builder(model)
 Implement `PMeshDeformer<D>` for a new operation. `codec()` describes a serializable definition and `prepare(...)` creates one or more efficient `PPreparedDeformer` operations. Register the type from `IPulseCommonPlugin.registerDeformers(PTypeRegistrar)` or the same callback on a client plugin.
 
 ```java
-public final class MyDeformer implements PMeshDeformer<MyDefinition> {
-    public static final MyDeformer INSTANCE = new MyDeformer();
+public final class MyDeformer implements PMeshDeformer<MyDefinition>
+{
+	public static final MyDeformer INSTANCE = new MyDeformer();
 
-    @Override public ResourceLocation id() { return MY_ID; }
-    @Override public MapCodec<MyDefinition> codec() { return MyDefinition.CODEC; }
+	@Override
+	public ResourceLocation id()
+	{
+		return MY_ID;
+	}
+	@Override
+	public MapCodec<MyDefinition> codec()
+	{
+		return MyDefinition.CODEC;
+	}
 
-    @Override
-    public void prepare(PDeformerPrepareContext context, MyDefinition definition) {
-        context.add((position, values) -> {
-            // Modify position in place.
-        });
-    }
+	@Override
+	public void prepare(PDeformerPrepareContext context, MyDefinition definition)
+	{
+		context.add((position, values) ->
+		{
+			// Modify position in place.
+		});
+	}
 }
 ```
 
 ```java
 @Override
-public void registerDeformers(PTypeRegistrar registrar) {
-    registrar.registerMeshDeformer(MyDeformer.INSTANCE);
+public void registerDeformers(PTypeRegistrar registrar)
+{
+	registrar.registerMeshDeformer(MyDeformer.INSTANCE);
 }
 ```
 

@@ -19,14 +19,16 @@ import java.io.InputStream;
 import java.util.Map;
 
 /**
- * Parses gltf animation event sidecar.
+ * Compatibility entry point for format-independent animation event sidecar parsing.
  */
 public class PGltfAnimationEventSidecarParser
 {
 	/**
-	 * Parses the json.
-	 * @param stream the stream to use.
-	 * @return the value produced by this operation.
+	 * Reads a format-independent animation event sidecar JSON document.
+	 *
+	 * @param stream the source resource input stream
+	 * @return the parsed sidecar JSON document
+	 * @throws IOException if the source resource cannot be read
 	 */
 	public static JsonElement parseJson(InputStream stream) throws IOException
 	{

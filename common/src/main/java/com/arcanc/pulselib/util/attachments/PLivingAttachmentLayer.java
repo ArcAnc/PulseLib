@@ -33,8 +33,17 @@ import org.joml.Vector3f;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Living entity render layer that submits item-specific and global attachment definitions.
+ *
+ * @param <T> the entity type rendered or animated by this contract
+ * @param <M> the entity type rendered or animated by this contract
+ */
 public class PLivingAttachmentLayer<T extends LivingEntity, M extends EntityModel<T>> extends RenderLayer<T, M>
 {
+	/**
+	 * Equipment slots inspected when selecting item-specific attachments.
+	 */
 	protected static final List<EquipmentSlot> EQUIPMENT_SLOTS = List.of(
 			EquipmentSlot.HEAD,
 			EquipmentSlot.CHEST,
@@ -44,11 +53,30 @@ public class PLivingAttachmentLayer<T extends LivingEntity, M extends EntityMode
 			EquipmentSlot.MAINHAND,
 			EquipmentSlot.OFFHAND);
 	
+	/**
+	 * Attaches living attachment rendering to the supplied vanilla renderer.
+	 *
+	 * @param parent the parent
+	 */
 	public PLivingAttachmentLayer(RenderLayerParent<T, M> parent)
 	{
 		super(parent);
 	}
 	
+	/**
+	 * Resolves equipped and global living attachments and submits their bound model bones.
+	 *
+	 * @param poseStack the current model-to-render pose stack
+	 * @param buffer the vertex or buffer output
+	 * @param light the packed block and sky light coordinates
+	 * @param entity the entity being animated or rendered
+	 * @param limbSwing the entity limb animation position
+	 * @param limbSwingAmount the entity limb animation amplitude
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param ageInTicks the entity age used by vanilla render animation
+	 * @param netHeadYaw the head yaw relative to the body in degrees
+	 * @param headPitch the head pitch in degrees
+	 */
 	@Override
 	public void render(PoseStack poseStack,
 	                   MultiBufferSource buffer,
@@ -74,6 +102,16 @@ public class PLivingAttachmentLayer<T extends LivingEntity, M extends EntityMode
 					binding -> PAttachmentAnchorResolvers.resolve(entity, this.getParentModel(), binding.anchor()));
 	}
 	
+	/**
+	 * Renders eligible attachments at the supplied first-person model anchor.
+	 *
+	 * @param poseStack the current model-to-render pose stack
+	 * @param light the packed block and sky light coordinates
+	 * @param entity the entity being animated or rendered
+	 * @param targetAnchor the model anchor at which attachments are rendered
+	 * @param anchorPart the vanilla model part representing the attachment anchor
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 */
 	protected static void renderFirstPersonAnchor(PoseStack poseStack,
 	                                              int light,
 	                                              LivingEntity entity,
@@ -190,9 +228,18 @@ public class PLivingAttachmentLayer<T extends LivingEntity, M extends EntityMode
 		return null;
 	}
 	
+	/**
+	 * Resolves the vanilla model part followed by an attachment binding.
+	 */
 	@FunctionalInterface
 	private interface AttachmentPartResolver
 	{
+		/**
+		 * Returns the model part selected by the supplied attachment binding.
+		 *
+		 * @param binding the binding
+		 * @return the model part selected by the supplied attachment binding, or {@code null} when the requested value is unavailable
+		 */
 		@Nullable ModelPart resolve(PAttachmentBinding binding);
 	}
 }

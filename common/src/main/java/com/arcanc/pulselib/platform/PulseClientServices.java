@@ -9,8 +9,14 @@
 
 package com.arcanc.pulselib.platform;
 
+/**
+ * Client-only service bindings resolved from the active loader implementation.
+ */
 public final class PulseClientServices
 {
+	/**
+	 * Loader-provided camera rotation service.
+	 */
 	public static final IPulseCameraService CAMERA = PulseServices.load(IPulseCameraService.class);
 
 	private PulseClientServices()

@@ -21,9 +21,24 @@ import net.minecraft.client.renderer.LightTexture;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 
+/**
+ * Scopes world rendering and guarantees end-of-frame cleanup of deferred submissions.
+ */
 @Mixin (LevelRenderer.class)
 public abstract class LevelRendererContextMixin
 {
+	/**
+	 * Runs level rendering in world context and guarantees deferred frame cleanup.
+	 *
+	 * @param deltaTracker the delta tracker
+	 * @param outline the outline
+	 * @param camera the camera
+	 * @param renderer the renderer
+	 * @param light the packed block and sky light coordinates
+	 * @param view the view
+	 * @param projection the captured projection matrix
+	 * @param original the original implementation or unmodified value supplied by the render hook
+	 */
 	@WrapMethod (method = "renderLevel")
 	private void pulselib$worldContext(DeltaTracker deltaTracker, boolean outline, Camera camera,
 	                                 GameRenderer renderer, LightTexture light, Matrix4f view, Matrix4f projection,

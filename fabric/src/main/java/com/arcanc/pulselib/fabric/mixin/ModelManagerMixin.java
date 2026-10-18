@@ -19,9 +19,18 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Adds the PulseLib texture atlas to Fabric model-manager atlas construction.
+ */
 @Mixin (ModelManager.class)
 public abstract class ModelManagerMixin
 {
+	/**
+	 * Adds the PulseLib atlas mapping without mutating the original atlas map.
+	 *
+	 * @param original the original implementation or unmodified value supplied by the render hook
+	 * @return a copy of the atlas map containing the PulseLib atlas
+	 */
 	@ModifyArg (method = "<init>", at = @At (value = "INVOKE",
 		target = "Lnet/minecraft/client/resources/model/AtlasSet;<init>(Ljava/util/Map;Lnet/minecraft/client/renderer/texture/TextureManager;)V"), index = 0)
 	private Map<ResourceLocation, ResourceLocation> pulselib$addAtlas(Map<ResourceLocation, ResourceLocation> original)

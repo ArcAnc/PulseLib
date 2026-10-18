@@ -11,10 +11,21 @@ package com.arcanc.pulselib.content.model.animation;
 
 import org.joml.Vector3f;
 
+/**
+ * Converts sampled vectors from a source format into PulseLib animation coordinates.
+ */
 @FunctionalInterface
 public interface PVectorConversion
 {
+	/**
+	 * Leaves sampled vectors unchanged.
+	 */
 	PVectorConversion IDENTITY = value -> {};
 
+	/**
+	 * Converts the supplied vector in place.
+	 *
+	 * @param value the sampled animation channel value
+	 */
 	void apply(Vector3f value);
 }

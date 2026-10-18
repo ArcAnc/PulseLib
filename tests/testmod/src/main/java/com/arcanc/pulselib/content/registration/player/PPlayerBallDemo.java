@@ -16,6 +16,7 @@ import com.arcanc.pulselib.content.model.animation.PRawAnimation;
 import com.arcanc.pulselib.content.player.animation.*;
 import com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonSettings;
 import com.arcanc.pulselib.content.renderer.modelData.PModelData;
+import com.arcanc.pulselib.test.AnimationSamplingHarness;
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
 import com.mojang.blaze3d.platform.InputConstants;
@@ -57,6 +58,8 @@ public class PPlayerBallDemo
 						anchor(PPlayerAnimationAnchors.RIGHT_ITEM, "right_hand").
 						anchor(PPlayerAnimationAnchors.LEFT_ITEM, "left_hand").
 						firstPerson(PPlayerFirstPersonSettings.ENABLED).
+						populateMolangContext((player, instance, controller, context, partialTick) ->
+								AnimationSamplingHarness.checkTime(controller, context, partialTick)).
 						itemRenderPolicy(PPlayerAnimationDefinition.ItemRenderPolicy.RENDER).
 						controllers(controllers -> controllers.add("ball_toss", () -> state ->
 								state.controller().isStopped() ? ControllerState.STOP : ControllerState.PLAY)).

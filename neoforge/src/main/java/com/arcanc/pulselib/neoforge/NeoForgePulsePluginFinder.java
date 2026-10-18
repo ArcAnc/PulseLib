@@ -26,10 +26,16 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Discovers PulseLib plugins from NeoForge annotation scan data without loading candidate classes.
+ */
 public final class NeoForgePulsePluginFinder implements IPulsePluginFinder
 {
 	private @Nullable List<PulsePluginCandidate> candidates;
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public synchronized List<PulsePluginCandidate> findPlugins()
 	{

@@ -14,11 +14,21 @@ final class PPoseSnapshot
 {
 	private final PPose pose;
 
+	/**
+	 * Captures an independent copy of the supplied pose.
+	 *
+	 * @param pose the indexed bone pose
+	 */
 	PPoseSnapshot(PPose pose)
 	{
 		this.pose = pose.copy();
 	}
 
+	/**
+	 * Returns an independent copy of the captured pose.
+	 *
+	 * @return an independent copy of the captured pose
+	 */
 	PPose sample()
 	{
 		return this.pose.copy();

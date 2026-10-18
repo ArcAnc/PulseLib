@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+/**
+ * Combines prioritized pose layers with masks, bone weights and configurable transform-space blend modes.
+ */
 public final class PPoseMixer
 {
 	private static final float EPSILON = 1.0e-6f;
@@ -28,11 +31,22 @@ public final class PPoseMixer
 	private final int boneCount;
 	private final int @Nullable [] parents;
 
+	/**
+	 * Creates a pose mixer for the requested bone count and optional parent hierarchy.
+	 *
+	 * @param boneCount the number of indexed bones
+	 */
 	public PPoseMixer(int boneCount)
 	{
 		this(boneCount, null);
 	}
 
+	/**
+	 * Creates a pose mixer for the requested bone count and optional parent hierarchy.
+	 *
+	 * @param boneCount the number of indexed bones
+	 * @param parents the parent bone indices, with a root sentinel for root bones; may be {@code null}
+	 */
 	public PPoseMixer(int boneCount, int @Nullable [] parents)
 	{
 		if (boneCount < 0)
@@ -47,6 +61,13 @@ public final class PPoseMixer
 		this.parents = parents == null ? null : parents.clone();
 	}
 
+	/**
+	 * Combines the supplied layers over the reference pose in priority order.
+	 *
+	 * @param referencePose the reference pose used to calculate layer deltas
+	 * @param layers the layers
+	 * @return the indexed bone pose
+	 */
 	public PPose mix(PPose referencePose, Collection<Layer> layers)
 	{
 		Objects.requireNonNull(referencePose);
@@ -80,7 +101,16 @@ public final class PPoseMixer
 		return result;
 	}
 
-	/** Creates the two weighted layers forming a crossfade at {@code elapsed}. */
+	/**
+	 * Creates the two weighted layers forming a crossfade at {@code elapsed} .
+	 *
+	 * @param outgoing the outgoing
+	 * @param incoming the incoming
+	 * @param elapsed the elapsed transition time in game ticks
+	 * @param duration the duration of the effect or transition in game ticks
+	 * @param easing the crossfade progress easing curve
+	 * @return the outgoing and incoming layers with complementary eased weights
+	 */
 	public static List<Layer> crossfade(Layer outgoing,
 	                                    Layer incoming,
 	                                    float elapsed,
@@ -97,6 +127,12 @@ public final class PPoseMixer
 	/**
 	 * Blends resolved poses against their reference without promoting absent channels to identity.
 	 * Only the endpoints' channel masks participate; scalar values and visibility are retained.
+	 *
+	 * @param reference the reference value or channel used by this operation
+	 * @param source the pose supplying transform and channel-presence data
+	 * @param target the target
+	 * @param alpha the normalized interpolation progress
+	 * @return the indexed bone pose
 	 */
 	public static PPose blend(PPose reference, PPose source, PPose target, float alpha)
 	{
@@ -165,14 +201,24 @@ public final class PPoseMixer
 		private float duration;
 		private PPoseEasing easing;
 
-		/** Uses the initial layer's reference, or identity, and a hierarchy-free mixer. */
+		/**
+		 * Uses the initial layer's reference, or identity, and a hierarchy-free mixer.
+		 *
+		 * @param initial the initial
+		 */
 		public Transition(Layer initial)
 		{
 			this(new PPoseMixer(initial.pose().boneCount()),
 					initial.referencePose() == null ? new PPose(initial.pose().boneCount(), initial.pose().scalarChannelCount()) : initial.referencePose(), initial);
 		}
 
-		/** Supplies the actual reference/hierarchy for additive and mesh-space snapshot capture. */
+		/**
+		 * Supplies the actual reference/hierarchy for additive and mesh-space snapshot capture.
+		 *
+		 * @param mixer the mixer
+		 * @param reference the reference value or channel used by this operation
+		 * @param initial the initial
+		 */
 		public Transition(PPoseMixer mixer, PPose reference, Layer initial)
 		{
 			this.mixer = Objects.requireNonNull(mixer);
@@ -184,6 +230,15 @@ public final class PPoseMixer
 			this.easing = PPoseEasing.LINEAR;
 		}
 
+		/**
+		 * Starts a transition to the target layer according to the requested interruption policy.
+		 *
+		 * @param target the target
+		 * @param duration the duration of the effect or transition in game ticks
+		 * @param easing the crossfade progress easing curve
+		 * @param interruptionPolicy the policy for interrupting an active crossfade
+		 * @return whether the new transition was accepted
+		 */
 		public boolean transitionTo(Layer target,
 		                            float duration,
 		                            PPoseEasing easing,
@@ -219,6 +274,11 @@ public final class PPoseMixer
 			return true;
 		}
 
+		/**
+		 * Advances the active crossfade by the supplied elapsed tick interval.
+		 *
+		 * @param delta the elapsed playback interval in game ticks
+		 */
 		public void advance(float delta)
 		{
 			this.elapsed = Math.min(this.elapsed + Math.max(delta, 0.0f), this.duration);
@@ -229,6 +289,11 @@ public final class PPoseMixer
 			}
 		}
 
+		/**
+		 * Returns whether a crossfade is currently active.
+		 *
+		 * @return whether a crossfade is currently active
+		 */
 		public boolean isTransitioning()
 		{
 			return this.elapsed < this.duration;
@@ -267,6 +332,11 @@ public final class PPoseMixer
 			return new Layer(pose, PPoseBlendMode.OVERRIDE, target.priority(), 1.0f);
 		}
 
+		/**
+		 * Returns the layers and weights representing the current transition state.
+		 *
+		 * @return the layers and weights representing the current transition state
+		 */
 		public List<Layer> layers()
 		{
 			if (!isTransitioning())
@@ -516,14 +586,37 @@ public final class PPoseMixer
 		return Math.abs(value) < EPSILON ? 1.0f : 1.0f / value;
 	}
 
+	/**
+	 * Supplies the contribution weight of an individual bone in a pose layer.
+	 */
 	@FunctionalInterface
 	public interface BoneWeight
 	{
+		/**
+		 * Assigns full contribution to every bone.
+		 */
 		BoneWeight FULL = boneIndex -> 1.0f;
 
+		/**
+		 * Returns the layer weight for the supplied bone index.
+		 *
+		 * @param boneIndex the zero-based baked-model bone index
+		 * @return the layer weight for the supplied bone index
+		 */
 		float weight(int boneIndex);
 	}
 
+	/**
+	 * Pose contribution with a reference pose, bone mask, blend mode, priority and overall weight.
+	 *
+	 * @param pose the indexed bone pose
+	 * @param referencePose the reference pose used to calculate layer deltas; may be {@code null}
+	 * @param mask the mask selecting participating bones or player parts
+	 * @param boneWeight the per-bone contribution weight provider
+	 * @param mode the rule used to combine the layer with the accumulated value
+	 * @param priority the ordering priority of the contribution
+	 * @param weight the contribution weight
+	 */
 	public record Layer(PPose pose,
 	                    @Nullable PPose referencePose,
 	                    BitSet mask,
@@ -532,6 +625,17 @@ public final class PPoseMixer
 	                    int priority,
 	                    float weight)
 	{
+		/**
+		 * Creates a weighted pose layer with the supplied blending and bone-selection policy.
+		 *
+		 * @param pose the indexed bone pose
+		 * @param referencePose the reference pose used to calculate layer deltas; may be {@code null}
+		 * @param mask the mask selecting participating bones or player parts
+		 * @param boneWeight the per-bone contribution weight provider
+		 * @param mode the rule used to combine the layer with the accumulated value
+		 * @param priority the ordering priority of the contribution
+		 * @param weight the contribution weight
+		 */
 		public Layer
 		{
 			pose = Objects.requireNonNull(pose);
@@ -545,16 +649,36 @@ public final class PPoseMixer
 			}
 		}
 
+		/**
+		 * Creates a weighted pose layer with the supplied blending and bone-selection policy.
+		 *
+		 * @param pose the indexed bone pose
+		 * @param mode the rule used to combine the layer with the accumulated value
+		 * @param priority the ordering priority of the contribution
+		 * @param weight the contribution weight
+		 */
 		public Layer(PPose pose, PPoseBlendMode mode, int priority, float weight)
 		{
 			this(pose, null, null, null, mode, priority, weight);
 		}
 
+		/**
+		 * Returns the effective contribution weight for the supplied bone index.
+		 *
+		 * @param boneIndex the zero-based baked-model bone index
+		 * @return the effective contribution weight for the supplied bone index
+		 */
 		public float boneWeight(int boneIndex)
 		{
 			return this.mask.get(boneIndex) ? Math.clamp(this.weight * this.boneWeight.weight(boneIndex), 0.0f, 1.0f) : 0.0f;
 		}
 
+		/**
+		 * Returns a layer copy with a different overall contribution weight.
+		 *
+		 * @param weight the contribution weight
+		 * @return a layer copy with a different overall contribution weight
+		 */
 		public Layer withWeight(float weight)
 		{
 			return new Layer(this.pose, this.referencePose, this.mask, this.boneWeight, this.mode, this.priority, weight);

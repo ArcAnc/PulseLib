@@ -30,6 +30,11 @@ public abstract class LevelRendererMixin
 	private @Nullable RenderTarget weatherTarget;
 
 	// After block-entity batches and outline processing, immediately before destruction rendering.
+	/**
+	 * Flushes shared opaque geometry at the Fabric post-block-entity boundary.
+	 *
+	 * @param callback the Mixin callback used to inspect or replace the intercepted result
+	 */
 	@Inject (method = "renderLevel", at = @At (value = "INVOKE",
 		target = "Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;long2ObjectEntrySet()Lit/unimi/dsi/fastutil/objects/ObjectSet;"))
 	private void pulselib$afterBlockEntities(CallbackInfo callback)
@@ -37,6 +42,11 @@ public abstract class LevelRendererMixin
 		PRenderStagesHandler.afterBlockEntities();
 	}
 
+	/**
+	 * Flushes shared remaining world geometry after Fabric particle rendering.
+	 *
+	 * @param callback the Mixin callback used to inspect or replace the intercepted result
+	 */
 	@Inject (method = "renderLevel", at = @At (value = "INVOKE",
 		target = "Lnet/minecraft/client/particle/ParticleEngine;render(Lnet/minecraft/client/renderer/LightTexture;Lnet/minecraft/client/Camera;F)V", shift = At.Shift.AFTER))
 	private void pulselib$afterParticles(CallbackInfo callback)
@@ -44,6 +54,11 @@ public abstract class LevelRendererMixin
 		PRenderStagesHandler.afterParticles();
 	}
 
+	/**
+	 * Composites deferred translucency into the active weather or main render target.
+	 *
+	 * @param callback the Mixin callback used to inspect or replace the intercepted result
+	 */
 	@Inject (method = "renderLevel", at = @At (value = "INVOKE",
 		target = "Lnet/minecraft/client/renderer/LevelRenderer;renderSnowAndRain(Lnet/minecraft/client/renderer/LightTexture;FDDD)V", shift = At.Shift.AFTER))
 	private void pulselib$afterWeather(CallbackInfo callback)

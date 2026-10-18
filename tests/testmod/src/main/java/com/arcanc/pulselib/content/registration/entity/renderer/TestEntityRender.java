@@ -10,21 +10,24 @@
 package com.arcanc.pulselib.content.registration.entity.renderer;
 
 
+import com.arcanc.pulselib.content.animatable.PAnimationController;
 import com.arcanc.pulselib.content.model.baked.PBakedBone;
-import com.arcanc.pulselib.content.model.textures.PAlphaMode;
-import org.jetbrains.annotations.Nullable;
-import com.arcanc.pulselib.data.gecko.PGeckoModelLoader;
-import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
 import com.arcanc.pulselib.content.model.baked.PBakedMesh;
 import com.arcanc.pulselib.content.model.baked.PMeshRenderContext;
 import com.arcanc.pulselib.content.model.deformer.*;
+import com.arcanc.pulselib.content.model.textures.PAlphaMode;
 import com.arcanc.pulselib.content.registration.entity.TestEntity;
 import com.arcanc.pulselib.content.renderer.PEntityRenderer;
 import com.arcanc.pulselib.content.renderer.modelData.PModelData;
+import com.arcanc.pulselib.data.gecko.MolangParser;
+import com.arcanc.pulselib.data.gecko.PGeckoModelLoader;
+import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
+import com.arcanc.pulselib.test.AnimationSamplingHarness;
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.arcanc.pulselib.util.PRenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.List;
@@ -40,7 +43,7 @@ public class TestEntityRender extends PEntityRenderer<TestEntity>
 	public static final ResourceLocation ZERO = PLibDatabase.rl("entity/test_entity/0");
 	public static final ResourceLocation ARMOR = PLibDatabase.rl("entity/test_entity/armor/0");
 	public static final PModelData MODEL_DATA = PModelData.entity(PLibDatabase.rl("test_entity"), Boolean.getBoolean("pulselib.test.geckoEntity") ? PGeckoModelLoader.INSTANCE.id() : PGltfModelLoader.INSTANCE.id());
-	
+
 	private static final PChannelReference<Float> ARM_HINGE_ANGLE = new PChannelReference<>("test_entity_arm_hinge_angle", 0.0f);
 	private static final PDeformerStack ARM_HINGE = PDeformerStack.compile(List.of(
 			new PDeformerInstance<>(PHingeDeformer.INSTANCE, new PHingeDefinition(
@@ -50,18 +53,27 @@ public class TestEntityRender extends PEntityRenderer<TestEntity>
 					ARM_HINGE_ANGLE))));
 	private final Object leftArmHingeKey = new Object();
 	private final Object rightArmHingeKey = new Object();
-	
+
 	public TestEntityRender(EntityRendererProvider.Context context)
 	{
 		super(context, MODEL_DATA,
 				PRenderTypes.RenderTypeProvider :: trianglesTranslucent);
-		
+
 		addRenderLayer("body", new PTestArmor().
 				bindBone("armor_chest", "body").
 				bindBone("armor_helm", "head").
 				bindBone("armor_left_hand", "hand_left"));
 	}
-	
+
+	@Override
+	protected void populateMolangContext(TestEntity animatable,
+	                                    PAnimationController<TestEntity> controller,
+	                                    MolangParser.Context context,
+	                                    float partialTick)
+	{
+		AnimationSamplingHarness.checkTime(controller, context, partialTick);
+	}
+
 	@Override
 	protected PMeshRenderContext resolveMeshRender(TestEntity animatable,
 	                                               PBakedBone bone,
@@ -86,7 +98,7 @@ public class TestEntityRender extends PEntityRenderer<TestEntity>
 			context = context.withTexture(alternateMaterial ? TORUS : ZERO).
 					withEmissive(alternateMaterial);
 		}
-		
+
 		if (!bone.name().equals("hand_left") && !bone.name().equals("hand_right"))
 			return context;
 

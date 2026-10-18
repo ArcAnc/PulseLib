@@ -40,6 +40,12 @@ public final class PPlayerAutomaticMeshAttachments
 {
 	private PPlayerAutomaticMeshAttachments() {}
 
+	/**
+	 * Finds configured mesh attachment roots in the sampled animation model.
+	 *
+	 * @param frame the frame matrices or sampled animation values used by this operation
+	 * @return the baked mesh roots selected for automatic attachment rendering
+	 */
 	public static List<PBakedBone> roots(PPlayerAnimationFrame frame)
 	{
 		PPlayerAnimationDefinition definition = frame.definition();
@@ -63,6 +69,13 @@ public final class PPlayerAutomaticMeshAttachments
 		return List.copyOf(roots);
 	}
 
+	/**
+	 * Submits sampled animation-model mesh attachments in third-person player space.
+	 *
+	 * @param poses the poses
+	 * @param poseStack the current model-to-render pose stack
+	 * @param packedLight the packed block and sky light coordinates
+	 */
 	public static void renderThirdPerson(List<PPlayerAnimationMeshAttachmentPose> poses, PoseStack poseStack, int packedLight)
 	{
 		for (PPlayerAnimationMeshAttachmentPose pose : poses)
@@ -80,7 +93,13 @@ public final class PPlayerAutomaticMeshAttachments
 			}
 	}
 
-	/** Draws model mesh attachments after their first-person presentation has been resolved. */
+	/**
+	 * Draws model mesh attachments after their first-person presentation has been resolved.
+	 *
+	 * @param poses the poses
+	 * @param poseStack the current model-to-render pose stack
+	 * @param packedLight the packed block and sky light coordinates
+	 */
 	public static void renderFirstPerson(List<PPlayerFirstPersonMeshAttachmentPose> poses, PoseStack poseStack, int packedLight)
 	{
 		for (PPlayerFirstPersonMeshAttachmentPose pose : poses)
@@ -100,6 +119,12 @@ public final class PPlayerAutomaticMeshAttachments
 	/**
 	 * First-person meshes are drawn after Minecraft has written hand depth. An
 	 * immediate draw here would still test against the world depth buffer.
+	 *
+	 * @param root the root
+	 * @param frame the frame matrices or sampled animation values used by this operation
+	 * @param transform the transform
+	 * @param poseStack the current model-to-render pose stack
+	 * @param packedLight the packed block and sky light coordinates
 	 */
 	private static void submitFirstPerson(PBakedBone root, PPlayerAnimationFrame frame,
 	                                      Matrix4f transform,

@@ -11,7 +11,16 @@ package com.arcanc.pulselib.content.model.deformer;
 
 import org.joml.Vector3f;
 
+/**
+ * Executable mesh deformation operation with parameters resolved at sample time.
+ */
 public interface PPreparedDeformer
 {
+	/**
+	 * Changes the supplied local position in place using current channel values.
+	 *
+	 * @param position the position
+	 * @param values the source of current animated deformation channel values
+	 */
 	void deform(Vector3f position, PDeformerValueSource values);
 }

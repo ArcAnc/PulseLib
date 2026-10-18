@@ -15,6 +15,16 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.joml.Vector3f;
 
+/**
+ * Serializable configuration and animation channel references for bending around a configurable axis.
+ *
+ * @param origin the local pivot or origin of the deformation
+ * @param lengthAxis the axis along which the deformation extent is measured
+ * @param bendAxis the axis around which the mesh bends
+ * @param positiveExtent the positive-axis deformation extent
+ * @param negativeExtent the negative-axis deformation extent
+ * @param angle the angle channel reference and its fallback value
+ */
 public record PBendDefinition(Vector3f origin,
 							 Vector3f lengthAxis,
 							 Vector3f bendAxis,
@@ -22,6 +32,9 @@ public record PBendDefinition(Vector3f origin,
 							 float negativeExtent,
 							 PChannelReference<Float> angle)
 {
+	/**
+	 * Serialization codec for bend definition.
+	 */
 	public static final MapCodec<PBendDefinition> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.
 			group(
 					PLibCodecs.VECTOR3F_CODEC.fieldOf("origin").forGetter(PBendDefinition::origin),
@@ -32,6 +45,16 @@ public record PBendDefinition(Vector3f origin,
 					PChannelReference.FLOAT_CODEC.forGetter(PBendDefinition::angle)).
 			apply(instance, PBendDefinition::new));
 
+	/**
+	 * Creates the deformation configuration and copies its local origin and axis inputs.
+	 *
+	 * @param origin the local pivot or origin of the deformation
+	 * @param lengthAxis the axis along which the deformation extent is measured
+	 * @param bendAxis the axis around which the mesh bends
+	 * @param positiveExtent the positive-axis deformation extent
+	 * @param negativeExtent the negative-axis deformation extent
+	 * @param angle the angle channel reference and its fallback value
+	 */
 	public PBendDefinition
 	{
 		origin = new Vector3f(origin);

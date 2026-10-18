@@ -14,6 +14,12 @@ package com.arcanc.pulselib.content.player.animation.firstPerson;
  */
 public enum PFirstPersonTransformMode
 {
+	/**
+	 * Replaces the vanilla local item transform with the animated target.
+	 */
 	OVERRIDE,
+	/**
+	 * Composes the animated transform after the vanilla local item transform.
+	 */
 	ADDITIVE
 }

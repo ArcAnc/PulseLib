@@ -40,6 +40,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ItemInHandRenderer.class)
 public abstract class ItemInHandRendererMixin
 {
+	/**
+	 * Samples and scopes the player presentation for the complete first-person hand pass.
+	 *
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param poseStack the current model-to-render pose stack
+	 * @param buffers the vanilla vertex buffer source
+	 * @param player the player whose animation or presentation is being processed
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param original the original implementation or unmodified value supplied by the render hook
+	 */
 	@WrapMethod(method = "renderHandsWithItems")
 	private void pulselib$withFirstPersonPass(float partialTick, PoseStack poseStack,
 	                                          MultiBufferSource.BufferSource buffers, LocalPlayer player, int packedLight,
@@ -50,7 +60,16 @@ public abstract class ItemInHandRendererMixin
 		finally { PFirstPersonRenderContexts.endPass(); }
 	}
 
-	/** The BufferSource is still open immediately before the vanilla batch flush. */
+	/**
+	 * The BufferSource is still open immediately before the vanilla batch flush.
+	 *
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param poseStack the current model-to-render pose stack
+	 * @param buffers the vanilla vertex buffer source
+	 * @param player the player whose animation or presentation is being processed
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param ci the Mixin callback for the intercepted method
+	 */
 	@Inject(method = "renderHandsWithItems", at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;endBatch()V", shift = At.Shift.BEFORE))
 	private void pulselib$renderFirstPersonAttachments(float partialTick, PoseStack poseStack,
@@ -61,6 +80,21 @@ public abstract class ItemInHandRendererMixin
 		if (presentation != null) PPlayerFirstPersonRenderer.renderExtras(player, presentation, poseStack, buffers, packedLight, partialTick);
 	}
 
+	/**
+	 * Captures the hand-pass basis and renders animated empty off-hand geometry when required.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param pitch the pitch angle in degrees
+	 * @param hand the interaction hand being rendered
+	 * @param swingProgress the vanilla hand swing animation progress
+	 * @param stack the item stack supplying render or animation state
+	 * @param equippedProgress the vanilla hand equip animation progress
+	 * @param poseStack the current model-to-render pose stack
+	 * @param buffers the vanilla vertex buffer source
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param original the original implementation or unmodified value supplied by the render hook
+	 */
 	@WrapMethod(method = "renderArmWithItem")
 	private void pulselib$renderArmWithItem(AbstractClientPlayer player, float partialTick, float pitch,
 	                                        InteractionHand hand, float swingProgress, ItemStack stack, float equippedProgress,
@@ -76,6 +110,16 @@ public abstract class ItemInHandRendererMixin
 		finally { PFirstPersonRenderContexts.pop(); }
 	}
 
+	/**
+	 * Applies the sampled right-arm presentation around vanilla first-person arm rendering.
+	 *
+	 * @param renderer the renderer
+	 * @param poseStack the current model-to-render pose stack
+	 * @param buffers the vanilla vertex buffer source
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param player the player whose animation or presentation is being processed
+	 * @param original the original implementation or unmodified value supplied by the render hook
+	 */
 	@WrapOperation(method = "renderPlayerArm", at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/client/renderer/entity/player/PlayerRenderer;renderRightHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/client/player/AbstractClientPlayer;)V"))
 	private void pulselib$renderRightArm(PlayerRenderer renderer, PoseStack poseStack, MultiBufferSource buffers,
@@ -84,6 +128,16 @@ public abstract class ItemInHandRendererMixin
 		renderArm(renderer, poseStack, buffers, packedLight, player, original);
 	}
 
+	/**
+	 * Applies the sampled left-arm presentation around vanilla first-person arm rendering.
+	 *
+	 * @param renderer the renderer
+	 * @param poseStack the current model-to-render pose stack
+	 * @param buffers the vanilla vertex buffer source
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param player the player whose animation or presentation is being processed
+	 * @param original the original implementation or unmodified value supplied by the render hook
+	 */
 	@WrapOperation(method = "renderPlayerArm", at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/client/renderer/entity/player/PlayerRenderer;renderLeftHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/client/player/AbstractClientPlayer;)V"))
 	private void pulselib$renderLeftArm(PlayerRenderer renderer, PoseStack poseStack, MultiBufferSource buffers,
@@ -92,6 +146,19 @@ public abstract class ItemInHandRendererMixin
 		renderArm(renderer, poseStack, buffers, packedLight, player, original);
 	}
 
+	/**
+	 * Selects hidden, vanilla or animated held-item rendering from the current presentation.
+	 *
+	 * @param renderer the renderer
+	 * @param entity the entity being animated or rendered
+	 * @param stack the item stack supplying render or animation state
+	 * @param displayContext the display context
+	 * @param leftHand the left hand
+	 * @param poseStack the current model-to-render pose stack
+	 * @param buffers the vanilla vertex buffer source
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param original the original implementation or unmodified value supplied by the render hook
+	 */
 	@WrapOperation(method = "renderArmWithItem", at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;renderItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;ZLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"))
 	private void pulselib$renderHeldItem(ItemInHandRenderer renderer, LivingEntity entity, ItemStack stack,

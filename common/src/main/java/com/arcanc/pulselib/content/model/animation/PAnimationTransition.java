@@ -11,6 +11,18 @@ package com.arcanc.pulselib.content.model.animation;
 
 import java.util.Objects;
 
+/**
+ * Conditional transition between graph states with exit timing, blend duration, priority and interruption
+ * policy.
+ *
+ * @param source the source graph state index
+ * @param target the destination graph state index
+ * @param condition the graph transition predicate
+ * @param exitTime the normalized exit threshold required before a transition can start
+ * @param blendDuration the transition blend duration in game ticks
+ * @param priority the ordering priority of the contribution
+ * @param interruption the policy for interrupting an active graph transition
+ */
 public record PAnimationTransition(
 		int source,
 		int target,
@@ -22,6 +34,16 @@ public record PAnimationTransition(
 )
 {
 	
+	/**
+	 * Creates a conditional graph transition with exit, blend and interruption settings.
+	 *
+	 * @param source the source graph state index
+	 * @param target the destination graph state index
+	 * @param condition the graph transition predicate
+	 * @param blendDuration the transition blend duration in game ticks
+	 * @param priority the ordering priority of the contribution
+	 * @param interruption the policy for interrupting an active graph transition
+	 */
 	public PAnimationTransition(int source,
 	                            int target,
 	                            PCondition condition,
@@ -32,6 +54,17 @@ public record PAnimationTransition(
 		this(source, target, condition, -1.0f, blendDuration, priority, interruption);
 	}
 
+	/**
+	 * Creates a conditional graph transition with exit, blend and interruption settings.
+	 *
+	 * @param source the source graph state index
+	 * @param target the destination graph state index
+	 * @param condition the graph transition predicate
+	 * @param exitTime the normalized exit threshold required before a transition can start
+	 * @param blendDuration the transition blend duration in game ticks
+	 * @param priority the ordering priority of the contribution
+	 * @param interruption the policy for interrupting an active graph transition
+	 */
 	public PAnimationTransition
 	{
 		Objects.requireNonNull(condition);

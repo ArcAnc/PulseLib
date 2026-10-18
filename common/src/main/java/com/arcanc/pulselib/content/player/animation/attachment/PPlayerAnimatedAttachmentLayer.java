@@ -20,8 +20,28 @@ import net.minecraft.client.renderer.entity.layers.RenderLayer;
 /** Native 1.21.1 third-person player layer for animated anchor and mesh attachments. */
 public final class PPlayerAnimatedAttachmentLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>>
 {
+	/**
+	 * Attaches animated anchor and mesh rendering to the supplied player renderer.
+	 *
+	 * @param parent the parent
+	 */
 	public PPlayerAnimatedAttachmentLayer(RenderLayerParent<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> parent) { super(parent); }
 
+	/**
+	 * Renders animated action-anchor attachments and automatic animation-model mesh attachments for the
+	 * player.
+	 *
+	 * @param poseStack the current model-to-render pose stack
+	 * @param buffers the vanilla vertex buffer source
+	 * @param light the packed block and sky light coordinates
+	 * @param player the player whose animation or presentation is being processed
+	 * @param limbSwing the entity limb animation position
+	 * @param limbSwingAmount the entity limb animation amplitude
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param ageInTicks the entity age used by vanilla render animation
+	 * @param netHeadYaw the head yaw relative to the body in degrees
+	 * @param headPitch the head pitch in degrees
+	 */
 	@Override
 	public void render(PoseStack poseStack, MultiBufferSource buffers, int light, AbstractClientPlayer player,
 	                   float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks,

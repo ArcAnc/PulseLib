@@ -13,7 +13,16 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
-/** Immutable per-renderArmWithItem state. Matrices are copied at capture time. */
+/**
+ * Immutable per-renderArmWithItem state. Matrices are copied at capture time.
+ *
+ * @param hand the interaction hand being rendered
+ * @param arm the humanoid arm whose geometry is being processed
+ * @param basePose the base pose
+ * @param baseNormal the base normal
+ * @param presentation the presentation
+ * @param map the map
+ */
 public record PFirstPersonRenderContext(
         InteractionHand hand,
         HumanoidArm arm,
@@ -23,13 +32,14 @@ public record PFirstPersonRenderContext(
         boolean map)
 {
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param hand the hand to use.
-	 * @param arm the arm to use.
-	 * @param basePose the base pose to use.
-	 * @param baseNormal the base normal to use.
-	 * @param presentation the presentation to use.
-	 * @param map the map to use.
+	 * Copies the hand-pass basis and associates it with the sampled presentation.
+	 *
+	 * @param hand the interaction hand being rendered
+	 * @param arm the humanoid arm whose geometry is being processed
+	 * @param basePose the base pose
+	 * @param baseNormal the base normal
+	 * @param presentation the presentation
+	 * @param map the map
 	 */
 	public PFirstPersonRenderContext
 	{

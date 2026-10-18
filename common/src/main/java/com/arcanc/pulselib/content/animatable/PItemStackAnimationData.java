@@ -15,11 +15,24 @@ package com.arcanc.pulselib.content.animatable;
  */
 public interface PItemStackAnimationData
 {
+	/**
+	 * Returns the stored transient animation id, or zero if the stack has not been assigned an id.
+	 *
+	 * @return the stored transient animation id, or zero if the stack has not been assigned an id
+	 */
 	long pulselib$getAnimationId();
 
-	/** Copies an existing identity, or clears it with zero; intended for stack transfers. */
+	/**
+	 * Copies an existing identity, or clears it with zero; intended for stack transfers.
+	 *
+	 * @param id the namespaced resource or registration identifier
+	 */
 	void pulselib$setAnimationId(long id);
 
-	/** Returns zero for empty or nonanimated stacks; otherwise assigns an ID once. */
+	/**
+	 * Returns zero for empty or nonanimated stacks; otherwise assigns an ID once.
+	 *
+	 * @return zero for empty or nonanimated stacks; otherwise assigns an ID once
+	 */
 	long pulselib$getOrCreateAnimationId();
 }

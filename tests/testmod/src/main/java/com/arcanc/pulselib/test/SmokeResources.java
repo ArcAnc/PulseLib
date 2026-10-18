@@ -21,7 +21,6 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL30;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -53,7 +52,7 @@ record SmokeResources(List<Integer> buffers, List<Integer> textures, int framebu
 			}
 		}
 		textures.add((Integer)field(oit.getClass(), "fabulousMetadataTexture", oit));
-		check(!((Collection<?>)field(InstanceAnimationManager.class, "MANAGERS", null)).isEmpty(), "Lifecycle fixture must populate instance managers");
+		check(!((Map<?, ?>)field(InstanceAnimationManager.class, "MANAGERS", null)).isEmpty(), "Lifecycle fixture must populate instance managers");
 		check(!((Map<?, ?>)field(SingletonAnimationManager.class, "MANAGERS", null)).isEmpty(), "Lifecycle fixture must populate singleton managers");
 		return new SmokeResources(buffers.stream().filter(id -> id > 0).distinct().toList(),
 				textures.stream().filter(id -> id > 0).distinct().toList(), (Integer)field(oit.getClass(), "framebuffer", oit));
@@ -70,7 +69,7 @@ record SmokeResources(List<Integer> buffers, List<Integer> textures, int framebu
 			check(!GL11.glIsTexture(texture), scenario + ": GPU texture leaked: " + texture);
 		}
 		check(this.framebuffer < 0 || !GL30.glIsFramebuffer(this.framebuffer), scenario + ": OIT framebuffer leaked");
-		check(((Collection<?>)field(InstanceAnimationManager.class, "MANAGERS", null)).isEmpty(), scenario + ": instance managers leaked");
+		check(((Map<?, ?>)field(InstanceAnimationManager.class, "MANAGERS", null)).isEmpty(), scenario + ": instance managers leaked");
 		check(((Map<?, ?>)field(SingletonAnimationManager.class, "MANAGERS", null)).isEmpty(), scenario + ": singleton managers leaked");
 		check(((Map<?, ?>)field(PPlayerAnimations.class, "INSTANCES", null)).isEmpty(), scenario + ": player managers leaked");
 		check(((Map<?, ?>)field(PGpuDeformedMeshBuffers.class, "GEOMETRIES", null)).isEmpty(), scenario + ": GPU deformation cache leaked");

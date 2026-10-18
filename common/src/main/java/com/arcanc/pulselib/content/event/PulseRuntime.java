@@ -28,11 +28,17 @@ public final class PulseRuntime
 	{
 	}
 
+	/**
+	 * Clears runtime state that must not outlive the resources being reloaded.
+	 */
 	public static void beforeResourceReload()
 	{
 		PResourceCache.reloadRegistrations();
 	}
 
+	/**
+	 * Releases animation and rendering state associated with the disconnected client session.
+	 */
 	public static void disconnected()
 	{
 		RenderSystem.assertOnRenderThread();

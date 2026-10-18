@@ -15,9 +15,20 @@ import java.util.Objects;
 
 /**
  * Discovery metadata, obtained without loading the plugin class.
+ *
+ * @param className the binary name of the discovered plugin class
+ * @param modId the owning mod identifier used in discovery diagnostics
+ * @param side the physical-side restriction of the plugin candidate
  */
 public record PulsePluginCandidate(String className, String modId, PulsePlugin.Side side)
 {
+	/**
+	 * Captures a discovered plugin class without loading or initializing it.
+	 *
+	 * @param className the binary name of the discovered plugin class
+	 * @param modId the owning mod identifier used in discovery diagnostics
+	 * @param side the physical-side restriction of the plugin candidate
+	 */
 	public PulsePluginCandidate
 	{
 		Objects.requireNonNull(className);

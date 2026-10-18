@@ -28,11 +28,26 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Atlas sprite source that discovers textures referenced by registered PulseLib models.
+ */
 public class RuntimeLoader implements SpriteSource
 {
+	/**
+	 * Serialization codec for runtime loader.
+	 */
 	public static final MapCodec<RuntimeLoader> CODEC = MapCodec.unit(RuntimeLoader ::new);
+	/**
+	 * Registered sprite source type for runtime model texture discovery.
+	 */
 	public static final SpriteSourceType TYPE = new SpriteSourceType(CODEC);
 	
+	/**
+	 * Adds the texture resources required by registered models to the atlas output.
+	 *
+	 * @param resourceManager the resource manager used to locate source assets
+	 * @param output the output
+	 */
 	@Override
 	public void run(ResourceManager resourceManager, Output output)
 	{
@@ -59,6 +74,11 @@ public class RuntimeLoader implements SpriteSource
 		});
 	}
 	
+	/**
+	 * Returns the sprite source type registered for this runtime loader.
+	 *
+	 * @return the sprite source type registered for this runtime loader
+	 */
 	@Override
 	public SpriteSourceType type()
 	{

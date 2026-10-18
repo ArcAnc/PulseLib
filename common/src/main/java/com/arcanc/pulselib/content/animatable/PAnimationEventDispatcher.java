@@ -25,10 +25,24 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Routes animation events to side-appropriate handlers and resolves locator positions from the animated
+ * pose.
+ */
 public final class PAnimationEventDispatcher
 {
 	private PAnimationEventDispatcher() { }
 
+	/**
+	 * Dispatches an animation event using the owner, controller and available pose information.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param animatable the owner whose animation state is being processed
+	 * @param controller the controller supplying playback and persistent expression state
+	 * @param event the typed animation event to dispatch
+	 * @param model the baked model supplying indexed bones and animations; may be {@code null}
+	 * @param controllers the animation controllers in pose composition order
+	 */
 	public static <T extends PAnimatable<T>> void dispatch(T animatable, PAnimationController<T> controller,
 	                                                       PAnimationEvent<?> event, @Nullable PBakedModel model,
 	                                                       Collection<PAnimationController<T>> controllers)
@@ -43,6 +57,14 @@ public final class PAnimationEventDispatcher
 		execute(context, event);
 	}
 	
+	/**
+	 * Dispatches an animation event using the owner, controller and available pose information.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param animatable the owner whose animation state is being processed
+	 * @param controller the controller supplying playback and persistent expression state
+	 * @param event the typed animation event to dispatch
+	 */
 	public static <T extends PAnimatable<T>> void dispatch(T animatable, PAnimationController<T> controller,
 	                                                       PAnimationEvent<?> event)
 	{
@@ -138,5 +160,13 @@ public final class PAnimationEventDispatcher
 		return null;
 	}
 
+	/**
+	 * Model and controller inputs used to resolve an event locator into world space.
+	 *
+	 * @param level the level
+	 * @param x the x component or coordinate
+	 * @param y the y component or coordinate
+	 * @param z the z component or coordinate
+	 */
 	private record PositionContext(Level level, double x, double y, double z) { }
 }

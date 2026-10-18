@@ -13,12 +13,20 @@ import com.arcanc.pulselib.content.renderer.plan.PRenderCapabilityMatrix;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GLCapabilities;
 
+/**
+ * Detects renderer-relevant OpenGL features from the current context.
+ */
 public final class GlCapabilityProbe
 {
 	private GlCapabilityProbe()
 	{
 	}
 
+	/**
+	 * Returns the capability matrix supported by the current OpenGL context.
+	 *
+	 * @return the capability matrix supported by the current OpenGL context
+	 */
 	public static PRenderCapabilityMatrix currentContext()
 	{
 		GLCapabilities gl = GL.getCapabilities();

@@ -2,7 +2,7 @@
 
 Most mods can use PulseLib's renderers without touching the render queue directly. This page explains why PulseLib does not use vanilla `RenderType` values and how to add custom geometry to the current render backend. For its internal frame-plan, geometry-arena, and capability paths, see [Render backend](render-backend.md).
 
-PulseLib models are triangle meshes loaded from glTF/GLB or another model loader. Vanilla baked block models are mostly quad-based, so PulseLib provides its own triangle render types, shaders, vertex format, and instanced queue. That is why examples use [`PRenderTypes`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java) instead of `RenderType.entityCutout` or block render types.
+PulseLib models are triangle meshes loaded from glTF/GLB or another model loader. Vanilla baked block models are mostly quad-based, so PulseLib provides its own triangle render types, shaders, vertex format, and instanced queue. That is why examples use [`PRenderTypes`](../common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java) instead of `RenderType.entityCutout` or block render types.
 
 ## Which render type should I choose?
 
@@ -28,7 +28,7 @@ Emissive and alpha-mode texture metadata is described on [Resources](resources.m
 
 ## Why vanilla RenderType is not enough
 
-PulseLib's baked meshes use [`PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java). Queued shaders also expect per-instance data: transform rows, color, light, overlay, and deformer stream offsets. A vanilla render type may compile and still render incorrectly because its shader and vertex format do not match the data PulseLib sends.
+PulseLib's baked meshes use [`PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL`](../common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java). Queued shaders also expect per-instance data: transform rows, color, light, overlay, and deformer stream offsets. A vanilla render type may compile and still render incorrectly because its shader and vertex format do not match the data PulseLib sends.
 
 If you create a custom render type, keep these requirements:
 
@@ -41,9 +41,9 @@ For most mods, it is safer to start from PulseLib's existing render types and on
 
 ## What the queue does
 
-[`PRenderQueue`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java) compiles submissions into a frame plan. Opaque submissions with the same render type and geometry are batched as instances. Transparent submissions use back-to-front ordering unless they use a built-in OIT render type; OIT submissions are batched by compatible render type and geometry, then resolved through four depth-peeled transparent layers. The OpenGL driver uploads the instance stream once per flush and uses multi-draw indirect where the current context supports it. It falls back to direct instanced draws when that capability is unavailable.
+[`PRenderQueue`](../common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java) compiles submissions into a frame plan. Opaque submissions with the same render type and geometry are batched as instances. Transparent submissions use back-to-front ordering unless they use a built-in OIT render type; OIT submissions are batched by compatible render type and geometry, then resolved through four depth-peeled transparent layers. The OpenGL driver uploads the instance stream once per flush and uses multi-draw indirect where the current context supports it. It falls back to direct instanced draws when that capability is unavailable.
 
-Static [`PGeometryData`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/plan/PGeometryData.java) is placed in the backend's geometry arena and reused across frames. This is the normal path for baked meshes. Dynamic geometry is reserved for CPU-deformed meshes and is more expensive because its vertex data is uploaded again.
+Static [`PGeometryData`](../common/src/main/java/com/arcanc/pulselib/content/renderer/plan/PGeometryData.java) is placed in the backend's geometry arena and reused across frames. This is the normal path for baked meshes. Dynamic geometry is reserved for CPU-deformed meshes and is more expensive because its vertex data is uploaded again.
 
 The queue has a few stages:
 
@@ -51,9 +51,11 @@ The queue has a few stages:
 * `TRANSLUCENT_BLOCKS` for transparent block/entity-adjacent meshes.
 * `ENTITIES` for entity and third-person item rendering.
 * `FIRST_PERSON` for first-person item rendering.
-* `GUI` for GUI rendering.
+* `GUI` for local GUI submissions; direct GUI model/item drawing bypasses the queue.
 
-Normal renderers submit into these stages for you. [`PRenderStagesHandler`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java) flushes `ENTITIES` and `TRANSLUCENT_BLOCKS` together; `GameRendererMixin` flushes `FIRST_PERSON` directly after the hand pass. With an enabled player first-person animation, that pass uses PulseLib's presentation for the affected arms and items.
+Normal renderers submit into these stages for you. [`PRenderStagesHandler`](../common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java) flushes opaque `ENTITIES` and `SOLID_BLOCKS` after block entities, then flushes remaining `ENTITIES`, `SOLID_BLOCKS`, and `TRANSLUCENT_BLOCKS` together after particles. `GameRendererMixin` flushes `FIRST_PERSON` directly after the hand pass. With an enabled player first-person animation, that pass uses PulseLib's presentation for the affected arms and items.
+
+World OIT is resolved after weather for Fast/Fancy graphics. Fabulous defers composition until after Minecraft's transparency chain and combines PulseLib layers with the native translucent, item/entity, particles, weather, and clouds targets. GUI/offscreen entity previews use separate scoped queues with sorted transparency; they do not contribute to world OIT. See [GUI rendering](gui-rendering.md#entity-previews-and-offscreen-targets).
 
 ## When to submit manually
 
@@ -62,15 +64,15 @@ Manual queue submission is an advanced escape hatch. Use it for static triangle 
 ```java
 PGeometryData geometry = createCompatibleTriangleGeometry();
 PInstanceHeader instance = new PInstanceHeader(
-        poseStack.last().pose(),
-        0xFFFFFFFF,
-        packedLight,
-        packedOverlay);
+		poseStack.last().pose(),
+		0xFFFFFFFF,
+		packedLight,
+		packedOverlay);
 
 PRenderQueue.submitEntityMesh(
-        renderType,
-        geometry,
-        instance);
+		renderType,
+		geometry,
+		instance);
 ```
 
 `PGeometryData` copies its supplied vertex and index buffers, so it is safe to retain and submit it repeatedly. Its vertex stride and index type must match the data you supplied. For the standard PulseLib shaders, use `VertexFormat.Mode.TRIANGLES` and `PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL` when packing the data. For most integrations, using a baked mesh's `geometry()` is preferable to hand-packing a buffer.
@@ -81,6 +83,9 @@ Use the stage-specific methods whenever possible:
 * `submitBlockEntityTranslucentMesh(...)` for block-entity geometry that must be sorted as transparent.
 * `submitEntityMesh(...)` for entities and held items.
 * `submitItem(...)` when the item display context decides the stage.
+* `submitFirstPersonMesh(...)` for geometry explicitly owned by the hand pass.
+
+`submitItem` routes first-person hands to `FIRST_PERSON`, third-person hands and `HEAD` to `ENTITIES`, and `GROUND`, `FIXED`, and `NONE` to `TRANSLUCENT_BLOCKS`. It does not queue `GUI`: `PItemRenderer` draws that context immediately. `submitEntityMesh` follows an active first-person scope and otherwise uses `ENTITIES`; a GUI/offscreen scope captures those submissions locally.
 
 The queue is flushed by `PRenderStagesHandler`. Do not call `flush(...)` from an ordinary renderer: flushing early breaks batching and can render at the wrong stage. A custom `RenderStage` is available only when you also own the matching flush point.
 
@@ -99,19 +104,20 @@ A typical customization is small:
 ```java
 @Override
 public void postSubmit(PoseStack poseStack,
-                       RobotEntity entity,
-                       Function<ResourceLocation, RenderType> renderType,
-                       MultiBufferSource bufferSource,
-                       int packedLight,
-                       int packedOverlay,
-                       float partialTick,
-                       Object... additionalData) {
-    // Add vanilla buffer rendering here, or submit extra PulseLib-compatible meshes.
+		RobotEntity entity,
+		Function<ResourceLocation, RenderType> renderType,
+		MultiBufferSource bufferSource,
+		int packedLight,
+		int packedOverlay,
+		float partialTick,
+		Object... additionalData)
+{
+	// Add vanilla buffer rendering here, or submit extra PulseLib-compatible meshes.
 }
 ```
 
 Classes used:
 
-* [`PRenderTypes`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java)
-* [`PRenderQueue`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java)
-* [`PRenderStagesHandler`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java)
+* [`PRenderTypes`](../common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java)
+* [`PRenderQueue`](../common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java)
+* [`PRenderStagesHandler`](../common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java)

@@ -16,7 +16,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 
 /**
- * Immutable value object representing first person item pose.
+ * First-person held-item rendering decision, transform and composition mode.
+ *
+ * @param mode the rule used to combine the layer with the accumulated value
+ * @param transform the transform; may be {@code null}
+ * @param transformMode the transform mode
  */
 public record PFirstPersonItemPose(
 		PFirstPersonRenderMode mode,
@@ -27,6 +31,10 @@ public record PFirstPersonItemPose(
 	 * {@code transform} places the resolved camera-space item socket. Minecraft
 	 * still applies the item's FIRST_PERSON_*_HAND display transform and submits
 	 * the model through its normal item renderer.
+	 *
+	 * @param mode the rule used to combine the layer with the accumulated value
+	 * @param transform the transform; may be {@code null}
+	 * @param transformMode the transform mode
 	 */
 	public PFirstPersonItemPose
 	{
@@ -39,8 +47,9 @@ public record PFirstPersonItemPose(
 	}
 
 	/**
-	 * Performs the vanilla operation.
-	 * @return the value produced by this operation.
+	 * Creates a held-item presentation that retains vanilla first-person rendering.
+	 *
+	 * @return an item command retaining vanilla rendering
 	 */
 	public static PFirstPersonItemPose vanilla()
 	{
@@ -48,9 +57,10 @@ public record PFirstPersonItemPose(
 	}
 
 	/**
-	 * Performs the animated operation.
-	 * @param transform the transform to use.
-	 * @return the value produced by this operation.
+	 * Creates an animated held-item presentation with the requested transform composition policy.
+	 *
+	 * @param transform the transform
+	 * @return an item command using the supplied animation transform
 	 */
 	public static PFirstPersonItemPose animated(PTransform transform)
 	{
@@ -58,10 +68,11 @@ public record PFirstPersonItemPose(
 	}
 
 	/**
-	 * Performs the animated operation.
-	 * @param transform the transform to use.
-	 * @param transformMode the transform mode to use.
-	 * @return the value produced by this operation.
+	 * Creates an animated held-item presentation with the requested transform composition policy.
+	 *
+	 * @param transform the transform
+	 * @param transformMode the transform mode
+	 * @return an item command using the supplied animation transform
 	 */
 	public static PFirstPersonItemPose animated(PTransform transform, PFirstPersonTransformMode transformMode)
 	{
@@ -69,8 +80,9 @@ public record PFirstPersonItemPose(
 	}
 
 	/**
-	 * Performs the hidden operation.
-	 * @return the value produced by this operation.
+	 * Creates a held-item presentation that suppresses item geometry.
+	 *
+	 * @return an item command suppressing held-item geometry
 	 */
 	public static PFirstPersonItemPose hidden()
 	{

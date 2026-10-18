@@ -37,6 +37,12 @@ public final class PPlayerAnimationFrame
 	private final Map<String, PTransform> transforms = new HashMap<>();
 	private final Set<String> missingTransforms = new HashSet<>();
 
+	/**
+	 * Creates a sampled frame backed by the supplied animation definition and pose resolver.
+	 *
+	 * @param definition the immutable configuration to register or evaluate
+	 * @param resolver the resolver
+	 */
 	PPlayerAnimationFrame(PPlayerAnimationDefinition definition,
 	                      PAnimationPoseResolver<PPlayerAnimationInstance> resolver)
 	{
@@ -45,22 +51,44 @@ public final class PPlayerAnimationFrame
 		this.rootBone = definition.bindings().get(PPlayerPart.ROOT);
 	}
 
+	/**
+	 * Returns the immutable configuration to register or evaluate.
+	 *
+	 * @return the immutable configuration to register or evaluate
+	 */
 	public PPlayerAnimationDefinition definition()
 	{
 		return this.definition;
 	}
 
+	/**
+	 * Returns the resolver.
+	 *
+	 * @return the resolver
+	 */
 	public PAnimationPoseResolver<PPlayerAnimationInstance> resolver()
 	{
 		return this.resolver;
 	}
 
+	/**
+	 * Returns the sampled local transform of the named animation bone.
+	 *
+	 * @param boneName the animation bone name
+	 * @return the sampled local transform of the named animation bone, or {@code null} when the requested value is unavailable
+	 */
 	public @Nullable BoneFrame localTransform(String boneName)
 	{
 		PAnimationPoseResolver.BonePose pose = this.resolver.resolve(boneName);
 		return pose == null ? null : pose.localTransform();
 	}
 
+	/**
+	 * Returns the named bone's animation delta in canonical player model space.
+	 *
+	 * @param boneName the animation bone name
+	 * @return the named bone's animation delta in canonical player model space, or {@code null} when the requested value is unavailable
+	 */
 	public @Nullable PPlayerBonePose canonicalModelDelta(String boneName)
 	{
 		PTransform current = transform(boneName);
@@ -98,18 +126,36 @@ public final class PPlayerAnimationFrame
 		return translated || rotated || scaled ? new PPlayerBonePose(translation, rotation, scale, translated, rotated, scaled) : null;
 	}
 
+	/**
+	 * Returns the current model-space transform of the named bone.
+	 *
+	 * @param boneName the animation bone name
+	 * @return the current model-space transform of the named bone, or {@code null} when the requested value is unavailable
+	 */
 	public @Nullable PTransform modelTransform(String boneName)
 	{
 		return transform(boneName);
 	}
 
-	/** Writes the exact parent matrix product, including inherited nonuniform scale. */
+	/**
+	 * Writes the exact parent matrix product, including inherited nonuniform scale.
+	 *
+	 * @param boneName the animation bone name
+	 * @param destination the mutable object receiving the result
+	 * @return whether the requested transform was resolved and written to the destination
+	 */
 	public boolean modelMatrix(String boneName, Matrix4f destination)
 	{
 		return hierarchyMatrix(boneName, destination, false);
 	}
 
-	/** Writes the exact bind hierarchy in the same source-model basis. */
+	/**
+	 * Writes the exact bind hierarchy in the same source-model basis.
+	 *
+	 * @param boneName the animation bone name
+	 * @param destination the mutable object receiving the result
+	 * @return whether the requested transform was resolved and written to the destination
+	 */
 	public boolean bindMatrix(String boneName, Matrix4f destination)
 	{
 		return hierarchyMatrix(boneName, destination, true);
@@ -153,6 +199,12 @@ public final class PPlayerAnimationFrame
 		return true;
 	}
 
+	/**
+	 * Returns the unanimated model-space transform of the named bone.
+	 *
+	 * @param boneName the animation bone name
+	 * @return the unanimated model-space transform of the named bone, or {@code null} when the requested value is unavailable
+	 */
 	public @Nullable PTransform bindTransform(String boneName)
 	{
 		PAnimationPoseResolver.BonePose pose = this.resolver.resolve(boneName);
@@ -163,6 +215,11 @@ public final class PPlayerAnimationFrame
 	 * Returns the current MODEL transform in the ROOT bind frame (or HEAD bind
 	 * frame for rootless rigs). This includes animated ROOT motion and is for
 	 * callers whose outer stack has not already applied that motion.
+	 *
+	 * @param boneName the animation bone name
+	 * @return the current MODEL transform in the ROOT bind frame (or HEAD bind
+ frame for rootless rigs). This includes animated ROOT motion and is for
+ callers whose outer stack has not already applied that motion, or {@code null} when the requested value is unavailable
 	 */
 	public @Nullable PTransform rootRelativeTransform(String boneName)
 	{
@@ -184,6 +241,11 @@ public final class PPlayerAnimationFrame
 	 * Returns a bone in the current ROOT frame for a PoseStack that already
 	 * contains visual ROOT motion. Without ROOT, the head bind frame remains
 	 * the reference used by existing rootless player rigs.
+	 *
+	 * @param boneName the animation bone name
+	 * @return a bone in the current ROOT frame for a PoseStack that already
+ contains visual ROOT motion. Without ROOT, the head bind frame remains
+ the reference used by existing rootless player rigs, or {@code null} when the requested value is unavailable
 	 */
 	public @Nullable PTransform currentRootRelativeTransform(String boneName)
 	{
@@ -191,7 +253,13 @@ public final class PPlayerAnimationFrame
 		return currentRootRelativeMatrix(boneName, matrix) ? PTransform.fromMatrix(matrix) : null;
 	}
 
-	/** Exact rendering form of {@link #currentRootRelativeTransform(String)}. */
+	/**
+	 * Exact rendering form of {@link #currentRootRelativeTransform(String)} .
+	 *
+	 * @param boneName the animation bone name
+	 * @param destination the mutable object receiving the result
+	 * @return whether the requested transform was resolved and written to the destination
+	 */
 	public boolean currentRootRelativeMatrix(String boneName, Matrix4f destination)
 	{
 		if (!modelMatrix(boneName, destination))
@@ -212,7 +280,12 @@ public final class PPlayerAnimationFrame
 		return true;
 	}
 
-	/** Returns the full MODEL-space socket, including ROOT and every parent. */
+	/**
+	 * Returns the full MODEL-space socket, including ROOT and every parent.
+	 *
+	 * @param anchor the anchor
+	 * @return the full MODEL-space socket, including ROOT and every parent, or {@code null} when the requested value is unavailable
+	 */
 	public @Nullable PTransform actionTransform(PPlayerAnimationAnchor anchor)
 	{
 		String bone = this.definition.anchors().get(anchor);
@@ -223,6 +296,8 @@ public final class PPlayerAnimationFrame
 	 * Camera-origin displacement and orientation relative to bind, in the same
 	 * normalized source-model frame used by the native player. This is a pose
 	 * delta at the camera point, not the affine delta's translation at zero.
+	 *
+	 * @return the animated camera-anchor delta in model space, or {@code null} when the requested value is unavailable
 	 */
 	public @Nullable PTransform cameraAnchorModelDelta()
 	{

@@ -13,8 +13,14 @@ import com.arcanc.pulselib.content.mixin.NeoForgeCameraAccessor;
 import com.arcanc.pulselib.platform.IPulseCameraService;
 import net.minecraft.client.Camera;
 
+/**
+ * NeoForge camera rotation bridge using the loader's yaw, pitch and roll camera method.
+ */
 public final class NeoForgeCameraService implements IPulseCameraService
 {
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void setRotation(Camera camera, float yaw, float pitch, float roll)
 	{

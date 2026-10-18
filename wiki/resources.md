@@ -11,20 +11,23 @@ A public annotated plugin is discovered automatically. Declare every model with 
 
 ```java
 @PulsePlugin
-public final class ExamplePlugin implements IPulseClientPlugin {
-    @Override
-    public ResourceLocation getPluginId() {
-        return ResourceLocation.fromNamespaceAndPath("examplemod", "main");
-    }
+public final class ExamplePlugin implements IPulseClientPlugin
+{
+	@Override
+	public ResourceLocation getPluginId()
+	{
+		return ResourceLocation.fromNamespaceAndPath("examplemod", "main");
+	}
 
-    @Override
-    public void registerModels(PModelRegistrar registrar) {
-        PModelData robot = PModelData.entity(
-                ResourceLocation.fromNamespaceAndPath("examplemod", "robot"));
-        registrar.model(robot)
-                .texture("textures/body", ResourceLocation.fromNamespaceAndPath("examplemod", "entity/robot/body"))
-                .texture("textures/eyes", ResourceLocation.fromNamespaceAndPath("examplemod", "entity/robot/eyes"));
-    }
+	@Override
+	public void registerModels(PModelRegistrar registrar)
+	{
+		PModelData robot = PModelData.entity(
+				ResourceLocation.fromNamespaceAndPath("examplemod", "robot"));
+		registrar.model(robot).
+				texture("textures/body", ResourceLocation.fromNamespaceAndPath("examplemod", "entity/robot/body")).
+				texture("textures/eyes", ResourceLocation.fromNamespaceAndPath("examplemod", "entity/robot/eyes"));
+	}
 }
 ```
 
@@ -144,10 +147,10 @@ When a cube in a Gecko model has no `texture` field, PulseLib assigns the materi
 
 ```java
 PModelData robot = PModelData.entity(
-        ResourceLocation.fromNamespaceAndPath("examplemod", "robot"),
-        PGeckoModelLoader.INSTANCE.id());
-registrar.model(robot)
-        .texture("0", ResourceLocation.fromNamespaceAndPath("examplemod", "entity/robot/fallback"));
+		ResourceLocation.fromNamespaceAndPath("examplemod", "robot"),
+		PGeckoModelLoader.INSTANCE.id());
+registrar.model(robot).
+		texture("0", ResourceLocation.fromNamespaceAndPath("examplemod", "entity/robot/fallback"));
 ```
 
 ## Runtime atlas
@@ -156,8 +159,8 @@ The atlas is registered by PulseLib itself. Your mod contributes model-resource 
 
 Runtime atlas classes:
 
-* [`PResourceCache`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/PResourceCache.java)
-* [`RuntimeLoader`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/textures/atlas/RuntimeLoader.java)
+* [`PResourceCache`](../common/src/main/java/com/arcanc/pulselib/util/PResourceCache.java)
+* [`RuntimeLoader`](../common/src/main/java/com/arcanc/pulselib/content/model/textures/atlas/RuntimeLoader.java)
 
 PulseLib registers the atlas at:
 
@@ -193,16 +196,21 @@ The render type supplied to the renderer remains authoritative by default. Opt i
 
 `PMeshRenderContext` can override a mesh's colour, packed light, packed overlay, deformation, texture, emissive state, or alpha mode at render time. The replacement texture must still be registered in the runtime atlas. The first use of a `(base mesh, replacement texture)` pair lazily bakes and caches a matching `PBakedMesh`; later renders reuse it.
 
+Register extra variant textures in the same model declaration, for example `.texture("eyes_active", ResourceLocation.fromNamespaceAndPath("examplemod", "entity/robot/eyes_active"))`. The variant reference may be additional to those used by the exported primitives; registering it makes the sprite available in the runtime atlas.
+
 ```java
 @Override
 public PMeshRenderContext resolve(PBakedBone bone, PBakedMesh mesh,
-                                  PMeshRenderContext inherited) {
-    if (!mesh.textureReference().equals("textures/eyes"))
-        return inherited;
-    return inherited
-            .withTexture(ResourceLocation.fromNamespaceAndPath("examplemod", "entity/robot/eyes_active"))
-            .withEmissive(true)
-            .withAlphaMode(PAlphaMode.AUTO);
+		PMeshRenderContext inherited)
+{
+	if (!mesh.textureReference().equals("textures/eyes"))
+	{
+		return inherited;
+	}
+	return inherited.
+			withTexture(ResourceLocation.fromNamespaceAndPath("examplemod", "entity/robot/eyes_active")).
+			withEmissive(true).
+			withAlphaMode(PAlphaMode.AUTO);
 }
 ```
 
@@ -212,7 +220,7 @@ Prefer `withColor(...)`, `withPackedLight(...)`, `withPackedOverlay(...)`, and t
 
 ## Emissive textures
 
-Emissive textures are useful for eyes, screens, lamps, energy parts, and other pieces that should ignore normal light. PulseLib reads this flag from texture metadata through [`PLibMetadata`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/textures/atlas/PLibMetadata.java).
+Emissive textures are useful for eyes, screens, lamps, energy parts, and other pieces that should ignore normal light. PulseLib reads this flag from texture metadata through [`PLibMetadata`](../common/src/main/java/com/arcanc/pulselib/content/model/textures/atlas/PLibMetadata.java).
 
 To mark a texture as emissive, add a `.png.mcmeta` file next to it:
 
@@ -247,9 +255,9 @@ Direct `PBakedBone.instantDraw(...)` accepts the same render-type functions. Use
 
 Classes used:
 
-* [`PResourceCache`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/PResourceCache.java)
-* [`RuntimeLoader`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/textures/atlas/RuntimeLoader.java)
-* [`PLibMetadata`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/textures/atlas/PLibMetadata.java)
-* [`PAlphaMode`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/textures/PAlphaMode.java)
-* [`PTextureAlphaClassifier`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/textures/PTextureAlphaClassifier.java)
-* [`PRenderTypes`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java)
+* [`PResourceCache`](../common/src/main/java/com/arcanc/pulselib/util/PResourceCache.java)
+* [`RuntimeLoader`](../common/src/main/java/com/arcanc/pulselib/content/model/textures/atlas/RuntimeLoader.java)
+* [`PLibMetadata`](../common/src/main/java/com/arcanc/pulselib/content/model/textures/atlas/PLibMetadata.java)
+* [`PAlphaMode`](../common/src/main/java/com/arcanc/pulselib/content/model/textures/PAlphaMode.java)
+* [`PTextureAlphaClassifier`](../common/src/main/java/com/arcanc/pulselib/content/model/textures/PTextureAlphaClassifier.java)
+* [`PRenderTypes`](../common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java)

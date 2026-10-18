@@ -34,6 +34,9 @@ import java.nio.FloatBuffer;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Converts glTF model hierarchy, mesh accessors, materials and animation channels into common model data.
+ */
 public class PGltfModelParser
 {
 	private static final List<PGltfChannelDecoder<?>> CHANNEL_DECODERS = List.of(
@@ -106,6 +109,13 @@ public class PGltfModelParser
 				}
 			});
 
+	/**
+	 * Parses a glTF or GLB stream into source bones, meshes and animation clips.
+	 *
+	 * @param stream the source resource input stream
+	 * @return the parsed source-model hierarchy and geometry
+	 * @throws IOException if the source resource cannot be read
+	 */
 	public static PModel parse(InputStream stream) throws IOException
 	{
 		GltfModel model = new GltfModelReader().readWithoutReferences(stream);

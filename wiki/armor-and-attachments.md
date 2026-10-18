@@ -8,20 +8,20 @@ First-person arm attachments render through an enabled player-animation first-pe
 
 Important classes:
 
-* [`PLivingAttachmentDefinition`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentDefinition.java)
-* [`PLivingAttachments`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachments.java)
-* [`PLivingAttachmentSource`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentSource.java)
-* [`PLivingAttachmentSources`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentSources.java)
-* [`PAttachmentBinding`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentBinding.java)
-* [`PAttachmentAnchor`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentAnchor.java)
-* [`PAttachmentAnchorResolvers`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentAnchorResolvers.java)
-* [`PTransform`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PTransform.java)
-* [`PHumanoidAnchors`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidAnchors.java)
-* [`PHumanoidBindings`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidBindings.java)
-* [`PLivingAttachmentLayer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentLayer.java)
-* [`PHumanoidAttachmentLayer`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidAttachmentLayer.java)
+* [`PLivingAttachmentDefinition`](../common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentDefinition.java)
+* [`PLivingAttachments`](../common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachments.java)
+* [`PLivingAttachmentSource`](../common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentSource.java)
+* [`PLivingAttachmentSources`](../common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentSources.java)
+* [`PAttachmentBinding`](../common/src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentBinding.java)
+* [`PAttachmentAnchor`](../common/src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentAnchor.java)
+* [`PAttachmentAnchorResolvers`](../common/src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentAnchorResolvers.java)
+* [`PTransform`](../common/src/main/java/com/arcanc/pulselib/util/attachments/PTransform.java)
+* [`PHumanoidAnchors`](../common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidAnchors.java)
+* [`PHumanoidBindings`](../common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidBindings.java)
+* [`PLivingAttachmentLayer`](../common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentLayer.java)
+* [`PHumanoidAttachmentLayer`](../common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidAttachmentLayer.java)
 
-PulseLib adds attachment render layers for players and living entities automatically through [`PLibArmorHandler`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PLibArmorHandler.java). Attachment definitions are contributed in `IPulseClientPlugin.registerAttachments(PAttachmentRegistrar)`.
+PulseLib adds attachment render layers for players and living entities automatically through [`PLibArmorHandler`](../common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PLibArmorHandler.java). Attachment definitions are contributed in `IPulseClientPlugin.registerAttachments(PAttachmentRegistrar)`.
 
 ## Player-animation anchors and meshes
 
@@ -39,19 +39,35 @@ Armor is the most direct use case: register a living attachment definition for t
 
 ```java
 @PulsePlugin
-public final class ExamplePlugin implements IPulseClientPlugin {
-    @Override public ResourceLocation getPluginId() { return ResourceLocation.fromNamespaceAndPath("examplemod", "attachments"); }
-    @Override
-    public void registerAttachments(PAttachmentRegistrar registrar) {
-        registrar.registerLiving(MyItems.EXAMPLE_HELMET.get(),
-                new PLivingAttachmentDefinition(
-                        PModelData.entity(
-                                ResourceLocation.fromNamespaceAndPath("examplemod", "armor/example_helmet")),
-                        PLivingAttachmentSources.equipmentSlot(EquipmentSlot.HEAD),
-                        List.of(PHumanoidBindings.head("helmet")),
-                        PLivingMeshRenderResolvers.defaultLit(),
-                        true));
-    }
+public final class ExamplePlugin implements IPulseClientPlugin
+{
+	private static final PModelData HELMET_MODEL = PModelData.entity(
+			ResourceLocation.fromNamespaceAndPath("examplemod", "armor/example_helmet"));
+
+	@Override
+	public ResourceLocation getPluginId()
+	{
+		return ResourceLocation.fromNamespaceAndPath("examplemod", "attachments");
+	}
+
+	@Override
+	public void registerModels(PModelRegistrar registrar)
+	{
+		registrar.model(HELMET_MODEL).texture("base",
+				ResourceLocation.fromNamespaceAndPath("examplemod", "armor/example_helmet"));
+	}
+
+	@Override
+	public void registerAttachments(PAttachmentRegistrar registrar)
+	{
+		registrar.registerLiving(MyItems.EXAMPLE_HELMET.get(),
+				new PLivingAttachmentDefinition(
+						HELMET_MODEL,
+						PLivingAttachmentSources.equipmentSlot(EquipmentSlot.HEAD),
+						List.of(PHumanoidBindings.head("helmet")),
+						PLivingMeshRenderResolvers.defaultLit(),
+						true));
+	}
 }
 ```
 
@@ -61,6 +77,8 @@ For the default glTF loader this model path resolves to:
 assets/examplemod/glmodels/entity/armor/example_helmet.glb
 ```
 
+If the GLB is absent, the loader tries the same path with `.gltf`. This example expects material reference `base` and texture `assets/examplemod/textures/armor/example_helmet.png`; use the exact reference exported by your model.
+
 `hideVanilla = true` makes the loader armor adapter hide the vanilla armor model for matching equipment slots. Use it when the PulseLib model fully replaces the vanilla armor layer.
 
 ## General attachment item
@@ -69,19 +87,19 @@ Attachments are not limited to armor slots. A held item can render a tail, an am
 
 ```java
 registrar.registerLiving(MyItems.TAIL.get(),
-        new PLivingAttachmentDefinition(
-                PModelData.entity(
-                        ResourceLocation.fromNamespaceAndPath("examplemod", "attachment/tail")),
-                PLivingAttachmentSources.hand(),
-                List.of(PHumanoidBindings.bind(
-                        PHumanoidAnchors.BODY,
-                        "tail",
-                        PTransform.of(
-                                new Vector3f(0.0f, -0.2f, 0.4f),
-                                new Vector3f(90.0f, 0.0f, 0.0f),
-                                new Vector3f(1.0f, 1.0f, 1.0f)))),
-                PLivingMeshRenderResolvers.defaultLit(),
-                false));
+		new PLivingAttachmentDefinition(
+				PModelData.entity(
+						ResourceLocation.fromNamespaceAndPath("examplemod", "attachment/tail")),
+				PLivingAttachmentSources.hand(),
+				List.of(PHumanoidBindings.bind(
+						PHumanoidAnchors.BODY,
+						"tail",
+						PTransform.of(
+								new Vector3f(0.0f, -0.2f, 0.4f),
+								new Vector3f(90.0f, 0.0f, 0.0f),
+								new Vector3f(1.0f, 1.0f, 1.0f)))),
+				PLivingMeshRenderResolvers.defaultLit(),
+				false));
 ```
 
 `PLivingAttachmentSource` controls when a definition renders. Built-in factories:
@@ -98,16 +116,16 @@ Global attachments use the same definition type:
 
 ```java
 registrar.registerGlobalLiving(new PLivingAttachmentDefinition(
-        MODEL_DATA,
-        PLivingAttachmentSources.entityPredicate(entity -> entity.isInvisible()),
-        List.of(PHumanoidBindings.body("aura")),
-        PLivingMeshRenderResolvers.defaultLit(),
-        false));
+		MODEL_DATA,
+		PLivingAttachmentSources.entityPredicate(entity -> entity.isInvisible()),
+		List.of(PHumanoidBindings.body("aura")),
+		PLivingMeshRenderResolvers.defaultLit(),
+		false));
 ```
 
 ## Humanoid anchors
 
-Built-in anchors from [`PHumanoidAnchors`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidAnchors.java):
+Built-in anchors from [`PHumanoidAnchors`](../common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidAnchors.java):
 
 * `HEAD`
 * `HAT`
@@ -117,7 +135,7 @@ Built-in anchors from [`PHumanoidAnchors`](https://github.com/ArcAnc/PulseLib/bl
 * `RIGHT_LEG`
 * `LEFT_LEG`
 
-Use [`PHumanoidBindings`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidBindings.java) for common bindings:
+Use [`PHumanoidBindings`](../common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidBindings.java) for common bindings:
 
 ```java
 PHumanoidBindings.head("helmet");
@@ -130,30 +148,28 @@ Use `PHumanoidBindings.bind(anchor, bone, transform)` when you need offset, rota
 
 ## Custom anchors
 
-Register anchors for custom vanilla `EntityModel` classes through [`PAttachmentAnchorResolvers`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentAnchorResolvers.java):
+Register anchors for custom vanilla `EntityModel` classes through [`PAttachmentAnchorResolvers`](../common/src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentAnchorResolvers.java):
 
 ```java
 public static final PAttachmentAnchor SHELL =
-        PAttachmentAnchor.of(ResourceLocation.fromNamespaceAndPath("examplemod", "shell"));
+		PAttachmentAnchor.of(ResourceLocation.fromNamespaceAndPath("examplemod", "shell"));
 
-public static void registerAnchors() {
-    PAttachmentAnchorResolvers.register(MyEntityModel.class, SHELL,
-            (entity, model) -> ((MyEntityModel<?>) model).shell);
+public static void registerAnchors()
+{
+	PAttachmentAnchorResolvers.register(MyEntityModel.class, SHELL,
+			(entity, model) -> ((MyEntityModel<?>) model).shell);
 }
 ```
 
 ## Custom mesh rendering
 
-Each definition takes a [`PLivingMeshRenderResolver`](https://github.com/ArcAnc/PulseLib/blob/1.21.1-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingMeshRenderResolver.java). The resolver receives the living entity, stack, baked bone, baked mesh, inherited render context, and partial tick.
+Each definition takes a [`PLivingMeshRenderResolver`](../common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingMeshRenderResolver.java). The resolver receives the living entity, stack, baked bone, baked mesh, inherited render context, and partial tick.
 
 ```java
-PLivingMeshRenderResolver resolver = (entity, stack, bone, mesh, inherited, partialTick) -> {
-    int color = stack.hasFoil() ? 0xFF80FFFF : inherited.color();
-    return new PMeshRenderContext(
-            inherited.renderType(),
-            color,
-            inherited.packedLight(),
-            inherited.packedOverlay());
+PLivingMeshRenderResolver resolver = (entity, stack, bone, mesh, inherited, partialTick) ->
+{
+	int color = stack.hasFoil() ? 0xFF80FFFF : inherited.color();
+	return inherited.withColor(color);
 };
 ```
 
@@ -161,19 +177,21 @@ Use `PLivingMeshRenderResolvers.defaultLit()` or `inherited()` when you do not n
 
 ## Animated attachments
 
-`PLivingAttachmentDefinition` can supply standalone controllers. This is useful when the attachment is not itself an item/entity/block entity implementing `PAnimatable`.
+`PLivingAttachmentDefinition.ControllerProvider` supplies controllers for each render sample. For an attachment backed by an animatable item, reuse its stack-specific manager:
 
 ```java
-PLivingAttachmentDefinition.ControllerProvider provider = (entity, stack, model, partialTick) -> {
-    PAnimationController<MyAttachmentAnimatable> controller =
-            new PAnimationController<>("idle", state -> {
-                state.controller().play(IDLE);
-                return ControllerState.PLAY;
-            });
-
-    controller.tick(MY_ATTACHMENT_ANIMATABLE, 1, model);
-    return List.of(controller);
+PLivingAttachmentDefinition.ControllerProvider provider = (entity, stack, model, partialTick) ->
+{
+	if (stack.isEmpty() || !(stack.getItem() instanceof PAnimatable<?>))
+	{
+		return List.of();
+	}
+	PAnimationManager<?> manager = PLibHelper.getManager(stack);
+	manager.bindModel(model);
+	return List.copyOf(manager.getControllers().values());
 };
 ```
 
-For real items, cache controllers per entity or stack instead of creating a new controller every frame.
+Pass the provider as the definition constructor's final argument. Its item must register controllers using animation names present in the attachment model. This shares the item's keyed timeline, so use a dedicated manager if the item renderer needs an incompatible model.
+
+Attachments without a `PAnimatable` can supply standalone controllers instead. Retain them per attachment owner, tick once per game tick with the real elapsed time, and release them when the owner disappears. Creating or ticking a fresh controller in this render callback resets playback or makes its speed depend on frame rate.

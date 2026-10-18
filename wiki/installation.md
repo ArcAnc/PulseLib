@@ -26,7 +26,7 @@ dependencies {
 }
 ```
 
-These coordinates describe the prepared 1.2.0 beta; it has not been published by this update. Use a version actually published to the repository. Refresh Gradle after changing dependencies. `common` is a development module, not an installable mod or Maven dependency published by this build. Mods using the old NeoForge API may need [source adaptation](plugins.md#migrating-from-pulselib-11x).
+These coordinates match this checkout's `mod_version=1.2.0` (`beta` release type); they do not establish repository availability. Use a version available in the Maven repository and refresh Gradle after changing dependencies. `common` is a development module, not an installable mod or Maven dependency published by this build. Mods using the old NeoForge API may need [source adaptation](plugins.md#migrating-from-pulselib-11x).
 
 Declare PulseLib as a required mod dependency in your loader metadata. For Fabric this is the ordinary `depends.pulselib` declaration; [PulseLib plugins](plugins.md) require no extra entrypoint. Ordinary mod initialization for registering Minecraft items/blocks still uses the loader's normal lifecycle.
 
@@ -41,6 +41,14 @@ Download the artifact matching your loader from [CurseForge](https://www.cursefo
 ```
 
 This is also the standard CI command: it compiles all three modules, runs JUnit tests and builds both loader JARs. CI uploads the JARs and test reports; it does not start Minecraft or the demo mod.
+
+Generate the API documentation for all three modules with Java 21:
+
+```sh
+./gradlew :common:javadoc :fabric:javadoc :neoforge:javadoc
+```
+
+Each module writes its documentation to `<module>/build/docs/javadoc/index.html`. The [API reference](api-reference.md) maps the main entry points to their source files.
 
 Client/server runs are manual:
 

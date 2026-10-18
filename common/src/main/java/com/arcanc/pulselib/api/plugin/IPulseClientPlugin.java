@@ -19,18 +19,38 @@ import com.arcanc.pulselib.api.registration.PPlayerAnimationRegistrar;
  */
 public interface IPulseClientPlugin extends IPulseCommonPlugin
 {
+	/**
+	 * Declares models and texture overrides to load during client resource reloads.
+	 *
+	 * @param registrar the active registration scope for this callback
+	 */
 	default void registerModels(PModelRegistrar registrar)
 	{
 	}
 
+	/**
+	 * Registers item-specific and global attachments for living entity rendering.
+	 *
+	 * @param registrar the active registration scope for this callback
+	 */
 	default void registerAttachments(PAttachmentRegistrar registrar)
 	{
 	}
 
+	/**
+	 * Registers named player animation definitions.
+	 *
+	 * @param registrar the active registration scope for this callback
+	 */
 	default void registerPlayerAnimations(PPlayerAnimationRegistrar registrar)
 	{
 	}
 
+	/**
+	 * Registers renderers for attachments driven by player animation bones.
+	 *
+	 * @param registrar the active registration scope for this callback
+	 */
 	default void registerAnimatedAttachments(PAnimatedAttachmentRegistrar registrar)
 	{
 	}

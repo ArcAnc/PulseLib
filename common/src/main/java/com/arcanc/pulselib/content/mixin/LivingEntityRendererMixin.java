@@ -26,13 +26,33 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+/**
+ * Applies player pose animation and deformation around vanilla living-entity rendering.
+ *
+ * @param <T> the entity type rendered or animated by this contract
+ * @param <M> the entity type rendered or animated by this contract
+ */
 @Mixin(LivingEntityRenderer.class)
 public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extends EntityModel<T>>
 {
 	@Unique private @Nullable PPlayerAnimations.PPlayerModelPose pulselib$playerPose;
 
+	/**
+	 * Vanilla living-entity model temporarily modified during player animation rendering.
+	 */
 	@Shadow protected M model;
 
+	/**
+	 * Applies player animation and mesh deformation before the living model renders.
+	 *
+	 * @param entity the entity being animated or rendered
+	 * @param entityYaw the entity yaw in degrees
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param poseStack the current model-to-render pose stack
+	 * @param bufferSource the vanilla vertex buffer source
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param ci the Mixin callback for the intercepted method
+	 */
 	@Inject(
 			method = "render",
 			at = @At(
@@ -59,6 +79,17 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
 		PPlayerAnimations.applyRoot(player, poseStack, partialTick);
 	}
 
+	/**
+	 * Restores vanilla model-part transforms after living entity rendering.
+	 *
+	 * @param entity the entity being animated or rendered
+	 * @param entityYaw the entity yaw in degrees
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param poseStack the current model-to-render pose stack
+	 * @param bufferSource the vanilla vertex buffer source
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param ci the Mixin callback for the intercepted method
+	 */
 	@Inject(method = "render", at = @At("RETURN"))
 	private void pulselib$restorePlayerAnimations(T entity,
 	                                               float entityYaw,

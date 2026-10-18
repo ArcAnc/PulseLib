@@ -16,7 +16,14 @@ import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import net.minecraft.resources.ResourceLocation;
 
 /**
- * Immutable value object representing player first person mesh attachment pose.
+ * Animation mesh root and exact transform resolved for first-person rendering.
+ *
+ * @param animation the namespaced resource or registry identifier
+ * @param modelData the canonical model and loader selection
+ * @param root the root
+ * @param frame the frame matrices or sampled animation values used by this operation
+ * @param transform the transform
+ * @param weight the contribution weight
  */
 public record PPlayerFirstPersonMeshAttachmentPose(
 		ResourceLocation animation,

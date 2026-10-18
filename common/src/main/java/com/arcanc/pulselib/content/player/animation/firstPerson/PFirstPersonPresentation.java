@@ -32,9 +32,10 @@ public final class PFirstPersonPresentation
 	private final Matrix4f scratchBasis = new Matrix4f();
 
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param frame the frame to use.
-	 * @param modelToView the model to view to use.
+	 * Creates first-person matrix resolution using the sampled frame and model-to-view basis.
+	 *
+	 * @param frame the frame matrices or sampled animation values used by this operation
+	 * @param modelToView the model to view
 	 */
 	private PFirstPersonPresentation(PPlayerAnimationFrame frame,
 	                                 Matrix4f modelToView)
@@ -44,9 +45,10 @@ public final class PFirstPersonPresentation
 	}
 
 	/**
-	 * Performs the create operation.
-	 * @param frame the frame to use.
-	 * @return the value produced by this operation.
+	 * Creates exact first-person matrix resolution for the sampled animation frame.
+	 *
+	 * @param frame the frame matrices or sampled animation values used by this operation
+	 * @return a first-person matrix resolver for the sampled animation frame, or {@code null} when the requested value is unavailable
 	 */
 	public static @Nullable PFirstPersonPresentation create(PPlayerAnimationFrame frame)
 	{
@@ -61,7 +63,13 @@ public final class PFirstPersonPresentation
 		return new PFirstPersonPresentation(frame, currentCamera.invert());
 	}
 
-	/** Writes {@code M_viewRoot * M_boneModel}. */
+	/**
+	 * Writes {@code M_viewRoot * M_boneModel} .
+	 *
+	 * @param boneName the animation bone name
+	 * @param destination the mutable object receiving the result
+	 * @return whether the requested transform was resolved and written to the destination
+	 */
 	public boolean boneMatrix(String boneName, Matrix4f destination)
 	{
 		if (!this.frame.modelMatrix(boneName, destination))
@@ -71,10 +79,11 @@ public final class PFirstPersonPresentation
 	}
 
 	/**
-	 * Performs the anchor matrix operation.
-	 * @param anchor the anchor to use.
-	 * @param destination the destination to use.
-	 * @return the value produced by this operation.
+	 * Writes an animated action-anchor matrix when the requested anchor can be resolved.
+	 *
+	 * @param anchor the anchor
+	 * @param destination the mutable object receiving the result
+	 * @return whether the requested transform was resolved and written to the destination
 	 */
 	public boolean anchorMatrix(PPlayerAnimationAnchor anchor, Matrix4f destination)
 	{
@@ -85,6 +94,10 @@ public final class PFirstPersonPresentation
 	/**
 	 * Matrix immediately before Minecraft applies the corresponding arm
 	 * ModelPart, composed from the canonical MODEL-space arm matrix.
+	 *
+	 * @param part the player model part receiving the contribution
+	 * @param destination the mutable object receiving the result
+	 * @return whether the requested transform was resolved and written to the destination
 	 */
 	public boolean armPreModelPartMatrix(PPlayerPart part, Matrix4f destination)
 	{
@@ -119,6 +132,10 @@ public final class PFirstPersonPresentation
 	/**
 	 * Matrix immediately before Minecraft submits a held item.  Item anchors
 	 * inherit their canonical skeleton hierarchy in the same way as arms.
+	 *
+	 * @param anchor the anchor
+	 * @param destination the mutable object receiving the result
+	 * @return whether the requested transform was resolved and written to the destination
 	 */
 	public boolean itemMatrix(PPlayerAnimationAnchor anchor, Matrix4f destination)
 	{
