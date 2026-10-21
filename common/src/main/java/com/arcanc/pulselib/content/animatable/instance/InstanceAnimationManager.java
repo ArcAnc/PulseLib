@@ -14,25 +14,29 @@ import com.arcanc.pulselib.content.animatable.AnimManagerKey;
 import com.arcanc.pulselib.content.animatable.PAnimatable;
 import com.arcanc.pulselib.content.animatable.PAnimationManager;
 import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.util.Util;
+import net.minecraft.client.multiplayer.ClientLevel;
 
-import java.util.Objects;
-import java.util.Set;
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 /**
+ * Tracks animation managers whose lifetime follows individual entity or block entity owners.
+ * <p>
  * Part of this code copied from Geckolib: <a href="https://github.com/bernie-g/geckolib/blob/1.21.1/common/src/main/java/software/bernie/geckolib/animatable/instance/InstancedAnimatableInstanceCache.java">InstancedAnimatableInstanceCache</a>
  * <p>Stop crying, Tslat!</p>
  * <p>Modified by ArcAnc</p>
+ *
+ * @param <T> the animatable owner type
  */
 public class InstanceAnimationManager<T extends PAnimatable<T>> extends PAnimationManager<T>
 {
-	private static final Set<AnimationManagerContainer<?>> MANAGERS = new ObjectOpenHashSet<>();
-	
+	private static final Map<InstanceAnimationManager<?>, Long> MANAGERS = new IdentityHashMap<>();
+
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param animatable the animatable to use.
+	 * Creates directly owned animation state for the supplied animatable.
+	 *
+	 * @param animatable the owner whose animation state is being processed
 	 */
 	public InstanceAnimationManager(T animatable)
 	{
@@ -40,119 +44,95 @@ public class InstanceAnimationManager<T extends PAnimatable<T>> extends PAnimati
 	}
 
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param animatable the animatable to use.
-	 * @param key the key to use.
+	 * Creates directly owned animation state for the supplied animatable.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param key the key
 	 */
 	public InstanceAnimationManager(T animatable, AnimManagerKey key)
 	{
 		super(animatable, key);
-		createControllers();
 	}
-	
+
 	/**
-	 * Updates the all.
+	 * Ticks every tracked instance animation manager.
 	 */
 	public static void tickAll()
 	{
-		MANAGERS.forEach(container ->
-				container.manager().tick());
+		MANAGERS.keySet().forEach(PAnimationManager :: tick);
 	}
-	
+
 	/**
-	 * Adds the manager.
-	 * @param manager the manager to use.
+	 * Tracks an instance manager and records its most recent use time.
+	 *
+	 * @param manager the manager
 	 */
 	public static void addManager(PAnimationManager<?> manager)
 	{
-		if (manager instanceof InstanceAnimationManager<?> instance)
-			MANAGERS.add(new AnimationManagerContainer<>(Util.getEpochMillis(), instance));
+		addManager(manager, Util.getEpochMillis());
 	}
-	
+
 	/**
-	 * Removes the unused.
+	 * Package-private time seam shared by real rendering access and deterministic tests.
+	 *
+	 * @param manager the manager
+	 * @param now the current manager-maintenance timestamp
+	 */
+	static void addManager(PAnimationManager<?> manager, long now)
+	{
+		if (manager instanceof InstanceAnimationManager<?> instance)
+		{
+			MANAGERS.put(instance, now);
+		}
+	}
+
+	/**
+	 * Removes instance managers whose idle time exceeds the retention threshold.
 	 */
 	public static void removeUnused()
 	{
 		ClientLevel level = PLibRenderHelper.mc().level;
 		if (level == null)
+		{
 			return;
+		}
 		if (level.getGameTime() % 200 != 0)
+		{
 			return;
+		}
 		if (MANAGERS.isEmpty())
+		{
 			return;
-		
-		long now = Util.getEpochMillis();
-		
-		MANAGERS.removeIf(container -> container.lastUsedTick() + THRESHOLD_TIME < now);
+		}
+
+		removeUnused(Util.getEpochMillis());
 	}
-	
+
 	/**
-	 * Performs the clean up operation.
+	 * Expires entries relative to their most recent access, retaining the existing 5s TTL.
+	 *
+	 * @param now the current manager-maintenance timestamp
+	 */
+	static void removeUnused(long now)
+	{
+		MANAGERS.entrySet().removeIf(entry -> entry.getValue() + THRESHOLD_TIME < now);
+	}
+
+	/**
+	 * Discards all tracked instance animation managers.
 	 */
 	public static void cleanUp()
 	{
 		MANAGERS.clear();
 	}
-	
-/**
- * Provides support for animation manager container.
- */
-	static class AnimationManagerContainer<T extends PAnimatable<T>>
+
+	/**
+	 * Removes the animation manager associated with the supplied owner.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 */
+	public static void removeManager(Object animatable)
 	{
-		long lastUsedTick;
-		InstanceAnimationManager<T> manager;
-		
-		/**
-		 * Creates an instance of the enclosing type.
-		 * @param lastUsedTick the last used tick to use.
-		 * @param manager the manager to use.
-		 */
-		AnimationManagerContainer(long lastUsedTick, InstanceAnimationManager<T> manager)
-		{
-			this.lastUsedTick = lastUsedTick;
-			this.manager = manager;
-		}
-		
-		/**
-		 * Performs the manager operation.
-		 * @return the value produced by this operation.
-		 */
-		InstanceAnimationManager<T> manager()
-		{
-			return this.manager;
-		}
-		
-		/**
-		 * Performs the last used tick operation.
-		 * @return the value produced by this operation.
-		 */
-		long lastUsedTick()
-		{
-			return this.lastUsedTick;
-		}
-		
-		/**
-		 * Performs the equals operation.
-		 * @param o the o to use.
-		 * @return the value produced by this operation.
-		 */
-		@Override
-		public boolean equals(Object o)
-		{
-			if (! (o instanceof AnimationManagerContainer<?> that))
-				return false;
-			return Objects.equals(this.manager, that.manager);
-		}
-		
-		/**
-		 * Performs the hash code operation.
-		 * @return the value produced by this operation.
-		 */
-		@Override
-		public int hashCode()
-		{
-			return Objects.hashCode(this.manager);
-		}
+		MANAGERS.keySet().removeIf(manager -> manager.getAnimatable() == animatable);
 	}
 }

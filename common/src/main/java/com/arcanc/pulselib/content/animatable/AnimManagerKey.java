@@ -1,6 +1,6 @@
 /**
  * @author ArcAnc
- * Created at: 06.04.2026
+ * Created at: 13.04.2026
  * Copyright (c) 2026
  * <p>
  * This code is licensed under "Arc's License of Common Sense"
@@ -11,21 +11,23 @@ package com.arcanc.pulselib.content.animatable;
 
 
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.Objects;
 
 /**
- * Immutable value object representing anim manager key.
+ * Identity used to select animation state for an entity, block entity, item stack or arbitrary owner.
+ *
+ * @param key the key
  */
 public record AnimManagerKey(long key)
 {
 	/**
-	 * Performs the of object operation.
-	 * @param animatable the animatable to use.
-	 * @return the value produced by this operation.
+	 * Builds an animation manager key from the identity of an arbitrary owner.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @return the identity key for the supplied owner
 	 */
 	public static AnimManagerKey ofObject(Object animatable)
 	{
@@ -34,38 +36,45 @@ public record AnimManagerKey(long key)
 			case ItemStack stack -> of(stack);
 			case BlockEntity be -> of(be);
 			case Entity entity -> of(entity);
-			default -> new AnimManagerKey(animatable.hashCode());
+			default -> new AnimManagerKey(Integer.toUnsignedLong(animatable.hashCode()));
 		};
 	}
 	
 	/**
-	 * Performs the of operation.
-	 * @param stack the stack to use.
-	 * @return the value produced by this operation.
+	 * Gets a client runtime identity. The sign bit reserves item keys without changing
+	 * the public long-key API; other factory methods always return nonnegative keys.
+	 * @throws IllegalArgumentException if the stack is empty or is not animated.
+	 *
+	 * @param stack the item stack supplying render or animation state
+	 * @return the identity key for the supplied owner
 	 */
 	public static AnimManagerKey of(ItemStack stack)
 	{
-		int itemId = Item.getId(stack.getItem());
-		int count = stack.getCount();
-		int dataMap = stack.getComponents().hashCode();
-		return new AnimManagerKey(Objects.hash(itemId, count, dataMap));
+		long id = ((PItemStackAnimationData)(Object)stack).pulselib$getOrCreateAnimationId();
+		if (stack.isEmpty() || id == 0)
+		{
+			throw new IllegalArgumentException("Animation keys require a nonempty PItemAnimatable stack");
+		}
+		return new AnimManagerKey(Long.MIN_VALUE | id);
 	}
 	
 	/**
-	 * Performs the of operation.
-	 * @param entity the entity to use.
-	 * @return the value produced by this operation.
+	 * Builds an animation manager key for the supplied owner.
+	 *
+	 * @param entity the entity being animated or rendered
+	 * @return the identity key for the supplied owner
 	 */
 	public static AnimManagerKey of (Entity entity)
 	{
-		return new AnimManagerKey(entity.getUUID().getMostSignificantBits() ^
-				entity.getUUID().getLeastSignificantBits());
+		return new AnimManagerKey((entity.getUUID().getMostSignificantBits() ^
+				entity.getUUID().getLeastSignificantBits()) & Long.MAX_VALUE);
 	}
 	
 	/**
-	 * Performs the of operation.
-	 * @param blockEntity the block entity to use.
-	 * @return the value produced by this operation.
+	 * Builds an animation manager key for the supplied owner.
+	 *
+	 * @param blockEntity the block entity
+	 * @return the identity key for the supplied owner
 	 */
 	public static AnimManagerKey of(BlockEntity blockEntity)
 	{
@@ -73,25 +82,26 @@ public record AnimManagerKey(long key)
 		long blockPos = blockEntity.getBlockPos().asLong();
 		int levelId = blockEntity.hasLevel() ? blockEntity.getLevel().dimension().hashCode() : 0;
 		
-		return new AnimManagerKey(Objects.hash(type, blockPos, levelId));
+		return new AnimManagerKey(Integer.toUnsignedLong(Objects.hash(type, blockPos, levelId)));
 	}
 	
 	/**
-	 * Performs the equals operation.
-	 * @param o the o to use.
-	 * @return the value produced by this operation.
+	 * {@inheritDoc}
 	 */
 	@Override
 	public boolean equals(Object o)
 	{
 		if (! (o instanceof AnimManagerKey (long other)))
+		{
 			return false;
+		}
 		return key() == other;
 	}
 	
 	/**
-	 * Performs the hash code operation.
-	 * @return the value produced by this operation.
+	 * Returns the hash code.
+	 *
+	 * @return the hash code
 	 */
 	@Override
 	public int hashCode()

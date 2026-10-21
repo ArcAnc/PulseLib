@@ -12,7 +12,7 @@ package com.arcanc.pulselib.content.registration.item;
 
 import com.arcanc.pulselib.content.animatable.AnimManagerKey;
 import com.arcanc.pulselib.content.animatable.ControllerState;
-import com.arcanc.pulselib.content.animatable.PAnimatable;
+import com.arcanc.pulselib.content.animatable.PItemAnimatable;
 import com.arcanc.pulselib.content.animatable.PAnimationManager;
 import com.arcanc.pulselib.content.animatable.singleton.SingletonAnimationManager;
 import com.arcanc.pulselib.content.model.animation.PRawAnimation;
@@ -23,7 +23,7 @@ import org.jspecify.annotations.NonNull;
 /**
  * Provides support for test block item.
  */
-public class TestBlockItem extends BlockItem implements PAnimatable<TestBlockItem>
+public class TestBlockItem extends BlockItem implements PItemAnimatable<TestBlockItem>
 {
 	private final PRawAnimation idle = PRawAnimation.begin().
 			thenLoop("idle").

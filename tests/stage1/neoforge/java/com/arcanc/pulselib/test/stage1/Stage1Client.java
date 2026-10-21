@@ -26,6 +26,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
 import net.minecraft.resources.Identifier;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent;
@@ -67,6 +68,10 @@ public final class Stage1Client implements IPulseClientPlugin
 		bus.addListener((RegisterSpecialModelRendererEvent event) ->
 				event.register(PLibDatabase.rl("test_block"), TestBlockItemRenderer.Unbaked.MAP_CODEC));
 		NeoForge.EVENT_BUS.addListener(Stage1Client::tick);
+		if (Boolean.getBoolean("pulselib.stage31Probe"))
+		{
+			NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, Stage31ItemIdentityProbe::shutdown);
+		}
 	}
 
 	private static void renderers(EntityRenderersEvent.RegisterRenderers event)
@@ -127,6 +132,10 @@ public final class Stage1Client implements IPulseClientPlugin
 					message -> LogUtils.getLogger().info("{}", message.getString()));
 		}
 		boolean pluginProbe = Boolean.getBoolean("pulselib.stage2Probe");
+		if (Boolean.getBoolean("pulselib.stage31Probe") && worldTicks == 75)
+		{
+			Stage31ItemIdentityProbe.verify();
+		}
 		if (pluginProbe && worldTicks == 50)
 		{
 			verifyCameraService(minecraft);

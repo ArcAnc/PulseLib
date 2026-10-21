@@ -10,6 +10,7 @@
     "requireAnnotations": true
   },
   "client": [
+    "ItemStackMixin",
     "BlockEntityRenderStateAccessor",
     "CameraMixin",
     "CubeDefinitionMixin",
