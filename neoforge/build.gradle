@@ -1,0 +1,52 @@
+plugins {
+    id 'multiloader-loader'
+    id 'net.neoforged.moddev'
+    id 'multiloader-publishing'
+}
+
+neoForge {
+    version = neo_version
+    runs {
+        client {
+            client()
+            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
+        }
+        server {
+            server()
+            programArgument '--nogui'
+            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
+        }
+        gameTestServer {
+            type = 'gameTestServer'
+            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
+        }
+        data {
+            clientData()
+            gameDirectory = project.file('run-data')
+            programArguments.addAll '--mod', mod_id, '--all', '--output',
+                    file('src/generated/resources/').absolutePath, '--existing', file('src/main/resources/').absolutePath
+        }
+        configureEach {
+            ideName = "NeoForge ${it.name.capitalize()} (PulseLib)"
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            logLevel = org.slf4j.event.Level.DEBUG
+        }
+    }
+    mods {
+        pulselib { sourceSet sourceSets.main }
+    }
+}
+
+dependencies {
+    ['de.javagl:jgltf-model:2.0.3', 'de.javagl:jgltf-impl-v1:2.0.3', 'de.javagl:jgltf-impl-v2:2.0.3',
+     'com.fasterxml.jackson.core:jackson-databind:2.13.2.1',
+     'com.fasterxml.jackson.core:jackson-annotations:2.13.2', 'com.fasterxml.jackson.core:jackson-core:2.13.2'].each {
+        jarJar it
+    }
+}
+
+sourceSets.main.resources {
+    srcDir 'src/main/templates'
+    srcDir 'src/generated/resources'
+    exclude 'src/generated/**/.cache'
+}

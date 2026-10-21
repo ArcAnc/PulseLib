@@ -20,3 +20,10 @@ run/
 **/src/generated/**/.cache/
 repo/
 !**/src/**/repo/
+
+# MultiLoader runtime files; preserve existing local worlds and diagnostics.
+**/runs/
+**/logs/
+**/crash-reports/
+**/hs_err_pid*.log
+**/replay_pid*.log
