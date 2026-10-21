@@ -1,0 +1,135 @@
+/**
+ * @author ArcAnc
+ * Created at: 12.10.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
+package com.arcanc.pulselib.api.registration;
+
+import com.arcanc.pulselib.content.model.PTextureReference;
+import com.arcanc.pulselib.content.model.resource.PModelResource;
+import com.arcanc.pulselib.content.renderer.modelData.PModelData;
+import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
+import com.arcanc.pulselib.util.PModelCache;
+import net.minecraft.resources.Identifier;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+
+/**
+ * Collects canonical model declarations and their per-reference texture overrides.
+ */
+public class PModelRegistrar extends PulseRegistrar
+{
+	private final Map<Identifier, ModelRegistration> models = new LinkedHashMap<>();
+
+	/**
+	 * Declares a canonical model and returns its texture override configuration.
+	 *
+	 * @param data the canonical model and loader selection
+	 * @return the model registration whose texture overrides can be configured
+	 */
+	public ModelRegistration model(PModelData data)
+	{
+		return model(data.getModelId(), data.getModelLoaderId());
+	}
+
+	/**
+	 * Declares a canonical model and returns its texture override configuration.
+	 *
+	 * @param id the namespaced resource or registration identifier
+	 * @return the model registration whose texture overrides can be configured
+	 */
+	public ModelRegistration model(Identifier id)
+	{
+		return model(id, PGltfModelLoader.INSTANCE.id());
+	}
+
+	/**
+	 * Declares a canonical model and returns its texture override configuration.
+	 *
+	 * @param id the namespaced resource or registration identifier
+	 * @param loader the loader
+	 * @return the model registration whose texture overrides can be configured
+	 */
+	public ModelRegistration model(Identifier id, Identifier loader)
+	{
+		checkOpen();
+		Objects.requireNonNull(id, "model id");
+		Objects.requireNonNull(loader, "loader id");
+		PModelCache.getModelLoader(loader).
+				orElseThrow(() -> new IllegalStateException("No model loader registered for " + loader));
+		ModelRegistration registration = this.models.computeIfAbsent(id, key -> new ModelRegistration(key, loader));
+		if (!registration.loader.equals(loader))
+			throw new IllegalStateException("Conflicting model loaders registered for " + id);
+		return registration;
+	}
+
+	/**
+	 * Validates all changes before applying a plugin's declarations.
+	 *
+	 * @param target the target
+	 */
+	public void apply(Map<Identifier, PModelResource> target)
+	{
+		checkOpen();
+		Map<Identifier, PModelResource> staged = new LinkedHashMap<>();
+		this.models.forEach((id, registration) ->
+		{
+			Map<String, Identifier> textures = new LinkedHashMap<>();
+			PModelResource previous = target.get(id);
+			if (previous != null)
+			{
+				if (!previous.modelLoaderId().equals(registration.loader))
+					throw new IllegalStateException("Conflicting model loaders registered for " + id);
+				textures.putAll(previous.textures());
+			}
+			registration.textures.forEach((reference, texture) ->
+			{
+				Identifier old = textures.putIfAbsent(reference, texture);
+				if (old != null && !old.equals(texture))
+					throw new IllegalStateException("Conflicting texture for model " + id + ": " + reference);
+			});
+			staged.put(id, new PModelResource(id, registration.loader, textures));
+		});
+		target.putAll(staged);
+		close();
+	}
+
+	/**
+	 * Texture override configuration for one canonical model registration.
+	 */
+	public final class ModelRegistration
+	{
+		private final Identifier id;
+		private final Identifier loader;
+		private final Map<String, Identifier> textures = new LinkedHashMap<>();
+
+		private ModelRegistration(Identifier id, Identifier loader)
+		{
+			this.id = id;
+			this.loader = loader;
+		}
+
+		/**
+		 * Associates a model texture reference with the resource to use during baking.
+		 *
+		 * @param reference the reference value or channel used by this operation
+		 * @param texture the texture resource location
+		 * @return this builder
+		 */
+		public ModelRegistration texture(String reference, Identifier texture)
+		{
+			checkOpen();
+			String normalized = PTextureReference.normalize(reference);
+			Identifier old = this.textures.putIfAbsent(normalized, Objects.requireNonNull(texture));
+			if (old != null && !old.equals(texture))
+				throw new IllegalStateException("Conflicting texture for model " + this.id + ": " + normalized);
+			return this;
+		}
+	}
+}

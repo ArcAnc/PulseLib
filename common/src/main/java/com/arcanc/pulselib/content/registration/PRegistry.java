@@ -9,7 +9,6 @@
 
 package com.arcanc.pulselib.content.registration;
 
-
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.resources.Identifier;
 
@@ -18,17 +17,21 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Registers registry.
+ * Small platform-independent registry for PulseLib extension types.
+ *
+ * @param <T> the registered value type
  */
 public final class PRegistry<T>
 {
 	private final Map<Identifier, T> values = new Object2ObjectOpenHashMap<>();
 
 	/**
-	 * Performs the register operation.
-	 * @param id the id to use.
-	 * @param value the value to use.
-	 * @return the value produced by this operation.
+	 * Adds a value under the supplied identifier and returns the registered value.
+	 *
+	 * @param <V> the registered value subtype
+	 * @param id the namespaced resource or registration identifier
+	 * @param value the value written by this operation
+	 * @return the registered value
 	 */
 	public <V extends T> V register(Identifier id, V value)
 	{
@@ -40,12 +43,51 @@ public final class PRegistry<T>
 	}
 
 	/**
-	 * Performs the get operation.
-	 * @param id the id to use.
-	 * @return the value produced by this operation.
+	 * Returns the value registered under the supplied identifier when present.
+	 *
+	 * @param id the namespaced resource or registration identifier
+	 * @return the value registered under the supplied identifier when present
 	 */
 	public Optional<T> get(Identifier id)
 	{
 		return Optional.ofNullable(this.values.get(id));
+	}
+
+	/**
+	 * Returns the registered identifier-to-value mappings.
+	 *
+	 * @return the registered identifier-to-value mappings
+	 */
+	public Map<Identifier, T> entries()
+	{
+		return Map.copyOf(this.values);
+	}
+
+	/**
+	 * Checks a batch of additions for invalid or duplicate registrations without applying it.
+	 *
+	 * @param additions the additions
+	 */
+	public void validateAll(Map<Identifier, ? extends T> additions)
+	{
+		additions.forEach((id, value) ->
+		{
+			Objects.requireNonNull(id, "id");
+			Objects.requireNonNull(value, "value");
+			T previous = this.values.get(id);
+			if (previous != null && previous != value)
+				throw new IllegalArgumentException("Duplicate PulseLib registry entry " + id);
+		});
+	}
+
+	/**
+	 * Validates and installs a batch of namespaced values.
+	 *
+	 * @param additions the additions
+	 */
+	public void registerAll(Map<Identifier, ? extends T> additions)
+	{
+		validateAll(additions);
+		this.values.putAll(additions);
 	}
 }
