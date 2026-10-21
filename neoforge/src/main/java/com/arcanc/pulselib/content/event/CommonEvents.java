@@ -9,20 +9,27 @@
 
 package com.arcanc.pulselib.content.event;
 
-
+import com.arcanc.pulselib.plugin.PulsePluginManager;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 
 /**
- * Provides support for common events.
+ * NeoForge common setup bridge for side-safe plugin type registration.
  */
 public class CommonEvents
 {
 	/**
-	 * Registers the common events.
-	 * @param modEventBus the mod event bus to use.
+	 * Installs the NeoForge common setup listener that runs common plugin registration.
+	 *
+	 * @param bus the NeoForge mod lifecycle event bus
 	 */
-	public static void registerCommonEvents(final IEventBus modEventBus)
+	public static void registerCommonEvents(IEventBus bus)
 	{
+		bus.addListener(CommonEvents :: setup);
 	}
-	
+
+	private static void setup(FMLCommonSetupEvent event)
+	{
+		event.enqueueWork(() -> PulsePluginManager.get().registerCommon());
+	}
 }

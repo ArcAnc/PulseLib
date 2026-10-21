@@ -25,6 +25,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -72,6 +73,18 @@ class PulsePluginClassScannerTest
 	{
 		assertThrows(IllegalArgumentException.class, () -> new PulsePluginClassScanner().read(
 				"example", new ByteArrayInputStream(bytecode("INVALID"))));
+	}
+
+	@Test
+	void readsActualJava25PluginBytecode() throws Exception
+	{
+		try (var input = PulsePluginManagerTest.class.getResourceAsStream("PulsePluginManagerTest$ClientPlugin.class"))
+		{
+			assertNotNull(input);
+			var candidate = new PulsePluginClassScanner().read("test", input);
+			assertEquals(PulsePluginManagerTest.ClientPlugin.class.getName(), candidate.className());
+			assertEquals(PulsePlugin.Side.CLIENT, candidate.side());
+		}
 	}
 
 	private static byte[] bytecode(String side)

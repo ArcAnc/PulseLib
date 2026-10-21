@@ -29,6 +29,8 @@
     "LivingAttachmentRenderStateMixin",
     "EntityPartialTickRenderStateMixin",
     "EntityRendererExtractionMixin",
-    "SpriteContentsAccessor"
+    "SpriteContentsAccessor",
+    "CameraAccessor",
+    "ResourceReloadMixin"
   ]
 }

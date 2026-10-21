@@ -100,13 +100,13 @@ Reference it from `assets/examplemod/items/wand.json`:
 }
 ```
 
-The `base` model is the normal `assets/examplemod/models/item/wand.json` file that supplies display transforms. `PModelData.CODEC` accepts canonical `model_id` and optional `model_loader`; texture lists do not belong in this JSON. Item JSON is decoded after `RegisterResourceEvent`, so it cannot pass that decoded `PModelData` instance to `event.model(...)`. Create a separate static `PModelData` for registration and add its material textures there:
+The `base` model is the normal `assets/examplemod/models/item/wand.json` file that supplies display transforms. `PModelData.CODEC` accepts canonical `model_id` and optional `model_loader`; texture lists do not belong in this JSON. Item JSON is decoded after the [`registerModels(PModelRegistrar)` callback](plugins.md), so it cannot pass that decoded `PModelData` instance to `registrar.model(...)`. Create a separate static `PModelData` for registration and add its material textures there:
 
 ```java
 public static final PModelData WAND_RESOURCE =
         PModelData.item(Identifier.fromNamespaceAndPath("examplemod", "wand"));
 
-event.model(WAND_RESOURCE)
+registrar.model(WAND_RESOURCE)
         .texture("body", Identifier.fromNamespaceAndPath("examplemod", "item/wand/body"));
 ```
 

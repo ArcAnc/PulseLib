@@ -20,6 +20,7 @@ import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
 
 /** Opt-in original-content smoke scene. Only writes to the isolated run world. */
 @Mod("pulselib_stage1")
@@ -31,6 +32,13 @@ public final class Stage1Smoke
 		bus.addListener((EntityAttributeCreationEvent event) ->
 				event.put(Stage1Content.EntityTypeReg.TEST_ENTITY.get(), TestEntity.createAttributes().build()));
 		NeoForge.EVENT_BUS.addListener(Stage1Smoke::joined);
+		NeoForge.EVENT_BUS.addListener((ServerStartedEvent event) ->
+		{
+			if (Boolean.getBoolean("pulselib.stage2Probe"))
+			{
+				Stage2PluginProbe.verify(false);
+			}
+		});
 		if (FMLEnvironment.getDist() == Dist.CLIENT)
 		{
 			Stage1Client.register(bus);
@@ -46,6 +54,7 @@ public final class Stage1Smoke
 		var server = player.level().getServer();
 		var source = player.createCommandSourceStack().withPermission(PermissionSet.ALL_PERMISSIONS).withSuppressedOutput();
 		for (String command : new String[] {
+				"kill @e[type=pulselib:test_entity]",
 				"fill -8 79 -8 8 79 8 minecraft:stone",
 				"tp @s 0 80 5 0 10",
 				"gamemode creative @s",

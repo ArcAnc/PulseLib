@@ -9,9 +9,10 @@
 
 package com.arcanc.pulselib.content.mixin;
 
+import com.arcanc.pulselib.content.animatable.PAnimationCameraShake;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
 import com.arcanc.pulselib.content.player.animation.firstPerson.PFirstPersonCameraSpace;
-import com.arcanc.pulselib.content.animatable.PAnimationCameraShake;
+import com.arcanc.pulselib.platform.PulseClientServices;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -41,14 +42,6 @@ public abstract class CameraMixin
 	@Shadow protected abstract void setPosition(Vec3 pos);
 
 	/**
-	 * Sets the rotation.
-	 * @param yRot the y rot to use.
-	 * @param xRot the x rot to use.
-	 * @param roll the roll to use.
-	 */
-	@Shadow protected abstract void setRotation(float yRot, float xRot, float roll);
-
-	/**
 	 * Performs the pulselib$follow animated head operation.
 	 * @param partialTick the partial tick to use.
 	 * @param ci the ci to use.
@@ -68,7 +61,7 @@ public abstract class CameraMixin
 		{
 			Camera camera = (Camera)(Object)this;
 			Vector3f euler = camera.rotation().getEulerAnglesYXZ(new Vector3f());
-			this.setRotation(180.0f - (float)Math.toDegrees(euler.y) + shake,
+			PulseClientServices.CAMERA.setRotation((Camera)(Object)this, 180.0f - (float)Math.toDegrees(euler.y) + shake,
 					-(float)Math.toDegrees(euler.x) + shake * 0.5f,
 					-(float)Math.toDegrees(euler.z));
 			return;
@@ -89,7 +82,7 @@ public abstract class CameraMixin
 					mul(new Quaternionf(bodyRotation).invert());
 			Quaternionf cameraRotation = worldRotation.mul(new Quaternionf(camera.rotation()));
 			Vector3f euler = cameraRotation.getEulerAnglesYXZ(new Vector3f());
-			this.setRotation(
+			PulseClientServices.CAMERA.setRotation((Camera)(Object)this,
 					180.0f - (float)Math.toDegrees(euler.y) + shake,
 					-(float)Math.toDegrees(euler.x) + shake * 0.5f,
 					-(float)Math.toDegrees(euler.z));

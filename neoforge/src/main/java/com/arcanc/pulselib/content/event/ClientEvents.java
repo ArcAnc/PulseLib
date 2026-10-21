@@ -10,11 +10,11 @@
 package com.arcanc.pulselib.content.event;
 
 
-import com.arcanc.pulselib.neoforge.NeoForgeClientLifecycle;
 import com.arcanc.pulselib.content.model.textures.atlas.RuntimeLoader;
+import com.arcanc.pulselib.neoforge.NeoForgeClientLifecycle;
+import com.arcanc.pulselib.plugin.PulsePluginManager;
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.arcanc.pulselib.util.PModelCache;
-import com.arcanc.pulselib.util.PResourceCache;
 import com.arcanc.pulselib.util.attachments.PAttachmentAnchorResolvers;
 import com.arcanc.pulselib.util.attachments.PLivingAttachments;
 import com.arcanc.pulselib.util.attachments.humanoid.armor.PArmorClientExtensions;
@@ -22,7 +22,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.ModLoader;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.RegisterSpriteSourcesEvent;
@@ -40,24 +39,16 @@ public class ClientEvents
 	
 	/**
 	 * Registers the client events.
-	 * @param modEventBus the mod event bus to use.
+	 * @param bus the mod event bus to use.
 	 */
-	public static void registerClientEvents(final IEventBus modEventBus)
+	public static void registerClientEvents(IEventBus bus)
 	{
-		ModLoader.postEvent(new PulseLibEvents.TypeRegistrationEvent());
-		PResourceCache.setResourceRegistrar(resources ->
-		{
-			PulseLibEvents.RegisterResourceEvent event = new PulseLibEvents.RegisterResourceEvent();
-			ModLoader.postEvent(event);
-			event.apply(resources);
-		});
-		NeoForgeClientLifecycle.register(modEventBus);
+		NeoForgeClientLifecycle.register(bus);
 
-		PAttachmentAnchorResolvers.init();
-		modEventBus.addListener(EventPriority.HIGHEST, ClientEvents :: registerSpriteSources);
-		modEventBus.addListener(ClientEvents :: registerReloadListeners);
-		modEventBus.addListener(ClientEvents :: registerPulseClientContent);
-		modEventBus.addListener(ClientEvents :: registerClientExtensions);
+		bus.addListener(EventPriority.HIGHEST, ClientEvents :: registerSpriteSources);
+		bus.addListener(ClientEvents :: registerReloadListeners);
+		bus.addListener(ClientEvents :: registerPulseClientContent);
+		bus.addListener(ClientEvents :: registerClientExtensions);
 		NeoForge.EVENT_BUS.addListener(ClientEvents :: playerDisconnected);
 		
 	}
@@ -68,7 +59,6 @@ public class ClientEvents
 	 */
 	private static void registerReloadListeners(final AddClientReloadListenersEvent event)
 	{
-		PulseRuntime.beforeResourceReload();
 		event.addListener(PLibDatabase.RELOAD_LISTENER_ID, PModelCache :: reload);
 	}
 	
@@ -78,27 +68,19 @@ public class ClientEvents
 	 */
 	private static void registerPulseClientContent(final FMLClientSetupEvent event)
 	{
-		ensurePulseClientContentRegistered();
+		event.enqueueWork(ClientEvents::ensurePulseClientContentRegistered);
 	}
 	
 	/**
 	 * Performs the ensure pulse client content registered operation.
 	 */
-	private static void ensurePulseClientContentRegistered()
+	public static synchronized void ensurePulseClientContentRegistered()
 	{
 		if (pulseClientContentRegistered)
 			return;
 		
-		PulseLibEvents.AttachmentRegistrationEvent registrationEvent = new PulseLibEvents.AttachmentRegistrationEvent();
-		ModLoader.postEvent(registrationEvent);
-		PulseLibEvents.PlayerAnimationRegistrationEvent playerAnimationRegistrationEvent = new PulseLibEvents.PlayerAnimationRegistrationEvent();
-		ModLoader.postEvent(playerAnimationRegistrationEvent);
-		PulseLibEvents.PlayerAnimatedAttachmentRegistrationEvent animatedAttachmentRegistrationEvent = new PulseLibEvents.PlayerAnimatedAttachmentRegistrationEvent();
-		ModLoader.postEvent(animatedAttachmentRegistrationEvent);
-
-		registrationEvent.registration().apply();
-		playerAnimationRegistrationEvent.registration().apply();
-		animatedAttachmentRegistrationEvent.registration().apply();
+		PAttachmentAnchorResolvers.init();
+		PulsePluginManager.get().registerClient();
 		pulseClientContentRegistered = true;
 	}
 	

@@ -14,6 +14,8 @@ Library which allow you to anything with custom models
 '''
 [[mixins]]
 config="${mod_id}.mixins.json"
+[[mixins]]
+config="${mod_id}.neoforge.mixins.json"
 #[[accessTransformers]]
 #file="META-INF/accesstransformer.cfg"
 

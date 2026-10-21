@@ -22,20 +22,28 @@ Important classes:
 * [`PHumanoidAttachmentLayer`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidAttachmentLayer.java)
 * [`PArmorClientExtensions`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PArmorClientExtensions.java)
 
-PulseLib adds attachment render layers for players and living entities automatically through [`PLibArmorHandler`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PLibArmorHandler.java). Attachment definitions should be contributed on the mod event bus through [`PulseLibEvents.AttachmentRegistrationEvent`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/event/PulseLibEvents.java).
+PulseLib adds attachment render layers for players and living entities automatically through [`PLibArmorHandler`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PLibArmorHandler.java). Attachment definitions are contributed through [`IPulseClientPlugin.registerAttachments(PAttachmentRegistrar)`](plugins.md).
 
-Before registering an attachment definition, register its model and material texture references through `PulseLibEvents.RegisterResourceEvent`; otherwise that model is not loaded. See [Resources](resources.md#register-model-resources).
+Before registering an attachment definition, register its model and material texture references in `IPulseClientPlugin.registerModels(PModelRegistrar)`; otherwise that model is not loaded. See [Resources](resources.md#register-model-resources).
 
 ## Armor item example
 
 Armor is the most direct use case: register a living attachment definition for the armor item, say which equipment slot owns it, and map PulseLib bones to humanoid anchors.
 
 ```java
-@Mod.EventBusSubscriber(modid = ExampleMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-public final class ExampleClientEvents {
-    @SubscribeEvent
-    public static void registerAttachments(PulseLibEvents.AttachmentRegistrationEvent event) {
-        event.registration().registerLiving(MyItems.EXAMPLE_HELMET.get(),
+@PulsePlugin
+public final class ExamplePulsePlugin implements IPulseClientPlugin
+{
+    @Override
+    public Identifier getPluginId()
+    {
+        return Identifier.fromNamespaceAndPath(ExampleMod.MOD_ID, "attachments");
+    }
+
+    @Override
+    public void registerAttachments(PAttachmentRegistrar registrar)
+    {
+        registrar.registerLiving(MyItems.EXAMPLE_HELMET.get(),
                 new PLivingAttachmentDefinition(
                         PModelData.entity(
                                 Identifier.fromNamespaceAndPath("examplemod", "armor/example_helmet")),
@@ -60,7 +68,7 @@ assets/examplemod/glmodels/entity/armor/example_helmet.glb
 Attachments are not limited to armor slots. A held item can render a tail, an amulet can render on the body, or a global definition can render on an entity even without a specific item stack.
 
 ```java
-event.registration().registerLiving(MyItems.TAIL.get(),
+registrar.registerLiving(MyItems.TAIL.get(),
         new PLivingAttachmentDefinition(
                 PModelData.entity(
                         Identifier.fromNamespaceAndPath("examplemod", "attachment/tail")),
@@ -89,7 +97,7 @@ PLivingAttachmentSources.equipmentSlotPredicate(EquipmentSlot.CHEST, entity -> e
 Global attachments use the same definition type:
 
 ```java
-event.registration().registerGlobalLiving(new PLivingAttachmentDefinition(
+registrar.registerGlobalLiving(new PLivingAttachmentDefinition(
         MODEL_DATA,
         PLivingAttachmentSources.entityPredicate(entity -> entity.isInvisible()),
         List.of(PHumanoidBindings.body("aura")),

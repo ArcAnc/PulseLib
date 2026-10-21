@@ -12,7 +12,7 @@ package com.arcanc.pulselib.util;
 
 import com.arcanc.pulselib.content.model.PTextureReference;
 import com.arcanc.pulselib.content.model.resource.PModelResource;
-import com.arcanc.pulselib.content.model.textures.atlas.PLibSpriteMetadata;
+import com.arcanc.pulselib.plugin.PulsePluginManager;
 import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.Identifier;
@@ -22,13 +22,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Objects;
-import java.util.function.Consumer;
 
 /**
  * Caches resource.
  */
-public class PResourceCache
+public final class PResourceCache
 {
 	private static final String SPRITE_PATH_PREFIX = "runtime/";
 	public static final Identifier ATLAS_LOCATION = PLibDatabase.rl("textures/atlas.png");
@@ -37,10 +35,10 @@ public class PResourceCache
 	private static @Nullable TextureAtlas TEXTURES;
 
 	private static final Map<Identifier, PModelResource> RESOURCE_CACHE = new LinkedHashMap<>();
-	private static Consumer<Map<Identifier, PModelResource>> resourceRegistrar = resources ->
+
+	private PResourceCache()
 	{
-		throw new IllegalStateException("PulseLib client resource registration hook is not installed");
-	};
+	}
 
 	/**
 	 * Returns the texture atlas.
@@ -54,13 +52,6 @@ public class PResourceCache
 		return TEXTURES;
 	}
 	
-	/** Installs the loader callback until model registration moves to PulsePluginManager. */
-	@ApiStatus.Internal
-	public static void setResourceRegistrar(Consumer<Map<Identifier, PModelResource>> registrar)
-	{
-		resourceRegistrar = Objects.requireNonNull(registrar);
-	}
-
 	@ApiStatus.Internal
 	public static Map<Identifier, PModelResource> getResourceCache()
 	{
@@ -104,8 +95,12 @@ public class PResourceCache
 	@ApiStatus.Internal
 	public static void reloadRegistrations()
 	{
-		clear();
-		postEvent();
+		Map<Identifier, PModelResource> staged = new LinkedHashMap<>();
+		PulsePluginManager.get().registerModels(staged);
+		RESOURCE_CACHE.clear();
+		RESOURCE_CACHE.putAll(staged);
+		invalidateTextureAtlas();
+		PLibDatabase.LOGGER.info("PulseLib resource reload: collected {} model declarations", RESOURCE_CACHE.size());
 	}
 
 	/**
@@ -139,9 +134,4 @@ public class PResourceCache
 		return PLibDatabase.rl(SPRITE_PATH_PREFIX + texture.getNamespace() + "/" + texture.getPath());
 	}
 	
-	@ApiStatus.Internal
-	public static void postEvent()
-	{
-		resourceRegistrar.accept(RESOURCE_CACHE);
-	}
 }

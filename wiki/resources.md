@@ -3,32 +3,38 @@
 > [!IMPORTANT]
 > PulseLib does not draw model textures directly from arbitrary files. It first collects them into a runtime atlas, then the baked model stores UVs for that atlas. This is why model-resource registration is a required step instead of an optional convenience.
 
-Model resources are registered through [`PulseLibEvents.RegisterResourceEvent`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/event/PulseLibEvents.java).
+Model resources are declared by [`IPulseClientPlugin.registerModels(PModelRegistrar)`](plugins.md).
 
-PulseLib collects these registrations while client reload listeners are being registered, before resource reload starts. The model loader and runtime atlas then consume the same completed registration cache; resource registration callbacks must therefore describe stable client content.
+PulseLib collects these declarations at the beginning of every client resource reload, before atlas and model work starts. Both consumers use the completed resource map. Plugin instances survive reloads; model callbacks describe stable client content and may run repeatedly.
 
 ## Register model resources
 
-Subscribe on the mod event bus and register every model together with its material texture references:
+Declare an automatically discovered client plugin and register each model with its material texture references:
 
 ```java
-@Mod.EventBusSubscriber(modid = ExampleMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-public final class ExampleClientEvents {
-    public static final PModelData ROBOT_MODEL =
-            PModelData.entity(Identifier.fromNamespaceAndPath(ExampleMod.MOD_ID, "robot"));
+@PulsePlugin
+public final class ExamplePulsePlugin implements IPulseClientPlugin
+{
+	public static final PModelData ROBOT_MODEL =
+			PModelData.entity(Identifier.fromNamespaceAndPath(ExampleMod.MOD_ID, "robot"));
 
-    @SubscribeEvent
-    public static void registerPulseResources(PulseLibEvents.RegisterResourceEvent event) {
-        event.model(ROBOT_MODEL)
-                .texture("textures/body", Identifier.fromNamespaceAndPath(
-                        ExampleMod.MOD_ID, "entity/robot/body"))
-                .texture("textures/eyes", Identifier.fromNamespaceAndPath(
-                        ExampleMod.MOD_ID, "entity/robot/eyes"));
-    }
+	@Override
+	public Identifier getPluginId()
+	{
+		return Identifier.fromNamespaceAndPath(ExampleMod.MOD_ID, "client");
+	}
+
+	@Override
+	public void registerModels(PModelRegistrar registrar)
+	{
+		registrar.model(ROBOT_MODEL).
+				texture("textures/body", Identifier.fromNamespaceAndPath(ExampleMod.MOD_ID, "entity/robot/body")).
+				texture("textures/eyes", Identifier.fromNamespaceAndPath(ExampleMod.MOD_ID, "entity/robot/eyes"));
+	}
 }
 ```
 
-`event.model(PModelData)` uses the model data's canonical ID and loader. For item JSON, create a static `PModelData` for registration; the JSON later creates a separate instance with the same canonical ID. `event.model(Identifier)` remains available for lower-level registrations and uses the glTF loader by default. The ID is canonical: it has no loader root or file extension. The glTF loader resolves `entity/robot` under `glmodels/`, and the Gecko loader resolves the same canonical id under `geckolib/models/`; call `event.model(model, PGeckoModelLoader.INSTANCE.id())` for Gecko. Repeated calls for one model extend the same registration. A resource registration is also what makes PulseLib load and bake that model, so every `PModelData` canonical ID needs one matching registration.
+`registrar.model(PModelData)` uses the model data's canonical ID and loader. For item JSON, create a static `PModelData` for registration; the JSON later creates a separate instance with the same canonical ID. `registrar.model(Identifier)` remains available for lower-level registrations and uses the glTF loader by default. The ID is canonical: it has no loader root or file extension. The glTF loader resolves `entity/robot` under `glmodels/`, and the Gecko loader resolves the same canonical id under `geckolib/models/`; call `registrar.model(model, PGeckoModelLoader.INSTANCE.id())` for Gecko. Repeated calls for one model extend the same registration. A resource registration is also what makes PulseLib load and bake that model, so every `PModelData` canonical ID needs one matching registration.
 
 The glTF loader accepts both `.glb` and `.gltf`. For every canonical ID it tries `<model>.glb` first and then `<model>.gltf`. The selected physical representation never changes the cache key or `PModelData` ID:
 
@@ -36,7 +42,7 @@ The glTF loader accepts both `.glb` and `.gltf`. For every canonical ID it tries
 PModelData data = PModelData.entity(
         Identifier.fromNamespaceAndPath("examplemod", "robot"));
 
-event.model(data);
+registrar.model(data);
 ```
 If neither candidate exists, resource reload fails and reports the canonical ID and both attempted physical paths.
 
@@ -54,7 +60,7 @@ Identifier.fromNamespaceAndPath("examplemod", "entity/robot/body")
 
 ## Animation-event sidecars
 
-An animation-event sidecar is optional and needs no `RegisterResourceEvent` entry: the model loader finds it while loading its model or animation file. The first existing candidate is used, so keep only one sidecar for a model unless you deliberately want the earlier path to take precedence. Its contents use the `animations` JSON object described in [Animation events](animation-events.md).
+An animation-event sidecar is optional and needs no plugin model declaration: the model loader finds it while loading its model or animation file. The first existing candidate is used, so keep only one sidecar for a model unless you deliberately want the earlier path to take precedence. Its contents use the `animations` JSON object described in [Animation events](animation-events.md).
 
 For a glTF model at `assets/examplemod/glmodels/entity/robot.glb` or `.gltf`, PulseLib checks these paths in order:
 
@@ -165,7 +171,7 @@ The animation key must exactly match the animation name in the loaded model. Bot
 When a cube in a Gecko model has no `texture` field, PulseLib assigns the material reference `"0"`. Register that reference as the model's fallback texture:
 
 ```java
-event.model(ResourceLocation.fromNamespaceAndPath("examplemod", "entity/robot"),
+registrar.model(ResourceLocation.fromNamespaceAndPath("examplemod", "entity/robot"),
                 PGeckoModelLoader.INSTANCE.id())
         .texture("0", ResourceLocation.fromNamespaceAndPath("examplemod", "entity/robot/fallback"));
 ```

@@ -9,37 +9,61 @@
 
 package com.arcanc.pulselib.test.stage1;
 
-import com.arcanc.pulselib.content.event.PulseLibEvents;
+import com.arcanc.pulselib.api.plugin.IPulseClientPlugin;
+import com.arcanc.pulselib.api.plugin.PulsePlugin;
+import com.arcanc.pulselib.api.registration.PAnimatedAttachmentRegistrar;
+import com.arcanc.pulselib.api.registration.PAttachmentRegistrar;
+import com.arcanc.pulselib.api.registration.PModelRegistrar;
+import com.arcanc.pulselib.api.registration.PPlayerAnimationRegistrar;
 import com.arcanc.pulselib.content.registration.block.block_entity.ber.TestBlockEntityRenderer;
 import com.arcanc.pulselib.content.registration.entity.renderer.PTestArmor;
 import com.arcanc.pulselib.content.registration.entity.renderer.TestEntityRender;
 import com.arcanc.pulselib.content.registration.item.renderer.TestBlockItemRenderer;
+import com.arcanc.pulselib.platform.PulseClientServices;
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
+import net.minecraft.resources.Identifier;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+import org.jspecify.annotations.Nullable;
+
+import java.util.concurrent.CompletableFuture;
 
 /** Requires actual world submissions before requesting normal client shutdown. */
-public final class Stage1Client
+@PulsePlugin
+public final class Stage1Client implements IPulseClientPlugin
 {
 	private static int worldTicks;
+	private static @Nullable CompletableFuture<Void> reload;
+	private static int entitiesBeforeReload;
+	private static int blocksBeforeReload;
+	private static int itemsBeforeReload;
+	private static boolean reloadScreenshot;
 	public static int entitySubmissions;
 	public static int blockSubmissions;
 	public static int itemSubmissions;
 
-	private Stage1Client()
+	public Stage1Client()
 	{
+		Stage2PluginProbe.clientConstructions++;
+	}
+
+	@Override
+	public Identifier getPluginId()
+	{
+		return PLibDatabase.rl("stage1_client");
 	}
 
 	public static void register(IEventBus bus)
 	{
 		bus.addListener(Stage1Client::renderers);
-		bus.addListener(Stage1Client::resources);
 		bus.addListener((RegisterSpecialModelRendererEvent event) ->
 				event.register(PLibDatabase.rl("test_block"), TestBlockItemRenderer.Unbaked.MAP_CODEC));
 		NeoForge.EVENT_BUS.addListener(Stage1Client::tick);
@@ -51,8 +75,10 @@ public final class Stage1Client
 		event.registerEntityRenderer(Stage1Content.EntityTypeReg.TEST_ENTITY.get(), TestEntityRender::new);
 	}
 
-	private static void resources(PulseLibEvents.RegisterResourceEvent event)
+	@Override
+	public void registerModels(PModelRegistrar event)
 	{
+		Stage2PluginProbe.models++;
 		event.model(TestEntityRender.MODEL_DATA).
 				texture("tube", TestEntityRender.TUBE).
 				texture("sphere", TestEntityRender.SPHERE).
@@ -70,6 +96,24 @@ public final class Stage1Client
 				texture("circle", TestBlockItemRenderer.CIRCLE);
 	}
 
+	@Override
+	public void registerAttachments(PAttachmentRegistrar registrar)
+	{
+		Stage2PluginProbe.attachments++;
+	}
+
+	@Override
+	public void registerPlayerAnimations(PPlayerAnimationRegistrar registrar)
+	{
+		Stage2PluginProbe.playerAnimations++;
+	}
+
+	@Override
+	public void registerAnimatedAttachments(PAnimatedAttachmentRegistrar registrar)
+	{
+		Stage2PluginProbe.animatedAttachments++;
+	}
+
 	private static void tick(ClientTickEvent.Post event)
 	{
 		Minecraft minecraft = Minecraft.getInstance();
@@ -82,8 +126,41 @@ public final class Stage1Client
 			Screenshot.grab(minecraft.gameDirectory, "stage1-world.png", minecraft.getMainRenderTarget(), 1,
 					message -> LogUtils.getLogger().info("{}", message.getString()));
 		}
-		if (worldTicks == 300)
+		boolean pluginProbe = Boolean.getBoolean("pulselib.stage2Probe");
+		if (pluginProbe && worldTicks == 50)
 		{
+			verifyCameraService(minecraft);
+		}
+		if (pluginProbe && worldTicks == 120)
+		{
+			entitiesBeforeReload = entitySubmissions;
+			blocksBeforeReload = blockSubmissions;
+			itemsBeforeReload = itemSubmissions;
+			reload = minecraft.reloadResourcePacks();
+		}
+		if (pluginProbe && !reloadScreenshot && worldTicks >= 200 && reload != null && reload.isDone())
+		{
+			reload.join();
+			Screenshot.grab(minecraft.gameDirectory, "stage2-after-reload.png", minecraft.getMainRenderTarget(), 1,
+					message -> LogUtils.getLogger().info("{}", message.getString()));
+			reloadScreenshot = true;
+		}
+		if (worldTicks > 1200)
+		{
+			throw new AssertionError("Stage 2 resource reload did not finish in time");
+		}
+		if (worldTicks >= 300 && (!pluginProbe || reload != null && reload.isDone()))
+		{
+			if (pluginProbe)
+			{
+				reload.join();
+				Stage2PluginProbe.verify(true);
+				if (entitySubmissions - entitiesBeforeReload < 20 || blockSubmissions - blocksBeforeReload < 20 ||
+						itemSubmissions - itemsBeforeReload < 20 || !reloadScreenshot)
+				{
+					throw new AssertionError("Rendering did not recover after the plugin model reload");
+				}
+			}
 			if (entitySubmissions < 20 || blockSubmissions < 20 || itemSubmissions < 20)
 			{
 				throw new AssertionError("Missing world rendering: entity=" + entitySubmissions + ", block=" + blockSubmissions + ", item=" + itemSubmissions);
@@ -91,5 +168,30 @@ public final class Stage1Client
 			LogUtils.getLogger().info("STAGE 1.2 WORLD SMOKE: entity={}, block={}, item={}", entitySubmissions, blockSubmissions, itemSubmissions);
 			minecraft.stop();
 		}
+	}
+
+	/** Exercises the real loader camera provider, including roll, then restores the ordinary camera. */
+	private static void verifyCameraService(Minecraft minecraft)
+	{
+		var camera = minecraft.gameRenderer.getMainCamera();
+		float yaw = camera.yRot();
+		float pitch = camera.xRot();
+		try
+		{
+			PulseClientServices.CAMERA.setRotation(camera, yaw, pitch, 17.0f);
+			Quaternionf expected = new Quaternionf().rotationYXZ((float)Math.PI - (float)Math.toRadians(yaw),
+					-(float)Math.toRadians(pitch), -(float)Math.toRadians(17.0f));
+			Vector3f up = new Vector3f(0.0f, 1.0f, 0.0f).rotate(expected);
+			if (Math.abs(1.0f - Math.abs(expected.dot(camera.rotation()))) > 0.00001f ||
+					up.distanceSquared(camera.upVector()) > 0.00001f)
+			{
+				throw new AssertionError("Camera service did not update its orientation and basis vectors");
+			}
+		}
+		finally
+		{
+			PulseClientServices.CAMERA.setRotation(camera, yaw, pitch, 0.0f);
+		}
+		LogUtils.getLogger().info("STAGE 2 CAMERA SERVICE PASS: {}", PulseClientServices.CAMERA.getClass().getName());
 	}
 }

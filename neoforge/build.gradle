@@ -70,7 +70,11 @@ if (providers.gradleProperty('pulseStage1Smoke').isPresent()) {
         mods { pulselib_stage1 { sourceSet sourceSets.stage1Smoke } }
         runs {
             configureEach {
-                gameDirectory = layout.buildDirectory.dir("stage1-runs/${it.name}").get().asFile
+                gameDirectory = layout.buildDirectory.dir("${providers.gradleProperty('pulseVerificationDir').getOrElse('stage1-runs')}/${it.name}").get().asFile
+                if (providers.gradleProperty('pulseStage2Probe').isPresent()) {
+                    systemProperty 'pulselib.stage2Probe', 'true'
+                    jvmArgument '-Xlog:class+load=info:file=classloading.log'
+                }
             }
             client {
                 programArguments.addAll '--quickPlayMultiplayer', '127.0.0.1:25576', '--width', '960', '--height', '640'

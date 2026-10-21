@@ -2,13 +2,18 @@
 
 Player animations modify the vanilla player model after Minecraft has prepared its normal walk, swim, crouch, and item-use pose. They work for both classic and slim skins, including hats, jackets, sleeves, and pants layers.
 
-The API is client-only. Register definitions on the mod event bus through `PulseLibEvents.PlayerAnimationRegistrationEvent`:
+The API is client-only. Register definitions through [`IPulseClientPlugin.registerPlayerAnimations(PPlayerAnimationRegistrar)`](plugins.md):
 
 ```java
-@Mod.EventBusSubscriber(modid = ExampleMod.MOD_ID,
-        bus = Mod.EventBusSubscriber.Bus.MOD,
-        value = Dist.CLIENT)
-public final class ExamplePlayerAnimations {
+@PulsePlugin
+public final class ExamplePlayerAnimations implements IPulseClientPlugin
+{
+    @Override
+    public Identifier getPluginId()
+    {
+        return Identifier.fromNamespaceAndPath(ExampleMod.MOD_ID, "player_animations");
+    }
+
     private static final PModelData COMBAT_MODEL = PModelData.direct(
             Identifier.fromNamespaceAndPath(ExampleMod.MOD_ID, "player/combat"),
             PGeckoModelLoader.INSTANCE.id());
@@ -17,9 +22,10 @@ public final class ExamplePlayerAnimations {
             .thenLoop("animation.combat.idle")
             .build();
 
-    @SubscribeEvent
-    public static void register(PulseLibEvents.PlayerAnimationRegistrationEvent event) {
-        event.registration().register(
+    @Override
+    public void registerPlayerAnimations(PPlayerAnimationRegistrar registrar)
+    {
+        registrar.register(
                 Identifier.fromNamespaceAndPath(ExampleMod.MOD_ID, "combat_pose"),
                 PPlayerAnimationDefinition.builder(COMBAT_MODEL)
                         .when(player -> player.getMainHandItem().is(MyItems.KATANA.get()))
@@ -37,7 +43,7 @@ public final class ExamplePlayerAnimations {
 }
 ```
 
-The example uses the Gecko loader. Then register the same model and every material texture reference through `PulseLibEvents.RegisterResourceEvent`. Only registered resources are loaded; select the loader with `event.model(COMBAT_MODEL)`. See [Resources](resources.md#register-model-resources).
+The example uses the Gecko loader. Then register the same model and every material texture reference in `registerModels(PModelRegistrar)`. Only registered resources are loaded; select the loader with `registrar.model(COMBAT_MODEL)`. See [Resources](resources.md#register-model-resources).
 
 Controllers receive a `PPlayerAnimationInstance` as their animatable. Use `state.animatable().player()` to read the current player. PulseLib creates one instance for every `(player UUID, definition id)` pair, so remote players and multiple definitions never share a controller timeline.
 
@@ -211,7 +217,7 @@ This phase policy supplements `itemRenderPolicy(...)`: either policy may hide th
 
 ## Animation anchors and mesh attachments
 
-`anchor(PPlayerAnimationAnchor, boneName)` exposes a model bone as a named attachment point. PulseLib reserves `FIRST_PERSON_CAMERA`, `RIGHT_ITEM`, and `LEFT_ITEM`; use a custom `PPlayerAnimationAnchor` for equipment or effects that follow an animation bone. Register a `PPlayerAnimatedAttachmentRenderer` through `PulseLibEvents.PlayerAnimatedAttachmentRegistrationEvent`. Its context contains the player, animation id, anchor, sampled transform, blend weight, render stack, collector, and whether it is rendering in first person.
+`anchor(PPlayerAnimationAnchor, boneName)` exposes a model bone as a named attachment point. PulseLib reserves `FIRST_PERSON_CAMERA`, `RIGHT_ITEM`, and `LEFT_ITEM`; use a custom `PPlayerAnimationAnchor` for equipment or effects that follow an animation bone. Register a `PPlayerAnimatedAttachmentRenderer` in `IPulseClientPlugin.registerAnimatedAttachments(PAnimatedAttachmentRegistrar)`. Its context contains the player, animation id, anchor, sampled transform, blend weight, render stack, collector, and whether it is rendering in first person.
 
 The player-animation model may also contain mesh branches that are not bound to a vanilla player part. By default, PulseLib automatically renders a mesh branch when it contains an active animated bone, both in third person and through the enabled first-person integration. To render only known branches, declare their roots with `meshAttachment(boneName)`:
 

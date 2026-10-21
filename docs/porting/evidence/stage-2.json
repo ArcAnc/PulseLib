@@ -1,0 +1,191 @@
+{
+  "stage": 2,
+  "date": "2026-10-21",
+  "previousCheckpoint": "7ffa7ca16a8edf38b0ab79c5c7efc8172e40870f",
+  "commonApiCheckpoint": "6edb47a6ce3ad4206a01cdd46c801da840085177",
+  "baseCommit": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1",
+  "canonicalCommit": "7ce6f024b307bb821ce543344d3896c8e1fcf26b",
+  "java": "25.0.4.1",
+  "gradle": "9.2.1",
+  "modules": {
+    "common": {
+      "jar": "common/build/libs/pulselib-26.1.2-common-1.1.5.3.jar",
+      "providers": {},
+      "javaUnits": 301,
+      "sha256": "1fd2e64805f63801aa6e674f6dac6be4dadef70de323a364d051453b698cd2f9",
+      "pulseClasses": 480
+    },
+    "neoforge": {
+      "jar": "neoforge/build/libs/pulselib-26.1.2-neoforge-1.1.5.3.jar",
+      "providers": {
+        "platform.IPulsePlatform": "com.arcanc.pulselib.neoforge.NeoForgePlatform",
+        "platform.IPulseCameraService": "com.arcanc.pulselib.neoforge.NeoForgeCameraService",
+        "plugin.IPulsePluginFinder": "com.arcanc.pulselib.neoforge.NeoForgePulsePluginFinder"
+      },
+      "javaUnits": 312,
+      "sha256": "8e60cfdfd8b9878ec71f535e5d10a5f17767e6df9f7bd8299d949b2b81529982",
+      "pulseClasses": 492
+    },
+    "fabric": {
+      "jar": "fabric/build/libs/pulselib-26.1.2-fabric-1.1.5.3.jar",
+      "providers": {
+        "platform.IPulsePlatform": "com.arcanc.pulselib.fabric.FabricPlatform",
+        "platform.IPulseCameraService": "com.arcanc.pulselib.fabric.FabricCameraService",
+        "plugin.IPulsePluginFinder": "com.arcanc.pulselib.fabric.FabricPulsePluginFinder"
+      },
+      "javaUnits": 305,
+      "sha256": "8debd2740acc234a7fc6075f33ed8311c932ef49d66765cbf6bb0ff66b66588f",
+      "pulseClasses": 484
+    }
+  },
+  "tests": [
+    {
+      "module": "common",
+      "suite": "com.arcanc.pulselib.plugin.PulsePluginClassScannerTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xmlSha256": "693a9338639f0946e465cea8756b30a1fa4cd85d752dd203be63bc42dab42073"
+    },
+    {
+      "module": "common",
+      "suite": "com.arcanc.pulselib.plugin.PulsePluginLifecycleTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xmlSha256": "369759c95d58b3d0e06ac297603edc42db013a890e2b1b1bd5cf5f3514556ca2"
+    },
+    {
+      "module": "common",
+      "suite": "com.arcanc.pulselib.plugin.PulsePluginManagerTest",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xmlSha256": "9aef93e06e5dce82128bb867d122689242c6862b92f7d64711979c69e6af1d34"
+    },
+    {
+      "module": "common",
+      "suite": "com.arcanc.pulselib.plugin.PulseRegistrarTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xmlSha256": "b955c3a87b68e677508c800cd927832157585382af7b8f714daa820e1fb2f883"
+    },
+    {
+      "module": "fabric",
+      "suite": "com.arcanc.pulselib.fabric.FabricDevelopmentRootsTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xmlSha256": "eca6fc80f82e7d8f0a00f4c83656a7e0aab57b773d399d384fa557b1989c2a8d"
+    }
+  ],
+  "canonicalTypesVerified": 38,
+  "gpuSources": [
+    {
+      "file": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlFrameArena.java",
+      "sha256": "75267c6fde8cb5d942e9cab02163dcc7ac199306c29e8d1b360b0c18056470fe",
+      "unchangedFromStage1_2": true
+    },
+    {
+      "file": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlGeometryArena.java",
+      "sha256": "f7668da7cab7b01b0f6ed820b4fd03f2a59581d46c8d2c1de01aa59eb4c1bdd2",
+      "unchangedFromStage1_2": true
+    },
+    {
+      "file": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlIndirectStream.java",
+      "sha256": "c3c238c5d2fecf9ffdfc0044905c14c8d3968f5a96a26cb373cfc420bf1237d4",
+      "unchangedFromStage1_2": true
+    },
+    {
+      "file": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlInstanceStream.java",
+      "sha256": "f648a6940e97f62d16917b79fad4e2b9cc4067ca975b55db704ea1f35f49ad1d",
+      "unchangedFromStage1_2": true
+    },
+    {
+      "file": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+      "sha256": "4a68c9d1b67f1dd291c00a73f2c975d3ee6b809c86e95c4bb3cd01a6df02301c",
+      "unchangedFromStage1_2": true
+    },
+    {
+      "file": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+      "sha256": "a5712078a00121611bf94eec0abd0561e92533ffd0a9e4755cfde6fca83626f3",
+      "unchangedFromStage1_2": true
+    }
+  ],
+  "originalResourceCountUnchanged": 18,
+  "protectedGameFilesVerifiedAfterLogRecovery": 165,
+  "preexistingFabricChangesSinceStage1_2": [
+    "fabric/runs/client/config/fabric/indigo-renderer.properties",
+    "fabric/runs/client/logs/debug-1.log.gz",
+    "fabric/runs/client/logs/debug-2.log.gz",
+    "fabric/runs/client/logs/debug-3.log.gz",
+    "fabric/runs/client/logs/debug-4.log.gz",
+    "fabric/runs/client/logs/debug-5.log.gz",
+    "fabric/runs/client/logs/debug.log",
+    "fabric/runs/client/logs/latest.log",
+    "fabric/runs/client/options.txt"
+  ],
+  "commonLogRecovery": {
+    "sha256": "dee52d8bdc8efefa64ee141f836a8d5d0968cfaefba461f368b399f1c1047bf1",
+    "exactStage1_2ContentRestored": true,
+    "testLogsMovedTo": "common/build/reports/porting/recovered-test-logs",
+    "allTestWorkingDirectories": "<module>/build/test-runs/test"
+  },
+  "runtime": {
+    "client": {
+      "exit": 0,
+      "marker": "ids=[pulselib:stage1_client, pulselib:stage2_common], common=1, channels=1, events=1, deformers=1, client=1, server=0, models=2",
+      "classloadingSha256": "06657cd7b1d7bef6e29676a3777e73a016157e62d2a4cf50387a6587879f7fbc",
+      "forbiddenClassesAbsent": [
+        "com.arcanc.pulselib.test.stage1.Stage2ServerPlugin"
+      ],
+      "minecraftClientClassCount": 4138,
+      "logSha256": "4e708df0d68cca20bfabd40bf6e685360ec7c19b4769245915e87fdd8af6cb83",
+      "discoveryPasses": 1,
+      "modelRegistrationPasses": 2,
+      "modelsPerPass": 4,
+      "cameraRollDegrees": 17,
+      "entitySubmissions": 1644,
+      "blockSubmissions": 1618,
+      "itemSubmissions": 2300,
+      "postReloadSubmissionsChecked": true
+    },
+    "server": {
+      "exit": 0,
+      "marker": "ids=[pulselib:stage2_common, pulselib:stage2_server], common=1, channels=1, events=1, deformers=1, client=0, server=1, models=0",
+      "classloadingSha256": "2a921f12582150f2d4df3fcefc4e9ead04d19705731c6cccfbd9a08c3a6df3ea",
+      "forbiddenClassesAbsent": [
+        "com.arcanc.pulselib.test.stage1.Stage1Client",
+        "com.arcanc.pulselib.neoforge.NeoForgeClientLifecycle",
+        "com.arcanc.pulselib.neoforge.NeoForgeCameraService",
+        "com.arcanc.pulselib.platform.PulseClientServices",
+        "com.arcanc.pulselib.content.event.ClientEvents",
+        "com.arcanc.pulselib.content.event.PulseRuntime",
+        "com.arcanc.pulselib.content.renderer.",
+        "com.arcanc.pulselib.api.registration.PModelRegistrar",
+        "com.arcanc.pulselib.api.registration.PAttachmentRegistrar",
+        "com.arcanc.pulselib.api.registration.PPlayerAnimationRegistrar",
+        "com.arcanc.pulselib.api.registration.PAnimatedAttachmentRegistrar"
+      ],
+      "minecraftClientClassCount": 0,
+      "logSha256": "4cc617bb0472553c48e2441235a26508bd03f5ce26ea2a1fcc2dcd90e3acd5ba"
+    }
+  },
+  "screenshot": {
+    "file": "stage-2-after-reload.png",
+    "sha256": "77d6a48720a9689cb094e6b3895aaf0178b85328dc74cd2aaff7b5d3a8f866d9"
+  },
+  "limitations": [
+    "Declared API comparison, not binary compatibility between Minecraft versions",
+    "Fabric plugin services and development-root JUnit tested; Fabric runtime integration remains stage 6",
+    "Canonical animation, manager, player and pixel/GPU regression suites remain later stages",
+    "Runtime screenshot includes the open inventory; it is a smoke artifact, not an H15 pixel test",
+    "No GPU performance comparison"
+  ]
+}
