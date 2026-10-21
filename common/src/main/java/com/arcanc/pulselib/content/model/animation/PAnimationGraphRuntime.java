@@ -101,16 +101,36 @@ public final class PAnimationGraphRuntime
 	 */
 	public List<EventTrack> tick(@Nullable PBakedModel model, float delta)
 	{
+		return tickPrecise(model, delta).stream().
+				map(track -> new EventTrack(track.animation(), (float)track.from(), (float)track.to(), track.animationType())).
+				toList();
+	}
+
+	/**
+	 * Advances graph playback once and preserves precise event intervals.
+	 * The float tick/EventTrack view remains available for existing callers.
+	 * @param model the model used for phase and transition evaluation.
+	 * @param delta elapsed game ticks.
+	 * @return double-precision event windows crossed during the update.
+	 */
+	public List<PreciseEventTrack> tickPrecise(@Nullable PBakedModel model, float delta)
+	{
 		if (!Float.isFinite(delta))
+		{
 			throw new IllegalArgumentException("Animation graph tick delta must be finite");
-		List<EventTrack> eventTracks = new ArrayList<>();
+		}
+		List<PreciseEventTrack> eventTracks = new ArrayList<>();
 		float elapsed = Math.max(delta, 0.0f);
 		if (this.transition == null)
+		{
 			advance(this.current, elapsed, eventTracks);
+		}
 		else
 		{
 			for (WeightedPlayback source : this.transition.sources)
+			{
 				advance(source.playback, elapsed, eventTracks);
+			}
 			advance(this.transition.target, elapsed, eventTracks);
 			this.transition.elapsed += elapsed;
 			if (this.transition.elapsed >= this.transition.duration)
@@ -120,7 +140,9 @@ public final class PAnimationGraphRuntime
 			}
 		}
 		for (OverlayPlayback overlay : this.overlays)
+		{
 			advance(overlay.playback, elapsed, eventTracks);
+		}
 		this.overlays.removeIf(overlay -> overlayFinished(overlay, model));
 
 		triggerOverlays();
@@ -142,16 +164,22 @@ public final class PAnimationGraphRuntime
 	{
 		List<Layer> result = new ArrayList<>();
 		if (this.transition == null)
+		{
 			appendStateLayers(result, this.current, 1.0f, false, model);
+		}
 		else
 		{
 			float alpha = this.transition.duration <= 0.0f ? 1.0f : Math.clamp(this.transition.elapsed / this.transition.duration, 0.0f, 1.0f);
 			for (WeightedPlayback source : this.transition.sources)
+			{
 				appendStateLayers(result, source.playback, source.weight * (1.0f - alpha), false, model);
+			}
 			appendStateLayers(result, this.transition.target, alpha, false, model);
 		}
 		for (OverlayPlayback overlay : this.overlays)
+		{
 			appendStateLayers(result, overlay.playback, overlayWeight(overlay, model), true, model);
+		}
 		return List.copyOf(result);
 	}
 
@@ -164,7 +192,9 @@ public final class PAnimationGraphRuntime
 	{
 		Playback playback = this.transition == null ? this.current : this.transition.target;
 		if (this.graph.states().get(playback.stateIndex).animationType() != PAnimationType.CYCLE)
+		{
 			return Float.NaN;
+		}
 		return phase(playback, model);
 	}
 
@@ -178,7 +208,7 @@ public final class PAnimationGraphRuntime
 		Playback playback = this.transition == null ? this.current : this.transition.target;
 		PAnimationState state = this.graph.states().get(playback.stateIndex);
 		float alpha = Math.clamp(partialTick, 0.0f, 1.0f);
-		return (playback.previousTime + (playback.time - playback.previousTime) * alpha) * state.speed();
+		return (float)((playback.previousTime + (playback.time - playback.previousTime) * alpha) * state.speed());
 	}
 
 	/**
@@ -187,7 +217,7 @@ public final class PAnimationGraphRuntime
 	 */
 	public float time()
 	{
-		return (this.transition == null ? this.current : this.transition.target).time;
+		return (float)(this.transition == null ? this.current : this.transition.target).time;
 	}
 
 	/**
@@ -202,7 +232,9 @@ public final class PAnimationGraphRuntime
 		if (this.transition != null)
 		{
 			for (WeightedPlayback source : this.transition.sources)
+			{
 				syncPlayback(source.playback, clampedPhase, model);
+			}
 			syncPlayback(this.transition.target, clampedPhase, model);
 		}
 	}
@@ -216,7 +248,9 @@ public final class PAnimationGraphRuntime
 		{
 			PAnimationState state = this.graph.states().get(index);
 			if (state instanceof PAnimationState.OneShotOverlay overlay && this.parameters.consumeTrigger(overlay.trigger()))
+			{
 				this.overlays.add(new OverlayPlayback(new Playback(index), overlay));
+			}
 		}
 	}
 
@@ -228,7 +262,9 @@ public final class PAnimationGraphRuntime
 	private @Nullable PAnimationTransition selectTransition(@Nullable PBakedModel model)
 	{
 		if (this.transition != null && this.transition.policy == PInterruptionPolicy.COMPLETE_CURRENT)
+		{
 			return null;
+		}
 		int source = stateIndex();
 		float phase = phase(this.transition == null ? this.current : this.transition.target, model);
 		return this.graph.transitions().stream().
@@ -248,24 +284,34 @@ public final class PAnimationGraphRuntime
 	{
 		List<WeightedPlayback> sources;
 		if (this.transition == null)
+		{
 			sources = List.of(new WeightedPlayback(this.current, 1.0f));
+		}
 		else if (request.interruption() == PInterruptionPolicy.FROM_CURRENT)
 		{
 			float alpha = this.transition.duration <= 0.0f ? 1.0f : Math.clamp(this.transition.elapsed / this.transition.duration, 0.0f, 1.0f);
 			sources = new ArrayList<>(this.transition.sources.size() + 1);
 			for (WeightedPlayback source : this.transition.sources)
+			{
 				sources.add(new WeightedPlayback(source.playback, source.weight * (1.0f - alpha)));
+			}
 			sources.add(new WeightedPlayback(this.transition.target, alpha));
 		}
 		else if (request.interruption() == PInterruptionPolicy.RESTART)
+		{
 			sources = List.of();
+		}
 		else
+		{
 			return;
+		}
 
 		Playback target = new Playback(request.target());
 		PAnimationState targetState = this.graph.states().get(request.target());
 		if (targetState.synchronizedCycle())
+		{
 			syncPlayback(target, phase(this.transition == null ? this.current : this.transition.target, model), model);
+		}
 		this.transition = new Transition(sources, target, request.blendDuration(), request.interruption());
 		if (request.blendDuration() == 0.0f)
 		{
@@ -285,7 +331,9 @@ public final class PAnimationGraphRuntime
 	private void appendStateLayers(List<Layer> result, Playback playback, float stateWeight, boolean overlay, PBakedModel model)
 	{
 		if (stateWeight <= 0.0f)
+		{
 			return;
+		}
 		PAnimationState state = this.graph.states().get(playback.stateIndex);
 		for (PAnimationSample sample : state.samples(this.parameters))
 			if (sample.weight() > 0.0f)
@@ -305,13 +353,19 @@ public final class PAnimationGraphRuntime
 	{
 		PAnimation animation = model.animations().get(animationName);
 		if (animation == null || animation.length() <= 0.0f)
-			return playback.time * state.speed();
-		float time = playback.time * state.speed();
+		{
+			return (float)(playback.time * state.speed());
+		}
+		double time = playback.time * state.speed();
 		if (state.synchronizedCycle() && state.animationType() == PAnimationType.CYCLE)
+		{
 			time = phase(playback, model) * animation.length();
+		}
 		if (state.animationType() == PAnimationType.CYCLE)
-			return time % animation.length();
-		return Math.min(time, animation.length());
+		{
+			return (float)(time % animation.length());
+		}
+		return (float)Math.min(time, animation.length());
 	}
 
 	/**
@@ -323,16 +377,23 @@ public final class PAnimationGraphRuntime
 	private float phase(Playback playback, @Nullable PBakedModel model)
 	{
 		if (model == null)
+		{
 			return 0.0f;
+		}
 		PAnimationState state = this.graph.states().get(playback.stateIndex);
 		PAnimationSample sample = state.samples(this.parameters).stream().findFirst().orElse(null);
 		if (sample == null)
+		{
 			return 0.0f;
+		}
 		PAnimation animation = model.animations().get(sample.animation());
 		if (animation == null || animation.length() <= 0.0f)
+		{
 			return 0.0f;
-		float raw = playback.time * state.speed() / animation.length();
-		return state.animationType() == PAnimationType.CYCLE ? raw - (float)Math.floor(raw) : Math.clamp(raw, 0.0f, 1.0f);
+		}
+		double raw = playback.time * state.speed();
+		return (float)(state.animationType() == PAnimationType.CYCLE ? (raw % animation.length()) / animation.length() :
+				Math.clamp(raw / animation.length(), 0.0, 1.0));
 	}
 
 	/**
@@ -344,15 +405,21 @@ public final class PAnimationGraphRuntime
 	private void syncPlayback(Playback playback, float phase, @Nullable PBakedModel model)
 	{
 		if (model == null)
+		{
 			return;
+		}
 		PAnimationState state = this.graph.states().get(playback.stateIndex);
 		if (!state.synchronizedCycle() || state.animationType() != PAnimationType.CYCLE || state.speed() == 0.0f)
+		{
 			return;
+		}
 		PAnimationSample sample = state.samples(this.parameters).stream().findFirst().orElse(null);
 		PAnimation animation = sample == null ? null : model.animations().get(sample.animation());
 		if (animation == null || animation.length() <= 0.0f)
+		{
 			return;
-		playback.time = phase * animation.length() / state.speed();
+		}
+		playback.time = (double)phase * animation.length() / state.speed();
 		playback.previousTime = playback.time;
 	}
 
@@ -365,7 +432,9 @@ public final class PAnimationGraphRuntime
 	private boolean overlayFinished(OverlayPlayback overlay, @Nullable PBakedModel model)
 	{
 		if (model == null)
+		{
 			return false;
+		}
 		PAnimation animation = model.animations().get(overlay.overlay.animation());
 		return animation != null && overlay.playback.time * overlay.overlay.speed() >= animation.length();
 	}
@@ -380,12 +449,16 @@ public final class PAnimationGraphRuntime
 	{
 		PAnimation animation = model.animations().get(overlay.overlay.animation());
 		if (animation == null)
+		{
 			return 0.0f;
-		float time = overlay.playback.time;
+		}
+		float time = (float)overlay.playback.time;
 		float weight = overlay.overlay.fadeInDuration() <= 0.0f ? 1.0f : Math.min(time / overlay.overlay.fadeInDuration(), 1.0f);
 		float remaining = animation.length() / Math.max(overlay.overlay.speed(), 1.0e-6f) - time;
 		if (overlay.overlay.fadeOutDuration() > 0.0f)
+		{
 			weight = Math.clamp(remaining / overlay.overlay.fadeOutDuration(), 0.0f, weight);
+		}
 		return weight;
 	}
 
@@ -395,18 +468,28 @@ public final class PAnimationGraphRuntime
 	 * @param delta the delta to use.
 	 * @param tracks the tracks to use.
 	 */
-	private void advance(Playback playback, float delta, List<EventTrack> tracks)
+	private void advance(Playback playback, float delta, List<PreciseEventTrack> tracks)
 	{
 		PAnimationState state = this.graph.states().get(playback.stateIndex);
 		playback.previousTime = playback.time;
-		playback.time += delta;
-		if (state.speed() == 0.0f)
+		double nextTime = playback.time + delta;
+		if (!Double.isFinite(nextTime) || delta > 0.0f && nextTime <= playback.time)
+		{
+			throw new IllegalArgumentException("Animation graph time cannot advance precisely: state=" +
+					state.name() + ", time=" + playback.time + ", delta=" + delta);
+		}
+		playback.time = nextTime;
+		if (state.speed() == 0.0f || delta == 0.0f)
+		{
 			return;
-		float from = playback.previousTime * state.speed();
-		float to = playback.time * state.speed();
+		}
+		double from = playback.previousTime * state.speed();
+		double to = playback.time * state.speed();
 		for (PAnimationSample sample : state.samples(this.parameters))
 			if (sample.weight() > 0.0f)
-				tracks.add(new EventTrack(sample.animation(), from, to, state.animationType()));
+			{
+				tracks.add(new PreciseEventTrack(sample.animation(), from, to, state.animationType()));
+			}
 	}
 
 /**
@@ -421,14 +504,25 @@ public final class PAnimationGraphRuntime
  */
 	public record EventTrack(String animation, float from, float to, PAnimationType animationType) { }
 
+	/**
+	 * Double-precision event interval; EventTrack remains the compatible float view.
+	 * @param animation clip name.
+	 * @param from previous absolute clip time in ticks.
+	 * @param to current absolute clip time in ticks.
+	 * @param animationType clip loop behavior.
+	 */
+	public record PreciseEventTrack(String animation, double from, double to, PAnimationType animationType)
+	{
+	}
+
 /**
  * Provides support for playback.
  */
 	private static final class Playback
 	{
 		private final int stateIndex;
-		private float time;
-		private float previousTime;
+		private double time;
+		private double previousTime;
 
 		/**
 		 * Creates an instance of the enclosing type.

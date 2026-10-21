@@ -74,3 +74,8 @@ Gecko `sound_effects` and `particle_effects` retain their native format and are 
 - `seek(model, time)` and `syncCycle(model, phase)` change both previous and current cursors and never replay events. They are the required operations for a seek, late instance creation, and network re-synchronization.
 
 Locator resolution uses the current posed bone. It falls back to the entity origin or block-entity centre if the named locator cannot be found.
+
+
+## Cyclic event precision
+
+Cyclic clips dispatch every crossed event in playback order, including reverse playback and intervals crossing several cycles. Start/end seam markers follow the playback direction without epsilon-based duplicates. `PAnimation.forEachCyclicEvent(double, double, ...)` and `PAnimationGraphRuntime.tickPrecise(...)` retain double-precision event windows; `tick(...)` and the four-component float `EventTrack` record remain available. A pathological or unrepresentable interval fails before partial dispatch instead of silently dropping events.

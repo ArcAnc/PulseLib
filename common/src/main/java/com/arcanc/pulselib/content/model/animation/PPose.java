@@ -43,7 +43,9 @@ public final class PPose implements PPoseWriter
 	public PPose(int boneCount, int scalarChannelCount)
 	{
 		if (boneCount < 0 || scalarChannelCount < 0)
+		{
 			throw new IllegalArgumentException("Pose sizes must be non-negative");
+		}
 		this.translations = new Vector3f[boneCount];
 		this.rotations = new Quaternionf[boneCount];
 		this.scales = new Vector3f[boneCount];
@@ -65,6 +67,15 @@ public final class PPose implements PPoseWriter
 	public int boneCount()
 	{
 		return this.translations.length;
+	}
+
+	/**
+	 * Returns the number of stored scalar animation channels.
+	 * @return the number of scalar channels.
+	 */
+	public int scalarChannelCount()
+	{
+		return this.scalarChannels.length;
 	}
 
 	/**

@@ -15,6 +15,7 @@ import com.arcanc.pulselib.content.animatable.PAnimationController;
 import com.arcanc.pulselib.content.animatable.PAnimationManager;
 import com.arcanc.pulselib.content.animatable.instance.InstanceAnimationManager;
 import com.arcanc.pulselib.content.model.animation.BoneFrame;
+import com.arcanc.pulselib.content.model.animation.PAnimationEvaluationContext;
 import com.arcanc.pulselib.content.model.baked.PBakedBone;
 import com.arcanc.pulselib.content.model.baked.PBakedMesh;
 import com.arcanc.pulselib.content.model.baked.PBakedModel;
@@ -129,7 +130,9 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		this.renderLayers.compute(boneName, (bone, listLayers) ->
 		{
 			if (listLayers == null)
+			{
 				listLayers = new ArrayList<>();
+			}
 			listLayers.add(renderLayer);
 			return listLayers;
 		});
@@ -147,7 +150,9 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		super.extractRenderState(entity, renderState, partialTick);
 		renderState.extractEntityData(entity, this);
 		if (renderState.getAnimatable() instanceof LivingEntity living && renderState instanceof PEntityRenderState.LivingImpl<?> livingEntityRenderState)
+		{
 			extractLivingRenderData(living, livingEntityRenderState, partialTick);
+		}
 	}
 	
 	/**
@@ -195,7 +200,9 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 	{
 		PBakedModel model = renderState.getBakedModel();
 		if (model == null)
+		{
 			return;
+		}
 		
 		PAnimationManager<T> manager = PLibHelper.getManager(renderState.getAnimatable(), renderState.getAnimKey());
 		manager.bindModel(model);
@@ -221,7 +228,9 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		if (this.renderLayers.isEmpty())
 		{
 			for (PBakedBone bone : model.bones())
+			{
 				perBoneSubmit(renderState, poseStack, bone, controllers, this.getModelData(renderState), renderType, - 1, renderState.lightCoords, packedOverlay, submitNodeCollector, cameraRenderState, null, null, null, null, molangContexts);
+			}
 		}
 		else
 		{
@@ -229,10 +238,14 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 			List<DeferredLayerSubmit> deferredLayers = new ArrayList<>();
 
 			for (PBakedBone bone : model.bones())
+			{
 				perBoneSubmit(renderState, poseStack, bone, controllers, this.getModelData(renderState), renderType, -1, renderState.lightCoords, packedOverlay, submitNodeCollector, cameraRenderState, null, entityBonePoses, null, deferredLayers, molangContexts);
+			}
 			
 			for (DeferredLayerSubmit deferredLayer : deferredLayers)
+			{
 				submitDeferredLayer(renderState, poseStack, submitNodeCollector, cameraRenderState, controllers, molangContexts, entityBonePoses, deferredLayer);
+			}
 		}
 	}
 	
@@ -358,7 +371,9 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		BoneFrame frame = bone.mixBone(data.getModel(), controllers, molangContexts, renderState.partialTick());
 		poseStack.pushPose();
 		if (renderLayer != null && entityBonePoses != null)
+		{
 			applyBoundLayerBonePose(poseStack, bone, renderLayer, entityBonePoses, layerTransform);
+		}
 		if (frame != null)
 		{
 			poseStack.translate(frame.translation().x(), frame.translation().y(), frame.translation().z());
@@ -376,7 +391,9 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 			poseStack.mulPose(Axis.XN.rotationDegrees(livingEntityRenderState.getHeadXRot()));
 		}
 		if (renderLayer == null && entityBonePoses != null)
+		{
 			entityBonePoses.put(bone.name(), new Matrix4f(poseStack.last().pose()));
+		}
 		if (renderLayer == null)
 		{
 			this.submitBone(renderState, bone, poseStack, data, controllers, renderType, packedColor, packedLight, packedOverlay);
@@ -393,14 +410,20 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 						poseStack.scale(scale.x(), scale.y(), scale.z());
 						Matrix4f attachmentTransform = getLayerTransform(bone.name(), poseStack, entityBonePoses);
 						if (deferredLayers != null)
+						{
 							deferredLayers.add(new DeferredLayerSubmit(layer, new Matrix4f(poseStack.last().pose()), attachmentTransform, packedColor, packedLight, packedOverlay));
+						}
 						else
+						{
 							layer.submit(this, renderState, poseStack, submitNodeCollector, cameraRenderState, controllers, molangContexts, packedColor, packedLight, packedOverlay, entityBonePoses, attachmentTransform);
+						}
 						poseStack.popPose();
 					}
 		}
 		else
+		{
 			this.submitBone(renderState, bone, poseStack, data, controllers, renderType, packedColor, packedLight, packedOverlay, renderLayer);
+		}
 		
 		if (!bone.children().isEmpty())
 			for(PBakedBone child : bone.children())
@@ -464,7 +487,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		for (PAnimationController<T> controller : controllers)
 		{
 			MolangParser.Context context = new MolangParser.Context().
-					query("anim_time", controller.getInterpolatedTime(partialTick) / 20.0f).
+					query("anim_time", PAnimationEvaluationContext.ticksToSeconds(controller.getInterpolatedTime(partialTick))).
 					randomSeed(manager.key().key());
 			populateMolangContext(animatable, controller, context, partialTick);
 			contexts.put(controller, context);
@@ -496,10 +519,14 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 	private Matrix4f getLayerTransform(String anchorBoneName, PoseStack poseStack, @Nullable Map<String, Matrix4f> entityBonePoses)
 	{
 		if (entityBonePoses == null)
+		{
 			return new Matrix4f();
+		}
 		Matrix4f anchorPose = entityBonePoses.get(anchorBoneName);
 		if (anchorPose == null)
+		{
 			return new Matrix4f();
+		}
 		return new Matrix4f(anchorPose).invert().mul(poseStack.last().pose());
 	}
 
@@ -519,15 +546,21 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 	{
 		String entityBoneName = renderLayer.getBoundEntityBone(bone.name());
 		if (entityBoneName == null)
+		{
 			return;
+		}
 		Matrix4f entityBonePose = entityBonePoses.get(entityBoneName);
 		if (entityBonePose == null)
+		{
 			return;
+		}
 		Matrix4f pose = poseStack.last().pose();
 		pose.set(entityBonePose);
 		pose.translate(-bone.basePosition().x(), -bone.basePosition().y(), -bone.basePosition().z());
 		if (layerTransform != null)
+		{
 			pose.mul(layerTransform);
+		}
 	}
 	
 	/**
@@ -584,7 +617,9 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		for (PBakedMesh mesh : bone.meshes())
 		{
 			if (mesh.textureReference().isEmpty())
+			{
 				continue;
+			}
 			
 			PMeshRenderContext inherited = new PMeshRenderContext(
 					renderType,
@@ -628,10 +663,14 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 	protected void setupRotations(LivingEntityRenderState renderState, PoseStack poseStack, float yBodyRot, float scale)
 	{
 		if (renderState.isFullyFrozen)
+		{
 			yBodyRot += (float)(Math.cos(Mth.floor(renderState.ageInTicks) * 3.25F) * Math.PI * 0.4F);
+		}
 		
 		if (!renderState.hasPose(Pose.SLEEPING))
+		{
 			poseStack.mulPose(Axis.YN.rotationDegrees(yBodyRot));
+		}
 		
 		float deathTime = renderState.deathTime;
 		if (deathTime > 0)
@@ -639,7 +678,9 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 			float f = (deathTime - 1.0F) / 20.0F * 1.6F;
 			f = Mth.sqrt(f);
 			if (f > 1.0F)
+			{
 				f = 1.0F;
+			}
 			
 			poseStack.mulPose(Axis.ZP.rotationDegrees(f * 90));
 		}
@@ -717,7 +758,9 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		float wornHeadAnimationPos = walkAnimationPos;
 		
 		if (entity.getVehicle() instanceof LivingEntity vehicle)
+		{
 			wornHeadAnimationPos = vehicle.walkAnimation.position(partialTick);
+		}
 		
 		state.wornHeadAnimationPos = wornHeadAnimationPos;
 		
@@ -728,7 +771,9 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		state.bedOrientation = entity.getBedOrientation();
 		
 		if (state.bedOrientation != null)
+		{
 			state.eyeHeight = entity.getEyeHeight(Pose.STANDING);
+		}
 		
 		state.isFullyFrozen = entity.isFullyFrozen();
 		state.isBaby = entity.isBaby();
@@ -780,12 +825,16 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 			float headDiff = Mth.clamp(Mth.wrapDegrees(headRot - bodyRot), -maxHeadDiff, maxHeadDiff);
 			bodyRot = headRot - headDiff;
 			if (Math.abs(headDiff) > 50.0F)
+			{
 				bodyRot += headDiff * 0.2F;
+			}
 			
 			return bodyRot;
 		}
 		else
+		{
 			return Mth.rotLerp(partialTick, entity.yBodyRotO, entity.yBodyRot);
+		}
 	}
 	
 	/**

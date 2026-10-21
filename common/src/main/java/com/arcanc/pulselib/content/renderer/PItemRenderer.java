@@ -15,6 +15,7 @@ import com.arcanc.pulselib.content.animatable.PAnimationController;
 import com.arcanc.pulselib.content.animatable.PAnimationManager;
 import com.arcanc.pulselib.content.mixin.ItemStackRenderStateAccessor;
 import com.arcanc.pulselib.content.model.animation.BoneFrame;
+import com.arcanc.pulselib.content.model.animation.PAnimationEvaluationContext;
 import com.arcanc.pulselib.content.model.baked.*;
 import com.arcanc.pulselib.content.renderer.base.PItemRenderState;
 import com.arcanc.pulselib.content.renderer.modelData.PModelData;
@@ -89,7 +90,9 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 	                   int outlineColor)
 	{
 		if (renderState == null)
+		{
 			return;
+		}
 		renderState.extractAdditionalData(lightCoords,  overlayCoords, hasFoil, outlineColor);
 		poseStack.pushPose();
 		PModelData modelData = getModelData(renderState);
@@ -183,7 +186,9 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 	{
 		PBakedModel model = renderState.getBakedModel();
 		if (model == null)
+		{
 			return;
+		}
 		
 		PAnimationManager<T> manager = PLibHelper.getManager(renderState.getAnimatable(), renderState.getAnimKey());
 		manager.bindModel(model);
@@ -235,7 +240,9 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 		PModelData data = this.getModelData(renderState);
 		PBakedModel model = data.getModel();
 		if (model == null)
+		{
 			return;
+		}
 		BoneFrame frame = bone.mixBone(model, controllers, molangContexts, renderState.partialTick());
 		poseStack.pushPose();
 		if (frame != null)
@@ -253,7 +260,9 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 		this.submitBone(renderState, bone, poseStack, data, controllers, renderType, packedColor, packedLight, packedOverlay, context);
 		
 		if (!bone.children().isEmpty())
+		{
 			bone.children().forEach(child -> perBoneSubmit(renderState, poseStack, child, controllers, molangContexts, renderType, packedColor, packedLight, packedOverlay, context));
+		}
 		
 		poseStack.popPose();
 	}
@@ -275,7 +284,7 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 		for (PAnimationController<T> controller : controllers)
 		{
 			MolangParser.Context context = new MolangParser.Context().
-					query("anim_time", controller.getInterpolatedTime(partialTick) / 20.0f).
+					query("anim_time", PAnimationEvaluationContext.ticksToSeconds(controller.getInterpolatedTime(partialTick))).
 					randomSeed(manager.key().key());
 			populateMolangContext(animatable, controller, context, partialTick);
 			contexts.put(controller, context);
@@ -326,7 +335,9 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 		bone.meshes().forEach(mesh ->
 		{
 			if (mesh.textureReference().isEmpty())
+			{
 				return;
+			}
 			
 			PMeshRenderContext inherited = new PMeshRenderContext(
 					renderType,

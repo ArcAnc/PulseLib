@@ -55,3 +55,12 @@ Supported math functions include trigonometry, interpolation, clamping, rounding
 ## `variable.*` lifetime
 
 `variable.*` assignments persist for the lifetime of a `PAnimationController`, including across render frames. They are private to that controller, so two controllers do not overwrite each other's variables. `temp.*` remains local to one expression evaluation.
+
+
+## Sampling and time boundaries
+
+Animation clip and keyframe timestamps remain in game ticks. `PAnimationEvaluationContext.ticksToSeconds(...)` converts controller time at the Molang boundary. A caller-supplied context already contains seconds and is not converted again.
+
+`PExpressionEvaluator` evaluates every expression against its current context, including expressions classified as `TIME_ONLY`. It does not retain global time buckets or quantize sub-tick time. The existing `clearTimeCache()` method remains for source compatibility and has no cache to clear. Variables, custom query resolvers and random expressions therefore retain their own evaluation order and controller state.
+
+Gecko rotation keys interpolate Euler degrees before conversion to quaternions, preserving complete positive and negative turns, including independent pre/post values. Vector and Euler Catmull-Rom sampling uses four neighboring control points with local segment progress; endpoint neighbors are duplicated. Overshoot is preserved. glTF quaternion tracks keep shortest-path slerp. Existing custom typed channels retain their two-point interpolation through the new default four-point overload.

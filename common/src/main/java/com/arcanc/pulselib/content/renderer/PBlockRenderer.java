@@ -16,6 +16,7 @@ import com.arcanc.pulselib.content.animatable.PAnimationManager;
 import com.arcanc.pulselib.content.animatable.instance.InstanceAnimationManager;
 import com.arcanc.pulselib.content.mixin.BlockEntityRenderStateAccessor;
 import com.arcanc.pulselib.content.model.animation.BoneFrame;
+import com.arcanc.pulselib.content.model.animation.PAnimationEvaluationContext;
 import com.arcanc.pulselib.content.model.baked.PBakedBone;
 import com.arcanc.pulselib.content.model.baked.PBakedMesh;
 import com.arcanc.pulselib.content.model.baked.PBakedModel;
@@ -167,7 +168,9 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 	{
 		PBakedModel model = this.getModelData(renderState).getModel();
 		if (model == null)
+		{
 			return;
+		}
 		PAnimationManager<T> manager = PLibHelper.getManager(renderState.getAnimatable(), renderState.getAnimKey());
 		manager.bindModel(model);
 		Collection<PAnimationController<T>> controllers = manager.getControllers().values();
@@ -222,7 +225,9 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 		this.submitBone(renderState, bone, poseStack, data, controllers, renderType, packedColor, packedLight, packedOverlay);
 		
 		if (!bone.children().isEmpty())
+		{
 			bone.children().forEach(child -> perBoneSubmit(renderState, poseStack, child, controllers, molangContexts, renderType, packedColor, packedLight, packedOverlay));
+		}
 		
 		poseStack.popPose();
 	}
@@ -244,7 +249,7 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 		for (PAnimationController<T> controller : controllers)
 		{
 			MolangParser.Context context = new MolangParser.Context().
-					query("anim_time", controller.getInterpolatedTime(partialTick) / 20.0f).
+					query("anim_time", PAnimationEvaluationContext.ticksToSeconds(controller.getInterpolatedTime(partialTick))).
 					randomSeed(manager.key().key());
 			populateMolangContext(animatable, controller, context, partialTick);
 			contexts.put(controller, context);
@@ -293,7 +298,9 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 		bone.meshes().forEach(mesh ->
 		{
 			if (mesh.textureReference().isEmpty())
+			{
 				return;
+			}
 			
 			PMeshRenderContext inherited = new PMeshRenderContext(
 					renderType,
@@ -306,9 +313,13 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 			RenderType type = material.resolveRenderType(meshContext, PResourceCache.ATLAS_LOCATION);
 			
 			if (PRenderTypes.isTransparent(type))
+			{
 				PRenderQueue.submitBlockEntityTranslucentMesh(type, material.mesh(), meshContext.deformation(), new PRenderQueue.InstanceData(matrix4fstack, meshContext.color(), material.packedLight(), meshContext.packedOverlay()));
+			}
 			else
+			{
 				PRenderQueue.submitBlockEntityMesh(type, material.mesh(), meshContext.deformation(), new PRenderQueue.InstanceData(matrix4fstack, meshContext.color(), material.packedLight(), meshContext.packedOverlay()));
+			}
 		});
 	}
 	
@@ -336,9 +347,13 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 	protected void tryRotateToRealRotation(PoseStack poseStack, Direction facing)
 	{
 		if (facing.getAxis().isHorizontal())
+		{
 			poseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
+		}
 		else
+		{
 			poseStack.mulPose(Axis.XP.rotationDegrees(90 * facing.getUnitVec3i().getY()));
+		}
 	}
 	
 	/**
@@ -352,13 +367,19 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 		Direction dir = Direction.NORTH;
 		
 		if (blockState.hasProperty(BlockStateProperties.HORIZONTAL_FACING))
+		{
 			dir = blockState.getValue(BlockStateProperties.HORIZONTAL_FACING);
+		}
 		
 		if (blockState.hasProperty(BlockStateProperties.FACING))
+		{
 			dir = blockState.getValue(BlockStateProperties.FACING);
+		}
 		
 		if (dir.getAxis() ==  Direction.Axis.Z)
+		{
 			dir = dir.getOpposite();
+		}
 		return dir;
 	}
 }

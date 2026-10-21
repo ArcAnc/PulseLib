@@ -76,8 +76,18 @@ public final class Stage1Client implements IPulseClientPlugin
 
 	private static void renderers(EntityRenderersEvent.RegisterRenderers event)
 	{
-		event.registerBlockEntityRenderer(Stage1Content.BETypeReg.TEST_BLOCK_ENTITY.get(), TestBlockEntityRenderer::new);
-		event.registerEntityRenderer(Stage1Content.EntityTypeReg.TEST_ENTITY.get(), TestEntityRender::new);
+		event.registerBlockEntityRenderer(Stage1Content.BETypeReg.TEST_BLOCK_ENTITY.get(), context ->
+		{
+			var renderer = new TestBlockEntityRenderer(context);
+			Stage32TimeProbe.blockRenderer = renderer;
+			return renderer;
+		});
+		event.registerEntityRenderer(Stage1Content.EntityTypeReg.TEST_ENTITY.get(), context ->
+		{
+			var renderer = new TestEntityRender(context);
+			Stage32TimeProbe.entityRenderer = renderer;
+			return renderer;
+		});
 	}
 
 	@Override
@@ -132,9 +142,24 @@ public final class Stage1Client implements IPulseClientPlugin
 					message -> LogUtils.getLogger().info("{}", message.getString()));
 		}
 		boolean pluginProbe = Boolean.getBoolean("pulselib.stage2Probe");
+		if (Boolean.getBoolean("pulselib.stage32Probe") && (worldTicks == 100 || worldTicks == 210))
+		{
+			Stage32TimeProbe.lighting(worldTicks);
+		}
 		if (Boolean.getBoolean("pulselib.stage31Probe") && worldTicks == 75)
 		{
 			Stage31ItemIdentityProbe.verify();
+		}
+		if (Boolean.getBoolean("pulselib.stage32Probe") && worldTicks == 80)
+		{
+			try
+			{
+				Stage32TimeProbe.verify();
+			}
+			catch (ReflectiveOperationException exception)
+			{
+				throw new AssertionError("Renderer Molang time probe failed", exception);
+			}
 		}
 		if (pluginProbe && worldTicks == 50)
 		{

@@ -15,15 +15,16 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 /**
- * Provides support for molang euler rotation value.
+ * Gecko Euler-degree expressions sampled before conversion to a quaternion rotation.
  */
 public final class PMolangEulerRotationValue implements PAnimationValue<Quaternionf>
 {
 	private final PMolangVectorValue eulerDegrees;
 
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param eulerDegrees the euler degrees to use.
+	 * Uses source Euler-degree expressions as a sampled quaternion rotation value.
+	 *
+	 * @param eulerDegrees the euler degrees
 	 */
 	public PMolangEulerRotationValue(PMolangVectorValue eulerDegrees)
 	{
@@ -31,15 +32,27 @@ public final class PMolangEulerRotationValue implements PAnimationValue<Quaterni
 	}
 
 	/**
-	 * Performs the evaluate operation.
-	 * @param context the context to use.
-	 * @param destination the destination to use.
+	 * Evaluates authored degrees without normalizing away complete revolutions.
+	 *
+	 * @param context the animation sampling context and reusable scratch values
+	 * @param destination the mutable object receiving the result
+	 */
+	public void evaluateEuler(PAnimationEvaluationContext context, Vector3f destination)
+	{
+		this.eulerDegrees.evaluate(context, destination);
+	}
+
+	/**
+	 * Evaluates the source Euler expressions and converts the result into the destination quaternion.
+	 *
+	 * @param context the animation sampling context and reusable scratch values
+	 * @param destination the mutable object receiving the result
 	 */
 	@Override
 	public void evaluate(PAnimationEvaluationContext context, Quaternionf destination)
 	{
 		Vector3f temporary = context.temporaryVector();
-		this.eulerDegrees.evaluate(context, temporary);
+		evaluateEuler(context, temporary);
 		destination.rotationXYZ(
 				(float) Math.toRadians(temporary.x),
 				(float) Math.toRadians(temporary.y),

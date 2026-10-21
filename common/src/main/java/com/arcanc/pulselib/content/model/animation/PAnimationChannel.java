@@ -15,19 +15,24 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 /**
- * Provides support for animation channel.
+ * Built-in vector and quaternion channel implementations for bone transform animation.
  */
 public class PAnimationChannel
 {
-/**
- * Immutable value object representing vector3f channel type.
- */
+	/**
+	 * Vector-valued animation channel with configurable default value, blend behavior and pose writer.
+	 *
+	 * @param id the namespaced resource or registration identifier
+	 * @param defaultValue the default value
+	 * @param multiplicativeBlend the multiplicative blend
+	 */
 	public record Vector3fChannelType(Identifier id, Vector3f defaultValue, boolean multiplicativeBlend)
 			implements PAnimationChannelType<Vector3f>
 	{
 		/**
-		 * Performs the value class operation.
-		 * @return the value produced by this operation.
+		 * Returns the value class.
+		 *
+		 * @return the value class
 		 */
 		@Override
 		public Class<Vector3f> valueClass()
@@ -36,8 +41,9 @@ public class PAnimationChannel
 		}
 
 		/**
-		 * Performs the default value operation.
-		 * @return the value produced by this operation.
+		 * Returns the default value.
+		 *
+		 * @return the default value
 		 */
 		@Override
 		public Vector3f defaultValue()
@@ -46,12 +52,7 @@ public class PAnimationChannel
 		}
 
 		/**
-		 * Performs the interpolate operation.
-		 * @param from the from to use.
-		 * @param to the to to use.
-		 * @param alpha the alpha to use.
-		 * @param interpolation the interpolation to use.
-		 * @param destination the destination to use.
+		 * {@inheritDoc}
 		 */
 		@Override
 		public void interpolate(Vector3f from, Vector3f to, float alpha, PInterpolation interpolation, Vector3f destination)
@@ -60,12 +61,25 @@ public class PAnimationChannel
 		}
 
 		/**
-		 * Performs the blend operation.
-		 * @param base the base to use.
-		 * @param layer the layer to use.
-		 * @param weight the weight to use.
-		 * @param mode the mode to use.
-		 * @param destination the destination to use.
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void interpolate(Vector3f before, Vector3f from, Vector3f to, Vector3f after,
+		                        float alpha, PInterpolation interpolation, Vector3f destination)
+		{
+			if (interpolation != PInterpolationType.CATMULLROM)
+			{
+				interpolate(from, to, alpha, interpolation, destination);
+				return;
+			}
+			destination.set(
+					(float)PInterpolationType.catmullRom(alpha, before.x, from.x, to.x, after.x),
+					(float)PInterpolationType.catmullRom(alpha, before.y, from.y, to.y, after.y),
+					(float)PInterpolationType.catmullRom(alpha, before.z, from.z, to.z, after.z));
+		}
+
+		/**
+		 * {@inheritDoc}
 		 */
 		@Override
 		public void blend(Vector3f base, Vector3f layer, float weight, PBlendMode mode, Vector3f destination)
@@ -77,37 +91,45 @@ public class PAnimationChannel
 				case ADDITIVE ->
 				{
 					if (this.multiplicativeBlend)
+					{
 						destination.set(base).mul(new Vector3f(1f).lerp(layer, clampedWeight));
+					}
 					else
+					{
 						destination.set(base).add(new Vector3f(layer).mul(clampedWeight));
+					}
 				}
 			}
 		}
 
 		/**
-		 * Performs the apply operation.
-		 * @param pose the pose to use.
-		 * @param boneIndex the bone index to use.
-		 * @param value the value to use.
+		 * {@inheritDoc}
 		 */
 		@Override
 		public void apply(PPoseWriter pose, int boneIndex, Vector3f value)
 		{
 			if (this.multiplicativeBlend)
+			{
 				pose.scale(boneIndex, value);
+			}
 			else
+			{
 				pose.translation(boneIndex, value);
+			}
 		}
 	}
 
-/**
- * Immutable value object representing quaternion channel type.
- */
+	/**
+	 * Quaternion rotation channel that interpolates and blends bone orientations.
+	 *
+	 * @param id the namespaced resource or registration identifier
+	 */
 	public record QuaternionChannelType(Identifier id) implements PAnimationChannelType<Quaternionf>
 	{
 		/**
-		 * Performs the value class operation.
-		 * @return the value produced by this operation.
+		 * Returns the value class.
+		 *
+		 * @return the value class
 		 */
 		@Override
 		public Class<Quaternionf> valueClass()
@@ -116,8 +138,9 @@ public class PAnimationChannel
 		}
 
 		/**
-		 * Performs the default value operation.
-		 * @return the value produced by this operation.
+		 * Returns the default value.
+		 *
+		 * @return the default value
 		 */
 		@Override
 		public Quaternionf defaultValue()
@@ -126,12 +149,7 @@ public class PAnimationChannel
 		}
 
 		/**
-		 * Performs the interpolate operation.
-		 * @param from the from to use.
-		 * @param to the to to use.
-		 * @param alpha the alpha to use.
-		 * @param interpolation the interpolation to use.
-		 * @param destination the destination to use.
+		 * {@inheritDoc}
 		 */
 		@Override
 		public void interpolate(Quaternionf from, Quaternionf to, float alpha, PInterpolation interpolation, Quaternionf destination)
@@ -140,12 +158,7 @@ public class PAnimationChannel
 		}
 
 		/**
-		 * Performs the blend operation.
-		 * @param base the base to use.
-		 * @param layer the layer to use.
-		 * @param weight the weight to use.
-		 * @param mode the mode to use.
-		 * @param destination the destination to use.
+		 * {@inheritDoc}
 		 */
 		@Override
 		public void blend(Quaternionf base, Quaternionf layer, float weight, PBlendMode mode, Quaternionf destination)
@@ -159,10 +172,7 @@ public class PAnimationChannel
 		}
 
 		/**
-		 * Performs the apply operation.
-		 * @param pose the pose to use.
-		 * @param boneIndex the bone index to use.
-		 * @param value the value to use.
+		 * {@inheritDoc}
 		 */
 		@Override
 		public void apply(PPoseWriter pose, int boneIndex, Quaternionf value)
@@ -171,12 +181,6 @@ public class PAnimationChannel
 		}
 	}
 
-	/**
-	 * Performs the transformed alpha operation.
-	 * @param alpha the alpha to use.
-	 * @param interpolation the interpolation to use.
-	 * @return the value produced by this operation.
-	 */
 	private static float transformedAlpha(float alpha, PInterpolation interpolation)
 	{
 		return (float) interpolation.buildTransformer(Math.clamp(alpha, 0f, 1f));

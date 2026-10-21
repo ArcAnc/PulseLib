@@ -1,0 +1,38 @@
+Stage 3.2 final runtime; both client and dedicated server exit 0.
+CLIENT:
+[21:57:02] [Render thread/INFO] [Pulse Lib/]: PulseLib resource reload: collected 4 model declarations
+[21:57:09] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 1 PASS: independent identical stacks
+[21:57:09] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 2 PASS: repeated reads
+[21:57:09] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 3 PASS: ordinary copy before/after first identity access
+[21:57:09] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 4 PASS: 100-copy chain
+[21:57:09] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 5 PASS: copyWithCount
+[21:57:09] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 6 PASS: partial split, including an unassigned source
+[21:57:09] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 7 PASS: full split and source refill
+[21:57:09] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 8 PASS: count mutation
+[21:57:09] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 9 PASS: component mutation/removal
+[21:57:09] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 10 PASS: tool durability mutation
+[21:57:09] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 11 PASS: EMPTY
+[21:57:09] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 12 PASS: ordinary items, no managers from identity assignment
+[21:57:09] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 13 PASS: 100000 copies
+[21:57:09] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 14 PASS: eight concurrent readers/copy callers
+[21:57:09] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 15 PASS: NBT and network round trips
+[21:57:09] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 16 PASS: vanilla component equality and merging
+[21:57:09] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSIONS PASS: 16 cases, copy-sharing limitation, independent controllers and phases
+[21:57:10] [Render thread/INFO] [Pulse Lib/]: STAGE 3.2 RENDERER TIME PASS: 60 assertions, Entity/BlockEntity/Item, interpolated seconds
+[21:57:11] [Render thread/INFO] [Pulse Lib/]: STAGE 3.2 VANILLA LIGHT INPUTS: tick=100, leftSky=15, rightSky=15, leftRaw=15, rightRaw=15
+[21:57:12] [Render thread/INFO] [Pulse Lib/]: PulseLib resource reload: collected 4 model declarations
+[21:57:16] [Render thread/INFO] [Pulse Lib/]: STAGE 3.2 VANILLA LIGHT INPUTS: tick=210, leftSky=15, rightSky=15, leftRaw=15, rightRaw=15
+[21:57:21] [Render thread/INFO] [Pulse Lib/]: STAGE 2 CLIENT PLUGINS PASS: ids=[pulselib:stage1_client, pulselib:stage2_common], common=1, channels=1, events=1, deformers=1, client=1, server=0, models=2
+[21:57:21] [Render thread/INFO] [co.ar.pu.te.st.Stage1Client/]: STAGE 1.2 WORLD SMOKE: entity=1602, block=1602, item=1645
+[21:57:21] [Render thread/INFO] [Pulse Lib/]: STAGE 3.1 MANAGER SHUTDOWN PASS: singleton=0, instance=0, surviving ID retained
+BUILD SUCCESSFUL in 35s
+
+SERVER:
+[21:53:17] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved
+[21:53:17] [Server thread/INFO] [Pulse Lib/]: STAGE 2 SERVER PLUGINS PASS: ids=[pulselib:stage2_common, pulselib:stage2_server], common=1, channels=1, events=1, deformers=1, client=0, server=1, models=0
+[21:57:40] [Server thread/INFO] [minecraft/MinecraftServer]: Stopping the server
+[21:57:41] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved
+[21:57:42] [main/INFO] [ne.ne.fm.lo.FMLLoader/]: Closing FML Loader 4b295318
+BUILD SUCCESSFUL in 4m 40s
+
+Unsuccessful diagnostic run (not a PASS): exit 137; debugger could not complete observation without altering a user-owned breakpoint; automatic approval rejected removal. No lighting cause established from debugger.

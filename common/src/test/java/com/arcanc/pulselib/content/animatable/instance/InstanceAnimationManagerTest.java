@@ -56,8 +56,7 @@ class InstanceAnimationManagerTest
 		var model = new PBakedModel(List.of(), Map.of("idle", new PAnimation("idle", 100, Map.of())));
 		owner.manager.bindModel(model);
 		graph.parameters().set("saved", 42);
-		// The 26.1 graph accepts float deltas; integral 12 is exact here.
-		graph.tick(model, 12);
+		graph.tickPrecise(model, 12);
 		InstanceAnimationManager.addManager(owner.manager, 0);
 		InstanceAnimationManager.addManager(owner.manager, 3000);
 		InstanceAnimationManager.addManager(owner.manager, 6000);

@@ -9,21 +9,20 @@
 
 package com.arcanc.pulselib.data.gecko;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 /**
- * Provides support for expression evaluator.
+ * Evaluates against the current context on every call. Even TIME_ONLY queries can
+ * be overridden by a context's resolver; clip time alone is never a cache key.
+ * Parsed CONSTANT programs already retain their folded value in MolangParser.
  */
 public final class PExpressionEvaluator
 {
+	/**
+	 * Shared evaluator for expressions whose caching follows the dependency contract.
+	 */
 	public static final PExpressionEvaluator SHARED = new PExpressionEvaluator();
 
-	private final Map<MolangParser.Expression, TimedValue> timeOnlyValues = new ConcurrentHashMap<>();
-	private final float timeQuantum;
-
 	/**
-	 * Creates an instance of the enclosing type.
+	 * Creates an expression evaluator that retains only context-independent constant results.
 	 */
 	public PExpressionEvaluator()
 	{
@@ -31,61 +30,30 @@ public final class PExpressionEvaluator
 	}
 
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param timeQuantum the time quantum to use.
+	 * Retained for source/binary compatibility. Time is no longer quantized.
+	 * @param timeQuantum the formerly used positive cache quantum.
 	 */
 	public PExpressionEvaluator(float timeQuantum)
 	{
 		if (timeQuantum <= 0f)
+		{
 			throw new IllegalArgumentException("timeQuantum must be positive");
-		this.timeQuantum = timeQuantum;
+		}
 	}
 
 	/**
-	 * Performs the evaluate operation.
-	 * @param expression the expression to use.
-	 * @param context the context to use.
-	 * @param animationTime the animation time to use.
-	 * @return the value produced by this operation.
+	 * @param expression the parsed program.
+	 * @param context the actual queries, variables, resolver and random state.
+	 * @param animationTime clip time in ticks, retained for API compatibility.
+	 * @return the current result, without sharing values between contexts.
 	 */
 	public float evaluate(MolangParser.Expression expression, MolangParser.Context context, float animationTime)
 	{
-		return switch (expression.dependency())
-		{
-			case CONSTANT, INSTANCE, STATEFUL -> expression.evaluate(context);
-			case TIME_ONLY -> timeOnly(expression, context, Math.round(animationTime / this.timeQuantum));
-		};
+		return expression.evaluate(context);
 	}
 
-	/**
-	 * Clears the time cache.
-	 */
+	/** Retained for compatibility with resource reload callers; no values are retained. */
 	public void clearTimeCache()
-	{
-		this.timeOnlyValues.clear();
-	}
-
-	/**
-	 * Performs the time only operation.
-	 * @param expression the expression to use.
-	 * @param context the context to use.
-	 * @param timeStep the time step to use.
-	 * @return the value produced by this operation.
-	 */
-	private float timeOnly(MolangParser.Expression expression, MolangParser.Context context, int timeStep)
-	{
-		TimedValue cached = this.timeOnlyValues.get(expression);
-		if (cached != null && cached.timeStep == timeStep)
-			return cached.value;
-		float value = expression.evaluate(context);
-		this.timeOnlyValues.put(expression, new TimedValue(timeStep, value));
-		return value;
-	}
-
-/**
- * Immutable value object representing timed value.
- */
-	private record TimedValue(int timeStep, float value)
 	{
 	}
 }

@@ -135,7 +135,9 @@ public class PAnimationController<T extends PAnimatable<T>>
 	public PAnimationController<T> setParameter(String name, float value)
 	{
 		if (this.graphRuntime == null)
+		{
 			throw new IllegalStateException("This controller does not have an animation graph");
+		}
 		this.graphRuntime.parameters().set(name, value);
 		return this;
 	}
@@ -149,7 +151,9 @@ public class PAnimationController<T extends PAnimatable<T>>
 	public PAnimationController<T> setParameter(String name, boolean value)
 	{
 		if (this.graphRuntime == null)
+		{
 			throw new IllegalStateException("This controller does not have an animation graph");
+		}
 		this.graphRuntime.parameters().set(name, value);
 		return this;
 	}
@@ -162,7 +166,9 @@ public class PAnimationController<T extends PAnimatable<T>>
 	public PAnimationController<T> trigger(String name)
 	{
 		if (this.graphRuntime == null)
+		{
 			throw new IllegalStateException("This controller does not have an animation graph");
+		}
 		this.graphRuntime.parameters().trigger(name);
 		return this;
 	}
@@ -179,9 +185,13 @@ public class PAnimationController<T extends PAnimatable<T>>
 			PAnimationStagePlayback stage = getCurrentStage();
 			if (stage != null && stage.animationType() == PAnimationType.HOLD_LAST_FRAME)
 				if (this.state == ControllerState.PAUSE)
+				{
 					return;
+				}
 			if (this.state == ControllerState.PLAY)
+			{
 				return;
+			}
 		}
 		
 		this.currentAnimation = animation;
@@ -196,7 +206,9 @@ public class PAnimationController<T extends PAnimatable<T>>
 	public void pause()
 	{
 		if (this.state == ControllerState.PLAY)
+		{
 			this.state = ControllerState.PAUSE;
+		}
 	}
 	
 	/**
@@ -205,7 +217,9 @@ public class PAnimationController<T extends PAnimatable<T>>
 	public void resume()
 	{
 		if (this.state == ControllerState.PAUSE)
+		{
 			this.state = ControllerState.PLAY;
+		}
 	}
 	
 	/**
@@ -278,16 +292,22 @@ public class PAnimationController<T extends PAnimatable<T>>
 	                                                        @Nullable BoneFrame accumulatedFrame)
 	{
 		if (this.state == ControllerState.STOP)
+		{
 			return null;
+		}
 		
 		PAnimationStagePlayback stage = getCurrentStage();
 		if (stage == null)
+		{
 			return null;
+		}
 		
 		PAnimation animation = model.animations().get(stage.animationName());
 		
 		if (animation == null)
+		{
 			return null;
+		}
 		
 		float animationTime = this.getInterpolatedTime(partialTick);
 		return animation.calculateBoneTransformations(
@@ -314,10 +334,14 @@ public class PAnimationController<T extends PAnimatable<T>>
 	                                                        @Nullable BoneFrame accumulatedFrame)
 	{
 		if (this.state == ControllerState.STOP)
+		{
 			return null;
+		}
 		PAnimationStagePlayback stage = getCurrentStage();
 		if (stage == null || stage.isWaiting() || animation.boneAnimation(boneIndex) == null)
+		{
 			return null;
+		}
 		return animation.animation().calculateBoneTransformations(
 				animation.boneAnimation(boneIndex),
 				this.getInterpolatedTime(partialTick),
@@ -356,24 +380,32 @@ public class PAnimationController<T extends PAnimatable<T>>
 	public void tick(T animatable, float tickCount, PBakedModel model, Collection<PAnimationController<T>> poseControllers)
 	{
 		if (!Float.isFinite(tickCount))
+		{
 			throw new IllegalArgumentException("Animation tick delta must be finite");
+		}
 		if (this.graphRuntime != null)
 		{
 			if (this.state == ControllerState.PLAY)
-				for (PAnimationGraphRuntime.EventTrack track : this.graphRuntime.tick(model, tickCount))
+				for (PAnimationGraphRuntime.PreciseEventTrack track : this.graphRuntime.tickPrecise(model, tickCount))
 				{
 					PAnimation animation = model == null ? null : model.animations().get(track.animation());
 					if (animation != null)
+					{
 						fireEvents(animatable, model, poseControllers, animation, track.from(), track.to(), track.animationType());
+					}
 				}
 			return;
 		}
 		ControllerState newState = this.stateHandler.handle(new AnimatableState<>(animatable, this));
 		if (newState != this.state)
+		{
 			this.state = newState;
+		}
 		
 		if (this.state != ControllerState.PLAY)
+		{
 			return;
+		}
 		
 		if (this.currentAnimation == null)
 		{
@@ -388,7 +420,9 @@ public class PAnimationController<T extends PAnimatable<T>>
 		}
 		
 		if (model == null)
+		{
 			return;
+		}
 		
 		PAnimationStagePlayback stage = getCurrentStage();
 		if (stage == null)
@@ -405,7 +439,9 @@ public class PAnimationController<T extends PAnimatable<T>>
 			this.interpolationTo = this.time;
 			this.interpolationCycleLength = 0.0f;
 			if (this.time >= stage.waitTicks())
+			{
 				completePlayback();
+			}
 			return;
 		}
 		
@@ -417,6 +453,7 @@ public class PAnimationController<T extends PAnimatable<T>>
 		}
 		
 		float length = animation.length();
+		boolean includeReverseStart = !this.stageStarted || stage.speed() >= 0.0f;
 		if (this.stageStarted)
 		{
 			this.time = stage.speed() < 0.0f ? length : 0.0f;
@@ -436,7 +473,9 @@ public class PAnimationController<T extends PAnimatable<T>>
 				float bounded = Math.clamp(this.time, 0.0f, length);
 				fireEvents(animatable, model, poseControllers, animation, this.prevTime, bounded, PAnimationType.PLAY_ONCE);
 				if ((stage.speed() >= 0.0f && this.time >= length) || (stage.speed() < 0.0f && this.time <= 0.0f))
+				{
 					completePlayback();
+				}
 			}
 			case HOLD_LAST_FRAME ->
 			{
@@ -456,11 +495,13 @@ public class PAnimationController<T extends PAnimatable<T>>
 			{
 				if (length > 0)
 				{
+					double cyclicTime = this.time + (double)tickCount * stage.speed();
 					this.interpolationFrom = this.time;
-					this.interpolationTo = nextTime;
+					this.interpolationTo = (float)cyclicTime;
 					this.interpolationCycleLength = length;
-					fireEvents(animatable, model, poseControllers, animation, this.prevTime, nextTime, PAnimationType.CYCLE);
-					this.time = floorMod(nextTime, length);
+					fireCyclicEvents(animatable, model, poseControllers, animation, this.prevTime, cyclicTime, includeReverseStart);
+					double wrapped = cyclicTime % length;
+					this.time = (float)(wrapped < 0.0 ? wrapped + length : wrapped);
 				}
 				else
 				{
@@ -487,16 +528,22 @@ public class PAnimationController<T extends PAnimatable<T>>
 	                        PBakedModel model,
 	                        Collection<PAnimationController<T>> poseControllers,
 	                        PAnimation animation,
-	                        float from,
-	                        float to,
+	                        double from,
+	                        double to,
 	                        PAnimationType type)
 	{
 		if (type == PAnimationType.CYCLE && animation.length() > 0.0f)
-			fireCyclicEvents(animatable, model, poseControllers, animation, from, to);
+		{
+			fireCyclicEvents(animatable, model, poseControllers, animation, from, to, true);
+		}
 		else if (to >= from)
-			animation.eventsBetween(from, to).forEach(event -> PAnimationEventDispatcher.dispatch(animatable, this, event, model, poseControllers));
+		{
+			animation.eventsBetween((float)from, (float)to).forEach(event -> PAnimationEventDispatcher.dispatch(animatable, this, event, model, poseControllers));
+		}
 		else
-			animation.eventsBetweenReverse(from, to).forEach(event -> PAnimationEventDispatcher.dispatch(animatable, this, event, model, poseControllers));
+		{
+			animation.eventsBetweenReverse((float)from, (float)to).forEach(event -> PAnimationEventDispatcher.dispatch(animatable, this, event, model, poseControllers));
+		}
 	}
 
 	/**
@@ -509,41 +556,10 @@ public class PAnimationController<T extends PAnimatable<T>>
 	 * @param to the to to use.
 	 */
 	private void fireCyclicEvents(T animatable, PBakedModel model, Collection<PAnimationController<T>> controllers,
-	                              PAnimation animation, float from, float to)
+	                              PAnimation animation, double from, double to, boolean includeReverseStart)
 	{
-		float length = animation.length();
-		if (to >= from)
-		{
-			for (float cursor = from; cursor < to; )
-			{
-				float boundary = ((float)Math.floor(cursor / length) + 1.0f) * length;
-				float end = Math.min(to, boundary);
-				float localFrom = floorMod(cursor, length);
-				float localTo = end == boundary ? length : floorMod(end, length);
-				animation.eventsBetween(localFrom, localTo).forEach(event -> PAnimationEventDispatcher.dispatch(animatable, this, event, model, controllers));
-				if (end >= to) break;
-				cursor = end;
-			}
-		}
-		else
-		{
-			boolean wrapped = false;
-			for (float cursor = from; cursor > to; )
-			{
-				float boundary = ((float)Math.ceil(cursor / length) - 1.0f) * length;
-				float end = Math.max(to, boundary);
-				float localFrom = floorMod(cursor, length);
-				if (localFrom == 0.0f && (cursor > 0.0f || wrapped)) localFrom = length;
-				float localTo = end == boundary ? 0.0f : floorMod(end, length);
-				animation.eventsBetweenReverse(localFrom, localTo).forEach(event -> PAnimationEventDispatcher.dispatch(animatable, this, event, model, controllers));
-				if (end <= to) break;
-				// Crossing zero wraps onto the end marker of the previous cycle.
-				animation.eventsBetween(length - 1.0e-6f, length).forEach(event ->
-						PAnimationEventDispatcher.dispatch(animatable, this, event, model, controllers));
-				wrapped = true;
-				cursor = end;
-			}
-		}
+		animation.forEachCyclicEvent(from, to, includeReverseStart, event ->
+				PAnimationEventDispatcher.dispatch(animatable, this, event, model, controllers));
 	}
 
 	/**
@@ -627,7 +643,9 @@ public class PAnimationController<T extends PAnimatable<T>>
 	public float getInterpolatedTime(float partialTick)
 	{
 		if (this.graphRuntime != null)
+		{
 			return this.graphRuntime.interpolatedTime(partialTick);
+		}
 		float interpolated = Mth.lerp(partialTick, this.interpolationFrom, this.interpolationTo);
 		return this.interpolationCycleLength > 0.0f ? floorMod(interpolated, this.interpolationCycleLength) : interpolated;
 	}
@@ -639,7 +657,9 @@ public class PAnimationController<T extends PAnimatable<T>>
 	public float getTime()
 	{
 		if (this.graphRuntime != null)
+		{
 			return this.graphRuntime.time();
+		}
 		return this.time;
 	}
 	
@@ -651,10 +671,14 @@ public class PAnimationController<T extends PAnimatable<T>>
 	public float cyclePhase(PBakedModel model)
 	{
 		if (this.graphRuntime != null)
+		{
 			return this.graphRuntime.cyclePhase(model);
+		}
 		PAnimationStagePlayback stage = getCurrentStage();
 		if (stage == null || stage.animationType() != PAnimationType.CYCLE)
+		{
 			return Float.NaN;
+		}
 		PAnimation animation = model.animations().get(stage.animationName());
 		return animation == null || animation.length() <= 0.0f ? Float.NaN : this.time / animation.length();
 	}
@@ -673,12 +697,19 @@ public class PAnimationController<T extends PAnimatable<T>>
 		}
 		PAnimationStagePlayback stage = getCurrentStage();
 		if (stage == null || stage.animationType() != PAnimationType.CYCLE)
+		{
 			return;
+		}
 		PAnimation animation = model.animations().get(stage.animationName());
 		if (animation == null || animation.length() <= 0.0f)
+		{
 			return;
+		}
 		this.time = Math.clamp(phase, 0.0f, 1.0f) * animation.length();
 		this.prevTime = this.time;
+		this.interpolationFrom = this.time;
+		this.interpolationTo = this.time;
+		this.interpolationCycleLength = 0.0f;
 		this.stageStarted = false;
 	}
 
@@ -689,16 +720,25 @@ public class PAnimationController<T extends PAnimatable<T>>
 	public void seek(PBakedModel model, float animationTime)
 	{
 		if (this.graphRuntime != null)
+		{
 			return;
+		}
 		PAnimationStagePlayback stage = getCurrentStage();
 		if (stage == null || stage.isWaiting())
+		{
 			return;
+		}
 		PAnimation animation = model.animations().get(stage.animationName());
 		if (animation == null || animation.length() <= 0.0f)
+		{
 			return;
+		}
 		this.time = stage.animationType() == PAnimationType.CYCLE ? floorMod(animationTime, animation.length()) :
 				Math.clamp(animationTime, 0.0f, animation.length());
 		this.prevTime = this.time;
+		this.interpolationFrom = this.time;
+		this.interpolationTo = this.time;
+		this.interpolationCycleLength = 0.0f;
 		this.stageStarted = false;
 	}
 	
@@ -719,7 +759,9 @@ public class PAnimationController<T extends PAnimatable<T>>
 	public List<PAnimationGraphRuntime.Layer> graphLayers(PBakedModel model)
 	{
 		if (this.graphRuntime == null || this.state == ControllerState.STOP)
+		{
 			return List.of();
+		}
 		return this.graphRuntime.layers(model);
 	}
 	

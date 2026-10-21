@@ -106,7 +106,9 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 		for (PAnimationController<T> controller : this.controllers)
 		{
 			if (controller.isStopped())
+			{
 				continue;
+			}
 
 			var layers = controller.graphLayers(this.model);
 			if (!layers.isEmpty())
@@ -114,20 +116,28 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 				for (PAnimationGraphRuntime.Layer layer : layers)
 				{
 					if (layer.weight() <= 0.0f)
+					{
 						continue;
+					}
 					PAnimation animation = this.model.animations().get(layer.animation());
 					if (animation != null && !animation.isBoneVisible(bone.name(), layer.time()))
+					{
 						return false;
+					}
 				}
 				continue;
 			}
 
 			PAnimationStagePlayback stage = controller.getCurrentStage();
 			if (stage == null || stage.isWaiting())
+			{
 				continue;
+			}
 			PAnimation animation = this.model.animations().get(stage.animationName());
 			if (animation != null && !animation.isBoneVisible(bone.name(), controller.getInterpolatedTime(this.partialTick)))
+			{
 				return false;
+			}
 		}
 		return true;
 	}
@@ -142,7 +152,9 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 		for (PAnimationController<T> controller : this.controllers)
 		{
 			if (controller.isStopped())
+			{
 				continue;
+			}
 
 			var layers = controller.graphLayers(this.model);
 			if (!layers.isEmpty())
@@ -150,7 +162,9 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 				for (PAnimationGraphRuntime.Layer layer : layers)
 				{
 					if (layer.weight() <= 0.0f)
+					{
 						continue;
+					}
 					addAnimationBones(result, this.model.animations().get(layer.animation()));
 				}
 				continue;
@@ -158,7 +172,9 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 
 			PAnimationStagePlayback stage = controller.getCurrentStage();
 			if (stage != null && !stage.isWaiting())
+			{
 				addAnimationBones(result, this.model.animations().get(stage.animationName()));
+			}
 		}
 		return Set.copyOf(result);
 	}
@@ -171,7 +187,9 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	private static void addAnimationBones(Set<String> destination, @Nullable PAnimation animation)
 	{
 		if (animation == null)
+		{
 			return;
+		}
 		destination.addAll(animation.boneAnimations().keySet());
 		destination.addAll(animation.visibilityTracks().keySet());
 	}
@@ -187,7 +205,9 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 		int boneIndex = this.model.boneIndex(boneName);
 		
 		if (boneIndex < 0)
+		{
 			return null;
+		}
 		
 		PTransform current;
 		PTransform bind;
@@ -202,7 +222,9 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 			int rootIndex = this.model.boneIndex(rootBoneName);
 			
 			if (rootIndex < 0)
+			{
 				return null;
+			}
 			
 			current = relativeTransform(
 					boneIndex,
@@ -316,7 +338,9 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 		int referenceIndex = this.model.boneIndex(referenceBoneName);
 		
 		if (boneIndex < 0 || referenceIndex < 0)
+		{
 			return null;
+		}
 		
 		return relativeTransform(boneIndex, referenceIndex);
 	}
@@ -344,7 +368,9 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 		int referenceIndex = this.model.boneIndex(referenceBoneName);
 		
 		if (boneIndex < 0 || referenceIndex < 0)
+		{
 			return null;
+		}
 		
 		return relativeBindTransform(boneIndex, referenceIndex);
 	}
@@ -372,7 +398,9 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 				this.model.boneIndex(boneName);
 		
 		if (boneIndex < 0)
+		{
 			return null;
+		}
 		
 		int parentIndex =
 				this.model.parentIndex(boneIndex);
@@ -411,15 +439,21 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 		{
 		PAnimationStagePlayback stage = controller.getCurrentStage();
 			if (stage == null || stage.isWaiting())
+			{
 				continue;
+			}
 
 			PAnimation animation = model.animations().get(stage.animationName());
 			if (animation == null)
+			{
 				continue;
+			}
 
 			PBoneAnimation boneAnimation = animation.boneAnimations().get(bone.name());
 			if (boneAnimation == null)
+			{
 				continue;
+			}
 
 			BoneFrame frame = controller.calculateBoneTransformations(
 					bone.name(),
@@ -428,7 +462,9 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 					molangContexts.context(controller, partialTick),
 					new BoneFrame(new Vector3f(translation), new Quaternionf(rotation), new Vector3f(scale)));
 			if (frame == null)
+			{
 				continue;
+			}
 
 			if (boneAnimation.hasChannel(PLibRegistration.AnimationChannelReg.POSITION))
 			{
@@ -465,7 +501,7 @@ public final class PAnimationPoseResolver<T extends PAnimatable<T>>
 	public static <T extends PAnimatable<T>> MolangContextProvider<T> defaultContexts()
 	{
 		return (controller, partialTick) -> new MolangParser.Context().
-				query("anim_time", controller.getInterpolatedTime(partialTick) / 20.0f).
+				query("anim_time", PAnimationEvaluationContext.ticksToSeconds(controller.getInterpolatedTime(partialTick))).
 				randomSeed(0L);
 	}
 
