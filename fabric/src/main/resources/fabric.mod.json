@@ -4,7 +4,9 @@
   "version": "${mod_version}",
   "name": "${mod_name}",
   "description": "Animation and rendering library",
-  "authors": ["ArcAnc"],
+  "authors": [
+    "ArcAnc"
+  ],
   "license": "${mod_license}",
   "icon": "logo.png",
   "environment": "*",
@@ -13,5 +15,6 @@
     "fabric-api": "*",
     "minecraft": "${minecraft_version}",
     "java": ">=25"
-  }
+  },
+  "accessWidener": "pulselib.accesswidener"
 }

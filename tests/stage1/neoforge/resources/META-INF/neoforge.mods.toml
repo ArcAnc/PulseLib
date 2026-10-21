@@ -1,0 +1,11 @@
+license="Arc's License of Common Sense"
+[[mods]]
+modId="pulselib_stage1"
+version="1"
+displayName="PulseLib Stage 1 Smoke (development only)"
+[[dependencies.pulselib_stage1]]
+modId="pulselib"
+type="required"
+versionRange="[1,)"
+ordering="AFTER"
+side="BOTH"

@@ -6,6 +6,7 @@ plugins {
 
 neoForge {
     version = neo_version
+    accessTransformers.from rootProject.file('common/src/main/resources/META-INF/accesstransformer.cfg')
     runs {
         client {
             client()
@@ -49,4 +50,39 @@ sourceSets.main.resources {
     srcDir 'src/main/templates'
     srcDir 'src/generated/resources'
     exclude 'src/generated/**/.cache'
+}
+
+tasks.named('processResources') {
+    from(rootProject.file('common/src/main/resources/META-INF/accesstransformer.cfg')) { into 'META-INF' }
+}
+
+// The original 26.1 demos are verification fixtures, never release content.
+if (providers.gradleProperty('pulseStage1Smoke').isPresent()) {
+    sourceSets {
+        stage1Smoke {
+            java.srcDir rootProject.file('tests/stage1/neoforge/java')
+            resources.srcDir rootProject.file('tests/stage1/neoforge/resources')
+            compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+            runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+        }
+    }
+    neoForge {
+        mods { pulselib_stage1 { sourceSet sourceSets.stage1Smoke } }
+        runs {
+            configureEach {
+                gameDirectory = layout.buildDirectory.dir("stage1-runs/${it.name}").get().asFile
+            }
+            client {
+                programArguments.addAll '--quickPlayMultiplayer', '127.0.0.1:25576', '--width', '960', '--height', '640'
+            }
+        }
+    }
+    tasks.named('runServer') { standardInput = System.in }
+    tasks.named('processStage1SmokeResources') {
+        ['geckolib', 'glmodels', 'textures'].each { archive ->
+            from(zipTree(rootProject.file("common/src/main/resources/assets/pulselib/${archive}.zip"))) {
+                into 'assets/pulselib'
+            }
+        }
+    }
 }

@@ -1,0 +1,76 @@
+/**
+ * @author ArcAnc
+ * Created at: 21.10.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
+import groovy.json.JsonOutput
+import java.util.zip.ZipFile
+
+gradle.projectsEvaluated {
+    def root = gradle.rootProject
+    if (root.findProject(':common') == null) return
+    root.tasks.register('stage12Evidence') {
+        dependsOn ':common:compileJava', ':neoforge:jar', ':fabric:jar'
+        doLast {
+            def common = root.project(':common')
+            def artifacts = common.configurations.compileClasspath.resolvedConfiguration.resolvedArtifacts.collect {
+                it.moduleVersion.id.toString()
+            }.sort()
+            assert artifacts.every {
+                !it.startsWith('net.neoforged:neoforge:') &&
+                    !it.startsWith('net.neoforged.fancymodloader:') &&
+                    !it.startsWith('net.fabricmc:fabric-loader:') &&
+                    !it.startsWith('net.fabricmc.fabric-api:')
+            }: "Common contains loader dependencies: ${artifacts}"
+            assert common.fileTree('src/main/java').matching { include '**/*.java' }.every {
+                !(it.text =~ /\bnet\.(neoforged|fabricmc)\./)
+            }: 'Loader references in Common Java'
+            def fixtureClasses = root.fileTree('tests/stage1/neoforge/java').matching {
+                include '**/*.java'; exclude '**/package-info.java'
+            }.collect { source ->
+                root.file('tests/stage1/neoforge/java').toPath().relativize(source.toPath()).toString().replace('.java', '.class')
+            }
+            def modules = ['common', 'neoforge', 'fabric'].collectEntries { module ->
+                def target = root.project(":${module}")
+                def sources = target.tasks.named('compileJava').get().source.files
+                def identities = sources.collect { source ->
+                    def path = source.toString()
+                    path.substring(path.indexOf('/java/') + 6)
+                }
+                assert identities.toSet().size() == identities.size(): "Duplicate Java input in ${module}"
+                def jar = target.tasks.named('jar').get().archiveFile.get().asFile
+                new ZipFile(jar).withCloseable { zip ->
+                    def entries = zip.entries().collect { it.name }
+                    assert entries.size() == entries.toSet().size(): "Duplicate JAR entry in ${module}"
+                    assert fixtureClasses.every { !entries.contains(it) }: "Fixture class in release ${module}"
+                    ['PGlMultiDrawExecutor', 'PGlGeometryArena', 'PGlFrameArena', 'PGlInstanceStream',
+                     'PGlIndirectStream', 'PGlWeightedBlendedOit'].each {
+                        assert entries.contains("com/arcanc/pulselib/content/renderer/gl/${it}.class".toString())
+                    }
+                    assert entries.contains('pulselib.mixins.json')
+                    if (module == 'neoforge') {
+                        assert entries.contains('META-INF/accesstransformer.cfg')
+                        assert entries.contains('META-INF/neoforge.mods.toml')
+                    }
+                    if (module == 'fabric') {
+                        assert entries.contains('pulselib.accesswidener')
+                    }
+                }
+                [(module): [javaUnits: sources.size(), ownJavaUnits: target.fileTree('src/main/java').matching {
+                    include '**/*.java'
+                }.size(), jar: root.relativePath(jar), sourcePaths: sources.collect { root.relativePath(it) }.sort()]]
+            }
+            def report = root.file('build/reports/porting/stage-1.2-build.json')
+            report.parentFile.mkdirs()
+            report.text = JsonOutput.prettyPrint(JsonOutput.toJson([
+                gradle: gradle.gradleVersion, java: System.getProperty('java.version'),
+                commonArtifacts: artifacts, modules: modules
+            ])) + '\n'
+            println "STAGE 1.2 COMMON / SINGLE BACKEND / RELEASE ISOLATION PASS: ${report}"
+        }
+    }
+}

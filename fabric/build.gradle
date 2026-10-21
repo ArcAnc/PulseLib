@@ -15,6 +15,7 @@ dependencies {
 }
 
 loom {
+    accessWidenerPath = file("src/main/resources/pulselib.accesswidener")
     runs {
         client { client(); configName = 'Fabric Client (PulseLib)'; ideConfigGenerated true; runDir 'runs/client' }
         server { server(); configName = 'Fabric Server (PulseLib)'; ideConfigGenerated true; runDir 'runs/server' }

@@ -1,0 +1,158 @@
+{
+  "stage": "1.2",
+  "date": "2026-10-21",
+  "baseCommit": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1",
+  "canonicalCommit": "7ce6f024b307bb821ce543344d3896c8e1fcf26b",
+  "previousCheckpoint": "908b17a73a2c2488af97928bf1ec7e5531d359e0",
+  "gradle": "9.2.1",
+  "java": "25.0.4.1",
+  "modules": {
+    "common": {
+      "path": "common/build/libs/pulselib-26.1.2-common-1.1.5.3.jar",
+      "sha256": "4299ea749ee9c0efb6f5a6e05fae35300f7183f10d70e9b9b973a5d4c93dabf1",
+      "pulseClasses": 448,
+      "javaUnits": 278,
+      "ownJavaUnits": 278
+    },
+    "neoforge": {
+      "path": "neoforge/build/libs/pulselib-26.1.2-neoforge-1.1.5.3.jar",
+      "sha256": "aae423dabb61b28d3c7f19cf32fc1688f0d824a31abc14ffafb0017e72bced68",
+      "pulseClasses": 466,
+      "javaUnits": 286,
+      "ownJavaUnits": 8
+    },
+    "fabric": {
+      "path": "fabric/build/libs/pulselib-26.1.2-fabric-1.1.5.3.jar",
+      "sha256": "bb23164a3a84cd4fb09bf203aaf4546e908e0e8e23e65fce8055ee6076a0d5fd",
+      "pulseClasses": 448,
+      "javaUnits": 278,
+      "ownJavaUnits": 0
+    }
+  },
+  "originalFilesLocated": 308,
+  "originalFilesByteIdentical": 279,
+  "changedOriginalFiles": [
+    "src/main/java/com/arcanc/pulselib/PLib.java",
+    "src/main/java/com/arcanc/pulselib/content/animatable/PLibAnimationTicker.java",
+    "src/main/java/com/arcanc/pulselib/content/animatable/instance/InstanceAnimationManager.java",
+    "src/main/java/com/arcanc/pulselib/content/animatable/singleton/SingletonAnimationManager.java",
+    "src/main/java/com/arcanc/pulselib/content/event/ClientEvents.java",
+    "src/main/java/com/arcanc/pulselib/content/event/CommonEvents.java",
+    "src/main/java/com/arcanc/pulselib/content/mixin/HumanoidArmorLayerMixin.java",
+    "src/main/java/com/arcanc/pulselib/content/mixin/ItemInHandRendererMixin.java",
+    "src/main/java/com/arcanc/pulselib/content/mixin/LivingEntityRendererMixin.java",
+    "src/main/java/com/arcanc/pulselib/content/mixin/PlayerRootTransformMixin.java",
+    "src/main/java/com/arcanc/pulselib/content/model/textures/PTextureAlphaClassifier.java",
+    "src/main/java/com/arcanc/pulselib/content/player/animation/attachment/PPlayerAnimatedAttachmentLayer.java",
+    "src/main/java/com/arcanc/pulselib/content/registration/PLibRegistration.java",
+    "src/main/java/com/arcanc/pulselib/content/registration/block/block_entity/TestBlockEntity.java",
+    "src/main/java/com/arcanc/pulselib/content/registration/block/block_entity/ber/TestBlockEntityRenderer.java",
+    "src/main/java/com/arcanc/pulselib/content/registration/entity/renderer/PTestArmor.java",
+    "src/main/java/com/arcanc/pulselib/content/registration/entity/renderer/TestEntityRender.java",
+    "src/main/java/com/arcanc/pulselib/content/registration/item/renderer/TestBlockItemRenderer.java",
+    "src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java",
+    "src/main/java/com/arcanc/pulselib/content/renderer/base/PEntityRenderState.java",
+    "src/main/java/com/arcanc/pulselib/content/renderer/base/PRenderState.java",
+    "src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+    "src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+    "src/main/java/com/arcanc/pulselib/util/PResourceCache.java",
+    "src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentAnchorResolvers.java",
+    "src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentLayer.java",
+    "src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PLibArmorHandler.java",
+    "src/main/resources/META-INF/accesstransformer.cfg",
+    "src/main/resources/pulselib.mixins.json"
+  ],
+  "gpuOrigins": [
+    {
+      "class": "PGlMultiDrawExecutor",
+      "sourceSha256": "4a68c9d1b67f1dd291c00a73f2c975d3ee6b809c86e95c4bb3cd01a6df02301c",
+      "resultSha256": "4a68c9d1b67f1dd291c00a73f2c975d3ee6b809c86e95c4bb3cd01a6df02301c",
+      "change": "byte-identical"
+    },
+    {
+      "class": "PGlGeometryArena",
+      "sourceSha256": "f7668da7cab7b01b0f6ed820b4fd03f2a59581d46c8d2c1de01aa59eb4c1bdd2",
+      "resultSha256": "f7668da7cab7b01b0f6ed820b4fd03f2a59581d46c8d2c1de01aa59eb4c1bdd2",
+      "change": "byte-identical"
+    },
+    {
+      "class": "PGlFrameArena",
+      "sourceSha256": "75267c6fde8cb5d942e9cab02163dcc7ac199306c29e8d1b360b0c18056470fe",
+      "resultSha256": "75267c6fde8cb5d942e9cab02163dcc7ac199306c29e8d1b360b0c18056470fe",
+      "change": "byte-identical"
+    },
+    {
+      "class": "PGlInstanceStream",
+      "sourceSha256": "f648a6940e97f62d16917b79fad4e2b9cc4067ca975b55db704ea1f35f49ad1d",
+      "resultSha256": "f648a6940e97f62d16917b79fad4e2b9cc4067ca975b55db704ea1f35f49ad1d",
+      "change": "byte-identical"
+    },
+    {
+      "class": "PGlIndirectStream",
+      "sourceSha256": "c3c238c5d2fecf9ffdfc0044905c14c8d3968f5a96a26cb373cfc420bf1237d4",
+      "resultSha256": "c3c238c5d2fecf9ffdfc0044905c14c8d3968f5a96a26cb373cfc420bf1237d4",
+      "change": "byte-identical"
+    },
+    {
+      "class": "PGlWeightedBlendedOit",
+      "sourceSha256": "c48dcd643fcfc39a5b6ea089ade2d98f9e01a72dc0b0e4edd680c4a7bca0ab7b",
+      "resultSha256": "a5712078a00121611bf94eec0abd0561e92533ffd0a9e4755cfde6fca83626f3",
+      "change": "stencil predicate adapter"
+    }
+  ],
+  "originalResourceBytesVerified": [
+    "assets/pulselib/atlases/atlas.json",
+    "assets/pulselib/geckolib.zip",
+    "assets/pulselib/glmodels.zip",
+    "assets/pulselib/items.zip",
+    "assets/pulselib/models.zip",
+    "assets/pulselib/shaders/core/oit_composite.fsh",
+    "assets/pulselib/shaders/core/oit_composite.vsh",
+    "assets/pulselib/shaders/core/triangles.fsh",
+    "assets/pulselib/shaders/core/triangles.vsh",
+    "assets/pulselib/shaders/core/triangles_instant.fsh",
+    "assets/pulselib/shaders/core/triangles_instant.vsh",
+    "assets/pulselib/shaders/core/triangles_oit.fsh",
+    "assets/pulselib/shaders/core/triangles_oit_depth.fsh",
+    "assets/pulselib/shaders/core/triangles_oit_depth_peel.fsh",
+    "assets/pulselib/shaders/include/deformers.glsl",
+    "assets/pulselib/template/player/player_model_template.bbmodel",
+    "assets/pulselib/template/player/player_model_template.gltf",
+    "assets/pulselib/textures.zip",
+    "logo.png"
+  ],
+  "canonicalApiBaseline": "unchanged; frozen checksums pass",
+  "originalUserGameFilesUnchanged": 165,
+  "runtime": {
+    "loader": "NeoForge 26.1.2.95 / Minecraft 26.1.2",
+    "gpu": "NVIDIA GeForce GTX 1660 Ti, driver 615.78.08, OpenGL 4.6",
+    "smokeClientExit": 0,
+    "smokeServerExit": 0,
+    "standaloneLibraryServerExit": 0,
+    "entitySubmissions": 5072,
+    "blockSubmissions": 1266,
+    "itemSubmissions": 2081,
+    "standaloneLoadedPulseClassCount": 70,
+    "standaloneClientBootstrapPresent": false,
+    "screenshot": {
+      "file": "stage-1.2-world.png",
+      "sha256": "1ec3218a6d70bf6a2946784db651fe52788c4fdfb78cf5cb53a4cf4307a12d61"
+    },
+    "debugger": {
+      "persistent": true,
+      "multiDraw": true,
+      "instanceBuffer": 130,
+      "indirectBuffer": 131,
+      "commands": 2,
+      "indirectPersistentMappingBytes": 11520,
+      "oitAccumulationLayerObserved": 0
+    },
+    "limitations": [
+      "Smoke coverage only; no pixel correctness assertion or performance comparison",
+      "Third debug run timed out after a prolonged suspending breakpoint; not counted as smoke pass",
+      "Canonical JUnit tests not yet ported; test tasks NO-SOURCE",
+      "Full Fabric runtime remains stage 6",
+      "H13/H14/H15/L18 correctness and full GPU lifecycle regressions remain stages 4/7"
+    ]
+  }
+}

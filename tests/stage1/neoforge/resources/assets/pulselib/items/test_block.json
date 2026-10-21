@@ -1,0 +1,11 @@
+{
+  "model" :
+  {
+    "type": "minecraft:special",
+    "base" : "pulselib:item/test_block",
+    "model":
+    {
+      "type": "pulselib:test_block",
+      "model_id": "pulselib:item/test_block"}
+  }
+}

@@ -1,0 +1,20 @@
+/**
+ * @author ArcAnc
+ * Created at: 21.10.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
+// Standalone library bootstrap, without the stage 1 content fixture.
+// Prepare this isolated directory's eula.txt and server.properties before running.
+gradle.projectsEvaluated {
+    def neo = gradle.rootProject.findProject(':neoforge')
+    if (neo == null) return
+    neo.neoForge.runs.server.gameDirectory = neo.layout.buildDirectory.dir('stage1-runs/server-library').get().asFile
+    neo.tasks.named('runServer').configure {
+        standardInput = System.in
+        jvmArgs '-Xlog:class+load=info:file=classloading.log'
+    }
+}
