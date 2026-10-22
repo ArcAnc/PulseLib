@@ -1,0 +1,626 @@
+{
+  "stage": "4.1b.1",
+  "status": "complete checkpoint; baked/model/renderer 4.1b.2 and major stage 4 incomplete",
+  "date": "2026-10-22",
+  "startingCommit": "e7aa34f84f6b160987507ef975e3123c9110cb3d",
+  "sources": {
+    "26.1": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1",
+    "1.21.1-multiloader": "7ce6f024b307bb821ce543344d3896c8e1fcf26b"
+  },
+  "architecture": {
+    "queue": "11 canonical portable geometry overloads and endWorldFrame; one existing compiler/executor",
+    "static": "Immutable PGeometryData copied once into existing static arena pages; legacy baked GPU copy retained",
+    "dynamic": "PGlDynamicGeometry snapshots resolved after reclaiming original frame slot; <=9 reusable page allocations per source, no static allocation per update",
+    "renderPass": "Two small owned state buffers replace baked-mesh dependency for the existing zero-index draw that applies pipeline/uniform state; actual instanced/indirect draws unchanged",
+    "remainingBoundary": "Canonical PBakedMesh/model/bone/renderer API and CPU deformation consumers remain 4.1b.2; GUI scopes and OIT targets later"
+  },
+  "build": {
+    "exitCode": 0,
+    "command": "./gradlew build stage2Evidence -I docs/porting/tools/stage2-evidence.gradle -I /tmp/pulselib-stage41b/index-check.gradle --no-daemon --console=plain",
+    "logSha256": "52632d07270cf655e3a926203360e5e9c832ca9005f6beb7d7225fc0cf969f6f",
+    "compileLogSha256": "ff7620f14d9eeea73f9d73c468a85162555231ace49a6fc5cbf21c634ea8c1e6",
+    "probeCompileLogSha256": "bc7496fade65c3792d5c9538729d9da7a00e47f73fa0aa04fd18847a2f8beb79",
+    "projection": "16 preexisting Java compile inputs replaced with intended index versions; one overlapping executor includes migration implementation without user import formatting; worktree unchanged",
+    "modules": {
+      "common": {
+        "jar": "common/build/libs/pulselib-26.1.2-common-1.1.5.3.jar",
+        "providers": {},
+        "javaUnits": 324,
+        "sha256": "f5099c6d96a6ed04a00e2ada43e465eca504a179f232443fded3a40f6aa9531d",
+        "classFiles": 512,
+        "classMajorVersions": [
+          69
+        ]
+      },
+      "neoforge": {
+        "jar": "neoforge/build/libs/pulselib-26.1.2-neoforge-1.1.5.3.jar",
+        "providers": {
+          "platform.IPulsePlatform": "com.arcanc.pulselib.neoforge.NeoForgePlatform",
+          "platform.IPulseCameraService": "com.arcanc.pulselib.neoforge.NeoForgeCameraService",
+          "plugin.IPulsePluginFinder": "com.arcanc.pulselib.neoforge.NeoForgePulsePluginFinder"
+        },
+        "javaUnits": 335,
+        "sha256": "4f9325911eed8b883b5f7a257fe91d8aafb728028c7cd635596352b3d07c414a",
+        "classFiles": 524,
+        "classMajorVersions": [
+          69
+        ]
+      },
+      "fabric": {
+        "jar": "fabric/build/libs/pulselib-26.1.2-fabric-1.1.5.3.jar",
+        "providers": {
+          "platform.IPulsePlatform": "com.arcanc.pulselib.fabric.FabricPlatform",
+          "platform.IPulseCameraService": "com.arcanc.pulselib.fabric.FabricCameraService",
+          "plugin.IPulsePluginFinder": "com.arcanc.pulselib.fabric.FabricPulsePluginFinder"
+        },
+        "javaUnits": 328,
+        "sha256": "07e45603e5c71a7a9d84b634f9840ec37c100f4d8bf5893b21bc74222f27b730",
+        "classFiles": 516,
+        "classMajorVersions": [
+          69
+        ]
+      }
+    }
+  },
+  "junit": {
+    "total": 173,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "previousCasesPreserved": 168,
+    "newGeometrySourceCases": 5,
+    "suites": [
+      {
+        "module": "common",
+        "suite": "com.arcanc.pulselib.content.animatable.PAnimationManagerAccessTest",
+        "tests": 12,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.animatable.PAnimationManagerAccessTest.xml",
+        "sha256": "f88f1116fea1afb760882eb336074eb29f65f4cadacf04b1bfa979fecc45d38c"
+      },
+      {
+        "module": "common",
+        "suite": "com.arcanc.pulselib.content.animatable.PItemStackAnimationIdsTest",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.animatable.PItemStackAnimationIdsTest.xml",
+        "sha256": "b692375e96719ea3b9783ee41a711b6bb788f81e927c0786dd0b4817b144b510"
+      },
+      {
+        "module": "common",
+        "suite": "com.arcanc.pulselib.content.animatable.instance.InstanceAnimationManagerTest",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.animatable.instance.InstanceAnimationManagerTest.xml",
+        "sha256": "b274508fa28128789d42abb43c7e79e656b7cb0232465fb368da09fa71fe9403"
+      },
+      {
+        "module": "common",
+        "suite": "com.arcanc.pulselib.content.model.animation.PAnimationTimeTest",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PAnimationTimeTest.xml",
+        "sha256": "740872c0cd4d2801d7a643ebfd74c3ef937b9bde527c9a73e93f465ec764a772"
+      },
+      {
+        "module": "common",
+        "suite": "com.arcanc.pulselib.content.model.animation.PCatmullRomSamplingTest",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PCatmullRomSamplingTest.xml",
+        "sha256": "e8639d47201ca1202327ed3af9701cb9b38c0d3a19e7e03e4c14f29cba1df4a3"
+      },
+      {
+        "module": "common",
+        "suite": "com.arcanc.pulselib.content.model.animation.PCustomChannelSamplingTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PCustomChannelSamplingTest.xml",
+        "sha256": "65fd3495d98ce1f579be042d25fc7dc2d3e801d8455d1757bf38a8abe8881577"
+      },
+      {
+        "module": "common",
+        "suite": "com.arcanc.pulselib.content.model.animation.PCyclicAnimationEventsTest",
+        "tests": 25,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PCyclicAnimationEventsTest.xml",
+        "sha256": "04032a16a47273b1e88f11061f0585c7c885049b396b08238a6aab6343d94f8b"
+      },
+      {
+        "module": "common",
+        "suite": "com.arcanc.pulselib.content.model.animation.PExpressionEvaluationTest",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PExpressionEvaluationTest.xml",
+        "sha256": "29abb97fb96daa5c27bf14d54a49355773150d603ab3b97391261ecff2439d78"
+      },
+      {
+        "module": "common",
+        "suite": "com.arcanc.pulselib.content.model.animation.PGeckoEulerSamplingTest",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PGeckoEulerSamplingTest.xml",
+        "sha256": "99cace0554080f301c5aea5905fd258f646d95e056aeeb77d1bc2e2a1c64c251"
+      },
+      {
+        "module": "common",
+        "suite": "com.arcanc.pulselib.content.model.animation.PGltfQuaternionSamplingTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PGltfQuaternionSamplingTest.xml",
+        "sha256": "5ce6a995fdc95f201b0c5ab6b5439b26eb93716d5d3917cf42c344658991d6a7"
+      },
+      {
+        "module": "common",
+        "suite": "com.arcanc.pulselib.content.model.animation.PGraphRestartTest",
+        "tests": 18,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PGraphRestartTest.xml",
+        "sha256": "c54bb73651cc0093dbe8567e040a7041242b98293738d9b4b059b99717d6fb11"
+      },
+      {
+        "module": "common",
+        "suite": "com.arcanc.pulselib.content.model.animation.POverlayLifecycleTest",
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.POverlayLifecycleTest.xml",
+        "sha256": "527bfcb18577ea8056cb0143b7d1a50ca3015d91dcf82c0f6add2db367187ae6"
+      },
+      {
+        "module": "common",
+        "suite": "com.arcanc.pulselib.content.model.animation.POverlayReverseTest",
+        "tests": 14,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.POverlayReverseTest.xml",
+        "sha256": "68abe2b0b804fb944d3815d09b9732d21337f9cb27080716b6b7bab888b2a417"
+      },
+      {
+        "module": "common",
+        "suite": "com.arcanc.pulselib.content.model.animation.PPoseMixerTransitionTest",
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PPoseMixerTransitionTest.xml",
+        "sha256": "063a5d703699c3be3e0571ae1993c280bf9c24a9ad78a2725a58e81534ce42d6"
+      },
+      {
+        "module": "common",
+        "suite": "com.arcanc.pulselib.content.model.animation.PRootMotionSpacesTest",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PRootMotionSpacesTest.xml",
+        "sha256": "68349b66b1d6032c4ac1592f3019f59c4e3b427112464a720223d4156f6c8693"
+      },
+      {
+        "module": "common",
+        "suite": "com.arcanc.pulselib.content.renderer.PRenderPoseContextsTest",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.renderer.PRenderPoseContextsTest.xml",
+        "sha256": "b344182c15a78b025eff34147c1ac960c19d98e358c5bd654e791165a109c8a8"
+      },
+      {
+        "module": "common",
+        "suite": "com.arcanc.pulselib.content.renderer.gl.PGlGeometrySourceTest",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.renderer.gl.PGlGeometrySourceTest.xml",
+        "sha256": "656f85e5c02b492ee66c565f132237a22187c7594de779126d9c998f088b7c37"
+      },
+      {
+        "module": "common",
+        "suite": "com.arcanc.pulselib.content.renderer.gl.PGlInstanceLayoutTest",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.renderer.gl.PGlInstanceLayoutTest.xml",
+        "sha256": "8a7c2e9b7e7b018fc9b64eb8fbf925f37d2c2a580e7e3663cf27d9684c647fe9"
+      },
+      {
+        "module": "common",
+        "suite": "com.arcanc.pulselib.content.renderer.plan.PFrameCompilerPassTest",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.renderer.plan.PFrameCompilerPassTest.xml",
+        "sha256": "638e1c9314ee3cbeed0b7628f64c0af4264507a416af01fe4c8e786ebbc8087d"
+      },
+      {
+        "module": "common",
+        "suite": "com.arcanc.pulselib.content.renderer.plan.PRenderPlanContractTest",
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.renderer.plan.PRenderPlanContractTest.xml",
+        "sha256": "aa237195ddab1b9c7ffda8d565a5c5eed5f3314e94d7bd6810b51719c7bf9785"
+      },
+      {
+        "module": "common",
+        "suite": "com.arcanc.pulselib.plugin.PulsePluginClassScannerTest",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml": "common/build/test-results/test/TEST-com.arcanc.pulselib.plugin.PulsePluginClassScannerTest.xml",
+        "sha256": "8990298469c44be37ed27e06667decb7e3e8419709d54836fefc953da4a53bb5"
+      },
+      {
+        "module": "common",
+        "suite": "com.arcanc.pulselib.plugin.PulsePluginLifecycleTest",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml": "common/build/test-results/test/TEST-com.arcanc.pulselib.plugin.PulsePluginLifecycleTest.xml",
+        "sha256": "03ba6459e5b8a54836127db250c2596b2dcbc18593fcb15ce425770ca1deb6c0"
+      },
+      {
+        "module": "common",
+        "suite": "com.arcanc.pulselib.plugin.PulsePluginManagerTest",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml": "common/build/test-results/test/TEST-com.arcanc.pulselib.plugin.PulsePluginManagerTest.xml",
+        "sha256": "3e325e3d9b0961773d7518483a947eb831066f53928e8c1a60b581333d96586f"
+      },
+      {
+        "module": "common",
+        "suite": "com.arcanc.pulselib.plugin.PulseRegistrarTest",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml": "common/build/test-results/test/TEST-com.arcanc.pulselib.plugin.PulseRegistrarTest.xml",
+        "sha256": "0d5a15de9641c7129bd1258526b6430b3d59d83bc539f660a584f2a719a74596"
+      },
+      {
+        "module": "fabric",
+        "suite": "com.arcanc.pulselib.fabric.FabricDevelopmentRootsTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "xml": "fabric/build/test-results/test/TEST-com.arcanc.pulselib.fabric.FabricDevelopmentRootsTest.xml",
+        "sha256": "6cf6da41f6ca502bd3185da78612eeac589e354c6400762bd5f4c855b21a20ba"
+      }
+    ]
+  },
+  "api": {
+    "planTypes": 18,
+    "planMembers": 121,
+    "canonicalGeometryQueueOverloads": 11,
+    "endWorldFrame": "preserved",
+    "queueMembersPreserved": 16,
+    "renderStageMembersPreserved": 8,
+    "remainingQueueMembers": 3,
+    "remainingQueueStage": "4.2 RenderTarget flush/composition",
+    "animationDeformerTypes": 123,
+    "animationDeformerMembers": 847,
+    "managerTypes": 13,
+    "pluginTypes": 38,
+    "baselineChecksums": "unchanged",
+    "animationReportSha256": "6f9456cc3e98fb03ac5108342c319fc3185037a2ef471fbf3d71e136da957c55",
+    "managerReportSha256": "7301dc3446c2adba9e8bf40c7475f26df9ee83cb1f6f6ebe9fd17e1d147db8e8",
+    "pluginReportSha256": "c8f0b1bf32fc77b20c8e13925d308344bcbf0a9ee0b6c9316f7d59b4e1e450b7"
+  },
+  "backend": {
+    "sources": [
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+        "sha256": "1dc1eac7ddad0d49411a14393fe2115029d0eab42c6355b27d47de21c584d85e",
+        "unchangedFromStage41a": false,
+        "intendedIndexSha256": "4b0fbdad7ddec3a45b53434163aa42d5e5be1972dc3669a3e6d8ed8ad33804b1"
+      },
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlGeometryArena.java",
+        "sha256": "7e963bcbd44c9937c13980568a6dfbe151a7cb8e4354447b56f45de561e1168b",
+        "unchangedFromStage41a": false,
+        "intendedIndexSha256": "7e963bcbd44c9937c13980568a6dfbe151a7cb8e4354447b56f45de561e1168b"
+      },
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlFrameArena.java",
+        "sha256": "75267c6fde8cb5d942e9cab02163dcc7ac199306c29e8d1b360b0c18056470fe",
+        "unchangedFromStage41a": true,
+        "intendedIndexSha256": "75267c6fde8cb5d942e9cab02163dcc7ac199306c29e8d1b360b0c18056470fe"
+      },
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlInstanceStream.java",
+        "sha256": "a2a026cc636d9fc2e0d0ca5199178ab6963d6707c919236a1cfb8ffd28a8099a",
+        "unchangedFromStage41a": true,
+        "intendedIndexSha256": "a2a026cc636d9fc2e0d0ca5199178ab6963d6707c919236a1cfb8ffd28a8099a"
+      },
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlIndirectStream.java",
+        "sha256": "c3c238c5d2fecf9ffdfc0044905c14c8d3968f5a96a26cb373cfc420bf1237d4",
+        "unchangedFromStage41a": true,
+        "intendedIndexSha256": "c3c238c5d2fecf9ffdfc0044905c14c8d3968f5a96a26cb373cfc420bf1237d4"
+      },
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+        "sha256": "a5712078a00121611bf94eec0abd0561e92533ffd0a9e4755cfde6fca83626f3",
+        "unchangedFromStage41a": true,
+        "intendedIndexSha256": "a5712078a00121611bf94eec0abd0561e92533ffd0a9e4755cfde6fca83626f3"
+      }
+    ],
+    "assetsUnchanged": 18,
+    "shadersUnchanged": 10
+  },
+  "runtime": {
+    "minecraft": "26.1.2",
+    "neoforge": "26.1.2.95",
+    "java": "25.0.4.1",
+    "gpu": "NVIDIA GeForce GTX 1660 Ti",
+    "directories": "neoforge/build/stage41b-runs/{client,server}",
+    "world": "stage41b-smoke",
+    "clientExitCode": 0,
+    "serverExitCode": 0,
+    "failedRuns": 0,
+    "shutdown": "normal Minecraft.stop / server console stop, all dimensions saved, FML closed",
+    "geometryPhases": [
+      {
+        "tick": 100,
+        "renderFrames": 245,
+        "gpuPrimitives": 768
+      },
+      {
+        "tick": 230,
+        "renderFrames": 567,
+        "gpuPrimitives": 768
+      }
+    ],
+    "gpuQuery": "GL_PRIMITIVES_GENERATED around isolated custom stage flush; expected 6*(indexCount/3)=768",
+    "gpuInstanceCount": 6,
+    "indexWidths": [
+      16,
+      32
+    ],
+    "staticIdentityResources": 3,
+    "dynamicAllocationBound": 9,
+    "checks": [
+      "Actual GPU static/dynamic vertex/index bytes match CPU sources",
+      "GPU primitive counts prove all six instances execute",
+      "Bounded dynamic slots over hundreds of updates and after real resource reload",
+      "Same static/dynamic source objects can register again after reload",
+      "Original plan probe: 17 live handles, buffers, projection UBO/CPU match and old-handle rejection",
+      "Normal cleanup: static/dynamic pages=0; pass-state buffers/projection released; handles=0",
+      "Previous identity, time, graph, plugin and camera regressions preserved"
+    ],
+    "rendererTimeAssertions": 60,
+    "itemIdentityScenarios": 16,
+    "graphOwners": 2,
+    "graphTimeAfterReload": 124.0,
+    "submissions": {
+      "entity": 1407,
+      "blockEntity": 1217,
+      "item": 1547
+    },
+    "lightingInputs": [
+      {
+        "tick": 100,
+        "negativeXSky": 15,
+        "positiveXSky": 15,
+        "negativeXRaw": 15,
+        "positiveXRaw": 15
+      },
+      {
+        "tick": 210,
+        "negativeXSky": 15,
+        "positiveXSky": 15,
+        "negativeXRaw": 15,
+        "positiveXRaw": 15
+      }
+    ],
+    "classloading": {
+      "client": {
+        "sha256": "9905ee1fe6e5a75df82f7d93ebad6382de9b6ffa4bc2620ac8309dab04bc1765",
+        "minecraftClientClassLoads": 4049,
+        "dynamicGeometryClassLoads": 1,
+        "identityMixinClassLoads": 0,
+        "projectionMixinClassLoads": 0
+      },
+      "server": {
+        "sha256": "78b57b55b2f70dfbab1aadb037ddfe3962c11852dd81d7435343f0976987a086",
+        "minecraftClientClassLoads": 0,
+        "dynamicGeometryClassLoads": 0,
+        "identityMixinClassLoads": 0,
+        "projectionMixinClassLoads": 0
+      }
+    },
+    "clientLogSha256": "96c933a970a23453075dad27100cbfca167d2840d7b3c1e0ab10ff7da095f7a4",
+    "serverLogSha256": "47a80bb7f7360440f0b8d33a5fd26904f6a71b6c68ffbb91874d6945805c9ed0",
+    "screenshotSha256": "f74db8cf9475bb474db7269b17e1c4eabd488a5723ba33a32d7bd1b1a449e202"
+  },
+  "preservation": {
+    "initialUserFiles": [
+      {
+        "path": "AGENTS.md",
+        "initialSha256": "29193689e2a271a2cad6281a657f2a8fa412db66d1488daa5259996fda096c5b",
+        "currentSha256": "29193689e2a271a2cad6281a657f2a8fa412db66d1488daa5259996fda096c5b",
+        "userFormattingIncludedInCommit": false,
+        "migrationOverlap": false,
+        "intendedIndexSha256": null
+      },
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimatable.java",
+        "initialSha256": "ce35ff77b6b84fabc43735047f7bb47c2685c9f44f65707dfeaa5d92d1222f11",
+        "currentSha256": "ce35ff77b6b84fabc43735047f7bb47c2685c9f44f65707dfeaa5d92d1222f11",
+        "userFormattingIncludedInCommit": false,
+        "migrationOverlap": false,
+        "intendedIndexSha256": "6ca6e13ebf2df97bac9742e0bd662930de90f9c68055a747154ec84d3746267f"
+      },
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimationController.java",
+        "initialSha256": "3ebd7d2765844e91c01312c9156b7a2c5c78777cd9470d9a039a28a66d7bd194",
+        "currentSha256": "3ebd7d2765844e91c01312c9156b7a2c5c78777cd9470d9a039a28a66d7bd194",
+        "userFormattingIncludedInCommit": false,
+        "migrationOverlap": false,
+        "intendedIndexSha256": "dcf837e9e2abef0fce31d47762cf9b47bb78962b9c2bebcf3cb040fd67682ac7"
+      },
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/content/animatable/instance/InstanceAnimationManager.java",
+        "initialSha256": "245ed4808443cf1bcaf952e0c6795c3ec0d0f23bb3007bdb11b2f0c8dac5fe04",
+        "currentSha256": "245ed4808443cf1bcaf952e0c6795c3ec0d0f23bb3007bdb11b2f0c8dac5fe04",
+        "userFormattingIncludedInCommit": false,
+        "migrationOverlap": false,
+        "intendedIndexSha256": "3c3ba6cc0850d1b988b8af606d2fda5726568632934578e0ff2154137f581853"
+      },
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemStackMixin.java",
+        "initialSha256": "ef896126246c7973735a002a781a10cda0b14f79599f98b74440abfdf4035681",
+        "currentSha256": "ef896126246c7973735a002a781a10cda0b14f79599f98b74440abfdf4035681",
+        "userFormattingIncludedInCommit": false,
+        "migrationOverlap": false,
+        "intendedIndexSha256": "de7c4946c85dcdd47a8183a3e2bb77da6e7a5924082f93a4b05bb5ffeee7b3f0"
+      },
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationChannel.java",
+        "initialSha256": "21a420d8362bccd97e84d8dc0a0b45530a340e03454649507ae90f9113a9a9f9",
+        "currentSha256": "21a420d8362bccd97e84d8dc0a0b45530a340e03454649507ae90f9113a9a9f9",
+        "userFormattingIncludedInCommit": false,
+        "migrationOverlap": false,
+        "intendedIndexSha256": "a5eb5828d3f465dc102c7554ea549d5b90205d78417f4408e6e8e06ee93c8743"
+      },
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationGraphRuntime.java",
+        "initialSha256": "7eca03691196367b9e6b082ac717cd45bc500d8da503329f90237cb1eab063ba",
+        "currentSha256": "7eca03691196367b9e6b082ac717cd45bc500d8da503329f90237cb1eab063ba",
+        "userFormattingIncludedInCommit": false,
+        "migrationOverlap": false,
+        "intendedIndexSha256": "074dca1419f39b7181b626022d61bee040c9a64ebd6592cfd3b5606ab8faa128"
+      },
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationRuntime.java",
+        "initialSha256": "3689c5b22b290f6adb7a3360719647763b3d0abc839b61a960b7680c7c0edfba",
+        "currentSha256": "3689c5b22b290f6adb7a3360719647763b3d0abc839b61a960b7680c7c0edfba",
+        "userFormattingIncludedInCommit": false,
+        "migrationOverlap": false,
+        "intendedIndexSha256": "a244c7c27185716c3be3cdefc3897da8d65fe54299e3816f75a10a17d702eabb"
+      },
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/content/model/animation/PCyclicAnimationEvents.java",
+        "initialSha256": "0a15df2229ce954a9d84e21bde0cfb518b55f4cc1e7672c761e5b99905719d98",
+        "currentSha256": "0a15df2229ce954a9d84e21bde0cfb518b55f4cc1e7672c761e5b99905719d98",
+        "userFormattingIncludedInCommit": false,
+        "migrationOverlap": false,
+        "intendedIndexSha256": "4eeb07837a336baaba287fd24f7486c306035f372382d273409f785dba96d22b"
+      },
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PBlockRenderer.java",
+        "initialSha256": "2d177641a177e23d8adcb526162e47abd4f11f6f726af38910b4b72dee6c3267",
+        "currentSha256": "2d177641a177e23d8adcb526162e47abd4f11f6f726af38910b4b72dee6c3267",
+        "userFormattingIncludedInCommit": false,
+        "migrationOverlap": false,
+        "intendedIndexSha256": "a0ab3e5a7e76ce5a29d447de5be10d46732904923457f3032c5d87d74ef0a3ad"
+      },
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java",
+        "initialSha256": "18e2a218449d8668f7146fc9eb75e59036b29bed468cfb7ebc45cb0d9b4963fb",
+        "currentSha256": "18e2a218449d8668f7146fc9eb75e59036b29bed468cfb7ebc45cb0d9b4963fb",
+        "userFormattingIncludedInCommit": false,
+        "migrationOverlap": false,
+        "intendedIndexSha256": "38436c3418599d75ee391b60727f5bbacd034be5428d906966d003b06849b63c"
+      },
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java",
+        "initialSha256": "3352653a5df2ea71c1464a561255fa3575729a037ab2943f42ee909604bfbc39",
+        "currentSha256": "3352653a5df2ea71c1464a561255fa3575729a037ab2943f42ee909604bfbc39",
+        "userFormattingIncludedInCommit": false,
+        "migrationOverlap": false,
+        "intendedIndexSha256": "bb9717fd2fcc871f66466e0ef02dbe57b8cc037e80a6b51a8558c7e354649d4c"
+      },
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderPoseContexts.java",
+        "initialSha256": "4e9ed0e7100744a41f69a8c826a90b27e50953af0e9a1838162d66a16cd35b82",
+        "currentSha256": "4e9ed0e7100744a41f69a8c826a90b27e50953af0e9a1838162d66a16cd35b82",
+        "userFormattingIncludedInCommit": false,
+        "migrationOverlap": false,
+        "intendedIndexSha256": "86c3ec5a6e1994f2f5924abf3426b53ca4aa22d6db903f8fe98fdac12aed5261"
+      },
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+        "initialSha256": "caac8708c1576493c50b81e131bb42d47c51af3f6b1f8e5a7cff68ca4a29c13b",
+        "currentSha256": "1dc1eac7ddad0d49411a14393fe2115029d0eab42c6355b27d47de21c584d85e",
+        "userFormattingIncludedInCommit": false,
+        "migrationOverlap": true,
+        "intendedIndexSha256": "4b0fbdad7ddec3a45b53434163aa42d5e5be1972dc3669a3e6d8ed8ad33804b1"
+      },
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/plan/PFrameCompiler.java",
+        "initialSha256": "d38163edc49fe912fc8024965ae5d2f1a2cf855dc7e51cdf07c3f10e6170cf57",
+        "currentSha256": "d38163edc49fe912fc8024965ae5d2f1a2cf855dc7e51cdf07c3f10e6170cf57",
+        "userFormattingIncludedInCommit": false,
+        "migrationOverlap": false,
+        "intendedIndexSha256": "2886cb42a6292542df11fcc3fe27645ce2ad514bcac3aafaab74cd8b5e25ac0a"
+      },
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/data/gecko/MolangParser.java",
+        "initialSha256": "41404c62c3b3e1013c5387e14c542b686e9bf9979cf673c16806030632e86f38",
+        "currentSha256": "41404c62c3b3e1013c5387e14c542b686e9bf9979cf673c16806030632e86f38",
+        "userFormattingIncludedInCommit": false,
+        "migrationOverlap": false,
+        "intendedIndexSha256": "1c6a52c42cd06b43f42fd197285b192eaff07c75c8bbd32139a7fb90f4b614a0"
+      },
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/util/PModelCache.java",
+        "initialSha256": "5176304462bdac2f8bc7cfd21c4454489c6f1a1ad6f3562d45f8a319d4d142d5",
+        "currentSha256": "5176304462bdac2f8bc7cfd21c4454489c6f1a1ad6f3562d45f8a319d4d142d5",
+        "userFormattingIncludedInCommit": false,
+        "migrationOverlap": false,
+        "intendedIndexSha256": "1e67bb55c34bd29dae35be77a969f8ae5596eb4e5c8f5ea0ee3f95dec0536571"
+      }
+    ],
+    "preexistingDiffSha256": "4a54d3e91065297b205b2e2cc622f755fee3b452a0bbc8e322c53417b5e7ae0d",
+    "protectedGameFiles": 167,
+    "changedGameFiles": 0,
+    "newGameFiles": 0,
+    "sourceBranchesUnchanged": true,
+    "pushOrPublish": false,
+    "ideOrDebuggerStateChanged": false
+  },
+  "limits": [
+    "4.1b remains incomplete: canonical baked/model/renderer API and legacy dynamic VertexBuffer compatibility require 4.1b.2",
+    "GUI/offscreen scopes and context-aware entity routing remain 4.3; GUI item overloads do not submit into world queue",
+    "Three RenderTarget queue operations remain 4.2; no stub implementations",
+    "No full H13/H14/H15/OIT/Fabulous/GUI/pixel/resize/disconnect/performance claims from the geometry smoke",
+    "Flush pending dynamic submissions before changing index count/layout; updates occur on render thread",
+    "Fresh-world lighting issue remains open despite symmetric final vanilla inputs",
+    "Full Fabric runtime stage 6 and compiled whole-library API audit stage 7"
+  ]
+}

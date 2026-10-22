@@ -11,12 +11,17 @@ package com.arcanc.pulselib.content.renderer.gl;
 
 import com.arcanc.pulselib.content.mixin.GlBufferAccessor;
 import com.arcanc.pulselib.content.model.baked.PBakedMesh;
+import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.lwjgl.opengl.*;
+import org.lwjgl.system.MemoryUtil;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +35,8 @@ public final class PGlGeometryArena
 
 	private final Map<PBakedMesh, Slice> slices = new Object2ObjectOpenHashMap<>();
 	private final List<Page> pages = new ArrayList<>();
+	private final Map<PGeometryData, Slice> geometrySlices = new IdentityHashMap<>();
+	private final Map<PGlDynamicGeometry, Map<Integer, DynamicAllocation>> dynamicPages = new IdentityHashMap<>();
 
 	/**
 	 * Performs the resolve operation.
@@ -41,6 +48,57 @@ public final class PGlGeometryArena
 		return this.slices.computeIfAbsent(mesh, this :: append);
 	}
 
+	/** Appends immutable portable geometry into the same static arena pages. */
+	public Slice resolve(PGeometryData geometry)
+	{
+		return this.geometrySlices.computeIfAbsent(geometry, data ->
+		{
+			validate(data, VERTEX_STRIDE);
+			int vertexBytes = data.vertices().remaining();
+			int indexBytes = Math.multiplyExact(data.indexCount(), data.indexType().bytes());
+			Page page = this.pages.isEmpty() ? null : this.pages.getLast();
+			if (page == null || !page.hasSpace(vertexBytes, indexBytes, data.indexType().bytes()))
+			{
+				page = new Page(Math.max(PAGE_BYTES, vertexBytes), Math.max(PAGE_BYTES, indexBytes));
+				this.pages.add(page);
+			}
+			return page.append(data);
+		});
+	}
+
+	/** Reuses one allocation per reclaimed executor frame slot, rather than accumulating snapshots. */
+	Slice resolve(PGlDynamicGeometry source, int frameSlot)
+	{
+		PGeometryData data = source.geometry();
+		validate(data, VERTEX_STRIDE);
+		Map<Integer, DynamicAllocation> slots = this.dynamicPages.computeIfAbsent(source, ignored -> new HashMap<>());
+		DynamicAllocation previous = slots.get(frameSlot);
+		if (previous != null && previous.data() == data)
+			return previous.slice();
+		int vertexBytes = data.vertices().remaining();
+		int indexBytes = Math.multiplyExact(data.indexCount(), data.indexType().bytes());
+		Page page;
+		if (previous == null || vertexBytes > previous.page().vertexCapacity || indexBytes > previous.page().indexCapacity)
+		{
+			if (previous != null)
+				previous.page().close();
+			page = new Page(Math.max(VERTEX_STRIDE * 64, vertexBytes), Math.max(256, indexBytes));
+		}
+		else
+			page = previous.page();
+		page.vertices = 0;
+		page.indices = 0;
+		Slice slice = page.append(data);
+		slots.put(frameSlot, new DynamicAllocation(page, data, slice));
+		return slice;
+	}
+
+	static void validate(PGeometryData data, int vertexStride)
+	{
+		if (data.vertexStride() != vertexStride || data.vertices().remaining() % vertexStride != 0)
+			throw new IllegalArgumentException("Portable geometry must use PulseLib POSITION_TEX_NORMAL vertex layout");
+	}
+
 	/**
 	 * Performs the clear operation.
 	 */
@@ -49,6 +107,13 @@ public final class PGlGeometryArena
 		this.pages.forEach(Page :: close);
 		this.pages.clear();
 		this.slices.clear();
+		this.geometrySlices.clear();
+		this.dynamicPages.values().forEach(slots -> slots.values().forEach(allocation -> allocation.page().close()));
+		this.dynamicPages.clear();
+	}
+
+	private record DynamicAllocation(Page page, PGeometryData data, Slice slice)
+	{
 	}
 
 	/**
@@ -197,6 +262,41 @@ public final class PGlGeometryArena
 			this.indices = indexOffset + indexBytes;
 			return new Slice(this, indexOffset, baseVertex, mesh.indicesCount(),
 					mesh.indexType() == VertexFormat.IndexType.SHORT ? GL11.GL_UNSIGNED_SHORT : GL11.GL_UNSIGNED_INT);
+		}
+
+		private Slice append(PGeometryData geometry)
+		{
+			int indexOffset = align(this.indices, geometry.indexType().bytes());
+			int baseVertex = this.vertices / VERTEX_STRIDE;
+			ByteBuffer vertices = geometry.vertices();
+			ByteBuffer indices = geometry.indices();
+			int indexBytes = Math.multiplyExact(geometry.indexCount(), geometry.indexType().bytes());
+			indices.limit(indexBytes);
+			upload(this.vertexBuffer, this.vertices, vertices);
+			upload(this.indexBuffer, indexOffset, indices);
+			this.vertices += vertices.remaining();
+			this.indices = indexOffset + indexBytes;
+			return new Slice(this, indexOffset, baseVertex, geometry.indexCount(),
+					geometry.indexType() == PGeometryData.IndexType.UNSIGNED_SHORT ? GL11.GL_UNSIGNED_SHORT : GL11.GL_UNSIGNED_INT);
+		}
+
+		private static void upload(int target, int offset, ByteBuffer source)
+		{
+			if (!source.hasRemaining())
+				return;
+			int previous = GL11.glGetInteger(GL31.GL_COPY_WRITE_BUFFER);
+			ByteBuffer direct = MemoryUtil.memAlloc(source.remaining());
+			try
+			{
+				direct.put(source.duplicate()).flip();
+				GL15.glBindBuffer(GL31.GL_COPY_WRITE_BUFFER, target);
+				GL15.glBufferSubData(GL31.GL_COPY_WRITE_BUFFER, offset, direct);
+			}
+			finally
+			{
+				GL15.glBindBuffer(GL31.GL_COPY_WRITE_BUFFER, previous);
+				MemoryUtil.memFree(direct);
+			}
 		}
 
 		/**

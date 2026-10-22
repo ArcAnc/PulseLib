@@ -12,6 +12,8 @@ package com.arcanc.pulselib.content.renderer.gl;
 import com.arcanc.pulselib.content.model.baked.PBakedMesh;
 import com.arcanc.pulselib.content.renderer.plan.PMeshHandle;
 import com.arcanc.pulselib.content.renderer.plan.PPipelineHandle;
+import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
+import com.arcanc.pulselib.content.renderer.plan.PDynamicGeometry;
 import net.minecraft.client.renderer.rendertype.RenderType;
 
 import java.util.IdentityHashMap;
@@ -23,7 +25,9 @@ public final class PGlResourceRegistry
 	private final Map<RenderType, PPipelineHandle> pipelines = new IdentityHashMap<>();
 	private final Map<PPipelineHandle, RenderType> pipelineResources = new IdentityHashMap<>();
 	private final Map<PBakedMesh, PMeshHandle> meshes = new IdentityHashMap<>();
-	private final Map<PMeshHandle, PBakedMesh> meshResources = new IdentityHashMap<>();
+	private final Map<PGeometryData, PMeshHandle> geometry = new IdentityHashMap<>();
+	private final Map<PGlDynamicGeometry, PMeshHandle> dynamic = new IdentityHashMap<>();
+	private final Map<PMeshHandle, Object> meshResources = new IdentityHashMap<>();
 	private long nextHandle;
 
 	/** Registers a pipeline by resource identity without hashing its contents. */
@@ -60,7 +64,58 @@ public final class PGlResourceRegistry
 	/** Resolves a live mesh handle owned by this registry. */
 	public PBakedMesh mesh(PMeshHandle handle)
 	{
-		PBakedMesh resource = this.meshResources.get(handle);
+		Object resource = resource(handle);
+		if (resource instanceof PBakedMesh mesh)
+			return mesh;
+		throw new IllegalArgumentException("Handle refers to portable geometry, not a legacy baked mesh");
+	}
+
+	/** Registers immutable geometry by identity, without allocating GPU buffers during submission. */
+	public PMeshHandle geometry(PGeometryData geometry)
+	{
+		return this.geometry.computeIfAbsent(geometry, resource -> register(resource));
+	}
+
+	/** Registers the supported Minecraft 26.1 dynamic geometry implementation. */
+	public PMeshHandle dynamic(PDynamicGeometry geometry)
+	{
+		if (!(geometry instanceof PGlDynamicGeometry source))
+			throw new IllegalArgumentException("Unsupported dynamic geometry for Minecraft 26.1: " + geometry.getClass().getName());
+		return this.dynamic.computeIfAbsent(source, resource -> register(resource));
+	}
+
+	public int indexCount(PMeshHandle handle)
+	{
+		return switch (resource(handle))
+		{
+			case PBakedMesh mesh -> mesh.indicesCount();
+			case PGeometryData data -> data.indexCount();
+			case PGlDynamicGeometry source -> source.geometry().indexCount();
+			default -> throw new IllegalStateException("Unknown geometry resource");
+		};
+	}
+
+	PGlGeometryArena.Slice resolve(PMeshHandle handle, PGlGeometryArena arena, int frameSlot)
+	{
+		return switch (resource(handle))
+		{
+			case PBakedMesh mesh -> arena.resolve(mesh);
+			case PGeometryData data -> arena.resolve(data);
+			case PGlDynamicGeometry source -> arena.resolve(source, frameSlot);
+			default -> throw new IllegalStateException("Unknown geometry resource");
+		};
+	}
+
+	private PMeshHandle register(Object resource)
+	{
+		PMeshHandle handle = new PMeshHandle(this.nextHandle++);
+		this.meshResources.put(handle, resource);
+		return handle;
+	}
+
+	private Object resource(PMeshHandle handle)
+	{
+		Object resource = this.meshResources.get(handle);
 		if (resource == null)
 			throw new IllegalStateException("Unknown PulseLib mesh handle: " + handle.value());
 		return resource;
@@ -72,6 +127,8 @@ public final class PGlResourceRegistry
 		this.pipelines.clear();
 		this.pipelineResources.clear();
 		this.meshes.clear();
+		this.geometry.clear();
+		this.dynamic.clear();
 		this.meshResources.clear();
 	}
 }

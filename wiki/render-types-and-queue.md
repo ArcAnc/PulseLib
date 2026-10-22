@@ -82,7 +82,11 @@ The queue now feeds the canonical `PFrameCompiler<S>`. It produces a `PRenderPla
 
 `PRenderCapabilities.storageMode()` describes pose storage. The current backend reports CPU pose evaluation and retains GPU deformation through the existing UBO stream. Draw submission and upload modes independently report multi-draw indirect and persistent ring storage where supported.
 
-This is checkpoint **4.1a**. The baked-mesh queue overloads above are a temporary facade into the single canonical compiler, while the modern baked/model API and portable geometry submission overloads are adapted in **4.1b**. World stage timing, OIT integration and GUI/offscreen scopes still require their remaining stage 4 checks; compiler tests alone do not establish visual compatibility. See the [migration journal](../docs/porting/26.1.2-multiloader.md).
+Checkpoint **4.1b.1** adds canonical queue overloads accepting `PGeometryData` or `PDynamicGeometry` with `PInstanceHeader`. Portable geometry uses the same `POSITION_TEX_NORMAL` layout and triangle indices as baked meshes. Both unsigned 16-bit and 32-bit indices are supported. Immutable data is uploaded once per resource identity into the existing arena pages.
+
+For mutable geometry, reuse one `PGlDynamicGeometry` source and call `update(PGeometryData)` on the render thread. Submit it through the `PDynamicGeometry` overloads. Pending submissions see the latest data, so flush before changing the index count or vertex layout. The executor reuses allocations associated with its reclaimed frame slots; repeated updates do not add a new static arena allocation each frame. Queue reload/disconnect/shutdown owns GPU cleanup.
+
+The baked-mesh queue overloads above remain a temporary facade into the single canonical compiler. Modern baked/model/renderer API adaptation is the next checkpoint, **4.1b.2**. World stage timing, target-specific OIT composition and GUI/offscreen scopes still require their remaining stage 4 checks. Canonical item submissions with `ItemDisplayContext.GUI` do not enter the world queue; full local GUI rendering is adapted in 4.3. See the [migration journal](../docs/porting/26.1.2-multiloader.md).
 
 ## Renderer hooks
 

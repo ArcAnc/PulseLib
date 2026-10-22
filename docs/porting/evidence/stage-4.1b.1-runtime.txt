@@ -1,0 +1,27 @@
+Stage 4.1b.1 actual runtime: client/server exit 0; no failed runtime attempts this session.
+CLIENT:
+[17:51:28] [Render thread/INFO] [Pulse Lib/]: PulseLib resource reload: collected 4 model declarations
+[17:51:37] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSIONS PASS: 16 cases, copy-sharing limitation, independent controllers and phases
+[17:51:37] [Render thread/INFO] [Pulse Lib/]: STAGE 3.2 RENDERER TIME PASS: 60 assertions, Entity/BlockEntity/Item, interpolated seconds
+[17:51:38] [Render thread/INFO] [Pulse Lib/]: STAGE 3.2 VANILLA LIGHT INPUTS: tick=100, leftSky=15, rightSky=15, leftRaw=15, rightRaw=15
+[17:51:38] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1b.1 GEOMETRY PASS: tick=100, frames=245, primitives=768, 16/32-bit indices, static/dynamic bytes match GPU, slots<=9
+[17:51:38] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1a PLAN BACKEND PASS: tick=100, meshes=17, strategies=PRenderCapabilities[storageMode=CPU, submissionMode=MULTI_DRAW_INDIRECT, uploadMode=PERSISTENT_RING, matrix=PRenderCapabilityMatrix[texelBuffer=true, shaderStorageBuffer=true, multiDrawIndirect=true, baseInstance=true, persistentMapping=true]], projection UBO matches CPU capture
+[17:51:39] [Render thread/INFO] [Pulse Lib/]: PulseLib resource reload: collected 4 model declarations
+[17:51:44] [Render thread/INFO] [Pulse Lib/]: STAGE 3.2 VANILLA LIGHT INPUTS: tick=210, leftSky=15, rightSky=15, leftRaw=15, rightRaw=15
+[17:51:44] [Render thread/INFO] [Pulse Lib/]: STAGE 3.3 GRAPH RENDER PASS: owners=2, zero/reverse overlay, RESTART, reload, time=124.0
+[17:51:45] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1b.1 GEOMETRY PASS: tick=230, frames=567, primitives=768, 16/32-bit indices, static/dynamic bytes match GPU, slots<=9
+[17:51:45] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1a PLAN BACKEND PASS: tick=230, meshes=17, strategies=PRenderCapabilities[storageMode=CPU, submissionMode=MULTI_DRAW_INDIRECT, uploadMode=PERSISTENT_RING, matrix=PRenderCapabilityMatrix[texelBuffer=true, shaderStorageBuffer=true, multiDrawIndirect=true, baseInstance=true, persistentMapping=true]], projection UBO matches CPU capture
+[17:51:48] [Render thread/INFO] [Pulse Lib/]: STAGE 2 CLIENT PLUGINS PASS: ids=[pulselib:stage1_client, pulselib:stage2_common], common=1, channels=1, events=1, deformers=1, client=1, server=0, models=2
+[17:51:48] [Render thread/INFO] [co.ar.pu.te.st.Stage1Client/]: STAGE 1.2 WORLD SMOKE: entity=1407, block=1217, item=1547
+[17:51:48] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1b.1 GEOMETRY SHUTDOWN PASS: static/dynamic pages=0, pass-state buffers released
+[17:51:48] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1a PLAN SHUTDOWN PASS: handles=0, frame projection released
+[17:51:48] [Render thread/INFO] [Pulse Lib/]: STAGE 3.1 MANAGER SHUTDOWN PASS: singleton=0, instance=0, surviving ID retained
+BUILD SUCCESSFUL in 45s
+
+SERVER:
+[17:50:43] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved
+[17:50:43] [Server thread/INFO] [Pulse Lib/]: STAGE 2 SERVER PLUGINS PASS: ids=[pulselib:stage2_common, pulselib:stage2_server], common=1, channels=1, events=1, deformers=1, client=0, server=1, models=0
+[17:52:56] [Server thread/INFO] [minecraft/MinecraftServer]: Stopping the server
+[17:52:57] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved
+[17:52:57] [main/INFO] [ne.ne.fm.lo.FMLLoader/]: Closing FML Loader 6c35bcfd
+BUILD SUCCESSFUL in 2m 43s

@@ -9,7 +9,6 @@
 
 package com.arcanc.pulselib.content.renderer.gl;
 
-import com.arcanc.pulselib.content.model.baked.PBakedMesh;
 import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
 import com.arcanc.pulselib.content.renderer.plan.PDrawCommand;
 import com.arcanc.pulselib.content.renderer.plan.PDrawGroup;
@@ -22,6 +21,8 @@ import com.arcanc.pulselib.util.PRenderTypes;
 import com.arcanc.pulselib.util.PResourceCache;
 import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
+import com.mojang.blaze3d.buffers.GpuBuffer;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.pipeline.RenderTarget;
@@ -63,6 +64,8 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 	private final Map<RenderTarget, PGlWeightedBlendedOit> weightedBlendedOits = new IdentityHashMap<>();
 	private @Nullable PGlWeightedBlendedOit activeWeightedBlendedOit;
 	private @Nullable ProjectionMatrixBuffer projectionBuffer;
+	private @Nullable GpuBuffer stateVertices;
+	private @Nullable GpuBuffer stateIndices;
 
 	public PGlMultiDrawExecutor()
 	{
@@ -107,19 +110,18 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 		if (plan.isEmpty())
 			return;
 
-		List<Draw> draws = new ArrayList<>();
+		List<PDrawGroup> groups = new ArrayList<>();
 		for (PDrawGroup group : plan.groups())
 		{
 			if (group.instances().isEmpty())
 				continue;
-			PBakedMesh mesh = this.resources.mesh(group.mesh());
 			PDrawCommand command = group.command();
-			if ((long)command.firstIndex() + command.indexCount() > mesh.indicesCount() ||
+			if ((long)command.firstIndex() + command.indexCount() > this.resources.indexCount(group.mesh()) ||
 					(long)command.firstInstance() + command.instanceCount() > plan.instances().size())
 				throw new IllegalArgumentException("Draw command exceeds its geometry or instance stream");
-			draws.add(new Draw(this.resources.pipeline(group.pipeline()), mesh, this.geometry.resolve(mesh), command, group.writeDepth()));
+			groups.add(group);
 		}
-		if (draws.isEmpty())
+		if (groups.isEmpty())
 			return;
 
 		PRenderCapabilities capabilities = capabilities();
@@ -132,6 +134,15 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 		ProjectionType previousProjectionType = RenderSystem.getProjectionType();
 		try
 		{
+			List<Draw> draws = new ArrayList<>();
+			for (PDrawGroup group : groups)
+				draws.add(new Draw(this.resources.pipeline(group.pipeline()), "PulseLib mesh " + group.mesh().value(),
+						this.resources.resolve(group.mesh(), this.geometry, frameSlot), group.command(), group.writeDepth()));
+			if (this.stateVertices == null)
+				this.stateVertices = RenderSystem.getDevice().createBuffer(() -> "PulseLib pass state vertices", GpuBuffer.USAGE_VERTEX,
+						(long)PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize());
+			if (this.stateIndices == null)
+				this.stateIndices = RenderSystem.getDevice().createBuffer(() -> "PulseLib pass state indices", GpuBuffer.USAGE_INDEX, (long)Integer.BYTES);
 			if (this.projectionBuffer == null)
 				this.projectionBuffer = new ProjectionMatrixBuffer("PulseLib render frame");
 			RenderSystem.setProjectionMatrix(this.projectionBuffer.getBuffer(frame.projection()),
@@ -228,6 +239,12 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 		if (this.projectionBuffer != null)
 			this.projectionBuffer.close();
 		this.projectionBuffer = null;
+		if (this.stateVertices != null)
+			this.stateVertices.close();
+		if (this.stateIndices != null)
+			this.stateIndices.close();
+		this.stateVertices = null;
+		this.stateIndices = null;
 		this.resources.clear();
 	}
 
@@ -330,7 +347,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 		RenderTargetAttachments attachments = attachments(type);
 
 		try (RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-				first.mesh().uuid() :: toString, attachments.color(), OptionalInt.empty(), attachments.depth(), OptionalDouble.empty()))
+				first :: label, attachments.color(), OptionalInt.empty(), attachments.depth(), OptionalDouble.empty()))
 		{
 			pass.setPipeline(resolvePipeline(type, oitPass));
 			RenderSystem.bindDefaultUniforms(pass);
@@ -345,8 +362,9 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 				pass.bindTexture("LayerDepthSampler", oitPass == OitPass.DEPTH_PEEL ?
 						activeOit().previousLayerDepthView() : activeOit().activeLayerDepthView(),
 						RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST));
-			pass.setVertexBuffer(0, first.mesh().vbo());
-			pass.setIndexBuffer(first.mesh().indices(), first.mesh().indexType());
+			// A zero-index draw applies Minecraft pipeline/uniform state; arena VAOs supply actual geometry.
+			pass.setVertexBuffer(0, this.stateVertices);
+			pass.setIndexBuffer(this.stateIndices, VertexFormat.IndexType.INT);
 			pass.drawIndexed(0, 0, 0, 1);
 			if (oitPass != OitPass.NONE)
 				activeOit().bindForDraw();
@@ -470,7 +488,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 /**
  * Immutable value object representing draw.
  */
-	private record Draw(RenderType type, PBakedMesh mesh, PGlGeometryArena.Slice slice,
+	private record Draw(RenderType type, String label, PGlGeometryArena.Slice slice,
 	                    PDrawCommand command, boolean writeDepth)
 	{
 	}

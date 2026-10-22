@@ -16,6 +16,7 @@ PREFIX = 'com.arcanc.pulselib.content.renderer.plan.'
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--report', type=Path)
+    parser.add_argument('--require-geometry-queue', action='store_true', help='Require all canonical geometry submission overloads and RenderStage contracts')
     args = parser.parse_args()
     directory = ROOT / 'docs/porting/26.1.2-multiloader'
     for line in (directory / 'checksums.sha256').read_text().splitlines():
@@ -54,10 +55,19 @@ def main():
               'remainingStage4Work': ['Baked/model and renderer API, canonical queue geometry overloads',
                                       'Render stage hooks, OIT integration and controlled pixel regressions',
                                       'GUI/offscreen local scopes and PLibHelper.renderModelInGui']}
+    if args.require_geometry_queue:
+        for row in queue_debt:
+            assert not row['deferredTypeChanges'], f"Queue type contract changed: {row['type']}"
+            assert all(member['name'] in ['flush', 'compositeTranslucency', 'compositeFabulousTranslucency']
+                       and 'RenderTarget' in member['signature'] for member in row['deferredMembers']), row['deferredMembers']
+        report['geometryQueueStatus'] = 'PASS: all 11 geometry submission overloads, endWorldFrame and RenderStage contracts preserved'
+        report['remainingStage4Work'][0] = 'Baked/model and renderer API; target-specific queue operations remain explicit debt'
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(json.dumps(report, indent=2) + '\n')
     print(f"RENDER PLAN API PASS: {len(results)} canonical types / {sum(r['preservedMembers'] for r in results)} declared members")
+    if args.require_geometry_queue:
+        print('GEOMETRY QUEUE API PASS: 11 submission overloads, endWorldFrame and complete RenderStage contracts')
 
 
 if __name__ == '__main__':

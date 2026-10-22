@@ -19,6 +19,9 @@ import com.arcanc.pulselib.content.renderer.gl.PGlResourceRegistry;
 import com.arcanc.pulselib.content.renderer.plan.PFrameCompiler;
 import com.arcanc.pulselib.content.renderer.plan.PInstanceHeader;
 import com.arcanc.pulselib.content.renderer.plan.PPipelineHandle;
+import com.arcanc.pulselib.content.renderer.plan.PMeshHandle;
+import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
+import com.arcanc.pulselib.content.renderer.plan.PDynamicGeometry;
 import com.arcanc.pulselib.util.PRenderTypes;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -30,11 +33,194 @@ import java.util.List;
 /**
  * Provides support for render queue.
  */
-public class PRenderQueue
+public final class PRenderQueue
 {
 	private static final PGlResourceRegistry RESOURCES = new PGlResourceRegistry();
 	private static final PFrameCompiler<RenderStage> COMPILER = new PFrameCompiler<>();
 	private static final PGlMultiDrawExecutor EXECUTOR = new PGlMultiDrawExecutor(RESOURCES);
+
+	private PRenderQueue()
+	{
+	}
+
+	/**
+	 * Queues block-entity geometry for the opaque world block stage.
+	 *
+	 * @param renderType the render type
+	 * @param geometry the dynamically updated geometry
+	 * @param data the data
+	 */
+	public static void submitBlockEntityMesh(RenderType renderType, PDynamicGeometry geometry, PInstanceHeader data)
+	{
+		submit(RenderStage.SOLID_BLOCKS, renderType, geometry, data);
+	}
+
+	/**
+	 * Queues block-entity geometry for the opaque world block stage.
+	 *
+	 * @param renderType the render type
+	 * @param geometry the immutable indexed mesh geometry
+	 * @param data the data
+	 */
+	public static void submitBlockEntityMesh(RenderType renderType, PGeometryData geometry, PInstanceHeader data)
+	{
+		submit(RenderStage.SOLID_BLOCKS, renderType, geometry, data);
+	}
+
+	/**
+	 * Queues block-entity geometry for translucent world rendering.
+	 *
+	 * @param renderType the render type
+	 * @param geometry the dynamically updated geometry
+	 * @param data the data
+	 */
+	public static void submitBlockEntityTranslucentMesh(RenderType renderType, PDynamicGeometry geometry, PInstanceHeader data)
+	{
+		submitTranslucent(RenderStage.TRANSLUCENT_BLOCKS, renderType, geometry, data);
+	}
+
+	/**
+	 * Queues block-entity geometry for translucent world rendering.
+	 *
+	 * @param renderType the render type
+	 * @param geometry the immutable indexed mesh geometry
+	 * @param data the data
+	 */
+	public static void submitBlockEntityTranslucentMesh(RenderType renderType, PGeometryData geometry, PInstanceHeader data)
+	{
+		submitTranslucent(RenderStage.TRANSLUCENT_BLOCKS, renderType, geometry, data);
+	}
+
+	/**
+	 * Queues item geometry in the stage selected by its display context.
+	 *
+	 * @param context the context
+	 * @param renderType the render type
+	 * @param geometry the dynamically updated geometry
+	 * @param data the data
+	 */
+	public static void submitItem(ItemDisplayContext context, RenderType renderType, PDynamicGeometry geometry, PInstanceHeader data)
+	{
+		RenderStage stage = stage(context);
+		if (stage != RenderStage.GUI)
+			submit(stage, renderType, geometry, data);
+	}
+
+	/**
+	 * Queues item geometry in the stage selected by its display context.
+	 *
+	 * @param context the context
+	 * @param renderType the render type
+	 * @param geometry the immutable indexed mesh geometry
+	 * @param data the data
+	 */
+	public static void submitItem(ItemDisplayContext context, RenderType renderType, PGeometryData geometry, PInstanceHeader data)
+	{
+		RenderStage stage = stage(context);
+		if (stage != RenderStage.GUI)
+			submit(stage, renderType, geometry, data, PRenderTypes.isTransparent(renderType));
+	}
+
+	/**
+	 * Queues entity geometry in the stage selected by the current render context.
+	 *
+	 * @param renderType the render type
+	 * @param geometry the dynamically updated geometry
+	 * @param data the data
+	 */
+	public static void submitEntityMesh(RenderType renderType, PDynamicGeometry geometry, PInstanceHeader data)
+	{
+		submit(RenderStage.ENTITIES, renderType, geometry, data);
+	}
+
+	/**
+	 * Queues entity geometry in the stage selected by the current render context.
+	 *
+	 * @param renderType the render type
+	 * @param geometry the immutable indexed mesh geometry
+	 * @param data the data
+	 */
+	public static void submitEntityMesh(RenderType renderType, PGeometryData geometry, PInstanceHeader data)
+	{
+		submit(RenderStage.ENTITIES, renderType, geometry, data);
+	}
+
+	/**
+	 * Queues geometry for the depth buffer produced by Minecraft's hand pass.
+	 *
+	 * @param renderType the render type
+	 * @param geometry the immutable indexed mesh geometry
+	 * @param data the data
+	 */
+	public static void submitFirstPersonMesh(RenderType renderType, PGeometryData geometry, PInstanceHeader data)
+	{
+		submit(RenderStage.FIRST_PERSON, renderType, geometry, data);
+	}
+
+	/**
+	 * Queues one geometry instance for the supplied render stage and pipeline.
+	 *
+	 * @param stage the stage
+	 * @param type the vanilla render pipeline
+	 * @param geometry the dynamically updated geometry
+	 * @param data the data
+	 */
+	public static void submit(RenderStage stage, RenderType type, PDynamicGeometry geometry, PInstanceHeader data)
+	{
+		submit(stage, type, geometry, data, PRenderTypes.isTransparent(type));
+	}
+
+	/**
+	 * Queues one geometry instance for the supplied render stage and pipeline.
+	 *
+	 * @param stage the stage
+	 * @param type the vanilla render pipeline
+	 * @param geometry the immutable indexed mesh geometry
+	 * @param data the data
+	 */
+	public static void submit(RenderStage stage, RenderType type, PGeometryData geometry, PInstanceHeader data)
+	{
+		submit(stage, type, geometry, data, PRenderTypes.isTransparent(type));
+	}
+
+	private static void submit(RenderStage stage, RenderType type, PGeometryData geometry, PInstanceHeader data, boolean transparent)
+	{
+		COMPILER.submit(stage, RESOURCES.pipeline(type), RESOURCES.geometry(geometry), geometry.indexCount(), data, transparent);
+	}
+
+	private static void submit(RenderStage stage, RenderType type, PDynamicGeometry geometry, PInstanceHeader data, boolean transparent)
+	{
+		PMeshHandle mesh = RESOURCES.dynamic(geometry);
+		COMPILER.submit(stage, RESOURCES.pipeline(type), mesh, RESOURCES.indexCount(mesh), data, transparent);
+	}
+
+	private static void submitTranslucent(RenderStage stage, RenderType type, PGeometryData geometry, PInstanceHeader data)
+	{
+		submit(stage, type, geometry, data, true);
+	}
+
+	private static void submitTranslucent(RenderStage stage, RenderType type, PDynamicGeometry geometry, PInstanceHeader data)
+	{
+		submit(stage, type, geometry, data, true);
+	}
+
+	private static RenderStage stage(ItemDisplayContext context)
+	{
+		return switch (context)
+		{
+			case GUI -> RenderStage.GUI;
+			case FIRST_PERSON_LEFT_HAND, FIRST_PERSON_RIGHT_HAND -> RenderStage.FIRST_PERSON;
+			case THIRD_PERSON_LEFT_HAND, THIRD_PERSON_RIGHT_HAND, HEAD, ON_SHELF -> RenderStage.ENTITIES;
+			case GROUND, FIXED, NONE -> RenderStage.TRANSLUCENT_BLOCKS;
+		};
+	}
+
+	/** Drops unconsumed world commands, including when world rendering throws. */
+	public static void endWorldFrame()
+	{
+		COMPILER.discard(List.of(RenderStage.ENTITIES, RenderStage.SOLID_BLOCKS, RenderStage.TRANSLUCENT_BLOCKS));
+	}
+
 	
 	/**
 	 * Performs the submit block entity mesh operation.
@@ -203,7 +389,7 @@ public class PRenderQueue
 /**
  * Provides support for render stage.
  */
-	public static class RenderStage
+	public static final class RenderStage
 	{
 		public static final RenderStage SOLID_BLOCKS = new RenderStage("solid_blocks");
 		public static final RenderStage TRANSLUCENT_BLOCKS = new RenderStage("translucent_blocks");
@@ -238,15 +424,9 @@ public class PRenderQueue
 		 * @return the value produced by this operation.
 		 */
 		@Override
-		public boolean equals(Object obj)
+		public boolean equals(Object object)
 		{
-			if (obj == null)
-				return false;
-			if (!(obj instanceof RenderStage other))
-				return false;
-			if (this == other)
-				return true;
-			return this.name.equals(other.name);
+			return object instanceof RenderStage other && this.name.equals(other.name);
 		}
 	}
 	
