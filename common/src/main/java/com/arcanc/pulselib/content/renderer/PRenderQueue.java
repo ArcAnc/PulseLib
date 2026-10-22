@@ -15,17 +15,16 @@ import com.arcanc.pulselib.content.model.baked.PSubdividedMeshCache;
 import com.arcanc.pulselib.content.model.deformer.PMeshDeformation;
 import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
 import com.arcanc.pulselib.content.renderer.gl.PGlMultiDrawExecutor;
-import com.arcanc.pulselib.content.renderer.plan.PDrawGroup;
+import com.arcanc.pulselib.content.renderer.gl.PGlResourceRegistry;
 import com.arcanc.pulselib.content.renderer.plan.PFrameCompiler;
-import com.arcanc.pulselib.content.renderer.plan.PRenderPlan;
+import com.arcanc.pulselib.content.renderer.plan.PInstanceHeader;
+import com.arcanc.pulselib.content.renderer.plan.PPipelineHandle;
 import com.arcanc.pulselib.util.PRenderTypes;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.world.item.ItemDisplayContext;
 import org.joml.Matrix4f;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Comparator;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,12 +32,9 @@ import java.util.List;
  */
 public class PRenderQueue
 {
-	private static final PFrameCompiler<RenderStage, RenderType, PBakedMesh, InstanceData> COMPILER = new PFrameCompiler<>(
-			Comparator.comparing(RenderType::toString),
-			data -> data.posMatrix().m30() * data.posMatrix().m30() +
-					data.posMatrix().m31() * data.posMatrix().m31() +
-					data.posMatrix().m32() * data.posMatrix().m32());
-	private static final PGlMultiDrawExecutor EXECUTOR = new PGlMultiDrawExecutor();
+	private static final PGlResourceRegistry RESOURCES = new PGlResourceRegistry();
+	private static final PFrameCompiler<RenderStage> COMPILER = new PFrameCompiler<>();
+	private static final PGlMultiDrawExecutor EXECUTOR = new PGlMultiDrawExecutor(RESOURCES);
 	
 	/**
 	 * Performs the submit block entity mesh operation.
@@ -145,7 +141,9 @@ public class PRenderQueue
 	{
 		PBakedMesh subdividedMesh = PSubdividedMeshCache.resolve(mesh, deformation == null ? 0 : deformation.subdivisionLevel());
 		PGpuDeformerBuffers.Submission deformer = PGpuDeformerBuffers.submit(deformation);
-		COMPILER.submit(stage, type, subdividedMesh, data.withDeformer(deformer), transparent);
+		PInstanceHeader header = new PInstanceHeader(data.posMatrix(), data.packedColor(), data.packedLight(), data.packedOverlay(),
+				deformer.operationOffset(), deformer.valueOffset(), deformer.operationCount());
+		COMPILER.submit(stage, RESOURCES.pipeline(type), RESOURCES.mesh(subdividedMesh), subdividedMesh.indicesCount(), header, transparent);
 	}
 	
 	/**
@@ -154,8 +152,13 @@ public class PRenderQueue
 	 */
 	public static void flush(RenderStage stage)
 	{
-		PRenderPlan<RenderType, PBakedMesh, InstanceData> plan = COMPILER.compile(stage);
-		EXECUTOR.execute(plan);
+		EXECUTOR.execute(COMPILER.compile(stage, PRenderQueue::canBatchWithOit));
+	}
+
+	/** Consumes opaque geometry while retaining transparent submissions for their later pass. */
+	public static void flushOpaque(RenderStage stage)
+	{
+		EXECUTOR.execute(COMPILER.compileOpaque(stage));
 	}
 
 	/**
@@ -164,11 +167,13 @@ public class PRenderQueue
 	 */
 	public static void flushCombined(RenderStage... stages)
 	{
-		List<PDrawGroup<RenderType, PBakedMesh, InstanceData>> groups = new ArrayList<>();
-		for (RenderStage stage : stages)
-			groups.addAll(COMPILER.compile(stage).groups());
-		if (!groups.isEmpty())
-			EXECUTOR.execute(new PRenderPlan<>(groups));
+		EXECUTOR.execute(COMPILER.compileCombined(List.of(stages), PRenderQueue::canBatchWithOit));
+	}
+
+	private static boolean canBatchWithOit(PPipelineHandle pipeline)
+	{
+		RenderType type = RESOURCES.pipeline(pipeline);
+		return PRenderTypes.usesOit(type) && type.outputTarget().getRenderTarget().useDepth;
 	}
 
 	/**
@@ -187,6 +192,12 @@ public class PRenderQueue
 		COMPILER.clear();
 		EXECUTOR.cleanup();
 		PGpuDeformerBuffers.cleanup();
+	}
+
+	/** Canonical cleanup entry point; both names operate on the same queue and executor. */
+	public static void cleanup()
+	{
+		cleanUp();
 	}
 	
 /**
@@ -279,14 +290,13 @@ public class PRenderQueue
 		}
 
 		/**
-		 * Performs the with deformer operation.
-		 * @param deformer the deformer to use.
+		 * Returns the canonical instance header without changing packed attributes.
 		 * @return the value produced by this operation.
 		 */
-		private InstanceData withDeformer(PGpuDeformerBuffers.Submission deformer)
+		public PInstanceHeader header()
 		{
-			return new InstanceData(this.posMatrix, this.packedColor, this.packedLight, this.packedOverlay,
-					deformer.operationOffset(), deformer.valueOffset(), deformer.operationCount());
+			return new PInstanceHeader(this.posMatrix, this.packedColor, this.packedLight, this.packedOverlay,
+					this.deformerOperationOffset, this.deformerValueOffset, this.deformerOperationCount);
 		}
 	}
 	

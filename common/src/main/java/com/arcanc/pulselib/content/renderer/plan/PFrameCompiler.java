@@ -1,6 +1,6 @@
 /**
  * @author ArcAnc
- * Created at: 14.08.2026
+ * Created at: 13.08.2026
  * Copyright (c) 2026
  * <p>
  * This code is licensed under "Arc's License of Common Sense"
@@ -9,53 +9,90 @@
 
 package com.arcanc.pulselib.content.renderer.plan;
 
-import com.arcanc.pulselib.util.PRenderTypes;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 
 /**
- * Provides support for frame compiler.
+ * Collects staged instance submissions and compiles opaque batches and ordered translucent draw groups.
+ *
+ * @param <S> the render-stage identifier type
  */
-public final class PFrameCompiler<S, P, M, I>
+public final class PFrameCompiler<S>
 {
-	private final Map<S, Map<DrawKey<P, M>, List<I>>> opaque = new Object2ObjectOpenHashMap<>();
-	private final Map<S, List<TransparentSubmission<P, M, I>>> translucent = new Object2ObjectOpenHashMap<>();
-	private final Comparator<? super P> pipelineOrder;
-	private final ToDoubleFunction<I> distanceSquared;
+	private final Map<S, Map<DrawKey, List<PInstanceHeader>>> opaque = new Object2ObjectOpenHashMap<>();
+	private final Map<S, List<TransparentSubmission>> translucent = new Object2ObjectOpenHashMap<>();
+
+	private final ToDoubleFunction<PInstanceHeader> sortDepth;
 
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param pipelineOrder the pipeline order to use.
-	 * @param distanceSquared the distance squared to use.
+	 * Creates a staged submission compiler using the default or supplied translucent-depth function.
 	 */
-	public PFrameCompiler(Comparator<? super P> pipelineOrder, ToDoubleFunction<I> distanceSquared)
+	public PFrameCompiler()
 	{
-		this.pipelineOrder = pipelineOrder;
-		this.distanceSquared = distanceSquared;
+		this(PFrameCompiler :: distanceSquared);
 	}
 
 	/**
-	 * Performs the submit operation.
-	 * @param stage the stage to use.
-	 * @param pipeline the pipeline to use.
-	 * @param mesh the mesh to use.
-	 * @param instance the instance to use.
-	 * @param transparent the transparent to use.
+	 * Creates a staged submission compiler using the default or supplied translucent-depth function.
+	 *
+	 * @param sortDepth the callback calculating translucent instance sort depth
 	 */
-	public void submit(S stage, P pipeline, M mesh, I instance, boolean transparent)
+	public PFrameCompiler(ToDoubleFunction<PInstanceHeader> sortDepth)
 	{
-		DrawKey<P, M> key = new DrawKey<>(pipeline, mesh);
+		this.sortDepth = sortDepth;
+	}
+
+	/**
+	 * Queues one instance under a stage, pipeline and mesh draw description.
+	 *
+	 * @param stage the stage
+	 * @param pipeline the pipeline
+	 * @param mesh the mesh
+	 * @param indexCount the number of indices to draw
+	 * @param instance the instance
+	 * @param transparent whether the submission requires translucent rendering
+	 */
+	public void submit(S stage,
+	                   PPipelineHandle pipeline,
+	                   PMeshHandle mesh,
+	                   int indexCount,
+	                   PInstanceHeader instance,
+	                   boolean transparent)
+	{
+		this.submit(stage, pipeline, mesh, new PDrawCommand(indexCount, 1, 0, 0, 0), instance, transparent);
+	}
+
+	/**
+	 * Queues one instance under a stage, pipeline and mesh draw description.
+	 *
+	 * @param stage the stage
+	 * @param pipeline the pipeline
+	 * @param mesh the mesh
+	 * @param command the command
+	 * @param instance the instance
+	 * @param transparent whether the submission requires translucent rendering
+	 */
+	public void submit(S stage,
+	                   PPipelineHandle pipeline,
+	                   PMeshHandle mesh,
+	                   PDrawCommand command,
+	                   PInstanceHeader instance,
+	                   boolean transparent)
+	{
+		DrawKey key = new DrawKey(pipeline, mesh, command);
 		if (transparent)
 		{
 			this.translucent.computeIfAbsent(stage, ignored -> new ObjectArrayList<>()).add(
-					new TransparentSubmission<>(key, instance, this.distanceSquared.applyAsDouble(instance)));
+					new TransparentSubmission(key, instance, this.sortDepth.applyAsDouble(instance)));
 			return;
 		}
 		this.opaque.computeIfAbsent(stage, ignored -> new Object2ObjectOpenHashMap<>()).
@@ -63,42 +100,95 @@ public final class PFrameCompiler<S, P, M, I>
 	}
 
 	/**
-	 * Performs the compile operation.
-	 * @param stage the stage to use.
-	 * @return the value produced by this operation.
+	 * Compiles queued submissions for one stage into an executable render plan.
+	 *
+	 * @param stage the stage
+	 * @return the compiled draw groups and packed instance data
 	 */
-	public PRenderPlan<P, M, I> compile(S stage)
+	public PRenderPlan compile(S stage)
 	{
-		Map<DrawKey<P, M>, List<I>> opaqueGroups = this.opaque.remove(stage);
-		List<TransparentSubmission<P, M, I>> translucentGroups = this.translucent.remove(stage);
-		if (opaqueGroups == null && translucentGroups == null)
-			return PRenderPlan.empty();
+		return compile(stage, ignored -> false);
+	}
 
-		List<PDrawGroup<P, M, I>> groups = new ArrayList<>();
+	/**
+	 * Compiles queued submissions for one stage into an executable render plan.
+	 *
+	 * @param stage the stage
+	 * @param canBatchWithOit the predicate identifying pipelines compatible with weighted transparency batching
+	 * @return the compiled draw groups and packed instance data
+	 */
+	public PRenderPlan compile(S stage, Predicate<PPipelineHandle> canBatchWithOit)
+	{
+		return compileCombined(List.of(stage), canBatchWithOit);
+	}
+
+	/**
+	 * Consumes only opaque submissions, leaving transparency for its later pass.
+	 *
+	 * @param stage the stage
+	 * @return the compiled draw groups and packed instance data
+	 */
+	public PRenderPlan compileOpaque(S stage)
+	{
+		return compile(this.opaque.remove(stage), null, ignored -> false);
+	}
+
+	/**
+	 * Sorts ordinary transparency across all requested sources before forming batches.
+	 *
+	 * @param stages the stages
+	 * @param canBatchWithOit the predicate identifying pipelines compatible with weighted transparency batching
+	 * @return the compiled draw groups and packed instance data
+	 */
+	public PRenderPlan compileCombined(List<S> stages, Predicate<PPipelineHandle> canBatchWithOit)
+	{
+		Map<DrawKey, List<PInstanceHeader>> opaqueGroups = new Object2ObjectOpenHashMap<>();
+		List<TransparentSubmission> translucentGroups = new ObjectArrayList<>();
+		for (S stage : stages)
+		{
+			Map<DrawKey, List<PInstanceHeader>> opaqueStage = this.opaque.remove(stage);
+			if (opaqueStage != null)
+				opaqueStage.forEach((key, instances) -> opaqueGroups.computeIfAbsent(key,
+						ignored -> new ObjectArrayList<>()).addAll(instances));
+			List<TransparentSubmission> translucentStage = this.translucent.remove(stage);
+			if (translucentStage != null)
+				translucentGroups.addAll(translucentStage);
+		}
+		return compile(opaqueGroups, translucentGroups, canBatchWithOit);
+	}
+
+	private PRenderPlan compile(@Nullable Map<DrawKey, List<PInstanceHeader>> opaqueGroups,
+	                           @Nullable List<TransparentSubmission> translucentGroups,
+	                           Predicate<PPipelineHandle> canBatchWithOit)
+	{
+		if (opaqueGroups == null && translucentGroups == null)
+			return PRenderPlan.EMPTY;
+
+		List<PDrawGroup> groups = new ArrayList<>();
 		if (opaqueGroups != null)
-			for (Map.Entry<DrawKey<P, M>, List<I>> entry : opaqueGroups.entrySet())
+			for (Map.Entry<DrawKey, List<PInstanceHeader>> entry : opaqueGroups.entrySet())
 				groups.add(group(entry.getKey(), entry.getValue(), true));
-		groups.sort(Comparator.comparing(PDrawGroup<P, M, I>::pipeline, this.pipelineOrder));
+		groups.sort(Comparator.comparingLong(group -> group.pipeline().value()));
 
 		if (translucentGroups != null && !translucentGroups.isEmpty())
 		{
-			Map<DrawKey<P, M>, List<I>> oitGroups = new Object2ObjectOpenHashMap<>();
-			List<TransparentSubmission<P, M, I>> sortedGroups = new ObjectArrayList<>();
-			for (TransparentSubmission<P, M, I> submission : translucentGroups)
+			Map<DrawKey, List<PInstanceHeader>> oitGroups = new Object2ObjectOpenHashMap<>();
+			List<TransparentSubmission> sortedGroups = new ObjectArrayList<>();
+			for (TransparentSubmission submission : translucentGroups)
 			{
-				if (canBatchWithOit(submission.key()))
+				if (canBatchWithOit.test(submission.key().pipeline()))
 					oitGroups.computeIfAbsent(submission.key(), ignored -> new ObjectArrayList<>()).add(submission.instance());
 				else
 					sortedGroups.add(submission);
 			}
 
-			for (Map.Entry<DrawKey<P, M>, List<I>> entry : oitGroups.entrySet())
+			for (Map.Entry<DrawKey, List<PInstanceHeader>> entry : oitGroups.entrySet())
 				groups.add(group(entry.getKey(), entry.getValue(), false));
 
-			sortedGroups.sort(Comparator.comparingDouble(TransparentSubmission<P, M, I>::distanceSquared).reversed());
-			DrawKey<P, M> activeKey = null;
-			List<I> activeInstances = new ObjectArrayList<>();
-			for (TransparentSubmission<P, M, I> submission : sortedGroups)
+			sortedGroups.sort(Comparator.comparingDouble(TransparentSubmission :: sortDepth).reversed());
+			DrawKey activeKey = null;
+			List<PInstanceHeader> activeInstances = new ObjectArrayList<>();
+			for (TransparentSubmission submission : sortedGroups)
 			{
 				if (activeKey != null && !activeKey.equals(submission.key()))
 				{
@@ -111,12 +201,48 @@ public final class PFrameCompiler<S, P, M, I>
 			if (activeKey != null)
 				groups.add(group(activeKey, activeInstances, false));
 		}
-
-		return groups.isEmpty() ? PRenderPlan.empty() : new PRenderPlan<>(groups);
+		return groups.isEmpty() ? PRenderPlan.EMPTY : new PRenderPlan(groups);
 	}
 
 	/**
-	 * Performs the clear operation.
+	 * Consumes every stage of a compiler owned by one local context.
+	 *
+	 * @param canBatchWithOit the predicate identifying pipelines compatible with weighted transparency batching
+	 * @return the compiled draw groups and packed instance data
+	 */
+	public PRenderPlan compileAll(Predicate<PPipelineHandle> canBatchWithOit)
+	{
+		var stages = new LinkedHashSet<>(this.opaque.keySet());
+		stages.addAll(this.translucent.keySet());
+		return compileCombined(new ArrayList<>(stages), canBatchWithOit);
+	}
+
+	/**
+	 * Discards selected stages without compiling a draw plan.
+	 *
+	 * @param stages the stages
+	 */
+	public void discard(List<S> stages)
+	{
+		for (S stage : stages)
+		{
+			this.opaque.remove(stage);
+			this.translucent.remove(stage);
+		}
+	}
+
+	/**
+	 * Returns whether no render submissions remain queued.
+	 *
+	 * @return whether no render submissions remain queued
+	 */
+	public boolean isEmpty()
+	{
+		return this.opaque.isEmpty() && this.translucent.isEmpty();
+	}
+
+	/**
+	 * Discards all queued stage submissions.
 	 */
 	public void clear()
 	{
@@ -124,56 +250,58 @@ public final class PFrameCompiler<S, P, M, I>
 		this.translucent.clear();
 	}
 
-	/**
-	 * Performs the group operation.
-	 * @param key the key to use.
-	 * @param instances the instances to use.
-	 * @param writeDepth the write depth to use.
-	 * @return the value produced by this operation.
-	 */
-	private static <P, M, I> PDrawGroup<P, M, I> group(DrawKey<P, M> key, List<I> instances, boolean writeDepth)
+	private static PDrawGroup group(DrawKey key, List<PInstanceHeader> instances, boolean writeDepth)
 	{
-		return new PDrawGroup<>(key.pipeline(), key.mesh(), writeDepth, instances);
+		return new PDrawGroup(key.pipeline(), key.mesh(),
+				key.command().withInstances(instances.size(), 0), writeDepth, instances);
+	}
+
+	private static float distanceSquared(PInstanceHeader instance)
+	{
+		return instance.transform().m30() * instance.transform().m30() +
+				instance.transform().m31() * instance.transform().m31() +
+				instance.transform().m32() * instance.transform().m32();
 	}
 
 	/**
-	 * Determines whether the object can batch with oit.
-	 * @param key the key to use.
-	 * @return the value produced by this operation.
-	 */
-	private static <P, M> boolean canBatchWithOit(DrawKey<P, M> key)
-	{
-		return key.pipeline() instanceof RenderType renderType && PRenderTypes.usesOit(renderType) &&
-				renderType.outputTarget().getRenderTarget().useDepth;
-	}
-
-	/**
-	 * Identifies one GPU draw resource pair.
+	 * Batch identity for submissions sharing pipeline, mesh and draw-command parameters.
 	 *
-	 * Meshes contain vertex and index buffers.  Their value hash codes may walk
-	 * every buffer element, so batching must use the resource identities rather
-	 * than structural equality.
+	 * @param pipeline the pipeline
+	 * @param mesh the mesh
+	 * @param command the command
 	 */
-	private record DrawKey<P, M>(P pipeline, M mesh)
+	private record DrawKey(PPipelineHandle pipeline, PMeshHandle mesh, PDrawCommand command)
 	{
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
-		public boolean equals(Object object)
+		public boolean equals(@Nullable Object object)
 		{
-			return this == object || object instanceof DrawKey<?, ?> that &&
-					this.pipeline == that.pipeline && this.mesh == that.mesh;
+			return this == object || object instanceof DrawKey that &&
+					this.pipeline == that.pipeline && this.mesh == that.mesh && this.command.equals(that.command);
 		}
 
+		/**
+		 * Returns the hash code.
+		 *
+		 * @return the hash code
+		 */
 		@Override
 		public int hashCode()
 		{
-			return 31 * System.identityHashCode(this.pipeline) + System.identityHashCode(this.mesh);
+			return 31 * (31 * System.identityHashCode(this.pipeline) + System.identityHashCode(this.mesh)) + this.command.hashCode();
 		}
 	}
 
-/**
- * Immutable value object representing transparent submission.
- */
-	private record TransparentSubmission<P, M, I>(DrawKey<P, M> key, I instance, double distanceSquared)
+	/**
+	 * One translucent draw submission retaining its sort depth and insertion order.
+	 *
+	 * @param key the key
+	 * @param instance the instance
+	 * @param sortDepth the callback calculating translucent instance sort depth
+	 */
+	private record TransparentSubmission(DrawKey key, PInstanceHeader instance, double sortDepth)
 	{
 	}
 }

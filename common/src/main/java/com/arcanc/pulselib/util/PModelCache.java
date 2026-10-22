@@ -12,7 +12,7 @@ package com.arcanc.pulselib.util;
 
 import com.arcanc.pulselib.content.model.*;
 import com.arcanc.pulselib.content.model.baked.*;
-import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
+import com.arcanc.pulselib.content.renderer.PRenderQueue;
 import com.arcanc.pulselib.content.model.resource.PModelResource;
 import com.arcanc.pulselib.content.model.textures.PTextureAlphaClassifier;
 import com.arcanc.pulselib.content.model.textures.atlas.PLibSpriteMetadata;
@@ -147,13 +147,14 @@ public class PModelCache
 	 */
 	private static void clearCaches()
 	{
+		// Runs on the reload game executor, before any old baked GPU buffers are closed.
+		PRenderQueue.cleanup();
 		PTextureAlphaClassifier.clear();
 		if (MODELS != null)
 		{
 			MODELS.forEach((_, model) ->
 				model.bones().forEach(PModelCache :: clearBoneCache));
 			PMeshTextureVariants.clear();
-			PGpuDeformerBuffers.cleanup();
 			MODELS = null;
 		}
 	}

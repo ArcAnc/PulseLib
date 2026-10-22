@@ -10,6 +10,7 @@
 package com.arcanc.pulselib.content.renderer.gl;
 
 import com.arcanc.pulselib.content.renderer.PRenderQueue;
+import com.arcanc.pulselib.content.renderer.plan.PInstanceHeader;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.LightCoordsUtil;
 import org.joml.Matrix4f;
@@ -46,6 +47,12 @@ public final class PGlInstanceStream
 	 */
 	public Upload upload(List<PRenderQueue.InstanceData> instances, int frameSlot, boolean persistent)
 	{
+		return uploadHeaders(instances.stream().map(PRenderQueue.InstanceData::header).toList(), frameSlot, persistent);
+	}
+
+	/** Streams canonical headers with the original 96-byte GPU instance layout. */
+	public Upload uploadHeaders(List<PInstanceHeader> instances, int frameSlot, boolean persistent)
+	{
 		int required = Math.max(STRIDE, instances.size() * STRIDE);
 		if (persistent)
 		{
@@ -53,14 +60,14 @@ public final class PGlInstanceStream
 			ByteBuffer target = this.persistentMapping.duplicate().order(ByteOrder.nativeOrder());
 			target.position(frameSlot * this.capacity).limit((frameSlot + 1) * this.capacity);
 			target = target.slice().order(ByteOrder.nativeOrder());
-			for (PRenderQueue.InstanceData instance : instances)
+			for (PInstanceHeader instance : instances)
 				write(target, instance);
 			GL42.glMemoryBarrier(ARBBufferStorage.GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
 			return new Upload(this.buffer, (long)frameSlot * this.capacity);
 		}
 		this.ensureCapacity(required);
 		this.staging.clear();
-		for (PRenderQueue.InstanceData instance : instances)
+		for (PInstanceHeader instance : instances)
 			write(this.staging, instance);
 		this.staging.flip();
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.buffer);
@@ -152,9 +159,9 @@ public final class PGlInstanceStream
 	 * @param target the target to use.
 	 * @param instance the instance to use.
 	 */
-	private static void write(ByteBuffer target, PRenderQueue.InstanceData instance)
+	static void write(ByteBuffer target, PInstanceHeader instance)
 	{
-		Matrix4f matrix = instance.posMatrix();
+		Matrix4f matrix = instance.transform();
 		target.putFloat(matrix.m00()).putFloat(matrix.m10()).putFloat(matrix.m20()).putFloat(matrix.m30());
 		target.putFloat(matrix.m01()).putFloat(matrix.m11()).putFloat(matrix.m21()).putFloat(matrix.m31());
 		target.putFloat(matrix.m02()).putFloat(matrix.m12()).putFloat(matrix.m22()).putFloat(matrix.m32());
@@ -166,9 +173,9 @@ public final class PGlInstanceStream
 		target.putFloat(LightCoordsUtil.sky(instance.packedLight()));
 		target.putFloat(instance.packedOverlay() & 0xFFFF);
 		target.putFloat(instance.packedOverlay() >> 16 & 0xFFFF);
-		target.putInt(instance.deformerOperationOffset());
-		target.putInt(instance.deformerValueOffset());
-		target.putInt(instance.deformerOperationCount());
+		target.putInt(instance.auxiliaryOperationOffset());
+		target.putInt(instance.auxiliaryValueOffset());
+		target.putInt(instance.auxiliaryOperationCount());
 		target.putInt(0);
 	}
 

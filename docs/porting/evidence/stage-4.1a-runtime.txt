@@ -1,0 +1,24 @@
+Stage 4.1a final actual runtime: client/server exit 0. First failed client attempt is recorded separately and not counted as PASS.
+CLIENT:
+[16:58:02] [Render thread/INFO] [Pulse Lib/]: PulseLib resource reload: collected 4 model declarations
+[16:58:10] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSIONS PASS: 16 cases, copy-sharing limitation, independent controllers and phases
+[16:58:10] [Render thread/INFO] [Pulse Lib/]: STAGE 3.2 RENDERER TIME PASS: 60 assertions, Entity/BlockEntity/Item, interpolated seconds
+[16:58:11] [Render thread/INFO] [Pulse Lib/]: STAGE 3.2 VANILLA LIGHT INPUTS: tick=100, leftSky=15, rightSky=15, leftRaw=15, rightRaw=15
+[16:58:11] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1a PLAN BACKEND PASS: tick=100, meshes=13, strategies=PRenderCapabilities[storageMode=CPU, submissionMode=MULTI_DRAW_INDIRECT, uploadMode=PERSISTENT_RING, matrix=PRenderCapabilityMatrix[texelBuffer=true, shaderStorageBuffer=true, multiDrawIndirect=true, baseInstance=true, persistentMapping=true]], projection UBO matches CPU capture
+[16:58:12] [Render thread/INFO] [Pulse Lib/]: PulseLib resource reload: collected 4 model declarations
+[16:58:16] [Render thread/INFO] [Pulse Lib/]: STAGE 3.2 VANILLA LIGHT INPUTS: tick=210, leftSky=15, rightSky=15, leftRaw=15, rightRaw=15
+[16:58:17] [Render thread/INFO] [Pulse Lib/]: STAGE 3.3 GRAPH RENDER PASS: owners=2, zero/reverse overlay, RESTART, reload, time=124.0
+[16:58:17] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1a PLAN BACKEND PASS: tick=230, meshes=13, strategies=PRenderCapabilities[storageMode=CPU, submissionMode=MULTI_DRAW_INDIRECT, uploadMode=PERSISTENT_RING, matrix=PRenderCapabilityMatrix[texelBuffer=true, shaderStorageBuffer=true, multiDrawIndirect=true, baseInstance=true, persistentMapping=true]], projection UBO matches CPU capture
+[16:58:21] [Render thread/INFO] [Pulse Lib/]: STAGE 2 CLIENT PLUGINS PASS: ids=[pulselib:stage1_client, pulselib:stage2_common], common=1, channels=1, events=1, deformers=1, client=1, server=0, models=2
+[16:58:21] [Render thread/INFO] [co.ar.pu.te.st.Stage1Client/]: STAGE 1.2 WORLD SMOKE: entity=1634, block=1628, item=1636
+[16:58:21] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1a PLAN SHUTDOWN PASS: handles=0, frame projection released
+[16:58:21] [Render thread/INFO] [Pulse Lib/]: STAGE 3.1 MANAGER SHUTDOWN PASS: singleton=0, instance=0, surviving ID retained
+BUILD SUCCESSFUL in 36s
+
+SERVER:
+[16:55:48] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved
+[16:55:48] [Server thread/INFO] [Pulse Lib/]: STAGE 2 SERVER PLUGINS PASS: ids=[pulselib:stage2_common, pulselib:stage2_server], common=1, channels=1, events=1, deformers=1, client=0, server=1, models=0
+[16:58:36] [Server thread/INFO] [minecraft/MinecraftServer]: Stopping the server
+[16:58:37] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved
+[16:58:38] [main/INFO] [ne.ne.fm.lo.FMLLoader/]: Closing FML Loader 36bb0fb2
+BUILD SUCCESSFUL in 3m 7s

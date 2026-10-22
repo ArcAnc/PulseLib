@@ -11,13 +11,18 @@ package com.arcanc.pulselib.content.renderer.gl;
 
 import com.arcanc.pulselib.content.model.baked.PBakedMesh;
 import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
-import com.arcanc.pulselib.content.renderer.PRenderQueue;
+import com.arcanc.pulselib.content.renderer.plan.PDrawCommand;
 import com.arcanc.pulselib.content.renderer.plan.PDrawGroup;
+import com.arcanc.pulselib.content.renderer.plan.PRenderCapabilities;
+import com.arcanc.pulselib.content.renderer.plan.PRenderCapabilityMatrix;
+import com.arcanc.pulselib.content.renderer.plan.PRenderExecutor;
+import com.arcanc.pulselib.content.renderer.plan.PRenderFrame;
 import com.arcanc.pulselib.content.renderer.plan.PRenderPlan;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.arcanc.pulselib.util.PResourceCache;
 import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
+import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
@@ -27,6 +32,7 @@ import com.mojang.blaze3d.systems.ScissorState;
 import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.textures.GpuTextureView;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ProjectionMatrixBuffer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
@@ -47,46 +53,90 @@ import java.util.OptionalInt;
 /**
  * Provides support for gl multi draw executor.
  */
-public final class PGlMultiDrawExecutor
+public final class PGlMultiDrawExecutor implements PRenderExecutor
 {
+	private final PGlResourceRegistry resources;
 	private final PGlGeometryArena geometry = new PGlGeometryArena();
 	private final PGlInstanceStream instances = new PGlInstanceStream();
 	private final PGlIndirectStream indirect = new PGlIndirectStream();
 	private final PGlFrameArena frameArena = new PGlFrameArena(9);
 	private final Map<RenderTarget, PGlWeightedBlendedOit> weightedBlendedOits = new IdentityHashMap<>();
 	private @Nullable PGlWeightedBlendedOit activeWeightedBlendedOit;
+	private @Nullable ProjectionMatrixBuffer projectionBuffer;
+
+	public PGlMultiDrawExecutor()
+	{
+		this(new PGlResourceRegistry());
+	}
+
+	/** Uses resource handles owned by the submitting queue. */
+	public PGlMultiDrawExecutor(PGlResourceRegistry resources)
+	{
+		this.resources = resources;
+	}
+
+	/** Reports the actual 26.1 backend strategies, without selecting another renderer. */
+	@Override
+	public PRenderCapabilities capabilities()
+	{
+		GLCapabilities gl = GL.getCapabilities();
+		PRenderCapabilityMatrix matrix = new PRenderCapabilityMatrix(
+				gl.OpenGL31 || gl.GL_ARB_texture_buffer_object,
+				gl.OpenGL43 || gl.GL_ARB_shader_storage_buffer_object,
+				gl.OpenGL43 || gl.GL_ARB_multi_draw_indirect,
+				gl.OpenGL42 || gl.GL_ARB_base_instance,
+				gl.OpenGL44 || gl.GL_ARB_buffer_storage);
+		// Bone poses are evaluated by Common; the existing GPU deformer stream uses UBOs.
+		return matrix.selectedCapabilities(PRenderCapabilities.StorageMode.CPU, matrix.persistentMapping());
+	}
 
 	/**
 	 * Performs the execute operation.
 	 * @param plan the plan to use.
 	 */
-	public void execute(PRenderPlan<RenderType, PBakedMesh, PRenderQueue.InstanceData> plan)
+	public void execute(PRenderPlan plan)
+	{
+		if (!plan.isEmpty())
+			this.execute(plan, new PGlRenderHost().captureFrame());
+	}
+
+	/** Executes canonical packed commands using the existing instanced GPU paths. */
+	@Override
+	public void execute(PRenderPlan plan, PRenderFrame frame)
 	{
 		if (plan.isEmpty())
 			return;
 
-		List<PRenderQueue.InstanceData> allInstances = new ArrayList<>();
 		List<Draw> draws = new ArrayList<>();
-		for (PDrawGroup<RenderType, PBakedMesh, PRenderQueue.InstanceData> group : plan.groups())
+		for (PDrawGroup group : plan.groups())
 		{
 			if (group.instances().isEmpty())
 				continue;
-			int baseInstance = allInstances.size();
-			allInstances.addAll(group.instances());
-			PBakedMesh mesh = group.mesh();
-			draws.add(new Draw(group.pipeline(), mesh, this.geometry.resolve(mesh), group.instances().size(), baseInstance, group.writeDepth()));
+			PBakedMesh mesh = this.resources.mesh(group.mesh());
+			PDrawCommand command = group.command();
+			if ((long)command.firstIndex() + command.indexCount() > mesh.indicesCount() ||
+					(long)command.firstInstance() + command.instanceCount() > plan.instances().size())
+				throw new IllegalArgumentException("Draw command exceeds its geometry or instance stream");
+			draws.add(new Draw(this.resources.pipeline(group.pipeline()), mesh, this.geometry.resolve(mesh), command, group.writeDepth()));
 		}
 		if (draws.isEmpty())
 			return;
 
-		boolean persistent = GL.getCapabilities().GL_ARB_buffer_storage || GL.getCapabilities().OpenGL44;
+		PRenderCapabilities capabilities = capabilities();
+		boolean persistent = capabilities.uploadMode() == PRenderCapabilities.UploadMode.PERSISTENT_RING;
 		int frameSlot = persistent ? this.frameArena.begin() : 0;
 		if (frameSlot < 0)
 			return;
-		PGlInstanceStream.Upload instanceStream = this.instances.upload(allInstances, frameSlot, persistent);
-		boolean multiDraw = GL.getCapabilities().GL_ARB_multi_draw_indirect || GL.getCapabilities().OpenGL43;
+		boolean multiDraw = capabilities.submissionMode() == PRenderCapabilities.SubmissionMode.MULTI_DRAW_INDIRECT;
+		GpuBufferSlice previousProjection = RenderSystem.getProjectionMatrixBuffer();
+		ProjectionType previousProjectionType = RenderSystem.getProjectionType();
 		try
 		{
+			if (this.projectionBuffer == null)
+				this.projectionBuffer = new ProjectionMatrixBuffer("PulseLib render frame");
+			RenderSystem.setProjectionMatrix(this.projectionBuffer.getBuffer(frame.projection()),
+					frame.projection().m33() == 0.0f ? ProjectionType.PERSPECTIVE : ProjectionType.ORTHOGRAPHIC);
+			PGlInstanceStream.Upload instanceStream = this.instances.uploadHeaders(plan.instances(), frameSlot, persistent);
 			List<Draw> standardDraws = new ArrayList<>();
 			List<Draw> oitDraws = new ArrayList<>();
 			for (Draw draw : draws)
@@ -99,7 +149,7 @@ public final class PGlMultiDrawExecutor
 			int maximumIndirectCommands = standardDraws.size() + oitDraws.size() * PGlWeightedBlendedOit.LAYER_COUNT * 2;
 			this.indirect.begin(maximumIndirectCommands, frameSlot, persistent && multiDraw);
 
-			drawGroups(standardDraws, instanceStream, multiDraw, OitPass.NONE);
+			drawGroups(standardDraws, instanceStream, multiDraw, OitPass.NONE, frame);
 			Map<RenderTarget, List<Draw>> oitTargetBatches = new LinkedHashMap<>();
 			for (Draw draw : oitDraws)
 				oitTargetBatches.computeIfAbsent(draw.type().outputTarget().getRenderTarget(), ignored -> new ArrayList<>()).add(draw);
@@ -118,7 +168,7 @@ public final class PGlMultiDrawExecutor
 							try
 							{
 								drawGroups(targetDraws, instanceStream, multiDraw,
-										layer == 0 ? OitPass.DEPTH : OitPass.DEPTH_PEEL);
+										layer == 0 ? OitPass.DEPTH : OitPass.DEPTH_PEEL, frame);
 							}
 							finally
 							{
@@ -128,7 +178,7 @@ public final class PGlMultiDrawExecutor
 							activeOit().beginAccumulationPass(layer);
 							try
 							{
-								drawGroups(targetDraws, instanceStream, multiDraw, OitPass.ACCUMULATION);
+								drawGroups(targetDraws, instanceStream, multiDraw, OitPass.ACCUMULATION, frame);
 								activeOit().markContent(layer);
 							}
 							finally
@@ -138,7 +188,7 @@ public final class PGlMultiDrawExecutor
 						}
 					}
 					else
-						drawGroups(targetDraws, instanceStream, multiDraw, OitPass.NONE);
+						drawGroups(targetDraws, instanceStream, multiDraw, OitPass.NONE, frame);
 				}
 				finally
 				{
@@ -148,6 +198,7 @@ public final class PGlMultiDrawExecutor
 		}
 		finally
 		{
+			RenderSystem.setProjectionMatrix(previousProjection, previousProjectionType);
 			if (persistent)
 				this.frameArena.finish(frameSlot);
 		}
@@ -164,6 +215,7 @@ public final class PGlMultiDrawExecutor
 	/**
 	 * Performs the cleanup operation.
 	 */
+	@Override
 	public void cleanup()
 	{
 		this.frameArena.awaitAll();
@@ -173,6 +225,10 @@ public final class PGlMultiDrawExecutor
 		this.weightedBlendedOits.values().forEach(PGlWeightedBlendedOit :: close);
 		this.weightedBlendedOits.clear();
 		this.activeWeightedBlendedOit = null;
+		if (this.projectionBuffer != null)
+			this.projectionBuffer.close();
+		this.projectionBuffer = null;
+		this.resources.clear();
 	}
 
 	/**
@@ -181,20 +237,21 @@ public final class PGlMultiDrawExecutor
 	 * @param instanceStream the instance stream to use.
 	 * @param multiDraw the multi draw to use.
 	 * @param oitPass the oit pass to use.
+	 * @param frame the captured frame matrices
 	 */
-	private void drawGroups(List<Draw> draws, PGlInstanceStream.Upload instanceStream, boolean multiDraw, OitPass oitPass)
+	private void drawGroups(List<Draw> draws, PGlInstanceStream.Upload instanceStream, boolean multiDraw, OitPass oitPass, PRenderFrame frame)
 	{
 		for (int start = 0; start < draws.size();)
 		{
 			if (draws.get(start).writeDepth())
 			{
 				int end = findOpaquePipelineEnd(draws, start);
-				drawOpaquePipeline(draws.subList(start, end), instanceStream, multiDraw);
+				drawOpaquePipeline(draws.subList(start, end), instanceStream, multiDraw, frame);
 				start = end;
 				continue;
 			}
 			int end = findBatchEnd(draws, start);
-			draw(draws.subList(start, end), instanceStream, multiDraw && end - start > 1, oitPass);
+			draw(draws.subList(start, end), instanceStream, multiDraw && end - start > 1, oitPass, frame);
 			start = end;
 		}
 	}
@@ -241,13 +298,13 @@ public final class PGlMultiDrawExecutor
 	 * @param instanceStream the instance stream to use.
 	 * @param multiDraw the multi draw to use.
 	 */
-	private void drawOpaquePipeline(List<Draw> draws, PGlInstanceStream.Upload instanceStream, boolean multiDraw)
+	private void drawOpaquePipeline(List<Draw> draws, PGlInstanceStream.Upload instanceStream, boolean multiDraw, PRenderFrame frame)
 	{
 		Map<ArenaKey, List<Draw>> batches = new LinkedHashMap<>();
 		for (Draw draw : draws)
 			batches.computeIfAbsent(new ArenaKey(draw.slice().page(), draw.slice().indexType()), ignored -> new ArrayList<>()).add(draw);
 		for (List<Draw> batch : batches.values())
-			draw(batch, instanceStream, multiDraw && batch.size() > 1, OitPass.NONE);
+			draw(batch, instanceStream, multiDraw && batch.size() > 1, OitPass.NONE, frame);
 	}
 
 	/**
@@ -256,8 +313,9 @@ public final class PGlMultiDrawExecutor
 	 * @param instanceStream the instance stream to use.
 	 * @param multiDraw the multi draw to use.
 	 * @param oitPass the oit pass to use.
+	 * @param frame the captured frame matrices
 	 */
-	private void draw(List<Draw> batch, PGlInstanceStream.Upload instanceStream, boolean multiDraw, OitPass oitPass)
+	private void draw(List<Draw> batch, PGlInstanceStream.Upload instanceStream, boolean multiDraw, OitPass oitPass, PRenderFrame frame)
 	{
 		Draw first = batch.getFirst();
 		RenderType type = first.type();
@@ -267,7 +325,7 @@ public final class PGlMultiDrawExecutor
 		OverlayTexture overlayTexture = mc.gameRenderer.overlayTexture();
 		PGpuDeformerBuffers.Bindings deformerBuffers = PGpuDeformerBuffers.upload();
 		GpuBufferSlice dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(
-				RenderSystem.getModelViewMatrix(), new Vector4f(1.0F), new Vector3f(), new Matrix4f());
+				frame.modelView(), new Vector4f(1.0F), new Vector3f(), new Matrix4f());
 
 		RenderTargetAttachments attachments = attachments(type);
 
@@ -309,9 +367,10 @@ public final class PGlMultiDrawExecutor
 				else
 					for (Draw draw : batch)
 					{
-						draw.slice().page().setInstanceOffset(instanceStream.offset() + (long)draw.baseInstance() * PGlInstanceStream.STRIDE);
-						GL32.glDrawElementsInstancedBaseVertex(GL11.GL_TRIANGLES, draw.slice().indexCount(), draw.slice().indexType(),
-								draw.slice().indexOffset(), draw.instanceCount(), draw.slice().baseVertex());
+						PGlIndirectStream.Command command = command(draw);
+						draw.slice().page().setInstanceOffset(instanceStream.offset() + (long)command.baseInstance() * PGlInstanceStream.STRIDE);
+						GL32.glDrawElementsInstancedBaseVertex(GL11.GL_TRIANGLES, command.indexCount(), draw.slice().indexType(),
+								(long)command.firstIndex() * indexBytes(draw.slice()), command.instanceCount(), command.baseVertex());
 					}
 			}
 			finally
@@ -340,6 +399,7 @@ public final class PGlMultiDrawExecutor
 	 * Resolves the pipeline.
 	 * @param type the type to use.
 	 * @param oitPass the oit pass to use.
+	 * @param frame the captured frame matrices
 	 * @return the value produced by this operation.
 	 */
 	private RenderPipeline resolvePipeline(RenderType type, OitPass oitPass)
@@ -378,9 +438,20 @@ public final class PGlMultiDrawExecutor
 	private static PGlIndirectStream.Command command(Draw draw)
 	{
 		PGlGeometryArena.Slice slice = draw.slice();
-		return new PGlIndirectStream.Command(slice.indexCount(), draw.instanceCount(),
-				Math.toIntExact(slice.indexOffset() / (slice.indexType() == GL11.GL_UNSIGNED_SHORT ? Short.BYTES : Integer.BYTES)),
-				slice.baseVertex(), draw.baseInstance());
+		return resolveCommand(draw.command(), Math.toIntExact(slice.indexOffset() / indexBytes(slice)), slice.baseVertex());
+	}
+
+	/** Resolves mesh-local addressing identically for indirect and direct instanced draws. */
+	static PGlIndirectStream.Command resolveCommand(PDrawCommand command, int firstIndex, int baseVertex)
+	{
+		return new PGlIndirectStream.Command(command.indexCount(), command.instanceCount(),
+				Math.addExact(firstIndex, command.firstIndex()),
+				Math.addExact(baseVertex, command.baseVertex()), command.firstInstance());
+	}
+
+	private static int indexBytes(PGlGeometryArena.Slice slice)
+	{
+		return slice.indexType() == GL11.GL_UNSIGNED_SHORT ? Short.BYTES : Integer.BYTES;
 	}
 
 	/**
@@ -400,7 +471,7 @@ public final class PGlMultiDrawExecutor
  * Immutable value object representing draw.
  */
 	private record Draw(RenderType type, PBakedMesh mesh, PGlGeometryArena.Slice slice,
-	                    int instanceCount, int baseInstance, boolean writeDepth)
+	                    PDrawCommand command, boolean writeDepth)
 	{
 	}
 

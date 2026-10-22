@@ -68,6 +68,8 @@ public final class Stage1Client implements IPulseClientPlugin
 		bus.addListener((RegisterSpecialModelRendererEvent event) ->
 				event.register(PLibDatabase.rl("test_block"), TestBlockItemRenderer.Unbaked.MAP_CODEC));
 		NeoForge.EVENT_BUS.addListener(Stage1Client::tick);
+		if (Boolean.getBoolean("pulselib.stage41Probe"))
+			Stage41PlanProbe.register();
 		if (Boolean.getBoolean("pulselib.stage31Probe"))
 		{
 			NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, Stage31ItemIdentityProbe::shutdown);
@@ -142,6 +144,8 @@ public final class Stage1Client implements IPulseClientPlugin
 					message -> LogUtils.getLogger().info("{}", message.getString()));
 		}
 		boolean pluginProbe = Boolean.getBoolean("pulselib.stage2Probe");
+		if (Boolean.getBoolean("pulselib.stage41Probe"))
+			Stage41PlanProbe.tick(worldTicks);
 		if (Boolean.getBoolean("pulselib.stage33Probe"))
 		{
 			Stage33GraphProbe.tick(worldTicks);

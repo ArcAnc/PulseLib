@@ -1,0 +1,23 @@
+/**
+ * @author ArcAnc
+ * Created at: 13.08.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
+package com.arcanc.pulselib.content.renderer.plan;
+
+/**
+ * Provides the host application frame matrices needed by a render backend.
+ */
+public interface PRenderHost
+{
+	/**
+	 * Captures the current host render matrices into an independent render frame.
+	 *
+	 * @return the captured host model-view and projection matrices
+	 */
+	PRenderFrame captureFrame();
+}

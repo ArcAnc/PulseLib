@@ -74,6 +74,16 @@ PRenderQueue.submit(
 
 For opaque submissions, identical `(RenderType, PBakedMesh)` pairs are grouped. Transparent submissions that cannot use OIT are ordered back-to-front and only adjacent equal pairs are joined. Built-in translucent types are accumulated into OIT targets per Minecraft output target, then composited after `ENTITIES` and `TRANSLUCENT_BLOCKS` are flushed together from `RenderLevelStageEvent.AfterTranslucentFeatures`. First-person OIT is instead composited immediately after the hand pass. Each OIT target records transparent depth layers, allowing Minecraft's transparency post-chain to place the result correctly relative to translucent blocks. This makes supported PulseLib translucency independent of its own submission order; custom transparent types, targets without depth, and unsupported OpenGL contexts retain sorted alpha blending. Static mesh data is packed into OpenGL geometry pages; the queue streams per-instance records and indirect commands through fence-protected ring buffers, using multi-draw indirect where the current OpenGL driver supports it. These are implementation details: callers only submit meshes and must not retain or manipulate the queue's buffers.
 
+## Compiled render plans in the 26.1.2 MultiLoader port
+
+The queue now feeds the canonical `PFrameCompiler<S>`. It produces a `PRenderPlan` with `PPipelineHandle` / `PMeshHandle`, indexed `PDrawCommand` values and a packed `PInstanceHeader` stream. Geometry offsets remain mesh-local until the backend resolves them against the existing GPU arena; instance offsets refer to the plan's packed stream. Combined compilation sorts ordinary transparency across the requested stages and keeps OIT batches separate. `compileOpaque` consumes only opaque submissions, leaving transparency queued.
+
+`PGlMultiDrawExecutor` implements `PRenderExecutor` using the existing 26.1 instancing, indirect streams and OIT implementation. Its `execute(plan, frame)` consumes captured model-view and projection matrices; it restores the host projection afterward. Minecraft 26.1 exposes the current projection as a GPU buffer, so the host adapter mirrors actual CPU projection uploads instead of reading back GPU memory. Custom hosts that bind their own projection buffers can provide an explicit `PRenderFrame`.
+
+`PRenderCapabilities.storageMode()` describes pose storage. The current backend reports CPU pose evaluation and retains GPU deformation through the existing UBO stream. Draw submission and upload modes independently report multi-draw indirect and persistent ring storage where supported.
+
+This is checkpoint **4.1a**. The baked-mesh queue overloads above are a temporary facade into the single canonical compiler, while the modern baked/model API and portable geometry submission overloads are adapted in **4.1b**. World stage timing, OIT integration and GUI/offscreen scopes still require their remaining stage 4 checks; compiler tests alone do not establish visual compatibility. See the [migration journal](../docs/porting/26.1.2-multiloader.md).
+
 ## Renderer hooks
 
 Every PulseLib renderer has the same three-stage flow:
