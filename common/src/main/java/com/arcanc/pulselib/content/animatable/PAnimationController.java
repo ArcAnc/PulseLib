@@ -43,6 +43,7 @@ public class PAnimationController<T extends PAnimatable<T>>
 	private final long randomSeed;
 	private final MolangParser.Context persistentMolangContext = new MolangParser.Context();
 	private @Nullable PAnimationGraphRuntime graphRuntime;
+	private PAnimationPoseResolver.@Nullable MolangContextProvider<T> graphSnapshotContexts;
 	
 	/**
 	 * Creates an instance of the enclosing type.
@@ -124,6 +125,17 @@ public class PAnimationController<T extends PAnimatable<T>>
 	public @Nullable PAnimationGraphRuntime graphRuntime()
 	{
 		return this.graphRuntime;
+	}
+
+	/**
+	 * Sets the contexts used to capture the latest evaluated base pose on graph restart.
+	 * @param contexts the per-controller Molang context provider.
+	 * @return this controller.
+	 */
+	public PAnimationController<T> setGraphSnapshotContexts(PAnimationPoseResolver.MolangContextProvider<T> contexts)
+	{
+		this.graphSnapshotContexts = Objects.requireNonNull(contexts);
+		return this;
 	}
 
 	/**
@@ -386,7 +398,10 @@ public class PAnimationController<T extends PAnimatable<T>>
 		if (this.graphRuntime != null)
 		{
 			if (this.state == ControllerState.PLAY)
-				for (PAnimationGraphRuntime.PreciseEventTrack track : this.graphRuntime.tickPrecise(model, tickCount))
+				for (PAnimationGraphRuntime.PreciseEventTrack track : this.graphRuntime.tickPrecise(model, tickCount,
+						(snapshotModel, runtime) -> this.graphSnapshotContexts == null ?
+								PAnimationRuntime.captureGraphBase(snapshotModel, this, poseControllers) :
+								PAnimationRuntime.captureGraphBase(snapshotModel, this, poseControllers, this.graphSnapshotContexts)))
 				{
 					PAnimation animation = model == null ? null : model.animations().get(track.animation());
 					if (animation != null)

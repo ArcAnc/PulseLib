@@ -15,67 +15,82 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Defines the contract for animation state.
+ * Named graph state that selects weighted clips and defines their playback policy.
  */
 public sealed interface PAnimationState permits PAnimationState.Clip, PAnimationState.BlendSpace1D,
 		PAnimationState.BlendSpace2D, PAnimationState.OneShotOverlay
 {
 	/**
-	 * Performs the name operation.
-	 * @return the value produced by this operation.
+	 * Returns the unique name used to identify this graph state.
+	 *
+	 * @return the unique name used to identify this graph state
 	 */
 	String name();
 
 	/**
-	 * Performs the samples operation.
-	 * @param parameters the parameters to use.
-	 * @return the value produced by this operation.
+	 * Selects weighted animation clips from the current graph parameter values.
+	 *
+	 * @param parameters the graph parameter and trigger state
+	 * @return the animation clips and their contribution weights
 	 */
 	List<PAnimationSample> samples(PAnimationParameters parameters);
 
 	/**
-	 * Performs the animation type operation.
-	 * @return the value produced by this operation.
+	 * Returns the loop or completion policy of this state.
+	 *
+	 * @return the loop or completion policy of this state
 	 */
 	PAnimationType animationType();
 
 	/**
-	 * Performs the interpolation operation.
-	 * @return the value produced by this operation.
+	 * Returns the interpolation policy used to sample this state.
+	 *
+	 * @return the interpolation policy used to sample this state
 	 */
 	PInterpolationType interpolation();
 
 	/**
-	 * Performs the speed operation.
-	 * @return the value produced by this operation.
+	 * Returns the multiplier applied to this state's playback clock.
+	 *
+	 * @return the multiplier applied to this state's playback clock
 	 */
 	float speed();
 
 	/**
-	 * Performs the synchronized cycle operation.
-	 * @return the value produced by this operation.
+	 * Returns whether transitions should preserve the normalized cycle phase.
+	 *
+	 * @return whether transitions should preserve the normalized cycle phase
 	 */
 	boolean synchronizedCycle();
 
 	/**
-	 * Determines whether overlay.
-	 * @return the value produced by this operation.
+	 * Returns whether this state contributes a one-shot overlay instead of a base-state pose.
+	 *
+	 * @return whether this state contributes a one-shot overlay instead of a base-state pose
 	 */
 	default boolean isOverlay()
 	{
 		return false;
 	}
 
-/**
- * Immutable value object representing clip.
- */
+	/**
+	 * Graph state that samples one named animation clip.
+	 *
+	 * @param name the graph state name
+	 * @param animation the source animation clip name
+	 * @param animationType the animation loop and completion policy
+	 * @param interpolation the keyframe interpolation policy
+	 * @param speed the playback speed multiplier
+	 * @param synchronizedCycle whether cyclic playback preserves phase across state changes
+	 */
 	record Clip(String name, String animation, PAnimationType animationType, PInterpolationType interpolation,
 	            float speed, boolean synchronizedCycle) implements PAnimationState
 	{
 		/**
-		 * Creates an instance of the enclosing type.
-		 * @param name the name to use.
-		 * @param animation the animation to use.
+		 * Creates a graph state that samples the supplied animation clip.
+		 *
+		 * @param name the graph state name
+		 * @param animation the source animation clip name
 		 */
 		public Clip(String name, String animation)
 		{
@@ -83,13 +98,14 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 		}
 
 		/**
-		 * Creates an instance of the enclosing type.
-		 * @param name the name to use.
-		 * @param animation the animation to use.
-		 * @param animationType the animation type to use.
-		 * @param interpolation the interpolation to use.
-		 * @param speed the speed to use.
-		 * @param synchronizedCycle the synchronized cycle to use.
+		 * Creates a graph state that samples the supplied animation clip.
+		 *
+		 * @param name the graph state name
+		 * @param animation the source animation clip name
+		 * @param animationType the animation loop and completion policy
+		 * @param interpolation the keyframe interpolation policy
+		 * @param speed the playback speed multiplier
+		 * @param synchronizedCycle whether cyclic playback preserves phase across state changes
 		 */
 		public Clip
 		{
@@ -98,9 +114,7 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 		}
 
 		/**
-		 * Performs the samples operation.
-		 * @param parameters the parameters to use.
-		 * @return the value produced by this operation.
+		 * {@inheritDoc}
 		 */
 		@Override
 		public List<PAnimationSample> samples(PAnimationParameters parameters)
@@ -109,17 +123,26 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 		}
 	}
 
-/**
- * Immutable value object representing blend space1 d.
- */
+	/**
+	 * Graph state that blends neighboring clips along one numeric parameter.
+	 *
+	 * @param name the graph state name
+	 * @param parameter the graph parameter selecting the blend-space coordinate
+	 * @param points the clips and coordinates defining the blend space
+	 * @param animationType the animation loop and completion policy
+	 * @param interpolation the keyframe interpolation policy
+	 * @param speed the playback speed multiplier
+	 * @param synchronizedCycle whether cyclic playback preserves phase across state changes
+	 */
 	record BlendSpace1D(String name, String parameter, List<Point> points, PAnimationType animationType,
 	                  PInterpolationType interpolation, float speed, boolean synchronizedCycle) implements PAnimationState
 	{
 		/**
-		 * Creates an instance of the enclosing type.
-		 * @param name the name to use.
-		 * @param parameter the parameter to use.
-		 * @param points the points to use.
+		 * Creates a graph state that blends clips along one named numeric parameter.
+		 *
+		 * @param name the graph state name
+		 * @param parameter the graph parameter selecting the blend-space coordinate
+		 * @param points the clips and coordinates defining the blend space
 		 */
 		public BlendSpace1D(String name, String parameter, List<Point> points)
 		{
@@ -127,14 +150,15 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 		}
 
 		/**
-		 * Creates an instance of the enclosing type.
-		 * @param name the name to use.
-		 * @param parameter the parameter to use.
-		 * @param points the points to use.
-		 * @param animationType the animation type to use.
-		 * @param interpolation the interpolation to use.
-		 * @param speed the speed to use.
-		 * @param synchronizedCycle the synchronized cycle to use.
+		 * Creates a graph state that blends clips along one named numeric parameter.
+		 *
+		 * @param name the graph state name
+		 * @param parameter the graph parameter selecting the blend-space coordinate
+		 * @param points the clips and coordinates defining the blend space
+		 * @param animationType the animation loop and completion policy
+		 * @param interpolation the keyframe interpolation policy
+		 * @param speed the playback speed multiplier
+		 * @param synchronizedCycle whether cyclic playback preserves phase across state changes
 		 */
 		public BlendSpace1D
 		{
@@ -144,24 +168,28 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 		}
 
 		/**
-		 * Performs the samples operation.
-		 * @param parameters the parameters to use.
-		 * @return the value produced by this operation.
+		 * {@inheritDoc}
 		 */
 		@Override
 		public List<PAnimationSample> samples(PAnimationParameters parameters)
 		{
 			float value = parameters.get(this.parameter);
 			if (value <= this.points.getFirst().coordinate())
+			{
 				return List.of(new PAnimationSample(this.points.getFirst().animation(), 1.0f));
+			}
 			Point last = this.points.getLast();
 			if (value >= last.coordinate())
+			{
 				return List.of(new PAnimationSample(last.animation(), 1.0f));
+			}
 			for (int index = 1; index < this.points.size(); index++)
 			{
 				Point right = this.points.get(index);
 				if (value > right.coordinate())
+				{
 					continue;
+				}
 				Point left = this.points.get(index - 1);
 				float alpha = (value - left.coordinate()) / (right.coordinate() - left.coordinate());
 				return List.of(new PAnimationSample(left.animation(), 1.0f - alpha), new PAnimationSample(right.animation(), alpha));
@@ -169,15 +197,19 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 			return List.of();
 		}
 
-/**
- * Immutable value object representing point.
- */
+		/**
+		 * Animation clip located at one coordinate of a one-dimensional blend space.
+		 *
+		 * @param coordinate the coordinate
+		 * @param animation the source animation clip name
+		 */
 		public record Point(float coordinate, String animation)
 		{
 			/**
-			 * Creates an instance of the enclosing type.
-			 * @param coordinate the coordinate to use.
-			 * @param animation the animation to use.
+			 * Associates an animation clip with a one-dimensional blend coordinate.
+			 *
+			 * @param coordinate the coordinate
+			 * @param animation the source animation clip name
 			 */
 			public Point
 			{
@@ -186,19 +218,29 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 		}
 	}
 
-/**
- * Immutable value object representing blend space2 d.
- */
+	/**
+	 * Graph state that blends clips from two numeric graph parameters.
+	 *
+	 * @param name the graph state name
+	 * @param xParameter the graph parameter selecting the horizontal blend coordinate
+	 * @param yParameter the graph parameter selecting the vertical blend coordinate
+	 * @param points the clips and coordinates defining the blend space
+	 * @param animationType the animation loop and completion policy
+	 * @param interpolation the keyframe interpolation policy
+	 * @param speed the playback speed multiplier
+	 * @param synchronizedCycle whether cyclic playback preserves phase across state changes
+	 */
 	record BlendSpace2D(String name, String xParameter, String yParameter, List<Point> points,
 	                  PAnimationType animationType, PInterpolationType interpolation, float speed,
 	                  boolean synchronizedCycle) implements PAnimationState
 	{
 		/**
-		 * Creates an instance of the enclosing type.
-		 * @param name the name to use.
-		 * @param xParameter the x parameter to use.
-		 * @param yParameter the y parameter to use.
-		 * @param points the points to use.
+		 * Creates a graph state that blends clips across two named numeric parameters.
+		 *
+		 * @param name the graph state name
+		 * @param xParameter the graph parameter selecting the horizontal blend coordinate
+		 * @param yParameter the graph parameter selecting the vertical blend coordinate
+		 * @param points the clips and coordinates defining the blend space
 		 */
 		public BlendSpace2D(String name, String xParameter, String yParameter, List<Point> points)
 		{
@@ -206,15 +248,16 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 		}
 
 		/**
-		 * Creates an instance of the enclosing type.
-		 * @param name the name to use.
-		 * @param xParameter the x parameter to use.
-		 * @param yParameter the y parameter to use.
-		 * @param points the points to use.
-		 * @param animationType the animation type to use.
-		 * @param interpolation the interpolation to use.
-		 * @param speed the speed to use.
-		 * @param synchronizedCycle the synchronized cycle to use.
+		 * Creates a graph state that blends clips across two named numeric parameters.
+		 *
+		 * @param name the graph state name
+		 * @param xParameter the graph parameter selecting the horizontal blend coordinate
+		 * @param yParameter the graph parameter selecting the vertical blend coordinate
+		 * @param points the clips and coordinates defining the blend space
+		 * @param animationType the animation loop and completion policy
+		 * @param interpolation the keyframe interpolation policy
+		 * @param speed the playback speed multiplier
+		 * @param synchronizedCycle whether cyclic playback preserves phase across state changes
 		 */
 		public BlendSpace2D
 		{
@@ -222,14 +265,14 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 			xParameter = require(xParameter, "X blend-space parameter");
 			yParameter = require(yParameter, "Y blend-space parameter");
 			if (points == null || points.isEmpty())
+			{
 				throw new IllegalArgumentException("A 2D blend space needs at least one point");
+			}
 			points = List.copyOf(points);
 		}
 
 		/**
-		 * Performs the samples operation.
-		 * @param parameters the parameters to use.
-		 * @return the value produced by this operation.
+		 * {@inheritDoc}
 		 */
 		@Override
 		public List<PAnimationSample> samples(PAnimationParameters parameters)
@@ -242,7 +285,9 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 			{
 				float distanceSquared = square(x - point.x()) + square(y - point.y());
 				if (distanceSquared < 1.0e-8f)
+				{
 					return List.of(new PAnimationSample(point.animation(), 1.0f));
+				}
 				float weight = 1.0f / distanceSquared;
 				result.add(new PAnimationSample(point.animation(), weight));
 				total += weight;
@@ -251,16 +296,21 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 			return result.stream().map(sample -> new PAnimationSample(sample.animation(), sample.weight() * inverse)).toList();
 		}
 
-/**
- * Immutable value object representing point.
- */
+		/**
+		 * Animation clip located at a two-dimensional blend-space coordinate.
+		 *
+		 * @param x the x component or coordinate
+		 * @param y the y component or coordinate
+		 * @param animation the source animation clip name
+		 */
 		public record Point(float x, float y, String animation)
 		{
 			/**
-			 * Creates an instance of the enclosing type.
-			 * @param x the x to use.
-			 * @param y the y to use.
-			 * @param animation the animation to use.
+			 * Associates an animation clip with a two-dimensional blend coordinate.
+			 *
+			 * @param x the x component or coordinate
+			 * @param y the y component or coordinate
+			 * @param animation the source animation clip name
 			 */
 			public Point
 			{
@@ -269,17 +319,28 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 		}
 	}
 	
-/**
- * Immutable value object representing one shot overlay.
- */
+	/**
+	 * Immutable overlay definition with a signed playback speed. Positive starts at the beginning,
+	 * negative starts at the clip end, and zero pauses. Runtime speed changes never seek the clip.
+	 *
+	 * @param name the graph state name
+	 * @param trigger the trigger name that activates the overlay
+	 * @param animation the source animation clip name
+	 * @param fadeInDuration the overlay fade-in duration in game ticks
+	 * @param fadeOutDuration the overlay fade-out duration in game ticks
+	 * @param interpolation the keyframe interpolation policy
+	 * @param speed the playback speed multiplier
+	 * @param synchronizedCycle whether cyclic playback preserves phase across state changes
+	 */
 	record OneShotOverlay(String name, String trigger, String animation, float fadeInDuration, float fadeOutDuration,
 	                     PInterpolationType interpolation, float speed, boolean synchronizedCycle) implements PAnimationState
 	{
 		/**
-		 * Creates an instance of the enclosing type.
-		 * @param name the name to use.
-		 * @param trigger the trigger to use.
-		 * @param animation the animation to use.
+		 * Creates a trigger-driven overlay with the supplied fade and playback settings.
+		 *
+		 * @param name the graph state name
+		 * @param trigger the trigger name that activates the overlay
+		 * @param animation the source animation clip name
 		 */
 		public OneShotOverlay(String name, String trigger, String animation)
 		{
@@ -287,29 +348,34 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 		}
 
 		/**
-		 * Creates an instance of the enclosing type.
-		 * @param name the name to use.
-		 * @param trigger the trigger to use.
-		 * @param animation the animation to use.
-		 * @param fadeInDuration the fade in duration to use.
-		 * @param fadeOutDuration the fade out duration to use.
-		 * @param interpolation the interpolation to use.
-		 * @param speed the speed to use.
-		 * @param synchronizedCycle the synchronized cycle to use.
+		 * Creates a trigger-driven overlay with the supplied fade and playback settings.
+		 *
+		 * @param name the graph state name
+		 * @param trigger the trigger name that activates the overlay
+		 * @param animation the source animation clip name
+		 * @param fadeInDuration the overlay fade-in duration in game ticks
+		 * @param fadeOutDuration the overlay fade-out duration in game ticks
+		 * @param interpolation the keyframe interpolation policy
+		 * @param speed the playback speed multiplier
+		 * @param synchronizedCycle whether cyclic playback preserves phase across state changes
 		 */
 		public OneShotOverlay
 		{
-			validate(name, PAnimationType.PLAY_ONCE, interpolation, speed);
+			validate(name, PAnimationType.PLAY_ONCE, interpolation);
 			trigger = require(trigger, "Overlay trigger");
 			animation = require(animation, "Animation name");
-			if (fadeInDuration < 0.0f || fadeOutDuration < 0.0f)
-				throw new IllegalArgumentException("Overlay fade durations must be non-negative");
+			if (!Float.isFinite(speed))
+			{
+				throw new IllegalArgumentException("Overlay speed must be finite");
+			}
+			if (!Float.isFinite(fadeInDuration) || !Float.isFinite(fadeOutDuration) || fadeInDuration < 0.0f || fadeOutDuration < 0.0f)
+			{
+				throw new IllegalArgumentException("Overlay fade durations must be finite and non-negative");
+			}
 		}
 
 		/**
-		 * Performs the samples operation.
-		 * @param parameters the parameters to use.
-		 * @return the value produced by this operation.
+		 * {@inheritDoc}
 		 */
 		@Override
 		public List<PAnimationSample> samples(PAnimationParameters parameters)
@@ -318,8 +384,9 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 		}
 
 		/**
-		 * Performs the animation type operation.
-		 * @return the value produced by this operation.
+		 * Returns the animation loop and completion policy.
+		 *
+		 * @return the animation loop and completion policy
 		 */
 		@Override
 		public PAnimationType animationType()
@@ -328,8 +395,9 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 		}
 
 		/**
-		 * Determines whether overlay.
-		 * @return the value produced by this operation.
+		 * Returns the is overlay.
+		 *
+		 * @return the is overlay
 		 */
 		@Override
 		public boolean isOverlay()
@@ -338,56 +406,46 @@ public sealed interface PAnimationState permits PAnimationState.Clip, PAnimation
 		}
 	}
 
-	/**
-	 * Performs the sorted points operation.
-	 * @param points the points to use.
-	 * @return the value produced by this operation.
-	 */
 	private static List<BlendSpace1D.Point> sortedPoints(List<BlendSpace1D.Point> points)
 	{
 		if (points == null || points.isEmpty())
+		{
 			throw new IllegalArgumentException("A 1D blend space needs at least one point");
+		}
 		List<BlendSpace1D.Point> sorted = points.stream().sorted(Comparator.comparingDouble(BlendSpace1D.Point::coordinate)).toList();
 		for (int index = 1; index < sorted.size(); index++)
 			if (sorted.get(index - 1).coordinate() == sorted.get(index).coordinate())
+			{
 				throw new IllegalArgumentException("Blend-space point coordinates must be unique");
+			}
 		return sorted;
 	}
 
-	/**
-	 * Performs the validate operation.
-	 * @param name the name to use.
-	 * @param type the type to use.
-	 * @param interpolation the interpolation to use.
-	 * @param speed the speed to use.
-	 */
 	private static void validate(String name, PAnimationType type, PInterpolationType interpolation, float speed)
+	{
+		validate(name, type, interpolation);
+		if (speed < 0.0f)
+		{
+			throw new IllegalArgumentException("Animation state speed must be non-negative");
+		}
+	}
+
+	private static void validate(String name, PAnimationType type, PInterpolationType interpolation)
 	{
 		require(name, "State name");
 		Objects.requireNonNull(type);
 		Objects.requireNonNull(interpolation);
-		if (speed < 0.0f)
-			throw new IllegalArgumentException("Animation state speed must be non-negative");
 	}
 
-	/**
-	 * Performs the require operation.
-	 * @param value the value to use.
-	 * @param what the what to use.
-	 * @return the value produced by this operation.
-	 */
 	private static String require(String value, String what)
 	{
 		if (value == null || value.isBlank())
+		{
 			throw new IllegalArgumentException(what + " must not be blank");
+		}
 		return value;
 	}
 
-	/**
-	 * Performs the square operation.
-	 * @param value the value to use.
-	 * @return the value produced by this operation.
-	 */
 	private static float square(float value)
 	{
 		return value * value;

@@ -9,23 +9,28 @@
 
 package com.arcanc.pulselib.content.model.animation;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.Objects;
 
 /**
- * Provides support for root motion runtime.
+ * Extracts animation-space motion for callers. PulseLib applies ROOT to visual
+ * poses only; using the extracted delta for entity movement, collisions or
+ * server synchronization is the consuming mod's responsibility.
  */
 public final class PRootMotionRuntime
 {
 	private final PAnimation animation;
 	private final String rootBoneName;
 	private final PInterpolationType interpolation;
-	private final Object data;
+	private final @Nullable Object data;
 
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param animation the animation to use.
-	 * @param rootBoneName the root bone name to use.
-	 * @param interpolation the interpolation to use.
+	 * Creates a root-motion sampler for one clip, root bone and interpolation policy.
+	 *
+	 * @param animation the animation clip to sample
+	 * @param rootBoneName the bone used as the root-motion or relative-transform reference
+	 * @param interpolation the keyframe interpolation policy
 	 */
 	public PRootMotionRuntime(PAnimation animation, String rootBoneName, PInterpolationType interpolation)
 	{
@@ -33,13 +38,14 @@ public final class PRootMotionRuntime
 	}
 
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param animation the animation to use.
-	 * @param rootBoneName the root bone name to use.
-	 * @param interpolation the interpolation to use.
-	 * @param data the data to use.
+	 * Creates a root-motion sampler for one clip, root bone and interpolation policy.
+	 *
+	 * @param animation the animation clip to sample
+	 * @param rootBoneName the bone used as the root-motion or relative-transform reference
+	 * @param interpolation the keyframe interpolation policy
+	 * @param data the optional expression context used to sample source-format animation values; may be {@code null}
 	 */
-	public PRootMotionRuntime(PAnimation animation, String rootBoneName, PInterpolationType interpolation, Object data)
+	public PRootMotionRuntime(PAnimation animation, String rootBoneName, PInterpolationType interpolation, @Nullable Object data)
 	{
 		this.animation = Objects.requireNonNull(animation, "animation");
 		this.rootBoneName = Objects.requireNonNull(rootBoneName, "rootBoneName");
@@ -48,10 +54,11 @@ public final class PRootMotionRuntime
 	}
 	
 	/**
-	 * Extracts the root motion.
-	 * @param previousTime the previous time to use.
-	 * @param currentTime the current time to use.
-	 * @return the value produced by this operation.
+	 * Computes the root-bone translation and rotation crossed by the supplied playback interval.
+	 *
+	 * @param previousTime the preceding animation playback position in game ticks
+	 * @param currentTime the current animation playback position in game ticks
+	 * @return the root-bone translation and rotation accumulated across the playback interval
 	 */
 	public PRootMotionDelta extractRootMotion(float previousTime, float currentTime)
 	{

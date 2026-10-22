@@ -16,6 +16,7 @@ import com.arcanc.pulselib.content.animatable.PAnimationManager;
 import com.arcanc.pulselib.content.animatable.instance.InstanceAnimationManager;
 import com.arcanc.pulselib.content.mixin.BlockEntityRenderStateAccessor;
 import com.arcanc.pulselib.content.model.animation.BoneFrame;
+import com.arcanc.pulselib.content.model.animation.PAnimationPoseResolver;
 import com.arcanc.pulselib.content.model.animation.PAnimationEvaluationContext;
 import com.arcanc.pulselib.content.model.baked.PBakedBone;
 import com.arcanc.pulselib.content.model.baked.PBakedMesh;
@@ -208,7 +209,12 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 	protected void perBoneSubmit(RS renderState, PoseStack poseStack, PBakedBone bone, Collection<PAnimationController<T>> controllers, Map<PAnimationController<T>, MolangParser.Context> molangContexts, Function<Identifier, RenderType> renderType, int packedColor, int packedLight, int packedOverlay)
 	{
 		PModelData data = this.getModelData(renderState);
-		BoneFrame frame = bone.mixBone(data.getModel(), controllers, molangContexts, renderState.partialTick());
+		PAnimationPoseResolver<T> poseResolver = PRenderPoseContexts.resolve(data.getModel(), controllers, molangContexts, renderState.partialTick());
+		if (!poseResolver.isVisible(bone))
+		{
+			return;
+		}
+		BoneFrame frame = poseResolver.resolve(bone).localTransform();
 		poseStack.pushPose();
 		if (frame != null)
 		{
@@ -245,7 +251,7 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 	                                                                                   Collection<PAnimationController<T>> controllers,
 	                                                                                   float partialTick)
 	{
-		Map<PAnimationController<T>, MolangParser.Context> contexts = new IdentityHashMap<>();
+		Map<PAnimationController<T>, MolangParser.Context> contexts = new PRenderPoseContexts<>();
 		for (PAnimationController<T> controller : controllers)
 		{
 			MolangParser.Context context = new MolangParser.Context().

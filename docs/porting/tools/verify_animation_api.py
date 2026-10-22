@@ -28,6 +28,7 @@ def normalized(value):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--report', type=Path)
+    parser.add_argument('--include-pose', action='store_true', help='Require the complete stage 3.3 graph/controller/pose API')
     args = parser.parse_args()
     directory = ROOT / 'docs/porting/26.1.2-multiloader'
     for line in (directory / 'checksums.sha256').read_text().splitlines():
@@ -52,6 +53,17 @@ def main():
     # These owners are completed in 3.3. Verify every present member and expose the precise missing API.
     partial = {PREFIX + 'content.animatable.PAnimationController', PREFIX + 'content.model.animation.PAnimationGraphRuntime',
                PREFIX + 'content.model.animation.PPose'}
+    if args.include_pose:
+        names += [n.removeprefix(PREFIX) for n in partial]
+        names += ['content.model.animation.' + n for n in ['PAnimationGraph', 'PAnimationState', 'PAnimationTransition',
+                  'PAnimationParameters', 'PAnimationRuntime', 'PAnimationPoseResolver', 'PModelPose', 'PPoseMixer',
+                  'PPoseWriter', 'PPoseEasing', 'PPoseBlendMode', 'PBlendMode', 'PRootMotionRuntime', 'PRootMotionDelta',
+                  'PTransform', 'PCondition', 'PInterruptionPolicy', 'PTransitionInterruptionPolicy',
+                  'PRawAnimation', 'PAnimationStageContext', 'PAnimationStagePlayback', 'PAnimationStagePlayer',
+                  'PAnimationStageTransition', 'PIAnimationStage', 'PAnimationSample']]
+        names += [name.removeprefix(PREFIX) for name in baseline if name.startswith(PREFIX + 'content.model.deformer.') and
+                  not name.startswith(PREFIX + 'content.model.deformer.gpu.')]
+        partial = set()
     selected = sorted(n for n in baseline if any(n == PREFIX + v or n.startswith(PREFIX + v + '.') for v in names) or
                       any(n == v or n.startswith(v + '.') for v in partial))
     contract_keys = ['kind', 'modifiers', 'annotations', 'type_parameters', 'extends', 'implements', 'permits', 'record_components']
@@ -80,16 +92,16 @@ def main():
         missing = [expected[k] for k in sorted(expected.keys() - actual.keys())]
         assert is_partial or not missing, f'Missing sampling members: {name}'
         results.append({'type': name, 'preservedMembers': len(actual), 'deferredToStage33': missing})
-    report = {'status': 'PASS_WITH_EXPLICIT_STAGE33_DEBT', 'baselineCommit': '7ce6f024b307bb821ce543344d3896c8e1fcf26b',
+    report = {'status': 'PASS' if not missing_types and not any(r['deferredToStage33'] for r in results) else 'PASS_WITH_EXPLICIT_STAGE33_DEBT', 'baselineCommit': '7ce6f024b307bb821ce543344d3896c8e1fcf26b',
               'baselineChecksums': 'unchanged', 'types': results, 'typesDeferredToStage33': missing_types,
               'allowedRename': 'Minecraft ResourceLocation -> Identifier',
               'nonConstantInitializerChanges': initializers,
               'initializerPolicy': 'Literal constants compared; executable callback/registry bodies excluded from API declarations and changed body hashes reported',
-              'scope': 'Source declarations for sampling/events plus explicit partial graph/controller/pose API; full compatibility remains stage 7'}
+              'scope': 'Complete stage 3.3 animation declarations' if args.include_pose else 'Stage 3.2 sampling/event declarations; full compatibility remains stage 7'}
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(json.dumps(report, indent=2) + '\n')
-    print(f'ANIMATION API PASS: {len(results)} canonical types; graph/controller/pose debt explicitly listed for 3.3')
+    print(f"ANIMATION API {report['status']}: {len(results)} canonical types; {sum(len(r['deferredToStage33']) for r in results)} deferred members")
 
 
 if __name__ == '__main__':

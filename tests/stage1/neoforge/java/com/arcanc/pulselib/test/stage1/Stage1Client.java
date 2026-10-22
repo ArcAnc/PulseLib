@@ -142,6 +142,10 @@ public final class Stage1Client implements IPulseClientPlugin
 					message -> LogUtils.getLogger().info("{}", message.getString()));
 		}
 		boolean pluginProbe = Boolean.getBoolean("pulselib.stage2Probe");
+		if (Boolean.getBoolean("pulselib.stage33Probe"))
+		{
+			Stage33GraphProbe.tick(worldTicks);
+		}
 		if (Boolean.getBoolean("pulselib.stage32Probe") && (worldTicks == 100 || worldTicks == 210))
 		{
 			Stage32TimeProbe.lighting(worldTicks);

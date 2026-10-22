@@ -15,6 +15,7 @@ import com.arcanc.pulselib.content.animatable.PAnimationController;
 import com.arcanc.pulselib.content.animatable.PAnimationManager;
 import com.arcanc.pulselib.content.animatable.instance.InstanceAnimationManager;
 import com.arcanc.pulselib.content.model.animation.BoneFrame;
+import com.arcanc.pulselib.content.model.animation.PAnimationPoseResolver;
 import com.arcanc.pulselib.content.model.animation.PAnimationEvaluationContext;
 import com.arcanc.pulselib.content.model.baked.PBakedBone;
 import com.arcanc.pulselib.content.model.baked.PBakedMesh;
@@ -368,7 +369,12 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 	                           @Nullable List<DeferredLayerSubmit> deferredLayers,
 	                           Map<PAnimationController<T>, MolangParser.Context> molangContexts)
 	{
-		BoneFrame frame = bone.mixBone(data.getModel(), controllers, molangContexts, renderState.partialTick());
+		PAnimationPoseResolver<T> poseResolver = PRenderPoseContexts.resolve(data.getModel(), controllers, molangContexts, renderState.partialTick());
+		if (!poseResolver.isVisible(bone))
+		{
+			return;
+		}
+		BoneFrame frame = poseResolver.resolve(bone).localTransform();
 		poseStack.pushPose();
 		if (renderLayer != null && entityBonePoses != null)
 		{
@@ -483,7 +489,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 	                                                                                   Collection<PAnimationController<T>> controllers,
 	                                                                                   float partialTick)
 	{
-		Map<PAnimationController<T>, MolangParser.Context> contexts = new IdentityHashMap<>();
+		Map<PAnimationController<T>, MolangParser.Context> contexts = new PRenderPoseContexts<>();
 		for (PAnimationController<T> controller : controllers)
 		{
 			MolangParser.Context context = new MolangParser.Context().

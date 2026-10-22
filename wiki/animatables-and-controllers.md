@@ -182,3 +182,13 @@ controller.trigger("attack");
 `PCondition.parameter(name)` treats a non-zero boolean or numeric parameter as true. Use `PCondition.triggered(name)` for a one-use transition: it consumes the trigger once selected. `trigger(name)` starts a `OneShotOverlay` with the matching trigger name. Use separate trigger names when both are needed, because overlays consume their triggers before transitions are tested.
 
 `BlendSpace2D` takes independent X and Y parameter names (for example speed and direction) and blends its points by inverse distance. Set `synchronizedCycle` to `true` on a looping clip or blend space to preserve its normalized phase when entering that state; controller `cyclePhase` / `syncCycle` also work with graph controllers.
+
+## Graph poses and overlays
+
+A graph controller owns its runtime; sharing an immutable `PAnimationGraph` definition does not share playback state between owners. `PAnimationRuntime` evaluates controllers into one `PPose`, including channel presence, visibility, masks and weighted overlays. Renderers reuse the evaluated pose across a submission's bones; starting another render context evaluates it again with fresh frame queries.
+
+`PAnimationGraphRuntime.setOverlaySpeed(...)` accepts zero and negative finite speeds. Zero holds the overlay cursor; reverse playback starts from the appropriate clip boundary. `restartOverlay(...)` restarts an active slot and `stopOverlay(...)` respects its fade-out. Overlay lifecycle and base transitions remain independent.
+
+A `RESTART` interruption captures the latest evaluated base pose at the tick boundary, with preceding controllers and the current Molang context. The snapshot owns copied pose data; later mutation of a source layer does not change the frozen transition source. `PPoseMixer.Transition` applies the same snapshot rule for weighted, masked and additive layers. `setGraphSnapshotContexts(...)` supplies a custom context provider when required.
+
+Root-motion extraction returns translation in the previous root rotation's space. `PAnimationPoseResolver.animationDelta(bone, root)` distinguishes model-space motion from motion relative to an explicit root reference; applying that motion to players and camera rigs is a separate integration step.

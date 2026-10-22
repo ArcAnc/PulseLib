@@ -11,9 +11,11 @@ package com.arcanc.pulselib.content.model.animation;
 
 import com.arcanc.pulselib.content.animatable.PAnimatable;
 import com.arcanc.pulselib.content.animatable.PAnimationController;
-import com.arcanc.pulselib.content.model.baked.PBakedModel;
 import com.arcanc.pulselib.content.model.baked.PBakedBone;
+import com.arcanc.pulselib.content.model.baked.PBakedModel;
+import com.arcanc.pulselib.content.registration.PLibRegistration;
 import com.arcanc.pulselib.data.gecko.MolangParser;
+import org.jspecify.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -21,102 +23,193 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
- * Provides support for animation runtime.
+ * Samples controller layers into poses and extracts root-motion deltas from animation playback.
  */
 public final class PAnimationRuntime
 {
-	/**
-	 * Creates an instance of the enclosing type.
-	 */
 	private PAnimationRuntime()
 	{
 	}
 
 	/**
-	 * Performs the evaluate operation.
-	 * @param model the model to use.
-	 * @param controllers the controllers to use.
-	 * @param contexts the contexts to use.
-	 * @param partialTick the partial tick to use.
-	 * @return the value produced by this operation.
+	 * Evaluates the ordered controller contributions into a model pose at the supplied render interpolation
+	 * fraction.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param model the baked model supplying indexed bones and animations
+	 * @param controllers the animation controllers in pose composition order
+	 * @param contexts the contexts
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the indexed bone pose
 	 */
 	public static <T extends PAnimatable<T>> PPose evaluate(PBakedModel model,
 	                                                        Collection<PAnimationController<T>> controllers,
 	                                                        PAnimationPoseResolver.MolangContextProvider<T> contexts,
 	                                                        float partialTick)
 	{
+		return evaluate(model, controllers, contexts, partialTick, null);
+	}
+
+	/**
+	 * Evaluates the ordered controller contributions into a model pose at the supplied render interpolation
+	 * fraction.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param model the baked model supplying indexed bones and animations
+	 * @param controllers the animation controllers in pose composition order
+	 * @param contexts the contexts
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param activeBones the bone names allowed to contribute to this pose sample; may be {@code null}
+	 * @return the indexed bone pose
+	 */
+	static <T extends PAnimatable<T>> PPose evaluate(PBakedModel model,
+	                                               Collection<PAnimationController<T>> controllers,
+	                                               PAnimationPoseResolver.MolangContextProvider<T> contexts,
+	                                               float partialTick, @Nullable Set<String> activeBones)
+	{
 		PPose pose = model.bindPose();
 		BitSet affectedBones = new BitSet(model.boneCount());
 		for (PAnimationController<T> controller : controllers)
 		{
-			List<PAnimationGraphRuntime.Layer> layers = controller.graphLayers(model);
-			if (layers.isEmpty())
+			if (controller.isStopped())
 			{
-				PCompiledAnimation animation = animation(model, controller);
-				if (animation != null)
-					affectedBones.or(animation.boneMask());
+				continue;
 			}
-			else
-				for (PAnimationGraphRuntime.Layer layer : layers)
-				{
-					PCompiledAnimation animation = model.compiledAnimation(layer.animation());
-					if (animation != null)
-						affectedBones.or(animation.boneMask());
-				}
-		}
-
-		for (int boneIndex = affectedBones.nextSetBit(0); boneIndex >= 0; boneIndex = affectedBones.nextSetBit(boneIndex + 1))
-		{
-			Vector3f translation = new Vector3f(pose.translation(boneIndex));
-			Quaternionf rotation = new Quaternionf(pose.rotation(boneIndex));
-			Vector3f scale = new Vector3f(pose.scale(boneIndex));
-			boolean changed = false;
-			for (PAnimationController<T> controller : controllers)
+			PAnimationGraphRuntime graph = controller.graphRuntime();
+			if (graph != null)
 			{
-				List<PAnimationGraphRuntime.Layer> layers = controller.graphLayers(model);
-				BoneFrame frame;
-				if (!layers.isEmpty())
-					frame = calculateGraphBoneTransformations(model, controller, layers, boneIndex, contexts.context(controller, partialTick),
-							new BoneFrame(new Vector3f(translation), new Quaternionf(rotation), new Vector3f(scale)));
-				else
+				MolangParser.Context supplied = contexts.context(controller, partialTick);
+				MolangParser.Context context = controller.persistentMolangContext();
+				if (supplied != context)
 				{
-					PCompiledAnimation animation = animation(model, controller);
-					if (animation == null)
-						continue;
-					PBoneAnimation boneAnimation = animation.boneAnimation(boneIndex);
-					if (boneAnimation == null)
-						continue;
-					frame = controller.calculateBoneTransformations(
-							animation,
-							boneIndex,
-							partialTick,
-							contexts.context(controller, partialTick),
-							new BoneFrame(new Vector3f(translation), new Quaternionf(rotation), new Vector3f(scale)));
+					context.copyFrameValuesFrom(supplied);
 				}
-				if (frame == null)
+				PPose delta = graph.samplePose(model, partialTick, context, pose);
+				for (int bone = 0; bone < model.boneCount(); bone++)
+				{
+					if (activeBones != null && (delta.isValid(bone) || delta.hasVisibility(bone)))
+					{
+						activeBones.add(model.bone(bone).name());
+					}
+					if (delta.isValid(bone))
+					{
+						pose.translation(bone).add(delta.translation(bone));
+						pose.rotation(bone).premul(delta.rotation(bone));
+						pose.scale(bone).mul(delta.scale(bone));
+						affectedBones.set(bone);
+					}
+					if (delta.hasVisibility(bone))
+					{
+						pose.visibility(bone, pose.isVisible(bone) && delta.isVisible(bone));
+					}
+				}
+				continue;
+			}
+			PCompiledAnimation animation = animation(model, controller);
+			if (animation == null)
+			{
+				continue;
+			}
+			if (activeBones != null)
+			{
+				activeBones.addAll(animation.animation().boneAnimations().keySet());
+				activeBones.addAll(animation.animation().visibilityTracks().keySet());
+			}
+			for (int bone = 0; bone < model.boneCount(); bone++)
+			{
+				if (animation.animation().visibilityTracks().containsKey(model.bone(bone).name()))
+				{
+					pose.visibility(bone, pose.isVisible(bone) && animation.animation().isBoneVisible(model.bone(bone).name(), controller.getInterpolatedTime(partialTick)));
+				}
+				PBoneAnimation boneAnimation = animation.boneAnimation(bone);
+				if (boneAnimation == null)
+				{
 					continue;
-				translation.add(frame.translation());
-				rotation.premul(frame.rotation());
-				scale.mul(frame.scale());
-				changed = true;
+				}
+				BoneFrame frame = controller.calculateBoneTransformations(animation, bone, partialTick, contexts.context(controller, partialTick),
+						new BoneFrame(new Vector3f(pose.translation(bone)), new Quaternionf(pose.rotation(bone)), new Vector3f(pose.scale(bone))));
+				if (frame != null)
+				{
+					pose.translation(bone).add(frame.translation());
+					pose.rotation(bone).premul(frame.rotation());
+					pose.scale(bone).mul(frame.scale());
+					affectedBones.set(bone);
+				}
 			}
-			if (changed && differsFromBind(model, boneIndex, translation, rotation, scale))
-				pose.setAnimated(boneIndex, translation, rotation, scale);
+		}
+		for (int bone = affectedBones.nextSetBit(0); bone >= 0; bone = affectedBones.nextSetBit(bone + 1))
+		{
+			if (differsFromBind(model, bone, pose.translation(bone), pose.rotation(bone), pose.scale(bone)))
+			{
+				pose.markDirty(bone);
+			}
 		}
 		return pose;
 	}
-	
+
 	/**
-	 * Extracts the root motion.
-	 * @param animation the animation to use.
-	 * @param rootBoneName the root bone name to use.
-	 * @param previousTime the previous time to use.
-	 * @param currentTime the current time to use.
-	 * @param interpolation the interpolation to use.
-	 * @param data the data to use.
-	 * @return the value produced by this operation.
+	 * Captures the requesting graph's base using current tick time and preceding controllers.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param model the baked model supplying indexed bones and animations
+	 * @param controller the controller supplying playback and persistent expression state
+	 * @param controllers the animation controllers in pose composition order
+	 * @return the indexed bone pose
+	 */
+	public static <T extends PAnimatable<T>> PPose captureGraphBase(PBakedModel model, PAnimationController<T> controller,
+	                                                               Collection<PAnimationController<T>> controllers)
+	{
+		return captureGraphBase(model, controller, controllers, (candidate, partialTick) -> new MolangParser.Context().
+				copyFrameValuesFrom(candidate.persistentMolangContext()).
+				query("anim_time", PAnimationEvaluationContext.ticksToSeconds(candidate.getInterpolatedTime(partialTick))));
+	}
+
+	/**
+	 * Resolves current procedural queries for the requesting graph and preceding controllers.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param model the baked model supplying indexed bones and animations
+	 * @param controller the controller supplying playback and persistent expression state
+	 * @param controllers the animation controllers in pose composition order
+	 * @param contexts the contexts
+	 * @return the indexed bone pose
+	 */
+	public static <T extends PAnimatable<T>> PPose captureGraphBase(PBakedModel model, PAnimationController<T> controller,
+	                                                               Collection<PAnimationController<T>> controllers,
+	                                                               PAnimationPoseResolver.MolangContextProvider<T> contexts)
+	{
+		List<PAnimationController<T>> preceding = new ArrayList<>();
+		for (PAnimationController<T> candidate : controllers)
+		{
+			if (candidate == controller)
+			{
+				break;
+			}
+			preceding.add(candidate);
+		}
+		PPose accumulated = evaluate(model, preceding, contexts, 1.0f);
+		MolangParser.Context supplied = contexts.context(controller, 1.0f);
+		MolangParser.Context context = controller.persistentMolangContext();
+		if (supplied != context)
+		{
+			context.copyFrameValuesFrom(supplied);
+		}
+		return controller.graphRuntime().sampleBasePose(model, 1.0f, context, accumulated);
+	}
+
+	/**
+	 * Computes the root-bone movement accumulated between two animation tick positions.
+	 *
+	 * @param animation the animation clip to sample
+	 * @param rootBoneName the bone used as the root-motion or relative-transform reference
+	 * @param previousTime the preceding animation playback position in game ticks
+	 * @param currentTime the current animation playback position in game ticks
+	 * @param interpolation the keyframe interpolation policy
+	 * @param data the optional expression context used to sample source-format animation values
+	 * @return the root-bone translation and rotation accumulated across the playback interval
 	 */
 	public static PRootMotionDelta extractRootMotion(PAnimation animation,
 	                                                 String rootBoneName,
@@ -127,12 +220,16 @@ public final class PAnimationRuntime
 	{
 		PBoneAnimation rootBone = animation.boneAnimations().get(rootBoneName);
 		if (rootBone == null)
+		{
 			return PRootMotionDelta.identity();
+		}
 
 		BoneFrame previous = animation.calculateBoneTransformations(rootBone, previousTime, interpolation, data, null);
 		BoneFrame current = animation.calculateBoneTransformations(rootBone, currentTime, interpolation, data, null);
 		if (previous == null || current == null)
+		{
 			return PRootMotionDelta.identity();
+		}
 
 		Quaternionf previousRotation = new Quaternionf(previous.rotation());
 		Quaternionf inversePreviousRotation = previousRotation.invert(new Quaternionf());
@@ -141,49 +238,133 @@ public final class PAnimationRuntime
 		return new PRootMotionDelta(translation, rotation);
 	}
 
-	/**
-	 * Performs the animation operation.
-	 * @param model the model to use.
-	 * @param controller the controller to use.
-	 * @return the value produced by this operation.
-	 */
-	private static <T extends PAnimatable<T>> PCompiledAnimation animation(PBakedModel model, PAnimationController<T> controller)
+	private static <T extends PAnimatable<T>> @Nullable PCompiledAnimation animation(PBakedModel model, PAnimationController<T> controller)
 	{
 		PAnimationStagePlayback stage = controller.getCurrentStage();
 		return stage == null || stage.isWaiting() ? null : model.compiledAnimation(stage.animationName());
 	}
 
 	/**
-	 * Calculates the graph bone transformations.
-	 * @param model the model to use.
-	 * @param controller the controller to use.
-	 * @param layers the layers to use.
-	 * @param boneIndex the bone index to use.
-	 * @param context the context to use.
-	 * @param accumulatedFrame the accumulated frame to use.
-	 * @return the value produced by this operation.
+	 * Samples and blends graph layers over the supplied accumulated pose.
+	 *
+	 * @param model the baked model supplying indexed bones and animations
+	 * @param layers the layers
+	 * @param context the Molang context containing current frame and instance values
+	 * @param accumulatedPose the pose contributed by preceding controllers
+	 * @return the indexed bone pose
 	 */
-	private static <T extends PAnimatable<T>> BoneFrame calculateGraphBoneTransformations(PBakedModel model,
-	                                                                                      PAnimationController<T> controller,
-	                                                                                      List<PAnimationGraphRuntime.Layer> layers,
-	                                                                                      int boneIndex,
-	                                                                                      MolangParser.Context context,
-	                                                                                      BoneFrame accumulatedFrame)
+	static PPose sampleGraphLayers(PBakedModel model, List<PAnimationGraphRuntime.Layer> layers,
+	                              MolangParser.Context context, PPose accumulatedPose)
+	{
+		PPose pose = new PPose(model.boneCount());
+		for (int bone = 0; bone < model.boneCount(); bone++)
+		{
+			BoneFrame frame = calculateGraphBoneTransformations(model, layers, bone, context,
+					new BoneFrame(new Vector3f(accumulatedPose.translation(bone)), new Quaternionf(accumulatedPose.rotation(bone)), new Vector3f(accumulatedPose.scale(bone))));
+			boolean translation = false;
+			boolean rotation = false;
+			boolean scale = false;
+			for (PAnimationGraphRuntime.Layer layer : layers)
+			{
+				PAnimation animation = model.animations().get(layer.animation());
+				if (animation == null || layer.weight() <= 0.0f)
+				{
+					continue;
+				}
+				String boneName = model.bone(bone).name();
+				if (animation.visibilityTracks().containsKey(boneName))
+				{
+					pose.visibility(bone, pose.isVisible(bone) && animation.isBoneVisible(boneName, layer.time()));
+				}
+				PBoneAnimation boneAnimation = animation.boneAnimations().get(boneName);
+				if (boneAnimation != null)
+				{
+					translation |= hasKeys(boneAnimation, PLibRegistration.AnimationChannelReg.POSITION);
+					rotation |= hasKeys(boneAnimation, PLibRegistration.AnimationChannelReg.ROTATION);
+					scale |= hasKeys(boneAnimation, PLibRegistration.AnimationChannelReg.SCALE);
+				}
+			}
+			if (frame != null)
+			{
+				if (translation)
+				{
+					pose.translation(bone, frame.translation());
+				}
+				if (rotation)
+				{
+					pose.rotation(bone, frame.rotation());
+				}
+				if (scale)
+				{
+					pose.scale(bone, frame.scale());
+				}
+			}
+		}
+		return pose;
+	}
+
+	/**
+	 * Applies a weighted graph overlay delta to the base pose.
+	 *
+	 * @param base the accumulated channel value before the current layer
+	 * @param delta the elapsed playback interval in game ticks
+	 * @param weight the contribution weight
+	 */
+	static void applyGraphOverlay(PPose base, PPose delta, float weight)
+	{
+		for (int bone = 0; bone < base.boneCount(); bone++)
+		{
+			if (delta.hasTranslation(bone))
+			{
+				base.translation(bone, new Vector3f(base.translation(bone)).fma(weight, delta.translation(bone)));
+			}
+			if (delta.hasRotation(bone))
+			{
+				base.rotation(bone, new Quaternionf(base.rotation(bone)).premul(new Quaternionf().slerp(delta.rotation(bone), weight)).normalize());
+			}
+			if (delta.hasScale(bone))
+			{
+				base.scale(bone, new Vector3f(base.scale(bone)).mul(new Vector3f(1.0f).lerp(delta.scale(bone), weight)));
+			}
+			if (delta.hasVisibility(bone))
+			{
+				base.visibility(bone, base.isVisible(bone) && delta.isVisible(bone));
+			}
+		}
+	}
+
+	private static boolean hasKeys(PBoneAnimation animation, PAnimationChannelType<?> channel)
+	{
+		PAnimationTrack<?> track = animation.track(channel);
+		return track != null && !track.keyframes().isEmpty();
+	}
+
+	private static @Nullable BoneFrame calculateGraphBoneTransformations(PBakedModel model,
+	                                                                    List<PAnimationGraphRuntime.Layer> layers,
+	                                                                    int boneIndex,
+	                                                                    MolangParser.Context context,
+	                                                                    BoneFrame accumulatedFrame)
 	{
 		List<GraphFrame> frames = new ArrayList<>(layers.size());
 		for (PAnimationGraphRuntime.Layer layer : layers)
 		{
 			PCompiledAnimation animation = model.compiledAnimation(layer.animation());
 			if (animation == null || animation.boneAnimation(boneIndex) == null)
+			{
 				continue;
+			}
 			BoneFrame frame = animation.animation().calculateBoneTransformations(
 					animation.boneAnimation(boneIndex), layer.time(), layer.interpolation(),
-					controller.persistentMolangContext().copyFrameValuesFrom(context), accumulatedFrame);
+					context, accumulatedFrame);
 			if (frame != null)
+			{
 				frames.add(new GraphFrame(layer, frame));
+			}
 		}
 		if (frames.isEmpty())
+		{
 			return null;
+		}
 
 		Vector3f translation = new Vector3f();
 		Vector3f scale = new Vector3f(1f);
@@ -196,14 +377,18 @@ public final class PAnimationRuntime
 		for (GraphFrame graphFrame : frames)
 		{
 			if (graphFrame.layer.overlay())
+			{
 				continue;
+			}
 			float weight = graphFrame.layer.weight();
 			BoneFrame frame = graphFrame.frame;
 			translation.fma(weight, frame.translation());
 			scale.fma(weight, new Vector3f(frame.scale()).sub(1.0f, 1.0f, 1.0f));
 			Quaternionf rotation = frame.rotation();
 			if (anchor == null)
+			{
 				anchor = rotation;
+			}
 			float sign = anchor.dot(rotation) < 0.0f ? -1.0f : 1.0f;
 			qx += rotation.x * weight * sign;
 			qy += rotation.y * weight * sign;
@@ -212,19 +397,27 @@ public final class PAnimationRuntime
 			baseWeight += weight;
 		}
 		if (anchor == null)
+		{
 			anchor = new Quaternionf();
+		}
 		float identitySign = anchor.w < 0.0f ? -1.0f : 1.0f;
 		qw += Math.max(0.0f, 1.0f - baseWeight) * identitySign;
 		Quaternionf rotation = new Quaternionf(qx, qy, qz, qw);
 		if (rotation.lengthSquared() < 1.0e-10f)
+		{
 			rotation.identity();
+		}
 		else
+		{
 			rotation.normalize();
+		}
 
 		for (GraphFrame graphFrame : frames)
 		{
 			if (!graphFrame.layer.overlay())
+			{
 				continue;
+			}
 			float weight = graphFrame.layer.weight();
 			BoneFrame frame = graphFrame.frame;
 			translation.fma(weight, frame.translation());
@@ -234,22 +427,16 @@ public final class PAnimationRuntime
 		return new BoneFrame(translation, rotation, scale);
 	}
 
-/**
- * Immutable value object representing graph frame.
- */
+	/**
+	 * Sampled graph pose together with the base pose used to evaluate its overlays.
+	 *
+	 * @param layer the layer contribution being blended
+	 * @param frame the frame matrices or sampled animation values used by this operation
+	 */
 	private record GraphFrame(PAnimationGraphRuntime.Layer layer, BoneFrame frame)
 	{
 	}
 
-	/**
-	 * Performs the differs from bind operation.
-	 * @param model the model to use.
-	 * @param boneIndex the bone index to use.
-	 * @param translation the translation to use.
-	 * @param rotation the rotation to use.
-	 * @param scale the scale to use.
-	 * @return the value produced by this operation.
-	 */
 	private static boolean differsFromBind(PBakedModel model,
 	                                      int boneIndex,
 	                                      Vector3f translation,

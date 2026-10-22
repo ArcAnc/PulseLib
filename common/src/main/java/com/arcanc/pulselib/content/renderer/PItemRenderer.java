@@ -15,6 +15,7 @@ import com.arcanc.pulselib.content.animatable.PAnimationController;
 import com.arcanc.pulselib.content.animatable.PAnimationManager;
 import com.arcanc.pulselib.content.mixin.ItemStackRenderStateAccessor;
 import com.arcanc.pulselib.content.model.animation.BoneFrame;
+import com.arcanc.pulselib.content.model.animation.PAnimationPoseResolver;
 import com.arcanc.pulselib.content.model.animation.PAnimationEvaluationContext;
 import com.arcanc.pulselib.content.model.baked.*;
 import com.arcanc.pulselib.content.renderer.base.PItemRenderState;
@@ -243,7 +244,12 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 		{
 			return;
 		}
-		BoneFrame frame = bone.mixBone(model, controllers, molangContexts, renderState.partialTick());
+		PAnimationPoseResolver<T> poseResolver = PRenderPoseContexts.resolve(model, controllers, molangContexts, renderState.partialTick());
+		if (!poseResolver.isVisible(bone))
+		{
+			return;
+		}
+		BoneFrame frame = poseResolver.resolve(bone).localTransform();
 		poseStack.pushPose();
 		if (frame != null)
 		{
@@ -280,7 +286,7 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 	                                                                                   Collection<PAnimationController<T>> controllers,
 	                                                                                   float partialTick)
 	{
-		Map<PAnimationController<T>, MolangParser.Context> contexts = new IdentityHashMap<>();
+		Map<PAnimationController<T>, MolangParser.Context> contexts = new PRenderPoseContexts<>();
 		for (PAnimationController<T> controller : controllers)
 		{
 			MolangParser.Context context = new MolangParser.Context().
