@@ -9,7 +9,6 @@
 
 package com.arcanc.pulselib.test.stage1;
 
-import com.arcanc.pulselib.content.mixin.GlBufferAccessor;
 import com.arcanc.pulselib.content.model.baked.PBakedMesh;
 import com.arcanc.pulselib.content.registration.block.block_entity.ber.TestBlockEntityRenderer;
 import com.arcanc.pulselib.content.renderer.PRenderQueue;
@@ -20,7 +19,6 @@ import com.arcanc.pulselib.content.renderer.plan.PInstanceHeader;
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.arcanc.pulselib.util.PResourceCache;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.common.NeoForge;
@@ -75,22 +73,22 @@ public final class Stage41bGeometryProbe
 		{
 			PBakedMesh mesh = IntStream.range(0, model.boneCount()).mapToObj(model::bone).flatMap(bone -> bone.meshes().stream()).findFirst().orElseThrow();
 			int stride = PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize();
-			ByteBuffer vertices = read(((GlBufferAccessor)mesh.vbo()).pulselib$getHandle(), 0, mesh.vertexesAmount() * stride);
-			ByteBuffer raw = read(((GlBufferAccessor)mesh.indices()).pulselib$getHandle(), 0, mesh.indicesCount() * mesh.indexType().bytes);
-			ByteBuffer shorts = ByteBuffer.allocate(mesh.indicesCount() * 2).order(ByteOrder.nativeOrder());
-			ByteBuffer ints = ByteBuffer.allocate(mesh.indicesCount() * 4).order(ByteOrder.nativeOrder());
-			for (int i = 0; i < mesh.indicesCount(); i++)
+			ByteBuffer vertices = mesh.geometry().vertices();
+			ByteBuffer raw = mesh.geometry().indices().order(ByteOrder.nativeOrder());
+			ByteBuffer shorts = ByteBuffer.allocate(mesh.geometry().indexCount() * 2).order(ByteOrder.nativeOrder());
+			ByteBuffer ints = ByteBuffer.allocate(mesh.geometry().indexCount() * 4).order(ByteOrder.nativeOrder());
+			for (int i = 0; i < mesh.geometry().indexCount(); i++)
 			{
-				int index = mesh.indexType() == VertexFormat.IndexType.SHORT ? Short.toUnsignedInt(raw.getShort()) : raw.getInt();
+				int index = mesh.geometry().indexType() == PGeometryData.IndexType.UNSIGNED_SHORT ? Short.toUnsignedInt(raw.getShort()) : raw.getInt();
 				check(index <= 65535, "Chosen original fixture must fit 16-bit indices");
 				shorts.putShort((short)index);
 				ints.putInt(index);
 			}
 			shorts.flip();
 			ints.flip();
-			shortData = new PGeometryData(vertices, shorts, stride, mesh.indicesCount(), PGeometryData.IndexType.UNSIGNED_SHORT);
-			shortCopy = new PGeometryData(vertices, shorts, stride, mesh.indicesCount(), PGeometryData.IndexType.UNSIGNED_SHORT);
-			intData = new PGeometryData(vertices, ints, stride, mesh.indicesCount(), PGeometryData.IndexType.UNSIGNED_INT);
+			shortData = new PGeometryData(vertices, shorts, stride, mesh.geometry().indexCount(), PGeometryData.IndexType.UNSIGNED_SHORT);
+			shortCopy = new PGeometryData(vertices, shorts, stride, mesh.geometry().indexCount(), PGeometryData.IndexType.UNSIGNED_SHORT);
+			intData = new PGeometryData(vertices, ints, stride, mesh.geometry().indexCount(), PGeometryData.IndexType.UNSIGNED_INT);
 			dynamic = new PGlDynamicGeometry(shortData);
 		}
 		frames++;
@@ -149,7 +147,8 @@ public final class Stage41bGeometryProbe
 		Object executor = field(PRenderQueue.class, null, "EXECUTOR");
 		Object arena = field(executor.getClass(), executor, "geometry");
 		var immutable = (Map<?, ?>)field(arena.getClass(), arena, "geometrySlices");
-		check(immutable.size() == 3, "Static geometry must be cached by resource identity");
+		check(immutable.containsKey(shortData) && immutable.containsKey(shortCopy) && immutable.containsKey(intData), "All three portable identities must be uploaded alongside baked model geometry");
+		check(immutable.get(shortData) != immutable.get(shortCopy), "Equal bytes with distinct identity must retain distinct GPU slices");
 		verifySlice((PGlGeometryArena.Slice)immutable.get(shortData), shortData);
 		verifySlice((PGlGeometryArena.Slice)immutable.get(shortCopy), shortCopy);
 		verifySlice((PGlGeometryArena.Slice)immutable.get(intData), intData);
@@ -160,7 +159,7 @@ public final class Stage41bGeometryProbe
 		verifySlice((PGlGeometryArena.Slice)field(current.getClass(), current, "slice"), dynamic.geometry());
 	}
 
-	private static void verifySlice(PGlGeometryArena.Slice slice, PGeometryData data)
+	static void verifySlice(PGlGeometryArena.Slice slice, PGeometryData data)
 	{
 		int vertices = (int)field(slice.page().getClass(), slice.page(), "vertexBuffer");
 		int indices = (int)field(slice.page().getClass(), slice.page(), "indexBuffer");
@@ -168,7 +167,7 @@ public final class Stage41bGeometryProbe
 		check(data.indices().equals(read(indices, slice.indexOffset(), data.indexCount() * data.indexType().bytes())), "Index bytes must match actual arena GPU storage");
 	}
 
-	private static ByteBuffer read(int buffer, long offset, int size)
+	static ByteBuffer read(int buffer, long offset, int size)
 	{
 		int previous = GL11.glGetInteger(GL31.GL_COPY_READ_BUFFER);
 		ByteBuffer bytes = MemoryUtil.memAlloc(size);
@@ -198,7 +197,7 @@ public final class Stage41bGeometryProbe
 		PLibDatabase.LOGGER.info("STAGE 4.1b.1 GEOMETRY SHUTDOWN PASS: static/dynamic pages=0, pass-state buffers released");
 	}
 
-	private static @Nullable Object field(Class<?> type, @Nullable Object owner, String name)
+	static @Nullable Object field(Class<?> type, @Nullable Object owner, String name)
 	{
 		try
 		{

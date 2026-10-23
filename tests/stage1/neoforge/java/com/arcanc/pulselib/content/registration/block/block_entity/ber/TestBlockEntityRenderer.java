@@ -10,7 +10,10 @@
 package com.arcanc.pulselib.content.registration.block.block_entity.ber;
 
 
+import com.arcanc.pulselib.content.model.baked.PBakedModel;
+import org.jspecify.annotations.Nullable;
 import com.arcanc.pulselib.test.stage1.Stage1Client;
+import com.arcanc.pulselib.test.stage1.Stage41b2BakedProbe;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -39,6 +42,22 @@ public class TestBlockEntityRenderer extends PBlockRenderer<TestBlockEntity, Tes
 	public static final Identifier PYRAMID = PLibDatabase.rl("block/test_block/pyramid_texture");
 	public static final Identifier CUBE = PLibDatabase.rl("block/test_block/cube_texture");
 	
+	@Override
+	public PModelData getModelData(TestBlockEntity animatable)
+	{
+		if (Boolean.getBoolean("pulselib.stage41b2Probe"))
+			Stage41b2BakedProbe.ownerLookup(animatable);
+		return super.getModelData(animatable);
+	}
+
+	@Override
+	public @Nullable PBakedModel getModel(TestBlockEntity animatable)
+	{
+		if (Boolean.getBoolean("pulselib.stage41b2Probe"))
+			Stage41b2BakedProbe.ownerModelLookup(animatable);
+		return super.getModel(animatable);
+	}
+
 	/**
 	 * Creates an instance of the enclosing type.
 	 * @param ctx the ctx to use.

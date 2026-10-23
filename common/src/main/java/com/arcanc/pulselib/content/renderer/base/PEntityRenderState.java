@@ -65,8 +65,8 @@ public interface PEntityRenderState<T extends Entity & PAnimatable<T>> extends P
 				PEntityRenderer<T, RS> renderer)
 		{
 			this.extractData();
-			this.model = renderer.getModel((RS) this);
 			this.animatable = entity;
+			this.model = renderer.getModel((RS) this);
 			this.key = AnimManagerKey.of(entity);
 		}
 		
@@ -143,8 +143,8 @@ public interface PEntityRenderState<T extends Entity & PAnimatable<T>> extends P
 				PEntityRenderer<T, RS> renderer)
 		{
 			this.extractData();
-			this.model = renderer.getModel((RS) this);
 			this.animatable = entity;
+			this.model = renderer.getModel((RS) this);
 			this.key = AnimManagerKey.of(entity);
 		}
 		

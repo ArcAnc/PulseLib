@@ -26,6 +26,12 @@ import org.jspecify.annotations.Nullable;
  */
 public interface PRenderer<T extends PAnimatable<T>, RS extends PRenderState<T>>
 {
+	/** Selects the model for the animatable owner, as in the canonical MultiLoader API. */
+	PModelData getModelData(T animatable);
+
+	/** Returns the owner's loaded model, or null before its resources are available. */
+	@Nullable PBakedModel getModel(T animatable);
+
 	/**
 	 * Returns the model data.
 	 * @param renderState the render state to use.

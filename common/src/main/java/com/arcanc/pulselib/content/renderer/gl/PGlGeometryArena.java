@@ -9,12 +9,9 @@
 
 package com.arcanc.pulselib.content.renderer.gl;
 
-import com.arcanc.pulselib.content.mixin.GlBufferAccessor;
 import com.arcanc.pulselib.content.model.baked.PBakedMesh;
 import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
 import com.arcanc.pulselib.util.PRenderTypes;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.MemoryUtil;
 
@@ -33,7 +30,6 @@ public final class PGlGeometryArena
 	private static final int PAGE_BYTES = 4 * 1024 * 1024;
 	private static final int VERTEX_STRIDE = PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize();
 
-	private final Map<PBakedMesh, Slice> slices = new Object2ObjectOpenHashMap<>();
 	private final List<Page> pages = new ArrayList<>();
 	private final Map<PGeometryData, Slice> geometrySlices = new IdentityHashMap<>();
 	private final Map<PGlDynamicGeometry, Map<Integer, DynamicAllocation>> dynamicPages = new IdentityHashMap<>();
@@ -45,7 +41,7 @@ public final class PGlGeometryArena
 	 */
 	public Slice resolve(PBakedMesh mesh)
 	{
-		return this.slices.computeIfAbsent(mesh, this :: append);
+		return resolve(mesh.geometry());
 	}
 
 	/** Appends immutable portable geometry into the same static arena pages. */
@@ -71,7 +67,16 @@ public final class PGlGeometryArena
 	{
 		PGeometryData data = source.geometry();
 		validate(data, VERTEX_STRIDE);
-		Map<Integer, DynamicAllocation> slots = this.dynamicPages.computeIfAbsent(source, ignored -> new HashMap<>());
+		Map<Integer, DynamicAllocation> slots = this.dynamicPages.computeIfAbsent(source, ignored ->
+		{
+			source.onClose(this, () ->
+			{
+				Map<Integer, DynamicAllocation> owned = this.dynamicPages.remove(source);
+				if (owned != null)
+					owned.values().forEach(allocation -> allocation.page().close());
+			});
+			return new HashMap<>();
+		});
 		DynamicAllocation previous = slots.get(frameSlot);
 		if (previous != null && previous.data() == data)
 			return previous.slice();
@@ -106,9 +111,9 @@ public final class PGlGeometryArena
 	{
 		this.pages.forEach(Page :: close);
 		this.pages.clear();
-		this.slices.clear();
 		this.geometrySlices.clear();
 		this.dynamicPages.values().forEach(slots -> slots.values().forEach(allocation -> allocation.page().close()));
+		this.dynamicPages.keySet().forEach(source -> source.removeCloseListener(this));
 		this.dynamicPages.clear();
 	}
 
@@ -116,23 +121,6 @@ public final class PGlGeometryArena
 	{
 	}
 
-	/**
-	 * Performs the append operation.
-	 * @param mesh the mesh to use.
-	 * @return the value produced by this operation.
-	 */
-	private Slice append(PBakedMesh mesh)
-	{
-		int vertexBytes = mesh.vertexesAmount() * VERTEX_STRIDE;
-		int indexBytes = mesh.indicesCount() * mesh.indexType().bytes;
-		Page page = this.pages.isEmpty() ? null : this.pages.getLast();
-		if (page == null || !page.hasSpace(vertexBytes, indexBytes, mesh.indexType().bytes))
-		{
-			page = new Page(Math.max(PAGE_BYTES, vertexBytes), Math.max(PAGE_BYTES, indexBytes));
-			this.pages.add(page);
-		}
-		return page.append(mesh, vertexBytes, indexBytes);
-	}
 
 /**
  * Immutable value object representing slice.
@@ -245,25 +233,6 @@ public final class PGlGeometryArena
 			return vertexBytes <= this.vertexCapacity - this.vertices && indexBytes <= this.indexCapacity - indexOffset;
 		}
 
-		/**
-		 * Performs the append operation.
-		 * @param mesh the mesh to use.
-		 * @param vertexBytes the vertex bytes to use.
-		 * @param indexBytes the index bytes to use.
-		 * @return the value produced by this operation.
-		 */
-		private Slice append(PBakedMesh mesh, int vertexBytes, int indexBytes)
-		{
-			int indexOffset = align(this.indices, mesh.indexType().bytes);
-			int baseVertex = this.vertices / VERTEX_STRIDE;
-			copy(((GlBufferAccessor)mesh.vbo()).pulselib$getHandle(), this.vertexBuffer, this.vertices, vertexBytes);
-			copy(((GlBufferAccessor)mesh.indices()).pulselib$getHandle(), this.indexBuffer, indexOffset, indexBytes);
-			this.vertices += vertexBytes;
-			this.indices = indexOffset + indexBytes;
-			return new Slice(this, indexOffset, baseVertex, mesh.indicesCount(),
-					mesh.indexType() == VertexFormat.IndexType.SHORT ? GL11.GL_UNSIGNED_SHORT : GL11.GL_UNSIGNED_INT);
-		}
-
 		private Slice append(PGeometryData geometry)
 		{
 			int indexOffset = align(this.indices, geometry.indexType().bytes());
@@ -308,20 +277,6 @@ public final class PGlGeometryArena
 		private static int align(int value, int alignment)
 		{
 			return (value + alignment - 1) & -alignment;
-		}
-
-		/**
-		 * Performs the copy operation.
-		 * @param source the source to use.
-		 * @param target the target to use.
-		 * @param targetOffset the target offset to use.
-		 * @param size the size to use.
-		 */
-		private static void copy(int source, int target, int targetOffset, int size)
-		{
-			GL15.glBindBuffer(GL31.GL_COPY_READ_BUFFER, source);
-			GL15.glBindBuffer(GL31.GL_COPY_WRITE_BUFFER, target);
-			GL31.glCopyBufferSubData(GL31.GL_COPY_READ_BUFFER, GL31.GL_COPY_WRITE_BUFFER, 0L, targetOffset, size);
 		}
 
 		/**

@@ -9,27 +9,32 @@
 
 package com.arcanc.pulselib.content.model.baked;
 
+
 import com.arcanc.pulselib.content.model.PMeshPrimitive;
 import com.arcanc.pulselib.content.model.textures.PAlphaMode;
-import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
 import net.minecraft.resources.Identifier;
 
 import java.util.UUID;
 
 /**
- * Immutable value object representing baked mesh.
+ * Render-ready mesh pairing triangle geometry, atlas texture and material properties.
+ *
+ * @param uuid the stable source-model bone identity
+ * @param geometry the immutable indexed mesh geometry
+ * @param textureReference the source-model texture reference used for override lookup
+ * @param isEmissive the is emissive
+ * @param alphaMode the material alpha handling policy
+ * @param source the source
+ * @param textureLocation the texture location
  */
-public record PBakedMesh(UUID uuid,
-                         GpuBuffer vbo,
-                         int vertexesAmount,
-                         GpuBuffer indices,
-                         int indicesCount,
-                         VertexFormat.IndexType indexType,
-                         String textureReference,
-                         boolean isEmissive,
-                         PAlphaMode alphaMode,
-                         PMeshPrimitive source,
-                         Identifier textureLocation)
+public record PBakedMesh(
+		UUID uuid,
+		PGeometryData geometry,
+		String textureReference,
+		boolean isEmissive,
+		PAlphaMode alphaMode,
+		PMeshPrimitive source,
+		Identifier textureLocation)
 {
 }

@@ -9,12 +9,11 @@
 
 package com.arcanc.pulselib.content.model.baked;
 
-
 import com.arcanc.pulselib.content.animatable.PAnimatable;
 import com.arcanc.pulselib.content.animatable.PAnimationController;
 import com.arcanc.pulselib.content.model.animation.PAnimation;
-import com.arcanc.pulselib.content.model.animation.PAnimationPoseResolver;
 import com.arcanc.pulselib.content.model.animation.PAnimationRuntime;
+import com.arcanc.pulselib.content.model.animation.PAnimationPoseResolver;
 import com.arcanc.pulselib.content.model.animation.PBoneAnimation;
 import com.arcanc.pulselib.content.model.animation.PCompiledAnimation;
 import com.arcanc.pulselib.content.model.animation.PPose;
@@ -24,12 +23,19 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;
 import org.joml.Vector3f;
+import org.jspecify.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
- * Provides support for baked model.
+ * Render-ready model with indexed bones, parent indices, bind pose and compiled animation lookup.
  */
 public final class PBakedModel
 {
@@ -41,9 +47,10 @@ public final class PBakedModel
 	private final Map<String, PCompiledAnimation> compiledAnimations;
 
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param bones the bones to use.
-	 * @param animations the animations to use.
+	 * Copies the bone hierarchy and animations, then builds indexed bone and animation lookup.
+	 *
+	 * @param bones the bones
+	 * @param animations the animation clips indexed by source name
 	 */
 	public PBakedModel(List<PBakedBone> bones, Map<String, PAnimation> animations)
 	{
@@ -65,59 +72,105 @@ public final class PBakedModel
 	}
 
 	/**
-	 * Performs the bones operation.
-	 * @return the value produced by this operation.
+	 * Returns the bones.
+	 *
+	 * @return the bones
 	 */
-	public List<PBakedBone> bones() { return this.bones; }
-	/**
-	 * Performs the animations operation.
-	 * @return the value produced by this operation.
-	 */
-	public Map<String, PAnimation> animations() { return this.animations; }
-	/**
-	 * Performs the bone count operation.
-	 * @return the value produced by this operation.
-	 */
-	public int boneCount() { return this.indexedBones.length; }
-	/**
-	 * Performs the bone index operation.
-	 * @param name the name to use.
-	 * @return the value produced by this operation.
-	 */
-	public int boneIndex(String name) { return this.boneIndices.getOrDefault(name, -1); }
-	/**
-	 * Performs the bone index operation.
-	 * @param bone the bone to use.
-	 * @return the value produced by this operation.
-	 */
-	public int boneIndex(PBakedBone bone) { return boneIndex(bone.name()); }
-	/**
-	 * Performs the bone operation.
-	 * @param index the index to use.
-	 * @return the value produced by this operation.
-	 */
-	public PBakedBone bone(int index) { return this.indexedBones[index]; }
-	/**
-	 * Performs the parent index operation.
-	 * @param index the index to use.
-	 * @return the value produced by this operation.
-	 */
-	public int parentIndex(int index) { return this.parents[index]; }
-	/**
-	 * Performs the parent indices operation.
-	 * @return the value produced by this operation.
-	 */
-	public int[] parentIndices() { return this.parents.clone(); }
-	/**
-	 * Performs the compiled animation operation.
-	 * @param name the name to use.
-	 * @return the value produced by this operation.
-	 */
-	public PCompiledAnimation compiledAnimation(String name) { return this.compiledAnimations.get(name); }
+	public List<PBakedBone> bones()
+	{
+		return this.bones;
+	}
 
 	/**
-	 * Binds the pose.
-	 * @return the value produced by this operation.
+	 * Returns the animation clips indexed by source name.
+	 *
+	 * @return the animation clips indexed by source name
+	 */
+	public Map<String, PAnimation> animations()
+	{
+		return this.animations;
+	}
+
+	/**
+	 * Returns the number of bones in the indexed baked hierarchy.
+	 *
+	 * @return the number of bones in the indexed baked hierarchy
+	 */
+	public int boneCount()
+	{
+		return this.indexedBones.length;
+	}
+
+	/**
+	 * Finds the index of a baked bone, returning the implementation's missing-index sentinel when absent.
+	 *
+	 * @param name the bone name
+	 * @return the bone index, or {@code -1} when no matching bone exists
+	 */
+	public int boneIndex(String name)
+	{
+		return this.boneIndices.getOrDefault(name, -1);
+	}
+
+	/**
+	 * Finds the index of a baked bone, returning the implementation's missing-index sentinel when absent.
+	 *
+	 * @param bone the baked bone being sampled or submitted
+	 * @return the bone index, or {@code -1} when no matching bone exists
+	 */
+	public int boneIndex(PBakedBone bone)
+	{
+		return boneIndex(bone.name());
+	}
+
+	/**
+	 * Returns the baked bone at the supplied model index.
+	 *
+	 * @param index the index
+	 * @return the baked bone at the supplied model index
+	 */
+	public PBakedBone bone(int index)
+	{
+		return this.indexedBones[index];
+	}
+
+	/**
+	 * Returns the parent index of a baked bone, or the root sentinel for a root bone.
+	 *
+	 * @param index the index
+	 * @return the parent index of a baked bone, or the root sentinel for a root bone
+	 */
+	public int parentIndex(int index)
+	{
+		return this.parents[index];
+	}
+
+	/**
+	 * Returns a defensive copy of the indexed parent hierarchy.
+	 *
+	 * @return a defensive copy of the indexed parent hierarchy
+	 */
+	public int[] parentIndices()
+	{
+		return this.parents.clone();
+	}
+
+	/**
+	 * Returns the named animation indexed for this model, or {@code null} if absent.
+	 *
+	 * @param name the bone name
+	 * @return the named animation indexed for this model, or {@code null} if absent
+	 */
+	@Nullable
+	public PCompiledAnimation compiledAnimation(String name)
+	{
+		return this.compiledAnimations.get(name);
+	}
+
+	/**
+	 * Returns the model's unanimated local bone pose.
+	 *
+	 * @return the model's unanimated local bone pose
 	 */
 	public PPose bindPose()
 	{
@@ -129,71 +182,100 @@ public final class PBakedModel
 		}
 		return pose;
 	}
+
 	/**
-	 * Performs the instant draw operation.
-	 * @param poseStack the pose stack to use.
-	 * @param modelData the model data to use.
-	 * @param controllers the controllers to use.
-	 * @param renderType the render type to use.
-	 * @param color the color to use.
-	 * @param packedOverlay the packed overlay to use.
-	 * @param partialTick the partial tick to use.
+	 * Evaluates the supplied controllers and submits the model meshes for rendering.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param poseStack the current model-to-render pose stack
+	 * @param modelData the canonical model and loader selection
+	 * @param controllers the animation controllers in pose composition order
+	 * @param renderType the render type
+	 * @param color the packed ARGB vertex color
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param packedOverlay the packed overlay texture coordinates
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
 	 */
-	public <T extends PAnimatable<T>>void instantDraw(PoseStack poseStack,
-	                                                  PModelData modelData,
-	                                                  Collection<PAnimationController<T>> controllers,
-	                                                  Function<Identifier, RenderType> renderType,
-	                                                  int color,
-	                                                  int packedOverlay,
-	                                                  float partialTick)
+	public <T extends PAnimatable<T>> void instantDraw(PoseStack poseStack, PModelData modelData,
+	                                                   Collection<PAnimationController<T>> controllers,
+	                                                   Function<Identifier, RenderType> renderType, int color,
+	                                                   int packedLight, int packedOverlay, float partialTick)
 	{
-		this.bones.forEach(bone -> bone.instantDraw(
-				poseStack,
-				modelData,
-				controllers,
-				renderType,
-				color,
-				packedOverlay,
-				partialTick));
+		instantDraw(poseStack, modelData, controllers, Map.of(), renderType, color, packedLight, packedOverlay, partialTick);
 	}
 
 	/**
-	 * Performs the instant draw operation.
-	 * @param poseStack the pose stack to use.
-	 * @param modelData the model data to use.
-	 * @param controllers the controllers to use.
-	 * @param renderType the render type to use.
-	 * @param color the color to use.
-	 * @param packedLight the packed light to use.
-	 * @param packedOverlay the packed overlay to use.
-	 * @param partialTick the partial tick to use.
+	 * Evaluates the supplied controllers and submits the model meshes for rendering.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param poseStack the current model-to-render pose stack
+	 * @param modelData the canonical model and loader selection
+	 * @param controllers the animation controllers in pose composition order
+	 * @param molangContexts the frame-specific Molang context of each controller
+	 * @param renderType the render type
+	 * @param color the packed ARGB vertex color
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param packedOverlay the packed overlay texture coordinates
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
 	 */
-	public <T extends PAnimatable<T>>void instantDraw(PoseStack poseStack,
-	                                                  PModelData modelData,
-	                                                  Collection<PAnimationController<T>> controllers,
-	                                                  Function<Identifier, RenderType> renderType,
-	                                                  int color,
-	                                                  int packedLight,
-	                                                  int packedOverlay,
-	                                                  float partialTick)
+	public <T extends PAnimatable<T>> void instantDraw(PoseStack poseStack, PModelData modelData,
+	                                                   Collection<PAnimationController<T>> controllers,
+	                                                   Map<PAnimationController<T>, MolangParser.Context> molangContexts,
+	                                                   Function<Identifier, RenderType> renderType, int color,
+	                                                   int packedLight, int packedOverlay, float partialTick)
 	{
-		this.bones.forEach(bone -> bone.instantDraw(
-				poseStack,
-				modelData,
-				controllers,
-				renderType,
-				color,
-				packedLight,
-				packedOverlay,
-				partialTick));
+		PMeshRenderContext inherited = new PMeshRenderContext(renderType, color, packedLight, packedOverlay);
+		PAnimationPoseResolver<T> poseResolver = poseResolver(controllers, molangContexts, partialTick);
+		this.bones.forEach(bone -> bone.instantDraw(poseStack, poseResolver, (ignoredBone, mesh, context) -> context, inherited));
 	}
 
 	/**
-	 * Performs the evaluate operation.
-	 * @param controllers the controllers to use.
-	 * @param contexts the contexts to use.
-	 * @param partialTick the partial tick to use.
-	 * @return the value produced by this operation.
+	 * Evaluates the supplied controllers and submits the model meshes for rendering.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param poseStack the current model-to-render pose stack
+	 * @param modelData the canonical model and loader selection
+	 * @param controllers the animation controllers in pose composition order
+	 * @param resolver the resolver
+	 * @param inherited the render inputs inherited from the parent bone or renderer
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 */
+	public <T extends PAnimatable<T>> void instantDraw(PoseStack poseStack, PModelData modelData,
+	                                                   Collection<PAnimationController<T>> controllers,
+	                                                   PMeshRenderResolver resolver, PMeshRenderContext inherited, float partialTick)
+	{
+		instantDraw(poseStack, modelData, controllers, Map.of(), resolver, inherited, partialTick);
+	}
+
+	/**
+	 * Evaluates the supplied controllers and submits the model meshes for rendering.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param poseStack the current model-to-render pose stack
+	 * @param modelData the canonical model and loader selection
+	 * @param controllers the animation controllers in pose composition order
+	 * @param molangContexts the frame-specific Molang context of each controller
+	 * @param resolver the resolver
+	 * @param inherited the render inputs inherited from the parent bone or renderer
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 */
+	public <T extends PAnimatable<T>> void instantDraw(PoseStack poseStack, PModelData modelData,
+	                                                   Collection<PAnimationController<T>> controllers,
+	                                                   Map<PAnimationController<T>, MolangParser.Context> molangContexts,
+	                                                   PMeshRenderResolver resolver, PMeshRenderContext inherited, float partialTick)
+	{
+		PAnimationPoseResolver<T> poseResolver = poseResolver(controllers, molangContexts, partialTick);
+		this.bones.forEach(bone -> bone.instantDraw(poseStack, poseResolver, resolver, inherited));
+	}
+
+	/**
+	 * Samples the supplied controller collection into an indexed bone pose.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param controllers the animation controllers in pose composition order
+	 * @param contexts the contexts
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the indexed bone pose
 	 */
 	public <T extends PAnimatable<T>> PPose evaluate(Collection<PAnimationController<T>> controllers,
 	                                                 Map<PAnimationController<T>, MolangParser.Context> contexts,
@@ -204,12 +286,25 @@ public final class PBakedModel
 						PAnimationPoseResolver.<T>defaultContexts().context(controller, tick)), partialTick);
 	}
 
-	/**
-	 * Performs the index operation.
-	 * @param bone the bone to use.
-	 * @param target the target to use.
-	 * @param indices the indices to use.
-	 */
+	/** Renders using full-bright light coordinates for existing 26.1 callers. */
+	public <T extends PAnimatable<T>> void instantDraw(PoseStack poseStack, PModelData modelData,
+	                                                   Collection<PAnimationController<T>> controllers,
+	                                                   Function<Identifier, RenderType> renderType, int color,
+	                                                   int packedOverlay, float partialTick)
+	{
+		instantDraw(poseStack, modelData, controllers, renderType, color, 0xF000F0, packedOverlay, partialTick);
+	}
+
+	private <T extends PAnimatable<T>> PAnimationPoseResolver<T> poseResolver(
+			Collection<PAnimationController<T>> controllers,
+			Map<PAnimationController<T>, MolangParser.Context> contexts,
+			float partialTick)
+	{
+		return new PAnimationPoseResolver<>(this, controllers,
+				(controller, tick) -> contexts.getOrDefault(controller,
+						PAnimationPoseResolver.<T>defaultContexts().context(controller, tick)), partialTick);
+	}
+
 	private static void index(PBakedBone bone, List<PBakedBone> target, Map<String, Integer> indices)
 	{
 		if (indices.putIfAbsent(bone.name(), target.size()) != null)
@@ -218,10 +313,6 @@ public final class PBakedModel
 		bone.children().forEach(child -> index(child, target, indices));
 	}
 
-	/**
-	 * Compiles the animations.
-	 * @return the value produced by this operation.
-	 */
 	private Map<String, PCompiledAnimation> compileAnimations()
 	{
 		Map<String, PCompiledAnimation> compiled = new HashMap<>();

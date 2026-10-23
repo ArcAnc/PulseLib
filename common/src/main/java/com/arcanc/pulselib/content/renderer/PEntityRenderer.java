@@ -96,9 +96,23 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 	@Override
 	public PModelData getModelData(RS renderState)
 	{
-		return this.modelData;
+		return getModelData(renderState.getAnimatable());
 	}
 	
+	/** Selects the canonical model data for an owner during extraction and submission. */
+	@Override
+	public PModelData getModelData(T animatable)
+	{
+		return this.modelData;
+	}
+
+	/** Returns the baked model selected for the supplied owner, or null before resource load. */
+	@Override
+	public @Nullable PBakedModel getModel(T animatable)
+	{
+		return getModelData(animatable).getModel();
+	}
+
 	/**
 	 * Returns the model.
 	 * @param renderState the render state to use.
@@ -107,7 +121,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 	@Override
 	public @Nullable PBakedModel getModel(RS renderState)
 	{
-		return getModelData(renderState).getModel();
+		return getModel(renderState.getAnimatable());
 	}
 	
 	/**
@@ -369,7 +383,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 	                           @Nullable List<DeferredLayerSubmit> deferredLayers,
 	                           Map<PAnimationController<T>, MolangParser.Context> molangContexts)
 	{
-		PAnimationPoseResolver<T> poseResolver = PRenderPoseContexts.resolve(data.getModel(), controllers, molangContexts, renderState.partialTick());
+		PAnimationPoseResolver<T> poseResolver = PRenderPoseContexts.resolve(renderLayer == null ? renderState.getBakedModel() : data.getModel(), controllers, molangContexts, renderState.partialTick());
 		if (!poseResolver.isVisible(bone))
 		{
 			return;

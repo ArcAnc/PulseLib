@@ -1,0 +1,640 @@
+{
+  "status": "PASS",
+  "baselineCommit": "7ce6f024b307bb821ce543344d3896c8e1fcf26b",
+  "baselineChecksums": "unchanged",
+  "types": [
+    {
+      "type": "com.arcanc.pulselib.content.animatable.PAnimationController",
+      "preservedMembers": 35,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.animatable.PAnimationController.AnimatableState",
+      "preservedMembers": 6,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.animatable.PAnimationController.StateHandler",
+      "preservedMembers": 1,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.animatable.PAnimationEventCallbacks",
+      "preservedMembers": 3,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.animatable.PAnimationEventCallbacks.LocatorCallback",
+      "preservedMembers": 1,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.animatable.PAnimationEventDispatcher",
+      "preservedMembers": 2,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimation",
+      "preservedMembers": 22,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationChannel",
+      "preservedMembers": 1,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationChannel.QuaternionChannelType",
+      "preservedMembers": 10,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationChannel.Vector3fChannelType",
+      "preservedMembers": 12,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationChannelType",
+      "preservedMembers": 7,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationDecodeContext",
+      "preservedMembers": 0,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationEvaluationContext",
+      "preservedMembers": 8,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationEvent",
+      "preservedMembers": 7,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationEventContext",
+      "preservedMembers": 8,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationEventContext.PAnimationEventDispatcherBridge",
+      "preservedMembers": 1,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationEventContext.PAnimationEventDispatcherBridge.Position",
+      "preservedMembers": 8,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationEventType",
+      "preservedMembers": 4,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationEventTypes",
+      "preservedMembers": 5,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationEventTypes.AnimationParameterData",
+      "preservedMembers": 8,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationEventTypes.CameraShakeData",
+      "preservedMembers": 7,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationEventTypes.LocatorCallbackData",
+      "preservedMembers": 6,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationEventTypes.ParticleData",
+      "preservedMembers": 8,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationEventTypes.SoundData",
+      "preservedMembers": 8,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationFormatDecoder",
+      "preservedMembers": 1,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationGraph",
+      "preservedMembers": 7,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationGraphRuntime",
+      "preservedMembers": 26,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationGraphRuntime.EventTrack",
+      "preservedMembers": 8,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationGraphRuntime.Layer",
+      "preservedMembers": 9,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationGraphRuntime.PreciseEventTrack",
+      "preservedMembers": 8,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationParameters",
+      "preservedMembers": 10,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationPoseResolver",
+      "preservedMembers": 19,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationPoseResolver.AnimationDelta",
+      "preservedMembers": 11,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationPoseResolver.BonePose",
+      "preservedMembers": 12,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationPoseResolver.LocalPose",
+      "preservedMembers": 9,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationPoseResolver.MolangContextProvider",
+      "preservedMembers": 1,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationRuntime",
+      "preservedMembers": 4,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationSample",
+      "preservedMembers": 6,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationStageContext",
+      "preservedMembers": 5,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationStagePlayback",
+      "preservedMembers": 12,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationStagePlayer",
+      "preservedMembers": 2,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationStageTransition",
+      "preservedMembers": 4,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationState",
+      "preservedMembers": 7,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationState.BlendSpace1D",
+      "preservedMembers": 13,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationState.BlendSpace1D.Point",
+      "preservedMembers": 6,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationState.BlendSpace2D",
+      "preservedMembers": 14,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationState.BlendSpace2D.Point",
+      "preservedMembers": 7,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationState.Clip",
+      "preservedMembers": 12,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationState.OneShotOverlay",
+      "preservedMembers": 16,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationTrack",
+      "preservedMembers": 6,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationTransition",
+      "preservedMembers": 12,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationType",
+      "preservedMembers": 5,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationValue",
+      "preservedMembers": 2,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationVisibilityTrack",
+      "preservedMembers": 6,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationVisibilityTrack.Keyframe",
+      "preservedMembers": 6,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PBlendMode",
+      "preservedMembers": 4,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PBoneAnimation",
+      "preservedMembers": 8,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PCompiledAnimation",
+      "preservedMembers": 4,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PCondition",
+      "preservedMembers": 9,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PEventSide",
+      "preservedMembers": 6,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PIAnimationStage",
+      "preservedMembers": 3,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PInterpolation",
+      "preservedMembers": 1,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PInterpolationType",
+      "preservedMembers": 13,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PInterruptionPolicy",
+      "preservedMembers": 5,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PKeyframe",
+      "preservedMembers": 8,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PModelPose",
+      "preservedMembers": 3,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PPose",
+      "preservedMembers": 26,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PPoseBlendMode",
+      "preservedMembers": 7,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PPoseEasing",
+      "preservedMembers": 8,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PPoseMixer",
+      "preservedMembers": 5,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PPoseMixer.BoneWeight",
+      "preservedMembers": 2,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PPoseMixer.Layer",
+      "preservedMembers": 14,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PPoseMixer.Transition",
+      "preservedMembers": 6,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PPoseWriter",
+      "preservedMembers": 3,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PRawAnimation",
+      "preservedMembers": 3,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PRawAnimation.Builder",
+      "preservedMembers": 12,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PRawAnimation.RandomStageBuilder",
+      "preservedMembers": 3,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PRootMotionDelta",
+      "preservedMembers": 7,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PRootMotionRuntime",
+      "preservedMembers": 3,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PTransform",
+      "preservedMembers": 16,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PTransitionInterruptionPolicy",
+      "preservedMembers": 5,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PVectorConversion",
+      "preservedMembers": 2,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.deformer.PBendDefinition",
+      "preservedMembers": 11,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.deformer.PBendDeformer",
+      "preservedMembers": 4,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.deformer.PChannelReference",
+      "preservedMembers": 9,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.deformer.PDeformerFrame",
+      "preservedMembers": 9,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.deformer.PDeformerInstance",
+      "preservedMembers": 6,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.deformer.PDeformerPrepareContext",
+      "preservedMembers": 2,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.deformer.PDeformerStack",
+      "preservedMembers": 9,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.deformer.PDeformerValueSource",
+      "preservedMembers": 3,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.deformer.PHingeDefinition",
+      "preservedMembers": 9,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.deformer.PHingeDeformer",
+      "preservedMembers": 4,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.deformer.PMeshDeformation",
+      "preservedMembers": 10,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.deformer.PMeshDeformer",
+      "preservedMembers": 3,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.deformer.PMeshTessellator",
+      "preservedMembers": 2,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.deformer.PPreparedDeformer",
+      "preservedMembers": 1,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.deformer.PSquashDefinition",
+      "preservedMembers": 8,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.deformer.PSquashDeformer",
+      "preservedMembers": 4,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.deformer.PStretchDefinition",
+      "preservedMembers": 8,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.deformer.PStretchDeformer",
+      "preservedMembers": 4,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.deformer.PTaperDefinition",
+      "preservedMembers": 10,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.deformer.PTaperDeformer",
+      "preservedMembers": 4,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.deformer.PTwistDefinition",
+      "preservedMembers": 10,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.deformer.PTwistDeformer",
+      "preservedMembers": 4,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.deformer.PWaveDefinition",
+      "preservedMembers": 13,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.deformer.PWaveDeformer",
+      "preservedMembers": 4,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.data.PAnimationSidecarParser",
+      "preservedMembers": 2,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.data.gecko.MolangParser",
+      "preservedMembers": 2,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.data.gecko.MolangParser.Context",
+      "preservedMembers": 12,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.data.gecko.MolangParser.Expression",
+      "preservedMembers": 3,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.data.gecko.MolangParser.QueryResolver",
+      "preservedMembers": 1,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.data.gecko.PExpressionDependency",
+      "preservedMembers": 7,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.data.gecko.PExpressionEvaluator",
+      "preservedMembers": 5,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.data.gecko.PGeckoAnimationEventParser",
+      "preservedMembers": 3,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.data.gecko.PGeckoChannelDecoder",
+      "preservedMembers": 3,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.data.gecko.PGeckoDecodeContext",
+      "preservedMembers": 5,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.data.gecko.PGeckoModelParser",
+      "preservedMembers": 5,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.data.gecko.PMolangEulerRotationValue",
+      "preservedMembers": 3,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.data.gecko.PMolangVectorValue",
+      "preservedMembers": 2,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.data.gltf.PGltfAnimationEventSidecarParser",
+      "preservedMembers": 3,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.data.gltf.PGltfChannelDecoder",
+      "preservedMembers": 3,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.data.gltf.PGltfDecodeContext",
+      "preservedMembers": 5,
+      "deferredToStage33": []
+    },
+    {
+      "type": "com.arcanc.pulselib.data.gltf.PGltfModelParser",
+      "preservedMembers": 2,
+      "deferredToStage33": []
+    }
+  ],
+  "typesDeferredToStage33": [],
+  "allowedRename": "Minecraft ResourceLocation -> Identifier",
+  "nonConstantInitializerChanges": [
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationEventTypes",
+      "field": "SOUND",
+      "baselineBodySha256": "9711e6885ec2c5c92e9896079fe801204504af4a3aad41a1efcc38eb8fcba267",
+      "currentBodySha256": "d802ff37dc7d855e37eb8f1518f551fa4ec83d198bfaeacd19f46f0135e29c1c"
+    },
+    {
+      "type": "com.arcanc.pulselib.content.model.animation.PAnimationEventTypes",
+      "field": "PARTICLE",
+      "baselineBodySha256": "b4485459bf9222aacd291b76c615059f1eb2421bacd59f8ee9396e1dc7787f3c",
+      "currentBodySha256": "85119dc567f17f943a8a5820aaf4b11c56b2cda572f48d446eb5d3530bb4d99d"
+    }
+  ],
+  "initializerPolicy": "Literal constants compared; executable callback/registry bodies excluded from API declarations and changed body hashes reported",
+  "scope": "Complete stage 3.3 animation declarations"
+}

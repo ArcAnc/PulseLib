@@ -107,6 +107,17 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 	@Override
 	public void execute(PRenderPlan plan, PRenderFrame frame)
 	{
+		execute(plan, frame, true);
+	}
+
+	/** Direct bone/model rendering uses ordinary blending and never composites pending world OIT. */
+	public void executeImmediate(PRenderPlan plan, PRenderFrame frame)
+	{
+		execute(plan, frame, false);
+	}
+
+	private void execute(PRenderPlan plan, PRenderFrame frame, boolean useOit)
+	{
 		if (plan.isEmpty())
 			return;
 
@@ -152,7 +163,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 			List<Draw> oitDraws = new ArrayList<>();
 			for (Draw draw : draws)
 			{
-				if (!draw.writeDepth() && PRenderTypes.usesOit(draw.type()))
+				if (useOit && !draw.writeDepth() && PRenderTypes.usesOit(draw.type()))
 					oitDraws.add(draw);
 				else
 					standardDraws.add(draw);

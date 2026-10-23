@@ -150,10 +150,10 @@ public interface PItemRenderState<T extends Item & PAnimatable<T>> extends PRend
 		{
 			this.extractData();
 			this.stack = stack.copy();
-			this.model = renderer.getModel((RS) this);
 			this.key = AnimManagerKey.of(stack);
 			//TODO: remove this hack
 			this.animatable = (T) stack.getItem();
+			this.model = renderer.getModel((RS) this);
 		}
 		
 		/**

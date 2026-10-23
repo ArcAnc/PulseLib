@@ -14,173 +14,224 @@ import com.arcanc.pulselib.content.animatable.PAnimatable;
 import com.arcanc.pulselib.content.animatable.PAnimationController;
 import com.arcanc.pulselib.content.model.animation.BoneFrame;
 import com.arcanc.pulselib.content.model.animation.PAnimationPoseResolver;
-import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
+import com.arcanc.pulselib.content.model.animation.PPose;
 import com.arcanc.pulselib.data.gecko.MolangParser;
+import com.arcanc.pulselib.content.renderer.PRenderQueue;
+import com.arcanc.pulselib.content.renderer.gl.PGlRenderHost;
 import com.arcanc.pulselib.content.renderer.modelData.PModelData;
-import com.arcanc.pulselib.util.PLibDatabase;
+import com.arcanc.pulselib.content.renderer.plan.PInstanceHeader;
+import com.arcanc.pulselib.content.renderer.plan.PRenderFrame;
 import com.arcanc.pulselib.util.PResourceCache;
-import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
-import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
-import com.mojang.blaze3d.buffers.Std140Builder;
-import com.mojang.blaze3d.buffers.Std140SizeCalculator;
-import com.mojang.blaze3d.pipeline.RenderTarget;
-import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.FilterMode;
-import com.mojang.blaze3d.textures.GpuTextureView;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MappableRingBuffer;
 import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
-import net.minecraft.util.LightCoordsUtil;
-import org.jetbrains.annotations.ApiStatus;
-import org.joml.*;
 import org.jspecify.annotations.Nullable;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 /**
  * WARNING! Name should be unique per bone!
+ *
+ * @param name the name
+ * @param basePosition the unanimated local bone position
+ * @param baseRotation the unanimated local bone rotation
+ * @param children the child bones in hierarchy order
+ * @param parent the parent; may be {@code null}
+ * @param meshes the meshes
  */
-public class PBakedBone
+public record PBakedBone(String name,
+                         Vector3f basePosition,
+                         Quaternionf baseRotation,
+                         List<PBakedBone> children,
+                         @Nullable PBakedBone parent,
+                         List<PBakedMesh> meshes)
 {
-	private final String name;
-	private final Vector3f basePosition;
-	private final Quaternionf baseRotation;
-	private final List<PBakedBone> children;
-	private final @Nullable PBakedBone parent;
-	private final List<PBakedMesh> meshes;
-	private @Nullable MappableRingBuffer colorLightOverlay;
-	private static final int FULL_BRIGHT = 0x00F000F0;
-	
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param name the name to use.
-	 * @param basePosition the base position to use.
-	 * @param baseRotation the base rotation to use.
-	 * @param children the children to use.
-	 * @param parent the parent to use.
-	 * @param meshes the meshes to use.
+	 * Submits this bone's meshes and child bones using the supplied animation pose and material resolution.
+	 *
+	 * @param poseStack the current model-to-render pose stack
+	 * @param model the baked model supplying indexed bones and animations
+	 * @param pose the indexed bone pose
+	 * @param renderType the render type
+	 * @param color the packed ARGB vertex color
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param packedOverlay the packed overlay texture coordinates
 	 */
-	public PBakedBone(String name,
-	                  Vector3f basePosition,
-	                  Quaternionf baseRotation,
-	                  List<PBakedBone> children,
-	                  @Nullable PBakedBone parent,
-	                  List<PBakedMesh> meshes)
+	public void instantDraw(PoseStack poseStack,
+	                        PBakedModel model,
+	                        PPose pose,
+	                        Function<Identifier, RenderType> renderType,
+	                        int color,
+	                        int packedLight,
+	                        int packedOverlay)
 	{
-		this.name = name;
-		this.basePosition = basePosition;
-		this.baseRotation = baseRotation;
-		this.children = children;
-		this.parent = parent;
-		this.meshes = meshes;
-	}
-	
-	/**
-	 * Performs the ensure buffer initialized operation.
-	 */
-	@ApiStatus.Internal
-	public void ensureBufferInitialized()
-	{
-		if (this.colorLightOverlay != null)
-			return;
-		this.colorLightOverlay = new MappableRingBuffer(
-				() -> PLibDatabase.rl("color_overlay").toLanguageKey(),
-				GpuBuffer.USAGE_UNIFORM | GpuBuffer.USAGE_MAP_WRITE,
-				new Std140SizeCalculator().
-						putVec4().
-						putVec2().
-						putIVec2().
-						putIVec4().
-						get());
-	}
-	
-	/**
-	 * Performs the instant draw operation.
-	 * @param poseStack the pose stack to use.
-	 * @param modelData the model data to use.
-	 * @param controllers the controllers to use.
-	 * @param renderType the render type to use.
-	 * @param color the color to use.
-	 * @param packedOverlay the packed overlay to use.
-	 * @param partialTick the partial tick to use.
-	 */
-	public <T extends PAnimatable<T>>void instantDraw(PoseStack poseStack,
-	                                                  PModelData modelData,
-	                                                  Collection<PAnimationController<T>> controllers,
-	                                                  Function<Identifier, RenderType> renderType,
-	                                                  int color,
-	                                                  int packedOverlay,
-	                                                  float partialTick)
-	{
-		instantDraw(poseStack, modelData, controllers, renderType, color, FULL_BRIGHT, packedOverlay, partialTick);
+		PMeshRenderContext context = new PMeshRenderContext(renderType, color, packedLight, packedOverlay);
+		instantDraw(poseStack, model, pose, (bone, mesh, inherited) -> inherited, context);
 	}
 
 	/**
-	 * Performs the instant draw operation.
-	 * @param poseStack the pose stack to use.
-	 * @param modelData the model data to use.
-	 * @param controllers the controllers to use.
-	 * @param renderType the render type to use.
-	 * @param color the color to use.
-	 * @param packedLight the packed light to use.
-	 * @param packedOverlay the packed overlay to use.
-	 * @param partialTick the partial tick to use.
+	 * Submits this bone's meshes and child bones using the supplied animation pose and material resolution.
+	 *
+	 * @param poseStack the current model-to-render pose stack
+	 * @param model the baked model supplying indexed bones and animations
+	 * @param pose the indexed bone pose
+	 * @param resolver the resolver
+	 * @param inherited the render inputs inherited from the parent bone or renderer
 	 */
-	public <T extends PAnimatable<T>>void instantDraw(PoseStack poseStack,
-	                                                  PModelData modelData,
-	                                                  Collection<PAnimationController<T>> controllers,
-	                                                  Function<Identifier, RenderType> renderType,
-	                                                  int color,
-	                                                  int packedLight,
-	                                                  int packedOverlay,
-	                                                  float partialTick)
+	public void instantDraw(PoseStack poseStack,
+	                        PBakedModel model,
+	                        PPose pose,
+	                        PMeshRenderResolver resolver,
+	                        PMeshRenderContext inherited)
+	{
+		int boneIndex = model.boneIndex(this);
+		if (!pose.isVisible(boneIndex))
+			return;
+		poseStack.pushPose();
+		try
+		{
+			poseStack.translate(pose.translation(boneIndex).x(), pose.translation(boneIndex).y(), pose.translation(boneIndex).z());
+			poseStack.mulPose(pose.rotation(boneIndex));
+			poseStack.scale(pose.scale(boneIndex).x(), pose.scale(boneIndex).y(), pose.scale(boneIndex).z());
+			Matrix4f matrix4fstack = new Matrix4f(RenderSystem.getModelViewMatrix());
+			matrix4fstack.mul(poseStack.last().pose());
+
+			PMeshRenderContext boneContext = inherited;
+			this.meshes().forEach(mesh -> drawMesh(mesh, this, resolver, boneContext, matrix4fstack));
+			this.children().forEach(child -> child.instantDraw(poseStack, model, pose, resolver, boneContext));
+		}
+		finally
+		{
+			poseStack.popPose();
+		}
+	}
+
+	/**
+	 * Submits this bone's meshes and child bones using the supplied animation pose and material resolution.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param poseStack the current model-to-render pose stack
+	 * @param modelData the canonical model and loader selection
+	 * @param controllers the animation controllers in pose composition order
+	 * @param renderType the render type
+	 * @param color the packed ARGB vertex color
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param packedOverlay the packed overlay texture coordinates
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 */
+	public <T extends PAnimatable<T>> void instantDraw(PoseStack poseStack,
+	                                                   PModelData modelData,
+	                                                   Collection<PAnimationController<T>> controllers,
+	                                                   Function<Identifier, RenderType> renderType,
+	                                                   int color,
+	                                                   int packedLight,
+	                                                   int packedOverlay,
+	                                                   float partialTick)
+	{
+		instantDraw(poseStack, modelData, controllers, Map.of(), renderType, color, packedLight, packedOverlay, partialTick);
+	}
+
+	/**
+	 * Submits this bone's meshes and child bones using the supplied animation pose and material resolution.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param poseStack the current model-to-render pose stack
+	 * @param modelData the canonical model and loader selection
+	 * @param controllers the animation controllers in pose composition order
+	 * @param molangContexts the frame-specific Molang context of each controller
+	 * @param renderType the render type
+	 * @param color the packed ARGB vertex color
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param packedOverlay the packed overlay texture coordinates
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 */
+	public <T extends PAnimatable<T>> void instantDraw(PoseStack poseStack,
+	                                                   PModelData modelData,
+	                                                   Collection<PAnimationController<T>> controllers,
+	                                                   Map<PAnimationController<T>, MolangParser.Context> molangContexts,
+	                                                   Function<Identifier, RenderType> renderType,
+	                                                   int color,
+	                                                   int packedLight,
+	                                                   int packedOverlay,
+	                                                   float partialTick)
 	{
 		PMeshRenderContext context = new PMeshRenderContext(
 				renderType,
 				color,
 				packedLight,
 				packedOverlay);
-		instantDraw(poseStack, modelData, controllers, (bone, mesh, inherited) -> inherited, context, partialTick);
+		instantDraw(poseStack, modelData, controllers, molangContexts, (bone, mesh, inherited) -> inherited, context, partialTick);
 	}
-	
+
 	/**
-	 * Performs the instant draw operation.
-	 * @param poseStack the pose stack to use.
-	 * @param modelData the model data to use.
-	 * @param controllers the controllers to use.
-	 * @param resolver the resolver to use.
-	 * @param inherited the inherited to use.
-	 * @param partialTick the partial tick to use.
+	 * Submits this bone's meshes and child bones using the supplied animation pose and material resolution.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param poseStack the current model-to-render pose stack
+	 * @param modelData the canonical model and loader selection
+	 * @param controllers the animation controllers in pose composition order
+	 * @param resolver the resolver
+	 * @param inherited the render inputs inherited from the parent bone or renderer
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
 	 */
-	public <T extends PAnimatable<T>>void instantDraw(PoseStack poseStack,
-	                                                  PModelData modelData,
-	                                                  Collection<PAnimationController<T>> controllers,
-	                                                  PMeshRenderResolver resolver,
-	                                                  PMeshRenderContext inherited,
-	                                                  float partialTick)
+	public <T extends PAnimatable<T>> void instantDraw(PoseStack poseStack,
+	                                                   PModelData modelData,
+	                                                   Collection<PAnimationController<T>> controllers,
+	                                                   PMeshRenderResolver resolver,
+	                                                   PMeshRenderContext inherited,
+	                                                   float partialTick)
+	{
+		instantDraw(poseStack, modelData, controllers, Map.of(), resolver, inherited, partialTick);
+	}
+
+	/**
+	 * Submits this bone's meshes and child bones using the supplied animation pose and material resolution.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param poseStack the current model-to-render pose stack
+	 * @param modelData the canonical model and loader selection
+	 * @param controllers the animation controllers in pose composition order
+	 * @param molangContexts the frame-specific Molang context of each controller
+	 * @param resolver the resolver
+	 * @param inherited the render inputs inherited from the parent bone or renderer
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 */
+	public <T extends PAnimatable<T>> void instantDraw(PoseStack poseStack,
+	                                                   PModelData modelData,
+	                                                   Collection<PAnimationController<T>> controllers,
+	                                                   Map<PAnimationController<T>, MolangParser.Context> molangContexts,
+	                                                   PMeshRenderResolver resolver,
+	                                                   PMeshRenderContext inherited,
+	                                                   float partialTick)
 	{
 		PAnimationPoseResolver<T> poseResolver = new PAnimationPoseResolver<>(
 				modelData.getModel(),
 				controllers,
-				PAnimationPoseResolver.defaultContexts(),
+				(controller, tick) ->
+				{
+					MolangParser.Context context = molangContexts.get(controller);
+					return context == null ? PAnimationPoseResolver.<T>defaultContexts().context(controller, tick) : context;
+				},
 				partialTick);
 		instantDraw(poseStack, poseResolver, resolver, inherited);
 	}
-	
+
 	/**
-	 * Performs the instant draw operation.
-	 * @param poseStack the pose stack to use.
-	 * @param poseResolver the pose resolver to use.
-	 * @param resolver the resolver to use.
-	 * @param inherited the inherited to use.
+	 * Renders this subtree from one resolved animation pose.
+	 *
+	 * @param poseStack the current model-to-render pose stack
+	 * @param poseResolver the pose resolver
+	 * @param resolver the resolver
+	 * @param inherited the render inputs inherited from the parent bone or renderer
 	 */
 	public void instantDraw(PoseStack poseStack,
 	                        PAnimationPoseResolver<?> poseResolver,
@@ -189,110 +240,52 @@ public class PBakedBone
 	{
 		if (!poseResolver.isVisible(this))
 			return;
-
-		BoneFrame frame = poseResolver.resolve(this).localTransform();
+		PAnimationPoseResolver.BonePose resolved = poseResolver.resolve(this);
+		if (resolved == null)
+			return;
+		BoneFrame frame = resolved.localTransform();
 		poseStack.pushPose();
-		poseStack.translate(frame.translation().x(), frame.translation().y(), frame.translation().z());
-		poseStack.mulPose(frame.rotation());
-		poseStack.scale(frame.scale().x(), frame.scale().y(), frame.scale().z());
-		
-		Minecraft mc = PLibRenderHelper.mc();
-		
-		TextureAtlas atlas = PResourceCache.getTextureAtlas();
-		Matrix4f matrix4fStack = new Matrix4f(RenderSystem.getModelViewMatrix());
-		matrix4fStack.mul(poseStack.last().pose());
-		GpuBufferSlice transforms = RenderSystem.getDynamicUniforms().
-				writeTransform(matrix4fStack, new Vector4f(1.0f, 1.0f, 1.0f, 1.0f), new Vector3f(), new Matrix4f());
-				
-		PMeshRenderContext boneContext = inherited;
-		this.meshes().forEach(mesh ->
+		try
 		{
-			if (mesh.textureReference().isEmpty())
-				return;
-			
-			PMeshRenderContext meshContext = resolver.resolve(this, mesh, boneContext);
-			PMeshRenderMaterial material = PMeshRenderMaterial.resolve(mesh, meshContext);
-			RenderType type = material.resolveInstantRenderType(meshContext, PResourceCache.ATLAS_LOCATION);
-
-			RenderTarget renderTarget = type.outputTarget().getRenderTarget();
-
-			GpuTextureView colorAttachment = RenderSystem.outputColorTextureOverride != null
-					? RenderSystem.outputColorTextureOverride
-					: renderTarget.getColorTextureView();
-
-			GpuTextureView depthTexture = renderTarget.useDepth
-					? (RenderSystem.outputDepthTextureOverride != null ? RenderSystem.outputDepthTextureOverride : renderTarget.getDepthTextureView())
-					: null;
-			
-			GpuTextureView lightTexture = mc.gameRenderer.levelLightmap();
-			OverlayTexture overlayTexture = mc.gameRenderer.overlayTexture();
-			
-			this.ensureBufferInitialized();
-			try (GpuBuffer.MappedView colorLightOverlayMappedView = RenderSystem.getDevice().
-					createCommandEncoder().
-					mapBuffer(this.colorLightOverlay.currentBuffer(), false, true))
-			{
-				int u = meshContext.packedOverlay() & 0xFFFF;
-				int v = (meshContext.packedOverlay() >> 16) & 0xFFFF;
-				
-				PGpuDeformerBuffers.Submission deformer = PGpuDeformerBuffers.submit(meshContext.deformation());
-				Std140Builder.intoBuffer(colorLightOverlayMappedView.data()).
-						putVec4(ARGB.vector4fFromARGB32(meshContext.color())).
-						putVec2(LightCoordsUtil.block(material.packedLight()), LightCoordsUtil.sky(material.packedLight())).
-						putIVec2(new Vector2i(u, v)).
-						putIVec4(deformer.operationOffset(), deformer.valueOffset(), deformer.operationCount(), 0);
-				
-			}
-			
-			PBakedMesh deformedMesh = PSubdividedMeshCache.resolve(material.mesh(), meshContext.deformation() == null ? 0 : meshContext.deformation().subdivisionLevel());
-			PGpuDeformerBuffers.Bindings deformerBuffers = PGpuDeformerBuffers.upload();
-			try(RenderPass pass = RenderSystem.getDevice().createCommandEncoder().
-					createRenderPass(mesh.uuid() :: toString, colorAttachment, OptionalInt.empty(), depthTexture, OptionalDouble.empty()))
-			{
-				pass.setPipeline(type.pipeline());
-				RenderSystem.bindDefaultUniforms(pass);
-				pass.setUniform("ColorOverlay", colorLightOverlay.currentBuffer());
-				pass.setUniform("DynamicTransforms", transforms);
-				pass.setUniform("DeformerOperations", deformerBuffers.operations());
-				pass.setUniform("DeformerValues", deformerBuffers.values());
-				pass.bindTexture("Sampler0", atlas.getTextureView(), atlas.getSampler());
-				pass.bindTexture("Sampler1", overlayTexture.getTextureView(), RenderSystem.getSamplerCache().getClampToEdge(FilterMode.LINEAR));
-				pass.bindTexture("Sampler2", lightTexture, RenderSystem.getSamplerCache().getClampToEdge(FilterMode.LINEAR));
-				pass.setVertexBuffer(0, deformedMesh.vbo());
-				pass.setIndexBuffer(deformedMesh.indices(), deformedMesh.indexType());
-				
-				pass.drawIndexed(0, 0, deformedMesh.indicesCount(), 1);
-			}
-		});
-		
-		this.children().forEach(children ->
-				children.instantDraw(poseStack, poseResolver, resolver, boneContext));
-		
-		poseStack.popPose();
+			poseStack.translate(frame.translation().x(), frame.translation().y(), frame.translation().z());
+			poseStack.mulPose(frame.rotation());
+			poseStack.scale(frame.scale().x(), frame.scale().y(), frame.scale().z());
+			Matrix4f matrix4fstack = new Matrix4f(RenderSystem.getModelViewMatrix());
+			matrix4fstack.mul(poseStack.last().pose());
+			this.meshes().forEach(mesh -> drawMesh(mesh, this, resolver, inherited, matrix4fstack));
+			this.children().forEach(child -> child.instantDraw(poseStack, poseResolver, resolver, inherited));
+		}
+		finally
+		{
+			poseStack.popPose();
+		}
 	}
-	
+
 	/**
-	 * Performs the mix bone operation.
-	 * @param model the model to use.
-	 * @param controllers the controllers to use.
-	 * @param partialTick the partial tick to use.
-	 * @return the value produced by this operation.
+	 * Samples the ordered controller contributions for this bone.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param model the baked model supplying indexed bones and animations
+	 * @param controllers the animation controllers in pose composition order
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the accumulated controller transform for this bone, or {@code null} when no animation channels contribute to the bone
 	 */
 	public <T extends PAnimatable<T>>@Nullable BoneFrame mixBone(
 			PBakedModel model,
-			Collection<PAnimationController<T>> controllers,
-			float partialTick)
+			Collection<PAnimationController<T>> controllers, float partialTick)
 	{
 		return mixBone(model, controllers, Map.of(), partialTick);
 	}
 
 	/**
-	 * Performs the mix bone operation.
-	 * @param model the model to use.
-	 * @param controllers the controllers to use.
-	 * @param molangContexts the molang contexts to use.
-	 * @param partialTick the partial tick to use.
-	 * @return the value produced by this operation.
+	 * Samples the ordered controller contributions for this bone.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param model the baked model supplying indexed bones and animations
+	 * @param controllers the animation controllers in pose composition order
+	 * @param molangContexts the frame-specific Molang context of each controller
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the accumulated controller transform for this bone, or {@code null} when no animation channels contribute to the bone
 	 */
 	public <T extends PAnimatable<T>>@Nullable BoneFrame mixBone(
 			PBakedModel model,
@@ -300,91 +293,61 @@ public class PBakedBone
 			Map<PAnimationController<T>, MolangParser.Context> molangContexts,
 			float partialTick)
 	{
-		PAnimationPoseResolver<T> resolver = new PAnimationPoseResolver<>(
+		PAnimationPoseResolver.LocalPose pose = PAnimationPoseResolver.resolveLocal(
+				this,
 				model,
 				controllers,
-				(controller, tick) -> molangContexts.getOrDefault(controller,
-						PAnimationPoseResolver.<T>defaultContexts().context(controller, tick)),
+				(controller, tick) ->
+				{
+					MolangParser.Context context = molangContexts.get(controller);
+					return context == null ? PAnimationPoseResolver.<T>defaultContexts().context(controller, tick) : context;
+				},
 				partialTick);
-		PAnimationPoseResolver.BonePose pose = resolver.resolve(this);
-		return pose.isAnimated() ? pose.localTransform() : null;
+		return pose.hasTranslation() || pose.hasRotation() || pose.hasScale() ? pose.localTransform() : null;
 	}
-	
+
 	/**
-	 * Performs the name operation.
-	 * @return the value produced by this operation.
+	 * Mutable hierarchy node used while converting source bones into baked render bones.
 	 */
-	public String name()
-	{
-		return this.name;
-	}
-	
-	/**
-	 * Performs the base position operation.
-	 * @return the value produced by this operation.
-	 */
-	public Vector3f basePosition()
-	{
-		return this.basePosition;
-	}
-	
-	/**
-	 * Performs the base rotation operation.
-	 * @return the value produced by this operation.
-	 */
-	public Quaternionf baseRotation()
-	{
-		return this.baseRotation;
-	}
-	
-	/**
-	 * Performs the children operation.
-	 * @return the value produced by this operation.
-	 */
-	public List<PBakedBone> children()
-	{
-		return this.children;
-	}
-	
-	/**
-	 * Performs the parent operation.
-	 * @return the value produced by this operation.
-	 */
-	@Nullable
-	public PBakedBone parent()
-	{
-		return this.parent;
-	}
-	
-	/**
-	 * Performs the meshes operation.
-	 * @return the value produced by this operation.
-	 */
-	public List<PBakedMesh> meshes()
-	{
-		return this.meshes;
-	}
-	
-/**
- * Builds baked bone.
- */
 	public static final class PBakedBoneBuilder
 	{
-		public final UUID uuid;
-		public final String name;
-		public final Vector3f basePosition;
-		public final Quaternionf baseRotation;
-		
-		public @Nullable PBakedBoneBuilder parent;
-		public final List<PBakedBoneBuilder> children = new ArrayList<>();
-		public final List<PBakedMesh> meshes = new ArrayList<>();
-		
 		/**
-		 * Creates an instance of the enclosing type.
-		 * @param uuid the uuid to use.
-		 * @param name the name to use.
-		 * @param basePosition the base position to use.
-		 * @param baseRotation the base rotation to use.
+		 * Source-model identity retained while linking the hierarchy.
+		 */
+		public final UUID uuid;
+		/**
+		 * Bone name used by animation tracks and attachment lookup.
+		 */
+		public final String name;
+		/**
+		 * Unanimated local bone position.
+		 */
+		public final Vector3f basePosition;
+		/**
+		 * Unanimated local bone rotation.
+		 */
+		public final Quaternionf baseRotation;
+
+		/**
+		 * Parent builder node, or {@code null} for a root bone.
+		 */
+		public @Nullable PBakedBoneBuilder parent;
+		/**
+		 * Child builder nodes linked below this bone.
+		 */
+		public final List<PBakedBoneBuilder> children = new ArrayList<>();
+		/**
+		 * Render-ready meshes attached to this bone.
+		 */
+		public final List<PBakedMesh> meshes = new ArrayList<>();
+
+		/**
+		 * Creates a mutable baked-bone hierarchy node with the supplied bind transform.
+		 *
+		 * @param uuid the stable source-model bone identity
+		 * @param name the name
+		 * @param basePosition the unanimated local bone position
+		 * @param baseRotation the unanimated local bone rotation
 		 */
 		public PBakedBoneBuilder(
 				UUID uuid,
@@ -397,5 +360,28 @@ public class PBakedBone
 			this.basePosition = basePosition;
 			this.baseRotation = baseRotation;
 		}
+	}
+
+	/** Compatibility overload using full-bright light coordinates. */
+	public <T extends PAnimatable<T>> void instantDraw(PoseStack poseStack, PModelData modelData,
+	                                                   Collection<PAnimationController<T>> controllers,
+	                                                   Function<Identifier, RenderType> renderType,
+	                                                   int color, int packedOverlay, float partialTick)
+	{
+		instantDraw(poseStack, modelData, controllers, renderType, color, 0xF000F0, packedOverlay, partialTick);
+	}
+
+	private static void drawMesh(PBakedMesh mesh, PBakedBone bone, PMeshRenderResolver resolver,
+	                             PMeshRenderContext inherited, Matrix4f modelView)
+	{
+		if (mesh.textureReference().isEmpty())
+			return;
+		PMeshRenderContext context = resolver.resolve(bone, mesh, inherited);
+		PMeshRenderMaterial material = PMeshRenderMaterial.resolve(mesh, context);
+		RenderType type = material.resolveRenderType(context, PResourceCache.ATLAS_LOCATION);
+		PRenderQueue.drawImmediate(type, material.mesh(), context.deformation(),
+				new PInstanceHeader(new Matrix4f(), context.color(), material.packedLight(), context.packedOverlay()),
+				new PRenderFrame(modelView,
+						new PGlRenderHost().captureFrame().projection()));
 	}
 }

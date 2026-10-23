@@ -13,6 +13,7 @@ package com.arcanc.pulselib.util;
 import com.arcanc.pulselib.content.model.*;
 import com.arcanc.pulselib.content.model.baked.*;
 import com.arcanc.pulselib.content.renderer.PRenderQueue;
+import com.arcanc.pulselib.content.renderer.legacy.GlGeometryDataFactory;
 import com.arcanc.pulselib.content.model.resource.PModelResource;
 import com.arcanc.pulselib.content.model.textures.PTextureAlphaClassifier;
 import com.arcanc.pulselib.content.model.textures.atlas.PLibSpriteMetadata;
@@ -22,14 +23,11 @@ import com.arcanc.pulselib.data.gecko.PGeckoModelLoader;
 import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.datafixers.util.Pair;
-import de.javagl.jgltf.model.GltfConstants;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.Identifier;
@@ -40,7 +38,6 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.jspecify.annotations.Nullable;
 
-import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -167,9 +164,8 @@ public class PModelCache
 	{
 		bone.meshes().forEach(mesh ->
 		{
-			PSubdividedMeshCache.close(mesh);
-			mesh.vbo().close();
-			mesh.indices().close();
+			PGpuDeformedMeshBuffers.close(mesh);
+			PDeformedMeshBuffers.close(mesh);
 		});
 		bone.children().forEach(PModelCache :: clearBoneCache);
 	}
@@ -291,28 +287,23 @@ public class PModelCache
 			boolean emissive = sprite.contents().getAdditionalMetadata(PLibSpriteMetadata.TYPE).
 					map(PLibSpriteMetadata :: emissive).
 					orElse(false);
-			ByteBufferBuilder bytes = ByteBufferBuilder.exactlySized(
-					primitive.vertexCount() * PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize());
-			BufferBuilder buffer = new AtlasBufferBuilder(bytes, VertexFormat.Mode.TRIANGLES,
-					PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL, sprite);
-			for (int vertex = 0; vertex < primitive.vertexCount(); vertex++)
-				buffer.addVertex(primitive.positions().get(vertex * 3), primitive.positions().get(vertex * 3 + 1), primitive.positions().get(vertex * 3 + 2)).
-						setUv(primitive.uvs().get(vertex * 2), primitive.uvs().get(vertex * 2 + 1)).
-						setNormal(primitive.normals().get(vertex * 3), primitive.normals().get(vertex * 3 + 1), primitive.normals().get(vertex * 3 + 2));
-
-			UUID primitiveUUID = UUID.randomUUID();
-			try (MeshData data = buffer.buildOrThrow())
+			try (ByteBufferBuilder bytes = ByteBufferBuilder.exactlySized(
+					primitive.vertexCount() * PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize()))
 			{
-				GpuBuffer vertices = RenderSystem.getDevice().createBuffer(primitiveUUID :: toString, GpuBuffer.USAGE_VERTEX, data.vertexBuffer());
-				ByteBuffer indices = primitive.indices().duplicate();
-				indices.clear();
-				GpuBuffer indexBuffer = RenderSystem.getDevice().createBuffer(
-						() -> primitiveUUID + "_indexes", GpuBuffer.USAGE_INDEX, indices);
-				VertexFormat.IndexType indexType = primitive.glIndexType() == GltfConstants.GL_UNSIGNED_SHORT ?
-						VertexFormat.IndexType.SHORT : VertexFormat.IndexType.INT;
-				builder.meshes.add(new PBakedMesh(primitiveUUID, vertices, primitive.vertexCount(), indexBuffer,
-						primitive.indicesCount(), indexType, textureReference, emissive,
-						PTextureAlphaClassifier.resolve(sprite.contents()), primitive, texture));
+				BufferBuilder buffer = new AtlasBufferBuilder(bytes, VertexFormat.Mode.TRIANGLES,
+						PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL, sprite);
+				for (int vertex = 0; vertex < primitive.vertexCount(); vertex++)
+					buffer.addVertex(primitive.positions().get(vertex * 3), primitive.positions().get(vertex * 3 + 1), primitive.positions().get(vertex * 3 + 2)).
+							setUv(primitive.uvs().get(vertex * 2), primitive.uvs().get(vertex * 2 + 1)).
+							setNormal(primitive.normals().get(vertex * 3), primitive.normals().get(vertex * 3 + 1), primitive.normals().get(vertex * 3 + 2));
+
+				UUID primitiveUUID = UUID.randomUUID();
+				try (MeshData data = buffer.buildOrThrow())
+				{
+					builder.meshes.add(new PBakedMesh(primitiveUUID,
+							GlGeometryDataFactory.capture(data, primitive, PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize()),
+							textureReference, emissive, PTextureAlphaClassifier.resolve(sprite.contents()), primitive, texture));
+				}
 			}
 		}
 		catch (RuntimeException exception)

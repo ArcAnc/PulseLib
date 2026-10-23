@@ -10,6 +10,7 @@
 package com.arcanc.pulselib.content.renderer.gl;
 
 import com.arcanc.pulselib.content.model.baked.PBakedMesh;
+import com.arcanc.pulselib.content.renderer.legacy.GlDynamicGeometry;
 import com.arcanc.pulselib.content.renderer.plan.PMeshHandle;
 import com.arcanc.pulselib.content.renderer.plan.PPipelineHandle;
 import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
@@ -79,16 +80,31 @@ public final class PGlResourceRegistry
 	/** Registers the supported Minecraft 26.1 dynamic geometry implementation. */
 	public PMeshHandle dynamic(PDynamicGeometry geometry)
 	{
-		if (!(geometry instanceof PGlDynamicGeometry source))
+		PGlDynamicGeometry source;
+		if (geometry instanceof GlDynamicGeometry facade)
+			source = facade.vertexBuffer();
+		else if (geometry instanceof PGlDynamicGeometry nativeSource)
+			source = nativeSource;
+		else
 			throw new IllegalArgumentException("Unsupported dynamic geometry for Minecraft 26.1: " + geometry.getClass().getName());
-		return this.dynamic.computeIfAbsent(source, resource -> register(resource));
+		source.geometry();
+		return this.dynamic.computeIfAbsent(source, resource ->
+		{
+			PMeshHandle handle = register(resource);
+			resource.onClose(this, () ->
+			{
+				this.dynamic.remove(resource);
+				this.meshResources.remove(handle);
+			});
+			return handle;
+		});
 	}
 
 	public int indexCount(PMeshHandle handle)
 	{
 		return switch (resource(handle))
 		{
-			case PBakedMesh mesh -> mesh.indicesCount();
+			case PBakedMesh mesh -> mesh.geometry().indexCount();
 			case PGeometryData data -> data.indexCount();
 			case PGlDynamicGeometry source -> source.geometry().indexCount();
 			default -> throw new IllegalStateException("Unknown geometry resource");
@@ -128,6 +144,7 @@ public final class PGlResourceRegistry
 		this.pipelineResources.clear();
 		this.meshes.clear();
 		this.geometry.clear();
+		this.dynamic.keySet().forEach(source -> source.removeCloseListener(this));
 		this.dynamic.clear();
 		this.meshResources.clear();
 	}

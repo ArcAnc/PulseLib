@@ -1,0 +1,31 @@
+CLIENT
+[21:44:27] [Render thread/INFO] [co.ar.pu.te.st.Stage1Client/]: STAGE 2 CAMERA SERVICE PASS: com.arcanc.pulselib.neoforge.NeoForgeCameraService
+[21:44:29] [Render thread/INFO] [Pulse Lib/]: STAGE 3.2 RENDERER TIME PASS: 60 assertions, Entity/BlockEntity/Item, interpolated seconds
+[21:44:30] [Render thread/INFO] [Pulse Lib/]: STAGE 3.2 VANILLA LIGHT INPUTS: tick=100, leftSky=15, rightSky=15, leftRaw=15, rightRaw=15
+[21:44:30] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1b.2 BAKED PASS: tick=100, modelTriangles=338, direct draw preserves queue/pose, visibility, materials, CPU fallback readback, GPU subdivision/deformer UBO, owners=7, dataLookups=6405, modelLookups=1494
+[21:44:30] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1b.1 GEOMETRY PASS: tick=100, frames=256, primitives=36, 16/32-bit indices, static/dynamic bytes match GPU, slots<=9
+[21:44:30] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1a PLAN BACKEND PASS: tick=100, meshes=19, strategies=PRenderCapabilities[storageMode=CPU, submissionMode=MULTI_DRAW_INDIRECT, uploadMode=PERSISTENT_RING, matrix=PRenderCapabilityMatrix[texelBuffer=true, shaderStorageBuffer=true, multiDrawIndirect=true, baseInstance=true, persistentMapping=true]], projection UBO matches CPU capture
+[21:44:35] [Render thread/INFO] [Pulse Lib/]: STAGE 3.2 VANILLA LIGHT INPUTS: tick=210, leftSky=15, rightSky=15, leftRaw=15, rightRaw=15
+[21:44:36] [Render thread/INFO] [Pulse Lib/]: STAGE 3.3 GRAPH RENDER PASS: owners=2, zero/reverse overlay, RESTART, reload, time=124.0
+[21:44:36] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1b.2 BAKED PASS: tick=230, modelTriangles=338, direct draw preserves queue/pose, visibility, materials, CPU fallback readback, GPU subdivision/deformer UBO, owners=7, dataLookups=14620, modelLookups=3438
+[21:44:36] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1b.1 GEOMETRY PASS: tick=230, frames=602, primitives=36, 16/32-bit indices, static/dynamic bytes match GPU, slots<=9
+[21:44:36] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1a PLAN BACKEND PASS: tick=230, meshes=19, strategies=PRenderCapabilities[storageMode=CPU, submissionMode=MULTI_DRAW_INDIRECT, uploadMode=PERSISTENT_RING, matrix=PRenderCapabilityMatrix[texelBuffer=true, shaderStorageBuffer=true, multiDrawIndirect=true, baseInstance=true, persistentMapping=true]], projection UBO matches CPU capture
+[21:44:40] [Render thread/INFO] [Pulse Lib/]: STAGE 2 CLIENT PLUGINS PASS: ids=[pulselib:stage1_client, pulselib:stage2_common], common=1, channels=1, events=1, deformers=1, client=1, server=0, models=2
+[21:44:40] [Render thread/INFO] [co.ar.pu.te.st.Stage1Client/]: STAGE 1.2 WORLD SMOKE: entity=1614, block=1419, item=1617
+[21:44:40] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1b.2 BAKED SHUTDOWN PASS: dynamic sources closed after normal cleanup
+[21:44:40] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1b.1 GEOMETRY SHUTDOWN PASS: static/dynamic pages=0, pass-state buffers released
+[21:44:40] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1a PLAN SHUTDOWN PASS: handles=0, frame projection released
+[21:44:40] [Render thread/INFO] [Pulse Lib/]: STAGE 3.1 MANAGER SHUTDOWN PASS: singleton=0, instance=0, surviving ID retained
+[21:44:40] [Render thread/INFO] [minecraft/Minecraft]: Stopping!
+BUILD SUCCESSFUL in 34s
+SERVER
+[21:43:47] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved
+[21:43:47] [Server thread/INFO] [Pulse Lib/]: STAGE 2 SERVER PLUGINS PASS: ids=[pulselib:stage2_common, pulselib:stage2_server], common=1, channels=1, events=1, deformers=1, client=0, server=1, models=0
+[21:46:28] [Server thread/INFO] [minecraft/MinecraftServer]: Stopping server
+[21:46:29] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved
+[21:46:29] [main/INFO] [ne.ne.fm.lo.FMLLoader/]: Closing FML Loader 5036b031
+BUILD SUCCESSFUL in 3m 8s
+INITIAL FAILED PROBE (not a PASS)
+Expected raw texture ID; actual contract stores PResourceCache.spriteId(texture).
+java.lang.AssertionError: Texture override must select the requested atlas sprite
+Minecraft exit 255, Gradle exit 1. Fixture expectation corrected; GPU assertions retained.

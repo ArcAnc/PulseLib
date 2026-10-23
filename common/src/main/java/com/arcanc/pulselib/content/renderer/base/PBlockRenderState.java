@@ -65,8 +65,8 @@ public interface PBlockRenderState<T extends BlockEntity & PAnimatable<T>> exten
 		{
 			this.extractData();
 			BlockEntityRenderState.extractBase(blockEntity, this, breakProgress);
-			this.model = renderer.getModel((RS) this);
 			this.animatable = blockEntity;
+			this.model = renderer.getModel((RS) this);
 			this.key = AnimManagerKey.of(blockEntity);
 		}
 		

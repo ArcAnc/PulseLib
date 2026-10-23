@@ -11,43 +11,41 @@ package com.arcanc.pulselib.content.model.baked;
 
 import com.arcanc.pulselib.content.model.PMeshPrimitive;
 import com.arcanc.pulselib.content.model.textures.PTextureAlphaClassifier;
+import com.arcanc.pulselib.content.renderer.legacy.GlGeometryDataFactory;
+import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
 import com.arcanc.pulselib.content.model.textures.atlas.PLibSpriteMetadata;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.arcanc.pulselib.util.PResourceCache;
-import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.Identifier;
+import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
 
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
 /**
- * Provides support for mesh texture variants.
+ * Caches baked mesh variants that use overridden texture resources.
  */
 public final class PMeshTextureVariants
 {
 	private static final Map<PBakedMesh, Map<Identifier, PBakedMesh>> VARIANTS = new IdentityHashMap<>();
 
-	/**
-	 * Creates an instance of the enclosing type.
-	 */
 	private PMeshTextureVariants()
 	{
 	}
 
 	/**
-	 * Performs the resolve operation.
-	 * @param mesh the mesh to use.
-	 * @param texture the texture to use.
-	 * @return the value produced by this operation.
+	 * Returns a mesh variant using the supplied texture.
+	 *
+	 * @param mesh the baked mesh geometry and material
+	 * @param texture the texture resource location; may be {@code null}
+	 * @return a mesh variant using the supplied texture
 	 */
 	public static PBakedMesh resolve(PBakedMesh mesh, @Nullable Identifier texture)
 	{
@@ -61,51 +59,43 @@ public final class PMeshTextureVariants
 	}
 
 	/**
-	 * Performs the clear operation.
+	 * Discards cached mesh texture variants.
 	 */
+	@ApiStatus.Internal
 	public static void clear()
 	{
 		for (Map<Identifier, PBakedMesh> variants : VARIANTS.values())
 			for (PBakedMesh variant : variants.values())
 			{
-				PSubdividedMeshCache.close(variant);
-				variant.vbo().close();
-				variant.indices().close();
+				PDeformedMeshBuffers.close(variant);
+				PGpuDeformedMeshBuffers.close(variant);
 			}
 		VARIANTS.clear();
 	}
 
-	/**
-	 * Performs the bake operation.
-	 * @param base the base to use.
-	 * @param texture the texture to use.
-	 * @return the value produced by this operation.
-	 */
 	private static PBakedMesh bake(PBakedMesh base, Identifier texture)
 	{
 		PMeshPrimitive source = base.source();
 		TextureAtlasSprite sprite = PResourceCache.getTextureAtlas().getSprite(texture);
 		boolean emissive = sprite.contents().getAdditionalMetadata(PLibSpriteMetadata.TYPE).
 				map(PLibSpriteMetadata :: emissive).orElse(false);
-		ByteBufferBuilder bytes = ByteBufferBuilder.exactlySized(
-				source.vertexCount() * PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize());
-		BufferBuilder builder = sprite.contents().name().getPath().equals("missingno")
-				? new BufferBuilder(bytes, VertexFormat.Mode.TRIANGLES, PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL)
-				: new AtlasBufferBuilder(bytes, VertexFormat.Mode.TRIANGLES, PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL, sprite);
-		for (int vertex = 0; vertex < source.vertexCount(); vertex++)
-			builder.addVertex(source.positions().get(vertex * 3), source.positions().get(vertex * 3 + 1), source.positions().get(vertex * 3 + 2)).
-					setUv(source.uvs().get(vertex * 2), source.uvs().get(vertex * 2 + 1)).
-					setNormal(source.normals().get(vertex * 3), source.normals().get(vertex * 3 + 1), source.normals().get(vertex * 3 + 2));
-		try (MeshData data = builder.buildOrThrow())
+		try (ByteBufferBuilder bytes = new ByteBufferBuilder(source.vertexCount() * PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize()))
 		{
-			GpuBuffer vertices = RenderSystem.getDevice().createBuffer(
-					() -> base.uuid() + "_" + texture + "_vertices", GpuBuffer.USAGE_VERTEX, data.vertexBuffer());
-			ByteBuffer indices = source.indices().duplicate();
-			indices.clear();
-			GpuBuffer indexBuffer = RenderSystem.getDevice().createBuffer(
-					() -> base.uuid() + "_" + texture + "_indices", GpuBuffer.USAGE_INDEX, indices);
-			return new PBakedMesh(base.uuid(), vertices, source.vertexCount(), indexBuffer, source.indicesCount(),
-					base.indexType(), base.textureReference(), emissive, PTextureAlphaClassifier.resolve(sprite.contents()), source, texture);
+			BufferBuilder builder = sprite.contents().name().getPath().equals("missingno") ?
+					new BufferBuilder(bytes, VertexFormat.Mode.TRIANGLES, PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL) :
+					new AtlasBufferBuilder(bytes, VertexFormat.Mode.TRIANGLES, PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL, sprite);
+			for (int vertex = 0; vertex < source.vertexCount(); vertex++)
+				builder.addVertex(source.positions().get(vertex * 3), source.positions().get(vertex * 3 + 1), source.positions().get(vertex * 3 + 2)).
+						setUv(source.uvs().get(vertex * 2), source.uvs().get(vertex * 2 + 1)).
+						setNormal(source.normals().get(vertex * 3), source.normals().get(vertex * 3 + 1), source.normals().get(vertex * 3 + 2));
+			PGeometryData geometry;
+			try (MeshData data = builder.buildOrThrow())
+			{
+				geometry = GlGeometryDataFactory.capture(data, source,
+						PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize());
+			}
+			return new PBakedMesh(base.uuid(), geometry, base.textureReference(), emissive,
+					PTextureAlphaClassifier.resolve(sprite.contents()), source, texture);
 		}
 	}
 }

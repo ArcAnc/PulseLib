@@ -9,6 +9,7 @@
 
 package com.arcanc.pulselib.content.renderer.gl;
 
+import com.arcanc.pulselib.content.renderer.legacy.GlDynamicGeometry;
 import com.arcanc.pulselib.content.renderer.plan.PDynamicGeometry;
 import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
 import org.junit.jupiter.api.Test;
@@ -78,6 +79,42 @@ class PGlGeometrySourceTest
 		assertThrows(IllegalArgumentException.class, () -> PGlGeometryArena.validate(geometry(3), 32));
 		var truncated = new PGeometryData(ByteBuffer.allocate(25), ByteBuffer.allocate(6), 24, 3, PGeometryData.IndexType.UNSIGNED_SHORT);
 		assertThrows(IllegalArgumentException.class, () -> PGlGeometryArena.validate(truncated, 24));
+	}
+
+	@Test
+	void canonicalFacadeAndBackendSourceShareOneHandleAndCloseInvalidatesIt()
+	{
+		var registry = new PGlResourceRegistry();
+		var facade = new GlDynamicGeometry();
+		facade.vertexBuffer().update(geometry(6));
+		var handle = registry.dynamic(facade);
+		assertSame(handle, registry.dynamic(facade.vertexBuffer()));
+		assertEquals(6, facade.indexCount());
+		facade.close();
+		facade.close();
+		assertThrows(IllegalStateException.class, () -> registry.indexCount(handle));
+		assertThrows(IllegalStateException.class, () -> registry.dynamic(facade));
+		assertThrows(IllegalStateException.class, () -> facade.vertexBuffer().update(geometry(3)));
+	}
+
+	@Test
+	void closeNotifiesEachOwnerOnceAndClearDetachesOnlyThatRegistry()
+	{
+		var source = new PGlDynamicGeometry(geometry(3));
+		var first = new PGlResourceRegistry();
+		var second = new PGlResourceRegistry();
+		var detached = first.dynamic(source);
+		var active = second.dynamic(source);
+		first.clear();
+		assertThrows(IllegalStateException.class, () -> first.indexCount(detached));
+		assertEquals(3, second.indexCount(active));
+		int[] closes = {0};
+		source.onClose(this, () -> closes[0]++);
+		source.close();
+		source.close();
+		assertEquals(1, closes[0]);
+		assertThrows(IllegalStateException.class, () -> second.indexCount(active));
+		assertThrows(IllegalStateException.class, source::geometry);
 	}
 
 	private static PGeometryData geometry(int indices)

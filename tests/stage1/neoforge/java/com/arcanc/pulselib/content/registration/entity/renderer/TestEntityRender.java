@@ -10,7 +10,10 @@
 package com.arcanc.pulselib.content.registration.entity.renderer;
 
 
+import com.arcanc.pulselib.content.model.baked.PBakedModel;
+import org.jspecify.annotations.Nullable;
 import com.arcanc.pulselib.test.stage1.Stage1Client;
+import com.arcanc.pulselib.test.stage1.Stage41b2BakedProbe;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -53,6 +56,22 @@ public class TestEntityRender extends PEntityRenderer<TestEntity, PEntityRenderS
 					ARM_HINGE_ANGLE))));
 	private final Object leftArmHingeKey = new Object();
 	private final Object rightArmHingeKey = new Object();
+
+	@Override
+	public PModelData getModelData(TestEntity animatable)
+	{
+		if (Boolean.getBoolean("pulselib.stage41b2Probe"))
+			Stage41b2BakedProbe.ownerLookup(animatable);
+		return super.getModelData(animatable);
+	}
+
+	@Override
+	public @Nullable PBakedModel getModel(TestEntity animatable)
+	{
+		if (Boolean.getBoolean("pulselib.stage41b2Probe"))
+			Stage41b2BakedProbe.ownerModelLookup(animatable);
+		return super.getModel(animatable);
+	}
 
 	/**
 	 * Creates an instance of the enclosing type.

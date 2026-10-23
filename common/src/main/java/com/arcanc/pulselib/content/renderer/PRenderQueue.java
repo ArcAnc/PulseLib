@@ -11,13 +11,18 @@ package com.arcanc.pulselib.content.renderer;
 
 
 import com.arcanc.pulselib.content.model.baked.PBakedMesh;
-import com.arcanc.pulselib.content.model.baked.PSubdividedMeshCache;
+import com.arcanc.pulselib.content.model.baked.PGpuDeformedMeshBuffers;
 import com.arcanc.pulselib.content.model.deformer.PMeshDeformation;
 import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
 import com.arcanc.pulselib.content.renderer.gl.PGlMultiDrawExecutor;
 import com.arcanc.pulselib.content.renderer.gl.PGlResourceRegistry;
 import com.arcanc.pulselib.content.renderer.plan.PFrameCompiler;
 import com.arcanc.pulselib.content.renderer.plan.PInstanceHeader;
+import com.arcanc.pulselib.content.renderer.plan.PDrawCommand;
+import com.arcanc.pulselib.content.renderer.plan.PDrawGroup;
+import com.arcanc.pulselib.content.renderer.plan.PRenderPlan;
+import com.arcanc.pulselib.content.renderer.plan.PRenderFrame;
+import com.arcanc.pulselib.content.model.baked.PDeformedMeshBuffers;
 import com.arcanc.pulselib.content.renderer.plan.PPipelineHandle;
 import com.arcanc.pulselib.content.renderer.plan.PMeshHandle;
 import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
@@ -325,13 +330,38 @@ public final class PRenderQueue
 	                           InstanceData data,
 	                           boolean transparent)
 	{
-		PBakedMesh subdividedMesh = PSubdividedMeshCache.resolve(mesh, deformation == null ? 0 : deformation.subdivisionLevel());
-		PGpuDeformerBuffers.Submission deformer = PGpuDeformerBuffers.submit(deformation);
-		PInstanceHeader header = new PInstanceHeader(data.posMatrix(), data.packedColor(), data.packedLight(), data.packedOverlay(),
-				deformer.operationOffset(), deformer.valueOffset(), deformer.operationCount());
-		COMPILER.submit(stage, RESOURCES.pipeline(type), RESOURCES.mesh(subdividedMesh), subdividedMesh.indicesCount(), header, transparent);
+		PreparedMesh prepared = prepare(mesh, deformation, data.header());
+		COMPILER.submit(stage, RESOURCES.pipeline(type), prepared.mesh(), prepared.indexCount(), prepared.header(), transparent);
 	}
-	
+
+	/** Executes direct bone/model drawing without consuming or appending world submissions. */
+	public static void drawImmediate(RenderType type, PBakedMesh mesh, @Nullable PMeshDeformation deformation,
+	                                 PInstanceHeader data, PRenderFrame frame)
+	{
+		PreparedMesh prepared = prepare(mesh, deformation, data);
+		var group = new PDrawGroup(RESOURCES.pipeline(type), prepared.mesh(),
+				new PDrawCommand(prepared.indexCount(), 1, 0, 0, 0), !PRenderTypes.isTransparent(type), List.of(prepared.header()));
+		EXECUTOR.executeImmediate(new PRenderPlan(List.of(group)), frame);
+	}
+
+	private static PreparedMesh prepare(PBakedMesh mesh, @Nullable PMeshDeformation deformation, PInstanceHeader data)
+	{
+		PGpuDeformerBuffers.Submission deformer = PGpuDeformerBuffers.submit(deformation);
+		PInstanceHeader header = new PInstanceHeader(data.transform(), data.packedColor(), data.packedLight(), data.packedOverlay(),
+				deformer.operationOffset(), deformer.valueOffset(), deformer.operationCount());
+		if (deformation != null && !deformation.stack().isEmpty() && deformer.operationCount() == 0)
+		{
+			PMeshHandle handle = RESOURCES.dynamic(PDeformedMeshBuffers.resolve(mesh, deformation));
+			return new PreparedMesh(handle, RESOURCES.indexCount(handle), header);
+		}
+		var geometry = PGpuDeformedMeshBuffers.resolve(mesh, deformation == null ? 0 : deformation.subdivisionLevel());
+		return new PreparedMesh(RESOURCES.geometry(geometry), geometry.indexCount(), header);
+	}
+
+	private record PreparedMesh(PMeshHandle mesh, int indexCount, PInstanceHeader header)
+	{
+	}
+
 	/**
 	 * Performs the flush operation.
 	 * @param stage the stage to use.
@@ -377,6 +407,8 @@ public final class PRenderQueue
 	{
 		COMPILER.clear();
 		EXECUTOR.cleanup();
+		PDeformedMeshBuffers.cleanup();
+		PGpuDeformedMeshBuffers.cleanup();
 		PGpuDeformerBuffers.cleanup();
 	}
 

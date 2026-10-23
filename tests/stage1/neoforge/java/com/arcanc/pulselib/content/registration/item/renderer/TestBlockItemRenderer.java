@@ -10,7 +10,10 @@
 package com.arcanc.pulselib.content.registration.item.renderer;
 
 
+import com.arcanc.pulselib.content.model.baked.PBakedModel;
+import org.jspecify.annotations.Nullable;
 import com.arcanc.pulselib.test.stage1.Stage1Client;
+import com.arcanc.pulselib.test.stage1.Stage41b2BakedProbe;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -34,6 +37,22 @@ public class TestBlockItemRenderer extends PItemRenderer<TestBlockItem, TestBloc
 	public static final Identifier CIRCLE = PLibDatabase.rl("item/test_block/circle");
 	public static final Identifier PYRAMID = PLibDatabase.rl("item/test_block/pyramid");
 	
+	@Override
+	public PModelData getModelData(TestBlockItem animatable)
+	{
+		if (Boolean.getBoolean("pulselib.stage41b2Probe"))
+			Stage41b2BakedProbe.ownerLookup(animatable);
+		return super.getModelData(animatable);
+	}
+
+	@Override
+	public @Nullable PBakedModel getModel(TestBlockItem animatable)
+	{
+		if (Boolean.getBoolean("pulselib.stage41b2Probe"))
+			Stage41b2BakedProbe.ownerModelLookup(animatable);
+		return super.getModel(animatable);
+	}
+
 	/**
 	 * Creates an instance of the enclosing type.
 	 * @param modelData the model data to use.

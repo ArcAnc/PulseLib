@@ -80,9 +80,23 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 	@Override
 	public PModelData getModelData(RS renderState)
 	{
-		return this.modelData;
+		return getModelData(renderState.getAnimatable());
 	}
 	
+	/** Selects the canonical model data for an owner during extraction and submission. */
+	@Override
+	public PModelData getModelData(T animatable)
+	{
+		return this.modelData;
+	}
+
+	/** Returns the baked model selected for the supplied owner, or null before resource load. */
+	@Override
+	public @Nullable PBakedModel getModel(T animatable)
+	{
+		return getModelData(animatable).getModel();
+	}
+
 	/**
 	 * Returns the model.
 	 * @param renderState the render state to use.
@@ -91,7 +105,7 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 	@Override
 	public @Nullable PBakedModel getModel(RS renderState)
 	{
-		return getModelData(renderState).getModel();
+		return getModel(renderState.getAnimatable());
 	}
 	
 	/**
@@ -167,7 +181,7 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 	@Override
 	public void trueSubmit(PoseStack poseStack, RS renderState, CameraRenderState cameraRenderState, SubmitNodeCollector submitNodeCollector)
 	{
-		PBakedModel model = this.getModelData(renderState).getModel();
+		PBakedModel model = renderState.getBakedModel();
 		if (model == null)
 		{
 			return;
@@ -209,7 +223,7 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 	protected void perBoneSubmit(RS renderState, PoseStack poseStack, PBakedBone bone, Collection<PAnimationController<T>> controllers, Map<PAnimationController<T>, MolangParser.Context> molangContexts, Function<Identifier, RenderType> renderType, int packedColor, int packedLight, int packedOverlay)
 	{
 		PModelData data = this.getModelData(renderState);
-		PAnimationPoseResolver<T> poseResolver = PRenderPoseContexts.resolve(data.getModel(), controllers, molangContexts, renderState.partialTick());
+		PAnimationPoseResolver<T> poseResolver = PRenderPoseContexts.resolve(renderState.getBakedModel(), controllers, molangContexts, renderState.partialTick());
 		if (!poseResolver.isVisible(bone))
 		{
 			return;
