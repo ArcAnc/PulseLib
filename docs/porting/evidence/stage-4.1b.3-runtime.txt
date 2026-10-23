@@ -1,0 +1,30 @@
+CLIENT
+[22:31:58] [Render thread/INFO] [co.ar.pu.te.st.Stage1Client/]: STAGE 2 CAMERA SERVICE PASS: com.arcanc.pulselib.neoforge.NeoForgeCameraService
+[22:32:00] [Render thread/INFO] [Pulse Lib/]: STAGE 3.2 RENDERER TIME PASS: 60 assertions, Entity/BlockEntity/Item, interpolated seconds
+[22:32:01] [Render thread/INFO] [Pulse Lib/]: STAGE 3.2 VANILLA LIGHT INPUTS: tick=100, leftSky=15, rightSky=15, leftRaw=15, rightRaw=15
+[22:32:01] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1b.3 RENDERER PASS: tick=100, contexts=16, owner/state/submit/traversal hooks, sibling isolation, deferred forward-bound layer, Molang=4/4/8, GPU primitives=384, exception pose/state recovery, sleeping/head snapshots, layer modelSelections=1
+[22:32:01] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1b.2 BAKED PASS: tick=100, modelTriangles=338, direct draw preserves queue/pose, visibility, materials, CPU fallback readback, GPU subdivision/deformer UBO, owners=5, dataLookups=6662, modelLookups=1540
+[22:32:01] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1b.1 GEOMETRY PASS: tick=100, frames=259, primitives=36, 16/32-bit indices, static/dynamic bytes match GPU, slots<=9
+[22:32:01] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1a PLAN BACKEND PASS: tick=100, meshes=21, strategies=PRenderCapabilities[storageMode=CPU, submissionMode=MULTI_DRAW_INDIRECT, uploadMode=PERSISTENT_RING, matrix=PRenderCapabilityMatrix[texelBuffer=true, shaderStorageBuffer=true, multiDrawIndirect=true, baseInstance=true, persistentMapping=true]], projection UBO matches CPU capture
+[22:32:06] [Render thread/INFO] [Pulse Lib/]: STAGE 3.2 VANILLA LIGHT INPUTS: tick=210, leftSky=15, rightSky=15, leftRaw=15, rightRaw=15
+[22:32:07] [Render thread/INFO] [Pulse Lib/]: STAGE 3.3 GRAPH RENDER PASS: owners=2, zero/reverse overlay, RESTART, reload, time=124.0
+[22:32:07] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1b.3 RENDERER PASS: tick=230, contexts=16, owner/state/submit/traversal hooks, sibling isolation, deferred forward-bound layer, Molang=4/4/8, GPU primitives=8192, exception pose/state recovery, sleeping/head snapshots, layer modelSelections=1
+[22:32:07] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1b.2 BAKED PASS: tick=230, modelTriangles=338, direct draw preserves queue/pose, visibility, materials, CPU fallback readback, GPU subdivision/deformer UBO, owners=5, dataLookups=14815, modelLookups=3423
+[22:32:07] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1b.1 GEOMETRY PASS: tick=230, frames=604, primitives=36, 16/32-bit indices, static/dynamic bytes match GPU, slots<=9
+[22:32:07] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1a PLAN BACKEND PASS: tick=230, meshes=21, strategies=PRenderCapabilities[storageMode=CPU, submissionMode=MULTI_DRAW_INDIRECT, uploadMode=PERSISTENT_RING, matrix=PRenderCapabilityMatrix[texelBuffer=true, shaderStorageBuffer=true, multiDrawIndirect=true, baseInstance=true, persistentMapping=true]], projection UBO matches CPU capture
+[22:32:11] [Render thread/INFO] [Pulse Lib/]: STAGE 2 CLIENT PLUGINS PASS: ids=[pulselib:stage1_client, pulselib:stage2_common], common=1, channels=1, events=1, deformers=1, client=1, server=0, models=2
+[22:32:11] [Render thread/INFO] [co.ar.pu.te.st.Stage1Client/]: STAGE 1.2 WORLD SMOKE: entity=1500, block=1419, item=1623
+[22:32:11] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1b.3 RENDERER SHUTDOWN PASS: two complete probe passes, existing GPU/manager cleanup checks retained
+[22:32:11] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1b.2 BAKED SHUTDOWN PASS: dynamic sources closed after normal cleanup
+[22:32:11] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1b.1 GEOMETRY SHUTDOWN PASS: static/dynamic pages=0, pass-state buffers released
+[22:32:11] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1a PLAN SHUTDOWN PASS: handles=0, frame projection released
+[22:32:11] [Render thread/INFO] [Pulse Lib/]: STAGE 3.1 MANAGER SHUTDOWN PASS: singleton=0, instance=0, surviving ID retained
+[22:32:11] [Render thread/INFO] [minecraft/Minecraft]: Stopping!
+BUILD SUCCESSFUL in 35s
+SERVER
+[22:31:28] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved
+[22:31:28] [Server thread/INFO] [Pulse Lib/]: STAGE 2 SERVER PLUGINS PASS: ids=[pulselib:stage2_common, pulselib:stage2_server], common=1, channels=1, events=1, deformers=1, client=0, server=1, models=0
+[22:33:42] [Server thread/INFO] [minecraft/MinecraftServer]: Stopping server
+[22:33:43] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved
+[22:33:43] [main/INFO] [ne.ne.fm.lo.FMLLoader/]: Closing FML Loader 51045cc3
+BUILD SUCCESSFUL in 2m 32s

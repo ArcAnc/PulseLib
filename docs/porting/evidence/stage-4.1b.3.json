@@ -1,0 +1,381 @@
+{
+  "stage": "4.1b.3",
+  "status": "COMPLETE_CHECKPOINT_STAGE_4_PARTIAL",
+  "date": "2026-10-23",
+  "branch": "26.1.2-multiloader",
+  "parentCommit": "5320b29986cb9358df7aec95718b944881a8d4f5",
+  "sourceRefs": {
+    "26.1": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1",
+    "1.21.1-multiloader": "7ce6f024b307bb821ce543344d3896c8e1fcf26b"
+  },
+  "commitSubject": "feat: preserve canonical renderer hooks and inherited contexts (stage 4.1b.3)",
+  "commands": [
+    {
+      "command": "./gradlew build stage2Evidence :neoforge:compileStage1SmokeJava -PpulseStage1Smoke -I docs/porting/tools/stage2-evidence.gradle -I /tmp/pulselib-stage41b3/index-check.gradle --no-daemon --console=plain",
+      "exitCode": 0,
+      "log": {
+        "path": "/tmp/pulselib-stage41b3/build.log",
+        "sha256": "98856a27971663258bfd2b1831761c8aa54ebff09e3de1e57825f2f037feda24"
+      }
+    },
+    {
+      "command": "./gradlew :neoforge:runClient -PpulseStage1Smoke -PpulseStage2Probe -PpulseStage31Probe -PpulseStage32Probe -PpulseStage33Probe -PpulseStage41Probe -PpulseStage41bProbe -PpulseStage41b2Probe -PpulseStage41b3Probe -PpulseVerificationDir=stage41b3-runs --no-daemon --console=plain",
+      "exitCode": 0,
+      "normalTermination": "Minecraft.stop",
+      "log": {
+        "path": "/tmp/pulselib-stage41b3/client.log",
+        "sha256": "c58ab8059167fd88a4d91cbd31d17d7bba317db06c799e38d6163e7786b18100"
+      }
+    },
+    {
+      "command": "./gradlew :neoforge:runServer -PpulseStage1Smoke -PpulseStage2Probe -PpulseStage31Probe -PpulseStage32Probe -PpulseStage33Probe -PpulseStage41Probe -PpulseStage41bProbe -PpulseStage41b2Probe -PpulseStage41b3Probe -PpulseVerificationDir=stage41b3-runs --no-daemon --console=plain",
+      "exitCode": 0,
+      "normalTermination": "console stop; all dimensions saved; FML close",
+      "log": {
+        "path": "/tmp/pulselib-stage41b3/server.log",
+        "sha256": "05dd638363f66a829d28dfc913e048861b345da05722438715e4281f0c096551"
+      }
+    }
+  ],
+  "api": {
+    "renderer": {
+      "path": "docs/porting/evidence/stage-4.1b.3-renderer-api.json",
+      "sha256": "8caefc75241d8333d24bc86f2938ff0bd3f663cc6aef1ba233a338b745ecd829"
+    },
+    "baked": {
+      "path": "docs/porting/evidence/stage-4.1b.3-baked-api.json",
+      "sha256": "74d531c331da83a2ecf62b6badb256eea39c057af9f6026018f54289a06680fb"
+    },
+    "render-plan": {
+      "path": "docs/porting/evidence/stage-4.1b.3-render-plan-api.json",
+      "sha256": "15b7752da8588cde4c7217cfe22ec0e30706426d720be78ea2f94af2491ca46a"
+    },
+    "animation": {
+      "path": "docs/porting/evidence/stage-4.1b.3-animation-api.json",
+      "sha256": "6f9456cc3e98fb03ac5108342c319fc3185037a2ef471fbf3d71e136da957c55"
+    },
+    "manager": {
+      "path": "docs/porting/evidence/stage-4.1b.3-manager-api.json",
+      "sha256": "7301dc3446c2adba9e8bf40c7475f26df9ee83cb1f6f6ebe9fd17e1d147db8e8"
+    },
+    "plugin": {
+      "path": "docs/porting/evidence/stage-4.1b.3-plugin-api.json",
+      "sha256": "c8f0b1bf32fc77b20c8e13925d308344bcbf0a9ee0b6c9316f7d59b4e1e450b7"
+    }
+  },
+  "rendererApiSummary": {
+    "types": 7,
+    "canonicalMembers": 86,
+    "preservedAfterSharedMinecraftTypeNormalization": 69,
+    "enumeratedMemberAdaptations": 18,
+    "signatureChangedMembers": 17,
+    "sourceAnnotationOnlyChanges": 1,
+    "unclassifiedOrDeferredMembers": 0
+  },
+  "junit": {
+    "common": {
+      "tests": 176,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml": [
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.animatable.PAnimationManagerAccessTest.xml",
+          "sha256": "f9e27651cc243092c7b61c3c36dc34f7f342250cfe4dadfc0cf043064d89669b"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.animatable.PItemStackAnimationIdsTest.xml",
+          "sha256": "02c271d3eaba518929b32d536b7e96dd9259c593451d28c8983e5d696c1c1790"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.animatable.instance.InstanceAnimationManagerTest.xml",
+          "sha256": "87c027876bd0c1bb02bfd673b7af1ec2e79535c3fc5aefc79c04a0c138c34a29"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PAnimationTimeTest.xml",
+          "sha256": "097731ee3c6dcf74517eedaa1e69f01c61668515f0b0b383753b717c5aebc480"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PCatmullRomSamplingTest.xml",
+          "sha256": "5e95eeb8dc33d0c7a1885619674212f909ff1f45cc6843b10dfdb9fb05b60c98"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PCustomChannelSamplingTest.xml",
+          "sha256": "137206b146412f7db2563593cc3e56458b9cb37d6f7802801e730461048e53f8"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PCyclicAnimationEventsTest.xml",
+          "sha256": "d356541bc620535155baa32a728ecb032fce0b85bf9c3f9e57f600908ddbf586"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PExpressionEvaluationTest.xml",
+          "sha256": "bdbfef7f6f3ab15c3d08902ea5624abcc46e1fca9cebfcb3098ea024ad15dde2"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PGeckoEulerSamplingTest.xml",
+          "sha256": "1cb7b618b09570417d1fffe702f016863b383deab094c682e3ac24272cdb6867"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PGltfQuaternionSamplingTest.xml",
+          "sha256": "299f3513181120c7179dcf4a961d0f469a7cfe0c74e66cf1416aecf9657fb6ab"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PGraphRestartTest.xml",
+          "sha256": "4c8390f8b31b674e145ae93174267dc6f966dfe096d06272bfeb80a1d1a96051"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.POverlayLifecycleTest.xml",
+          "sha256": "c607d49231b4771f697c09d5fbc7b37c8a98d4e970be31e74b412901d0bee500"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.POverlayReverseTest.xml",
+          "sha256": "e9ba3932dae8e16e353d89604cdfeb6274a887c963468116eb651fdbfa424ef5"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PPoseMixerTransitionTest.xml",
+          "sha256": "2294584e054fda38f658da0892584e71c6986366688521960e146f29c0f6cc9a"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PRootMotionSpacesTest.xml",
+          "sha256": "9520e1e21f0e0c3715d08d458d37583bf52a3ae2cc1cee262fd539fb2c2ee668"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.renderer.PRenderPoseContextsTest.xml",
+          "sha256": "73d70562d7444fd5c3f61d94c9fac72b7df61bccdaf66c0d975b3171bdb32318"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.renderer.PRenderStateScopeTest.xml",
+          "sha256": "844a99573d173d736c51c2ac6c61f76866d9e409c5ac8058d9f1eed6d7d785b9"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.renderer.gl.PGlGeometrySourceTest.xml",
+          "sha256": "27b2ca4bea1c6c9175ff539c490f76c9da8477478c1842ee123b24963f06f11d"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.renderer.gl.PGlInstanceLayoutTest.xml",
+          "sha256": "7ba6be7e0443379d982850c3e0838557e468bafecc28646df313ca411eac6889"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.renderer.plan.PFrameCompilerPassTest.xml",
+          "sha256": "70620b1d7f073f2edb2156ad1e2232d21c313404f1102679e0d0b985baacf2f2"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.renderer.plan.PRenderPlanContractTest.xml",
+          "sha256": "9a79b32c319a5cbbf3c987779a7b513df481bc9aa53b36fb1b82fb1b32ddc0b5"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.plugin.PulsePluginClassScannerTest.xml",
+          "sha256": "bc5d3e611dc896a1c1d1b07c24017ac574d9cafa4be769c65da93b40074d271f"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.plugin.PulsePluginLifecycleTest.xml",
+          "sha256": "6c3c78e3dff153187a95ea086204d5a6fd8ea62725017914257cf41f5a884846"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.plugin.PulsePluginManagerTest.xml",
+          "sha256": "2d041dcbb07914e200a69f511b2bb5119d8ee45aeab8d8130917aba7ae55967e"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.plugin.PulseRegistrarTest.xml",
+          "sha256": "6aafefd55104632d67c06e5712fc7a662d186ef97277198385711876e29b8f5f"
+        }
+      ]
+    },
+    "fabric": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml": [
+        {
+          "path": "fabric/build/test-results/test/TEST-com.arcanc.pulselib.fabric.FabricDevelopmentRootsTest.xml",
+          "sha256": "9e0344c24fa067e4fa37f617a408b2ee4b7f76adc12cae5447e2b15a1055ba04"
+        }
+      ]
+    }
+  },
+  "modules": {
+    "common": {
+      "path": "common/build/libs/pulselib-26.1.2-common-1.1.5.3.jar",
+      "sha256": "37a72d0791f5da2fc0612cdd27549369ffd6818fd816098b928b6e0466a315a6",
+      "pulseClassFiles": 520,
+      "classMajors": [
+        69
+      ],
+      "javaUnits": 329
+    },
+    "neoforge": {
+      "path": "neoforge/build/libs/pulselib-26.1.2-neoforge-1.1.5.3.jar",
+      "sha256": "5c2c370e4fdcfe083c0d7f765d11109ca270057ee817072be4d361ab3fa071aa",
+      "pulseClassFiles": 532,
+      "classMajors": [
+        69
+      ],
+      "javaUnits": 340
+    },
+    "fabric": {
+      "path": "fabric/build/libs/pulselib-26.1.2-fabric-1.1.5.3.jar",
+      "sha256": "5d91840d4609a05131a99916ab57fd3a8d88ca0725a855a7d6a33132fc5502f0",
+      "pulseClassFiles": 524,
+      "classMajors": [
+        69
+      ],
+      "javaUnits": 333
+    }
+  },
+  "buildBoundary": {
+    "path": "build/reports/porting/stage-2-build.json",
+    "sha256": "d6e82460438ee95de1f8b579f9488b7d8e95928b37d12e05375e94cf08df5e3b"
+  },
+  "runtime": {
+    "minecraft": "26.1.2",
+    "neoforge": "26.1.2.95",
+    "gpu": "NVIDIA GeForce GTX 1660 Ti",
+    "world": "stage41b3-smoke",
+    "directories": "neoforge/build/stage41b3-runs/{client,server}",
+    "serverClientClassLoads": 0,
+    "serverClassloading": {
+      "path": "neoforge/build/stage41b3-runs/server/classloading.log",
+      "sha256": "bd6fba993887ecfa8736adcd4d4ad6ce45705b416eff7a20f353940a1135d3b5"
+    },
+    "excerpts": {
+      "path": "docs/porting/evidence/stage-4.1b.3-runtime.txt",
+      "sha256": "10210ddaf3de911068b310f50c9ecef3bc96e0e31ef051c3df19acce0d757353"
+    },
+    "afterReloadScreenshot": {
+      "path": "docs/porting/evidence/stage-4.1b.3-after-reload.png",
+      "sha256": "52fd9735cab425b282d24642a2203e5e08b2bd303a490b6c062ac42001bb9a7b"
+    },
+    "inheritedContextsPerProbe": 16,
+    "molangEvaluationsPerProbe": {
+      "block": 4,
+      "item": 4,
+      "entityAndLayer": 8
+    },
+    "layerModelSelectionsPerInvocation": 1,
+    "nativeGpuPrimitivesBeforeAfterReload": [
+      384,
+      8192
+    ],
+    "directBakedTrianglesBeforeAfterReload": [
+      338,
+      338
+    ],
+    "portableInstances": 6,
+    "dynamicAllocationLimitPerSource": 9,
+    "worldSubmissions": {
+      "entity": 1614,
+      "blockEntity": 1608,
+      "item": 1615
+    },
+    "lightInputsAt100And210": {
+      "leftSky": 15,
+      "rightSky": 15,
+      "leftRaw": 15,
+      "rightRaw": 15
+    },
+    "checks": [
+      "Actual canonical perBoneSubmit/submitBone/bone/mesh hooks and retained state hooks",
+      "Full context inheritance, owner deformation identity, per-mesh and sibling isolation",
+      "Forward binding to final entity leaf matrix, separate layer model and one layer model selection",
+      "Stateful Molang exactly once per model with all roots sharing one PPose",
+      "Actual compiler headers: matrices, color/light/overlay and GPU deformation operation count",
+      "Native primitive queries for the compiled opaque plans; translucent submissions retained",
+      "Forced owner-hook exception restores native caller PoseStack and releases captured state; following submit succeeds",
+      "Captured facing, sleeping offset, corrected upside-down head yaw and canonical item constructor",
+      "All previous plan/geometry/baked/graph/time/identity/plugin/reload/shutdown probes"
+    ]
+  },
+  "implementation": {
+    "singlePoseEvaluator": "PAnimationRuntime via PBakedModel.evaluate; canonical owner recursion reads the supplied PPose",
+    "singleCompilerAndGpuBackend": true,
+    "additionalNativeStateApi": [
+      "PBlockRenderState.extractFacing(Direction)",
+      "PBlockRenderState.facing()"
+    ],
+    "unchangedBackend": [
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+        "intendedSourceSha256": "f3e357584c78305079d9d3c27dea0e533d1eecb1835bb29add57e755493096dd",
+        "unchangedFromParent": true,
+        "worktreeIncludesPreexistingUserFormatting": true
+      },
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlGeometryArena.java",
+        "intendedSourceSha256": "52539ba678423df4aa46f55dca7c04632eb21f7c0bfa41ba2b7b6e791a067ae3",
+        "unchangedFromParent": true,
+        "worktreeIncludesPreexistingUserFormatting": true
+      },
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlFrameArena.java",
+        "intendedSourceSha256": "75267c6fde8cb5d942e9cab02163dcc7ac199306c29e8d1b360b0c18056470fe",
+        "unchangedFromParent": true,
+        "worktreeIncludesPreexistingUserFormatting": false
+      },
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlInstanceStream.java",
+        "intendedSourceSha256": "a2a026cc636d9fc2e0d0ca5199178ab6963d6707c919236a1cfb8ffd28a8099a",
+        "unchangedFromParent": true,
+        "worktreeIncludesPreexistingUserFormatting": false
+      },
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlIndirectStream.java",
+        "intendedSourceSha256": "c3c238c5d2fecf9ffdfc0044905c14c8d3968f5a96a26cb373cfc420bf1237d4",
+        "unchangedFromParent": true,
+        "worktreeIncludesPreexistingUserFormatting": false
+      },
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+        "intendedSourceSha256": "a5712078a00121611bf94eec0abd0561e92533ffd0a9e4755cfde6fca83626f3",
+        "unchangedFromParent": true,
+        "worktreeIncludesPreexistingUserFormatting": false
+      }
+    ],
+    "unchangedAssetFiles": 18,
+    "invocationScopeIsNotGuiTargetScope": true
+  },
+  "sourceIsolation": {
+    "preexistingUserEdits": 25,
+    "projectedPreexistingJavaInputs": 24,
+    "projectedOverlappingMigrationFiles": [
+      "common/src/main/java/com/arcanc/pulselib/content/renderer/PBlockRenderer.java",
+      "common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java",
+      "common/src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java"
+    ],
+    "projectionScript": {
+      "path": "/tmp/pulselib-stage41b3/index-check.gradle",
+      "sha256": "9ef644e96e6259673a9677e9488c5975a077dd67867a5bd892a4a2caf73231c6"
+    },
+    "compiledProjectedSources": [
+      {
+        "path": "/tmp/pulselib-stage41b3/index/common/src/main/java/com/arcanc/pulselib/content/renderer/PBlockRenderer.java",
+        "sha256": "cc40c868a385f608ea88f259d02f59a92030276940668af3cebfa90a0d84a782"
+      },
+      {
+        "path": "/tmp/pulselib-stage41b3/index/common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java",
+        "sha256": "7f26d18c8f29638a24fd708e7eeaeff115590fd28232d4c6c52e942996a2a577"
+      },
+      {
+        "path": "/tmp/pulselib-stage41b3/index/common/src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java",
+        "sha256": "39c30c78856b6ef0913215d7d7ec5907ad4af37d91e63e28cb0babecaae62989"
+      }
+    ],
+    "protectedGameFilesUnchanged": 167,
+    "baselineChecksumsUnchanged": true,
+    "sourceBranchesUnchanged": true,
+    "pushOrPublish": false
+  },
+  "initialCompileFixes": [
+    "JSpecify qualified nested type-use annotation placement",
+    "Missing state/layer adapter overload",
+    "Fixture stage name is SOLID_BLOCKS, not BLOCK_ENTITIES"
+  ],
+  "limits": [
+    "Source declaration audit with explicit Minecraft adaptations, not full compiled whole-library compatibility",
+    "GUI/offscreen native collector/local-context behavior and helper remain 4.3",
+    "World ordering/H13/L18, OIT/Fabulous/H14, resize/deletion/weather/water/particles matrix remain 4.2",
+    "Live riding scenarios and performance comparison are not claimed; platform sitting contract retained in source",
+    "Opaque plan query counts differ because a different source primitive may be selected after reload; not a performance comparison"
+  ],
+  "nextStage": "4.2: native world stage hooks, H13/L18 controlled overlap/depth pixels, H14 OIT/Fabulous and full GPU resource lifecycle"
+}

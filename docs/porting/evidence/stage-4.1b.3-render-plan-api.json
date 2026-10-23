@@ -1,0 +1,257 @@
+{
+  "status": "PASS",
+  "baselineCommit": "7ce6f024b307bb821ce543344d3896c8e1fcf26b",
+  "baselineChecksums": "unchanged",
+  "types": [
+    {
+      "type": "com.arcanc.pulselib.content.renderer.plan.PDrawCommand",
+      "preservedMembers": 10
+    },
+    {
+      "type": "com.arcanc.pulselib.content.renderer.plan.PDrawGroup",
+      "preservedMembers": 10
+    },
+    {
+      "type": "com.arcanc.pulselib.content.renderer.plan.PDynamicGeometry",
+      "preservedMembers": 0
+    },
+    {
+      "type": "com.arcanc.pulselib.content.renderer.plan.PFrameCompiler",
+      "preservedMembers": 12
+    },
+    {
+      "type": "com.arcanc.pulselib.content.renderer.plan.PGeometryData",
+      "preservedMembers": 6
+    },
+    {
+      "type": "com.arcanc.pulselib.content.renderer.plan.PGeometryData.IndexType",
+      "preservedMembers": 5
+    },
+    {
+      "type": "com.arcanc.pulselib.content.renderer.plan.PInstanceHeader",
+      "preservedMembers": 12
+    },
+    {
+      "type": "com.arcanc.pulselib.content.renderer.plan.PMeshHandle",
+      "preservedMembers": 5
+    },
+    {
+      "type": "com.arcanc.pulselib.content.renderer.plan.PPipelineHandle",
+      "preservedMembers": 5
+    },
+    {
+      "type": "com.arcanc.pulselib.content.renderer.plan.PRenderCapabilities",
+      "preservedMembers": 9
+    },
+    {
+      "type": "com.arcanc.pulselib.content.renderer.plan.PRenderCapabilities.StorageMode",
+      "preservedMembers": 5
+    },
+    {
+      "type": "com.arcanc.pulselib.content.renderer.plan.PRenderCapabilities.SubmissionMode",
+      "preservedMembers": 5
+    },
+    {
+      "type": "com.arcanc.pulselib.content.renderer.plan.PRenderCapabilities.UploadMode",
+      "preservedMembers": 5
+    },
+    {
+      "type": "com.arcanc.pulselib.content.renderer.plan.PRenderCapabilityMatrix",
+      "preservedMembers": 13
+    },
+    {
+      "type": "com.arcanc.pulselib.content.renderer.plan.PRenderExecutor",
+      "preservedMembers": 3
+    },
+    {
+      "type": "com.arcanc.pulselib.content.renderer.plan.PRenderFrame",
+      "preservedMembers": 6
+    },
+    {
+      "type": "com.arcanc.pulselib.content.renderer.plan.PRenderHost",
+      "preservedMembers": 1
+    },
+    {
+      "type": "com.arcanc.pulselib.content.renderer.plan.PRenderPlan",
+      "preservedMembers": 9
+    }
+  ],
+  "scope": "All public/protected render.plan types, including nested enums; source declarations, not the final whole-library compiled audit",
+  "minecraftAdaptations": [],
+  "annotationAdaptation": "org.jetbrains Nullable -> JSpecify Nullable; existing @NullMarked package convention retained",
+  "queueBoundaryDebtOutsidePlanScope": [
+    {
+      "type": "com.arcanc.pulselib.content.renderer.PRenderQueue",
+      "preservedMembers": 16,
+      "deferredMembers": [
+        {
+          "kind": "method",
+          "name": "compositeFabulousTranslucency",
+          "signature": "public static void compositeFabulousTranslucency(RenderTarget, List<RenderTarget>)",
+          "parameters": [
+            "RenderTarget destination",
+            "List<RenderTarget> targets"
+          ],
+          "receiver": "",
+          "annotations": [],
+          "default": "",
+          "implicit": false
+        },
+        {
+          "kind": "method",
+          "name": "compositeTranslucency",
+          "signature": "public static void compositeTranslucency(RenderTarget)",
+          "parameters": [
+            "RenderTarget destination"
+          ],
+          "receiver": "",
+          "annotations": [],
+          "default": "",
+          "implicit": false
+        },
+        {
+          "kind": "method",
+          "name": "flush",
+          "signature": "public static void flush(RenderStage, RenderTarget)",
+          "parameters": [
+            "RenderStage stage",
+            "RenderTarget depthSource"
+          ],
+          "receiver": "",
+          "annotations": [],
+          "default": "",
+          "implicit": false
+        }
+      ],
+      "temporary26_1FacadeMembers": [
+        {
+          "kind": "method",
+          "name": "cleanUp",
+          "signature": "public static void cleanUp()",
+          "parameters": [],
+          "receiver": "",
+          "annotations": [],
+          "default": "",
+          "implicit": false
+        },
+        {
+          "kind": "method",
+          "name": "compositeTranslucency",
+          "signature": "public static void compositeTranslucency()",
+          "parameters": [],
+          "receiver": "",
+          "annotations": [],
+          "default": "",
+          "implicit": false
+        },
+        {
+          "kind": "method",
+          "name": "drawImmediate",
+          "signature": "public static void drawImmediate(RenderType, PBakedMesh, PMeshDeformation, PInstanceHeader, PRenderFrame)",
+          "parameters": [
+            "RenderType type",
+            "PBakedMesh mesh",
+            "@Nullable PMeshDeformation deformation",
+            "PInstanceHeader data",
+            "PRenderFrame frame"
+          ],
+          "receiver": "",
+          "annotations": [],
+          "default": "",
+          "implicit": false
+        },
+        {
+          "kind": "method",
+          "name": "submit",
+          "signature": "public static void submit(RenderStage, RenderType, PBakedMesh, PMeshDeformation, InstanceData)",
+          "parameters": [
+            "RenderStage stage",
+            "RenderType type",
+            "PBakedMesh mesh",
+            "@Nullable PMeshDeformation deformation",
+            "InstanceData data"
+          ],
+          "receiver": "",
+          "annotations": [],
+          "default": "",
+          "implicit": false
+        },
+        {
+          "kind": "method",
+          "name": "submitBlockEntityMesh",
+          "signature": "public static void submitBlockEntityMesh(RenderType, PBakedMesh, PMeshDeformation, InstanceData)",
+          "parameters": [
+            "RenderType renderType",
+            "PBakedMesh mesh",
+            "@Nullable PMeshDeformation deformation",
+            "InstanceData data"
+          ],
+          "receiver": "",
+          "annotations": [],
+          "default": "",
+          "implicit": false
+        },
+        {
+          "kind": "method",
+          "name": "submitBlockEntityTranslucentMesh",
+          "signature": "public static void submitBlockEntityTranslucentMesh(RenderType, PBakedMesh, PMeshDeformation, InstanceData)",
+          "parameters": [
+            "RenderType renderType",
+            "PBakedMesh mesh",
+            "@Nullable PMeshDeformation deformation",
+            "InstanceData data"
+          ],
+          "receiver": "",
+          "annotations": [],
+          "default": "",
+          "implicit": false
+        },
+        {
+          "kind": "method",
+          "name": "submitEntityMesh",
+          "signature": "public static void submitEntityMesh(RenderType, PBakedMesh, PMeshDeformation, InstanceData)",
+          "parameters": [
+            "RenderType renderType",
+            "PBakedMesh mesh",
+            "@Nullable PMeshDeformation deformation",
+            "InstanceData data"
+          ],
+          "receiver": "",
+          "annotations": [],
+          "default": "",
+          "implicit": false
+        },
+        {
+          "kind": "method",
+          "name": "submitItem",
+          "signature": "public static void submitItem(ItemDisplayContext, RenderType, PBakedMesh, PMeshDeformation, InstanceData)",
+          "parameters": [
+            "ItemDisplayContext context",
+            "RenderType renderType",
+            "PBakedMesh mesh",
+            "@Nullable PMeshDeformation deformation",
+            "InstanceData data"
+          ],
+          "receiver": "",
+          "annotations": [],
+          "default": "",
+          "implicit": false
+        }
+      ],
+      "deferredTypeChanges": {}
+    },
+    {
+      "type": "com.arcanc.pulselib.content.renderer.PRenderQueue.RenderStage",
+      "preservedMembers": 8,
+      "deferredMembers": [],
+      "temporary26_1FacadeMembers": [],
+      "deferredTypeChanges": {}
+    }
+  ],
+  "remainingStage4Work": [
+    "Target-specific queue operations and world rendering stages/OIT remain explicit 4.2 debt",
+    "Render stage hooks, OIT integration and controlled pixel regressions",
+    "GUI/offscreen local scopes and PLibHelper.renderModelInGui"
+  ],
+  "geometryQueueStatus": "PASS: all 11 geometry submission overloads, endWorldFrame and RenderStage contracts preserved"
+}

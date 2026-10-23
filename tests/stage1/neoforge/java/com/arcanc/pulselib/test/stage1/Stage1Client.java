@@ -68,6 +68,8 @@ public final class Stage1Client implements IPulseClientPlugin
 		bus.addListener((RegisterSpecialModelRendererEvent event) ->
 				event.register(PLibDatabase.rl("test_block"), TestBlockItemRenderer.Unbaked.MAP_CODEC));
 		NeoForge.EVENT_BUS.addListener(Stage1Client::tick);
+		if (Boolean.getBoolean("pulselib.stage41b3Probe"))
+			Stage41b3RendererProbe.register();
 		if (Boolean.getBoolean("pulselib.stage41b2Probe"))
 			Stage41b2BakedProbe.register();
 		if (Boolean.getBoolean("pulselib.stage41bProbe"))
@@ -90,6 +92,8 @@ public final class Stage1Client implements IPulseClientPlugin
 		});
 		event.registerEntityRenderer(Stage1Content.EntityTypeReg.TEST_ENTITY.get(), context ->
 		{
+			if (Boolean.getBoolean("pulselib.stage41b3Probe"))
+				Stage41b3RendererProbe.entityContext = context;
 			var renderer = new TestEntityRender(context);
 			Stage32TimeProbe.entityRenderer = renderer;
 			return renderer;
@@ -148,6 +152,8 @@ public final class Stage1Client implements IPulseClientPlugin
 					message -> LogUtils.getLogger().info("{}", message.getString()));
 		}
 		boolean pluginProbe = Boolean.getBoolean("pulselib.stage2Probe");
+		if (Boolean.getBoolean("pulselib.stage41b3Probe"))
+			Stage41b3RendererProbe.tick(worldTicks);
 		if (Boolean.getBoolean("pulselib.stage41b2Probe"))
 			Stage41b2BakedProbe.tick(worldTicks);
 		if (Boolean.getBoolean("pulselib.stage41bProbe"))

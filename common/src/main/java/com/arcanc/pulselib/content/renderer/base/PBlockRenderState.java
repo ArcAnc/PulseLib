@@ -17,6 +17,7 @@ import com.arcanc.pulselib.content.renderer.PBlockRenderer;
 import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jspecify.annotations.Nullable;
 
@@ -36,16 +37,35 @@ public interface PBlockRenderState<T extends BlockEntity & PAnimatable<T>> exten
 			PBlockRenderer<T, RS> renderer,
 			ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress);
 	
+	/** Captures the renderer's owner-facing direction selection during extraction. */
+	void extractFacing(Direction facing);
+
+	/** Returns the immutable-for-submission facing captured during extraction. */
+	Direction facing();
+
 /**
  * Provides support for impl.
  */
 	class Impl<T extends BlockEntity & PAnimatable<T>> extends BlockEntityRenderState implements PBlockRenderState<T>
 	{
 		private float partialTicks;
+		private Direction facing = Direction.NORTH;
 		private @Nullable PBakedModel model;
 		private T animatable;
 		private AnimManagerKey key;
 		
+		@Override
+		public void extractFacing(Direction facing)
+		{
+			this.facing = facing;
+		}
+
+		@Override
+		public Direction facing()
+		{
+			return this.facing;
+		}
+
 		/**
 		 * Extracts the data.
 		 */

@@ -12,6 +12,7 @@ package com.arcanc.pulselib.content.renderer;
 
 import com.arcanc.pulselib.content.animatable.PAnimatable;
 import com.arcanc.pulselib.content.animatable.PAnimationController;
+import com.arcanc.pulselib.content.model.animation.PPose;
 import com.arcanc.pulselib.content.model.baked.PBakedBone;
 import com.arcanc.pulselib.content.model.baked.PBakedMesh;
 import com.arcanc.pulselib.content.model.baked.PBakedModel;
@@ -42,12 +43,14 @@ import java.util.function.Function;
 public abstract class PEntityRenderLayer<T extends Entity & PAnimatable<T>, RS extends EntityRenderState & PEntityRenderState<T>>
 {
 	private final PModelData modelData;
+	private final PRenderStateScope<RS> submission = new PRenderStateScope<>();
+	private final PRenderStateScope<ModelSample<T>> models = new PRenderStateScope<>();
 	private final Function<Identifier, RenderType> renderType;
 	private final Map<String, String> boneBindings = new HashMap<>();
 	private final Vector3f offset = new Vector3f();
 	private final Quaternionf rotation = new Quaternionf();
 	private final Vector3f scale = new Vector3f(1, 1, 1);
-	
+
 	/**
 	 * Creates an instance of the enclosing type.
 	 * @param modelData the model data to use.
@@ -58,27 +61,39 @@ public abstract class PEntityRenderLayer<T extends Entity & PAnimatable<T>, RS e
 		this.modelData = modelData;
 		this.renderType = renderType;
 	}
-	
+
 	/**
-	 * Returns the model data.
-	 * @param renderState the render state to use.
-	 * @return the value produced by this operation.
+	 * Returns the model selection used for this entity layer.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @return the model selection used for this entity layer
 	 */
-	public PModelData getModelData(RS renderState)
+	public PModelData getModelData(T animatable)
 	{
 		return this.modelData;
 	}
-	
+
+	public PModelData getModelData(RS renderState)
+	{
+		return getModelData(renderState.getAnimatable());
+	}
+
 	/**
-	 * Returns the model.
-	 * @param renderState the render state to use.
-	 * @return the value produced by this operation.
+	 * Returns the baked model selected for this entity layer.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @return the baked model selected for this entity layer, or {@code null} when the requested model has not been loaded
 	 */
+	public @Nullable PBakedModel getModel(T animatable)
+	{
+		return getModelData(animatable).getModel();
+	}
+
 	public @Nullable PBakedModel getModel(RS renderState)
 	{
-		return getModelData(renderState).getModel();
+		return getModel(renderState.getAnimatable());
 	}
-	
+
 	/**
 	 * Returns the render type.
 	 * @param texture the texture to use.
@@ -132,71 +147,107 @@ public abstract class PEntityRenderLayer<T extends Entity & PAnimatable<T>, RS e
 	{
 		return this.boneBindings.get(layerBoneName);
 	}
-	
+
 	/**
-	 * Performs the should render operation.
-	 * @param renderState the render state to use.
-	 * @return the value produced by this operation.
+	 * Returns whether this layer should be submitted for the current animatable.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @return whether this layer should be submitted for the current animatable
 	 */
-	public boolean shouldRender(RS renderState)
+	public boolean shouldRender(T animatable)
 	{
 		return true;
 	}
-	
+
+	public boolean shouldRender(RS renderState)
+	{
+		return shouldRender(renderState.getAnimatable());
+	}
+
 	/**
-	 * Returns the color.
-	 * @param renderState the render state to use.
-	 * @param bone the bone to use.
-	 * @param mesh the mesh to use.
-	 * @param packedColor the packed color to use.
-	 * @return the value produced by this operation.
+	 * Resolves the packed color used to render one layer mesh.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param bone the baked bone being sampled or submitted
+	 * @param mesh the baked mesh geometry and material
+	 * @param packedColor the packed ARGB vertex color
+	 * @return the packed mesh color after layer overrides
 	 */
-	public int getColor(RS renderState, PBakedBone bone, PBakedMesh mesh, int packedColor)
+	public int getColor(T animatable, PBakedBone bone, PBakedMesh mesh, int packedColor)
 	{
 		return packedColor;
 	}
-	
+
+	public int getColor(RS renderState, PBakedBone bone, PBakedMesh mesh, int packedColor)
+	{
+		return getColor(renderState.getAnimatable(), bone, mesh, packedColor);
+	}
+
 	/**
-	 * Returns the packed light.
-	 * @param renderState the render state to use.
-	 * @param packedLight the packed light to use.
-	 * @return the value produced by this operation.
+	 * Resolves the packed light used by this render layer.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param packedLight the packed block and sky light coordinates
+	 * @return the packed light after layer overrides
 	 */
-	public int getPackedLight(RS renderState, int packedLight)
+	public int getPackedLight(T animatable, int packedLight)
 	{
 		return packedLight;
 	}
-	
+
+	public int getPackedLight(RS renderState, int packedLight)
+	{
+		return getPackedLight(renderState.getAnimatable(), packedLight);
+	}
+
 	/**
-	 * Returns the packed overlay.
-	 * @param renderState the render state to use.
-	 * @param packedOverlay the packed overlay to use.
-	 * @return the value produced by this operation.
+	 * Resolves the packed overlay used by this render layer.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param packedOverlay the packed overlay texture coordinates
+	 * @return the packed overlay after layer overrides
 	 */
-	public int getPackedOverlay(RS renderState, int packedOverlay)
+	public int getPackedOverlay(T animatable, int packedOverlay)
 	{
 		return packedOverlay;
 	}
-	
+
+	public int getPackedOverlay(RS renderState, int packedOverlay)
+	{
+		return getPackedOverlay(renderState.getAnimatable(), packedOverlay);
+	}
+
 	/**
-	 * Resolves the mesh render.
-	 * @param renderState the render state to use.
-	 * @param bone the bone to use.
-	 * @param mesh the mesh to use.
-	 * @param inherited the inherited to use.
-	 * @return the value produced by this operation.
+	 * Resolves final render overrides for one mesh of the selected bone.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param bone the baked bone being sampled or submitted
+	 * @param mesh the baked mesh geometry and material
+	 * @param inherited the render inputs inherited from the parent bone or renderer
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the inherited or overridden mesh render inputs
 	 */
+	public PMeshRenderContext resolveMeshRender(T animatable,
+	                                            PBakedBone bone,
+	                                            PBakedMesh mesh,
+	                                            PMeshRenderContext inherited,
+	                                            float partialTick)
+	{
+		RS state = this.submission.current();
+		return inherited.
+				withColor(state == null ? getColor(animatable, bone, mesh, inherited.color()) : getColor(state, bone, mesh, inherited.color())).
+				withPackedLight(state == null ? getPackedLight(animatable, inherited.packedLight()) : getPackedLight(state, inherited.packedLight())).
+				withPackedOverlay(state == null ? getPackedOverlay(animatable, inherited.packedOverlay()) : getPackedOverlay(state, inherited.packedOverlay()));
+	}
+
 	public PMeshRenderContext resolveMeshRender(RS renderState,
 	                                            PBakedBone bone,
 	                                            PBakedMesh mesh,
 	                                            PMeshRenderContext inherited)
 	{
-		return inherited.
-				withColor(getColor(renderState, bone, mesh, inherited.color())).
-				withPackedLight(getPackedLight(renderState, inherited.packedLight())).
-				withPackedOverlay(getPackedOverlay(renderState, inherited.packedOverlay()));
+		return resolveMeshRender(renderState.getAnimatable(), bone, mesh, inherited, renderState.partialTick());
 	}
-	
+
 	/**
 	 * Performs the submit operation.
 	 * @param renderer the renderer to use.
@@ -252,32 +303,71 @@ public abstract class PEntityRenderLayer<T extends Entity & PAnimatable<T>, RS e
 	                   @Nullable Map<String, Matrix4f> entityBonePoses,
 	                   @Nullable Matrix4f layerTransform)
 	{
-		PBakedModel model = getModel(renderState);
+		this.submission.run(renderState, () -> submit(renderer, renderState.getAnimatable(), poseStack, controllers,
+				molangContexts, packedColor, packedLight, packedOverlay, renderState.partialTick(),
+				renderState instanceof PEntityRenderState.LivingImpl<?> living ?
+						new PEntityRenderer.HeadRotation(living.getHeadYRot(), living.getHeadXRot()) : null,
+				entityBonePoses, layerTransform));
+	}
+
+	/** Canonical geometry-only layer submission bound to an extracted Minecraft state. */
+	public void submit(PEntityRenderer<T, RS> renderer, RS state, PoseStack poseStack,
+	                   Collection<PAnimationController<T>> controllers, Map<PAnimationController<T>, MolangParser.Context> contexts,
+	                   int color, int light, int overlay, @Nullable Map<String, Matrix4f> entityBonePoses,
+	                   @Nullable Matrix4f layerTransform)
+	{
+		this.submission.run(state, () -> submit(renderer, state.getAnimatable(), poseStack, controllers, contexts,
+				color, light, overlay, state.partialTick(), state instanceof PEntityRenderState.LivingImpl<?> living ?
+						new PEntityRenderer.HeadRotation(living.getHeadYRot(), living.getHeadXRot()) : null,
+				entityBonePoses, layerTransform));
+	}
+
+	public void submit(PEntityRenderer<T, RS> renderer,
+	                   T animatable,
+	                   PoseStack poseStack,
+	                   Collection<PAnimationController<T>> controllers,
+	                   Map<PAnimationController<T>, MolangParser.Context> molangContexts,
+	                   int packedColor,
+	                   int packedLight,
+	                   int packedOverlay,
+	                   float partialTick,
+					   PEntityRenderer.@Nullable HeadRotation headRotation,
+	                   @Nullable Map<String, Matrix4f> entityBonePoses,
+	                   @Nullable Matrix4f layerTransform)
+	{
+		RS state = this.submission.current();
+		PBakedModel model = state == null ? getModel(animatable) : getModel(state);
 		if (model == null)
 			return;
-		
-		PModelData data = getModelData(renderState);
-		for (PBakedBone bone : model.bones())
+
+		this.models.run(new ModelSample<>(animatable, model), () ->
 		{
-			renderer.perBoneSubmit(
-					renderState,
-					poseStack,
-					bone,
-					controllers,
-					data,
-					this :: getRenderType,
-					packedColor,
-					packedLight,
-					packedOverlay,
-					submitNodeCollector,
-					cameraRenderState,
-					this,
-					entityBonePoses,
-					layerTransform,
-					molangContexts);
-		}
+			PModelData data = state == null ? getModelData(animatable) : getModelData(state);
+			PPose pose = model.evaluate(controllers, molangContexts, partialTick);
+			for (PBakedBone bone : model.bones())
+			{
+				renderer.perBoneSubmit(
+						animatable,
+						poseStack,
+						bone,
+						pose,
+						controllers,
+						data,
+						this :: getRenderType,
+						packedColor,
+						packedLight,
+						packedOverlay,
+						partialTick,
+						headRotation,
+						this,
+						entityBonePoses,
+						layerTransform,
+						null,
+						molangContexts);
+			}
+		});
 	}
-	
+
 	/**
 	 * Sets the offset.
 	 * @param offset the offset to use.
@@ -286,7 +376,7 @@ public abstract class PEntityRenderLayer<T extends Entity & PAnimatable<T>, RS e
 	{
 		this.offset.set(offset);
 	}
-	
+
 	/**
 	 * Performs the offset operation.
 	 * @return the value produced by this operation.
@@ -295,7 +385,7 @@ public abstract class PEntityRenderLayer<T extends Entity & PAnimatable<T>, RS e
 	{
 		return this.offset;
 	}
-	
+
 	/**
 	 * Sets the rotation.
 	 * @param rotation the rotation to use.
@@ -304,7 +394,7 @@ public abstract class PEntityRenderLayer<T extends Entity & PAnimatable<T>, RS e
 	{
 		this.rotation.set(rotation);
 	}
-	
+
 	/**
 	 * Performs the rotation operation.
 	 * @return the value produced by this operation.
@@ -313,7 +403,7 @@ public abstract class PEntityRenderLayer<T extends Entity & PAnimatable<T>, RS e
 	{
 		return this.rotation;
 	}
-	
+
 	/**
 	 * Sets the scale.
 	 * @param scale the scale to use.
@@ -322,7 +412,7 @@ public abstract class PEntityRenderLayer<T extends Entity & PAnimatable<T>, RS e
 	{
 		this.scale.set(scale);
 	}
-	
+
 	/**
 	 * Performs the scale operation.
 	 * @return the value produced by this operation.
@@ -330,5 +420,41 @@ public abstract class PEntityRenderLayer<T extends Entity & PAnimatable<T>, RS e
 	public Vector3f scale()
 	{
 		return this.scale;
+	}
+	/**
+	 * Resolves render overrides inherited by the selected bone and its meshes.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param bone the baked bone being sampled or submitted
+	 * @param inherited the render inputs inherited from the parent bone or renderer
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the inherited or overridden mesh render inputs
+	 */
+	public PMeshRenderContext resolveBoneRender(T animatable,
+	                                            PBakedBone bone,
+	                                            PMeshRenderContext inherited,
+	                                            float partialTick)
+	{
+		return inherited;
+	}
+
+	/** Native hook forwards to the canonical owner customization point. */
+	public PMeshRenderContext resolveBoneRender(RS state, PBakedBone bone, PMeshRenderContext inherited)
+	{
+		return resolveBoneRender(state.getAnimatable(), bone, inherited, state.partialTick());
+	}
+
+	/** Keeps one selected layer model paired with the PPose evaluated for this invocation. */
+	@Nullable PBakedModel currentModel(T owner)
+	{
+		ModelSample<T> sample = this.models.current();
+		if (sample != null && sample.owner() == owner)
+			return sample.model();
+		RS state = this.submission.current();
+		return state == null || state.getAnimatable() != owner ? getModel(owner) : getModel(state);
+	}
+
+	private record ModelSample<T>(T owner, PBakedModel model)
+	{
 	}
 }

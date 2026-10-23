@@ -52,7 +52,7 @@ def main():
               'scope': 'All public/protected render.plan types, including nested enums; source declarations, not the final whole-library compiled audit',
               'minecraftAdaptations': [], 'annotationAdaptation': 'org.jetbrains Nullable -> JSpecify Nullable; existing @NullMarked package convention retained',
               'queueBoundaryDebtOutsidePlanScope': queue_debt,
-              'remainingStage4Work': ['Baked/model and renderer API, canonical queue geometry overloads',
+              'remainingStage4Work': ['Target-specific queue operations and world rendering stages/OIT 4.2',
                                       'Render stage hooks, OIT integration and controlled pixel regressions',
                                       'GUI/offscreen local scopes and PLibHelper.renderModelInGui']}
     if args.require_geometry_queue:
@@ -61,7 +61,7 @@ def main():
             assert all(member['name'] in ['flush', 'compositeTranslucency', 'compositeFabulousTranslucency']
                        and 'RenderTarget' in member['signature'] for member in row['deferredMembers']), row['deferredMembers']
         report['geometryQueueStatus'] = 'PASS: all 11 geometry submission overloads, endWorldFrame and RenderStage contracts preserved'
-        report['remainingStage4Work'][0] = 'Baked/model and renderer API; target-specific queue operations remain explicit debt'
+        report['remainingStage4Work'][0] = 'Target-specific queue operations and world rendering stages/OIT remain explicit 4.2 debt'
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(json.dumps(report, indent=2) + '\n')

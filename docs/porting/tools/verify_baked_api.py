@@ -75,20 +75,19 @@ def main():
                               'additional26_1Members': [actual[k] for k in sorted(actual.keys() - expected.keys())],
                               'typeChanges': {k: {'canonical': before[k], 'current': after[k] if after else None} for k in CONTRACTS
                                               if after is None or normalized(before[k]) != normalized(after[k])}})
-    report = {'status': 'PASS_BAKED_WITH_EXPLICIT_RENDERER_DEBT', 'baselineCommit': '7ce6f024b307bb821ce543344d3896c8e1fcf26b',
+    report = {'status': 'PASS_BAKED_RENDERER_AUDIT_SEPARATE', 'baselineCommit': '7ce6f024b307bb821ce543344d3896c8e1fcf26b',
               'baselineChecksums': 'unchanged', 'types': results,
               'minecraftAdaptations': ['ResourceLocation -> Identifier', 'RenderType package -> renderer.rendertype',
                                        'org.jetbrains.Nullable -> JSpecify.Nullable under @NullMarked', 'Removed VertexBuffer -> PGlDynamicGeometry upload source'],
               'scope': 'All canonical model.baked types + PModel + geometry facade/factory; source declarations, not whole-library compiled audit',
               'rendererOwnerLookup': 'PASS: all four renderer types preserve getModelData(T), getModel(T), getRenderType(Identifier)',
-              'rendererBoundaryDeferredTo4_1b_3': renderer_debt,
-              'remainingWork': ['Bone context inheritance and renderer/layer extension hooks; preserve owner-based material hooks',
-                                'Classify/implement each remaining renderer signature; MC26 state generics, constructors and submission hooks require adapters',
-                                'World stages/OIT 4.2, GUI/offscreen scopes and renderModelInGui 4.3, player integration 5, compiled whole-library API audit 7']}
+              'rendererBoundaryInventory': renderer_debt,
+              'strictRendererAudit': 'verify_renderer_api.py classifies Minecraft generics/signature adaptations; raw declaration differences below are not unimplemented members',
+              'remainingWork': ['World stages/OIT 4.2', 'GUI/offscreen scopes and renderModelInGui 4.3', 'Player integration 5, Fabric runtime 6, compiled whole-library API audit 7']}
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(json.dumps(report, indent=2) + '\n')
-    print(f"BAKED API PASS: {len(results)} canonical types / {sum(r['preservedMembers'] for r in results)} members; renderer owner lookup preserved; remaining renderer debt enumerated")
+    print(f"BAKED API PASS: {len(results)} canonical types / {sum(r['preservedMembers'] for r in results)} members; renderer owner lookup preserved; raw renderer boundary inventoried; strict renderer audit is separate")
 
 
 if __name__ == '__main__':

@@ -14,10 +14,13 @@ import com.arcanc.pulselib.content.animatable.PAnimatable;
 import com.arcanc.pulselib.content.animatable.PAnimationController;
 import com.arcanc.pulselib.content.animatable.PAnimationManager;
 import com.arcanc.pulselib.content.mixin.ItemStackRenderStateAccessor;
-import com.arcanc.pulselib.content.model.animation.BoneFrame;
-import com.arcanc.pulselib.content.model.animation.PAnimationPoseResolver;
+import com.arcanc.pulselib.content.model.animation.PPose;
 import com.arcanc.pulselib.content.model.animation.PAnimationEvaluationContext;
-import com.arcanc.pulselib.content.model.baked.*;
+import com.arcanc.pulselib.content.model.baked.PBakedBone;
+import com.arcanc.pulselib.content.model.baked.PBakedMesh;
+import com.arcanc.pulselib.content.model.baked.PBakedModel;
+import com.arcanc.pulselib.content.model.baked.PMeshRenderContext;
+import com.arcanc.pulselib.content.model.baked.PMeshRenderMaterial;
 import com.arcanc.pulselib.content.renderer.base.PItemRenderState;
 import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import com.arcanc.pulselib.data.PModelLoader;
@@ -27,7 +30,9 @@ import com.arcanc.pulselib.util.PModelCache;
 import com.arcanc.pulselib.util.PResourceCache;
 import com.arcanc.pulselib.util.helpers.PLibHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
@@ -52,6 +57,7 @@ import java.util.function.Function;
 public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends PItemRenderState<T>> implements SpecialModelRenderer<RS>, PRenderer<T, RS>
 {
 	private final PModelData modelData;
+	private final PRenderStateScope<RS> submission = new PRenderStateScope<>();
 	private final Function<Identifier, RenderType> renderType;
 	
 	/**
@@ -63,6 +69,16 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 	{
 		this.modelData = modelData;
 		this.renderType = renderType;
+	}
+
+	/**
+	 * Canonical constructor adapter. Minecraft's special renderer no longer owns a BEWLR dispatcher/model set.
+	 * The model selection and render pipeline initialize the same renderer as the native constructor.
+	 */
+	public PItemRenderer(PModelData data, Function<Identifier, RenderType> renderType,
+	                     BlockEntityRenderDispatcher blockEntityRenderDispatcher, EntityModelSet entityModelSet)
+	{
+		this(data, renderType);
 	}
 	
 	/**
@@ -91,20 +107,24 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 	                   int outlineColor)
 	{
 		if (renderState == null)
-		{
 			return;
-		}
 		renderState.extractAdditionalData(lightCoords,  overlayCoords, hasFoil, outlineColor);
 		poseStack.pushPose();
-		PModelData modelData = getModelData(renderState);
-		PModelLoader modelLoader = PModelCache.getModelLoader(modelData.getModelLoaderId()).orElse(PGltfModelLoader.INSTANCE);
-		modelLoader.applyItemTransform(poseStack);
+		try
+		{
+			PModelData modelData = getModelData(renderState);
+			PModelLoader modelLoader = PModelCache.getModelLoader(modelData.getModelLoaderId()).orElse(PGltfModelLoader.INSTANCE);
+			modelLoader.applyItemTransform(poseStack);
 		
-		CameraRenderState cameraRenderState = new CameraRenderState();
-		preSubmit(poseStack, renderState, cameraRenderState, submitNodeCollector);
-		trueSubmit(poseStack, renderState, cameraRenderState, submitNodeCollector);
-		postSubmit(poseStack, renderState, cameraRenderState, submitNodeCollector);
-		poseStack.popPose();
+			CameraRenderState cameraRenderState = new CameraRenderState();
+			preSubmit(poseStack, renderState, cameraRenderState, submitNodeCollector);
+			trueSubmit(poseStack, renderState, cameraRenderState, submitNodeCollector);
+			postSubmit(poseStack, renderState, cameraRenderState, submitNodeCollector);
+		}
+		finally
+		{
+			poseStack.popPose();
+		}
 	}
 	
 	/**
@@ -143,6 +163,9 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 	
 	/** Selects the canonical model data for an owner during extraction and submission. */
 	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public PModelData getModelData(T animatable)
 	{
 		return this.modelData;
@@ -150,6 +173,9 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 
 	/** Returns the baked model selected for the supplied owner, or null before resource load. */
 	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public @Nullable PBakedModel getModel(T animatable)
 	{
 		return getModelData(animatable).getModel();
@@ -199,30 +225,32 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 	@Override
 	public void trueSubmit(PoseStack poseStack, RS renderState, CameraRenderState cameraRenderState, SubmitNodeCollector submitNodeCollector)
 	{
-		PBakedModel model = renderState.getBakedModel();
-		if (model == null)
+		this.submission.run(renderState, () ->
 		{
-			return;
-		}
+			PBakedModel model = renderState.getBakedModel();
+			if (model == null)
+				return;
 		
-		PAnimationManager<T> manager = PLibHelper.getManager(renderState.getAnimatable(), renderState.getAnimKey());
-		manager.bindModel(model);
+			PAnimationManager<T> manager = PLibHelper.getManager(renderState.getAnimatable(), renderState.getAnimKey());
+			manager.bindModel(model);
 		
-		Collection<PAnimationController<T>> controllers = manager.getControllers().values();
-		Map<PAnimationController<T>, MolangParser.Context> molangContexts = prepareMolangContexts(
-				renderState.getAnimatable(), manager, controllers, renderState.partialTick());
+			Collection<PAnimationController<T>> controllers = manager.getControllers().values();
+			Map<PAnimationController<T>, MolangParser.Context> molangContexts = prepareMolangContexts(
+					renderState.getAnimatable(), manager, controllers, renderState.partialTick());
 		
-		ItemDisplayContext context = ((ItemStackRenderStateAccessor)renderState.itemRenderState()).pulselib$getDisplayContext();
-		if (context == ItemDisplayContext.GUI)
-		{
-			model.bones().forEach(bone -> perBoneSubmit(renderState, poseStack, bone, controllers, molangContexts, renderType, -1, renderState.lightCoords(), renderState.overlayCoords(), context));
-			submitNodeCollector.submitCustomGeometry(
-					poseStack,
-					this.renderType.apply(PResourceCache.ATLAS_LOCATION),
-					(_, _) -> PRenderQueue.flush(PRenderQueue.RenderStage.GUI));
-			return;
-		}
-		model.bones().forEach(bone -> perBoneSubmit(renderState, poseStack, bone, controllers, molangContexts, renderType, -1, renderState.lightCoords(), renderState.overlayCoords(), context));
+			PPose pose = model.evaluate(controllers, molangContexts, renderState.partialTick());
+			ItemDisplayContext context = ((ItemStackRenderStateAccessor)renderState.itemRenderState()).pulselib$getDisplayContext();
+			if (context == ItemDisplayContext.GUI)
+			{
+				model.bones().forEach(bone -> perBoneSubmit(renderState.getAnimatable(), renderState.stack(), poseStack, bone, pose, controllers, molangContexts, this::getRenderType, -1, renderState.lightCoords(), renderState.overlayCoords(), renderState.partialTick(), context));
+				submitNodeCollector.submitCustomGeometry(
+						poseStack,
+						this.renderType.apply(PResourceCache.ATLAS_LOCATION),
+						(_, _) -> PRenderQueue.flush(PRenderQueue.RenderStage.GUI));
+				return;
+			}
+			model.bones().forEach(bone -> perBoneSubmit(renderState.getAnimatable(), renderState.stack(), poseStack, bone, pose, controllers, molangContexts, this::getRenderType, -1, renderState.lightCoords(), renderState.overlayCoords(), renderState.partialTick(), context));
+		});
 	}
 	
 	/**
@@ -238,53 +266,82 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 	}
 	
 	/**
-	 * Performs the per bone submit operation.
-	 * @param renderState the render state to use.
-	 * @param poseStack the pose stack to use.
-	 * @param bone the bone to use.
-	 * @param controllers the controllers to use.
-	 * @param molangContexts the molang contexts to use.
-	 * @param renderType the render type to use.
-	 * @param packedColor the packed color to use.
-	 * @param packedLight the packed light to use.
-	 * @param packedOverlay the packed overlay to use.
-	 * @param context the context to use.
+	 * Submits the selected bone and its descendants using the sampled pose and inherited mesh render context.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param stack the item stack supplying render or animation state
+	 * @param poseStack the current model-to-render pose stack
+	 * @param bone the baked bone being sampled or submitted
+	 * @param pose the indexed bone pose
+	 * @param controllers the animation controllers in pose composition order
+	 * @param molangContexts the frame-specific Molang context of each controller
+	 * @param renderType the render type
+	 * @param packedColor the packed ARGB vertex color
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param packedOverlay the packed overlay texture coordinates
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param context the context
 	 */
+	protected void perBoneSubmit(T animatable, ItemStack stack, PoseStack poseStack, PBakedBone bone, PPose pose, Collection<PAnimationController<T>> controllers, Map<PAnimationController<T>, MolangParser.Context> molangContexts, Function<Identifier, RenderType> renderType, int packedColor, int packedLight, int packedOverlay, float partialTick, ItemDisplayContext context)
+	{
+		PMeshRenderContext inherited = new PMeshRenderContext(
+				renderType,
+				packedColor,
+				packedLight,
+				packedOverlay);
+		perBoneSubmit(animatable, stack, poseStack, bone, pose, controllers, molangContexts, inherited, partialTick, context);
+	}
+
+	/**
+	 * Submits the selected bone and its descendants using the sampled pose and inherited mesh render context.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param stack the item stack supplying render or animation state
+	 * @param poseStack the current model-to-render pose stack
+	 * @param bone the baked bone being sampled or submitted
+	 * @param pose the indexed bone pose
+	 * @param controllers the animation controllers in pose composition order
+	 * @param molangContexts the frame-specific Molang context of each controller
+	 * @param inherited the render inputs inherited from the parent bone or renderer
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param context the context
+	 */
+	protected void perBoneSubmit(T animatable, ItemStack stack, PoseStack poseStack, PBakedBone bone, PPose pose, Collection<PAnimationController<T>> controllers, Map<PAnimationController<T>, MolangParser.Context> molangContexts, PMeshRenderContext inherited, float partialTick, ItemDisplayContext context)
+	{
+		PModelData data = this.getModelData(animatable);
+		PBakedModel model = selectedModel(animatable);
+		if (model == null)
+			return;
+		int boneIndex = model.boneIndex(bone);
+		if (!pose.isVisible(boneIndex))
+			return;
+		poseStack.pushPose();
+		try
+		{
+			poseStack.translate(pose.translation(boneIndex).x(), pose.translation(boneIndex).y(), pose.translation(boneIndex).z());
+			poseStack.mulPose(pose.rotation(boneIndex));
+			poseStack.scale(pose.scale(boneIndex).x(), pose.scale(boneIndex).y(), pose.scale(boneIndex).z());
+
+			PMeshRenderContext boneContext = resolveBoneForSubmission(animatable, stack, context, bone, inherited, partialTick);
+			this.submitBone(animatable, stack, bone, poseStack, data, controllers, boneContext, partialTick, context);
+
+			if (!bone.children().isEmpty())
+				bone.children().forEach(child -> perBoneSubmit(animatable, stack, poseStack, child, pose, controllers, molangContexts, boneContext, partialTick, context));
+		}
+		finally
+		{
+			poseStack.popPose();
+		}
+	}
+
 	protected void perBoneSubmit(RS renderState, PoseStack poseStack, PBakedBone bone, Collection<PAnimationController<T>> controllers, Map<PAnimationController<T>, MolangParser.Context> molangContexts, Function<Identifier, RenderType> renderType, int packedColor, int packedLight, int packedOverlay, ItemDisplayContext context)
 	{
-		PModelData data = this.getModelData(renderState);
 		PBakedModel model = renderState.getBakedModel();
 		if (model == null)
-		{
 			return;
-		}
-		PAnimationPoseResolver<T> poseResolver = PRenderPoseContexts.resolve(model, controllers, molangContexts, renderState.partialTick());
-		if (!poseResolver.isVisible(bone))
-		{
-			return;
-		}
-		BoneFrame frame = poseResolver.resolve(bone).localTransform();
-		poseStack.pushPose();
-		if (frame != null)
-		{
-			poseStack.translate(frame.translation().x(), frame.translation().y(), frame.translation().z());
-			poseStack.mulPose(frame.rotation());
-			poseStack.scale(frame.scale().x(), frame.scale().y(), frame.scale().z());
-		}
-		else
-		{
-			poseStack.translate(bone.basePosition().x(), bone.basePosition().y(), bone.basePosition().z());
-			poseStack.mulPose(bone.baseRotation());
-		}
-		
-		this.submitBone(renderState, bone, poseStack, data, controllers, renderType, packedColor, packedLight, packedOverlay, context);
-		
-		if (!bone.children().isEmpty())
-		{
-			bone.children().forEach(child -> perBoneSubmit(renderState, poseStack, child, controllers, molangContexts, renderType, packedColor, packedLight, packedOverlay, context));
-		}
-		
-		poseStack.popPose();
+		PPose pose = model.evaluate(controllers, molangContexts, renderState.partialTick());
+		this.submission.run(renderState, () -> perBoneSubmit(renderState.getAnimatable(), renderState.stack(), poseStack,
+				bone, pose, controllers, molangContexts, renderType, packedColor, packedLight, packedOverlay, renderState.partialTick(), context));
 	}
 
 	/**
@@ -327,18 +384,74 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 	}
 	
 	/**
-	 * Performs the submit bone operation.
-	 * @param renderState the render state to use.
-	 * @param bone the bone to use.
-	 * @param poseStack the pose stack to use.
-	 * @param modelData the model data to use.
-	 * @param controllers the controllers to use.
-	 * @param renderType the render type to use.
-	 * @param color the color to use.
-	 * @param packedLight the packed light to use.
-	 * @param packedOverlay the packed overlay to use.
-	 * @param context the context to use.
+	 * Submits one bone hierarchy using the supplied model and controller inputs.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param stack the item stack supplying render or animation state
+	 * @param bone the baked bone being sampled or submitted
+	 * @param poseStack the current model-to-render pose stack
+	 * @param modelData the canonical model and loader selection
+	 * @param controllers the animation controllers in pose composition order
+	 * @param renderType the render type
+	 * @param color the packed ARGB vertex color
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param packedOverlay the packed overlay texture coordinates
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param context the context
 	 */
+	protected void submitBone(T animatable,
+	                          ItemStack stack,
+	                          PBakedBone bone,
+	                          PoseStack poseStack,
+	                          PModelData modelData,
+	                          Collection<PAnimationController<T>> controllers,
+	                          Function<Identifier, RenderType> renderType,
+	                          int color,
+	                          int packedLight,
+	                          int packedOverlay,
+	                          float partialTick,
+	                          ItemDisplayContext context)
+	{
+		submitBone(animatable, stack, bone, poseStack, modelData, controllers,
+				new PMeshRenderContext(renderType, color, packedLight, packedOverlay), partialTick, context);
+	}
+
+	/**
+	 * Submits one bone hierarchy using the supplied model and controller inputs.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param stack the item stack supplying render or animation state
+	 * @param bone the baked bone being sampled or submitted
+	 * @param poseStack the current model-to-render pose stack
+	 * @param modelData the canonical model and loader selection
+	 * @param controllers the animation controllers in pose composition order
+	 * @param inherited the render inputs inherited from the parent bone or renderer
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @param context the context
+	 */
+	protected void submitBone(T animatable,
+	                          ItemStack stack,
+	                          PBakedBone bone,
+	                          PoseStack poseStack,
+	                          PModelData modelData,
+	                          Collection<PAnimationController<T>> controllers,
+	                          PMeshRenderContext inherited,
+	                          float partialTick,
+	                          ItemDisplayContext context)
+	{
+		Matrix4f transform = new Matrix4f(poseStack.last().pose());
+		for (PBakedMesh mesh : bone.meshes())
+		{
+			if (mesh.textureReference().isEmpty())
+				continue;
+			PMeshRenderContext meshContext = resolveMeshForSubmission(animatable, stack, context, bone, mesh, inherited, partialTick);
+			PMeshRenderMaterial material = PMeshRenderMaterial.resolve(mesh, meshContext);
+			RenderType type = material.resolveRenderType(meshContext, PResourceCache.ATLAS_LOCATION);
+			var instance = new PRenderQueue.InstanceData(transform, meshContext.color(), material.packedLight(), meshContext.packedOverlay());
+			PRenderQueue.submitItem(context, type, material.mesh(), meshContext.deformation(), instance);
+		}
+	}
+
 	protected void submitBone(RS renderState,
 	                          PBakedBone bone,
 	                          PoseStack poseStack,
@@ -350,44 +463,91 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 	                          int packedOverlay,
 	                          ItemDisplayContext context)
 	{
-		Matrix4f matrix4fstack = new Matrix4f(poseStack.last().pose());
-		
-		bone.meshes().forEach(mesh ->
-		{
-			if (mesh.textureReference().isEmpty())
-			{
-				return;
-			}
-			
-			PMeshRenderContext inherited = new PMeshRenderContext(
-					renderType,
-					color,
-					packedLight,
-					packedOverlay);
-			PMeshRenderContext meshContext = resolveMeshRender(renderState, context, bone, mesh, inherited);
-			PMeshRenderMaterial material = PMeshRenderMaterial.resolve(mesh, meshContext);
-			
-			RenderType type = material.resolveRenderType(meshContext, PResourceCache.ATLAS_LOCATION);
-			
-			PRenderQueue.submitItem(context, type, material.mesh(), meshContext.deformation(), new PRenderQueue.InstanceData(matrix4fstack, meshContext.color(), material.packedLight(), meshContext.packedOverlay()));
-		});
+		this.submission.run(renderState, () -> submitBone(renderState.getAnimatable(), renderState.stack(), bone, poseStack, modelData, controllers, renderType, color, packedLight, packedOverlay, renderState.partialTick(), context));
 	}
 	
 	/**
-	 * Resolves the mesh render.
-	 * @param renderState the render state to use.
-	 * @param context the context to use.
-	 * @param bone the bone to use.
-	 * @param mesh the mesh to use.
-	 * @param inherited the inherited to use.
-	 * @return the value produced by this operation.
+	 * Resolves render overrides inherited by the selected bone and its meshes.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param stack the item stack supplying render or animation state
+	 * @param context the context
+	 * @param bone the baked bone being sampled or submitted
+	 * @param inherited the render inputs inherited from the parent bone or renderer
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the inherited or overridden mesh render inputs
 	 */
+	protected PMeshRenderContext resolveBoneRender(T animatable,
+	                                               ItemStack stack,
+	                                               ItemDisplayContext context,
+	                                               PBakedBone bone,
+	                                               PMeshRenderContext inherited,
+	                                               float partialTick)
+	{
+		return inherited;
+	}
+
+	/**
+	 * Resolves final render overrides for one mesh of the selected bone.
+	 *
+	 * @param animatable the owner whose animation state is being processed
+	 * @param stack the item stack supplying render or animation state
+	 * @param context the context
+	 * @param bone the baked bone being sampled or submitted
+	 * @param mesh the baked mesh geometry and material
+	 * @param inherited the render inputs inherited from the parent bone or renderer
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the inherited or overridden mesh render inputs
+	 */
+	protected PMeshRenderContext resolveMeshRender(T animatable,
+	                                               ItemStack stack,
+	                                               ItemDisplayContext context,
+	                                               PBakedBone bone,
+	                                               PBakedMesh mesh,
+	                                               PMeshRenderContext inherited,
+	                                               float partialTick)
+	{
+		return inherited;
+	}
+
 	protected PMeshRenderContext resolveMeshRender(RS renderState,
 	                                               ItemDisplayContext context,
 	                                               PBakedBone bone,
 	                                               PBakedMesh mesh,
 	                                               PMeshRenderContext inherited)
 	{
-		return inherited;
+		return resolveMeshRender(renderState.getAnimatable(), renderState.stack(), context, bone, mesh, inherited, renderState.partialTick());
+	}
+
+	private @Nullable PBakedModel selectedModel(T animatable)
+	{
+		RS state = stateFor(animatable);
+		return state == null ? getModel(animatable) : state.getBakedModel();
+	}
+
+	/** Native state hook delegates to the canonical owner hook by default. */
+	protected PMeshRenderContext resolveBoneRender(RS state, ItemDisplayContext context, PBakedBone bone, PMeshRenderContext inherited)
+	{
+		return resolveBoneRender(state.getAnimatable(), state.stack(), context, bone, inherited, state.partialTick());
+	}
+
+	private PMeshRenderContext resolveBoneForSubmission(T animatable, ItemStack stack, ItemDisplayContext context, PBakedBone bone, PMeshRenderContext inherited, float partialTick)
+	{
+		RS state = stateFor(animatable);
+		return state == null ? resolveBoneRender(animatable, stack, context, bone, inherited, partialTick) :
+				resolveBoneRender(state, context, bone, inherited);
+	}
+
+	private PMeshRenderContext resolveMeshForSubmission(T animatable, ItemStack stack, ItemDisplayContext context, PBakedBone bone, PBakedMesh mesh, PMeshRenderContext inherited, float partialTick)
+	{
+		RS state = stateFor(animatable);
+		return state == null ? resolveMeshRender(animatable, stack, context, bone, mesh, inherited, partialTick) :
+				resolveMeshRender(state, context, bone, mesh, inherited);
+	}
+
+	private @Nullable RS stateFor(T owner)
+	{
+		RS state = this.submission.current();
+		return state != null && state.getAnimatable() == owner ? state : null;
 	}
 }

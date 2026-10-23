@@ -1,0 +1,848 @@
+{
+  "status": "PASS_WITH_ENUMERATED_MINECRAFT_ADAPTATIONS",
+  "baselineCommit": "7ce6f024b307bb821ce543344d3896c8e1fcf26b",
+  "baselineChecksums": "unchanged",
+  "types": [
+    {
+      "type": "com.arcanc.pulselib.content.renderer.PBlockRenderer",
+      "canonicalMembers": 17,
+      "preservedMembers": [
+        "public <init>(PModelData, Function<ResourceLocation, RenderType>)",
+        "public PModelData getModelData(T)",
+        "public PBakedModel getModel(T)",
+        "public RenderType getRenderType(ResourceLocation)",
+        "protected void perBoneSubmit(T, PoseStack, PBakedBone, PPose, Collection<PAnimationController<T>>, Map<PAnimationController<T>, MolangParser.Context>, Function<ResourceLocation, RenderType>, int, int, int, float)",
+        "protected void perBoneSubmit(T, PoseStack, PBakedBone, PPose, Collection<PAnimationController<T>>, Map<PAnimationController<T>, MolangParser.Context>, PMeshRenderContext, float)",
+        "protected void populateMolangContext(T, PAnimationController<T>, MolangParser.Context, float)",
+        "protected void tryRotateToRealRotation(PoseStack, Direction)",
+        "protected Direction getAnimatableFacing(T)",
+        "protected void submitBone(T, PBakedBone, PoseStack, PModelData, Collection<PAnimationController<T>>, Function<ResourceLocation, RenderType>, int, int, int, float)",
+        "protected void submitBone(T, PBakedBone, PoseStack, PModelData, Collection<PAnimationController<T>>, PMeshRenderContext, float)",
+        "protected PMeshRenderContext resolveBoneRender(T, PBakedBone, PMeshRenderContext, float)",
+        "protected PMeshRenderContext resolveMeshRender(T, PBakedBone, PBakedMesh, PMeshRenderContext, float)"
+      ],
+      "minecraftTypeAdaptations": [
+        "Additional RS generic: RS extends BlockEntityRenderState & PBlockRenderState<T>"
+      ],
+      "memberAdaptations": [
+        {
+          "canonical": {
+            "kind": "method",
+            "name": "render",
+            "signature": "public void render(T, float, PoseStack, MultiBufferSource, int, int)",
+            "parameters": [
+              "T animatable",
+              "float partialTick",
+              "PoseStack poseStack",
+              "MultiBufferSource bufferSource",
+              "int packedLight",
+              "int packedOverlay"
+            ],
+            "receiver": "",
+            "annotations": [
+              "@Override"
+            ],
+            "default": "",
+            "implicit": false
+          },
+          "adapted": {
+            "kind": "method",
+            "name": "submit",
+            "signature": "public void submit(RS, PoseStack, SubmitNodeCollector, CameraRenderState)",
+            "parameters": [
+              "RS renderState",
+              "PoseStack poseStack",
+              "SubmitNodeCollector submitNodeCollector",
+              "CameraRenderState cameraRenderState"
+            ],
+            "receiver": "",
+            "annotations": [
+              "@Override"
+            ],
+            "default": "",
+            "implicit": false
+          },
+          "reason": "Vanilla BlockEntityRenderer.render was replaced by extractRenderState/submit. Light and facing are captured; per-bone context overrides supply custom light/overlay/materials."
+        },
+        {
+          "canonical": {
+            "kind": "method",
+            "name": "preSubmit",
+            "signature": "public void preSubmit(PoseStack, T, Function<ResourceLocation, RenderType>, MultiBufferSource, int, int, float, Object...)",
+            "parameters": [
+              "PoseStack poseStack",
+              "T animatable",
+              "Function<ResourceLocation, RenderType> renderType",
+              "MultiBufferSource bufferSource",
+              "int packedLight",
+              "int packedOverlay",
+              "float partialTick",
+              "@Nullable Object... additionalData"
+            ],
+            "receiver": "",
+            "annotations": [
+              "@Override"
+            ],
+            "default": "",
+            "implicit": false
+          },
+          "adapted": {
+            "kind": "method",
+            "name": "preSubmit",
+            "signature": "public void preSubmit(PoseStack, RS, CameraRenderState, SubmitNodeCollector)",
+            "parameters": [
+              "PoseStack poseStack",
+              "RS renderState",
+              "CameraRenderState cameraRenderState",
+              "SubmitNodeCollector submitNodeCollector"
+            ],
+            "receiver": "",
+            "annotations": [
+              "@Override"
+            ],
+            "default": "",
+            "implicit": false
+          },
+          "reason": "Minecraft extraction/submission replaces live owner + MultiBufferSource: RS retains owner, partial tick, light/overlay and ItemStack/display context; virtual getRenderType supplies the pipeline; collector and camera are explicit. Hooks remain invoked by native submit."
+        },
+        {
+          "canonical": {
+            "kind": "method",
+            "name": "trueSubmit",
+            "signature": "public void trueSubmit(PoseStack, T, Function<ResourceLocation, RenderType>, MultiBufferSource, int, int, float, Object...)",
+            "parameters": [
+              "PoseStack poseStack",
+              "T animatable",
+              "Function<ResourceLocation, RenderType> renderType",
+              "MultiBufferSource bufferSource",
+              "int packedLight",
+              "int packedOverlay",
+              "float partialTick",
+              "@Nullable Object... additionalData"
+            ],
+            "receiver": "",
+            "annotations": [
+              "@Override"
+            ],
+            "default": "",
+            "implicit": false
+          },
+          "adapted": {
+            "kind": "method",
+            "name": "trueSubmit",
+            "signature": "public void trueSubmit(PoseStack, RS, CameraRenderState, SubmitNodeCollector)",
+            "parameters": [
+              "PoseStack poseStack",
+              "RS renderState",
+              "CameraRenderState cameraRenderState",
+              "SubmitNodeCollector submitNodeCollector"
+            ],
+            "receiver": "",
+            "annotations": [
+              "@Override"
+            ],
+            "default": "",
+            "implicit": false
+          },
+          "reason": "Minecraft extraction/submission replaces live owner + MultiBufferSource: RS retains owner, partial tick, light/overlay and ItemStack/display context; virtual getRenderType supplies the pipeline; collector and camera are explicit. Hooks remain invoked by native submit."
+        },
+        {
+          "canonical": {
+            "kind": "method",
+            "name": "postSubmit",
+            "signature": "public void postSubmit(PoseStack, T, Function<ResourceLocation, RenderType>, MultiBufferSource, int, int, float, Object...)",
+            "parameters": [
+              "PoseStack poseStack",
+              "T animatable",
+              "Function<ResourceLocation, RenderType> renderType",
+              "MultiBufferSource bufferSource",
+              "int packedLight",
+              "int packedOverlay",
+              "float partialTick",
+              "@Nullable Object... additionalData"
+            ],
+            "receiver": "",
+            "annotations": [
+              "@Override"
+            ],
+            "default": "",
+            "implicit": false
+          },
+          "adapted": {
+            "kind": "method",
+            "name": "postSubmit",
+            "signature": "public void postSubmit(PoseStack, RS, CameraRenderState, SubmitNodeCollector)",
+            "parameters": [
+              "PoseStack poseStack",
+              "RS renderState",
+              "CameraRenderState cameraRenderState",
+              "SubmitNodeCollector submitNodeCollector"
+            ],
+            "receiver": "",
+            "annotations": [
+              "@Override"
+            ],
+            "default": "",
+            "implicit": false
+          },
+          "reason": "Minecraft extraction/submission replaces live owner + MultiBufferSource: RS retains owner, partial tick, light/overlay and ItemStack/display context; virtual getRenderType supplies the pipeline; collector and camera are explicit. Hooks remain invoked by native submit."
+        }
+      ],
+      "unclassifiedOrDeferredMembers": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.renderer.PEntityRenderLayer",
+      "canonicalMembers": 21,
+      "preservedMembers": [
+        "public <init>(PModelData, Function<ResourceLocation, RenderType>)",
+        "public PModelData getModelData(T)",
+        "public PBakedModel getModel(T)",
+        "public RenderType getRenderType(ResourceLocation)",
+        "public PEntityRenderLayer<T> bindBone(String, String)",
+        "public PEntityRenderLayer<T> bindMatchingBone(String)",
+        "public PEntityRenderLayer<T> bindMatchingBones(String...)",
+        "public String getBoundEntityBone(String)",
+        "public boolean shouldRender(T)",
+        "public int getColor(T, PBakedBone, PBakedMesh, int)",
+        "public int getPackedLight(T, int)",
+        "public int getPackedOverlay(T, int)",
+        "public PMeshRenderContext resolveBoneRender(T, PBakedBone, PMeshRenderContext, float)",
+        "public PMeshRenderContext resolveMeshRender(T, PBakedBone, PBakedMesh, PMeshRenderContext, float)",
+        "public void submit(PEntityRenderer<T>, T, PoseStack, Collection<PAnimationController<T>>, Map<PAnimationController<T>, MolangParser.Context>, int, int, int, float, PEntityRenderer.HeadRotation, Map<String, Matrix4f>, Matrix4f)",
+        "public void setOffset(Vector3f)",
+        "public Vector3f offset()",
+        "public void setRotation(Quaternionf)",
+        "public Quaternionf rotation()",
+        "public void setScale(Vector3f)",
+        "public Vector3f scale()"
+      ],
+      "minecraftTypeAdaptations": [
+        "Additional RS generic: RS extends EntityRenderState & PEntityRenderState<T>"
+      ],
+      "memberAdaptations": [],
+      "unclassifiedOrDeferredMembers": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.renderer.PEntityRenderer",
+      "canonicalMembers": 21,
+      "preservedMembers": [
+        "public <init>(EntityRendererProvider.Context, PModelData, Function<ResourceLocation, RenderType>)",
+        "public PModelData getModelData(T)",
+        "public PBakedModel getModel(T)",
+        "public RenderType getRenderType(ResourceLocation)",
+        "public void addRenderLayer(String, PEntityRenderLayer<T>)",
+        "public ResourceLocation getTextureLocation(T)",
+        "protected void perBoneSubmit(T, PoseStack, PBakedBone, PPose, Collection<PAnimationController<T>>, PModelData, Function<ResourceLocation, RenderType>, int, int, int, float, HeadRotation, PEntityRenderLayer<T>, Map<String, Matrix4f>, Matrix4f, List<DeferredLayerSubmit>, Map<PAnimationController<T>, MolangParser.Context>)",
+        "protected void perBoneSubmit(T, PoseStack, PBakedBone, PPose, Collection<PAnimationController<T>>, PModelData, PMeshRenderContext, float, HeadRotation, PEntityRenderLayer<T>, Map<String, Matrix4f>, Matrix4f, List<DeferredLayerSubmit>, Map<PAnimationController<T>, MolangParser.Context>)",
+        "protected void populateMolangContext(T, PAnimationController<T>, MolangParser.Context, float)",
+        "protected void submitBone(T, PBakedBone, PoseStack, PModelData, Collection<PAnimationController<T>>, Function<ResourceLocation, RenderType>, int, int, int, float)",
+        "protected void submitBone(T, PBakedBone, PoseStack, PModelData, Collection<PAnimationController<T>>, Function<ResourceLocation, RenderType>, int, int, int, float, PEntityRenderLayer<T>)",
+        "protected void submitBone(T, PBakedBone, PoseStack, PModelData, Collection<PAnimationController<T>>, PMeshRenderContext, float)",
+        "protected void submitBone(T, PBakedBone, PoseStack, PModelData, Collection<PAnimationController<T>>, PMeshRenderContext, float, PEntityRenderLayer<T>)",
+        "protected PMeshRenderContext resolveBoneRender(T, PBakedBone, PMeshRenderContext, float)",
+        "protected PMeshRenderContext resolveMeshRender(T, PBakedBone, PBakedMesh, PMeshRenderContext, float)"
+      ],
+      "minecraftTypeAdaptations": [
+        "Additional RS generic: RS extends EntityRenderState & PEntityRenderState<T>"
+      ],
+      "memberAdaptations": [
+        {
+          "canonical": {
+            "kind": "method",
+            "name": "render",
+            "signature": "public void render(T, float, float, PoseStack, MultiBufferSource, int)",
+            "parameters": [
+              "T entity",
+              "float entityYaw",
+              "float partialTick",
+              "PoseStack poseStack",
+              "MultiBufferSource bufferSource",
+              "int packedLight"
+            ],
+            "receiver": "",
+            "annotations": [
+              "@Override"
+            ],
+            "default": "",
+            "implicit": false
+          },
+          "adapted": {
+            "kind": "method",
+            "name": "submit",
+            "signature": "public void submit(RS, PoseStack, SubmitNodeCollector, CameraRenderState)",
+            "parameters": [
+              "RS renderState",
+              "PoseStack poseStack",
+              "SubmitNodeCollector submitNodeCollector",
+              "CameraRenderState cameraRenderState"
+            ],
+            "receiver": "",
+            "annotations": [
+              "@Override"
+            ],
+            "default": "",
+            "implicit": false
+          },
+          "reason": "Vanilla EntityRenderer now extracts RS before submit. Entity position/body/head/light values are snapshots; collector replaces old immediate buffer source."
+        },
+        {
+          "canonical": {
+            "kind": "method",
+            "name": "getTextureLocation",
+            "signature": "public ResourceLocation getTextureLocation(T)",
+            "parameters": [
+              "T entity"
+            ],
+            "receiver": "",
+            "annotations": [
+              "@Override",
+              "@Nullable"
+            ],
+            "default": "",
+            "implicit": false
+          },
+          "adapted": "public Identifier getTextureLocation(T)",
+          "reason": "Removed only source @Override annotation because MC26 superclass has no getTextureLocation; method still returns null for per-mesh texture selection"
+        },
+        {
+          "canonical": {
+            "kind": "method",
+            "name": "preSubmit",
+            "signature": "public void preSubmit(PoseStack, T, Function<ResourceLocation, RenderType>, MultiBufferSource, int, int, float, Object...)",
+            "parameters": [
+              "PoseStack poseStack",
+              "T animatable",
+              "Function<ResourceLocation, RenderType> renderType",
+              "MultiBufferSource bufferSource",
+              "int packedLight",
+              "int packedOverlay",
+              "float partialTick",
+              "@Nullable Object... additionalData"
+            ],
+            "receiver": "",
+            "annotations": [
+              "@Override"
+            ],
+            "default": "",
+            "implicit": false
+          },
+          "adapted": {
+            "kind": "method",
+            "name": "preSubmit",
+            "signature": "public void preSubmit(PoseStack, RS, CameraRenderState, SubmitNodeCollector)",
+            "parameters": [
+              "PoseStack poseStack",
+              "RS renderState",
+              "CameraRenderState cameraRenderState",
+              "SubmitNodeCollector submitNodeCollector"
+            ],
+            "receiver": "",
+            "annotations": [
+              "@Override"
+            ],
+            "default": "",
+            "implicit": false
+          },
+          "reason": "Minecraft extraction/submission replaces live owner + MultiBufferSource: RS retains owner, partial tick, light/overlay and ItemStack/display context; virtual getRenderType supplies the pipeline; collector and camera are explicit. Hooks remain invoked by native submit."
+        },
+        {
+          "canonical": {
+            "kind": "method",
+            "name": "trueSubmit",
+            "signature": "public void trueSubmit(PoseStack, T, Function<ResourceLocation, RenderType>, MultiBufferSource, int, int, float, Object...)",
+            "parameters": [
+              "PoseStack poseStack",
+              "T animatable",
+              "Function<ResourceLocation, RenderType> renderType",
+              "MultiBufferSource bufferSource",
+              "int packedLight",
+              "int packedOverlay",
+              "float partialTick",
+              "@Nullable Object... additionalData"
+            ],
+            "receiver": "",
+            "annotations": [
+              "@Override"
+            ],
+            "default": "",
+            "implicit": false
+          },
+          "adapted": {
+            "kind": "method",
+            "name": "trueSubmit",
+            "signature": "public void trueSubmit(PoseStack, RS, CameraRenderState, SubmitNodeCollector)",
+            "parameters": [
+              "PoseStack poseStack",
+              "RS renderState",
+              "CameraRenderState cameraRenderState",
+              "SubmitNodeCollector submitNodeCollector"
+            ],
+            "receiver": "",
+            "annotations": [
+              "@Override"
+            ],
+            "default": "",
+            "implicit": false
+          },
+          "reason": "Minecraft extraction/submission replaces live owner + MultiBufferSource: RS retains owner, partial tick, light/overlay and ItemStack/display context; virtual getRenderType supplies the pipeline; collector and camera are explicit. Hooks remain invoked by native submit."
+        },
+        {
+          "canonical": {
+            "kind": "method",
+            "name": "postSubmit",
+            "signature": "public void postSubmit(PoseStack, T, Function<ResourceLocation, RenderType>, MultiBufferSource, int, int, float, Object...)",
+            "parameters": [
+              "PoseStack poseStack",
+              "T animatable",
+              "Function<ResourceLocation, RenderType> renderType",
+              "MultiBufferSource bufferSource",
+              "int packedLight",
+              "int packedOverlay",
+              "float partialTick",
+              "@Nullable Object... additionalData"
+            ],
+            "receiver": "",
+            "annotations": [
+              "@Override"
+            ],
+            "default": "",
+            "implicit": false
+          },
+          "adapted": {
+            "kind": "method",
+            "name": "postSubmit",
+            "signature": "public void postSubmit(PoseStack, RS, CameraRenderState, SubmitNodeCollector)",
+            "parameters": [
+              "PoseStack poseStack",
+              "RS renderState",
+              "CameraRenderState cameraRenderState",
+              "SubmitNodeCollector submitNodeCollector"
+            ],
+            "receiver": "",
+            "annotations": [
+              "@Override"
+            ],
+            "default": "",
+            "implicit": false
+          },
+          "reason": "Minecraft extraction/submission replaces live owner + MultiBufferSource: RS retains owner, partial tick, light/overlay and ItemStack/display context; virtual getRenderType supplies the pipeline; collector and camera are explicit. Hooks remain invoked by native submit."
+        },
+        {
+          "canonical": {
+            "kind": "method",
+            "name": "applyPositioning",
+            "signature": "protected HeadRotation applyPositioning(LivingEntity, PoseStack, float)",
+            "parameters": [
+              "LivingEntity entity",
+              "PoseStack poseStack",
+              "float partialTick"
+            ],
+            "receiver": "",
+            "annotations": [],
+            "default": "",
+            "implicit": false
+          },
+          "adapted": {
+            "kind": "method",
+            "name": "applyPositioning",
+            "signature": "protected HeadRotation applyPositioning(LivingEntityRenderState, PoseStack)",
+            "parameters": [
+              "LivingEntityRenderState state",
+              "PoseStack poseStack"
+            ],
+            "receiver": "",
+            "annotations": [],
+            "default": "",
+            "implicit": false
+          },
+          "reason": "Body/head/scale inputs are captured in Minecraft LivingEntityRenderState; submit does not resample live entity interpolation. Canonical HeadRotation record and its traversal contract are preserved."
+        },
+        {
+          "canonical": {
+            "kind": "method",
+            "name": "setupRotations",
+            "signature": "protected void setupRotations(LivingEntity, PoseStack, float, float, float, float)",
+            "parameters": [
+              "LivingEntity entity",
+              "PoseStack poseStack",
+              "float bob",
+              "float yBodyRot",
+              "float partialTick",
+              "float scale"
+            ],
+            "receiver": "",
+            "annotations": [],
+            "default": "",
+            "implicit": false
+          },
+          "adapted": {
+            "kind": "method",
+            "name": "setupRotations",
+            "signature": "protected void setupRotations(LivingEntityRenderState, PoseStack, float, float)",
+            "parameters": [
+              "LivingEntityRenderState renderState",
+              "PoseStack poseStack",
+              "float yBodyRot",
+              "float scale"
+            ],
+            "receiver": "",
+            "annotations": [],
+            "default": "",
+            "implicit": false
+          },
+          "reason": "Minecraft living rotations use captured age/death/pose/body-yaw/scale. The partial tick and bob were folded into extraction, and the native state hook remains invoked by applyPositioning."
+        }
+      ],
+      "unclassifiedOrDeferredMembers": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.renderer.PEntityRenderer.DeferredLayerSubmit",
+      "canonicalMembers": 0,
+      "preservedMembers": [],
+      "minecraftTypeAdaptations": [],
+      "memberAdaptations": [],
+      "unclassifiedOrDeferredMembers": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.renderer.PEntityRenderer.HeadRotation",
+      "canonicalMembers": 6,
+      "preservedMembers": [
+        "public <init>(float, float)",
+        "public float headYaw()",
+        "public float headPitch()",
+        "public final boolean equals(Object)",
+        "public final int hashCode()",
+        "public final String toString()"
+      ],
+      "minecraftTypeAdaptations": [],
+      "memberAdaptations": [],
+      "unclassifiedOrDeferredMembers": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.renderer.PItemRenderer",
+      "canonicalMembers": 15,
+      "preservedMembers": [
+        "public <init>(PModelData, Function<ResourceLocation, RenderType>, BlockEntityRenderDispatcher, EntityModelSet)",
+        "public PModelData getModelData(T)",
+        "public PBakedModel getModel(T)",
+        "public RenderType getRenderType(ResourceLocation)",
+        "protected void perBoneSubmit(T, ItemStack, PoseStack, PBakedBone, PPose, Collection<PAnimationController<T>>, Map<PAnimationController<T>, MolangParser.Context>, Function<ResourceLocation, RenderType>, int, int, int, float, ItemDisplayContext)",
+        "protected void perBoneSubmit(T, ItemStack, PoseStack, PBakedBone, PPose, Collection<PAnimationController<T>>, Map<PAnimationController<T>, MolangParser.Context>, PMeshRenderContext, float, ItemDisplayContext)",
+        "protected void populateMolangContext(T, PAnimationController<T>, MolangParser.Context, float)",
+        "protected void submitBone(T, ItemStack, PBakedBone, PoseStack, PModelData, Collection<PAnimationController<T>>, Function<ResourceLocation, RenderType>, int, int, int, float, ItemDisplayContext)",
+        "protected void submitBone(T, ItemStack, PBakedBone, PoseStack, PModelData, Collection<PAnimationController<T>>, PMeshRenderContext, float, ItemDisplayContext)",
+        "protected PMeshRenderContext resolveBoneRender(T, ItemStack, ItemDisplayContext, PBakedBone, PMeshRenderContext, float)",
+        "protected PMeshRenderContext resolveMeshRender(T, ItemStack, ItemDisplayContext, PBakedBone, PBakedMesh, PMeshRenderContext, float)"
+      ],
+      "minecraftTypeAdaptations": [
+        "Additional RS generic: RS extends PItemRenderState<T>",
+        "Removed Minecraft BlockEntityWithoutLevelRenderer -> SpecialModelRenderer<RS>; canonical four-argument constructor remains as a real adapter"
+      ],
+      "memberAdaptations": [
+        {
+          "canonical": {
+            "kind": "method",
+            "name": "renderByItem",
+            "signature": "public void renderByItem(ItemStack, ItemDisplayContext, PoseStack, MultiBufferSource, int, int)",
+            "parameters": [
+              "ItemStack stack",
+              "ItemDisplayContext displayContext",
+              "PoseStack poseStack",
+              "MultiBufferSource buffer",
+              "int packedLight",
+              "int packedOverlay"
+            ],
+            "receiver": "",
+            "annotations": [
+              "@Override"
+            ],
+            "default": "",
+            "implicit": false
+          },
+          "adapted": {
+            "kind": "method",
+            "name": "submit",
+            "signature": "public void submit(RS, PoseStack, SubmitNodeCollector, int, int, boolean, int)",
+            "parameters": [
+              "@Nullable RS renderState",
+              "PoseStack poseStack",
+              "SubmitNodeCollector submitNodeCollector",
+              "int lightCoords",
+              "int overlayCoords",
+              "boolean hasFoil",
+              "int outlineColor"
+            ],
+            "receiver": "",
+            "annotations": [
+              "@Override"
+            ],
+            "default": "",
+            "implicit": false
+          },
+          "reason": "Minecraft removed BEWLR.renderByItem. SpecialModelRenderer.extractArgument captures the stack; submit receives light/overlay/foil/outline and a deferred collector. Display context is retained in ItemStackRenderState."
+        },
+        {
+          "canonical": {
+            "kind": "method",
+            "name": "preSubmit",
+            "signature": "public void preSubmit(PoseStack, T, Function<ResourceLocation, RenderType>, MultiBufferSource, int, int, float, Object...)",
+            "parameters": [
+              "PoseStack poseStack",
+              "T animatable",
+              "Function<ResourceLocation, RenderType> renderType",
+              "MultiBufferSource bufferSource",
+              "int packedLight",
+              "int packedOverlay",
+              "float partialTick",
+              "@Nullable Object... additionalData"
+            ],
+            "receiver": "",
+            "annotations": [
+              "@Override"
+            ],
+            "default": "",
+            "implicit": false
+          },
+          "adapted": {
+            "kind": "method",
+            "name": "preSubmit",
+            "signature": "public void preSubmit(PoseStack, RS, CameraRenderState, SubmitNodeCollector)",
+            "parameters": [
+              "PoseStack poseStack",
+              "RS renderState",
+              "CameraRenderState cameraRenderState",
+              "SubmitNodeCollector submitNodeCollector"
+            ],
+            "receiver": "",
+            "annotations": [
+              "@Override"
+            ],
+            "default": "",
+            "implicit": false
+          },
+          "reason": "Minecraft extraction/submission replaces live owner + MultiBufferSource: RS retains owner, partial tick, light/overlay and ItemStack/display context; virtual getRenderType supplies the pipeline; collector and camera are explicit. Hooks remain invoked by native submit."
+        },
+        {
+          "canonical": {
+            "kind": "method",
+            "name": "trueSubmit",
+            "signature": "public void trueSubmit(PoseStack, T, Function<ResourceLocation, RenderType>, MultiBufferSource, int, int, float, Object...)",
+            "parameters": [
+              "PoseStack poseStack",
+              "T animatable",
+              "Function<ResourceLocation, RenderType> renderType",
+              "MultiBufferSource bufferSource",
+              "int packedLight",
+              "int packedOverlay",
+              "float partialTick",
+              "@Nullable Object... additionalData"
+            ],
+            "receiver": "",
+            "annotations": [
+              "@Override"
+            ],
+            "default": "",
+            "implicit": false
+          },
+          "adapted": {
+            "kind": "method",
+            "name": "trueSubmit",
+            "signature": "public void trueSubmit(PoseStack, RS, CameraRenderState, SubmitNodeCollector)",
+            "parameters": [
+              "PoseStack poseStack",
+              "RS renderState",
+              "CameraRenderState cameraRenderState",
+              "SubmitNodeCollector submitNodeCollector"
+            ],
+            "receiver": "",
+            "annotations": [
+              "@Override"
+            ],
+            "default": "",
+            "implicit": false
+          },
+          "reason": "Minecraft extraction/submission replaces live owner + MultiBufferSource: RS retains owner, partial tick, light/overlay and ItemStack/display context; virtual getRenderType supplies the pipeline; collector and camera are explicit. Hooks remain invoked by native submit."
+        },
+        {
+          "canonical": {
+            "kind": "method",
+            "name": "postSubmit",
+            "signature": "public void postSubmit(PoseStack, T, Function<ResourceLocation, RenderType>, MultiBufferSource, int, int, float, Object...)",
+            "parameters": [
+              "PoseStack poseStack",
+              "T animatable",
+              "Function<ResourceLocation, RenderType> renderType",
+              "MultiBufferSource bufferSource",
+              "int packedLight",
+              "int packedOverlay",
+              "float partialTick",
+              "@Nullable Object... additionalData"
+            ],
+            "receiver": "",
+            "annotations": [
+              "@Override"
+            ],
+            "default": "",
+            "implicit": false
+          },
+          "adapted": {
+            "kind": "method",
+            "name": "postSubmit",
+            "signature": "public void postSubmit(PoseStack, RS, CameraRenderState, SubmitNodeCollector)",
+            "parameters": [
+              "PoseStack poseStack",
+              "RS renderState",
+              "CameraRenderState cameraRenderState",
+              "SubmitNodeCollector submitNodeCollector"
+            ],
+            "receiver": "",
+            "annotations": [
+              "@Override"
+            ],
+            "default": "",
+            "implicit": false
+          },
+          "reason": "Minecraft extraction/submission replaces live owner + MultiBufferSource: RS retains owner, partial tick, light/overlay and ItemStack/display context; virtual getRenderType supplies the pipeline; collector and camera are explicit. Hooks remain invoked by native submit."
+        }
+      ],
+      "unclassifiedOrDeferredMembers": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.renderer.PRenderer",
+      "canonicalMembers": 6,
+      "preservedMembers": [
+        "abstract public PModelData getModelData(T)",
+        "abstract public PBakedModel getModel(T)",
+        "abstract public RenderType getRenderType(ResourceLocation)"
+      ],
+      "minecraftTypeAdaptations": [
+        "Additional RS generic: RS extends PRenderState<T>"
+      ],
+      "memberAdaptations": [
+        {
+          "canonical": {
+            "kind": "method",
+            "name": "preSubmit",
+            "signature": "abstract public void preSubmit(PoseStack, T, Function<ResourceLocation, RenderType>, MultiBufferSource, int, int, float, Object...)",
+            "parameters": [
+              "PoseStack poseStack",
+              "T animatable",
+              "Function<ResourceLocation, RenderType> renderType",
+              "MultiBufferSource bufferSource",
+              "int packedLight",
+              "int packedOverlay",
+              "float partialTick",
+              "@Nullable Object... additionalData"
+            ],
+            "receiver": "",
+            "annotations": [],
+            "default": "",
+            "implicit": false
+          },
+          "adapted": {
+            "kind": "method",
+            "name": "preSubmit",
+            "signature": "abstract public void preSubmit(PoseStack, RS, CameraRenderState, SubmitNodeCollector)",
+            "parameters": [
+              "PoseStack poseStack",
+              "RS renderState",
+              "CameraRenderState cameraRenderState",
+              "SubmitNodeCollector submitNodeCollector"
+            ],
+            "receiver": "",
+            "annotations": [],
+            "default": "",
+            "implicit": false
+          },
+          "reason": "Minecraft extraction/submission replaces live owner + MultiBufferSource: RS retains owner, partial tick, light/overlay and ItemStack/display context; virtual getRenderType supplies the pipeline; collector and camera are explicit. Hooks remain invoked by native submit."
+        },
+        {
+          "canonical": {
+            "kind": "method",
+            "name": "trueSubmit",
+            "signature": "abstract public void trueSubmit(PoseStack, T, Function<ResourceLocation, RenderType>, MultiBufferSource, int, int, float, Object...)",
+            "parameters": [
+              "PoseStack poseStack",
+              "T animatable",
+              "Function<ResourceLocation, RenderType> renderType",
+              "MultiBufferSource bufferSource",
+              "int packedLight",
+              "int packedOverlay",
+              "float partialTick",
+              "@Nullable Object... additionalData"
+            ],
+            "receiver": "",
+            "annotations": [],
+            "default": "",
+            "implicit": false
+          },
+          "adapted": {
+            "kind": "method",
+            "name": "trueSubmit",
+            "signature": "abstract public void trueSubmit(PoseStack, RS, CameraRenderState, SubmitNodeCollector)",
+            "parameters": [
+              "PoseStack poseStack",
+              "RS renderState",
+              "CameraRenderState cameraRenderState",
+              "SubmitNodeCollector submitNodeCollector"
+            ],
+            "receiver": "",
+            "annotations": [],
+            "default": "",
+            "implicit": false
+          },
+          "reason": "Minecraft extraction/submission replaces live owner + MultiBufferSource: RS retains owner, partial tick, light/overlay and ItemStack/display context; virtual getRenderType supplies the pipeline; collector and camera are explicit. Hooks remain invoked by native submit."
+        },
+        {
+          "canonical": {
+            "kind": "method",
+            "name": "postSubmit",
+            "signature": "abstract public void postSubmit(PoseStack, T, Function<ResourceLocation, RenderType>, MultiBufferSource, int, int, float, Object...)",
+            "parameters": [
+              "PoseStack poseStack",
+              "T animatable",
+              "Function<ResourceLocation, RenderType> renderType",
+              "MultiBufferSource bufferSource",
+              "int packedLight",
+              "int packedOverlay",
+              "float partialTick",
+              "@Nullable Object... additionalData"
+            ],
+            "receiver": "",
+            "annotations": [],
+            "default": "",
+            "implicit": false
+          },
+          "adapted": {
+            "kind": "method",
+            "name": "postSubmit",
+            "signature": "abstract public void postSubmit(PoseStack, RS, CameraRenderState, SubmitNodeCollector)",
+            "parameters": [
+              "PoseStack poseStack",
+              "RS renderState",
+              "CameraRenderState cameraRenderState",
+              "SubmitNodeCollector submitNodeCollector"
+            ],
+            "receiver": "",
+            "annotations": [],
+            "default": "",
+            "implicit": false
+          },
+          "reason": "Minecraft extraction/submission replaces live owner + MultiBufferSource: RS retains owner, partial tick, light/overlay and ItemStack/display context; virtual getRenderType supplies the pipeline; collector and camera are explicit. Hooks remain invoked by native submit."
+        }
+      ],
+      "unclassifiedOrDeferredMembers": []
+    }
+  ],
+  "scope": "Selected canonical PRenderer/PBlockRenderer/PEntityRenderer/PItemRenderer/PEntityRenderLayer types and their public/protected nested types; source declarations plus runtime probes, not the final compiled whole-library audit of other public GPU facade types",
+  "sharedAdaptations": [
+    "Identifier and renderer.rendertype.RenderType",
+    "JSpecify nullable type-use placement",
+    "MC26 RS generic propagated to renderer/layer references"
+  ],
+  "remainingOutsideThisCheckpoint": [
+    "World stages/H13/L18/OIT/Fabulous and full GPU lifecycle 4.2",
+    "GUI/offscreen local scopes and GUI helper 4.3",
+    "Player 5, Fabric runtime 6, compiled whole-library compatibility 7"
+  ]
+}

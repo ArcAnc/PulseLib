@@ -1,0 +1,205 @@
+{
+  "status": "PASS",
+  "baselineCommit": "7ce6f024b307bb821ce543344d3896c8e1fcf26b",
+  "baselineChecksums": "unchanged",
+  "types": [
+    {
+      "type": "com.arcanc.pulselib.PLib",
+      "canonicalMembers": 1,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.api.plugin.IPulseClientPlugin",
+      "canonicalMembers": 4,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.api.plugin.IPulseCommonPlugin",
+      "canonicalMembers": 4,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.api.plugin.PulsePlugin",
+      "canonicalMembers": 1,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.api.plugin.PulsePlugin.Side",
+      "canonicalMembers": 6,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.api.registration.PAnimatedAttachmentRegistrar",
+      "canonicalMembers": 3,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.api.registration.PAttachmentRegistrar",
+      "canonicalMembers": 4,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.api.registration.PModelRegistrar",
+      "canonicalMembers": 5,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.api.registration.PModelRegistrar.ModelRegistration",
+      "canonicalMembers": 1,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.api.registration.PPlayerAnimationRegistrar",
+      "canonicalMembers": 3,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.api.registration.PTypeRegistrar",
+      "canonicalMembers": 5,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.api.registration.PTypeRegistrar.Kind",
+      "canonicalMembers": 5,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.api.registration.PulseRegistrar",
+      "canonicalMembers": 3,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.event.ClientEvents",
+      "canonicalMembers": 3,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.event.CommonEvents",
+      "canonicalMembers": 2,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.event.PulseRuntime",
+      "canonicalMembers": 2,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.mixin.CameraAccessor",
+      "canonicalMembers": 1,
+      "additional26_1Members": [
+        "abstract public Vector3f pulselib$getForwards()",
+        "abstract public Vector3f pulselib$getUp()",
+        "abstract public Vector3f pulselib$getLeft()"
+      ]
+    },
+    {
+      "type": "com.arcanc.pulselib.content.mixin.NeoForgeCameraAccessor",
+      "canonicalMembers": 1,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.mixin.ResourceReloadMixin",
+      "canonicalMembers": 1,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.content.registration.PRegistry",
+      "canonicalMembers": 6,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.fabric.FabricCameraService",
+      "canonicalMembers": 2,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.fabric.FabricPlatform",
+      "canonicalMembers": 3,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.fabric.FabricPulsePluginFinder",
+      "canonicalMembers": 2,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.neoforge.NeoForgeCameraService",
+      "canonicalMembers": 2,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.neoforge.NeoForgePlatform",
+      "canonicalMembers": 3,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.neoforge.NeoForgePulsePluginFinder",
+      "canonicalMembers": 2,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.platform.IPulseCameraService",
+      "canonicalMembers": 1,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.platform.IPulsePlatform",
+      "canonicalMembers": 2,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.platform.PulseClientServices",
+      "canonicalMembers": 1,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.platform.PulseServices",
+      "canonicalMembers": 2,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.plugin.IPulsePluginFinder",
+      "canonicalMembers": 1,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.plugin.PulsePluginCandidate",
+      "canonicalMembers": 7,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.plugin.PulsePluginClassScanner",
+      "canonicalMembers": 4,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.plugin.PulsePluginLifecycle",
+      "canonicalMembers": 5,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.plugin.PulsePluginLifecycle.Phase",
+      "canonicalMembers": 9,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.plugin.PulsePluginLifecycle.State",
+      "canonicalMembers": 6,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.plugin.PulsePluginManager",
+      "canonicalMembers": 7,
+      "additional26_1Members": []
+    },
+    {
+      "type": "com.arcanc.pulselib.util.PResourceCache",
+      "canonicalMembers": 9,
+      "additional26_1Members": [
+        "public static Optional<PModelResource> getModelResource(Identifier)"
+      ]
+    }
+  ],
+  "allowedRename": "Minecraft ResourceLocation -> Identifier",
+  "scope": "Declared source API only; full compiled/behavioral compatibility remains stage 7"
+}
