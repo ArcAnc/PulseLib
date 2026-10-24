@@ -9,10 +9,13 @@
 
 package com.arcanc.pulselib.content.renderer;
 
+import com.arcanc.pulselib.content.renderer.base.PBlockRenderState;
+import com.arcanc.pulselib.content.renderer.base.PEntityRenderState;
 import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.resource.ResourceHandle;
 import net.minecraft.client.renderer.LevelTargetBundle;
+import net.minecraft.client.renderer.state.level.LevelRenderState;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
@@ -23,6 +26,23 @@ public final class PWorldRenderPass
 {
 	private PWorldRenderPass()
 	{
+	}
+
+	/**
+	 * Native color/depth layers must survive until OIT insertion, even with Improved Transparency disabled.
+	 * A conservative visible-owner gate also covers material overrides chosen later during submission.
+	 */
+	public static boolean requiresSeparateTargets(LevelRenderState state)
+	{
+		if (state.cameraRenderState.isPanoramicMode)
+			return false;
+		for (var entity : state.entityRenderStates)
+			if (entity instanceof PEntityRenderState<?>)
+				return true;
+		for (var block : state.blockEntityRenderStates)
+			if (block instanceof PBlockRenderState<?>)
+				return true;
+		return false;
 	}
 
 	/** Called after the native transparency chain has declared its passes, before late debug rendering. */

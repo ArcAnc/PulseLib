@@ -1,0 +1,8 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.arcanc.pulselib.test.stage1.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "client": ["Stage42b4QueueMixin"],
+  "injectors": {"defaultRequire": 1}
+}

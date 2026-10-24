@@ -34,6 +34,7 @@
     "SpriteContentsAccessor",
     "CameraAccessor",
     "ProjectionMatrixBufferMixin",
-    "ResourceReloadMixin"
+    "ResourceReloadMixin",
+    "WeatherEffectRendererMixin"
   ]
 }

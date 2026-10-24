@@ -21,9 +21,19 @@ public final class Stage42b3WorldScene
 
 	public static void prepare(ServerPlayer player)
 	{
+		prepare(player, "stage42b3-smoke");
+	}
+
+	public static void prepareTranslucent(ServerPlayer player)
+	{
+		prepare(player, "stage42b4-smoke");
+	}
+
+	private static void prepare(ServerPlayer player, String worldName)
+	{
 		var server = player.level().getServer();
-		if (!server.getWorldData().getLevelName().equals("stage42b3-smoke"))
-			throw new IllegalStateException("World overlap checks require the disposable stage42b3-smoke world");
+		if (!server.getWorldData().getLevelName().equals(worldName))
+			throw new IllegalStateException("World overlap checks require the disposable " + worldName + " world");
 		var source = player.createCommandSourceStack().withPermission(PermissionSet.ALL_PERMISSIONS).withSuppressedOutput();
 		for (String command : new String[] {
 				"kill @e[type=pulselib:test_entity]",

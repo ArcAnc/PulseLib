@@ -68,6 +68,8 @@ public final class Stage1Client implements IPulseClientPlugin
 		bus.addListener((RegisterSpecialModelRendererEvent event) ->
 				event.register(PLibDatabase.rl("test_block"), TestBlockItemRenderer.Unbaked.MAP_CODEC));
 		NeoForge.EVENT_BUS.addListener(Stage1Client::tick);
+		if (Boolean.getBoolean("pulselib.stage42b4Probe"))
+			Stage42b4TranslucentProbe.register();
 		if (Boolean.getBoolean("pulselib.stage42b3Probe"))
 			Stage42b3WorldProbe.register();
 		if (Boolean.getBoolean("pulselib.stage42b2Probe"))
@@ -92,6 +94,12 @@ public final class Stage1Client implements IPulseClientPlugin
 
 	private static void renderers(EntityRenderersEvent.RegisterRenderers event)
 	{
+		if (Boolean.getBoolean("pulselib.stage42b4Probe"))
+		{
+			event.registerBlockEntityRenderer(Stage1Content.BETypeReg.TEST_BLOCK_ENTITY.get(), Stage42b4TranslucentProbe.BlockRenderer::new);
+			event.registerEntityRenderer(Stage1Content.EntityTypeReg.TEST_ENTITY.get(), Stage42b4TranslucentProbe.EntityRenderer::new);
+			return;
+		}
 		if (Boolean.getBoolean("pulselib.stage42b3Probe"))
 		{
 			event.registerBlockEntityRenderer(Stage1Content.BETypeReg.TEST_BLOCK_ENTITY.get(), Stage42b3WorldProbe.BlockRenderer::new);
@@ -118,6 +126,8 @@ public final class Stage1Client implements IPulseClientPlugin
 	public void registerModels(PModelRegistrar event)
 	{
 		Stage2PluginProbe.models++;
+		if (Boolean.getBoolean("pulselib.stage42b4Probe"))
+			event.model(Stage42b4TranslucentProbe.MODEL).texture("0", Stage42aWorldStageProbe.WHITE);
 		if (Boolean.getBoolean("pulselib.stage42b3Probe"))
 			event.model(Stage42b3WorldProbe.MODEL).texture("0", Stage42aWorldStageProbe.WHITE);
 		if (Boolean.getBoolean("pulselib.stage42aProbe") || Boolean.getBoolean("pulselib.stage42b1Probe") || Boolean.getBoolean("pulselib.stage42b2Probe"))
@@ -162,6 +172,11 @@ public final class Stage1Client implements IPulseClientPlugin
 		Minecraft minecraft = Minecraft.getInstance();
 		if (minecraft.level == null)
 		{
+			return;
+		}
+		if (Boolean.getBoolean("pulselib.stage42b4Probe"))
+		{
+			Stage42b4TranslucentProbe.tick();
 			return;
 		}
 		if (Boolean.getBoolean("pulselib.stage42b3Probe"))

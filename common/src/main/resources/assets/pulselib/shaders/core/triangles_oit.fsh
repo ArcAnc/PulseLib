@@ -27,7 +27,8 @@ const float PULSELIB_OIT_EPSILON = 0.00001;
 bool pulselib_oit_matches_layer_depth()
 {
     float layerDepth = texelFetch(LayerDepthSampler, ivec2(gl_FragCoord.xy), 0).r;
-    float tolerance = max(0.000001, layerDepth * 0.00001);
+    // Match depth peeling: a later peeled surface must not accumulate in this layer too.
+    float tolerance = 0.000001;
     return layerDepth > 0.0 && abs(gl_FragCoord.z - layerDepth) <= tolerance;
 }
 

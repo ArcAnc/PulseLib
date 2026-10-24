@@ -1,0 +1,261 @@
+{
+  "checkpoint": "4.2b.2b.2",
+  "status": "complete; stage 4.2 GPU lifecycle and 4.3 GUI remain pending",
+  "date": "2026-10-25",
+  "base_commit": "2a4a5b7c822b5fbaa07e80c60ecfb77b5c7bf9da",
+  "source_refs": {
+    "26.1": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1",
+    "1.21.1-multiloader": "7ce6f024b307bb821ce543344d3896c8e1fcf26b"
+  },
+  "runtime": {
+    "minecraft": "26.1.2",
+    "neoforge": "26.1.2.95",
+    "java": "25.0.4.1",
+    "gradle": "9.2.1",
+    "library": "1.1.5.3",
+    "gpu": "NVIDIA GeForce GTX 1660 Ti",
+    "driver": "615.78.08",
+    "visible_gui_clients": true,
+    "client_exit": 0,
+    "server_exit": 0,
+    "controlled_client_exit": 0,
+    "controlled_server_exit": 0,
+    "h13_client_exit": 0,
+    "h13_server_exit": 0,
+    "world": "stage42b4-smoke",
+    "run_directory": "neoforge/build/stage42b4-runs",
+    "preset_matrix": {
+      "FAST": {
+        "cases": 384,
+        "actual_particle_cases": 128,
+        "actual_weather_cases": 68
+      },
+      "FANCY": {
+        "cases": 384,
+        "actual_particle_cases": 128,
+        "actual_weather_cases": 98
+      },
+      "FABULOUS": {
+        "cases": 384,
+        "actual_particle_cases": 128,
+        "actual_weather_cases": 96
+      }
+    },
+    "server_client_classloads": {
+      "neoforge/build/stage42b4-runs/server/classloading.log": 0,
+      "neoforge/build/stage42b4-h13-runs/server/classloading.log": 0
+    }
+  },
+  "checks": {
+    "actual_world_rgb_depth_cases": 1152,
+    "eight_frames_per_phase": true,
+    "phases": 18,
+    "native_postchain_pre_composite_rgb_checked": true,
+    "cpu_ordered_alpha_reference": true,
+    "max_rgb_error": 0.004692829999999981,
+    "all_eight_owners_have_actual_particles_in_each_particle_phase": true,
+    "weather_depth_less_than_one_required": true,
+    "destination_depth_preserved": true,
+    "resource_reload_between_phase_8_and_9": true,
+    "h13_regression_cases": 32,
+    "controlled_postchain_cases": 26,
+    "controlled_world_depth_cases": 4,
+    "full_build_exit": 0,
+    "stage2Evidence": "PASS",
+    "plan_api": "18 types / 121 members; strict geometry/target/Fabulous queue PASS",
+    "renderer_api": "7 types / 86 members PASS"
+  },
+  "fixes": [
+    {
+      "problem": "Non-improved native translucent geometry was already flattened into main before ordinary OIT resolve",
+      "change": "Retain native transparency chain/targets only for visible Pulse Entity/BlockEntity render states; preserve option and panoramic policy"
+    },
+    {
+      "problem": "Separated native weather in non-improved mode selected a pipeline without depth writes",
+      "change": "Choose weather depth writes from actual separate target availability; render* handles NeoForge overload"
+    },
+    {
+      "problem": "Accumulation tolerance wider than depth peeling counted nearby surfaces in multiple layers",
+      "change": "Use 0.000001 for both; adjacent depth 0.4/0.400003 fails before and passes after"
+    }
+  ],
+  "junit": {
+    "common": {
+      "reports": 26,
+      "tests": 182,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "execution": "executed in build.log; UP-TO-DATE in build-final.log"
+    },
+    "fabric": {
+      "reports": 1,
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "execution": "executed in build.log; UP-TO-DATE in build-final.log"
+    },
+    "neoforge": {
+      "reports": 0,
+      "tests": 0,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "execution": "NO-SOURCE"
+    }
+  },
+  "api_delta": "No canonical PulseLib signatures changed; new requiresSeparateTargets is an Internal host helper. Six PGl Java backend files unchanged relative to HEAD projection.",
+  "limitations": [
+    "World owners covered: Entity and BlockEntity with two-face thin cube reference. Native water is behind/in a clear-glass container; no isolated water contribution claim.",
+    "Real soul particles/rain covered. ItemEntity/clouds insertion is covered by controlled five-target postchain checks, not all real-world item/cloud variants.",
+    "Target gate is conservative (including opaque Pulse owners), excludes panorama, and does not yet identify standalone Pulse item/player layers without a Pulse Entity/BlockEntity render state. Extend at 4.3/5; performance not measured.",
+    "Fabric compiles; Fabric client/server runtime parity remains stage 6. GUI/H15, player, full lifecycle, performance remain later checkpoints.",
+    "Preliminary rain failures included reference rays overlapping a neighbouring owner; isolated ray/AABB selection added. Wider accumulation tolerance independently reproduced and fixed, not inferred only from that reference mismatch.",
+    "One H13 preliminary client closed before assertions (no proven cause); debugger observed 15/15/14, then final projected H13 completed.",
+    "Two separate startup attempts failed (weather overload injection; fixture mixin package); one controlled run used an H14 server and failed default item smoke. Neither counted as final PASS.",
+    "An API audit attempt returned JSONDecodeError; sequential final audit passed. Cause of that attempt was not investigated.",
+    "JUnit executed in first full build this turn; final full build reused unchanged reports.",
+    "Sources/Javadoc tasks read the user worktree; release class verification used the intended HEAD Java projection."
+  ],
+  "debugger": {
+    "skill": "ij-debugger",
+    "method": "non-suspending logpoint; no production mutation",
+    "location": "Stage42b3WorldProbe.java:175",
+    "expression": "\"phase=\" + phase + \", lights=\" + glassSky + \"/\" + waterSky + \"/\" + insideWaterSky",
+    "events": [
+      {
+        "phase": 0,
+        "lights": [
+          15,
+          15,
+          14
+        ],
+        "timestamp": "2026-10-24T22:41:22.895Z"
+      },
+      {
+        "phase": 1,
+        "lights": [
+          15,
+          15,
+          14
+        ],
+        "timestamp": "2026-10-24T22:41:24.113Z"
+      }
+    ],
+    "result": "32 owner RGB/depth assertions, normal shutdown, BUILD SUCCESSFUL. Diagnostic only; final H13 separately rerun using intended-source projection.",
+    "user_breakpoints_before_and_after": 4,
+    "agent_logpoint_removed": true,
+    "temporary_run_configuration_removed": true
+  },
+  "protection": {
+    "preexisting_user_files": 31,
+    "protected_game_files": 188,
+    "journal_user_edits_preserved": true,
+    "projected_java_inputs": 27,
+    "original_branches_unchanged": true,
+    "push_publish": false
+  },
+  "source_sha256": {
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/LevelRendererMixin.java": "99dd34c041ee15dfc9ba742658246db62ceebdb65b60b9d5fc081a8a94677b4c",
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/WeatherEffectRendererMixin.java": "cc9cb1e0840803dd1b074846f0b83961558bc60290f40a70aa0a99357df1271b",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/PWorldRenderPass.java": "31df8aeed7ee25c4aae848e3a7f1e510aa32858e686d38eaf565cbb1c5c715dd",
+    "common/src/main/resources/assets/pulselib/shaders/core/triangles_oit.fsh": "e3d44e72c41b213ca5816b5f22e8438f7b4a2dd781fee7611b3e3dbbd4cae9d0",
+    "common/src/main/resources/pulselib.mixins.json": "57dc7ce05dea88a4e3043e20705cfc1c7f7a7e5ee400575f6faa837624f10e06",
+    "common/src/test/java/com/arcanc/pulselib/content/renderer/PWorldRenderPassTest.java": "c5e09d70c8086eaec4495a9fc1593b2e34a818ee14a8758e971e69004475ca1f",
+    "neoforge/build.gradle": "de2fd3459cab1c0b7364ddde95a1137bd4e9725f133752e0f2032a1510e44e79",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage1Client.java": "a7026a2d172b2ef5bafc91e036cd1d75c06ede4f834a78bf40081ece7ab00938",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage1Smoke.java": "d23b969bb01251044667eac7319caad73fa91389efb3e52e18a5685cc994d305",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage42b2FabulousProbe.java": "686ce81990124edba9c07b3a5c7ae8b0d7bd772a4ff5821a9e20873d1533b669",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage42b3WorldScene.java": "b7a34ab64abdaa6cef4649510152fa01afd7cc7fe8ab41aea9e7b8afa91063d2",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage42b4TranslucentProbe.java": "23b0e192ad3d40e863d18b0c71d3190ff59382a910785094d589203d99e8a95a",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/mixin/Stage42b4QueueMixin.java": "59bd4eda14b15913d069f6ba5b8b703351055a1e563fe4185de75242ef73ef7f",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/mixin/package-info.java": "94207a69f0f32b58352533138719b0689ee1268b31cff45ae1f7de8e3fbeca41",
+    "tests/stage1/neoforge/resources/META-INF/neoforge.mods.toml": "4176b0fbebd36d947ff3459fea61acb26ef0ab149218c8740cf1cebc076ce611",
+    "tests/stage1/neoforge/resources/assets/pulselib/geckolib/models/entity/stage42b4_owner.geo.json": "5771f7a0b60abf57f7f2be527f00d7e17ca947cd1edeb07ea4d66d96e1d92403",
+    "tests/stage1/neoforge/resources/pulselib-stage1.mixins.json": "2fcb062c37d8d31d235cd32c247cc1ad73be9ae2bdca6f63ea8a3e78e2778d7b"
+  },
+  "projected_head_java_inputs": {
+    "common/src/main/java/com/arcanc/pulselib/util/PModelCache.java": "be136ed73525ea70c4a30c9ff14fc15641f8e6491959f52910be14053ba242ac",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStateScope.java": "b2a4c319e05e4f80a8492ad0d30746ddc9d3754b9d34ec7bce78a8eeafcae26e",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java": "c13b66145a884a81695a51ad6acfe1e1643ad066ef773a938f049d50098aee8e",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderPoseContexts.java": "86c3ec5a6e1994f2f5924abf3426b53ca4aa22d6db903f8fe98fdac12aed5261",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java": "39c30c78856b6ef0913215d7d7ec5907ad4af37d91e63e28cb0babecaae62989",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java": "7f26d18c8f29638a24fd708e7eeaeff115590fd28232d4c6c52e942996a2a577",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/PBlockRenderer.java": "cc40c868a385f608ea88f259d02f59a92030276940668af3cebfa90a0d84a782",
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemStackMixin.java": "de7c4946c85dcdd47a8183a3e2bb77da6e7a5924082f93a4b05bb5ffeee7b3f0",
+    "common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimationController.java": "dcf837e9e2abef0fce31d47762cf9b47bb78962b9c2bebcf3cb040fd67682ac7",
+    "common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimatable.java": "6ca6e13ebf2df97bac9742e0bd662930de90f9c68055a747154ec84d3746267f",
+    "common/src/main/java/com/arcanc/pulselib/content/animatable/instance/InstanceAnimationManager.java": "3c3ba6cc0850d1b988b8af606d2fda5726568632934578e0ff2154137f581853",
+    "common/src/main/java/com/arcanc/pulselib/content/model/baked/PMeshTextureVariants.java": "51956a7b3f23f58516072014b562bca4e02f1e916f27af0c041dcb862b958a30",
+    "common/src/main/java/com/arcanc/pulselib/content/model/baked/PDeformedMeshBuffers.java": "8c572568792042e785945f9788db40cfcaa9d9edd112ec9332b35ede7de7a489",
+    "common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedModel.java": "8ce968a9222df034dac9a8ef3a3812c201f00ffb0d7b0ead20a8f54625257bde",
+    "common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java": "f9fd3cf705a417b9136e8e8dffe273d88e3db0180f5d53ffe1874b7b17edbf0e",
+    "common/src/main/java/com/arcanc/pulselib/content/model/animation/PCyclicAnimationEvents.java": "4eeb07837a336baaba287fd24f7486c306035f372382d273409f785dba96d22b",
+    "common/src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationRuntime.java": "a244c7c27185716c3be3cdefc3897da8d65fe54299e3816f75a10a17d702eabb",
+    "common/src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationGraphRuntime.java": "074dca1419f39b7181b626022d61bee040c9a64ebd6592cfd3b5606ab8faa128",
+    "common/src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationChannel.java": "a5eb5828d3f465dc102c7554ea549d5b90205d78417f4408e6e8e06ee93c8743",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/plan/PFrameCompiler.java": "2886cb42a6292542df11fcc3fe27645ce2ad514bcac3aafaab74cd8b5e25ac0a",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java": "b40a4b8fb9e5e2cef99b5eb806429828aeb76e6749308ed0ccaea322685d41be",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlResourceRegistry.java": "ced196a145d769f9d116b6063397bb54e604efaf6b05a1060b86db8353470a84",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java": "29576869962f553c3efdb0648924ea9253bbddb7f6682fb455bbee3d5a37e606",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlGeometryArena.java": "52539ba678423df4aa46f55dca7c04632eb21f7c0bfa41ba2b7b6e791a067ae3",
+    "common/src/main/java/com/arcanc/pulselib/data/gecko/MolangParser.java": "1c6a52c42cd06b43f42fd197285b192eaff07c75c8bbd32139a7fb90f4b614a0",
+    "common/src/test/java/com/arcanc/pulselib/content/renderer/PRenderStateScopeTest.java": "3c2b1950dd1c37f5f59811e61d029a9c3bd1c404f374e69bf18a9a50ac8592d3",
+    "common/src/test/java/com/arcanc/pulselib/content/renderer/gl/PGlGeometrySourceTest.java": "b206e90d801eaee56962a4fc5049e2b2cc17ff8ee8a617cdce8196b3bdfa0230"
+  },
+  "artifacts": {
+    "common": {
+      "file": "common/build/libs/pulselib-26.1.2-common-1.1.5.3.jar",
+      "sha256": "249e21ef09ab1604d37f6943207650eadd4b32f193d789d2253449c56c2c7849",
+      "class_major": 69,
+      "java_units": 332
+    },
+    "neoforge": {
+      "file": "neoforge/build/libs/pulselib-26.1.2-neoforge-1.1.5.3.jar",
+      "sha256": "011a4b860c6a3917241622ceb259f6ebefa796b966227abc955e60c7bb634ad3",
+      "class_major": 69,
+      "java_units": 343
+    },
+    "fabric": {
+      "file": "fabric/build/libs/pulselib-26.1.2-fabric-1.1.5.3.jar",
+      "sha256": "44515ef4491c8847a8b87a699427ced09dcaed67e5142677c85557cbc4c44f71",
+      "class_major": 69,
+      "java_units": 336
+    }
+  },
+  "local_log_sha256": {
+    "build-final.log": "6059acd253abc909ff6ae1dbb483d26f870312539953089c9eab11b6050fb508",
+    "build.log": "85b74d3746116fa040989511f5d8cac64f5cf12123539de3b871b3293223d049",
+    "check-final.log": "93275d696e4b918d3947e3700c33e796b4aa17999a70f8445847f134f513188e",
+    "check.log": "67d1406f5783a75c0faacf73b1b0b9850c4eeec90c88006ce3fd7fed7244a0e7",
+    "client-after.log": "cdf5a6390930a41006d4e618a4c17ad02a166194ba24b57b7eeb740a5a566056",
+    "client-before.log": "27efefb4ed6b3b9eaeeaa65370e0a79de688aa6e56e8f3cd25a10a7fdb3a85e0",
+    "client-close-layers-after.log": "02de441c0603ff23d29b6853a6e541ee70a868ebf1f6c94f72b81b0a6bde30b1",
+    "client-close-layers-before.log": "8803492877bbdf938b59d1b85dc5313923959ed24c70550dcaceef36b16fd536",
+    "client-control-final.log": "d3846b218b191ce28651fa2fa450c949eab99344fd338165cec69c146c5e8253",
+    "client-covered.log": "a0ec5a54cd147a403d40e85d25b9d050bd0c546f8ad69f0948b1179ea28a5e2e",
+    "client-diagnostic.log": "1959f415adf5d9c1f35947756dd81aa74ea8b6c92a00dde3060ab13905bdf785",
+    "client-final.log": "074d4cdfd9552e8a8e6fa5dce85747e4301593a9e47b66f622d7c195e8efe1bb",
+    "client-h13-final.log": "85a5d93d94513fa73a79e2d18263cc1abc651ed85f346332b84bf0cb832ac60b",
+    "client-h13-projected.log": "84240fafb88cb0a4b39238df16f2cd387dd0c805fd2c0ed810966b93db93391f",
+    "client-multiframe.log": "1c4f3dcba201c220ad33ad5ba12add4d604a7ba7e8d71c559ea04b71d2b9c9bb",
+    "client-native-resolve.log": "a2a565bcfebabc8694cca4fe0b7b4923a1cd26387fbfc50707577afc68dfbb2a",
+    "client-weather-overload.log": "a96d7f3e692d4c7db35bd25829d5462d5d9e7b78fc649a3806e5e3daa228a8cd",
+    "client-weather.log": "96f73ea55d6de5421232827afd19659d333ce00999f3fb1ddc9d141b3d77a5c2",
+    "server-control.log": "8fcb11943e259d4db5c3a81bcea3b381a025a8cad32ae63542de86bd4c57444b",
+    "server-covered.log": "60801208cb6449e3435269c2afb2b883309a03b0e3e6ffdbe99132b65af01fa1",
+    "server-final.log": "72a49c6cf0b34c89601e82c7043bb6e0edf023d70d83809ab0eb502c6e60eda6",
+    "server-h13.log": "3a113b50a45358ca0c2b8f01537c9cd35fb7a291b9eb73d4f7ed462f302f6652",
+    "server.log": "89ab3ef30cea4d7767e1154d2cce13ddca089806a9e2a3696f1698d0ffd3dfce"
+  },
+  "api_report_sha256": {
+    "plan-api-final.json": "9b8eaf8d4adf6cfde0f41e1a40a7ea32ac5480a263c562a35e518f31dc746468",
+    "renderer-api-final.json": "8caefc75241d8333d24bc86f2938ff0bd3f663cc6aef1ba233a338b745ecd829"
+  },
+  "evidence_sha256": {
+    "stage-4.2b.2b.2-after-reload.png": "2f29384128b21464b911fd952a2a78eaa146b6162c60b4336674b28b7f70c128",
+    "stage-4.2b.2b.2-cases.ndjson": "a3cb763d1e29fc77898229a95413c7785f182ea6808297184966e48b2d263fd7",
+    "stage-4.2b.2b.2-runtime.txt": "748877594949a26f9bf2cbf246a26c46197ca984995b6420bccd8125e6347392"
+  }
+}

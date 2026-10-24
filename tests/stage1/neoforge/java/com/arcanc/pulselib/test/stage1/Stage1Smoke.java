@@ -52,6 +52,11 @@ public final class Stage1Smoke
 			return;
 		}
 		var server = player.level().getServer();
+		if (Boolean.getBoolean("pulselib.stage42b4Probe"))
+		{
+			Stage42b3WorldScene.prepareTranslucent(player);
+			return;
+		}
 		if (Boolean.getBoolean("pulselib.stage42b3Probe"))
 		{
 			Stage42b3WorldScene.prepare(player);

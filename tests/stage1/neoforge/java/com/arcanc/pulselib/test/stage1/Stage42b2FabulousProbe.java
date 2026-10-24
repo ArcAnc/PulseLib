@@ -104,6 +104,8 @@ public final class Stage42b2FabulousProbe
 			}
 			verify("interleaved-layers", 1, List.of(new Surface(0.2f, 0x80FF0000), new Surface(0.4f, 0x8000FF00), new Surface(0.7f, 0x800000FF)),
 					List.of(new Vanilla(2, 0.3f, 0x66FFFF00), new Vanilla(3, 0.6f, 0x6600FFFF), new Vanilla(4, 0.8f, 0x66FF00FF)));
+			verify("adjacent-peeled-layers", 1, List.of(new Surface(0.4f, 0x80FF0000), new Surface(0.400003f, 0x8000FF00)),
+					List.of(new Vanilla(0, 0.2f, 0x660000FF)));
 			verify("opaque-particle-and-occluder", 0.5f, List.of(new Surface(0.4f, 0x80FF0000), new Surface(0.7f, 0x8000FF00)),
 					List.of(new Vanilla(2, 0.2f, 0xFF0000FF)));
 			suites++;
@@ -311,10 +313,10 @@ public final class Stage42b2FabulousProbe
 
 	private static void shutdown(GameShuttingDownEvent event)
 	{
-		check(suites == 2 && cases == 24 && nativeCases == 4, "Both postchain suites and four native world passes must complete");
+		check(suites == 2 && cases == 26 && nativeCases == 4, "Both postchain suites and four native world passes must complete");
 		Object executor = Stage41bGeometryProbe.field(PRenderQueue.class, null, "EXECUTOR");
 		check(Stage41bGeometryProbe.field(executor.getClass(), executor, "worldOpaqueDepth") == null, "Opaque snapshot must be released on shutdown");
-		PLibDatabase.LOGGER.info("STAGE 4.2b.2 SHUTDOWN PASS: 24 native-postchain cases, four world mode passes; snapshot released");
+		PLibDatabase.LOGGER.info("STAGE 4.2b.2 SHUTDOWN PASS: 26 native-postchain cases, four world mode passes; snapshot released");
 	}
 
 	private static void check(boolean condition, String message)
