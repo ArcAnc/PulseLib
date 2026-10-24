@@ -16,6 +16,8 @@ import com.mojang.blaze3d.pipeline.ColorTargetState;
 import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.shaders.UniformType;
+import com.mojang.blaze3d.platform.SourceFactor;
+import com.mojang.blaze3d.platform.DestFactor;
 import com.mojang.blaze3d.textures.TextureFormat;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
@@ -152,6 +154,37 @@ public class PRenderTypes
 				withVertexFormat(DefaultVertexFormat.EMPTY, VertexFormat.Mode.TRIANGLES).
 				build());
 		
+		public static final RenderPipeline OIT_FABULOUS_METADATA = registerPipeline(RenderPipeline.builder().
+				withLocation(PLibDatabase.rl("pipeline/oit_fabulous_metadata")).
+				withVertexShader(PLibDatabase.rl("core/oit_composite")).
+				withFragmentShader(PLibDatabase.rl("core/oit_fabulous_metadata")).
+				withSampler("RevealSampler").withSampler("DepthSampler").
+				withCull(false).
+				withVertexFormat(DefaultVertexFormat.EMPTY, VertexFormat.Mode.TRIANGLES).
+				build());
+
+		public static final RenderPipeline OIT_FABULOUS_COMPOSITE = registerPipeline(RenderPipeline.builder().
+				withLocation(PLibDatabase.rl("pipeline/oit_fabulous_composite")).
+				withVertexShader(PLibDatabase.rl("core/oit_composite")).
+				withFragmentShader(PLibDatabase.rl("core/oit_fabulous_composite")).
+				withSampler("AccumSampler").
+				withSampler("OitMetadataSampler").
+				withSampler("TranslucentSampler").
+				withSampler("TranslucentDepthSampler").
+				withSampler("ItemEntitySampler").
+				withSampler("ItemEntityDepthSampler").
+				withSampler("ParticlesSampler").
+				withSampler("ParticlesDepthSampler").
+				withSampler("WeatherSampler").
+				withSampler("WeatherDepthSampler").
+				withSampler("CloudsSampler").
+				withSampler("CloudsDepthSampler").
+				withColorTargetState(new ColorTargetState(new BlendFunction(SourceFactor.SRC_ALPHA,
+						DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ZERO, DestFactor.ONE))).
+				withCull(false).
+				withVertexFormat(DefaultVertexFormat.EMPTY, VertexFormat.Mode.TRIANGLES).
+				build());
+
 		private static final RenderPipeline.Snippet TRIANGLES_INSTANT_SNIPPET = RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET).
 				withVertexShader(PLibDatabase.rl("core/triangles_instant")).
 				withFragmentShader(PLibDatabase.rl("core/triangles_instant")).

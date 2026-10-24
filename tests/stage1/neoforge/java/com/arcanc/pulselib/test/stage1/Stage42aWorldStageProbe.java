@@ -189,7 +189,7 @@ public final class Stage42aWorldStageProbe
 				boundary + " patch=" + patch + " expected depth=" + DEPTH[patch] + " actual=" + actual[3]);
 	}
 
-	private static PInstanceHeader header(int patch, float distance, int color)
+	static PInstanceHeader header(int patch, float distance, int color)
 	{
 		PRenderFrame frame = new PGlRenderHost().captureFrame();
 		Matrix4f inverseProjection = new Matrix4f(frame.projection()).invert();

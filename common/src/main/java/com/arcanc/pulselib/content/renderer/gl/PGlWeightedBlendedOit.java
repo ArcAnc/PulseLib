@@ -15,6 +15,7 @@ import com.arcanc.pulselib.util.PRenderTypes;
 import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.opengl.GlTexture;
 import com.mojang.blaze3d.opengl.GlTextureView;
+import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.FilterMode;
@@ -34,6 +35,7 @@ import org.lwjgl.opengl.GL32;
 import org.lwjgl.opengl.GL40;
 
 import java.util.OptionalInt;
+import java.util.List;
 
 /**
  * Provides support for gl weighted blended oit.
@@ -45,6 +47,9 @@ final class PGlWeightedBlendedOit
 	private static final float[] CLEAR_DEPTH = {1.0F, 1.0F, 1.0F, 1.0F};
 
 	private int framebuffer = -1;
+	private @Nullable ExternalGlTexture fabulousMetadataTexture;
+	private @Nullable ExternalGlTextureView fabulousMetadataView;
+	private static final String[] FABULOUS_SAMPLERS = {"Translucent", "ItemEntity", "Particles", "Weather", "Clouds"};
 	private final @Nullable ExternalGlTexture[] accumulationTextures = new ExternalGlTexture[LAYER_COUNT];
 	private final @Nullable ExternalGlTextureView[] accumulationViews = new ExternalGlTextureView[LAYER_COUNT];
 	private final @Nullable ExternalGlTexture[] revealageTextures = new ExternalGlTexture[LAYER_COUNT];
@@ -328,6 +333,86 @@ final class PGlWeightedBlendedOit
 		}
 	}
 
+	/** Validates all five native inputs before consuming any pending frame. */
+	public static void validateFabulousTargets(GpuTextureView destination, List<RenderTarget> targets)
+	{
+		if (targets.size() != FABULOUS_SAMPLERS.length)
+			throw new IllegalArgumentException("Fabulous composition requires five translucent targets");
+		for (RenderTarget target : targets)
+		{
+			GpuTextureView color = target.getColorTextureView();
+			GpuTextureView depth = target.getDepthTextureView();
+			if (color == null || depth == null || color.isClosed() || depth.isClosed() ||
+					color.getWidth(0) != destination.getWidth(0) || color.getHeight(0) != destination.getHeight(0) ||
+					depth.getWidth(0) != destination.getWidth(0) || depth.getHeight(0) != destination.getHeight(0))
+				throw new IllegalArgumentException("Fabulous inputs must have matching live color and depth attachments");
+		}
+	}
+
+	/** Inserts each peeled layer behind the nearer vanilla surfaces without blending them twice. */
+	public void compositeFabulous(GpuTextureView destination, List<RenderTarget> targets)
+	{
+		validateFabulousTargets(destination, targets);
+		validateDestination(destination);
+		if (!this.frameOpen)
+			return;
+		if (this.pass != Pass.NONE)
+			throw new IllegalStateException("Cannot composite weighted blended OIT while a pass is active");
+		GlStateSnapshot state = GlStateSnapshot.capture();
+		try
+		{
+			if (this.fabulousMetadataView == null)
+			{
+				this.fabulousMetadataTexture = createTexture("PulseLib Fabulous metadata", TextureFormat.RGBA8,
+						GL30.GL_RG32F, GL30.GL_RG, this.width, this.height);
+				this.fabulousMetadataView = new ExternalGlTextureView(this.fabulousMetadataTexture);
+			}
+			var sampler = RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST);
+			for (int layer = LAYER_COUNT - 1; layer >= 0; layer--)
+			{
+				if (!this.hasContent[layer])
+					continue;
+				// Pack optical depth and fragment depth: Minecraft still caches only twelve texture units.
+				try (RenderPass metadata = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
+						() -> "PulseLib Fabulous metadata", this.fabulousMetadataView, OptionalInt.empty()))
+				{
+					metadata.setPipeline(PRenderTypes.RenderPipelinesProvider.OIT_FABULOUS_METADATA);
+					metadata.disableScissor();
+					metadata.bindTexture("RevealSampler", revealageView(layer), sampler);
+					metadata.bindTexture("DepthSampler", layerDepthView(layer), sampler);
+					metadata.draw(0, 3);
+				}
+				try (RenderPass composite = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
+						() -> "PulseLib Fabulous composite", destination, OptionalInt.empty()))
+				{
+					composite.setPipeline(PRenderTypes.RenderPipelinesProvider.OIT_FABULOUS_COMPOSITE);
+					composite.disableScissor();
+					composite.bindTexture("AccumSampler", accumulationView(layer), sampler);
+					composite.bindTexture("OitMetadataSampler", this.fabulousMetadataView, sampler);
+					for (int input = 0; input < targets.size(); input++)
+					{
+						composite.bindTexture(FABULOUS_SAMPLERS[input] + "Sampler", targets.get(input).getColorTextureView(), sampler);
+						composite.bindTexture(FABULOUS_SAMPLERS[input] + "DepthSampler", targets.get(input).getDepthTextureView(), sampler);
+					}
+					composite.draw(0, 3);
+				}
+			}
+		}
+		finally
+		{
+			state.restore();
+			this.finishFrame();
+		}
+	}
+
+	/** Discards an interrupted world frame; next accumulation clears every layer. */
+	public void discard()
+	{
+		if (this.pass != Pass.NONE)
+			throw new IllegalStateException("Cannot discard an active OIT pass");
+		this.finishFrame();
+	}
+
 	/**
 	 * Performs the close operation.
 	 */
@@ -461,6 +546,10 @@ final class PGlWeightedBlendedOit
 	 */
 	private void closeBuffers()
 	{
+		close(this.fabulousMetadataView);
+		close(this.fabulousMetadataTexture);
+		this.fabulousMetadataView = null;
+		this.fabulousMetadataTexture = null;
 		for (int layer = 0; layer < LAYER_COUNT; layer++)
 		{
 			close(this.accumulationViews[layer]);

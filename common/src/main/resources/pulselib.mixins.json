@@ -16,6 +16,7 @@
     "CubeDefinitionMixin",
     "EntityModelSetMixin",
     "GameRendererMixin",
+    "LevelRendererMixin",
     "GlBufferAccessor",
     "HumanoidArmorLayerMixin",
     "ItemInHandRendererMixin",

@@ -10,6 +10,8 @@
 package com.arcanc.pulselib.content.renderer;
 
 import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
+import com.mojang.blaze3d.pipeline.RenderTarget;
+import net.minecraft.client.Minecraft;
 
 /** Shared 26.1 world-stage operations; loader adapters own event subscription. */
 public class PRenderStagesHandler
@@ -25,6 +27,7 @@ public class PRenderStagesHandler
 	{
 		PRenderQueue.flushOpaque(PRenderQueue.RenderStage.ENTITIES);
 		PRenderQueue.flushOpaque(PRenderQueue.RenderStage.SOLID_BLOCKS);
+		PRenderQueue.captureWorldDepth(Minecraft.getInstance().getMainRenderTarget());
 	}
 
 	/**
@@ -39,9 +42,18 @@ public class PRenderStagesHandler
 	/** Sorts ordinary alpha across every world source while retaining separate OIT groups. */
 	public static void afterParticles()
 	{
-		PRenderQueue.flushCombined(PRenderQueue.RenderStage.ENTITIES, PRenderQueue.RenderStage.SOLID_BLOCKS,
-				PRenderQueue.RenderStage.TRANSLUCENT_BLOCKS);
-		PRenderQueue.compositeTranslucency();
+		PRenderQueue.flushWorld();
 		PGpuDeformerBuffers.finishFrame();
+	}
+	/**
+	 * Composites deferred translucency into the destination after weather rendering.
+	 *
+	 * @param destination the mutable object receiving the result
+	 */
+	public static void afterWeather(RenderTarget destination)
+	{
+		if (destination == Minecraft.getInstance().levelRenderer.getWeatherTarget())
+			return;
+		PRenderQueue.compositeTranslucency(destination);
 	}
 }

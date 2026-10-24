@@ -26,6 +26,7 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -66,6 +67,8 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 	private @Nullable PGlWeightedBlendedOit activeWeightedBlendedOit;
 	private @Nullable RenderTargetAttachments activeOitAttachments;
 	private @Nullable ProjectionMatrixBuffer projectionBuffer;
+	private @Nullable TextureTarget worldOpaqueDepth;
+	private boolean worldDepthValid;
 	private @Nullable GpuBuffer stateVertices;
 	private @Nullable GpuBuffer stateIndices;
 
@@ -252,6 +255,50 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 		this.weightedBlendedOits.values().forEach(oit -> oit.composite(color));
 	}
 
+	/** Inserts pending OIT layers into the resolved vanilla Fabulous image. */
+	public void compositeFabulousOit(RenderTarget destination, List<RenderTarget> targets)
+	{
+		GpuTextureView color = Objects.requireNonNull(destination.getColorTextureView(), "OIT destination color");
+		PGlWeightedBlendedOit.validateFabulousTargets(color, targets);
+		this.weightedBlendedOits.values().forEach(oit -> oit.validateDestination(color));
+		this.weightedBlendedOits.values().forEach(oit -> oit.compositeFabulous(color, targets));
+	}
+
+	/** Copies only opaque depth; ownership stays with this executor through reload/disconnect. */
+	public void captureWorldDepth(RenderTarget source)
+	{
+		if (this.worldOpaqueDepth == null || this.worldOpaqueDepth.width != source.width || this.worldOpaqueDepth.height != source.height)
+		{
+			if (this.worldOpaqueDepth != null)
+			{
+				PGlWeightedBlendedOit old = this.weightedBlendedOits.remove(this.worldOpaqueDepth);
+				if (old != null)
+					old.close();
+				this.worldOpaqueDepth.destroyBuffers();
+			}
+			this.worldOpaqueDepth = new TextureTarget("PulseLib opaque world depth", source.width, source.height, true);
+		}
+		PGlWeightedBlendedOit pending = this.weightedBlendedOits.get(this.worldOpaqueDepth);
+		if (pending != null)
+			pending.discard();
+		this.worldOpaqueDepth.copyDepthFrom(source);
+		this.worldDepthValid = true;
+	}
+
+	/** World transparency uses the captured opaque depth, including in non-Fabulous mode. */
+	public void executeWorld(PRenderPlan plan)
+	{
+		if (!plan.isEmpty())
+			execute(plan, new PGlRenderHost().captureFrame(), this.worldDepthValid && this.worldOpaqueDepth != null ?
+					this.worldOpaqueDepth : Minecraft.getInstance().getMainRenderTarget());
+	}
+
+	/** Invalidates the snapshot when the world's framegraph pass has completed. */
+	public void endWorldFrame()
+	{
+		this.worldDepthValid = false;
+	}
+
 	/**
 	 * Performs the cleanup operation.
 	 */
@@ -264,6 +311,10 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 		this.indirect.close();
 		this.weightedBlendedOits.values().forEach(PGlWeightedBlendedOit :: close);
 		this.weightedBlendedOits.clear();
+		if (this.worldOpaqueDepth != null)
+			this.worldOpaqueDepth.destroyBuffers();
+		this.worldOpaqueDepth = null;
+		this.worldDepthValid = false;
 		this.activeWeightedBlendedOit = null;
 		this.activeOitAttachments = null;
 		if (this.projectionBuffer != null)

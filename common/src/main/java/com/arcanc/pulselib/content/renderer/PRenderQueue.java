@@ -227,6 +227,7 @@ public final class PRenderQueue
 	public static void endWorldFrame()
 	{
 		COMPILER.discard(List.of(RenderStage.ENTITIES, RenderStage.SOLID_BLOCKS, RenderStage.TRANSLUCENT_BLOCKS));
+		EXECUTOR.endWorldFrame();
 	}
 
 	
@@ -423,6 +424,31 @@ public final class PRenderQueue
 	public static void compositeTranslucency(RenderTarget destination)
 	{
 		EXECUTOR.compositeOit(destination);
+	}
+
+	/**
+	 * Inserts OIT layers after the vanilla Fabulous transparency chain.
+	 * Targets are ordered as terrain, items, particles, weather and clouds.
+	 *
+	 * @param destination the mutable object receiving the result
+	 * @param targets the vanilla Fabulous transparency targets
+	 */
+	public static void compositeFabulousTranslucency(RenderTarget destination, List<RenderTarget> targets)
+	{
+		EXECUTOR.compositeFabulousOit(destination, targets);
+	}
+
+	/** Captures the opaque world depth before Minecraft starts transparency. */
+	public static void captureWorldDepth(RenderTarget source)
+	{
+		EXECUTOR.captureWorldDepth(source);
+	}
+
+	/** Executes the shared world plan against the opaque depth snapshot. */
+	public static void flushWorld()
+	{
+		EXECUTOR.executeWorld(COMPILER.compileCombined(List.of(RenderStage.ENTITIES, RenderStage.SOLID_BLOCKS,
+				RenderStage.TRANSLUCENT_BLOCKS), PRenderQueue::canBatchWithOit));
 	}
 
 	/**

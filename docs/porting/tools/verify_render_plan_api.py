@@ -18,6 +18,7 @@ def main():
     parser.add_argument('--report', type=Path)
     parser.add_argument('--require-geometry-queue', action='store_true', help='Require all canonical geometry submission overloads and RenderStage contracts')
     parser.add_argument('--require-target-queue', action='store_true', help='Require explicit opaque-depth flush and destination composite; Fabulous integration remains separate')
+    parser.add_argument('--require-fabulous-queue', action='store_true', help='Require every canonical queue and stage-handler member, including Fabulous composition')
     args = parser.parse_args()
     directory = ROOT / 'docs/porting/26.1.2-multiloader'
     for line in (directory / 'checksums.sha256').read_text().splitlines():
@@ -69,7 +70,19 @@ def main():
             assert all(member['name'] == 'compositeFabulousTranslucency' and 'RenderTarget' in member['signature']
                        for member in row['deferredMembers']), row['deferredMembers']
         report['targetQueueStatus'] = 'PASS: canonical flush(RenderStage, RenderTarget) and compositeTranslucency(RenderTarget), all declared member metadata preserved'
-        report['remainingStage4Work'][0] = 'Fabulous target insertion/compositeFabulousTranslucency and afterWeather remain 4.2b.2; full GPU lifecycle remains 4.2c'
+        report['remainingStage4Work'][0] = ('Fabulous target insertion/compositeFabulousTranslucency and afterWeather remain 4.2b.2'
+                                           if any(row['deferredMembers'] for row in queue_debt) else
+                                           'All canonical queue declarations preserved; real world H14 scenes and GPU lifecycle remain')
+    if args.require_fabulous_queue:
+        for row in queue_debt:
+            assert not row['deferredMembers'] and not row['deferredTypeChanges'], row
+        name = 'com.arcanc.pulselib.content.renderer.PRenderStagesHandler'
+        before, after = all_baseline[name], current[name]
+        expected = {json.dumps(member, sort_keys=True) for member in before['members']}
+        actual = {json.dumps(member, sort_keys=True) for member in after['members']}
+        assert expected <= actual, f'Missing canonical stage callbacks: {expected - actual}'
+        report['fabulousQueueStatus'] = 'PASS: all 19 queue / 8 RenderStage members and canonical stage callbacks preserved'
+        report['remainingStage4Work'][0] = 'Native terrain/owner/world H14 scene matrix and full GPU lifecycle; GUI scopes/helper remain 4.3'
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(json.dumps(report, indent=2) + '\n')
@@ -77,7 +90,9 @@ def main():
     if args.require_geometry_queue:
         print('GEOMETRY QUEUE API PASS: 11 submission overloads, endWorldFrame and complete RenderStage contracts')
     if args.require_target_queue:
-        print('TARGET QUEUE API PASS: explicit opaque-depth flush and destination composite; Fabulous remains explicit debt')
+        print('TARGET QUEUE API PASS: explicit opaque-depth flush and destination composite')
+    if args.require_fabulous_queue:
+        print('FABULOUS QUEUE API PASS: every canonical queue/stage callback member preserved')
 
 
 if __name__ == '__main__':

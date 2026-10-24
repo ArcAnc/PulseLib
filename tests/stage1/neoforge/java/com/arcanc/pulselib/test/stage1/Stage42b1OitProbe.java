@@ -193,7 +193,7 @@ public final class Stage42b1OitProbe
 		return result;
 	}
 
-	private static void clear(RenderTarget target, int color, float depth)
+	static void clear(RenderTarget target, int color, float depth)
 	{
 		var encoder = RenderSystem.getDevice().createCommandEncoder();
 		if (target.useDepth)
@@ -202,7 +202,7 @@ public final class Stage42b1OitProbe
 			encoder.clearColorTexture(target.getColorTexture(), color);
 	}
 
-	private static float[] pixel(RenderTarget target)
+	static float[] pixel(RenderTarget target)
 	{
 		int previous = GL11.glGetInteger(GL30.GL_READ_FRAMEBUFFER_BINDING);
 		int framebuffer = GL30.glGenFramebuffers();
@@ -244,11 +244,11 @@ public final class Stage42b1OitProbe
 	}
 
 	/** Caller state which composition promises to preserve; no production snapshot helper is used. */
-	private static final class State
+	static final class State
 	{
-		private final int[] values = new int[19];
+		final int[] values = new int[19];
 
-		private State()
+		State()
 		{
 			GL11.glGetIntegerv(GL11.GL_VIEWPORT, this.values);
 			int[] box = new int[4];
@@ -267,7 +267,7 @@ public final class Stage42b1OitProbe
 			this.values[18] = GL11.glGetInteger(GL14.GL_BLEND_DST_ALPHA);
 		}
 
-		private void restore()
+		void restore()
 		{
 			GlStateManager._glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, this.values[8]);
 			GlStateManager._glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, this.values[9]);
