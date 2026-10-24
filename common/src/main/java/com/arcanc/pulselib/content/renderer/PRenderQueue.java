@@ -15,6 +15,7 @@ import com.arcanc.pulselib.content.model.baked.PGpuDeformedMeshBuffers;
 import com.arcanc.pulselib.content.model.deformer.PMeshDeformation;
 import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
 import com.arcanc.pulselib.content.renderer.gl.PGlMultiDrawExecutor;
+import com.arcanc.pulselib.content.renderer.gl.PGlRenderHost;
 import com.arcanc.pulselib.content.renderer.gl.PGlResourceRegistry;
 import com.arcanc.pulselib.content.renderer.plan.PFrameCompiler;
 import com.arcanc.pulselib.content.renderer.plan.PInstanceHeader;
@@ -28,6 +29,8 @@ import com.arcanc.pulselib.content.renderer.plan.PMeshHandle;
 import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
 import com.arcanc.pulselib.content.renderer.plan.PDynamicGeometry;
 import com.arcanc.pulselib.util.PRenderTypes;
+import com.mojang.blaze3d.pipeline.RenderTarget;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.world.item.ItemDisplayContext;
 import org.joml.Matrix4f;
@@ -368,7 +371,19 @@ public final class PRenderQueue
 	 */
 	public static void flush(RenderStage stage)
 	{
-		EXECUTOR.execute(COMPILER.compile(stage, PRenderQueue::canBatchWithOit));
+		flush(stage, Minecraft.getInstance().getMainRenderTarget());
+	}
+
+	/**
+	 * Compiles and executes queued submissions for one render stage.
+	 *
+	 * @param stage the stage
+	 * @param depthSource the render target supplying opaque scene depth
+	 */
+	public static void flush(RenderStage stage, RenderTarget depthSource)
+	{
+		EXECUTOR.execute(COMPILER.compile(stage, pipeline -> canBatchWithOit(pipeline) && depthSource.useDepth),
+				new PGlRenderHost().captureFrame(), depthSource);
 	}
 
 	/** Consumes opaque geometry while retaining transparent submissions for their later pass. */
@@ -398,6 +413,16 @@ public final class PRenderQueue
 	public static void compositeTranslucency()
 	{
 		EXECUTOR.compositeOit();
+	}
+
+	/**
+	 * Composites accumulated PulseLib translucent geometry into the destination target.
+	 *
+	 * @param destination the mutable object receiving the result
+	 */
+	public static void compositeTranslucency(RenderTarget destination)
+	{
+		EXECUTOR.compositeOit(destination);
 	}
 
 	/**

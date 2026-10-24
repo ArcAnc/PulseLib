@@ -1,0 +1,48 @@
+CLIENT
+[18:01:07] [fml-loadingscreen/INFO] [ne.ne.fm.ea.re.LoadingScreenRenderer/]: GL info: NVIDIA GeForce GTX 1660 Ti/PCIe/SSE2 GL version 3.3.0 NVIDIA 615.78.08, NVIDIA Corporation
+[18:01:20] [Render thread/INFO] [co.ar.pu.te.st.Stage1Client/]: STAGE 2 CAMERA SERVICE PASS: com.arcanc.pulselib.neoforge.NeoForgeCameraService
+[18:01:22] [Render thread/INFO] [Pulse Lib/]: STAGE 3.2 RENDERER TIME PASS: 60 assertions, Entity/BlockEntity/Item, interpolated seconds
+[18:01:23] [Render thread/INFO] [Pulse Lib/]: STAGE 3.2 VANILLA LIGHT INPUTS: tick=100, leftSky=0, rightSky=15, leftRaw=0, rightRaw=15
+[18:01:23] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1b.3 RENDERER PASS: tick=100, contexts=16, owner/state/submit/traversal hooks, sibling isolation, deferred forward-bound layer, Molang=4/4/8, GPU primitives=8192, exception pose/state recovery, sleeping/head snapshots, layer modelSelections=1
+[18:01:23] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1b.2 BAKED PASS: tick=100, modelTriangles=338, direct draw preserves queue/pose, visibility, materials, CPU fallback readback, GPU subdivision/deformer UBO, owners=5, dataLookups=6034, modelLookups=1432
+[18:01:23] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1b.1 GEOMETRY PASS: tick=100, frames=257, primitives=768, 16/32-bit indices, static/dynamic bytes match GPU, slots<=9
+[18:01:23] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1a PLAN BACKEND PASS: tick=100, meshes=21, strategies=PRenderCapabilities[storageMode=CPU, submissionMode=MULTI_DRAW_INDIRECT, uploadMode=PERSISTENT_RING, matrix=PRenderCapabilityMatrix[texelBuffer=true, shaderStorageBuffer=true, multiDrawIndirect=true, baseInstance=true, persistentMapping=true]], projection UBO matches CPU capture
+[18:01:23] [Render thread/INFO] [Pulse Lib/]: STAGE 4.2a WORLD PASS: tick=110, early opaque Entity/BlockEntity RGB/depth; alpha retained through terrain; three-source global blend RGB=[0.1254902, 0.2509804, 0.5019608, 0.9285942], including late submission; no alpha depth writes
+[18:01:23] [Render thread/INFO] [Pulse Lib/]: STAGE 4.2b.1 OIT CASE PASS: tick=115, opaque-depth, 64x32, opaqueDepth=0.5, RGBA/depth=[0.5529412, 0.1254902, 0.2509804, 1.0, 0.17000003]
+[18:01:23] [Render thread/INFO] [Pulse Lib/]: STAGE 4.2b.1 OIT CASE PASS: tick=115, four-peeled-layers, 64x32, opaqueDepth=1.0, RGBA/depth=[0.5686275, 0.32941177, 0.15686275, 1.0, 0.17000003]
+[18:01:23] [Render thread/INFO] [Pulse Lib/]: STAGE 4.2b.1 OIT CASE PASS: tick=115, reversed-submission-order, 64x32, opaqueDepth=1.0, RGBA/depth=[0.5686275, 0.32941177, 0.15686275, 1.0, 0.17000003]
+[18:01:24] [Render thread/INFO] [Pulse Lib/]: STAGE 4.2b.1 OIT CASE PASS: tick=115, color-only-destination, 64x32, opaqueDepth=1.0, RGBA/depth=[0.050980393, 0.627451, 0.2509804, 1.0, -1.0]
+[18:01:24] [Render thread/INFO] [Pulse Lib/]: STAGE 4.2b.1 OIT CASE PASS: tick=115, zero-alpha, 64x32, opaqueDepth=1.0, RGBA/depth=[0.101960786, 0.2509804, 0.5019608, 1.0, 0.17000003]
+[18:01:24] [Render thread/INFO] [Pulse Lib/]: STAGE 4.2b.1 OIT PASS: tick=115, cases=5, explicit opaque depth/destination, four real GPU peel layers, RGB/depth, override isolation, rejected-size recovery, composite idempotence/state
+[18:01:28] [Render thread/INFO] [Pulse Lib/]: STAGE 3.2 VANILLA LIGHT INPUTS: tick=210, leftSky=0, rightSky=15, leftRaw=0, rightRaw=15
+[18:01:29] [Render thread/INFO] [Pulse Lib/]: STAGE 3.3 GRAPH RENDER PASS: owners=2, zero/reverse overlay, RESTART, reload, time=124.0
+[18:01:29] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1b.3 RENDERER PASS: tick=230, contexts=16, owner/state/submit/traversal hooks, sibling isolation, deferred forward-bound layer, Molang=4/4/8, GPU primitives=8192, exception pose/state recovery, sleeping/head snapshots, layer modelSelections=1
+[18:01:29] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1b.2 BAKED PASS: tick=230, modelTriangles=338, direct draw preserves queue/pose, visibility, materials, CPU fallback readback, GPU subdivision/deformer UBO, owners=5, dataLookups=15164, modelLookups=3538
+[18:01:29] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1b.1 GEOMETRY PASS: tick=230, frames=610, primitives=768, 16/32-bit indices, static/dynamic bytes match GPU, slots<=9
+[18:01:29] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1a PLAN BACKEND PASS: tick=230, meshes=21, strategies=PRenderCapabilities[storageMode=CPU, submissionMode=MULTI_DRAW_INDIRECT, uploadMode=PERSISTENT_RING, matrix=PRenderCapabilityMatrix[texelBuffer=true, shaderStorageBuffer=true, multiDrawIndirect=true, baseInstance=true, persistentMapping=true]], projection UBO matches CPU capture
+[18:01:30] [Render thread/INFO] [Pulse Lib/]: STAGE 4.2a WORLD PASS: tick=240, early opaque Entity/BlockEntity RGB/depth; alpha retained through terrain; three-source global blend RGB=[0.1254902, 0.2509804, 0.5019608, 0.9285915], including late submission; no alpha depth writes
+[18:01:30] [Render thread/INFO] [Pulse Lib/]: STAGE 4.2b.1 OIT CASE PASS: tick=245, opaque-depth, 96x48, opaqueDepth=0.5, RGBA/depth=[0.5529412, 0.1254902, 0.2509804, 1.0, 0.17000003]
+[18:01:30] [Render thread/INFO] [Pulse Lib/]: STAGE 4.2b.1 OIT CASE PASS: tick=245, four-peeled-layers, 96x48, opaqueDepth=1.0, RGBA/depth=[0.5686275, 0.32941177, 0.15686275, 1.0, 0.17000003]
+[18:01:30] [Render thread/INFO] [Pulse Lib/]: STAGE 4.2b.1 OIT CASE PASS: tick=245, reversed-submission-order, 96x48, opaqueDepth=1.0, RGBA/depth=[0.5686275, 0.32941177, 0.15686275, 1.0, 0.17000003]
+[18:01:30] [Render thread/INFO] [Pulse Lib/]: STAGE 4.2b.1 OIT CASE PASS: tick=245, color-only-destination, 96x48, opaqueDepth=1.0, RGBA/depth=[0.050980393, 0.627451, 0.2509804, 1.0, -1.0]
+[18:01:30] [Render thread/INFO] [Pulse Lib/]: STAGE 4.2b.1 OIT CASE PASS: tick=245, zero-alpha, 96x48, opaqueDepth=1.0, RGBA/depth=[0.101960786, 0.2509804, 0.5019608, 1.0, 0.17000003]
+[18:01:30] [Render thread/INFO] [Pulse Lib/]: STAGE 4.2b.1 OIT PASS: tick=245, cases=10, explicit opaque depth/destination, four real GPU peel layers, RGB/depth, override isolation, rejected-size recovery, composite idempotence/state
+[18:01:33] [Render thread/INFO] [Pulse Lib/]: STAGE 2 CLIENT PLUGINS PASS: ids=[pulselib:stage1_client, pulselib:stage2_common], common=1, channels=1, events=1, deformers=1, client=1, server=0, models=2
+[18:01:33] [Render thread/INFO] [co.ar.pu.te.st.Stage1Client/]: STAGE 1.2 WORLD SMOKE: entity=1622, block=1528, item=1631
+[18:01:33] [Render thread/INFO] [Pulse Lib/]: STAGE 4.2b.1 OIT SHUTDOWN PASS: 10 GPU pixel cases, both complete suites
+[18:01:33] [Render thread/INFO] [Pulse Lib/]: STAGE 4.2a WORLD SHUTDOWN PASS: both pre/post reload world RGB/depth sequences complete
+[18:01:33] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1b.3 RENDERER SHUTDOWN PASS: two complete probe passes, existing GPU/manager cleanup checks retained
+[18:01:33] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1b.2 BAKED SHUTDOWN PASS: dynamic sources closed after normal cleanup
+[18:01:33] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1b.1 GEOMETRY SHUTDOWN PASS: static/dynamic pages=0, pass-state buffers released
+[18:01:33] [Render thread/INFO] [Pulse Lib/]: STAGE 4.1a PLAN SHUTDOWN PASS: handles=0, frame projection released
+[18:01:33] [Render thread/INFO] [Pulse Lib/]: STAGE 3.1 MANAGER SHUTDOWN PASS: singleton=0, instance=0, surviving ID retained
+[18:01:33] [Render thread/INFO] [minecraft/Minecraft]: Stopping!
+BUILD SUCCESSFUL in 33s
+SERVER
+[18:00:26] [Server thread/INFO] [minecraft/DedicatedServer]: Done (0.402s)! For help, type "help"
+[18:00:27] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved
+[18:00:27] [Server thread/INFO] [Pulse Lib/]: STAGE 2 SERVER PLUGINS PASS: ids=[pulselib:stage2_common, pulselib:stage2_server], common=1, channels=1, events=1, deformers=1, client=0, server=1, models=0
+[18:02:32] [Server thread/INFO] [minecraft/MinecraftServer]: Stopping server
+[18:02:33] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved
+[18:02:34] [main/INFO] [ne.ne.fm.lo.FMLLoader/]: Closing FML Loader 45c9cef3
+BUILD SUCCESSFUL in 2m 21s

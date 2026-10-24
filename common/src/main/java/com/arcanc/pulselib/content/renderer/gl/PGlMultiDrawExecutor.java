@@ -43,6 +43,7 @@ import org.joml.Vector4f;
 import org.jspecify.annotations.Nullable;
 import org.lwjgl.opengl.*;
 
+import java.util.Objects;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
@@ -63,6 +64,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 	private final PGlFrameArena frameArena = new PGlFrameArena(9);
 	private final Map<RenderTarget, PGlWeightedBlendedOit> weightedBlendedOits = new IdentityHashMap<>();
 	private @Nullable PGlWeightedBlendedOit activeWeightedBlendedOit;
+	private @Nullable RenderTargetAttachments activeOitAttachments;
 	private @Nullable ProjectionMatrixBuffer projectionBuffer;
 	private @Nullable GpuBuffer stateVertices;
 	private @Nullable GpuBuffer stateIndices;
@@ -107,16 +109,22 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 	@Override
 	public void execute(PRenderPlan plan, PRenderFrame frame)
 	{
-		execute(plan, frame, true);
+		execute(plan, frame, Minecraft.getInstance().getMainRenderTarget());
+	}
+
+	/** Uses opaque depth independently of the eventual transparency destination. */
+	public void execute(PRenderPlan plan, PRenderFrame frame, RenderTarget depthSource)
+	{
+		execute(plan, frame, depthSource, true);
 	}
 
 	/** Direct bone/model rendering uses ordinary blending and never composites pending world OIT. */
 	public void executeImmediate(PRenderPlan plan, PRenderFrame frame)
 	{
-		execute(plan, frame, false);
+		execute(plan, frame, null, false);
 	}
 
-	private void execute(PRenderPlan plan, PRenderFrame frame, boolean useOit)
+	private void execute(PRenderPlan plan, PRenderFrame frame, @Nullable RenderTarget depthSource, boolean useOit)
 	{
 		if (plan.isEmpty())
 			return;
@@ -172,16 +180,16 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 			this.indirect.begin(maximumIndirectCommands, frameSlot, persistent && multiDraw);
 
 			drawGroups(standardDraws, instanceStream, multiDraw, OitPass.NONE, frame);
-			Map<RenderTarget, List<Draw>> oitTargetBatches = new LinkedHashMap<>();
-			for (Draw draw : oitDraws)
-				oitTargetBatches.computeIfAbsent(draw.type().outputTarget().getRenderTarget(), ignored -> new ArrayList<>()).add(draw);
-			for (Map.Entry<RenderTarget, List<Draw>> entry : oitTargetBatches.entrySet())
+			if (!oitDraws.isEmpty())
 			{
-				List<Draw> targetDraws = entry.getValue();
-				this.activeWeightedBlendedOit = this.weightedBlendedOits.computeIfAbsent(entry.getKey(), ignored -> new PGlWeightedBlendedOit());
+				RenderTarget source = Objects.requireNonNull(depthSource, "OIT opaque depth source");
+				List<Draw> targetDraws = oitDraws;
+				this.activeWeightedBlendedOit = this.weightedBlendedOits.computeIfAbsent(source, ignored -> new PGlWeightedBlendedOit());
 				try
 				{
-					RenderTargetAttachments attachments = attachments(targetDraws.getFirst().type());
+					RenderTargetAttachments attachments = new RenderTargetAttachments(
+							Objects.requireNonNull(source.getColorTextureView(), "OIT depth source color"), source.getDepthTextureView());
+					this.activeOitAttachments = attachments;
 					if (activeOit().begin(attachments.color(), attachments.depth()))
 					{
 						for (int layer = 0; layer < PGlWeightedBlendedOit.LAYER_COUNT; layer++)
@@ -215,6 +223,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 				finally
 				{
 					this.activeWeightedBlendedOit = null;
+					this.activeOitAttachments = null;
 				}
 			}
 		}
@@ -234,6 +243,15 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 		this.weightedBlendedOits.values().forEach(PGlWeightedBlendedOit :: composite);
 	}
 
+	/** Resolves pending transparency into the requested color target, preserving its depth. */
+	public void compositeOit(RenderTarget destination)
+	{
+		GpuTextureView color = Objects.requireNonNull(destination.getColorTextureView(), "OIT destination color");
+		// Validate every pending source before consuming or writing any of them.
+		this.weightedBlendedOits.values().forEach(oit -> oit.validateDestination(color));
+		this.weightedBlendedOits.values().forEach(oit -> oit.composite(color));
+	}
+
 	/**
 	 * Performs the cleanup operation.
 	 */
@@ -247,6 +265,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 		this.weightedBlendedOits.values().forEach(PGlWeightedBlendedOit :: close);
 		this.weightedBlendedOits.clear();
 		this.activeWeightedBlendedOit = null;
+		this.activeOitAttachments = null;
 		if (this.projectionBuffer != null)
 			this.projectionBuffer.close();
 		this.projectionBuffer = null;
@@ -355,7 +374,8 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 		GpuBufferSlice dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(
 				frame.modelView(), new Vector4f(1.0F), new Vector3f(), new Matrix4f());
 
-		RenderTargetAttachments attachments = attachments(type);
+		RenderTargetAttachments attachments = oitPass == OitPass.NONE ? attachments(type) :
+				Objects.requireNonNull(this.activeOitAttachments, "OIT pass attachments");
 
 		try (RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
 				first :: label, attachments.color(), OptionalInt.empty(), attachments.depth(), OptionalDouble.empty()))

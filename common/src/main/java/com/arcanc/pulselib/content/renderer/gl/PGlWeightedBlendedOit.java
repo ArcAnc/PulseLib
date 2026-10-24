@@ -33,7 +33,6 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL32;
 import org.lwjgl.opengl.GL40;
 
-import java.util.OptionalDouble;
 import java.util.OptionalInt;
 
 /**
@@ -63,7 +62,6 @@ final class PGlWeightedBlendedOit
 	private final boolean[] hasContent = new boolean[LAYER_COUNT];
 	private int destinationColorTexture = -1;
 	private @Nullable GpuTextureView destinationColor;
-	private @Nullable GpuTextureView destinationDepth;
 	private @Nullable GlStateSnapshot passState;
 	private Pass pass = Pass.NONE;
 	private int activeLayer = -1;
@@ -91,7 +89,6 @@ final class PGlWeightedBlendedOit
 			if (!this.frameOpen)
 			{
 				this.destinationColor = colorAttachment;
-				this.destinationDepth = depthAttachment;
 				this.destinationColorTexture = colorTexture(colorAttachment);
 				this.frameOpen = true;
 				for (int layer = 0; layer < LAYER_COUNT; layer++)
@@ -282,6 +279,23 @@ final class PGlWeightedBlendedOit
 	 */
 	public void composite()
 	{
+		if (this.destinationColor != null)
+			composite(this.destinationColor);
+		else
+			this.finishFrame();
+	}
+
+	/** Rejects incompatible destinations without consuming pending layers. */
+	public void validateDestination(GpuTextureView colorAttachment)
+	{
+		if (this.frameOpen && (colorAttachment.isClosed() || colorAttachment.getWidth(0) != this.width ||
+				colorAttachment.getHeight(0) != this.height))
+			throw new IllegalArgumentException("OIT destination dimensions must match the accumulated scene");
+	}
+
+	/** Composites into caller-selected color only; opaque and destination depths remain untouched. */
+	public void composite(GpuTextureView colorAttachment)
+	{
 		if (!this.frameOpen)
 		{
 			this.finishFrame();
@@ -289,15 +303,10 @@ final class PGlWeightedBlendedOit
 		}
 		if (this.pass != Pass.NONE)
 			throw new IllegalStateException("Cannot composite weighted blended OIT while a pass is active");
-		GpuTextureView colorAttachment = this.destinationColor;
-		if (colorAttachment == null)
-			throw new IllegalStateException("Weighted blended OIT frame has no destination color attachment");
-		GpuTextureView depthAttachment = this.destinationDepth;
-		if (depthAttachment == null)
-			throw new IllegalStateException("Weighted blended OIT frame has no destination depth attachment");
+		validateDestination(colorAttachment);
 		GlStateSnapshot state = GlStateSnapshot.capture();
 		try (RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-				() -> "PulseLib weighted OIT composite", colorAttachment, OptionalInt.empty(), depthAttachment, OptionalDouble.empty()))
+				() -> "PulseLib weighted OIT composite", colorAttachment, OptionalInt.empty()))
 		{
 			pass.setPipeline(PRenderTypes.RenderPipelinesProvider.OIT_COMPOSITE);
 			pass.disableScissor();
@@ -347,7 +356,6 @@ final class PGlWeightedBlendedOit
 		}
 		this.destinationColorTexture = -1;
 		this.destinationColor = null;
-		this.destinationDepth = null;
 	}
 
 	/**

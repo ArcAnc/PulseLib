@@ -15,7 +15,6 @@ import com.mojang.blaze3d.pipeline.BlendFunction;
 import com.mojang.blaze3d.pipeline.ColorTargetState;
 import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.platform.CompareOp;
 import com.mojang.blaze3d.shaders.UniformType;
 import com.mojang.blaze3d.textures.TextureFormat;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
@@ -149,7 +148,6 @@ public class PRenderTypes
 				withSampler("RevealSampler").
 				withSampler("DepthSampler").
 				withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT)).
-				withDepthStencilState(new DepthStencilState(CompareOp.ALWAYS_PASS, true)).
 				withCull(false).
 				withVertexFormat(DefaultVertexFormat.EMPTY, VertexFormat.Mode.TRIANGLES).
 				build());

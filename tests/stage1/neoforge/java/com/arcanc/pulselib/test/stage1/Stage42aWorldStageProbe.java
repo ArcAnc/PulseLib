@@ -202,7 +202,7 @@ public final class Stage42aWorldStageProbe
 		return new PInstanceHeader(new Matrix4f(frame.modelView()).invert().mul(local), color, 0xF000F0, OverlayTexture.NO_OVERLAY);
 	}
 
-	private static PGeometryData quad()
+	static PGeometryData quad()
 	{
 		var sprite = PResourceCache.getTextureAtlas().getSprite(PResourceCache.spriteId(WHITE));
 		check(sprite.contents().name().equals(PResourceCache.spriteId(WHITE)), "White control sprite must be present after each reload");

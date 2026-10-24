@@ -1,0 +1,505 @@
+{
+  "stage": "4.2b.1",
+  "status": "COMPLETE_CHECKPOINT_STAGE_4_2_B_PARTIAL",
+  "date": "2026-10-24",
+  "branch": "26.1.2-multiloader",
+  "parentCommit": "57f93a7f4837caef7ae8fe57c41013e274c3464e",
+  "sourceRefs": {
+    "26.1": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1",
+    "1.21.1-multiloader": "7ce6f024b307bb821ce543344d3896c8e1fcf26b"
+  },
+  "commitSubject": "fix: separate OIT depth sources from composite destinations (stage 4.2b.1)",
+  "commands": [
+    {
+      "command": "./gradlew build stage2Evidence :neoforge:compileStage1SmokeJava -PpulseStage1Smoke -I docs/porting/tools/stage2-evidence.gradle -I /tmp/pulselib-stage42b1/index-check.gradle --no-daemon --console=plain",
+      "exitCode": 0,
+      "log": {
+        "path": "/tmp/pulselib-stage42b1/build.log",
+        "sha256": "b4a4c0db4ea1f49124cc7f3de980872945865b2daf25283ac4696c8dced0240c"
+      }
+    },
+    {
+      "command": "./gradlew :neoforge:runClient -PpulseStage1Smoke -PpulseStage2Probe -PpulseStage31Probe -PpulseStage32Probe -PpulseStage33Probe -PpulseStage41Probe -PpulseStage41bProbe -PpulseStage41b2Probe -PpulseStage41b3Probe -PpulseStage42aProbe -PpulseStage42b1Probe -PpulseVerificationDir=stage42b1-runs -I /tmp/pulselib-stage42b1/index-check.gradle --no-daemon --console=plain",
+      "exitCode": 0,
+      "normalTermination": "Minecraft.stop; all probe shutdown assertions complete",
+      "log": {
+        "path": "/tmp/pulselib-stage42b1/client.log",
+        "sha256": "f744e6689262ff598fb4d714bbf924e390a47392dc84487410f5623a10a6766b"
+      }
+    },
+    {
+      "command": "./gradlew :neoforge:runServer -PpulseStage1Smoke -PpulseStage2Probe -PpulseStage31Probe -PpulseStage32Probe -PpulseStage33Probe -PpulseStage41Probe -PpulseStage41bProbe -PpulseStage41b2Probe -PpulseStage41b3Probe -PpulseStage42aProbe -PpulseStage42b1Probe -PpulseVerificationDir=stage42b1-runs -I /tmp/pulselib-stage42b1/index-check.gradle --no-daemon --console=plain",
+      "exitCode": 0,
+      "normalTermination": "console stop; all dimensions saved; FML closed",
+      "log": {
+        "path": "/tmp/pulselib-stage42b1/server.log",
+        "sha256": "3384f20389eb7ecf534e8dbd50cc8e4e2bfcb6bcf07742a18d9af2ed9292df3d"
+      }
+    }
+  ],
+  "api": {
+    "path": "docs/porting/evidence/stage-4.2b.1-api.json",
+    "sha256": "7196d8c002e716455fea2591cb4ef56f0d32bb1c8131f663013a9fbb8c398449"
+  },
+  "junit": {
+    "common": {
+      "tests": 177,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml": [
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.animatable.PAnimationManagerAccessTest.xml",
+          "sha256": "1c737bca3462e904ad1e0f841d0cde408826d81c5dcfdfe877926355a36ab621"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.animatable.PItemStackAnimationIdsTest.xml",
+          "sha256": "6af8dc9e2a19c2a1ee89cfd0e673fa5b2e36d19d090bc36849c1826893d86ab6"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.animatable.instance.InstanceAnimationManagerTest.xml",
+          "sha256": "8297b59b501c6053165fa5229c6eabc0ae2b79168accc5bf96c09d10ecbf904f"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PAnimationTimeTest.xml",
+          "sha256": "808b13662caebf8a8c5053110c606ebd20d9a64fbf53b0ae43f3b79c4cb0d53f"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PCatmullRomSamplingTest.xml",
+          "sha256": "2de5a7b3c2eb79dd907568718f9432f63e6dc2f389de9cd1dc78563c8ef12656"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PCustomChannelSamplingTest.xml",
+          "sha256": "5c6a80cb09b2980db1661c8b44aefc87a82d6eb83d95aa4c4589af7f8d636f2d"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PCyclicAnimationEventsTest.xml",
+          "sha256": "c570daa39d477500cc3575cacd36eac9a0d844fde3533f1faec9b94db67da3ed"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PExpressionEvaluationTest.xml",
+          "sha256": "77b01c6e3cf1c00243968aa9decce94c8538e133908f06c0f29a9da329857e6f"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PGeckoEulerSamplingTest.xml",
+          "sha256": "5e814a6d0e0de70e689196cd60faa64565e0b80798b33123a9cb4c373afb44af"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PGltfQuaternionSamplingTest.xml",
+          "sha256": "41fd8af4b860f16f721c735e05cc4d16a5aa905a9cbaaf15c6ff99dc95ec2198"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PGraphRestartTest.xml",
+          "sha256": "a77b563ada9f453eacb8485325beb5f6a75a9ab85be47484223be72d3f0578c0"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.POverlayLifecycleTest.xml",
+          "sha256": "818a65c096a93c864c10393ba2567b4b6e6a7519cfed2d16b82b9c61e495e3bf"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.POverlayReverseTest.xml",
+          "sha256": "1957d9ce2df71b6b8f37429416138fce4f9aa496046a7934f90b2bd0532eb80a"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PPoseMixerTransitionTest.xml",
+          "sha256": "3f1e72160adc8a17a3e2ff988671e9a2b35112fe609075cfaa7b654b8de1650a"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.model.animation.PRootMotionSpacesTest.xml",
+          "sha256": "ab08f10f0ced9187d8b35562ea0456291a3491f7aacf9aec92614b6942ce2d44"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.renderer.PRenderPoseContextsTest.xml",
+          "sha256": "b49a98430ee3e7ed6441fcb0f79e1e292f854a463a99ab56c5e1155592a27d11"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.renderer.PRenderStateScopeTest.xml",
+          "sha256": "6b23c4307bcf2a758762d8791b0c16f8529daaf7584659ab1b64d9056b560815"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.renderer.gl.PGlGeometrySourceTest.xml",
+          "sha256": "77136912ced2f4b9675101fcc51a7bbffc5439341c50357d87fbbbbdaf03313e"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.renderer.gl.PGlInstanceLayoutTest.xml",
+          "sha256": "ad09d9733213ed74797ed271efec1219a7838f801437d65ef1f4bb1ac2dcfd28"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.renderer.plan.PFrameCompilerPassTest.xml",
+          "sha256": "e15dd6e518f5fbf05d92450f4fdcd80ad43feec22a02fa76f023cfbbc2f673ab"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.content.renderer.plan.PRenderPlanContractTest.xml",
+          "sha256": "d489649c10e920015944249b561a984d7b42d0c6f840a7a76cf134bb97db16f0"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.plugin.PulsePluginClassScannerTest.xml",
+          "sha256": "1e93e52f09d0882d2e77798352545fd83e543a564b45e7780e25d4843ad3c00e"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.plugin.PulsePluginLifecycleTest.xml",
+          "sha256": "247d4fd743e622b7ecd676db0b8392adf3cc90ecb528d2aedc8f137f2a3234e4"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.plugin.PulsePluginManagerTest.xml",
+          "sha256": "531856953c1ea7f461f9f050878f7da9ac2e5eee06286b15586a3904397ca90d"
+        },
+        {
+          "path": "common/build/test-results/test/TEST-com.arcanc.pulselib.plugin.PulseRegistrarTest.xml",
+          "sha256": "d75c4408c305e05b224654aa94ee0090bd8d845d14975138344beea43861e0d1"
+        }
+      ]
+    },
+    "fabric": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml": [
+        {
+          "path": "fabric/build/test-results/test/TEST-com.arcanc.pulselib.fabric.FabricDevelopmentRootsTest.xml",
+          "sha256": "46aa7b5870a9683b5178e91bcb6b9360b18a4eef451f55ab6215d3a0b05bfcb8"
+        }
+      ]
+    }
+  },
+  "modules": {
+    "common": {
+      "path": "common/build/libs/pulselib-26.1.2-common-1.1.5.3.jar",
+      "sha256": "bcfd3188752c6aa2380b6b33729ac249c05f9e984f66e98cbe14480581d4cec1",
+      "pulseClassFiles": 520,
+      "classMajors": [
+        69
+      ],
+      "javaUnits": 329
+    },
+    "neoforge": {
+      "path": "neoforge/build/libs/pulselib-26.1.2-neoforge-1.1.5.3.jar",
+      "sha256": "57ff17060ed04039d531f6246bde49686604879abf5842ebfd6d8e6031b3fcb7",
+      "pulseClassFiles": 532,
+      "classMajors": [
+        69
+      ],
+      "javaUnits": 340
+    },
+    "fabric": {
+      "path": "fabric/build/libs/pulselib-26.1.2-fabric-1.1.5.3.jar",
+      "sha256": "ccbe108e4265a10506207a3e1915d8e5d7ca88d29b404af41b7254366079ec82",
+      "pulseClassFiles": 524,
+      "classMajors": [
+        69
+      ],
+      "javaUnits": 333
+    }
+  },
+  "buildBoundary": {
+    "path": "build/reports/porting/stage-2-build.json",
+    "sha256": "d6e82460438ee95de1f8b579f9488b7d8e95928b37d12e05375e94cf08df5e3b"
+  },
+  "implementation": {
+    "restoredCanonicalQueueSignatures": [
+      "public static void flush(RenderStage, RenderTarget)",
+      "public static void compositeTranslucency(RenderTarget)"
+    ],
+    "depthBoundary": "OIT accumulation and bootstrap passes use supplied depthSource; normal/immediate draws retain native output target selection",
+    "defaultDepthSource": "Minecraft main RenderTarget, matching canonical source; final native opaque-depth snapshot/Fabulous integration remains 4.2b.2",
+    "compositeBoundary": "Explicit destination color view, no attached destination depth, pipeline has no depth/stencil state; legacy no-argument adapter retained",
+    "destinationValidation": "Validate all pending sources before any write or consumption; mismatched dimensions rejected and pending frame retained for retry",
+    "gpuAlgorithmsRetained": [
+      "four peeled layers",
+      "weighted color/revealage",
+      "persistent frame ring",
+      "instancing",
+      "indirect multi-draw",
+      "GPU deformers",
+      "one compiler/executor"
+    ],
+    "shaderResourcesChanged": false,
+    "sourceArtifacts": [
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+        "sha256": "2f7117a121eb52dcbae15cb5396b947b152183b534f6db01be92a10f6602fac8"
+      },
+      {
+        "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+        "sha256": "9e9ff659a020e1528b9a66aa27d2cc0d5e1911ad0fdba6fe10e7812d9a434b15"
+      },
+      {
+        "path": "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage42b1OitProbe.java",
+        "sha256": "f1ef3e35b4e21197936b1a39a3943296baeac449fe18f6a9ff37fcd2c9ceb3c9"
+      }
+    ],
+    "projectedSourceArtifacts": [
+      {
+        "repositoryPath": "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java",
+        "path": "/tmp/pulselib-stage42b1/index/common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java",
+        "sha256": "67e97375802f828393e8daf4f5d04b2bea8d427ed92fdd12f3971900d6d06e35"
+      },
+      {
+        "repositoryPath": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+        "path": "/tmp/pulselib-stage42b1/index/common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+        "sha256": "bfe5f510a21cbf22b3e97e70cc3cfbfceff1c3c177b4c8f67bf8ba8fdfa21768"
+      }
+    ],
+    "canonicalSources": [
+      "7ce6f024b307bb821ce543344d3896c8e1fcf26b:common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java",
+      "7ce6f024b307bb821ce543344d3896c8e1fcf26b:common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlWeightedBlendedOit.java",
+      "7ce6f024b307bb821ce543344d3896c8e1fcf26b:tests/testmod/src/main/java/com/arcanc/pulselib/test/H14Harness.java"
+    ]
+  },
+  "runtime": {
+    "minecraft": "26.1.2",
+    "neoforge": "26.1.2.95",
+    "gpu": "NVIDIA GeForce GTX 1660 Ti",
+    "world": "stage42b1-smoke",
+    "directories": "neoforge/build/stage42b1-runs/{client,server}",
+    "excerpts": {
+      "path": "docs/porting/evidence/stage-4.2b.1-runtime.txt",
+      "sha256": "4750d9b86eca830d81bf9d88718bc650a63223beb9085aaef520287e8d0617ef"
+    },
+    "afterReloadScreenshot": {
+      "path": "docs/porting/evidence/stage-4.2b.1-after-reload.png",
+      "sha256": "7ed0a0f5c55a67f01f96548819066135834a44d84111a65001b2293beefdd4c9"
+    },
+    "serverClientClassLoads": 0,
+    "serverClassloading": {
+      "path": "neoforge/build/stage42b1-runs/server/classloading.log",
+      "sha256": "07a6bb53727b8961f2325a2af61c2603dd28b1b67517c41ce7349c3d33ff6f14"
+    },
+    "gpuCases": [
+      {
+        "tick": 115,
+        "case": "opaque-depth",
+        "size": [
+          64,
+          32
+        ],
+        "opaqueDepth": 0.5,
+        "rgbaAndDepth": [
+          0.5529412,
+          0.1254902,
+          0.2509804,
+          1.0,
+          0.17000003
+        ]
+      },
+      {
+        "tick": 115,
+        "case": "four-peeled-layers",
+        "size": [
+          64,
+          32
+        ],
+        "opaqueDepth": 1.0,
+        "rgbaAndDepth": [
+          0.5686275,
+          0.32941177,
+          0.15686275,
+          1.0,
+          0.17000003
+        ]
+      },
+      {
+        "tick": 115,
+        "case": "reversed-submission-order",
+        "size": [
+          64,
+          32
+        ],
+        "opaqueDepth": 1.0,
+        "rgbaAndDepth": [
+          0.5686275,
+          0.32941177,
+          0.15686275,
+          1.0,
+          0.17000003
+        ]
+      },
+      {
+        "tick": 115,
+        "case": "color-only-destination",
+        "size": [
+          64,
+          32
+        ],
+        "opaqueDepth": 1.0,
+        "rgbaAndDepth": [
+          0.050980393,
+          0.627451,
+          0.2509804,
+          1.0,
+          -1.0
+        ]
+      },
+      {
+        "tick": 115,
+        "case": "zero-alpha",
+        "size": [
+          64,
+          32
+        ],
+        "opaqueDepth": 1.0,
+        "rgbaAndDepth": [
+          0.101960786,
+          0.2509804,
+          0.5019608,
+          1.0,
+          0.17000003
+        ]
+      },
+      {
+        "tick": 245,
+        "case": "opaque-depth",
+        "size": [
+          96,
+          48
+        ],
+        "opaqueDepth": 0.5,
+        "rgbaAndDepth": [
+          0.5529412,
+          0.1254902,
+          0.2509804,
+          1.0,
+          0.17000003
+        ]
+      },
+      {
+        "tick": 245,
+        "case": "four-peeled-layers",
+        "size": [
+          96,
+          48
+        ],
+        "opaqueDepth": 1.0,
+        "rgbaAndDepth": [
+          0.5686275,
+          0.32941177,
+          0.15686275,
+          1.0,
+          0.17000003
+        ]
+      },
+      {
+        "tick": 245,
+        "case": "reversed-submission-order",
+        "size": [
+          96,
+          48
+        ],
+        "opaqueDepth": 1.0,
+        "rgbaAndDepth": [
+          0.5686275,
+          0.32941177,
+          0.15686275,
+          1.0,
+          0.17000003
+        ]
+      },
+      {
+        "tick": 245,
+        "case": "color-only-destination",
+        "size": [
+          96,
+          48
+        ],
+        "opaqueDepth": 1.0,
+        "rgbaAndDepth": [
+          0.050980393,
+          0.627451,
+          0.2509804,
+          1.0,
+          -1.0
+        ]
+      },
+      {
+        "tick": 245,
+        "case": "zero-alpha",
+        "size": [
+          96,
+          48
+        ],
+        "opaqueDepth": 1.0,
+        "rgbaAndDepth": [
+          0.101960786,
+          0.2509804,
+          0.5019608,
+          1.0,
+          0.17000003
+        ]
+      }
+    ],
+    "rgbaTolerance": 0.016,
+    "depthComparison": "Exact float readback equality before/after composition",
+    "checks": [
+      "Explicit opaque depth rejects behind surfaces and ignores unrelated global depth override",
+      "Separate destination untouched until composite; source/override/world colors and depths untouched",
+      "Four actual GPU peeled layers match analytical back-to-front alpha, submission-order invariance",
+      "Destination without depth texture supported",
+      "Zero alpha leaves color unchanged",
+      "Invalid size throws without GL state change or consumption; correct destination succeeds afterward",
+      "Composite preserves draw/read framebuffers, viewport, scissor, depth test/mask/function, blend enable/factors",
+      "Bound projection and global output override objects retained",
+      "Second composite does not blend twice",
+      "All previous world/plan/geometry/baked/hooks/graph/time/identity/plugin/reload/shutdown probes"
+    ],
+    "worldSubmissions": {
+      "entity": 1622,
+      "blockEntity": 1528,
+      "item": 1631
+    },
+    "directBakedTrianglesBeforeAfterReload": [
+      338,
+      338
+    ],
+    "rendererGpuPrimitivesBeforeAfterReload": [
+      8192,
+      8192
+    ],
+    "portableGpuPrimitivesBeforeAfterReload": [
+      768,
+      768
+    ],
+    "lightInputsAt100And210": {
+      "leftSky": 0,
+      "rightSky": 15,
+      "leftRaw": 0,
+      "rightRaw": 15
+    },
+    "lightingLimit": "Uncontrolled fresh-save smoke lighting is asymmetric; new emissive isolated OIT pixels are independent of skylight.",
+    "graphicsPreset": "custom copied disposable options; no native mode matrix claimed"
+  },
+  "sourceIsolation": {
+    "preexistingUserEdits": 27,
+    "byteIdenticalUnaffectedUserFiles": 25,
+    "overlappingMigrationFiles": [
+      "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java",
+      "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java"
+    ],
+    "exactTransformsVerifiedAgainstInitialUserTextAndHead": true,
+    "projectedPreexistingJavaInputs": 26,
+    "projectionScript": {
+      "path": "/tmp/pulselib-stage42b1/index-check.gradle",
+      "sha256": "4600b11a87580241c9829866450d9cb42cf33920345b2cf55a30dbf8a62184c0"
+    },
+    "preexistingHashes": {
+      "path": "/tmp/pulselib-stage42b1/preexisting.json",
+      "sha256": "fdd6c3ac0810e5b47eb6bd7e0d6658aa7df8c835e99925a317406e45c1a9d0f6"
+    },
+    "protectedGameFilesUnchanged": 167,
+    "baselineChecksumsUnchanged": true,
+    "sourceBranchesUnchanged": true,
+    "pushOrPublish": false
+  },
+  "initialCompileFixes": [
+    "HEAD projection lacked explicit java.util.Objects import which was hidden by worktree wildcard import; fixed both intended source and worktree. No test disabled."
+  ],
+  "limits": [
+    "4.2b, 4.2 and stage 4 remain partial; compositeFabulousTranslucency and afterWeather remain absent until true native integration in 4.2b.2.",
+    "No Fabulous postchain insertion, actual owner/water/glass/particles/weather overlap or graphics-mode matrix tested in this checkpoint.",
+    "Late native main depth ownership may include translucent terrain/particles; final opaque-depth capture and native target composition remain 4.2b.2.",
+    "Different newly allocated target sizes before/after reload are tested, not actual window resize or repeated resize of one live source.",
+    "Transient depth-source cache cleanup, all GL deletion/lifecycle and unsupported GPU strategies remain 4.2c; full texture/program/VAO/exception state matrix remains outstanding.",
+    "No whole-library compiled API compatibility or performance claim; GUI/offscreen contexts/helper remain 4.3, final full audit remains 7."
+  ],
+  "nextStage": "4.2b.2: native Fabulous postchain/target insertion, afterWeather and final opaque-depth ownership, real world H14 pixel matrix; then 4.2c GPU lifecycle."
+}
