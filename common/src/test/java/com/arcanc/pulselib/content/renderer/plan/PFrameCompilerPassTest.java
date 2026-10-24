@@ -91,6 +91,33 @@ class PFrameCompilerPassTest
 		assertFalse(this.compiler.compile("hand").isEmpty());
 	}
 
+	@Test
+	void worldStagesRetainAllAlphaUntilCombinedPassAndKeepOitSeparate()
+	{
+		var oitPipeline = new PPipelineHandle(2);
+		for (String stage : List.of("entity", "solid_block", "translucent_block"))
+		{
+			submit(stage, 1, false);
+			this.compiler.submit(stage, oitPipeline, this.mesh, 6,
+					new PInstanceHeader(new Matrix4f().translation(0, 0, 2), -1, 0, 0), true);
+		}
+		submit("entity", 4, true);
+		submit("solid_block", 6, true);
+		submit("translucent_block", 5, true);
+		for (String stage : List.of("entity", "solid_block", "translucent_block"))
+		{
+			assertEquals(1, this.compiler.compileOpaque(stage).instances().size());
+			assertTrue(this.compiler.compileOpaque(stage).isEmpty());
+		}
+		var plan = this.compiler.compileCombined(List.of("entity", "solid_block", "translucent_block"), oitPipeline::equals);
+		assertEquals(3, plan.groups().getFirst().command().instanceCount());
+		assertEquals(oitPipeline, plan.groups().getFirst().pipeline());
+		assertEquals(List.of(6f, 5f, 4f), plan.groups().stream().filter(group -> group.pipeline().equals(this.pipeline)).
+				flatMap(group -> group.instances().stream()).map(instance -> instance.transform().m32()).toList());
+		assertTrue(plan.groups().stream().noneMatch(PDrawGroup::writeDepth));
+		assertTrue(this.compiler.isEmpty());
+	}
+
 	private void submit(String stage, float distance, boolean transparent)
 	{
 		this.compiler.submit(stage, this.pipeline, this.mesh, 6,

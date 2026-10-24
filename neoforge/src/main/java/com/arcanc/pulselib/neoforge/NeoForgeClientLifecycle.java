@@ -69,7 +69,7 @@ public final class NeoForgeClientLifecycle
 		NeoForge.EVENT_BUS.addListener((GameShuttingDownEvent event) -> PulseRuntime.disconnected());
 		NeoForge.EVENT_BUS.addListener((ClientTickEvent.Post event) -> PLibAnimationTicker.afterClientTick());
 		NeoForge.EVENT_BUS.addListener((RenderLevelStageEvent.AfterOpaqueFeatures event) -> PRenderStagesHandler.afterOpaqueFeatures());
-		NeoForge.EVENT_BUS.addListener((RenderLevelStageEvent.AfterTranslucentFeatures event) -> PRenderStagesHandler.afterTranslucentFeatures());
+		NeoForge.EVENT_BUS.addListener((RenderLevelStageEvent.AfterTranslucentParticles event) -> PRenderStagesHandler.afterParticles());
 	}
 
 	private static void registerAtlases(RegisterTextureAtlasesEvent event)

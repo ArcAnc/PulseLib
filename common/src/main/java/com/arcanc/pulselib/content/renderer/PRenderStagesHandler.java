@@ -11,17 +11,36 @@ package com.arcanc.pulselib.content.renderer;
 
 import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
 
-/** Shared 26.1 render stage operations; loader adapters own event subscription. */
+/** Shared 26.1 world-stage operations; loader adapters own event subscription. */
 public class PRenderStagesHandler
 {
+	/** Populates world depth before Minecraft copies it into translucent targets. */
 	public static void afterOpaqueFeatures()
 	{
-		PRenderQueue.flush(PRenderQueue.RenderStage.SOLID_BLOCKS);
+		afterBlockEntities();
 	}
 
+	/** Canonical callback after world entity and block-entity submissions are collected. */
+	public static void afterBlockEntities()
+	{
+		PRenderQueue.flushOpaque(PRenderQueue.RenderStage.ENTITIES);
+		PRenderQueue.flushOpaque(PRenderQueue.RenderStage.SOLID_BLOCKS);
+	}
+
+	/**
+	 * Compatibility entry point for loader integrations using the former callback name.
+	 * Invoke once after translucent particles, after all world model submissions exist.
+	 */
 	public static void afterTranslucentFeatures()
 	{
-		PRenderQueue.flushCombined(PRenderQueue.RenderStage.ENTITIES, PRenderQueue.RenderStage.TRANSLUCENT_BLOCKS);
+		afterParticles();
+	}
+
+	/** Sorts ordinary alpha across every world source while retaining separate OIT groups. */
+	public static void afterParticles()
+	{
+		PRenderQueue.flushCombined(PRenderQueue.RenderStage.ENTITIES, PRenderQueue.RenderStage.SOLID_BLOCKS,
+				PRenderQueue.RenderStage.TRANSLUCENT_BLOCKS);
 		PRenderQueue.compositeTranslucency();
 		PGpuDeformerBuffers.finishFrame();
 	}
