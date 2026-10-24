@@ -68,6 +68,8 @@ public final class Stage1Client implements IPulseClientPlugin
 		bus.addListener((RegisterSpecialModelRendererEvent event) ->
 				event.register(PLibDatabase.rl("test_block"), TestBlockItemRenderer.Unbaked.MAP_CODEC));
 		NeoForge.EVENT_BUS.addListener(Stage1Client::tick);
+		if (Boolean.getBoolean("pulselib.stage42b3Probe"))
+			Stage42b3WorldProbe.register();
 		if (Boolean.getBoolean("pulselib.stage42b2Probe"))
 			Stage42b2FabulousProbe.register();
 		if (Boolean.getBoolean("pulselib.stage42b1Probe"))
@@ -90,6 +92,12 @@ public final class Stage1Client implements IPulseClientPlugin
 
 	private static void renderers(EntityRenderersEvent.RegisterRenderers event)
 	{
+		if (Boolean.getBoolean("pulselib.stage42b3Probe"))
+		{
+			event.registerBlockEntityRenderer(Stage1Content.BETypeReg.TEST_BLOCK_ENTITY.get(), Stage42b3WorldProbe.BlockRenderer::new);
+			event.registerEntityRenderer(Stage1Content.EntityTypeReg.TEST_ENTITY.get(), Stage42b3WorldProbe.EntityRenderer::new);
+			return;
+		}
 		event.registerBlockEntityRenderer(Stage1Content.BETypeReg.TEST_BLOCK_ENTITY.get(), context ->
 		{
 			var renderer = new TestBlockEntityRenderer(context);
@@ -110,6 +118,8 @@ public final class Stage1Client implements IPulseClientPlugin
 	public void registerModels(PModelRegistrar event)
 	{
 		Stage2PluginProbe.models++;
+		if (Boolean.getBoolean("pulselib.stage42b3Probe"))
+			event.model(Stage42b3WorldProbe.MODEL).texture("0", Stage42aWorldStageProbe.WHITE);
 		if (Boolean.getBoolean("pulselib.stage42aProbe") || Boolean.getBoolean("pulselib.stage42b1Probe") || Boolean.getBoolean("pulselib.stage42b2Probe"))
 			event.model(TestBlockEntityRenderer.MODEL_DATA).texture("stage42a_white", Stage42aWorldStageProbe.WHITE);
 		event.model(TestEntityRender.MODEL_DATA).
@@ -152,6 +162,11 @@ public final class Stage1Client implements IPulseClientPlugin
 		Minecraft minecraft = Minecraft.getInstance();
 		if (minecraft.level == null)
 		{
+			return;
+		}
+		if (Boolean.getBoolean("pulselib.stage42b3Probe"))
+		{
+			Stage42b3WorldProbe.tick();
 			return;
 		}
 		if (++worldTicks == 100)
@@ -215,6 +230,9 @@ public final class Stage1Client implements IPulseClientPlugin
 					message -> LogUtils.getLogger().info("{}", message.getString()));
 			reloadScreenshot = true;
 		}
+		// Assisted observation is not an automated smoke result; explicit probe assertions still run above.
+		if (Boolean.getBoolean("pulselib.manualRun"))
+			return;
 		if (worldTicks > 1200)
 		{
 			throw new AssertionError("Stage 2 resource reload did not finish in time");

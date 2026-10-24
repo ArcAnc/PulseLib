@@ -52,6 +52,11 @@ public final class Stage1Smoke
 			return;
 		}
 		var server = player.level().getServer();
+		if (Boolean.getBoolean("pulselib.stage42b3Probe"))
+		{
+			Stage42b3WorldScene.prepare(player);
+			return;
+		}
 		var source = player.createCommandSourceStack().withPermission(PermissionSet.ALL_PERMISSIONS).withSuppressedOutput();
 		for (String command : new String[] {
 				"kill @e[type=pulselib:test_entity]",

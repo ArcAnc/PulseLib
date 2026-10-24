@@ -1,0 +1,164 @@
+{
+  "checkpoint": "4.2b.2b.1",
+  "status": "complete; parent 4.2b.2b / H14 remains partial",
+  "date": "2026-10-24",
+  "base_commit": "6721d8be937d6315698af2a0702a7dc892a31fe3",
+  "source_refs": {
+    "26.1": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1",
+    "1.21.1-multiloader": "7ce6f024b307bb821ce543344d3896c8e1fcf26b"
+  },
+  "runtime": {
+    "minecraft": "26.1.2",
+    "neoforge": "26.1.2.95",
+    "java": "25.0.4.1",
+    "gradle": "9.2.1",
+    "library": "1.1.5.3",
+    "gpu": "NVIDIA GeForce GTX 1660 Ti",
+    "graphics_preset": "custom",
+    "improved_transparency": [
+      false,
+      true
+    ],
+    "client_exit": 0,
+    "server_exit": 0,
+    "client_command": "./gradlew :neoforge:runClient -PpulseStage1Smoke -PpulseStage42b3Probe -PpulseVerificationDir=stage42b3-runs -I /tmp/pulselib-stage42b3-ai0qnlkb/index-check.gradle --offline --no-daemon --console=plain",
+    "server_command": "./gradlew :neoforge:runServer -PpulseStage1Smoke -PpulseStage42b3Probe -PpulseVerificationDir=stage42b3-runs -I /tmp/pulselib-stage42b3-ai0qnlkb/index-check.gradle --offline --no-daemon --console=plain",
+    "run_directory": "neoforge/build/stage42b3-runs",
+    "world": "stage42b3-smoke",
+    "server_client_classloads": 0
+  },
+  "checks": {
+    "owner_terrain_gpu_cases": 32,
+    "real_entity_owners": 4,
+    "real_block_entity_owners": 4,
+    "water_and_blue_glass": true,
+    "both_modes_before_after_reload": true,
+    "early_rgb_and_depth": true,
+    "front_owner_depth_preserved": true,
+    "skylight_glass_front_water_front_inside_water": [
+      15,
+      15,
+      14
+    ],
+    "compiled_visible_terrain_sections_required": true,
+    "fixed_camera_and_minimum_mode_warmup_seconds": 2,
+    "full_build_exit": 0,
+    "common_boundary_and_jar_isolation": "stage2Evidence PASS",
+    "render_plan_api": "18 types / 121 members; complete geometry, target and Fabulous queue checks PASS",
+    "renderer_api": "7 types / 86 canonical members PASS"
+  },
+  "junit": {
+    "common": {
+      "execution": "UP-TO-DATE",
+      "reports": 25,
+      "tests": 177,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "fabric": {
+      "execution": "UP-TO-DATE",
+      "reports": 1,
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "neoforge": {
+      "execution": "NO-SOURCE",
+      "reports": 0,
+      "tests": 0,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "limitations": [
+    "Opaque H13 owners only; no actual translucent-owner H14 world matrix yet",
+    "Water is contained behind clear glass; isolated water-versus-container contributions are not separated",
+    "No real particles/weather OIT overlap, graphics-preset matrix, GUI/H15, performance or full GPU lifecycle claim",
+    "First preliminary run lacked explicit light-ready gating; only the final gated run is accepted",
+    "One enhanced attempt failed because the player moved from the control location; camera lock added, final run succeeded",
+    "Dedicated log includes the connection reset from that rejected attempt; server then served the final successful run and stopped normally",
+    "Baseline assisted run was visually stable including user F3+T; second isolated baked probe passed assertions but has no user visual verdict",
+    "JUnit tasks were UP-TO-DATE; reports reused"
+  ],
+  "unchanged_production_api_and_renderer": true,
+  "manual_observation_property": "pulseManualRun affects the opt-in legacy smoke client only; no automated smoke PASS is issued in manual mode",
+  "protection": {
+    "preexisting_files": 33,
+    "unaffected_preexisting_files_preserved": 30,
+    "owned_preexisting_intersections": [
+      "neoforge/build.gradle",
+      "Stage1Client.java"
+    ],
+    "journal_user_edits_preserved": true,
+    "protected_game_files": 188,
+    "original_branches_unchanged": true
+  },
+  "source_sha256": {
+    "neoforge/build.gradle": "e6dae0322c28f3853ee01f434ad8bd7f4eefb2cbb681e8d850455f769a63c0f0",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage1Client.java": "ed6870c97d8e700b39a8db3f17f9628d3209f865e32bc22a3e731360c043c870",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage1Smoke.java": "c8c1257f0c4310cccf2b57b477f2ac8d8a24f8695e4c25d431023157f501effe",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage42b3WorldProbe.java": "4f9541b3addf6d53ceb5b528c8f0d161543491d9daf715fec14c4d6ec08e5d36",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage42b3WorldScene.java": "e6aa678dcaa866c76bb9533e5f5889112748831be5f9c1ea6ffc37472b7988fd",
+    "tests/stage1/neoforge/resources/assets/pulselib/geckolib/models/entity/stage42b3_owner.geo.json": "49faf36d43ba9d1bd93d982b7f8bc40048b2511c4bda063ab2a885e5fa465e81"
+  },
+  "projected_head_java_inputs": {
+    "common/src/main/java/com/arcanc/pulselib/util/PModelCache.java": "be136ed73525ea70c4a30c9ff14fc15641f8e6491959f52910be14053ba242ac",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStateScope.java": "b2a4c319e05e4f80a8492ad0d30746ddc9d3754b9d34ec7bce78a8eeafcae26e",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java": "c13b66145a884a81695a51ad6acfe1e1643ad066ef773a938f049d50098aee8e",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderPoseContexts.java": "86c3ec5a6e1994f2f5924abf3426b53ca4aa22d6db903f8fe98fdac12aed5261",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java": "39c30c78856b6ef0913215d7d7ec5907ad4af37d91e63e28cb0babecaae62989",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java": "7f26d18c8f29638a24fd708e7eeaeff115590fd28232d4c6c52e942996a2a577",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/PBlockRenderer.java": "cc40c868a385f608ea88f259d02f59a92030276940668af3cebfa90a0d84a782",
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemStackMixin.java": "de7c4946c85dcdd47a8183a3e2bb77da6e7a5924082f93a4b05bb5ffeee7b3f0",
+    "common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimationController.java": "dcf837e9e2abef0fce31d47762cf9b47bb78962b9c2bebcf3cb040fd67682ac7",
+    "common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimatable.java": "6ca6e13ebf2df97bac9742e0bd662930de90f9c68055a747154ec84d3746267f",
+    "common/src/main/java/com/arcanc/pulselib/content/animatable/instance/InstanceAnimationManager.java": "3c3ba6cc0850d1b988b8af606d2fda5726568632934578e0ff2154137f581853",
+    "common/src/main/java/com/arcanc/pulselib/content/model/baked/PMeshTextureVariants.java": "51956a7b3f23f58516072014b562bca4e02f1e916f27af0c041dcb862b958a30",
+    "common/src/main/java/com/arcanc/pulselib/content/model/baked/PDeformedMeshBuffers.java": "8c572568792042e785945f9788db40cfcaa9d9edd112ec9332b35ede7de7a489",
+    "common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedModel.java": "8ce968a9222df034dac9a8ef3a3812c201f00ffb0d7b0ead20a8f54625257bde",
+    "common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java": "f9fd3cf705a417b9136e8e8dffe273d88e3db0180f5d53ffe1874b7b17edbf0e",
+    "common/src/main/java/com/arcanc/pulselib/content/model/animation/PCyclicAnimationEvents.java": "4eeb07837a336baaba287fd24f7486c306035f372382d273409f785dba96d22b",
+    "common/src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationRuntime.java": "a244c7c27185716c3be3cdefc3897da8d65fe54299e3816f75a10a17d702eabb",
+    "common/src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationGraphRuntime.java": "074dca1419f39b7181b626022d61bee040c9a64ebd6592cfd3b5606ab8faa128",
+    "common/src/main/java/com/arcanc/pulselib/content/model/animation/PAnimationChannel.java": "a5eb5828d3f465dc102c7554ea549d5b90205d78417f4408e6e8e06ee93c8743",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/plan/PFrameCompiler.java": "2886cb42a6292542df11fcc3fe27645ce2ad514bcac3aafaab74cd8b5e25ac0a",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java": "b40a4b8fb9e5e2cef99b5eb806429828aeb76e6749308ed0ccaea322685d41be",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlResourceRegistry.java": "ced196a145d769f9d116b6063397bb54e604efaf6b05a1060b86db8353470a84",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java": "29576869962f553c3efdb0648924ea9253bbddb7f6682fb455bbee3d5a37e606",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlGeometryArena.java": "52539ba678423df4aa46f55dca7c04632eb21f7c0bfa41ba2b7b6e791a067ae3",
+    "common/src/main/java/com/arcanc/pulselib/data/gecko/MolangParser.java": "1c6a52c42cd06b43f42fd197285b192eaff07c75c8bbd32139a7fb90f4b614a0",
+    "common/src/test/java/com/arcanc/pulselib/content/renderer/PRenderStateScopeTest.java": "3c2b1950dd1c37f5f59811e61d029a9c3bd1c404f374e69bf18a9a50ac8592d3",
+    "common/src/test/java/com/arcanc/pulselib/content/renderer/gl/PGlGeometrySourceTest.java": "b206e90d801eaee56962a4fc5049e2b2cc17ff8ee8a617cdce8196b3bdfa0230"
+  },
+  "artifacts": {
+    "common": {
+      "file": "common/build/libs/pulselib-26.1.2-common-1.1.5.3.jar",
+      "sha256": "6e4ed07de3a3314a840a3caa327a92b2d32f713c872ee6cd735f313cf1f3b5d6",
+      "class_major": 69
+    },
+    "neoforge": {
+      "file": "neoforge/build/libs/pulselib-26.1.2-neoforge-1.1.5.3.jar",
+      "sha256": "b0b0bd3155ccd08adbad6e74daffc0cdfc575614c5c2402ae5e615f4c8229920",
+      "class_major": 69
+    },
+    "fabric": {
+      "file": "fabric/build/libs/pulselib-26.1.2-fabric-1.1.5.3.jar",
+      "sha256": "0b0f1a37a42c334a191598b02ca018013e633da040ba59e2c36062648390310f",
+      "class_major": 69
+    }
+  },
+  "evidence_sha256": {
+    "stage-4.2b.2b.1-cases.ndjson": "d1072e403812f395bf832914b12d74797e8a8fef9780c2c7e187a7eeda2c085a",
+    "stage-4.2b.2b.1-after-reload.png": "5b1a7fb6421c644396ffb6e70076ed651c627d39c093362fedfdd23a7d99cb05",
+    "stage-4.2b.2b.1-runtime.txt": "4823586b586d56134fc79a2bc009a8c7cd9f7aec6118327aab4dddde8312066d"
+  },
+  "local_log_sha256": {
+    "client-final.log": "f441e8fad449d6162a343d5515bb316eb5097c5cbaf2b4750ab339e2166da5cd",
+    "server-final.log": "35ea4202c3fb025331bdffc4330fbcd0f46fb0235a52305a91f34e69ef0a9cfe",
+    "client-camera-not-locked.log": "33d569a08ed7de70e3e9611241760befa840a2d07b0413500911faf3472289f4",
+    "build.log": "aeb3a705e3e35881ce60cd8be456d2a139aa28b65aa4ad32ef8d6543d19c8196"
+  }
+}
