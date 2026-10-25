@@ -1,0 +1,799 @@
+{
+  "checkpoint": "4.3a",
+  "status": "complete explicit local context boundary; 4.3 / stage 4 remain partial",
+  "date": "2026-10-25",
+  "base_commit": "60a81599436ea544b0f42257551a7d497cd5d66e",
+  "source_refs": {
+    "26.1": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1",
+    "1.21.1-multiloader": "7ce6f024b307bb821ce543344d3896c8e1fcf26b"
+  },
+  "canonical_context_history": "5b5961705240de348f1d31926dc24311dc44dbf2",
+  "runtime": {
+    "minecraft": "26.1.2",
+    "neoforge": "26.1.2.95",
+    "java": "25.0.4.1",
+    "gradle": "9.2.1",
+    "library": "1.1.5.3",
+    "gpu": "NVIDIA GeForce GTX 1660 Ti",
+    "driver": "615.78.08",
+    "context": "OpenGL 3.3 / supported ARB extensions",
+    "visible_gui": true,
+    "world": "stage43a-smoke",
+    "client_exit": 0,
+    "control_client_exit": 0,
+    "server_exit": 0,
+    "server_client_classloads": 0
+  },
+  "verification": {
+    "context_suites": 2,
+    "pixel_cases": 44,
+    "geometry_overloads": 11,
+    "baked_facade_overloads": 5,
+    "gpu_subdivision": 1,
+    "gpu_primitive_queries": "9x original baked mesh triangles local (five facades + 4x GPU mesh), world sentinel 2 + 4x mesh triangles, first-person 2",
+    "world_deformer_operations_and_values_prefix": "preserved through local close",
+    "native_state": "independent before/after framebuffer, viewport/scissor, depth/blend/cull, program, VAO, indirect/array/TBO/UBO generic bindings, 12 sampler/2D/TBO texture units, all indexed UBO ranges, indexed blend/color masks",
+    "scope_guards": [
+      "nested target/frame capture",
+      "LIFO rejection",
+      "idempotence",
+      "wrong thread rejected before GL access",
+      "active RenderPass entry rejected",
+      "explicit discard after renderer failure",
+      "closed dynamic source failure during flush preparation, subsequent scope recovery",
+      "Canonical GlRenderState.bindTarget()/close() used by all final scopes"
+    ],
+    "transparency": [
+      "orthographic and perspective local sorted alpha",
+      "color-only target",
+      "pending world OIT not composited by local close",
+      "world sentinel never consumed by local queue"
+    ],
+    "control_fabulous_cases": 26,
+    "control_native_depth_modes": 4,
+    "build": "PASS",
+    "junit": {
+      "common": 182,
+      "fabric": 1,
+      "neoforge": "NO-SOURCE",
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "execution": "Common/Fabric test tasks executed in build-canonical.log"
+    },
+    "context_api": {
+      "status": "PASS",
+      "baselineCommit": "7ce6f024b307bb821ce543344d3896c8e1fcf26b",
+      "baselineChecksums": "unchanged",
+      "types": [
+        {
+          "type": "com.arcanc.pulselib.content.renderer.PRenderContexts",
+          "preservedMembers": 3
+        },
+        {
+          "type": "com.arcanc.pulselib.content.renderer.PRenderContexts.Context",
+          "preservedMembers": 6
+        },
+        {
+          "type": "com.arcanc.pulselib.content.renderer.PRenderContexts.Scope",
+          "preservedMembers": 2
+        },
+        {
+          "type": "com.arcanc.pulselib.content.renderer.legacy.GlRenderState",
+          "preservedMembers": 3
+        }
+      ],
+      "scope": "Canonical PRenderContexts, Context, Scope and GlRenderState source declarations; native automatic GUI integration remains stage 4.3b",
+      "minecraftAdaptations": [
+        "Invocation scopes use 26.1 attachment overrides rather than the last bound raw GL framebuffer",
+        "Local scopes capture frame matrices, projection UBO binding and target views at entry",
+        "GlCommandEncoder program/pipeline caches invalidated after native restoration"
+      ],
+      "annotationAdaptation": "org.jetbrains Nullable -> JSpecify Nullable; package remains @NullMarked"
+    },
+    "renderer_api": "7 types / 86 members PASS",
+    "plan_api": "18 types / 121 members + strict geometry/target/Fabulous queue PASS"
+  },
+  "build_modules": {
+    "common": {
+      "jar": "common/build/libs/pulselib-26.1.2-common-1.1.5.3.jar",
+      "providers": {},
+      "javaUnits": 336,
+      "sha256": "1c83e06451ee4fa7c81159f73f0ef07f784c9ffb0a9fe635ceb56a2a4c4169e7",
+      "class_major": [
+        69
+      ],
+      "six_backend_classes": true,
+      "fixtures_absent": true,
+      "canonical_state_guard": true
+    },
+    "neoforge": {
+      "jar": "neoforge/build/libs/pulselib-26.1.2-neoforge-1.1.5.3.jar",
+      "providers": {
+        "platform.IPulsePlatform": "com.arcanc.pulselib.neoforge.NeoForgePlatform",
+        "platform.IPulseCameraService": "com.arcanc.pulselib.neoforge.NeoForgeCameraService",
+        "plugin.IPulsePluginFinder": "com.arcanc.pulselib.neoforge.NeoForgePulsePluginFinder"
+      },
+      "javaUnits": 347,
+      "sha256": "e6f140060451bfec9c8c3125f302f766aafacdee55814fb996d147ee1551bb79",
+      "class_major": [
+        69
+      ],
+      "six_backend_classes": true,
+      "fixtures_absent": true,
+      "canonical_state_guard": true
+    },
+    "fabric": {
+      "jar": "fabric/build/libs/pulselib-26.1.2-fabric-1.1.5.3.jar",
+      "providers": {
+        "platform.IPulsePlatform": "com.arcanc.pulselib.fabric.FabricPlatform",
+        "platform.IPulseCameraService": "com.arcanc.pulselib.fabric.FabricCameraService",
+        "plugin.IPulsePluginFinder": "com.arcanc.pulselib.fabric.FabricPulsePluginFinder"
+      },
+      "javaUnits": 340,
+      "sha256": "21191fa0f1121a9e0bf918701901a6afd7506627516747f9a04b140f0855cf52",
+      "class_major": [
+        69
+      ],
+      "six_backend_classes": true,
+      "fixtures_absent": true,
+      "canonical_state_guard": true
+    }
+  },
+  "logs": {
+    "client-canonical.log": {
+      "path": "/tmp/pulselib-stage43a-gscnyfhq/client-canonical.log",
+      "sha256": "f8e66e65ba3913b67209a9166a3b90d9f9e38ded909b1c8610e8b8da613f0f6e"
+    },
+    "client-control.log": {
+      "path": "/tmp/pulselib-stage43a-gscnyfhq/client-control.log",
+      "sha256": "4a7bea66f94f87b7bdc6b628bb449249810eff0711ab25bce58a0bbbb793b1a0"
+    },
+    "server-canonical.log": {
+      "path": "/tmp/pulselib-stage43a-gscnyfhq/server-canonical.log",
+      "sha256": "4fb96c19f348e04e3d8d2bfa9b1c2977e181594ec989e4a31c051fd84baac3c5"
+    },
+    "build-canonical.log": {
+      "path": "/tmp/pulselib-stage43a-gscnyfhq/build-canonical.log",
+      "sha256": "f5594f00e4b879016112b4fb0f327ff1c0dec7428b57c8750b2e77f9c05b0454"
+    },
+    "client.log": {
+      "path": "/tmp/pulselib-stage43a-gscnyfhq/client.log",
+      "sha256": "58c8d0cf0de9310c940ec5ea043f6eff70f2fe51167f6f325e28db78297ca35e"
+    },
+    "client-debug.log": {
+      "path": "/tmp/pulselib-stage43a-gscnyfhq/client-debug.log",
+      "sha256": "5e753952ee1c5d384fdaf19e33f8f1a0bbf33cb653618cc4b3bf2e5c932f7b00"
+    },
+    "client-debug-2.log": {
+      "path": "/tmp/pulselib-stage43a-gscnyfhq/client-debug-2.log",
+      "sha256": "8684b156a8b46f1639e4b1441eb1de0d361309e208ec82fd3aa3aab11646c04d"
+    },
+    "client-bindings.log": {
+      "path": "/tmp/pulselib-stage43a-gscnyfhq/client-bindings.log",
+      "sha256": "a4ec1e4c3bd3b83d62ecbd752134b5855843ac9498eed7f0d058d9d42a69ca52"
+    },
+    "client-values.log": {
+      "path": "/tmp/pulselib-stage43a-gscnyfhq/client-values.log",
+      "sha256": "f2161e19a454fe19379b068987cca3d58cecf6cf04e7376194269b7d2931848d"
+    }
+  },
+  "isolation": {
+    "backup": "/tmp/pulselib-stage43a-gscnyfhq",
+    "preexisting_dirty_files": 33,
+    "java_projection_inputs": 29,
+    "protected_run_files": 188,
+    "overlapping_java_inputs": [
+      "PRenderQueue.java",
+      "PGlMultiDrawExecutor.java"
+    ],
+    "user_patch_excluded": true
+  },
+  "limitations": [
+    "Explicit scopes are functional; automatic Entity/Item GUI boundaries, SubmitNodeCollector ownership and PLibHelper.renderModelInGui remain 4.3b",
+    "Standalone item transparency target eligibility and item/glint native matrix remain 4.3",
+    "No driver-loss/in-pass GPU exception fault injection; closed-source failure is before issuing the local plan",
+    "No performance conclusion or exhaustive capacity/driver matrix",
+    "Fabric build only; runtime parity remains stage 6",
+    "Context API source declarations verified; complete compiled library API audit remains stage 7"
+  ],
+  "rejected_attempts": [
+    "Initial GL enum constants unavailable in LWJGL: corrected to GL_TEXTURE_BUFFER / COPY_*_BUFFER tokens",
+    "Fixture initially attempted private query helper: replaced with own GL primitive query",
+    "Initial pixel failure caused by reusing one ProjectionMatrixBuffer to write both identity and zero scale; debugger observed m00=0.0 at line 156; fixed with distinct live buffers",
+    "First debug attach paused on a pre-existing user tick breakpoint and was diagnostic only; fixture now owns its opt-in tick/reload/stop flow without changing user breakpoints",
+    "A fixture strengthening script assertion failed before modifying the fixture; subsequent 42-case target-capture run is preliminary; final accepted run is client-values.log (44 cases + all added guards)",
+    "Final review restored canonical legacy.GlRenderState FQCN and bindTarget API in place of the uncommitted helper name; full build/API and 44-case native suite repeated on canonical implementation"
+  ],
+  "projection_sha256": "cda0cc23ddba3e1268b75ad92c23cabc7c813345c7f3ab1ee64ce66872d31670",
+  "screenshot": "stage-4.3a-after-reload.png",
+  "intended_inputs": {
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/CommandEncoderAccessor.java": {
+      "sha256": "b75bcd9eb2a88aa7830905b879788529f77c98c3721e37fea591fc4208121746",
+      "input": "worktree"
+    },
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/GlCommandEncoderAccessor.java": {
+      "sha256": "0977058d233e3fffaf263aa06cf59f191ecda767b8e449e34858e62e70886b1e",
+      "input": "worktree"
+    },
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderContexts.java": {
+      "sha256": "abc557741f7b74000ca6e68f468ef469c78bc4fb799f7bb47bdce209d396c62a",
+      "input": "worktree"
+    },
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java": {
+      "sha256": "e39f85e4fd3b78d6a899e9dbb7642850f27669d77341dd0550cb2b39724301f5",
+      "input": "intended projection"
+    },
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java": {
+      "sha256": "8e87fd1172a14c6a4382b7e7cfd7dd5c2359eebe194f425074cc2c2600e9b52d",
+      "input": "intended projection"
+    },
+    "common/src/main/resources/pulselib.mixins.json": {
+      "sha256": "809e077e9a30be19fd1a419c992e3cc87d3377a2bc53fc574a08b2194cfa6261",
+      "input": "worktree"
+    },
+    "neoforge/build.gradle": {
+      "sha256": "a062ff4faf18b4b492d8f8bb046cb99cc81a89c772d15b4e00c616a7fb553768",
+      "input": "worktree"
+    },
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage1Client.java": {
+      "sha256": "f27f4666cb9e3fa8e226ef4033ab0a69fe07582d2cc7544aac8622d489e58b7d",
+      "input": "worktree"
+    },
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage43aContextProbe.java": {
+      "sha256": "532104b7e75f07d61a3734a8ac15ae3745c07224eb2e14b8c8f24f3f8815780e",
+      "input": "worktree"
+    },
+    "docs/porting/tools/verify_render_context_api.py": {
+      "sha256": "7cf4905ab718b9d5861a0b68f9fc43930b64cc6c7966844cb0d209023384f0da",
+      "input": "worktree"
+    },
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java": {
+      "sha256": "42749d6968b097c88388cbf9e2de9f4940c490b8f8c5500ee63ff7f1ff57c759",
+      "input": "worktree"
+    }
+  },
+  "pixel_ledger": [
+    {
+      "tick": 115,
+      "case": 1,
+      "name": "outer captured matrix/target",
+      "rgba_depth": [
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        0.50000006
+      ]
+    },
+    {
+      "tick": 115,
+      "case": 2,
+      "name": "nested item GUI target",
+      "rgba_depth": [
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        0.50000006
+      ]
+    },
+    {
+      "tick": 115,
+      "case": 3,
+      "name": "unrelated color-only target",
+      "rgba_depth": [
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 115,
+      "case": 4,
+      "name": "local geometry overload 0",
+      "rgba_depth": [
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 115,
+      "case": 5,
+      "name": "local geometry overload 1",
+      "rgba_depth": [
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 115,
+      "case": 6,
+      "name": "local geometry overload 2",
+      "rgba_depth": [
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 115,
+      "case": 7,
+      "name": "local geometry overload 3",
+      "rgba_depth": [
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 115,
+      "case": 8,
+      "name": "local geometry overload 4",
+      "rgba_depth": [
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 115,
+      "case": 9,
+      "name": "local geometry overload 5",
+      "rgba_depth": [
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 115,
+      "case": 10,
+      "name": "local geometry overload 6",
+      "rgba_depth": [
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 115,
+      "case": 11,
+      "name": "local geometry overload 7",
+      "rgba_depth": [
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 115,
+      "case": 12,
+      "name": "local geometry overload 8",
+      "rgba_depth": [
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 115,
+      "case": 13,
+      "name": "local geometry overload 9",
+      "rgba_depth": [
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 115,
+      "case": 14,
+      "name": "local geometry overload 10",
+      "rgba_depth": [
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 115,
+      "case": 15,
+      "name": "global local alpha order",
+      "rgba_depth": [
+        0.5019608,
+        0.0,
+        0.2509804,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 115,
+      "case": 16,
+      "name": "perspective local alpha order",
+      "rgba_depth": [
+        0.5019608,
+        0.0,
+        0.2509804,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 115,
+      "case": 17,
+      "name": "discard incomplete renderer",
+      "rgba_depth": [
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 115,
+      "case": 18,
+      "name": "failed flush did not leave partial geometry",
+      "rgba_depth": [
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 115,
+      "case": 19,
+      "name": "successful scope after failed flush",
+      "rgba_depth": [
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 115,
+      "case": 20,
+      "name": "local close must not composite pending world OIT",
+      "rgba_depth": [
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "tick": 115,
+      "case": 21,
+      "name": "world OIT survives local close",
+      "rgba_depth": [
+        0.0,
+        0.0,
+        0.5019608,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "tick": 115,
+      "case": 22,
+      "name": "world composite ignores local target override",
+      "rgba_depth": [
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 245,
+      "case": 23,
+      "name": "outer captured matrix/target",
+      "rgba_depth": [
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        0.50000006
+      ]
+    },
+    {
+      "tick": 245,
+      "case": 24,
+      "name": "nested item GUI target",
+      "rgba_depth": [
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        0.50000006
+      ]
+    },
+    {
+      "tick": 245,
+      "case": 25,
+      "name": "unrelated color-only target",
+      "rgba_depth": [
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 245,
+      "case": 26,
+      "name": "local geometry overload 0",
+      "rgba_depth": [
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 245,
+      "case": 27,
+      "name": "local geometry overload 1",
+      "rgba_depth": [
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 245,
+      "case": 28,
+      "name": "local geometry overload 2",
+      "rgba_depth": [
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 245,
+      "case": 29,
+      "name": "local geometry overload 3",
+      "rgba_depth": [
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 245,
+      "case": 30,
+      "name": "local geometry overload 4",
+      "rgba_depth": [
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 245,
+      "case": 31,
+      "name": "local geometry overload 5",
+      "rgba_depth": [
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 245,
+      "case": 32,
+      "name": "local geometry overload 6",
+      "rgba_depth": [
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 245,
+      "case": 33,
+      "name": "local geometry overload 7",
+      "rgba_depth": [
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 245,
+      "case": 34,
+      "name": "local geometry overload 8",
+      "rgba_depth": [
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 245,
+      "case": 35,
+      "name": "local geometry overload 9",
+      "rgba_depth": [
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 245,
+      "case": 36,
+      "name": "local geometry overload 10",
+      "rgba_depth": [
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 245,
+      "case": 37,
+      "name": "global local alpha order",
+      "rgba_depth": [
+        0.5019608,
+        0.0,
+        0.2509804,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 245,
+      "case": 38,
+      "name": "perspective local alpha order",
+      "rgba_depth": [
+        0.5019608,
+        0.0,
+        0.2509804,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 245,
+      "case": 39,
+      "name": "discard incomplete renderer",
+      "rgba_depth": [
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 245,
+      "case": 40,
+      "name": "failed flush did not leave partial geometry",
+      "rgba_depth": [
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 245,
+      "case": 41,
+      "name": "successful scope after failed flush",
+      "rgba_depth": [
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    },
+    {
+      "tick": 245,
+      "case": 42,
+      "name": "local close must not composite pending world OIT",
+      "rgba_depth": [
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "tick": 245,
+      "case": 43,
+      "name": "world OIT survives local close",
+      "rgba_depth": [
+        0.0,
+        0.0,
+        0.5019608,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "tick": 245,
+      "case": 44,
+      "name": "world composite ignores local target override",
+      "rgba_depth": [
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -1.0
+      ]
+    }
+  ],
+  "debugger_evidence": {
+    "kind": "non-suspending logpoint, drained while briefly paused on following fixture line",
+    "diagnostic_line": 156,
+    "timestamp": "2026-10-25T13:26:43.292Z",
+    "expression": "com.arcanc.pulselib.content.renderer.gl.PGlRenderHost.PROJECTIONS.get(entry).m00()",
+    "observed": 0.0,
+    "value_kind": "CPU mirror of actual uploaded projection, not independent GPU byte readback",
+    "paused_location": "Stage43aContextProbe.render:157",
+    "stack": "render:157, Stage43aContextProbe -> RenderLevelStageEvent.AfterOpaqueBlocks dispatch (IDE folded 24 further frames)",
+    "user_breakpoints_preserved": 4,
+    "active_debug_sessions_final": 0
+  },
+  "control_timing": "World backend depth attachment fix verified by client-control.log before final state guard FQCN canonicalization; world backend behavior unchanged afterward"
+}

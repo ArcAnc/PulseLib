@@ -18,6 +18,8 @@
     "GameRendererMixin",
     "LevelRendererMixin",
     "GlBufferAccessor",
+    "CommandEncoderAccessor",
+    "GlCommandEncoderAccessor",
     "HumanoidArmorLayerMixin",
     "ItemInHandRendererMixin",
     "ItemModelResolverAccessor",

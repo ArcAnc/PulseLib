@@ -523,8 +523,8 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 		RenderTarget target = type.outputTarget().getRenderTarget();
 		GpuTextureView color = RenderSystem.outputColorTextureOverride != null ?
 				RenderSystem.outputColorTextureOverride : target.getColorTextureView();
-		GpuTextureView depth = target.useDepth ?
-				(RenderSystem.outputDepthTextureOverride != null ? RenderSystem.outputDepthTextureOverride : target.getDepthTextureView()) : null;
+		GpuTextureView depth = RenderSystem.outputColorTextureOverride != null ? RenderSystem.outputDepthTextureOverride :
+				(target.useDepth ? (RenderSystem.outputDepthTextureOverride != null ? RenderSystem.outputDepthTextureOverride : target.getDepthTextureView()) : null);
 		if (color == null)
 			throw new IllegalStateException("Render type " + type + " has no color attachment");
 		return new RenderTargetAttachments(color, depth);

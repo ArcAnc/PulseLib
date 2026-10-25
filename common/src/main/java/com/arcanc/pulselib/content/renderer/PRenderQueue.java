@@ -110,7 +110,7 @@ public final class PRenderQueue
 	public static void submitItem(ItemDisplayContext context, RenderType renderType, PDynamicGeometry geometry, PInstanceHeader data)
 	{
 		RenderStage stage = stage(context);
-		if (stage != RenderStage.GUI)
+		if (stage != RenderStage.GUI || PRenderContexts.localScope() != null)
 			submit(stage, renderType, geometry, data);
 	}
 
@@ -125,7 +125,7 @@ public final class PRenderQueue
 	public static void submitItem(ItemDisplayContext context, RenderType renderType, PGeometryData geometry, PInstanceHeader data)
 	{
 		RenderStage stage = stage(context);
-		if (stage != RenderStage.GUI)
+		if (stage != RenderStage.GUI || PRenderContexts.localScope() != null)
 			submit(stage, renderType, geometry, data, PRenderTypes.isTransparent(renderType));
 	}
 
@@ -138,7 +138,7 @@ public final class PRenderQueue
 	 */
 	public static void submitEntityMesh(RenderType renderType, PDynamicGeometry geometry, PInstanceHeader data)
 	{
-		submit(RenderStage.ENTITIES, renderType, geometry, data);
+		submit(PRenderContexts.entityStage(), renderType, geometry, data);
 	}
 
 	/**
@@ -150,7 +150,7 @@ public final class PRenderQueue
 	 */
 	public static void submitEntityMesh(RenderType renderType, PGeometryData geometry, PInstanceHeader data)
 	{
-		submit(RenderStage.ENTITIES, renderType, geometry, data);
+		submit(PRenderContexts.entityStage(), renderType, geometry, data);
 	}
 
 	/**
@@ -193,13 +193,13 @@ public final class PRenderQueue
 
 	private static void submit(RenderStage stage, RenderType type, PGeometryData geometry, PInstanceHeader data, boolean transparent)
 	{
-		COMPILER.submit(stage, RESOURCES.pipeline(type), RESOURCES.geometry(geometry), geometry.indexCount(), data, transparent);
+		compiler().submit(stage, RESOURCES.pipeline(type), RESOURCES.geometry(geometry), geometry.indexCount(), data, transparent);
 	}
 
 	private static void submit(RenderStage stage, RenderType type, PDynamicGeometry geometry, PInstanceHeader data, boolean transparent)
 	{
 		PMeshHandle mesh = RESOURCES.dynamic(geometry);
-		COMPILER.submit(stage, RESOURCES.pipeline(type), mesh, RESOURCES.indexCount(mesh), data, transparent);
+		compiler().submit(stage, RESOURCES.pipeline(type), mesh, RESOURCES.indexCount(mesh), data, transparent);
 	}
 
 	private static void submitTranslucent(RenderStage stage, RenderType type, PGeometryData geometry, PInstanceHeader data)
@@ -210,6 +210,31 @@ public final class PRenderQueue
 	private static void submitTranslucent(RenderStage stage, RenderType type, PDynamicGeometry geometry, PInstanceHeader data)
 	{
 		submit(stage, type, geometry, data, true);
+	}
+
+	private static PFrameCompiler<RenderStage> compiler()
+	{
+		PRenderContexts.Scope local = PRenderContexts.localScope();
+		return local == null ? COMPILER : java.util.Objects.requireNonNull(local.compiler);
+	}
+
+	/** Executes all local stages through the shared backend, using sorted alpha without world OIT. */
+	static void flushLocal(PFrameCompiler<RenderStage> compiler, PRenderFrame frame)
+	{
+		try
+		{
+			EXECUTOR.executeImmediate(compiler.compileAll(ignored -> false), frame);
+		}
+		finally
+		{
+			compiler.clear();
+		}
+	}
+
+	static void finishLocalFrame()
+	{
+		if (COMPILER.isEmpty())
+			PGpuDeformerBuffers.finishFrame();
 	}
 
 	private static RenderStage stage(ItemDisplayContext context)
@@ -298,7 +323,7 @@ public final class PRenderQueue
 	                                    @Nullable PMeshDeformation deformation,
 	                                    InstanceData data)
 	{
-		submit(RenderStage.ENTITIES, renderType, mesh, deformation, data, PRenderTypes.isTransparent(renderType));
+		submit(PRenderContexts.entityStage(), renderType, mesh, deformation, data, PRenderTypes.isTransparent(renderType));
 	}
 	
 	/**
@@ -335,7 +360,7 @@ public final class PRenderQueue
 	                           boolean transparent)
 	{
 		PreparedMesh prepared = prepare(mesh, deformation, data.header());
-		COMPILER.submit(stage, RESOURCES.pipeline(type), prepared.mesh(), prepared.indexCount(), prepared.header(), transparent);
+		compiler().submit(stage, RESOURCES.pipeline(type), prepared.mesh(), prepared.indexCount(), prepared.header(), transparent);
 	}
 
 	/** Executes direct bone/model drawing without consuming or appending world submissions. */

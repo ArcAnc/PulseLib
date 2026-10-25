@@ -48,3 +48,15 @@ does not provide compatibility registrations for `pulselibtest:*` saves.
 
 Client/server regression results must be recorded explicitly; a successful
 compilation or Gradle dry run does not establish them.
+
+Stage 4.3a provides explicit local rendering scopes through the canonical
+`PRenderContexts` / `legacy.GlRenderState` API. The opt-in NeoForge GPU harness is
+`-PpulseStage1Smoke -PpulseStage43aProbe -PpulseStage2Probe`, with an isolated
+`-PpulseVerificationDir=stage43a-runs` and a disposable `stage43a-smoke` server.
+It checks 44 pixels before/after reload, nested targets/frames, all portable
+queue overloads, baked GPU subdivision, world queue/OIT/deformer isolation and
+native state restoration. Clients run with a visible window and stop normally.
+`python3 docs/porting/tools/verify_render_context_api.py` verifies all 4 canonical
+types / 14 public declarations. Automatic native GUI Entity/Item execution and
+`PLibHelper.renderModelInGui` remain stage 4.3b; this harness does not claim H15
+completion. See journal section 27 for commands, evidence and exact limitations.
