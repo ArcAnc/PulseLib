@@ -29,6 +29,11 @@ public final class Stage42b3WorldScene
 		prepare(player, "stage42b4-smoke");
 	}
 
+	public static void prepareLifecycle(ServerPlayer player)
+	{
+		prepare(player, "stage42c-smoke");
+	}
+
 	private static void prepare(ServerPlayer player, String worldName)
 	{
 		var server = player.level().getServer();
