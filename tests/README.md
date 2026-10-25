@@ -76,3 +76,20 @@ source isolation, screenshots and exact limitations. The canonical
 standalone item/glint eligibility and the final H15 matrix remain open. These
 fixtures do not claim atomic rollback of arbitrary vanilla pixels already drawn
 before a mixed-batch failure, driver-loss recovery or Fabric runtime coverage.
+
+Stage 4.3b.2 restores the canonical `PLibHelper.renderModelInGui` using Minecraft
+26.1 `GuiGraphicsExtractor`. The opt-in NeoForge harness is
+`-PpulseStage1Smoke -PpulseStage43b2Probe -PpulseStage2Probe` with isolated
+`-PpulseVerificationDir=stage43b2-runs` and a new `stage43b2-smoke` server.
+It checks 208 RGB/text cases in 16 frames before/after resource reload, frozen
+animation/GUI pose/scale, rotation/scissor, mirrored scale, independent native
+PIP textures, alpha and packed overlay. Two fault suites verify missing-model
+behavior, invalid extraction, native draw failure, actual following GPU pixels,
+texture close and caller state/lights restoration. CPU readbacks save/reset/
+restore GL_PACK_ROW_LENGTH, including the native screenshot stride 960.
+The native 4.3b.1 harness also passes 192 regression checks and six failures.
+`python3 docs/porting/tools/verify_gui_helper_api.py` checks all nine canonical
+helper declarations with explicit Minecraft type substitutions. See journal
+section 29 / `docs/porting/evidence/stage-4.3b.2.json` for exact commands and limits.
+Next checkpoint is 4.3c (standalone Item/glint/final H15); Fabric GUI registration
+and runtime parity remain stage 6. Existing user worlds are never fixtures.

@@ -12,6 +12,8 @@ package com.arcanc.pulselib.neoforge;
 import com.arcanc.pulselib.content.animatable.PLibAnimationTicker;
 import com.arcanc.pulselib.content.event.PulseRuntime;
 import com.arcanc.pulselib.content.model.textures.atlas.PLibSpriteMetadata;
+import com.arcanc.pulselib.content.renderer.PModelGuiRenderer;
+import com.arcanc.pulselib.content.renderer.PModelGuiRenderState;
 import com.arcanc.pulselib.content.renderer.PRenderStagesHandler;
 import com.arcanc.pulselib.platform.PClientRenderHooks;
 import com.arcanc.pulselib.util.PRenderTypes;
@@ -27,6 +29,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterPictureInPictureRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 import net.neoforged.neoforge.client.event.RegisterTextureAtlasesEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
@@ -57,6 +60,7 @@ public final class NeoForgeClientLifecycle
 		});
 		bus.addListener((RegisterRenderPipelinesEvent event) -> PRenderTypes.register(event::registerPipeline));
 		bus.addListener(NeoForgeClientLifecycle::registerAtlases);
+		bus.addListener((RegisterPictureInPictureRenderersEvent event) -> event.register(PModelGuiRenderState.class, PModelGuiRenderer::new));
 		bus.addListener(NeoForgeClientLifecycle::addLayers);
 		bus.addListener(NeoForgeClientLifecycle::registerRenderStateModifiers);
 		NeoForge.EVENT_BUS.addListener((LevelTickEvent.Pre event) ->

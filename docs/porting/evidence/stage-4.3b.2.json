@@ -1,0 +1,421 @@
+{
+  "checkpoint": "4.3b.2",
+  "status": "complete; 4.3 / stage 4 remain partial; next 4.3c standalone item/glint/final H15 matrix",
+  "date": "2026-10-25",
+  "base_commit": "5cc96689307c7653f34bd9ba7369cc5d0bab1328",
+  "source_refs": {
+    "26.1": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1",
+    "1.21.1-multiloader": "7ce6f024b307bb821ce543344d3896c8e1fcf26b"
+  },
+  "runtime": {
+    "minecraft": "26.1.2",
+    "neoforge": "26.1.2.95",
+    "java": "25.0.4.1",
+    "gradle": "9.2.1",
+    "library": "1.1.5.3",
+    "gpu": "NVIDIA GeForce GTX 1660 Ti",
+    "driver": "615.78.08",
+    "visible_gui": true,
+    "world": "stage43b2-smoke",
+    "helper_client_exit": 0,
+    "native_regression_client_exit": 0,
+    "dedicated_server_exit": 0,
+    "server_client_classloads": 0
+  },
+  "architecture": [
+    "Canonical helper keeps FQCN, generics, all Pulse parameters and semantics; only Minecraft GUI/resource/render types adapted",
+    "Extraction samples PPose once and snapshots GUI affine matrix, origin, scale, color, light, overlay; no controller collection or caller vector retained",
+    "Bounds use packed mesh positions and exact indexed parent matrices, visibility, viewport and transformed native scissor; no world GPU submission during extraction",
+    "NeoForge native RegisterPictureInPictureRenderersEvent pool owns per-state textures and lifecycle; Common PIP renderer uses baked pose draw on unchanged GPU executor",
+    "Native PIP execution scopes from 4.3b.1 restore targets/projection/modelview; helper additionally selects and restores native shader lights",
+    "Readback harness preserves/resets/restores GL_PACK_ROW_LENGTH, including native screenshot stride 960"
+  ],
+  "verification": {
+    "helper_frames": 16,
+    "phases": [
+      "before reload",
+      "after reload"
+    ],
+    "rgb_points_per_frame": 12,
+    "text_regions_per_frame": 1,
+    "gpu_checks": 208,
+    "sample_coordinates": [
+      [
+        96,
+        40
+      ],
+      [
+        64,
+        40
+      ],
+      [
+        152,
+        24
+      ],
+      [
+        136,
+        24
+      ],
+      [
+        220,
+        40
+      ],
+      [
+        280,
+        160
+      ],
+      [
+        248,
+        160
+      ],
+      [
+        81,
+        25
+      ],
+      [
+        110,
+        54
+      ],
+      [
+        220,
+        70
+      ],
+      [
+        220,
+        74
+      ],
+      [
+        64,
+        156
+      ]
+    ],
+    "expected_rgb": [
+      [
+        255,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        255
+      ],
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        255,
+        0
+      ],
+      [
+        192,
+        0,
+        63
+      ],
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        255,
+        0,
+        0
+      ],
+      [
+        255,
+        0,
+        0
+      ],
+      [
+        0,
+        255,
+        0
+      ],
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        77,
+        0,
+        178
+      ]
+    ],
+    "text_pixels_all_frames": 2316,
+    "warmup_ticks_each_phase": 20,
+    "fault_suites": 2,
+    "expected_exceptions": 4,
+    "controls": [
+      "unloaded model emits no state",
+      "invalid transform preserves extractor pose",
+      "deferred render-type failure propagates",
+      "caller lights/projection/modelview/output overrides restored",
+      "failed target alpha zero",
+      "following real PIP draw has >20 alpha pixels",
+      "native close deletes texture",
+      "no GL error",
+      "world sentinel survives and world compiler otherwise empty"
+    ],
+    "incoming_pack_row_length_before_after_screenshot": [
+      0,
+      960
+    ],
+    "native_gui_regression": {
+      "gpu_checks": 192,
+      "expected_exceptions": 6,
+      "native_paths": [
+        "Entity PIP",
+        "Item atlas",
+        "oversized Item PIP"
+      ],
+      "exit": 0
+    },
+    "world_recovery_ticks": 60,
+    "junit": {
+      "common": {
+        "tests": 182,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "fabric": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "neoforge": {
+        "tests": 0,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "build": "PASS",
+    "api": {
+      "helper": {
+        "status": "PASS_WITH_ENUMERATED_MINECRAFT_ADAPTATIONS",
+        "type": "com.arcanc.pulselib.util.helpers.PLibHelper",
+        "baselineCommit": "7ce6f024b307bb821ce543344d3896c8e1fcf26b",
+        "canonicalMembers": 9,
+        "members": [
+          {
+            "canonical": "public static <T extends PAnimatable<T>> PAnimationManager<T> createManager(T)",
+            "current": "public static <T extends PAnimatable<T>> PAnimationManager<T> createManager(T)",
+            "minecraftReason": null
+          },
+          {
+            "canonical": "public static <T extends PAnimatable<T>> InstanceAnimationManager<T> createInstanceManager(T)",
+            "current": "public static <T extends PAnimatable<T>> InstanceAnimationManager<T> createInstanceManager(T)",
+            "minecraftReason": null
+          },
+          {
+            "canonical": "public static <T extends PAnimatable<T>> SingletonAnimationManager<T> createSingletonManager(T)",
+            "current": "public static <T extends PAnimatable<T>> SingletonAnimationManager<T> createSingletonManager(T)",
+            "minecraftReason": null
+          },
+          {
+            "canonical": "public static <T extends PAnimatable<T>> PAnimationManager<T> createManager(T, boolean)",
+            "current": "public static <T extends PAnimatable<T>> PAnimationManager<T> createManager(T, boolean)",
+            "minecraftReason": null
+          },
+          {
+            "canonical": "public static <T extends PAnimatable<T>> PAnimationManager<T> getManager(T)",
+            "current": "public static <T extends PAnimatable<T>> PAnimationManager<T> getManager(T)",
+            "minecraftReason": null
+          },
+          {
+            "canonical": "public static <T extends PAnimatable<T>> PAnimationManager<T> getManager(T, AnimManagerKey)",
+            "current": "public static <T extends PAnimatable<T>> PAnimationManager<T> getManager(T, AnimManagerKey)",
+            "minecraftReason": null
+          },
+          {
+            "canonical": "public static PAnimationManager<?> getManager(ItemStack)",
+            "current": "public static PAnimationManager<?> getManager(ItemStack)",
+            "minecraftReason": null
+          },
+          {
+            "canonical": "public static <T extends PAnimatable<T>> void renderModelInGui(GuiGraphics, PModelData, Collection<PAnimationController<T>>, Function<ResourceLocation, RenderType>, int, int, Vector3f, int, int, int, float)",
+            "current": "public static <T extends PAnimatable<T>> void renderModelInGui(GuiGraphicsExtractor, PModelData, Collection<PAnimationController<T>>, Function<Identifier, RenderType>, int, int, Vector3f, int, int, int, float)",
+            "minecraftReason": "Minecraft 26.1 GUI extraction replaces immediate GuiGraphics; ResourceLocation became Identifier; RenderType moved to renderer.rendertype. Pose is sampled at invocation and drawn through registered native PIP execution."
+          },
+          {
+            "canonical": "public <init>()",
+            "current": "public <init>()",
+            "minecraftReason": null
+          }
+        ],
+        "additional26_1Factories": [
+          "public static <T extends LivingEntity & PAnimatable<T>, RS extends PEntityRenderState<T>> RS livingRenderState(Supplier<RS>)",
+          "public static <T extends LivingEntity & PAnimatable<T>> PEntityRenderState.LivingImpl<T> livingRenderState()",
+          "public static <T extends Entity & PAnimatable<T>, RS extends PEntityRenderState<T>> RS entityRenderState(Supplier<RS>)",
+          "public static <T extends Entity & PAnimatable<T>> PEntityRenderState.Impl<T> entityRenderState()"
+        ],
+        "baselineChecksums": "unchanged",
+        "scope": "All declared public/protected PLibHelper source contracts, including parameter metadata; GPU behavior is verified separately. Whole compiled library audit remains stage 7."
+      },
+      "renderer": {
+        "status": "PASS_WITH_ENUMERATED_MINECRAFT_ADAPTATIONS",
+        "types": 7,
+        "canonical_members": 86,
+        "temporary_full_report": "/tmp/pulselib-stage43b2-7ia0o2yp/renderer-api.json",
+        "sha256": "8caefc75241d8333d24bc86f2938ff0bd3f663cc6aef1ba233a338b745ecd829"
+      },
+      "plan": {
+        "status": "PASS",
+        "types": 18,
+        "canonical_members": 121,
+        "temporary_full_report": "/tmp/pulselib-stage43b2-7ia0o2yp/plan-api.json",
+        "sha256": "9b8eaf8d4adf6cfde0f41e1a40a7ea32ac5480a263c562a35e518f31dc746468"
+      },
+      "context": {
+        "status": "PASS",
+        "types": 4,
+        "canonical_members": 14,
+        "temporary_full_report": "/tmp/pulselib-stage43b2-7ia0o2yp/context-api.json",
+        "sha256": "e48cefb54f1b721bbd6cb2c19251935bf4f869ea948eb87b235a31603af978aa"
+      }
+    }
+  },
+  "intended_inputs": {
+    "common/src/main/java/com/arcanc/pulselib/util/helpers/PLibHelper.java": "61eed034870c1cd29f850de8f46b09938a9e691d92b9912ea95d145b1543adf8",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderState.java": "cab57a178b99c538069c402a133e6cf3132df8ac51c944976e1d8dfc58f10a81",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java": "9994312fda0adc6a74bc68d53734ccf22c07c2029d7450e950e1fa678d9ac198",
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/GuiGraphicsExtractorAccessor.java": "5aa19c1a323c9eafda6226afbab18d23f5605292d507e7d2704165437ef96f93",
+    "common/src/main/resources/pulselib.mixins.json": "8ab8d3f974254860bca1d5c5abb4a7cf283ce574be1906fdc888e80642955f91",
+    "neoforge/build.gradle": "99272638f4cc0910afb87e0fe7750f672c8ca9d72757538c8a9a0f3b4b9337e8",
+    "neoforge/src/main/java/com/arcanc/pulselib/neoforge/NeoForgeClientLifecycle.java": "99219804708dac2ddbce4cc29b2418213fc9bb57e301586c0d3716f6ff7156b0",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage1Client.java": "961409c65b904e03d6e056f29513529c00c9f7eaa24761ef6b4b710fa018e998",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage43b2HelperProbe.java": "73d40d04e603f476b16087f353e424bed9018c4b4d6837f1351c90435b8c537a",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/mixin/Stage43bGuiMixin.java": "a4fc29a1f9fad9f300518e10dc9a56ec20bf586bc505e2a7b584e69b61fede21",
+    "tests/stage1/neoforge/resources/assets/pulselib/geckolib/models/entity/stage43b2_owner.geo.json": "bcd9e9e8fb7ec70696680f99058590c7c507d4152bf6c08357de3c0a279190a8",
+    "tests/stage1/neoforge/resources/assets/pulselib/geckolib/animations/stage43b2_owner.animation.json": "635fa3301d0ca9b2a01b799c56e851dc7499fb801bf2ba881de16f9ed3e06156",
+    "docs/porting/tools/verify_gui_helper_api.py": "ae7f55fdaee3d656dc6f1d74d2737896a1fbdf54f9af33a199919fbc32d50184",
+    "docs/porting/tools/verify_render_context_api.py": "f206ef1b04a31e1951d2d3dddcb09164216d76d3e70ad6efec90fdc9ee64dc0a"
+  },
+  "unchanged_backend_sha256": {
+    "PGlMultiDrawExecutor": "8e87fd1172a14c6a4382b7e7cfd7dd5c2359eebe194f425074cc2c2600e9b52d",
+    "PGlGeometryArena": "52539ba678423df4aa46f55dca7c04632eb21f7c0bfa41ba2b7b6e791a067ae3",
+    "PGlFrameArena": "75267c6fde8cb5d942e9cab02163dcc7ac199306c29e8d1b360b0c18056470fe",
+    "PGlInstanceStream": "a2a026cc636d9fc2e0d0ca5199178ab6963d6707c919236a1cfb8ffd28a8099a",
+    "PGlIndirectStream": "c3c238c5d2fecf9ffdfc0044905c14c8d3968f5a96a26cb373cfc420bf1237d4",
+    "PGlWeightedBlendedOit": "b40a4b8fb9e5e2cef99b5eb806429828aeb76e6749308ed0ccaea322685d41be"
+  },
+  "modules": {
+    "common": {
+      "jar": "common/build/libs/pulselib-26.1.2-common-1.1.5.3.jar",
+      "providers": {},
+      "javaUnits": 343,
+      "sha256": "447b23b09e7e0658718205e1156ea90252c6ad3786b0f7d00b43f00aabb77eba",
+      "class_major": 69,
+      "fixture_absent": true
+    },
+    "neoforge": {
+      "jar": "neoforge/build/libs/pulselib-26.1.2-neoforge-1.1.5.3.jar",
+      "providers": {
+        "platform.IPulsePlatform": "com.arcanc.pulselib.neoforge.NeoForgePlatform",
+        "platform.IPulseCameraService": "com.arcanc.pulselib.neoforge.NeoForgeCameraService",
+        "plugin.IPulsePluginFinder": "com.arcanc.pulselib.neoforge.NeoForgePulsePluginFinder"
+      },
+      "javaUnits": 354,
+      "sha256": "cae000390a4388a3066bb6c8b3457e1eda2cf907ac1bb73b4180a6a8631b6fb9",
+      "class_major": 69,
+      "fixture_absent": true
+    },
+    "fabric": {
+      "jar": "fabric/build/libs/pulselib-26.1.2-fabric-1.1.5.3.jar",
+      "providers": {
+        "platform.IPulsePlatform": "com.arcanc.pulselib.fabric.FabricPlatform",
+        "platform.IPulseCameraService": "com.arcanc.pulselib.fabric.FabricCameraService",
+        "plugin.IPulsePluginFinder": "com.arcanc.pulselib.fabric.FabricPulsePluginFinder"
+      },
+      "javaUnits": 347,
+      "sha256": "d15bb57fc5682d8b2349deec19c494e62d2fc6c9bbed6f6b53fb07b1f48cab2b",
+      "class_major": 69,
+      "fixture_absent": true
+    }
+  },
+  "logs": {
+    "client-final.log": {
+      "path": "/tmp/pulselib-stage43b2-7ia0o2yp/client-final.log",
+      "sha256": "9cf089099269b3c0eb392ed8b11e2f6fb39a03fb22d41c7651f10a18ab53e337"
+    },
+    "client-native.log": {
+      "path": "/tmp/pulselib-stage43b2-7ia0o2yp/client-native.log",
+      "sha256": "8d8843fb72b49a5dbe41584cdc6ff0a0e23b6dcbd220fb0eec6f2defb66331b4"
+    },
+    "server.log": {
+      "path": "/tmp/pulselib-stage43b2-7ia0o2yp/server.log",
+      "sha256": "b90ddce69945c6da6ee6a244f5b4b656dbb1979012d36beaf7e0a248caeabc12"
+    },
+    "build-final.log": {
+      "path": "/tmp/pulselib-stage43b2-7ia0o2yp/build-final.log",
+      "sha256": "1812c8058109ecf76ecdb1da3183bc198faacae3c1d58bb4839fe7fd1f11e290"
+    }
+  },
+  "pixel_ledger": {
+    "path": "docs/porting/evidence/stage-4.3b.2-cases.ndjson",
+    "sha256": "4349498c66d85f3fab23954b8274601aa228b81bac3b08613c89ca7942a11082"
+  },
+  "debugger_evidence": [
+    {
+      "diagnostic_source": "PModelGuiRenderState.extract:59",
+      "timestamp_utc": "2026-10-25T18:17:47.859Z",
+      "observed": "red pose0=(1,0,0); bounds x=79 y=23 width=34 height=34; transform scale(32,16,16), origin(64,24,200)",
+      "conclusion": "fixture expected a negative Gecko translation but actual canonical decoder contributes +1; moved red sample from x32 to x96"
+    },
+    {
+      "diagnostic_source": "Stage43b2HelperProbe.check:287 -> afterGui:173 -> native GuiRenderer RETURN (17 folded frames)",
+      "observed": "rgb=[77,0,178], target 960x640, scale=2, sample(152,24), offset=2270656; direct read buffer.get(2270656)=77",
+      "conclusion": "packedOverlay=0 selects native red overlay; shader mix and native texel 0xB2FF0000 explain RGB; use NO_OVERLAY plus separate strict overlay=0 case"
+    },
+    {
+      "diagnostic_source": "PModelGuiRenderer.renderToTexture:52 / check:290 -> faults:248 -> beforeGui:133 -> native GUI HEAD",
+      "timestamp_utc": "2026-10-25T18:30:46.535Z",
+      "observed": "host model-view identity, render scissor false; post-reload recovery alpha check failed",
+      "conclusion": "renderer host matrix/scissor do not explain failure; native screenshot changes pack row length; final corrected readback observes 960 and recovers pixels without production GPU changes"
+    }
+  ],
+  "rejected_attempts": [
+    "Initial Common compile: Matrix4f has no set(Matrix3x2fc); copied affine components explicitly",
+    "Initial fixture compile: nonexistent stopAllOverlays removed; clearing controller collection is the snapshot control",
+    "Initial helper API audit looked for ExtractApi imports metadata, which inventory adds separately; source import check now explicit",
+    "client.log / client-debug.log: wrong negative Gecko translation expectation; actual runtime +1, not a renderer position bug",
+    "client-2.log / client-debug-2.log / client-3.log: zero packedOverlay was incorrectly treated as NO_OVERLAY; strict RGB exposed native hurt tint",
+    "client-4.log: alpha sample lay in native chat-security toast region; moved same strict RGB case below toast",
+    "client-5.log / client-debug-3.log: unsafe CPU texture readback inherited native screenshot pack row length and reported zero; fixed harness stride save/reset/restore, no warmup delay added to fault suites",
+    "client-debug-pack.log: diagnostic process exited 134 / SIGSEGV in libspa-audioconvert.so before events could be drained; exact native crash causation not established, no audio code changed; not counted as PASS",
+    "Some debugger expressions could not resolve inferred target.width; field tree and literal-offset read succeeded; a temporary wrong-line point removed before launch",
+    "Remote localhost attach failed; ::1 attach worked. OS screenshot capture unavailable under Wayland; native Minecraft screenshots used",
+    "One parallel helper API extraction JSON parse failed; serial final helper audit passed; assertions not weakened"
+  ],
+  "isolation": {
+    "backup": "/tmp/pulselib-stage43b2-7ia0o2yp",
+    "preexisting_tracked_edits": 33,
+    "java_projection_inputs": 29,
+    "java_overlap": 0,
+    "protected_run_files": 188,
+    "source_refs_unchanged": true,
+    "push_publish": false,
+    "user_breakpoints_preserved": 4,
+    "active_debug_sessions_final": 0
+  },
+  "limitations": [
+    "Fabric builds but runtime GUI registration and pool parity remain stage 6",
+    "Standalone Pulse item/player target eligibility, glint and final H15 matrix remain 4.3c; player integration remains stage 5",
+    "Whole compiled library API audit and comparative performance remain stage 7",
+    "Helper bounds scan CPU vertices per invocation; no performance benchmark or arbitrary shader deformer displacement bound claimed",
+    "No driver-loss, exhaustive nested native pool or atomic rollback of already issued GPU geometry claimed; failure test occurs before first draw",
+    "Regression points/regions use uniform fixture surfaces and do not constitute a full image diff or every GUI scale matrix"
+  ]
+}

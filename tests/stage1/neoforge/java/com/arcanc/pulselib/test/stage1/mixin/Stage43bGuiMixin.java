@@ -10,6 +10,7 @@
 package com.arcanc.pulselib.test.stage1.mixin;
 
 import com.arcanc.pulselib.test.stage1.Stage43bGuiProbe;
+import com.arcanc.pulselib.test.stage1.Stage43b2HelperProbe;
 import net.minecraft.client.gui.render.GuiRenderer;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import org.spongepowered.asm.mixin.Mixin;
@@ -24,6 +25,8 @@ public abstract class Stage43bGuiMixin
 	@Inject(method = "render", at = @At("HEAD"))
 	private void pulselib$beforeGui(GpuBufferSlice fog, CallbackInfo callback)
 	{
+		if (Boolean.getBoolean("pulselib.stage43b2Probe"))
+			Stage43b2HelperProbe.beforeGui();
 		if (Boolean.getBoolean("pulselib.stage43bProbe"))
 			Stage43bGuiProbe.beforeGui();
 	}
@@ -31,6 +34,8 @@ public abstract class Stage43bGuiMixin
 	@Inject(method = "render", at = @At("RETURN"))
 	private void pulselib$afterGui(GpuBufferSlice fog, CallbackInfo callback)
 	{
+		if (Boolean.getBoolean("pulselib.stage43b2Probe"))
+			Stage43b2HelperProbe.afterGui();
 		if (Boolean.getBoolean("pulselib.stage43bProbe"))
 			Stage43bGuiProbe.afterGui();
 	}

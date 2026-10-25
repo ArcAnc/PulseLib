@@ -38,7 +38,7 @@ def main():
     assert len(results) == 4
     report = {'status': 'PASS', 'baselineCommit': '7ce6f024b307bb821ce543344d3896c8e1fcf26b',
               'baselineChecksums': 'unchanged', 'types': results,
-              'scope': 'Canonical PRenderContexts, Context, Scope and GlRenderState source declarations; GUI helper/custom render states remain stage 4.3b.2; native execution coverage is recorded separately',
+              'scope': 'Canonical PRenderContexts, Context, Scope and GlRenderState source declarations; Native GUI/helper runtime coverage is recorded separately; standalone item/glint and final H15 matrix remain stage 4.3c',
               'minecraftAdaptations': ['Invocation scopes use 26.1 attachment overrides rather than the last bound raw GL framebuffer',
                                        'Local scopes capture frame matrices, projection UBO binding and target views at entry',
                                        'GlCommandEncoder program/pipeline caches invalidated after native restoration'],

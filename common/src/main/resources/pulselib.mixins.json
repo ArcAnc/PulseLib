@@ -18,6 +18,7 @@
     "GameRendererMixin",
     "PictureInPictureRendererMixin",
     "GuiItemAtlasMixin",
+    "GuiGraphicsExtractorAccessor",
     "PoseStackAccessor",
     "FeatureRenderDispatcherMixin",
     "LevelRendererMixin",

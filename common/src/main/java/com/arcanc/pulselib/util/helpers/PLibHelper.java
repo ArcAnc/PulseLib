@@ -12,15 +12,24 @@ package com.arcanc.pulselib.util.helpers;
 
 import com.arcanc.pulselib.content.animatable.AnimManagerKey;
 import com.arcanc.pulselib.content.animatable.PAnimatable;
+import com.arcanc.pulselib.content.animatable.PAnimationController;
 import com.arcanc.pulselib.content.animatable.PAnimationManager;
 import com.arcanc.pulselib.content.animatable.instance.InstanceAnimationManager;
 import com.arcanc.pulselib.content.animatable.singleton.SingletonAnimationManager;
+import com.arcanc.pulselib.content.renderer.PModelGuiRenderState;
 import com.arcanc.pulselib.content.renderer.base.PEntityRenderState;
+import com.arcanc.pulselib.content.renderer.modelData.PModelData;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.joml.Vector3f;
 
+import java.util.Collection;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -162,5 +171,35 @@ public class PLibHelper
 	public static <T extends Entity & PAnimatable<T>> PEntityRenderState.Impl<T> entityRenderState()
 	{
 		return entityRenderState(PEntityRenderState.Impl::new);
+	}
+
+	/**
+	 * Renders an animated model in an isolated GUI render scope at the supplied screen position.
+	 * Minecraft 26.1 extracts a pose snapshot now and draws it during native GUI execution.
+	 * The extractor pose/scissor, scale, color, light and overlay belong to this invocation;
+	 * a model that has not loaded yet contributes no GUI state.
+	 *
+	 * @param <T> the animatable owner type
+	 * @param guiGraphics the GUI drawing context
+	 * @param modelData the canonical model and loader selection
+	 * @param controllers the animation controllers in pose composition order
+	 * @param renderType the render type
+	 * @param x the GUI x coordinate in screen pixels
+	 * @param y the GUI y coordinate in screen pixels
+	 * @param scale the local scale vector
+	 * @param packedColor the packed ARGB vertex color
+	 * @param packedLight the packed block and sky light coordinates
+	 * @param packedOverlay the packed overlay texture coordinates
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 */
+	public static <T extends PAnimatable<T>> void renderModelInGui(GuiGraphicsExtractor guiGraphics,
+	                                                            PModelData modelData,
+	                                                            Collection<PAnimationController<T>> controllers,
+	                                                            Function<Identifier, RenderType> renderType,
+	                                                            int x, int y, Vector3f scale,
+	                                                            int packedColor, int packedLight, int packedOverlay, float partialTick)
+	{
+		PModelGuiRenderState.extract(guiGraphics, modelData, controllers, renderType, x, y, scale,
+				packedColor, packedLight, packedOverlay, partialTick);
 	}
 }
