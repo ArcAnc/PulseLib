@@ -60,3 +60,19 @@ native state restoration. Clients run with a visible window and stop normally.
 types / 14 public declarations. Automatic native GUI Entity/Item execution and
 `PLibHelper.renderModelInGui` remain stage 4.3b; this harness does not claim H15
 completion. See journal section 27 for commands, evidence and exact limitations.
+
+Stage 4.3b.1 adds native GUI execution coverage. The opt-in NeoForge harness is
+`-PpulseStage1Smoke -PpulseStage43bProbe -PpulseStage2Probe`, with disposable
+`-PpulseVerificationDir=stage43b-runs` and a `stage43b-smoke` server (wait for
+server Done before connecting). It checks 192 GPU regions across native Entity
+PIP, normal Item atlas and oversized Item PIP, opaque/transparent phases, scissor,
+independent owners, vanilla text and resource reload. Six real submit/deferred
+callback failures verify discarded Pulse plans, retained native pose/collector
+recovery and subsequent successful native draws. Both visible clients and the
+server stop normally; the existing 4.3a harness also passes 44 regression pixels.
+See journal section 28 and `docs/porting/evidence/stage-4.3b.1.json` for commands,
+source isolation, screenshots and exact limitations. The canonical
+`PLibHelper.renderModelInGui` custom GUI state remains checkpoint 4.3b.2;
+standalone item/glint eligibility and the final H15 matrix remain open. These
+fixtures do not claim atomic rollback of arbitrary vanilla pixels already drawn
+before a mixed-batch failure, driver-loss recovery or Fabric runtime coverage.

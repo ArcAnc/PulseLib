@@ -108,22 +108,35 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 	{
 		if (renderState == null)
 			return;
-		renderState.extractAdditionalData(lightCoords,  overlayCoords, hasFoil, outlineColor);
-		poseStack.pushPose();
-		try
+		boolean gui = ((ItemStackRenderStateAccessor)renderState.itemRenderState()).pulselib$getDisplayContext() == ItemDisplayContext.GUI;
+		try (var scope = gui && PRenderContexts.localScope() == null ? PRenderContexts.enter(PRenderContexts.Context.GUI) : null)
 		{
-			PModelData modelData = getModelData(renderState);
-			PModelLoader modelLoader = PModelCache.getModelLoader(modelData.getModelLoaderId()).orElse(PGltfModelLoader.INSTANCE);
-			modelLoader.applyItemTransform(poseStack);
+			try
+			{
+				renderState.extractAdditionalData(lightCoords,  overlayCoords, hasFoil, outlineColor);
+				poseStack.pushPose();
+				try
+				{
+					PModelData modelData = getModelData(renderState);
+					PModelLoader modelLoader = PModelCache.getModelLoader(modelData.getModelLoaderId()).orElse(PGltfModelLoader.INSTANCE);
+					modelLoader.applyItemTransform(poseStack);
 		
-			CameraRenderState cameraRenderState = new CameraRenderState();
-			preSubmit(poseStack, renderState, cameraRenderState, submitNodeCollector);
-			trueSubmit(poseStack, renderState, cameraRenderState, submitNodeCollector);
-			postSubmit(poseStack, renderState, cameraRenderState, submitNodeCollector);
-		}
-		finally
-		{
-			poseStack.popPose();
+					CameraRenderState cameraRenderState = new CameraRenderState();
+					preSubmit(poseStack, renderState, cameraRenderState, submitNodeCollector);
+					trueSubmit(poseStack, renderState, cameraRenderState, submitNodeCollector);
+					postSubmit(poseStack, renderState, cameraRenderState, submitNodeCollector);
+				}
+				finally
+				{
+					poseStack.popPose();
+				}
+			}
+			catch (RuntimeException | Error failure)
+			{
+				if (scope != null)
+					scope.discard();
+				throw failure;
+			}
 		}
 	}
 	
@@ -240,15 +253,6 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 		
 			PPose pose = model.evaluate(controllers, molangContexts, renderState.partialTick());
 			ItemDisplayContext context = ((ItemStackRenderStateAccessor)renderState.itemRenderState()).pulselib$getDisplayContext();
-			if (context == ItemDisplayContext.GUI)
-			{
-				model.bones().forEach(bone -> perBoneSubmit(renderState.getAnimatable(), renderState.stack(), poseStack, bone, pose, controllers, molangContexts, this::getRenderType, -1, renderState.lightCoords(), renderState.overlayCoords(), renderState.partialTick(), context));
-				submitNodeCollector.submitCustomGeometry(
-						poseStack,
-						this.renderType.apply(PResourceCache.ATLAS_LOCATION),
-						(_, _) -> PRenderQueue.flush(PRenderQueue.RenderStage.GUI));
-				return;
-			}
 			model.bones().forEach(bone -> perBoneSubmit(renderState.getAnimatable(), renderState.stack(), poseStack, bone, pose, controllers, molangContexts, this::getRenderType, -1, renderState.lightCoords(), renderState.overlayCoords(), renderState.partialTick(), context));
 		});
 	}

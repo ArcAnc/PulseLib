@@ -10,6 +10,10 @@
 package com.arcanc.pulselib.content.mixin;
 
 import com.arcanc.pulselib.content.renderer.PRenderQueue;
+import com.arcanc.pulselib.content.renderer.PRenderContexts;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import org.joml.Matrix4fc;
@@ -24,6 +28,24 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin
 {
+	@WrapMethod(method = "renderLevel")
+	private void pulselib$worldInvocation(DeltaTracker delta, Operation<Void> original)
+	{
+		try (var scope = PRenderContexts.enter(PRenderContexts.Context.WORLD))
+		{
+			original.call(delta);
+		}
+	}
+
+	@WrapMethod(method = "renderItemInHand")
+	private void pulselib$handInvocation(CameraRenderState camera, float partialTick, Matrix4fc modelView, Operation<Void> original)
+	{
+		try (var scope = PRenderContexts.enter(PRenderContexts.Context.FIRST_PERSON))
+		{
+			original.call(camera, partialTick, modelView);
+		}
+	}
+
 	/**
 	 * Performs the pulselib$flush first person items operation.
 	 * @param cameraState the camera state to use.

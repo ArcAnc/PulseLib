@@ -66,8 +66,10 @@ public final class Stage1Client implements IPulseClientPlugin
 	{
 		bus.addListener(Stage1Client::renderers);
 		bus.addListener((RegisterSpecialModelRendererEvent event) ->
-				event.register(PLibDatabase.rl("test_block"), TestBlockItemRenderer.Unbaked.MAP_CODEC));
+				event.register(PLibDatabase.rl("test_block"), Boolean.getBoolean("pulselib.stage43bProbe") ? Stage43bGuiProbe.Unbaked.MAP_CODEC : TestBlockItemRenderer.Unbaked.MAP_CODEC));
 		NeoForge.EVENT_BUS.addListener(Stage1Client::tick);
+		if (Boolean.getBoolean("pulselib.stage43bProbe"))
+			Stage43bGuiProbe.register();
 		if (Boolean.getBoolean("pulselib.stage43aProbe"))
 			Stage43aContextProbe.register();
 		if (Boolean.getBoolean("pulselib.stage42cProbe"))
@@ -98,6 +100,12 @@ public final class Stage1Client implements IPulseClientPlugin
 
 	private static void renderers(EntityRenderersEvent.RegisterRenderers event)
 	{
+		if (Boolean.getBoolean("pulselib.stage43bProbe"))
+		{
+			event.registerEntityRenderer(Stage1Content.EntityTypeReg.TEST_ENTITY.get(), Stage43bGuiProbe.EntityRenderer::new);
+			event.registerBlockEntityRenderer(Stage1Content.BETypeReg.TEST_BLOCK_ENTITY.get(), TestBlockEntityRenderer::new);
+			return;
+		}
 		if (Boolean.getBoolean("pulselib.stage42b4Probe") || Boolean.getBoolean("pulselib.stage42cProbe"))
 		{
 			event.registerBlockEntityRenderer(Stage1Content.BETypeReg.TEST_BLOCK_ENTITY.get(), Stage42b4TranslucentProbe.BlockRenderer::new);
@@ -130,7 +138,7 @@ public final class Stage1Client implements IPulseClientPlugin
 	public void registerModels(PModelRegistrar event)
 	{
 		Stage2PluginProbe.models++;
-		if (Boolean.getBoolean("pulselib.stage42b4Probe") || Boolean.getBoolean("pulselib.stage42cProbe"))
+		if (Boolean.getBoolean("pulselib.stage43bProbe") || Boolean.getBoolean("pulselib.stage42b4Probe") || Boolean.getBoolean("pulselib.stage42cProbe"))
 			event.model(Stage42b4TranslucentProbe.MODEL).texture("0", Stage42aWorldStageProbe.WHITE);
 		if (Boolean.getBoolean("pulselib.stage42b3Probe"))
 			event.model(Stage42b3WorldProbe.MODEL).texture("0", Stage42aWorldStageProbe.WHITE);
@@ -174,6 +182,11 @@ public final class Stage1Client implements IPulseClientPlugin
 	private static void tick(ClientTickEvent.Post event)
 	{
 		Minecraft minecraft = Minecraft.getInstance();
+		if (Boolean.getBoolean("pulselib.stage43bProbe"))
+		{
+			Stage43bGuiProbe.tick();
+			return;
+		}
 		if (Boolean.getBoolean("pulselib.stage43aProbe"))
 		{
 			Stage43aContextProbe.tick();
