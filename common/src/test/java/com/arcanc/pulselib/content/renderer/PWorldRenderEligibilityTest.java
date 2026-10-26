@@ -97,6 +97,21 @@ class PWorldRenderEligibilityTest
 		assertFalse(PWorldRenderEligibility.capture(State::new).required);
 	}
 
+	@Test
+	void extractedPlayerGeometryUsesTheSameOwnerBoundaryAndResetsForReuse()
+	{
+		var owner = PWorldRenderEligibility.capture(() ->
+		{
+			PWorldRenderEligibility.markGeometry();
+			return new State();
+		});
+		assertTrue(owner.required);
+		PWorldRenderEligibility.capture(() -> owner);
+		assertFalse(owner.required);
+		PWorldRenderEligibility.markGeometry();
+		assertFalse(PWorldRenderEligibility.capture(State::new).required);
+	}
+
 	private static final class State extends EntityRenderState implements PWorldRenderState
 	{
 		private boolean required;

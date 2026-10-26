@@ -16,7 +16,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.function.Supplier;
 
-/** Captures actual special-item extraction, including nested vanilla render states, without scanning live owners. */
+/** Captures Pulse geometry discovered during native entity extraction, including nested vanilla states. */
 @ApiStatus.Internal
 public final class PWorldRenderEligibility
 {
@@ -49,6 +49,12 @@ public final class PWorldRenderEligibility
 
 	/** Called only when a Pulse special renderer has successfully extracted a non-null argument. */
 	public static void markItem()
+	{
+		markGeometry();
+	}
+
+	/** Marks successfully extracted Pulse geometry, including automatic meshes on native players. */
+	public static void markGeometry()
 	{
 		@Nullable Extraction extraction = CURRENT.get();
 		if (extraction != null)

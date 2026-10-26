@@ -11,7 +11,9 @@
     "Stage43bGuiMixin",
     "Stage43bNativeGuiMixin",
     "Stage43bOversizedMixin",
-    "Stage52AttachmentQueueMixin"
+    "Stage52AttachmentQueueMixin",
+    "Stage52CameraMixin",
+    "Stage52RootMixin"
   ],
   "injectors": {
     "defaultRequire": 1

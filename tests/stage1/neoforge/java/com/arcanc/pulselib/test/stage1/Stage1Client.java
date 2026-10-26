@@ -68,6 +68,8 @@ public final class Stage1Client implements IPulseClientPlugin
 		bus.addListener((RegisterSpecialModelRendererEvent event) ->
 				event.register(PLibDatabase.rl("test_block"), Boolean.getBoolean("pulselib.stage43cProbe") ? Stage43cItemProbe.Unbaked.MAP_CODEC : Boolean.getBoolean("pulselib.stage43bProbe") ? Stage43bGuiProbe.Unbaked.MAP_CODEC : TestBlockItemRenderer.Unbaked.MAP_CODEC));
 		NeoForge.EVENT_BUS.addListener(Stage1Client::tick);
+		if (Boolean.getBoolean("pulselib.stage52bProbe"))
+			Stage52CameraProbe.register();
 		if (Boolean.getBoolean("pulselib.stage52aProbe"))
 			Stage52AttachmentProbe.register();
 		if (Boolean.getBoolean("pulselib.stage51Probe"))
@@ -146,6 +148,7 @@ public final class Stage1Client implements IPulseClientPlugin
 	public void registerModels(PModelRegistrar event)
 	{
 		Stage2PluginProbe.models++;
+		Stage52CameraProbe.registerModels(event);
 		Stage52AttachmentProbe.registerModels(event);
 		if (Boolean.getBoolean("pulselib.stage51Probe"))
 			event.model(Stage51PlayerProbe.MODEL).texture("0", PLibDatabase.rl("stage42a_white"));
@@ -184,6 +187,7 @@ public final class Stage1Client implements IPulseClientPlugin
 	public void registerPlayerAnimations(PPlayerAnimationRegistrar registrar)
 	{
 		Stage2PluginProbe.playerAnimations++;
+		Stage52CameraProbe.registerAnimations(registrar);
 		Stage52AttachmentProbe.registerAnimations(registrar);
 		if (Boolean.getBoolean("pulselib.stage51Probe"))
 			Stage51PlayerProbe.registerAnimations(registrar);
@@ -201,6 +205,11 @@ public final class Stage1Client implements IPulseClientPlugin
 	private static void tick(ClientTickEvent.Post event)
 	{
 		Minecraft minecraft = Minecraft.getInstance();
+		if (Boolean.getBoolean("pulselib.stage52bProbe"))
+		{
+			Stage52CameraProbe.frame();
+			return;
+		}
 		if (Boolean.getBoolean("pulselib.stage52aProbe"))
 		{
 			Stage52AttachmentProbe.frame();

@@ -148,3 +148,17 @@ This is not the complete M-P2/M-P3 or native player matrix: camera, rig/items,
 armor/deformers, Fabulous targets, server extraction and real respawn remain
 5.2b. Run the existing 5.1 smoke against its own original server flags, which
 preserve its required Pulse held item, in a separate disposable world.
+
+Stage 5.2b.1 adds `-PpulseStage52bProbe` beside the stage1/stage2 flags, in new
+`stage52b1-runs` server and `stage52b1-final-runs` client directories. It checks
+40 native Camera M-P3 cases (Gecko/glTF, F/G/H weights and VANILLA, reload), actual
+camera-owner isolation, and four real AvatarRenderer ROOT suites. The ROOT probe
+uses captured native states with unavailable late entity IDs, independent vanilla
+placement, nested submits/failures on one renderer/stack, normal/depth restoration
+and recovery. Test collectors discard manual draw nodes; ordinary world ROOT
+boundaries are observed separately. Native Camera oracles preserve player physics.
+ROOT mutation/reset and generic eligibility regressions run in Common JUnit.
+See journal section 34 / `docs/porting/evidence/stage-5.2b.1.json`. The existing
+5.2a matrix/GPU probe is retained as regression with its own matching server flags.
+Deferred rig/item/ModelPart/armor/deformer capture/restoration, full Fabulous player
+parity, server extraction and real respawn remain checkpoint 5.2b.2.

@@ -1,0 +1,477 @@
+{
+  "checkpoint": "5.2b.1",
+  "status": "complete; 5.2b / 5.2 / stage 5 remain partial; next 5.2b.2 deferred player consumers",
+  "date": "2026-10-26",
+  "base_commit": "33dff4c89d8ed3a5afdcb50518e6cd1402a574ef",
+  "source_refs": {
+    "1.21.1-multiloader": "7ce6f024b307bb821ce543344d3896c8e1fcf26b",
+    "26.1": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1"
+  },
+  "implementation": [
+    "Visual ROOT matrix captured after complete virtual native entity extraction via the existing canonical applyRoot",
+    "Defensive nullable ROOT state; no retained Player/manager/evaluator in the snapshot",
+    "Native ROOT consumes captured matrix instead of late entity-ID lookup; no shared renderer rootPushed field",
+    "Per-invocation pose/normal/depth restoration in finally, including nested and failed submits",
+    "Automatic player meshes mark the existing native geometry extraction eligibility bridge; markItem behavior retained",
+    "Camera ownership guard reads the entity of the actual Camera rather than the global Minecraft camera entity; canonical camera mathematics/provider retained"
+  ],
+  "api": {
+    "playerCore": {
+      "status": "PASS",
+      "baselineCommit": "7ce6f024b307bb821ce543344d3896c8e1fcf26b",
+      "types": [
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.PPlayerAnimationAnchor",
+          "preservedMembers": 5
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.PPlayerAnimationAnchorPose",
+          "preservedMembers": 8
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.PPlayerAnimationAnchors",
+          "preservedMembers": 5
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.PPlayerAnimationBlendMode",
+          "preservedMembers": 8
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.PPlayerAnimationDefinition",
+          "preservedMembers": 24
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.PPlayerAnimationDefinition.Builder",
+          "preservedMembers": 25
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.PPlayerAnimationDefinition.ControllerRegistrar",
+          "preservedMembers": 2
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.PPlayerAnimationDefinition.ItemRenderPolicy",
+          "preservedMembers": 3
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.PPlayerAnimationDefinition.ItemVisibility",
+          "preservedMembers": 4
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.PPlayerAnimationDefinition.ItemVisibilityPolicy",
+          "preservedMembers": 3
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.PPlayerAnimationDefinition.MolangContextProvider",
+          "preservedMembers": 2
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.PPlayerAnimationDeformer",
+          "preservedMembers": 7
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.PPlayerAnimationDeformerApplication",
+          "preservedMembers": 6
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.PPlayerAnimationDeformerContext",
+          "preservedMembers": 7
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.PPlayerAnimationDeformerValueSource",
+          "preservedMembers": 1
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.PPlayerAnimationFrame",
+          "preservedMembers": 13
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.PPlayerAnimationHandle",
+          "preservedMembers": 12
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.PPlayerAnimationInstance",
+          "preservedMembers": 6
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.PPlayerAnimationMask",
+          "preservedMembers": 3
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.PPlayerAnimationSpace",
+          "preservedMembers": 10
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.PPlayerAnimationWeight",
+          "preservedMembers": 2
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.PPlayerAnimations",
+          "preservedMembers": 18
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.PPlayerAnimations.PPlayerCameraPose",
+          "preservedMembers": 4
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.PPlayerAnimations.PPlayerModelPose",
+          "preservedMembers": 1
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.PPlayerBonePose",
+          "preservedMembers": 11
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.PPlayerPart",
+          "preservedMembers": 10
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.firstPerson.PFirstPersonCameraSpace",
+          "preservedMembers": 3
+        }
+      ],
+      "minecraftAdaptations": [
+        "ResourceLocation -> Identifier",
+        "PlayerModel<?> -> non-generic net.minecraft.client.model.player.PlayerModel",
+        "PPlayerPart.resolve uses the native main ModelParts; 26.1 overlay parts are children, not separately sampled parts"
+      ],
+      "retainedNativeAdapters": [
+        "automaticMeshAttachmentPoses(Player, float)",
+        "firstPersonPresentation(Player, float)"
+      ],
+      "limits": "Source declaration audit for player core/camera math. Native player/attachment rendering signatures and runtime motion remain stage 5.2; compiled full API audit remains stage 7."
+    },
+    "attachments": {
+      "status": "PASS",
+      "baselineCommit": "7ce6f024b307bb821ce543344d3896c8e1fcf26b",
+      "types": [
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimatedAttachmentContext",
+          "preservedMembers": 14
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimatedAttachmentRenderer",
+          "preservedMembers": 2
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimatedAttachments",
+          "preservedMembers": 3
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimationMeshAttachmentPose",
+          "preservedMembers": 10
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.attachment.PPlayerAutomaticMeshAttachments",
+          "preservedMembers": 3
+        }
+      ],
+      "minecraftAdaptations": [
+        "ResourceLocation -> Identifier",
+        "MultiBufferSource -> SubmitNodeCollector"
+      ],
+      "retainedNativeAdapters": [
+        "PPlayerAnimatedAttachmentContext.submitNodeCollector()"
+      ],
+      "limits": "Source declaration audit for attachment APIs. Native RenderLayer, rig/item/camera/armor/deformer hooks remain the next 5.2 checkpoint; full compiled API audit remains stage 7."
+    },
+    "renderContextTypes": 5,
+    "renderContextMembers": 20,
+    "pluginTypes": 38,
+    "baselineChecksums": "unchanged"
+  },
+  "junit": {
+    "common": {
+      "totals": {
+        "tests": 219,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "newSuites": {
+        "TEST-com.arcanc.pulselib.content.mixin.PPlayerRootSnapshotTest.xml": {
+          "sha256": "cdfc78212c635b09c30233e8ceac1b11f5899caad15cd94f4499fb1debeb90ce",
+          "tests": 2
+        },
+        "TEST-com.arcanc.pulselib.content.renderer.PWorldRenderEligibilityTest.xml": {
+          "sha256": "40c33f3ff414d2c3674e0cc1da3a217190198a49125b227517dd3e1057a884e8",
+          "tests": 6
+        }
+      }
+    },
+    "fabric": {
+      "totals": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "newSuites": {}
+    }
+  },
+  "artifacts": {
+    "java": "25.0.4.1",
+    "gradle": "9.2.1",
+    "modules": {
+      "common": {
+        "jar": "common/build/libs/pulselib-26.1.2-common-1.1.5.3.jar",
+        "providers": {},
+        "javaUnits": 347,
+        "sha256": "bca36963adf29c1144640d6b80d773fd7e5531c0f342bd3c403aab4561a5f4d8",
+        "classes": 542,
+        "classMajors": [
+          69
+        ]
+      },
+      "neoforge": {
+        "jar": "neoforge/build/libs/pulselib-26.1.2-neoforge-1.1.5.3.jar",
+        "providers": {
+          "platform.IPulsePlatform": "com.arcanc.pulselib.neoforge.NeoForgePlatform",
+          "platform.IPulseCameraService": "com.arcanc.pulselib.neoforge.NeoForgeCameraService",
+          "plugin.IPulsePluginFinder": "com.arcanc.pulselib.neoforge.NeoForgePulsePluginFinder"
+        },
+        "javaUnits": 358,
+        "sha256": "64f268999da2b1b54a92f8df9750c5e81479de562ef7aaea326b194112c982c8",
+        "classes": 554,
+        "classMajors": [
+          69
+        ]
+      },
+      "fabric": {
+        "jar": "fabric/build/libs/pulselib-26.1.2-fabric-1.1.5.3.jar",
+        "providers": {
+          "platform.IPulsePlatform": "com.arcanc.pulselib.fabric.FabricPlatform",
+          "platform.IPulseCameraService": "com.arcanc.pulselib.fabric.FabricCameraService",
+          "plugin.IPulsePluginFinder": "com.arcanc.pulselib.fabric.FabricPulsePluginFinder"
+        },
+        "javaUnits": 351,
+        "sha256": "833209347d7d09729a687fc01738942d826485528389dfc8ad831aa116e34b56",
+        "classes": 546,
+        "classMajors": [
+          69
+        ]
+      }
+    }
+  },
+  "runtime": {
+    "minecraft": "26.1.2",
+    "neoforge": "26.1.2.95",
+    "visibleClient": true,
+    "mainClientDir": "neoforge/build/stage52b1-final-runs/client",
+    "mainWorld": "stage52b1-smoke",
+    "mainClientExit": 0,
+    "mainServerExit": 0,
+    "regressionClientExit": 0,
+    "regressionServerExit": 0,
+    "camera": {
+      "cases": 40,
+      "actualAlignmentChecks": 1833,
+      "rootSuites": 4,
+      "worldRootBoundaries": 1647,
+      "foreignCameraChecks": 4
+    },
+    "rootExpectedExceptions": 8,
+    "rootWitnesses": [
+      "actual transformed AvatarRenderer",
+      "captured ROOT equals canonical evaluator output",
+      "late entity ID absent at submit",
+      "independent vanilla placement baseline / ROOT once",
+      "nested invocation on same renderer and PoseStack with different snapshot",
+      "extra callback pushes / exception propagation / caller pose-normal-depth recovery",
+      "successful following submit",
+      "automatic mesh eligibility on actual extracted Avatar state"
+    ],
+    "cameraWitnesses": [
+      "Gecko + embedded glTF",
+      "F/G/H at weights 0.25/0.6/1",
+      "unchanged VANILLA",
+      "native vanilla baseline and post-Pulse position/quaternion",
+      "player position/movement/bounds/dimensions unchanged",
+      "second actual Camera bound to RemotePlayer while global camera owner remains local",
+      "before and after resource reload"
+    ],
+    "attachmentRegression": {
+      "cases": 996,
+      "nativeThird": [
+        [
+          5529,
+          5973
+        ],
+        [
+          400,
+          400
+        ]
+      ],
+      "nativeFirst": [
+        [
+          884,
+          924
+        ],
+        [
+          64,
+          64
+        ]
+      ],
+      "gpuHandFrames": [
+        [
+          884,
+          924
+        ],
+        [
+          64,
+          64
+        ]
+      ],
+      "generatedPrimitives": 98912,
+      "callbackRecoverySuites": 4,
+      "gpuHandFrameTotal": 1936
+    },
+    "serverClassloading": {
+      "stage52b1-runs": {
+        "path": "neoforge/build/stage52b1-runs/server/classloading.log",
+        "sha256": "1f8e125c8686cac1af455086f42ea735cb9e9af379edf5cec091b9bade3253f5",
+        "minecraftClientLoads": 0,
+        "probeLoads": 0
+      },
+      "stage52a-root-regression-runs": {
+        "path": "neoforge/build/stage52a-root-regression-runs/server/classloading.log",
+        "sha256": "266bbcec718afc694d4329eccb3833a71bd9a39d1121bcb63a17790122696521",
+        "minecraftClientLoads": 0,
+        "probeLoads": 0
+      }
+    }
+  },
+  "graphics_intended_sha256": {
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlDynamicGeometry.java": "ef173cb8592c36c8deb1252afc69abb8b1bb78d14bf9fe3db3ca3bd0447e0ce9",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlFrameArena.java": "75267c6fde8cb5d942e9cab02163dcc7ac199306c29e8d1b360b0c18056470fe",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlGeometryArena.java": "52539ba678423df4aa46f55dca7c04632eb21f7c0bfa41ba2b7b6e791a067ae3",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlIndirectStream.java": "c3c238c5d2fecf9ffdfc0044905c14c8d3968f5a96a26cb373cfc420bf1237d4",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlInstanceStream.java": "a2a026cc636d9fc2e0d0ca5199178ab6963d6707c919236a1cfb8ffd28a8099a",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java": "8e87fd1172a14c6a4382b7e7cfd7dd5c2359eebe194f425074cc2c2600e9b52d",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlRenderHost.java": "baba32946c29b0a639e8f1803f34bbf84c1a5e117eaedf813743eee1c7b30416",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlResourceRegistry.java": "ced196a145d769f9d116b6063397bb54e604efaf6b05a1060b86db8353470a84",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java": "b40a4b8fb9e5e2cef99b5eb806429828aeb76e6749308ed0ccaea322685d41be",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/package-info.java": "c39b48f5d48b8b12a7ab0a60433493cbc2564e97dba7995f4ab0f8bea34cea9b",
+    "common/src/main/resources/assets/pulselib/atlases/atlas.json": "a4e2be76bf36c68188dd5b8b3269ce97621abca89c56fde3bad8812589146cd6",
+    "common/src/main/resources/assets/pulselib/geckolib.zip": "3e1577c14b1be39f38288a08a784ee9eb555cd843d71324f297ae135a31615fb",
+    "common/src/main/resources/assets/pulselib/glmodels.zip": "93792d7ac3e77453b7d08bcb0cc829b83e0abc9f75d8210c9014b80615526bde",
+    "common/src/main/resources/assets/pulselib/items.zip": "8da45b48f5ba6b9426afc9f4f775443dd72957249b073c3531b1ac7e72562839",
+    "common/src/main/resources/assets/pulselib/models.zip": "c81433032c0b9e766e5a52255d55effb6359dd941c7ecd17b7497c0c4ea1e831",
+    "common/src/main/resources/assets/pulselib/shaders/core/oit_composite.fsh": "c7bda2ec92883ea5a4ad090fdb16c1cc4561e467c85ebbf875169c033dcb6385",
+    "common/src/main/resources/assets/pulselib/shaders/core/oit_composite.vsh": "47109b410ead6ac9297ba7ff60a119fc87cb3cd12336c5dab62f8baf556e3913",
+    "common/src/main/resources/assets/pulselib/shaders/core/oit_fabulous_composite.fsh": "60c365d9577d9a13eec82018020ffe437baafb4cd898fdb64b8ace98b2c5a58a",
+    "common/src/main/resources/assets/pulselib/shaders/core/oit_fabulous_metadata.fsh": "49bea446c856a29b3f064be64694444bc1207178758a2411e15843eaecdffe02",
+    "common/src/main/resources/assets/pulselib/shaders/core/triangles.fsh": "232228f436b969c7957a75b6d9e538081af8cce0579a8f79668f610e00dc37d0",
+    "common/src/main/resources/assets/pulselib/shaders/core/triangles.vsh": "d7cfa97cdba1ce93dd040d9ba483ed9eb87c1a011077fc00a75cdeba9e2231df",
+    "common/src/main/resources/assets/pulselib/shaders/core/triangles_instant.fsh": "38c2aa066bf7bf1334c282c12dabc435fa13e4d74b4f33daade2e74dcfc2eb0b",
+    "common/src/main/resources/assets/pulselib/shaders/core/triangles_instant.vsh": "66f5cf600bd8c2ad0dc97b4d026091dc9146856706389f16dcfdbd0008326e1f",
+    "common/src/main/resources/assets/pulselib/shaders/core/triangles_oit.fsh": "e3d44e72c41b213ca5816b5f22e8438f7b4a2dd781fee7611b3e3dbbd4cae9d0",
+    "common/src/main/resources/assets/pulselib/shaders/core/triangles_oit_depth.fsh": "bf98a6cea3b16b8ee9e45fdeb0e31c48eb6de5340ce97b82fccdf44fe464c7fc",
+    "common/src/main/resources/assets/pulselib/shaders/core/triangles_oit_depth_peel.fsh": "f00e3fa5d9b0d149f01309ce9abf338b22cf8801e7bd85ec35abf3a0866a00c8",
+    "common/src/main/resources/assets/pulselib/shaders/include/deformers.glsl": "9a1f6eee0a5fef10882531b07a44463cc110a94e531c74fda757187f66d4142f",
+    "common/src/main/resources/assets/pulselib/template/player/player_model_template.bbmodel": "404db85af63262309f24e319a49162def61258b0f4aa6d5fe66a7a869954e127",
+    "common/src/main/resources/assets/pulselib/template/player/player_model_template.gltf": "c5fe4817e44498c0808fccd3e33fdbdd9a6bb07a4db97df8efb8dfe62e614045",
+    "common/src/main/resources/assets/pulselib/textures.zip": "7330f2151870a56a0c80da5a775d4da6cede0c9ccabb825b1a1c9b6438813af9"
+  },
+  "source_isolation": {
+    "initialTrackedEdits": 42,
+    "dirtyJavaProjectionInputs": 38,
+    "javaOverlap": "PWorldRenderEligibility: same marker change in worktree and intended projection; original nullable edits retained",
+    "otherInitialEditsUnchanged": true,
+    "backup": "/tmp/pulselib-stage52b-w__xp5wr",
+    "protectedFiles": 188,
+    "frozenRefsUnchanged": true,
+    "intendedJournalAndReadme": true,
+    "sourcesJavadocReadWorktree": true,
+    "published": false
+  },
+  "logs": {
+    "build-accepted.log": {
+      "path": "/tmp/pulselib-stage52b-w__xp5wr/build-accepted.log",
+      "sha256": "d4c5ea3db5040539151978ad0fac2ea29339b5d55013bd29113ecd8c959cb5b6",
+      "acceptedLines": [
+        "STAGE 2 SERVICE PROVIDERS / LEGACY REMOVAL / COMMON BOUNDARY PASS: /mnt/MainDrive/Programs/MC mods/ArcsLib/build/reports/porting/stage-2-build.json",
+        "BUILD SUCCESSFUL in 15s"
+      ]
+    },
+    "client-final.log": {
+      "path": "/tmp/pulselib-stage52b-w__xp5wr/client-final.log",
+      "sha256": "9e533acff4e06dc81337382387fefa6930646498a0c3b4a071a58a2a957cc1c8",
+      "acceptedLines": [
+        "[23:11:42] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.1 PRE-RELOAD PASS: cameraCases=20, nativeCameraChecks=716, rootSuites=2, foreignCameras=2",
+        "[23:11:53] [Render thread/INFO] [Pulse Lib/]: STAGE 2 CLIENT PLUGINS PASS: ids=[pulselib:stage1_client, pulselib:stage2_common], common=1, channels=1, events=1, deformers=1, client=1, server=0, models=2",
+        "[23:11:53] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.1 NATIVE PLAYER PASS: cameraCases=40, cameraChecks=1833, rootSuites=4, nativeWorldRoots=1647, foreignCameras=4, formats=Gecko/glTF, F/G/H weights=0.25/0.6/1, VANILLA, extraction/nested failure/recovery/reload PASS",
+        "[23:11:53] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.1 NATIVE PLAYER SHUTDOWN PASS",
+        "BUILD SUCCESSFUL in 50s"
+      ]
+    },
+    "server.log": {
+      "path": "/tmp/pulselib-stage52b-w__xp5wr/server.log",
+      "sha256": "ea9e836ab57cbe0395b3f830c024bf0e69dc765aecbce32320257767a353ded1",
+      "acceptedLines": [
+        "[23:03:32] [Server thread/INFO] [Pulse Lib/]: STAGE 2 SERVER PLUGINS PASS: ids=[pulselib:stage2_common, pulselib:stage2_server], common=1, channels=1, events=1, deformers=1, client=0, server=1, models=0",
+        "BUILD SUCCESSFUL in 14m 20s"
+      ]
+    },
+    "client-regression.log": {
+      "path": "/tmp/pulselib-stage52b-w__xp5wr/client-regression.log",
+      "sha256": "da143e2e269051e7971461dc93d9416008a551900b5ad07b8e4b4b7fabbbad84",
+      "acceptedLines": [
+        "[23:21:21] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2a PRE-RELOAD PASS: cases=498, nativeThird=[[5529, 5921], [0, 0]], nativeFirst=[[884, 896], [0, 0]], GPU hand frames=[[884, 896], [0, 0]]",
+        "[23:21:56] [Render thread/INFO] [Pulse Lib/]: STAGE 2 CLIENT PLUGINS PASS: ids=[pulselib:stage1_client, pulselib:stage2_common], common=1, channels=1, events=1, deformers=1, client=1, server=0, models=2",
+        "[23:21:56] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2a ATTACHMENTS PASS: matrixPhysicsCases=996, formats=Gecko/glTF, blendModes=5, weights=0.25/0.6/1, ROOT masks/part/bone weights/transitions/two definitions/reload/queue isolation PASS; nativeThird=[[5529, 5973], [400, 400]], nativeFirst=[[884, 924], [64, 64]], GPU hand frames=[[884, 924], [64, 64]], generatedPrimitives=98912, callbackFailures=4, callbacks third=13270, first=2932",
+        "[23:21:56] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2a ATTACHMENTS SHUTDOWN PASS",
+        "BUILD SUCCESSFUL in 1m 27s"
+      ]
+    },
+    "server-regression.log": {
+      "path": "/tmp/pulselib-stage52b-w__xp5wr/server-regression.log",
+      "sha256": "ea3a3021c92f7317ec4faf6bf53f7f9e4d6dd5153ee9afc7b6880211d55c3dad",
+      "acceptedLines": [
+        "[23:19:10] [Server thread/INFO] [Pulse Lib/]: STAGE 2 SERVER PLUGINS PASS: ids=[pulselib:stage2_common, pulselib:stage2_server], common=1, channels=1, events=1, deformers=1, client=0, server=1, models=0",
+        "BUILD SUCCESSFUL in 9m 31s"
+      ]
+    },
+    "core-api.log": {
+      "path": "/tmp/pulselib-stage52b-w__xp5wr/core-api.log",
+      "sha256": "05991d41195e8f05f9a95353766ce3c6995b9fb306aeba62b196fe0f6c3e386f",
+      "acceptedLines": [
+        "PLAYER CORE API PASS: 27 canonical types / 203 declared members"
+      ]
+    },
+    "attachment-api.log": {
+      "path": "/tmp/pulselib-stage52b-w__xp5wr/attachment-api.log",
+      "sha256": "5258ac042cc7be2dbae4f514ee11219f85d7ac495ed2c7a2db0206761cf424b2",
+      "acceptedLines": [
+        "PLAYER ATTACHMENT API PASS: 5 canonical types / 32 declared members"
+      ]
+    },
+    "context-api.log": {
+      "path": "/tmp/pulselib-stage52b-w__xp5wr/context-api.log",
+      "sha256": "c8e346b8db77b1a445b0b4124699f558e017393e6e899a4631a63564ec82b113",
+      "acceptedLines": [
+        "RENDER CONTEXT API PASS: 5 canonical types / 20 declared members"
+      ]
+    },
+    "plugin-api.log": {
+      "path": "/tmp/pulselib-stage52b-w__xp5wr/plugin-api.log",
+      "sha256": "008f6c1ae68399be9f1318005f136fa64b8cab68d30f98b23fe9e6444677e38f",
+      "acceptedLines": [
+        "PLUGIN API PASS: 38 canonical types; complete declared member contracts preserved"
+      ]
+    }
+  },
+  "correctedAttempts": [
+    "New marker method initially absent from the intended dirty-source projection",
+    "Fixture Camera constructor signature and migrated baseline variable names corrected before runtime",
+    "Temporary formatting helper omitted static JUnit imports; restored before final full build",
+    "First runtime passed mathematical/ROOT witnesses but counted terminal keys between scenes; final guard requires actual current scene/start tick and yields exactly 20+20 cases"
+  ],
+  "limits": [
+    "ROOT/Camera checkpoint only; deferred rig/item/ModelPart/armor/deformer capture/restoration remains 5.2b.2",
+    "Full arbitrary anchor/rig/armor target eligibility and Fabulous pixel/depth parity remain 5.2b.2",
+    "Server root-motion extraction isolation and real respawn M-P2 witnesses remain 5.2b.2",
+    "Direct ROOT tests discard manual collector work; no atomic rollback of arbitrary already submitted world/native pixels claimed",
+    "No new ThreadLocal, alternate evaluator, manager, queue, shader or GPU backend; no performance improvement claimed",
+    "Fabric runtime remains stage 6; full testmod, compiled API audit and final GPU/performance matrix remain stage 7"
+  ]
+}
