@@ -93,3 +93,24 @@ helper declarations with explicit Minecraft type substitutions. See journal
 section 29 / `docs/porting/evidence/stage-4.3b.2.json` for exact commands and limits.
 Next checkpoint is 4.3c (standalone Item/glint/final H15); Fabric GUI registration
 and runtime parity remain stage 6. Existing user worlds are never fixtures.
+
+Stage 4.3c completes the current NeoForge H15/item boundary matrix. Standalone
+verification uses `-PpulseStage1Smoke -PpulseStage43cProbe -PpulseStage2Probe`,
+`-PpulseVerificationDir=stage43c-runs` and a new `stage43c-smoke` server world.
+It requires two real ItemEntity owners and an armed vanilla owner, with no Pulse
+Entity/BlockEntity states, in Fast/Fancy/Fabulous before/after resource reload.
+The probe checks five live native targets, player held-item eligibility, all ten
+ItemDisplayContext values in changing world/hand/offscreen invocation targets,
+132 GPU checks, direct submit failures/recovery and complete world queue snapshots.
+
+Native glint verification combines `-PpulseStage43cGlintProbe` with
+`-PpulseStage43bProbe` and the existing stage1/stage2 flags in isolated
+`stage43c-gui-runs`. It adds 32 equal vanilla diamond comparisons with/without
+glint beside actual Pulse atlas/PIP draws, checks the extracted special-renderer
+foil flag, and retains all 192 native GUI checks and six failure/recovery cases.
+Pulse geometry keeps canonical behavior: there is no new visual Pulse glint pass.
+The helper/context regression runs retain 208 / 44 checks. See migration journal
+section 30 and `docs/porting/evidence/stage-4.3c.json` for exact commands,
+accepted logs, source isolation and limitations. Stage 4 is complete within
+these NeoForge boundaries; player migration is stage 5, Fabric runtime stage 6,
+and the full testmod/compiled API/performance matrix stage 7.

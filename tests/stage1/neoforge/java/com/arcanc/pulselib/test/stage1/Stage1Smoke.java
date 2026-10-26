@@ -48,10 +48,13 @@ public final class Stage1Smoke
 	private static void joined(PlayerEvent.PlayerLoggedInEvent event)
 	{
 		if (!(event.getEntity() instanceof ServerPlayer player))
+			return;
+		var server = player.level().getServer();
+		if (Boolean.getBoolean("pulselib.stage43cProbe"))
 		{
+			Stage43cItemScene.prepare(player);
 			return;
 		}
-		var server = player.level().getServer();
 		if (Boolean.getBoolean("pulselib.stage42cProbe"))
 		{
 			Stage42b3WorldScene.prepareLifecycle(player);
@@ -80,8 +83,6 @@ public final class Stage1Smoke
 				"summon pulselib:test_entity -1 80 10 {NoAI:1b,PersistenceRequired:1b}",
 				"summon pulselib:test_entity 1 80 10 {NoAI:1b,PersistenceRequired:1b}",
 				"give @s pulselib:test_block 1" })
-		{
 			server.getCommands().performPrefixedCommand(source, command);
-		}
 	}
 }

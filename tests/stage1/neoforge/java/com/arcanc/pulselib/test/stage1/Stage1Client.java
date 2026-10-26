@@ -66,8 +66,10 @@ public final class Stage1Client implements IPulseClientPlugin
 	{
 		bus.addListener(Stage1Client::renderers);
 		bus.addListener((RegisterSpecialModelRendererEvent event) ->
-				event.register(PLibDatabase.rl("test_block"), Boolean.getBoolean("pulselib.stage43bProbe") ? Stage43bGuiProbe.Unbaked.MAP_CODEC : TestBlockItemRenderer.Unbaked.MAP_CODEC));
+				event.register(PLibDatabase.rl("test_block"), Boolean.getBoolean("pulselib.stage43cProbe") ? Stage43cItemProbe.Unbaked.MAP_CODEC : Boolean.getBoolean("pulselib.stage43bProbe") ? Stage43bGuiProbe.Unbaked.MAP_CODEC : TestBlockItemRenderer.Unbaked.MAP_CODEC));
 		NeoForge.EVENT_BUS.addListener(Stage1Client::tick);
+		if (Boolean.getBoolean("pulselib.stage43cProbe"))
+			Stage43cItemProbe.register();
 		if (Boolean.getBoolean("pulselib.stage43b2Probe"))
 			Stage43b2HelperProbe.register();
 		if (Boolean.getBoolean("pulselib.stage43bProbe"))
@@ -142,7 +144,7 @@ public final class Stage1Client implements IPulseClientPlugin
 		Stage2PluginProbe.models++;
 		if (Boolean.getBoolean("pulselib.stage43b2Probe"))
 			event.model(Stage43b2HelperProbe.MODEL).texture("0", Stage42aWorldStageProbe.WHITE);
-		if (Boolean.getBoolean("pulselib.stage43bProbe") || Boolean.getBoolean("pulselib.stage42b4Probe") || Boolean.getBoolean("pulselib.stage42cProbe"))
+		if (Boolean.getBoolean("pulselib.stage43cProbe") || Boolean.getBoolean("pulselib.stage43bProbe") || Boolean.getBoolean("pulselib.stage42b4Probe") || Boolean.getBoolean("pulselib.stage42cProbe"))
 			event.model(Stage42b4TranslucentProbe.MODEL).texture("0", Stage42aWorldStageProbe.WHITE);
 		if (Boolean.getBoolean("pulselib.stage42b3Probe"))
 			event.model(Stage42b3WorldProbe.MODEL).texture("0", Stage42aWorldStageProbe.WHITE);
@@ -186,6 +188,11 @@ public final class Stage1Client implements IPulseClientPlugin
 	private static void tick(ClientTickEvent.Post event)
 	{
 		Minecraft minecraft = Minecraft.getInstance();
+		if (Boolean.getBoolean("pulselib.stage43cProbe"))
+		{
+			Stage43cItemProbe.tick();
+			return;
+		}
 		if (Boolean.getBoolean("pulselib.stage43b2Probe"))
 		{
 			Stage43b2HelperProbe.tick();
@@ -207,9 +214,7 @@ public final class Stage1Client implements IPulseClientPlugin
 			return;
 		}
 		if (minecraft.level == null)
-		{
 			return;
-		}
 		if (Boolean.getBoolean("pulselib.stage42b4Probe"))
 		{
 			Stage42b4TranslucentProbe.tick();

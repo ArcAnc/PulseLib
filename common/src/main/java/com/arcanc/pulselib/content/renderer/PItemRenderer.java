@@ -109,7 +109,7 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 		if (renderState == null)
 			return;
 		boolean gui = ((ItemStackRenderStateAccessor)renderState.itemRenderState()).pulselib$getDisplayContext() == ItemDisplayContext.GUI;
-		try (var scope = gui && PRenderContexts.localScope() == null ? PRenderContexts.enter(PRenderContexts.Context.GUI) : null)
+		try (var scope = gui && PRenderContexts.localScope() == null ? PRenderContexts.enter(PRenderContexts.Context.GUI) : PRenderContexts.enterEntity())
 		{
 			try
 			{

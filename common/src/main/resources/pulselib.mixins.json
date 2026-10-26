@@ -38,6 +38,7 @@
     "LivingAttachmentRenderStateMixin",
     "EntityPartialTickRenderStateMixin",
     "EntityRendererExtractionMixin",
+    "WorldEntityRenderStateMixin",
     "SpriteContentsAccessor",
     "CameraAccessor",
     "ProjectionMatrixBufferMixin",

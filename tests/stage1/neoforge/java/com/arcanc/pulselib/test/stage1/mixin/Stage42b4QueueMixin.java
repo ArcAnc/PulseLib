@@ -11,6 +11,7 @@ package com.arcanc.pulselib.test.stage1.mixin;
 
 import com.arcanc.pulselib.test.stage1.Stage42b4TranslucentProbe;
 import com.arcanc.pulselib.test.stage1.Stage42cLifecycleProbe;
+import com.arcanc.pulselib.test.stage1.Stage43cItemProbe;
 
 import com.arcanc.pulselib.content.renderer.PRenderQueue;
 import com.mojang.blaze3d.pipeline.RenderTarget;
@@ -30,6 +31,8 @@ public abstract class Stage42b4QueueMixin
 	{
 		if (Boolean.getBoolean("pulselib.stage42b4Probe"))
 			Stage42b4TranslucentProbe.beforeComposite(destination);
+		if (Boolean.getBoolean("pulselib.stage43cProbe"))
+			Stage43cItemProbe.nativeTargets(destination, targets);
 		if (Boolean.getBoolean("pulselib.stage42cProbe"))
 			Stage42cLifecycleProbe.nativeTargets(destination, targets);
 	}

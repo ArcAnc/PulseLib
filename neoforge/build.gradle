@@ -71,6 +71,12 @@ if (providers.gradleProperty('pulseStage1Smoke').isPresent()) {
         runs {
             configureEach {
                 gameDirectory = layout.buildDirectory.dir("${providers.gradleProperty('pulseVerificationDir').getOrElse('stage1-runs')}/${it.name}").get().asFile
+                if (providers.gradleProperty('pulseStage43cGlintProbe').isPresent())
+                    systemProperty 'pulselib.stage43cGlintProbe', 'true'
+                if (providers.gradleProperty('pulseStage43cProbe').isPresent()) {
+                    systemProperty 'pulselib.stage43cProbe', 'true'
+                    jvmArgument '-Xlog:class+load=info:file=classloading.log'
+                }
                 if (providers.gradleProperty('pulseStage43b2Probe').isPresent()) {
                     systemProperty 'pulselib.stage43b2Probe', 'true'
                     jvmArgument '-Xlog:class+load=info:file=classloading.log'

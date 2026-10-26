@@ -148,6 +148,8 @@ public final class Stage43bGuiProbe
 		if (finished && ++recoveryTicks == 60)
 		{
 			Stage2PluginProbe.verify(true);
+			if (Boolean.getBoolean("pulselib.stage43cGlintProbe"))
+				Stage43cGlintProbe.finish();
 			check(guiEntities >= 64 && guiItems >= 64 && callbacks >= 64 && atlasCalls > 0 && oversizedCalls > 0, "Missing native GUI owner/callback/atlas/PIP coverage");
 			check(Stage1Client.itemSubmissions > 20 && Stage1Client.entitySubmissions > 20, "World and hand rendering must continue after GUI");
 			PLibDatabase.LOGGER.info("STAGE 4.3b GUI COMPLETE: phases={}, regions={}, entity={}, item={}, deferred={}, atlas={}, oversized={}, world={}, hand/items={}", phase, pixels, guiEntities, guiItems, callbacks, atlasCalls, oversizedCalls, Stage1Client.entitySubmissions, Stage1Client.itemSubmissions);
@@ -202,6 +204,8 @@ public final class Stage43bGuiProbe
 				"Native GUI pixels phase=" + phase + " red=" + red + " blue=" + blue + " clipped=" + clipped + " green=" + greenPixels + " yellow=" + yellowPixels);
 		for (int peak : PEAKS)
 			check(phase % 2 == 0 ? peak >= 245 : peak > 70 && peak < 245, "Native GUI alpha response phase=" + phase + " peaks=" + java.util.Arrays.toString(PEAKS));
+		if (Boolean.getBoolean("pulselib.stage43cGlintProbe"))
+			Stage43cGlintProbe.verify(phase);
 		pixels += 6;
 		RECORDS.add("phase=" + phase + ", frame=" + frames + ", rgbCounts=" + List.of(red, blue, clipped, greenPixels, yellowPixels, textPixels) + ", peaks=" + java.util.Arrays.toString(PEAKS));
 		if (++frames == FRAMES)
@@ -310,6 +314,8 @@ public final class Stage43bGuiProbe
 				if (index == 1)
 					graphics.disableScissor();
 			}
+			if (Boolean.getBoolean("pulselib.stage43cGlintProbe"))
+				Stage43cGlintProbe.extract(graphics, green);
 			graphics.item(green, 212, 130);
 			graphics.item(yellow, 272, 130);
 			graphics.text(mc.font, "Native Entity PIP / clipped Entity / " + (phase < 2 ? "Item atlas" : "Oversized Item PIP"), 16, 100, -1, false);
@@ -388,6 +394,8 @@ public final class Stage43bGuiProbe
 			if (((com.arcanc.pulselib.content.mixin.ItemStackRenderStateAccessor)state.itemRenderState()).pulselib$getDisplayContext() != net.minecraft.world.item.ItemDisplayContext.GUI)
 				return;
 			guiItems++;
+			if (Boolean.getBoolean("pulselib.stage43cGlintProbe"))
+				Stage43cGlintProbe.item(state);
 			if (failItem)
 				throw new IllegalArgumentException("stage43b item failure");
 			Matrix4f transform = new Matrix4f(poses.last().pose());

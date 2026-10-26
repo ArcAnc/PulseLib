@@ -11,6 +11,8 @@ package com.arcanc.pulselib.content.renderer;
 
 import com.arcanc.pulselib.content.renderer.base.PBlockRenderState;
 import com.arcanc.pulselib.content.renderer.base.PEntityRenderState;
+import com.arcanc.pulselib.content.renderer.base.PLivingAttachmentRenderState;
+import com.arcanc.pulselib.content.renderer.base.PWorldRenderState;
 import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.resource.ResourceHandle;
@@ -30,14 +32,17 @@ public final class PWorldRenderPass
 
 	/**
 	 * Native color/depth layers must survive until OIT insertion, even with Improved Transparency disabled.
-	 * A conservative visible-owner gate also covers material overrides chosen later during submission.
+	 * Extracted special items and living attachment snapshots also retain these layers for vanilla owners.
+	 * A conservative visible-owner gate covers material overrides chosen later during submission.
 	 */
 	public static boolean requiresSeparateTargets(LevelRenderState state)
 	{
 		if (state.cameraRenderState.isPanoramicMode)
 			return false;
 		for (var entity : state.entityRenderStates)
-			if (entity instanceof PEntityRenderState<?>)
+			if (entity instanceof PEntityRenderState<?> ||
+					(entity instanceof PWorldRenderState pulse && pulse.pulselib$requiresSeparateTargets()) ||
+					(entity instanceof PLivingAttachmentRenderState living && living.pulselib$getAttachments() != null && !living.pulselib$getAttachments().isEmpty()))
 				return true;
 		for (var block : state.blockEntityRenderStates)
 			if (block instanceof PBlockRenderState<?>)

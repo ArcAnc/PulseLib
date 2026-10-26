@@ -1,0 +1,369 @@
+{
+  "stage": "4.3c",
+  "date": "2026-10-26",
+  "status": "complete within documented NeoForge graphics scope",
+  "previousHead": "fa901faae5cf9ff608e52fd807f6f8d9cc8df20f",
+  "frozenRefs": {
+    "1.21.1-multiloader": "7ce6f024b307bb821ce543344d3896c8e1fcf26b",
+    "26.1": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1"
+  },
+  "environment": {
+    "minecraft": "26.1.2",
+    "neoforge": "26.1.2.95",
+    "java": "25.0.4.1",
+    "gradle": "9.2.1",
+    "gpu": "NVIDIA GeForce GTX 1660 Ti",
+    "driver": "615.78.08",
+    "visibleClients": true
+  },
+  "implementation": [
+    "Capture actual Pulse special-item extraction around complete native EntityRenderer.createRenderState; retain flags in extracted entity states with nested/exception-safe ThreadLocal ownership.",
+    "Retain native layers for otherwise vanilla owners with extracted Pulse items or nonempty attachment snapshots.",
+    "Direct non-GUI PItemRenderer submissions enter local scopes when invocation attachments differ; same shared compiler/evaluator/executor APIs."
+  ],
+  "standalone": {
+    "phases": 6,
+    "presets": [
+      "FAST",
+      "FANCY",
+      "FABULOUS"
+    ],
+    "beforeAndAfterReload": true,
+    "eachPhase": {
+      "pulseEntityStates": 0,
+      "pulseBlockEntityStates": 0,
+      "eligibleItemEntities": 2,
+      "eligibleArmedVanillaOwners": 1,
+      "playerHeldItemEligibility": true
+    },
+    "pixelChecks": 132,
+    "directFailureAndRecoverySuites": 6,
+    "nativeFrames": 567,
+    "worldSubmissions": 1689,
+    "handSubmissions": 585,
+    "foilTrueSubmissions": 1197,
+    "foilFalseSubmissions": 1725,
+    "displayContexts": [
+      "NONE",
+      "THIRD_PERSON_LEFT_HAND",
+      "THIRD_PERSON_RIGHT_HAND",
+      "FIRST_PERSON_LEFT_HAND",
+      "FIRST_PERSON_RIGHT_HAND",
+      "HEAD",
+      "GUI",
+      "GROUND",
+      "FIXED",
+      "ON_SHELF"
+    ],
+    "pendingWorldQueue": "complete opaque/translucent snapshots equal after each direct-item suite",
+    "vanillaEligibilityAfterOffscreenExtraction": false,
+    "rawDirectRgbValues": "Assertions passed, individual successful RGB values were not retained; see source thresholds and phase counts."
+  },
+  "nativeGui": {
+    "regionChecks": 192,
+    "expectedFailures": 6,
+    "reload": true,
+    "recoveryTicks": 60
+  },
+  "glint": {
+    "frames": 32,
+    "plainVisiblePixelsPerFrame": 480,
+    "changedPixelsPerFrame": 428,
+    "foilTrueSubmissions": 259,
+    "foilFalseSubmissions": 2968,
+    "comparison": "Equal vanilla diamond icons with/without glint beside actual Pulse atlas/PIP; thresholds visible >= 40 and differing RGB pixels >= 8.",
+    "canonicalBoundary": "Pulse hasFoil is forwarded to renderer hooks. Pinned canonical and 26.1 Pulse renderers do not add a visual Pulse geometry glint pass; no such pass was introduced."
+  },
+  "helperRegression": {
+    "checks": 208,
+    "expectedExceptions": 4,
+    "faultSuites": 2,
+    "incomingPackRowLength": [
+      0,
+      960
+    ],
+    "reload": true
+  },
+  "explicitScopeRegression": {
+    "pixelChecks": 44,
+    "suites": 2,
+    "coverage": [
+      "nested GUI/offscreen frames and targets",
+      "all geometry/baked overloads",
+      "sorted alpha",
+      "pending world OIT/deformer isolation",
+      "discard/LIFO/idempotence/failed flush",
+      "native GL bindings and first-person routing"
+    ]
+  },
+  "junit": {
+    "common": {
+      "tests": 187,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "fabric": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "neoforge": {
+      "tests": 0,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "build": {
+    "java": "25.0.4.1",
+    "gradle": "9.2.1",
+    "commonArtifacts": [
+      "at.yawk.lz4:lz4-java:1.10.1",
+      "ca.weblite:java-objc-bridge:1.1",
+      "com.azure:azure-json:1.4.0",
+      "com.fasterxml.jackson.core:jackson-annotations:2.13.2",
+      "com.fasterxml.jackson.core:jackson-core:2.13.2",
+      "com.fasterxml.jackson.core:jackson-databind:2.13.2.1",
+      "com.github.oshi:oshi-core:6.9.0",
+      "com.google.code.findbugs:jsr305:3.0.2",
+      "com.google.code.gson:gson:2.13.2",
+      "com.google.guava:failureaccess:1.0.3",
+      "com.google.guava:guava:33.5.0-jre",
+      "com.ibm.icu:icu4j:77.1",
+      "com.microsoft.azure:msal4j:1.23.1",
+      "com.mojang:authlib:7.0.63",
+      "com.mojang:blocklist:1.0.10",
+      "com.mojang:brigadier:1.3.10",
+      "com.mojang:datafixerupper:9.0.19",
+      "com.mojang:jtracy:1.0.37",
+      "com.mojang:logging:1.6.11",
+      "com.mojang:patchy:2.2.10",
+      "com.mojang:text2speech:1.18.11",
+      "commons-codec:commons-codec:1.19.0",
+      "commons-io:commons-io:2.20.0",
+      "de.javagl:jgltf-impl-v1:2.0.3",
+      "de.javagl:jgltf-impl-v2:2.0.3",
+      "de.javagl:jgltf-model:2.0.3",
+      "io.github.llamalad7:mixinextras-common:0.5.4",
+      "io.netty:netty-buffer:4.2.7.Final",
+      "io.netty:netty-codec-base:4.2.7.Final",
+      "io.netty:netty-codec-compression:4.2.7.Final",
+      "io.netty:netty-codec-http:4.2.7.Final",
+      "io.netty:netty-common:4.2.7.Final",
+      "io.netty:netty-handler:4.2.7.Final",
+      "io.netty:netty-resolver:4.2.7.Final",
+      "io.netty:netty-transport-classes-epoll:4.2.7.Final",
+      "io.netty:netty-transport-classes-kqueue:4.2.7.Final",
+      "io.netty:netty-transport-native-unix-common:4.2.7.Final",
+      "io.netty:netty-transport:4.2.7.Final",
+      "it.unimi.dsi:fastutil:8.5.18",
+      "net.fabricmc:sponge-mixin:0.17.3+mixin.0.8.7",
+      "net.java.dev.jna:jna-platform:5.17.0",
+      "net.java.dev.jna:jna:5.17.0",
+      "net.neoforged:mergetool:2.0.7",
+      "net.sf.jopt-simple:jopt-simple:5.0.4",
+      "org.apache.commons:commons-compress:1.28.0",
+      "org.apache.commons:commons-lang3:3.19.0",
+      "org.apache.logging.log4j:log4j-api:2.25.2",
+      "org.apache.logging.log4j:log4j-core:2.25.2",
+      "org.apache.logging.log4j:log4j-slf4j2-impl:2.25.2",
+      "org.jcraft:jorbis:0.0.17",
+      "org.jetbrains:annotations:26.0.2-1",
+      "org.joml:joml:1.10.8",
+      "org.jspecify:jspecify:1.0.0",
+      "org.lwjgl:lwjgl-freetype:3.4.1",
+      "org.lwjgl:lwjgl-glfw:3.4.1",
+      "org.lwjgl:lwjgl-jemalloc:3.4.1",
+      "org.lwjgl:lwjgl-openal:3.4.1",
+      "org.lwjgl:lwjgl-opengl:3.4.1",
+      "org.lwjgl:lwjgl-stb:3.4.1",
+      "org.lwjgl:lwjgl-tinyfd:3.4.1",
+      "org.lwjgl:lwjgl:3.4.1",
+      "org.ow2.asm:asm-analysis:9.8",
+      "org.ow2.asm:asm-commons:9.8",
+      "org.ow2.asm:asm-tree:9.8",
+      "org.ow2.asm:asm-util:9.8",
+      "org.ow2.asm:asm:9.8",
+      "org.slf4j:slf4j-api:2.0.17"
+    ],
+    "modules": {
+      "common": {
+        "jar": "common/build/libs/pulselib-26.1.2-common-1.1.5.3.jar",
+        "providers": {},
+        "javaUnits": 346,
+        "sha256": "950c8d212e97fc17a9020a0f90cf08031e1f10c27e0d069097c8d62579f204b3",
+        "classMajor": 69
+      },
+      "neoforge": {
+        "jar": "neoforge/build/libs/pulselib-26.1.2-neoforge-1.1.5.3.jar",
+        "providers": {
+          "platform.IPulsePlatform": "com.arcanc.pulselib.neoforge.NeoForgePlatform",
+          "platform.IPulseCameraService": "com.arcanc.pulselib.neoforge.NeoForgeCameraService",
+          "plugin.IPulsePluginFinder": "com.arcanc.pulselib.neoforge.NeoForgePulsePluginFinder"
+        },
+        "javaUnits": 357,
+        "sha256": "937edec288db2863087507c571b8fb1f0f42f69decace8b74d5c5890de66c3ce",
+        "classMajor": 69
+      },
+      "fabric": {
+        "jar": "fabric/build/libs/pulselib-26.1.2-fabric-1.1.5.3.jar",
+        "providers": {
+          "platform.IPulsePlatform": "com.arcanc.pulselib.fabric.FabricPlatform",
+          "platform.IPulseCameraService": "com.arcanc.pulselib.fabric.FabricCameraService",
+          "plugin.IPulsePluginFinder": "com.arcanc.pulselib.fabric.FabricPulsePluginFinder"
+        },
+        "javaUnits": 350,
+        "sha256": "26f9b217463559623751d121ee8ba497ab23c08b617ff0b1dd060d4ecdcca985",
+        "classMajor": 69
+      }
+    }
+  },
+  "api": {
+    "renderer": "PASS: 7 types / 86 canonical members",
+    "plans": "PASS: 18 types / 121 canonical members, strict geometry/target/Fabulous queue checks",
+    "contexts": "PASS: 4 types / 14 declarations",
+    "guiHelper": "PASS: 9 declarations, only enumerated Minecraft substitutions",
+    "inventory": "PASS: AST/javac/javap fixture, pinned coverage/policies/checksums",
+    "fullCompiledAudit": "stage 7"
+  },
+  "acceptedLogs": {
+    "client-items.log": {
+      "path": "/tmp/pulselib-stage43c-czvajuue/client-items.log",
+      "sha256": "d6982f86989068c4b75a0c372f1f150bd112b3b92ce42fb5c520b974d70092e4",
+      "exitCode": 0
+    },
+    "client-glint.log": {
+      "path": "/tmp/pulselib-stage43c-czvajuue/client-glint.log",
+      "sha256": "08c583a845e1f9666bc1fcdb3bfeac79f591a804cb617024e2834713e20aa779",
+      "exitCode": 0
+    },
+    "client-helper.log": {
+      "path": "/tmp/pulselib-stage43c-czvajuue/client-helper.log",
+      "sha256": "90f8cf8963e88b994ee4fd7228693059d527538efaa8e632c5fecef2386bb1c7",
+      "exitCode": 0
+    },
+    "client-scopes.log": {
+      "path": "/tmp/pulselib-stage43c-czvajuue/client-scopes.log",
+      "sha256": "1514655e783f4bb3b673ac4042c8c5ce24584eb7d03bfa5d977ba6b6881f3833",
+      "exitCode": 0
+    },
+    "server.log": {
+      "path": "/tmp/pulselib-stage43c-czvajuue/server.log",
+      "sha256": "3c4ee2e542ef32d827a725429cb95ece9473fb87736ece710d99a27138205940",
+      "exitCode": 0
+    },
+    "server-gui.log": {
+      "path": "/tmp/pulselib-stage43c-czvajuue/server-gui.log",
+      "sha256": "a3d90387f29cb8fd4b281dc976740100ef81486ffc23e48e6c2eab5eb6517cb6",
+      "exitCode": 0
+    },
+    "build-final.log": {
+      "path": "/tmp/pulselib-stage43c-czvajuue/build-final.log",
+      "sha256": "3b6ffe312a5ad281921e59076ea1c97efa8509f71893c497bc8c80afccf57a5e",
+      "exitCode": 0
+    }
+  },
+  "dedicatedTraces": {
+    "stage43c-runs": {
+      "sha256": "d34e5a49a936cdb2d838ca80f8c585607c4a229544cfda82fcc6fcc59115b14f",
+      "clientClassLoads": 0
+    },
+    "stage43c-gui-runs": {
+      "sha256": "f98ff03a2d8f44d8d213344eed8e5311f448b0e19d1afe50d456dc64b84748cb",
+      "clientClassLoads": 0
+    }
+  },
+  "intendedSourceSha256": {
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/EntityRendererExtractionMixin.java": "34c08c44ef1952e721b19ab978feca8e5b8e350058acde8f04e9e090bd0fff7a",
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/SpecialModelWrapperRenderStateExtractor.java": "309081514075431003e1e7a0ce474b2f1ede9dd6ab321dc20b052f1184c27163",
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/WorldEntityRenderStateMixin.java": "f6529d1517935103782a9f4664139f730c243066d3ab12acdb19f4deaa4b4503",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java": "7b47eee099e57a3ec30c16b90dd187e2ebfd0c9b748a72d7b326dd63967aa350",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/PWorldRenderEligibility.java": "31e3c927e4340f5eb4faf0e44932920db42f9f9f8f3b8bfdd8bde94c207bd920",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/PWorldRenderPass.java": "2fac5517a2ef86080e0e8a988bc8996d0dc2f15adaec0b725817d4e3e78490f1",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/base/PWorldRenderState.java": "eedcedbf8dc7f3b7329abb960c28c11e23c00bb69c4419124c5c2a8b576b4582",
+    "common/src/main/resources/pulselib.mixins.json": "05392ea7f82f4d22819ceec2dbcd471896125a3d0f273d96926cad21e1514f7e",
+    "common/src/test/java/com/arcanc/pulselib/content/renderer/PWorldRenderEligibilityTest.java": "2cb1ee2be6e49c9c7b905ca27df666c4b3aaf5b3f93724b6576a5c2169868abb",
+    "neoforge/build.gradle": "dcb66902e6107d2dafeab016ee8e876cd0f2aa1df112cac093b317b09c1db6a1",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage1Client.java": "d56176223f65209ace04e84b317ff8e7c44d52aa4b0428c06ab83acc36e20108",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage1Smoke.java": "4ffb54919b7d78f5d3770aa387cf38e07c763c10ac1b5584d1621f2086acba79",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage43bGuiProbe.java": "e6de8e540dcc2d70186ab8dd7f0cc314c5d2660afa461d44ce238ef9612756e7",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage43cGlintProbe.java": "8e002049589d1616cbef88dbd753008221f68389a39e0e7e7baa9fad5ac531ff",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage43cItemProbe.java": "023cc0f40743901a10de9d1ca90390f4915caf427a2d21d0b65ad35d7d05f514",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage43cItemScene.java": "223cfd1acbef07545a6225bfda6fea4b1f5867ba4ba60512e5a4bf024efe5465",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/mixin/Stage42b4QueueMixin.java": "b52774275022342b934d75fbc645b51dd6cd4a7c9327fbea48dc5242b4de111f"
+  },
+  "unchangedBackendSha256": {
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java": "8e87fd1172a14c6a4382b7e7cfd7dd5c2359eebe194f425074cc2c2600e9b52d",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlGeometryArena.java": "52539ba678423df4aa46f55dca7c04632eb21f7c0bfa41ba2b7b6e791a067ae3",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlFrameArena.java": "75267c6fde8cb5d942e9cab02163dcc7ac199306c29e8d1b360b0c18056470fe",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlInstanceStream.java": "a2a026cc636d9fc2e0d0ca5199178ab6963d6707c919236a1cfb8ffd28a8099a",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlIndirectStream.java": "c3c238c5d2fecf9ffdfc0044905c14c8d3968f5a96a26cb373cfc420bf1237d4",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java": "b40a4b8fb9e5e2cef99b5eb806429828aeb76e6749308ed0ccaea322685d41be"
+  },
+  "isolation": {
+    "backup": "/tmp/pulselib-stage43c-czvajuue",
+    "preexistingTrackedEdits": 34,
+    "preexistingDirtyJavaInputs": 29,
+    "overlap": [
+      "PItemRenderer.java: only one scope-selection expression",
+      "migration journal and README: intended index from HEAD plus checkpoint"
+    ],
+    "protectedFiles": 188,
+    "protectedFilesUnchanged": true,
+    "sourceRefsUnchanged": true,
+    "sourcesAndJavadoc": "read worktree; production JavaCompile inputs use intended projection",
+    "pushOrPublication": false
+  },
+  "diagnosticsNotAcceptedAsPass": {
+    "probe-compile.log": {
+      "reason": "Initial fixture import of TestBlockItemRenderState used the wrong package; fixed to renderer.renderState.",
+      "sha256": "989861cbca79af96e68c8aafc36c068c76c46130389bdc84a712c500f65a2848"
+    },
+    "server-fixture-dist-failure.log": {
+      "reason": "Server fixture called a class with client-only types. Split into Stage43cItemScene before the accepted server runs. Gradle reported success despite the server crash; not accepted as PASS.",
+      "sha256": "63f5c80bba40fe1df5f09efa11d1f9f4547c2f8936299391e09a43a084fd084e"
+    },
+    "client-fixture-dist-failure.log": {
+      "reason": "Server disconnect followed by strict incomplete-matrix shutdown failure; exit 255, not accepted.",
+      "sha256": "6177c4512a955864e6db1672112254b9298f08b979fae3d396bf2e846cbc2353"
+    },
+    "client-fixture-block-assertion.log": {
+      "reason": "Initial over-broad empty block-state assertion, subsequently narrowed to Pulse states; not accepted.",
+      "sha256": "da1d241ab6e2c716393cd0d3c0b77cc65120ffcc665cef7267fb9f1934ec8143"
+    },
+    "client-fixture-pulse-block.log": {
+      "reason": "Strict Pulse block assertion still failed; not accepted.",
+      "sha256": "7b9dd5f14342798814e5c7890a6c4029ebe7e17a7c94d61622ffabfc5c2a55e9"
+    },
+    "client-fixture-block-position.log": {
+      "reason": "Actual TestBlockEntityRenderState at (-1,80,7), server data confirmed enchantment_glint_override=1 on this block; setup now removes Pulse blocks in its named fixture region and releases client input. Source of the placement was not independently observed.",
+      "sha256": "6c40f21a1e75ff4d24bf47f6aaf11d33568d0c35c7c7388b2cf774016a885b31"
+    },
+    "fixture-input-compile-failure.log": {
+      "reason": "ClientInput has no reset() method; use existing KeyMapping.releaseAll and releaseMouse instead.",
+      "sha256": "bb6df3e2e0074b3e3481346105ec1a5d56493c73585c29e11b27ea8a19cd1b74"
+    },
+    "client-fixture-pending-world.log": {
+      "reason": "The harness incorrectly expected an empty world compiler while translucent owners were pending. It now compares complete immutable snapshots before/after local rendering.",
+      "sha256": "331e16cc2d1020d28dcd449a6a920bb032c23b97dc8de1d72bd04d85c3e4d9e6"
+    },
+    "client-fixture-inframe-mode-change.log": {
+      "reason": "First FAST suite passed, then native terrain failed with Missing sampler Sampler0 after harness called allChanged inside framegraph execution. Preset/allChanged now execute between frames in the client tick.",
+      "sha256": "37a700912dd82395c9edb0cb02ec911280e2bec5a4ba0d73a86d3f1b96e7b9e5"
+    }
+  },
+  "debugger": {
+    "skillRead": "ij-debugger",
+    "toolsAvailable": false,
+    "fallback": "server console, actual assertions, logs and bytecode; no debugger or IDE state changed"
+  },
+  "limits": [
+    "One GPU/driver and fixed scenes; no performance claim.",
+    "Standalone water/glass/world RGB ordering is not a new exhaustive CPU-reference matrix; accepted H13/H14 evidence remains sections 24/25.",
+    "No visual glint for Pulse geometry beyond canonical behavior.",
+    "No exhaustive GUI scale/nested native-pool/driver-loss matrix or atomic rollback of already drawn vanilla pixels.",
+    "Custom player rigs/camera/armor eligibility and semantics remain stage 5; Fabric runtime stage 6; full testmod/compiled API/performance stage 7."
+  ]
+}

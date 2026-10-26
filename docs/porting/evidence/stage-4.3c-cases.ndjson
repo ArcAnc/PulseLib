@@ -1,0 +1,82 @@
+{"log": "client-items.log", "observation": "[16:31:28] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c PHASE PASS: phase=0, mode=FAST, drops=2, armed=1, nativeFrames=61, pixels=22"}
+{"log": "client-items.log", "observation": "[16:31:29] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c PHASE PASS: phase=1, mode=FANCY, drops=2, armed=1, nativeFrames=111, pixels=44"}
+{"log": "client-items.log", "observation": "[16:31:29] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c PHASE PASS: phase=2, mode=FABULOUS, drops=2, armed=1, nativeFrames=163, pixels=66"}
+{"log": "client-items.log", "observation": "[16:31:33] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c PHASE PASS: phase=3, mode=FAST, drops=2, armed=1, nativeFrames=464, pixels=88"}
+{"log": "client-items.log", "observation": "[16:31:33] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c PHASE PASS: phase=4, mode=FANCY, drops=2, armed=1, nativeFrames=514, pixels=110"}
+{"log": "client-items.log", "observation": "[16:31:34] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c PHASE PASS: phase=5, mode=FABULOUS, drops=2, armed=1, nativeFrames=566, pixels=132"}
+{"log": "client-glint.log", "observation": "[16:33:57] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=0, frame=1, visible=480, changed=428, foil=51, plain=711"}
+{"log": "client-glint.log", "observation": "[16:33:57] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=0, frame=2, visible=480, changed=428, foil=52, plain=713"}
+{"log": "client-glint.log", "observation": "[16:33:57] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=0, frame=3, visible=480, changed=428, foil=53, plain=715"}
+{"log": "client-glint.log", "observation": "[16:33:57] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=0, frame=4, visible=480, changed=428, foil=54, plain=717"}
+{"log": "client-glint.log", "observation": "[16:33:57] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=0, frame=5, visible=480, changed=428, foil=55, plain=719"}
+{"log": "client-glint.log", "observation": "[16:33:57] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=0, frame=6, visible=480, changed=428, foil=56, plain=721"}
+{"log": "client-glint.log", "observation": "[16:33:57] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=0, frame=7, visible=480, changed=428, foil=57, plain=723"}
+{"log": "client-glint.log", "observation": "[16:33:57] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=0, frame=8, visible=480, changed=428, foil=58, plain=725"}
+{"log": "client-glint.log", "observation": "[16:33:58] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=1, frame=9, visible=480, changed=428, foil=118, plain=845"}
+{"log": "client-glint.log", "observation": "[16:33:58] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=1, frame=10, visible=480, changed=428, foil=119, plain=847"}
+{"log": "client-glint.log", "observation": "[16:33:58] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=1, frame=11, visible=480, changed=428, foil=120, plain=849"}
+{"log": "client-glint.log", "observation": "[16:33:58] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=1, frame=12, visible=480, changed=428, foil=121, plain=851"}
+{"log": "client-glint.log", "observation": "[16:33:58] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=1, frame=13, visible=480, changed=428, foil=122, plain=853"}
+{"log": "client-glint.log", "observation": "[16:33:58] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=1, frame=14, visible=480, changed=428, foil=123, plain=855"}
+{"log": "client-glint.log", "observation": "[16:33:58] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=1, frame=15, visible=480, changed=428, foil=124, plain=857"}
+{"log": "client-glint.log", "observation": "[16:33:58] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=1, frame=16, visible=480, changed=428, foil=125, plain=859"}
+{"log": "client-glint.log", "observation": "[16:34:02] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=2, frame=17, visible=480, changed=428, foil=183, plain=1520"}
+{"log": "client-glint.log", "observation": "[16:34:02] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=2, frame=18, visible=480, changed=428, foil=184, plain=1522"}
+{"log": "client-glint.log", "observation": "[16:34:02] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=2, frame=19, visible=480, changed=428, foil=185, plain=1524"}
+{"log": "client-glint.log", "observation": "[16:34:02] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=2, frame=20, visible=480, changed=428, foil=186, plain=1526"}
+{"log": "client-glint.log", "observation": "[16:34:02] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=2, frame=21, visible=480, changed=428, foil=187, plain=1528"}
+{"log": "client-glint.log", "observation": "[16:34:02] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=2, frame=22, visible=480, changed=428, foil=188, plain=1530"}
+{"log": "client-glint.log", "observation": "[16:34:02] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=2, frame=23, visible=480, changed=428, foil=189, plain=1532"}
+{"log": "client-glint.log", "observation": "[16:34:02] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=2, frame=24, visible=480, changed=428, foil=190, plain=1534"}
+{"log": "client-glint.log", "observation": "[16:34:03] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=3, frame=25, visible=480, changed=428, foil=251, plain=1656"}
+{"log": "client-glint.log", "observation": "[16:34:03] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=3, frame=26, visible=480, changed=428, foil=252, plain=1658"}
+{"log": "client-glint.log", "observation": "[16:34:03] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=3, frame=27, visible=480, changed=428, foil=253, plain=1660"}
+{"log": "client-glint.log", "observation": "[16:34:03] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=3, frame=28, visible=480, changed=428, foil=254, plain=1662"}
+{"log": "client-glint.log", "observation": "[16:34:03] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=3, frame=29, visible=480, changed=428, foil=255, plain=1664"}
+{"log": "client-glint.log", "observation": "[16:34:03] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=3, frame=30, visible=480, changed=428, foil=256, plain=1666"}
+{"log": "client-glint.log", "observation": "[16:34:03] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=3, frame=31, visible=480, changed=428, foil=257, plain=1668"}
+{"log": "client-glint.log", "observation": "[16:34:03] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT CASE: phase=3, frame=32, visible=480, changed=428, foil=258, plain=1670"}
+{"log": "client-scopes.log", "observation": "[16:35:31] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=115, case=1, outer captured matrix/target, RGBA/depth=[0.0, 1.0, 0.0, 1.0, 0.50000006]"}
+{"log": "client-scopes.log", "observation": "[16:35:31] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=115, case=2, nested item GUI target, RGBA/depth=[0.0, 0.0, 1.0, 1.0, 0.50000006]"}
+{"log": "client-scopes.log", "observation": "[16:35:31] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=115, case=3, unrelated color-only target, RGBA/depth=[0.0, 0.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:31] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=115, case=4, local geometry overload 0, RGBA/depth=[0.0, 1.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:31] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=115, case=5, local geometry overload 1, RGBA/depth=[0.0, 1.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:31] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=115, case=6, local geometry overload 2, RGBA/depth=[0.0, 1.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:31] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=115, case=7, local geometry overload 3, RGBA/depth=[0.0, 1.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:31] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=115, case=8, local geometry overload 4, RGBA/depth=[0.0, 1.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:31] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=115, case=9, local geometry overload 5, RGBA/depth=[0.0, 1.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:31] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=115, case=10, local geometry overload 6, RGBA/depth=[0.0, 1.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:31] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=115, case=11, local geometry overload 7, RGBA/depth=[0.0, 1.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:31] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=115, case=12, local geometry overload 8, RGBA/depth=[0.0, 1.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:31] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=115, case=13, local geometry overload 9, RGBA/depth=[0.0, 1.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:31] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=115, case=14, local geometry overload 10, RGBA/depth=[0.0, 1.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:31] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=115, case=15, global local alpha order, RGBA/depth=[0.5019608, 0.0, 0.2509804, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:31] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=115, case=16, perspective local alpha order, RGBA/depth=[0.5019608, 0.0, 0.2509804, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:31] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=115, case=17, discard incomplete renderer, RGBA/depth=[0.0, 0.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:31] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=115, case=18, failed flush did not leave partial geometry, RGBA/depth=[0.0, 0.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:31] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=115, case=19, successful scope after failed flush, RGBA/depth=[0.0, 1.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:31] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=115, case=20, local close must not composite pending world OIT, RGBA/depth=[0.0, 0.0, 0.0, 1.0, 1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:31] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=115, case=21, world OIT survives local close, RGBA/depth=[0.0, 0.0, 0.5019608, 1.0, 1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:31] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=115, case=22, world composite ignores local target override, RGBA/depth=[0.0, 1.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:38] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=23, outer captured matrix/target, RGBA/depth=[0.0, 1.0, 0.0, 1.0, 0.50000006]"}
+{"log": "client-scopes.log", "observation": "[16:35:38] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=24, nested item GUI target, RGBA/depth=[0.0, 0.0, 1.0, 1.0, 0.50000006]"}
+{"log": "client-scopes.log", "observation": "[16:35:38] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=25, unrelated color-only target, RGBA/depth=[0.0, 0.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:38] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=26, local geometry overload 0, RGBA/depth=[0.0, 1.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:38] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=27, local geometry overload 1, RGBA/depth=[0.0, 1.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:38] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=28, local geometry overload 2, RGBA/depth=[0.0, 1.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:38] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=29, local geometry overload 3, RGBA/depth=[0.0, 1.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:38] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=30, local geometry overload 4, RGBA/depth=[0.0, 1.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:38] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=31, local geometry overload 5, RGBA/depth=[0.0, 1.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:38] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=32, local geometry overload 6, RGBA/depth=[0.0, 1.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:38] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=33, local geometry overload 7, RGBA/depth=[0.0, 1.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:38] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=34, local geometry overload 8, RGBA/depth=[0.0, 1.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:38] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=35, local geometry overload 9, RGBA/depth=[0.0, 1.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:38] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=36, local geometry overload 10, RGBA/depth=[0.0, 1.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:38] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=37, global local alpha order, RGBA/depth=[0.5019608, 0.0, 0.2509804, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:38] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=38, perspective local alpha order, RGBA/depth=[0.5019608, 0.0, 0.2509804, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:38] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=39, discard incomplete renderer, RGBA/depth=[0.0, 0.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:38] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=40, failed flush did not leave partial geometry, RGBA/depth=[0.0, 0.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:38] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=41, successful scope after failed flush, RGBA/depth=[0.0, 1.0, 0.0, 1.0, -1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:38] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=42, local close must not composite pending world OIT, RGBA/depth=[0.0, 0.0, 0.0, 1.0, 1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:38] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=43, world OIT survives local close, RGBA/depth=[0.0, 0.0, 0.5019608, 1.0, 1.0]"}
+{"log": "client-scopes.log", "observation": "[16:35:38] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=44, world composite ignores local target override, RGBA/depth=[0.0, 1.0, 0.0, 1.0, -1.0]"}

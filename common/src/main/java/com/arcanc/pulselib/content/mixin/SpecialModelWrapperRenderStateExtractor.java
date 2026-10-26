@@ -10,6 +10,8 @@
 package com.arcanc.pulselib.content.mixin;
 
 
+import com.arcanc.pulselib.content.renderer.PItemRenderer;
+import com.arcanc.pulselib.content.renderer.PWorldRenderEligibility;
 import com.arcanc.pulselib.content.renderer.base.PItemRenderState;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -45,7 +47,11 @@ public class SpecialModelWrapperRenderStateExtractor<T>
 		T argument = original.call(renderer, itemStack);
 		
 		if (argument instanceof PItemRenderState<?> renderState)
+		{
 			renderState.extractItemRenderState(output);
+			if (renderer instanceof PItemRenderer<?, ?>)
+				PWorldRenderEligibility.markItem();
+		}
 		return argument;
 	}
 }
