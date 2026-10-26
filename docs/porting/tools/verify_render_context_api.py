@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify canonical local render scope declarations against the frozen stage 0 API.
+"""Verify canonical local and first-person render scope declarations against the frozen stage 0 API.
 ArcAnc, created 25.10.2026, copyright 2026. Arc's License of Common Sense; see LICENSE.txt.
 """
 import argparse
@@ -11,6 +11,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 PREFIX = 'com.arcanc.pulselib.content.renderer.PRenderContexts'
+FIRST_PERSON = 'com.arcanc.pulselib.content.player.animation.firstPerson.PFirstPersonRenderContexts'
 
 
 def main():
@@ -23,7 +24,8 @@ def main():
         assert hashlib.sha256((directory / name).read_bytes()).hexdigest() == digest, name
     baseline = {row['fqcn']: row for row in map(json.loads, (directory / 'api-1.21.1-multiloader.ndjson').read_text().splitlines())
                 if row['fqcn'] == PREFIX or row['fqcn'].startswith(PREFIX + '.')
-                or row['fqcn'] == 'com.arcanc.pulselib.content.renderer.legacy.GlRenderState'}
+                or row['fqcn'] == 'com.arcanc.pulselib.content.renderer.legacy.GlRenderState'
+                or row['fqcn'] == FIRST_PERSON}
     with tempfile.TemporaryFile(mode='w+') as output:
         subprocess.run(['java', str(ROOT / 'docs/porting/tools/ExtractApi.java'), str(ROOT)], stdout=output, check=True, cwd=ROOT)
         output.seek(0)
@@ -35,14 +37,14 @@ def main():
         assert len(candidates) == 1, f'Missing or duplicate canonical context type: {name}'
         assert {key: before[key] for key in keys} == {key: candidates[0][key] for key in keys}, f'Changed canonical context declaration: {name}'
         results.append({'type': name, 'preservedMembers': len(before['members'])})
-    assert len(results) == 4
+    assert len(results) == 5
     report = {'status': 'PASS', 'baselineCommit': '7ce6f024b307bb821ce543344d3896c8e1fcf26b',
               'baselineChecksums': 'unchanged', 'types': results,
-              'scope': 'Canonical PRenderContexts, Context, Scope and GlRenderState source declarations; Native GUI/helper runtime coverage is recorded separately; standalone item/glint and final H15 matrix remain stage 4.3c',
+              'scope': 'Canonical PRenderContexts, Context, Scope, GlRenderState and PFirstPersonRenderContexts source declarations; native GUI/helper/item/context runtime coverage is recorded separately',
               'minecraftAdaptations': ['Invocation scopes use 26.1 attachment overrides rather than the last bound raw GL framebuffer',
                                        'Local scopes capture frame matrices, projection UBO binding and target views at entry',
                                        'GlCommandEncoder program/pipeline caches invalidated after native restoration'],
-              'annotationAdaptation': 'org.jetbrains Nullable -> JSpecify Nullable; package remains @NullMarked'}
+              'annotationAdaptation': 'Render context/guard: org.jetbrains Nullable -> JSpecify Nullable; first-person facade retains canonical org.jetbrains Nullable; packages remain @NullMarked'}
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(json.dumps(report, indent=2) + '\n')

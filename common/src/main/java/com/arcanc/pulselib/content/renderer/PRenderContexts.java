@@ -28,7 +28,7 @@ import java.util.Objects;
  */
 public final class PRenderContexts
 {
-	private static final ThreadLocal<Deque<Scope>> SCOPES = ThreadLocal.withInitial(ArrayDeque::new);
+	private static final Deque<Scope> SCOPES = new ArrayDeque<>();
 
 	private PRenderContexts()
 	{
@@ -51,7 +51,7 @@ public final class PRenderContexts
 	public static Context current()
 	{
 		RenderSystem.assertOnRenderThread();
-		Scope scope = SCOPES.get().peek();
+		Scope scope = SCOPES.peek();
 		if (scope != null && scope.matchesTarget())
 			return scope.context;
 		return RenderSystem.outputColorTextureOverride == null ? Context.GUI : Context.OFFSCREEN;
@@ -62,7 +62,7 @@ public final class PRenderContexts
 	{
 		RenderSystem.assertOnRenderThread();
 		Scope scope = new Scope(Objects.requireNonNull(context));
-		SCOPES.get().push(scope);
+		SCOPES.push(scope);
 		return scope;
 	}
 
@@ -78,14 +78,16 @@ public final class PRenderContexts
 
 	static PRenderQueue.RenderStage entityStage()
 	{
-		Scope scope = SCOPES.get().peek();
+		RenderSystem.assertOnRenderThread();
+		Scope scope = SCOPES.peek();
 		return scope != null && scope.context == Context.FIRST_PERSON ?
 				PRenderQueue.RenderStage.FIRST_PERSON : PRenderQueue.RenderStage.ENTITIES;
 	}
 
 	static @Nullable Scope localScope()
 	{
-		Scope scope = SCOPES.get().peek();
+		RenderSystem.assertOnRenderThread();
+		Scope scope = SCOPES.peek();
 		return scope != null && scope.compiler != null ? scope : null;
 	}
 
@@ -124,6 +126,7 @@ public final class PRenderContexts
 		/** Drops incomplete geometry when a renderer throws; close still restores state. */
 		public void discard()
 		{
+			RenderSystem.assertOnRenderThread();
 			if (this.compiler != null)
 				this.compiler.clear();
 		}
@@ -134,7 +137,7 @@ public final class PRenderContexts
 		{
 			if (this.closed)
 				return;
-			if (Thread.currentThread() != this.thread || SCOPES.get().peek() != this)
+			if (Thread.currentThread() != this.thread || SCOPES.peek() != this)
 				throw new IllegalStateException("Render scopes must close on their render thread in reverse order");
 			try
 			{
@@ -153,13 +156,9 @@ public final class PRenderContexts
 				}
 				finally
 				{
-					SCOPES.get().pop();
-					if (SCOPES.get().isEmpty())
-					{
-						SCOPES.remove();
-						if (this.compiler != null)
-							PRenderQueue.finishLocalFrame();
-					}
+					SCOPES.pop();
+					if (SCOPES.isEmpty() && this.compiler != null)
+						PRenderQueue.finishLocalFrame();
 					this.closed = true;
 				}
 			}

@@ -1,5 +1,16 @@
+/**
+ * @author ArcAnc
+ * Created at: 23.09.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
 package com.arcanc.pulselib.content.player.animation.firstPerson;
+
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
@@ -10,95 +21,102 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.Optional;
-/** Render-thread scopes; nested calls are supported and never use a global hand field. */
+
+/** Render-thread passes own their hand frames; nested calls restore the enclosing pass unchanged. */
 public final class PFirstPersonRenderContexts
 {
-	private static final ThreadLocal<Deque<PFirstPersonRenderContext>> CONTEXTS =
-			ThreadLocal.withInitial(ArrayDeque::new);
-	private static final ThreadLocal<Deque<Optional<PFirstPersonRenderPresentation>>> PASSES =
-			ThreadLocal.withInitial(ArrayDeque::new);
+	private static final Deque<Pass> PASSES = new ArrayDeque<>();
 
-	/**
-	 * Creates an instance of the enclosing type.
-	 */
 	private PFirstPersonRenderContexts()
 	{
 	}
 
 	/**
-	 * Performs the begin pass operation.
-	 * @param player the player to use.
-	 * @param partialTick the partial tick to use.
+	 * Samples one presentation for the entire native hand-rendering pass.
+	 *
+	 * @param player the player whose first-person animation is sampled
+	 * @param partialTick the interpolation fraction for this pass
 	 */
 	public static void beginPass(LocalPlayer player, float partialTick)
 	{
-		PASSES.get().push(Optional.ofNullable(PPlayerAnimations.firstPersonPresentation(player, partialTick)));
+		RenderSystem.assertOnRenderThread();
+		beginPass(PPlayerAnimations.firstPersonPresentation(player, partialTick));
 	}
 
-	/**
-	 * Performs the end pass operation.
-	 */
+	/** Binds an already sampled presentation independently of animation evaluation. */
+	static void beginPass(@Nullable PFirstPersonRenderPresentation presentation)
+	{
+		RenderSystem.assertOnRenderThread();
+		PASSES.push(new Pass(presentation));
+	}
+
+	/** Releases this pass's hand frames and restores the enclosing pass. */
 	public static void endPass()
 	{
-		Deque<Optional<PFirstPersonRenderPresentation>> passes = PASSES.get();
-		if (!passes.isEmpty())
-			passes.pop();
-		if (passes.isEmpty())
-		{
-			PASSES.remove();
-			CONTEXTS.remove();
-		}
+		RenderSystem.assertOnRenderThread();
+		if (!PASSES.isEmpty())
+			PASSES.pop();
 	}
 
-	/**
-	 * Performs the pass presentation operation.
-	 * @return the value produced by this operation.
-	 */
+	/** Returns the presentation captured for the current pass. */
 	public static @Nullable PFirstPersonRenderPresentation passPresentation()
 	{
-		Deque<Optional<PFirstPersonRenderPresentation>> passes = PASSES.get();
-		return passes.isEmpty() ? null : passes.peek().orElse(null);
+		RenderSystem.assertOnRenderThread();
+		@Nullable Pass pass = PASSES.peek();
+		return pass == null ? null : pass.presentation;
 	}
 
 	/**
-	 * Performs the push operation.
-	 * @param hand the hand to use.
-	 * @param arm the arm to use.
-	 * @param stack the stack to use.
-	 * @param poseStack the pose stack to use.
+	 * Captures a hand invocation in its owning pass; an empty pass has no animated hand frames.
+	 *
+	 * @param hand the main or off hand being rendered
+	 * @param arm the corresponding physical arm
+	 * @param stack the held item supplying map-rendering eligibility
+	 * @param poseStack the invocation's base matrices, copied into the hand context
 	 */
 	public static void push(InteractionHand hand,
 	                        HumanoidArm arm,
 	                        ItemStack stack,
 	                        PoseStack poseStack)
 	{
-		PFirstPersonRenderPresentation pose = passPresentation();
-		if (pose == null)
+		RenderSystem.assertOnRenderThread();
+		@Nullable Pass pass = PASSES.peek();
+		if (pass == null || pass.presentation == null)
 			return;
-		CONTEXTS.get().push(new PFirstPersonRenderContext(hand, arm,
-				poseStack.last().pose(), poseStack.last().normal(), pose, stack.getItem() instanceof MapItem));
+		PFirstPersonRenderContext context = new PFirstPersonRenderContext(hand, arm,
+				poseStack.last().pose(), poseStack.last().normal(), pass.presentation, stack.getItem() instanceof MapItem);
+		pass.hand = new HandFrame(pass.hand, context);
 	}
 
-	/**
-	 * Performs the pop operation.
-	 */
+	/** Releases only the current pass's innermost hand invocation. */
 	public static void pop()
 	{
-		Deque<PFirstPersonRenderContext> contexts = CONTEXTS.get();
-		if (!contexts.isEmpty())
-			contexts.pop();
-		if (contexts.isEmpty())
-			CONTEXTS.remove();
+		RenderSystem.assertOnRenderThread();
+		@Nullable Pass pass = PASSES.peek();
+		if (pass != null && pass.hand != null)
+			pass.hand = pass.hand.previous();
 	}
 
-	/**
-	 * Performs the current operation.
-	 * @return the value produced by this operation.
-	 */
+	/** Returns the current hand frame; an empty nested pass never exposes an outer hand. */
 	public static @Nullable PFirstPersonRenderContext current()
 	{
-		Deque<PFirstPersonRenderContext> contexts = CONTEXTS.get();
-		return contexts.isEmpty() ? null : contexts.peek();
+		RenderSystem.assertOnRenderThread();
+		@Nullable Pass pass = PASSES.peek();
+		return pass == null || pass.hand == null ? null : pass.hand.context();
+	}
+
+	private static final class Pass
+	{
+		private final @Nullable PFirstPersonRenderPresentation presentation;
+		private @Nullable HandFrame hand;
+
+		private Pass(@Nullable PFirstPersonRenderPresentation presentation)
+		{
+			this.presentation = presentation;
+		}
+	}
+
+	private record HandFrame(@Nullable HandFrame previous, PFirstPersonRenderContext context)
+	{
 	}
 }
