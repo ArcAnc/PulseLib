@@ -84,5 +84,10 @@ public final class Stage1Smoke
 				"summon pulselib:test_entity 1 80 10 {NoAI:1b,PersistenceRequired:1b}",
 				"give @s pulselib:test_block 1" })
 			server.getCommands().performPrefixedCommand(source, command);
+		if (Boolean.getBoolean("pulselib.stage52aProbe"))
+		{
+			server.getCommands().performPrefixedCommand(source, "clear @s");
+			server.getCommands().performPrefixedCommand(source, "give @s minecraft:stick");
+		}
 	}
 }

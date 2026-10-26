@@ -17,7 +17,18 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.resources.Identifier;
 
 /**
- * Immutable value object representing player animated attachment context.
+ * Native 26.1.2 attachment invocation context.
+ *
+ * @param player the player being rendered
+ * @param animation the animation identifier
+ * @param anchor the semantic attachment anchor
+ * @param transform the editable sampled transform
+ * @param weight the contribution weight
+ * @param firstPerson whether this is a first-person invocation
+ * @param poseStack the current attachment pose stack
+ * @param buffers the native deferred geometry collector
+ * @param packedLight the packed light coordinates
+ * @param partialTick the interpolation fraction
  */
 public record PPlayerAnimatedAttachmentContext(
 		AbstractClientPlayer player,
@@ -27,8 +38,17 @@ public record PPlayerAnimatedAttachmentContext(
 		float weight,
 		boolean firstPerson,
 		PoseStack poseStack,
-		SubmitNodeCollector submitNodeCollector,
+		SubmitNodeCollector buffers,
 		int packedLight,
 		float partialTick)
 {
+	/**
+	 * Retains the original 26.1 collector accessor alongside the canonical buffers accessor.
+	 *
+	 * @return the native deferred geometry collector
+	 */
+	public SubmitNodeCollector submitNodeCollector()
+	{
+		return this.buffers;
+	}
 }

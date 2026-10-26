@@ -10,15 +10,26 @@
 package com.arcanc.pulselib.content.player.animation.attachment;
 
 import com.arcanc.pulselib.content.model.animation.BoneFrame;
+import com.arcanc.pulselib.content.model.animation.PAnimationPoseResolver;
 import com.arcanc.pulselib.content.model.animation.PTransform;
 import com.arcanc.pulselib.content.model.baked.PBakedBone;
+import com.arcanc.pulselib.content.model.baked.PBakedMesh;
 import com.arcanc.pulselib.content.model.baked.PMeshRenderContext;
+import com.arcanc.pulselib.content.model.baked.PMeshRenderMaterial;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationDefinition;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationFrame;
+import com.arcanc.pulselib.content.player.animation.PPlayerAnimationSpace;
+import com.arcanc.pulselib.content.player.animation.firstPerson.PFirstPersonPresentation;
 import com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonMeshAttachmentPose;
+import com.arcanc.pulselib.content.renderer.PRenderQueue;
+import com.arcanc.pulselib.content.renderer.plan.PInstanceHeader;
 import com.arcanc.pulselib.util.PRenderTypes;
+import com.arcanc.pulselib.util.PResourceCache;
 import com.mojang.blaze3d.vertex.PoseStack;
+
 import net.minecraft.client.renderer.texture.OverlayTexture;
+
+import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
 import java.util.ArrayList;
@@ -105,10 +116,10 @@ public final class PPlayerAutomaticMeshAttachments
 	 * @param roots the roots to use.
 	 */
 	private static void findRoots(PBakedBone bone,
-	                              Set<String> skeletonBones,
-	                              Set<String> animatedBones,
-	                              boolean animatedParent,
-	                              List<PBakedBone> roots)
+								  Set<String> skeletonBones,
+								  Set<String> animatedBones,
+								  boolean animatedParent,
+								  List<PBakedBone> roots)
 	{
 		boolean inheritsAnimation = animatedParent || skeletonBones.contains(bone.name()) || animatedBones.contains(bone.name());
 		if (!skeletonBones.contains(bone.name()) && (inheritsAnimation || containsAnimatedBone(bone, animatedBones)) && containsMesh(bone))
@@ -146,69 +157,165 @@ public final class PPlayerAutomaticMeshAttachments
 	}
 
 	/**
-	 * Renders the third person.
-	 * @param poses the poses to use.
-	 * @param poseStack the pose stack to use.
-	 * @param packedLight the packed light to use.
+	 * Submits sampled animation-model mesh attachments in third-person player space.
+	 *
+	 * @param poses the poses
+	 * @param poseStack the current model-to-render pose stack
+	 * @param packedLight the packed block and sky light coordinates
 	 */
-	public static void renderThirdPerson(List<PPlayerAnimationMeshAttachmentPose> poses,
-	                                     PoseStack poseStack,
-	                                     int packedLight)
+	public static void renderThirdPerson(List<PPlayerAnimationMeshAttachmentPose> poses, PoseStack poseStack, int packedLight)
 	{
 		for (PPlayerAnimationMeshAttachmentPose pose : poses)
 			if (pose.weight() > 1.0e-4f)
-				render(pose.root(), pose.frame(), pose.transform(), poseStack, packedLight);
+			{
+				Matrix4f matrix = new Matrix4f();
+				if (pose.frame().currentRootRelativeMatrix(pose.root().name(), matrix))
+				{
+					PPlayerAnimationSpace.toPlayerGeometrySpace(matrix, pose.frame().definition());
+					PTransform sampled = PPlayerAnimationSpace.toPlayerGeometrySpace(
+						pose.frame().currentRootRelativeTransform(pose.root().name()), pose.frame().definition());
+					PPlayerAnimationSpace.applyChannelOverride(matrix, pose.transform(), sampled);
+					submit(pose.root(), pose.frame(), matrix, poseStack, packedLight);
+				}
+			}
 	}
 
 	/**
-	 * Renders the first person.
-	 * @param poses the poses to use.
-	 * @param poseStack the pose stack to use.
-	 * @param packedLight the packed light to use.
+	 * Draws model mesh attachments after their first-person presentation has been resolved.
+	 *
+	 * @param poses the poses
+	 * @param poseStack the current model-to-render pose stack
+	 * @param packedLight the packed block and sky light coordinates
 	 */
-	public static void renderFirstPerson(List<PPlayerFirstPersonMeshAttachmentPose> poses,
-	                                    PoseStack poseStack,
-	                                    int packedLight)
+	public static void renderFirstPerson(List<PPlayerFirstPersonMeshAttachmentPose> poses, PoseStack poseStack, int packedLight)
 	{
 		for (PPlayerFirstPersonMeshAttachmentPose pose : poses)
 			if (pose.weight() > 1.0e-4f)
-				render(pose.root(), pose.frame(), pose.transform(), poseStack, packedLight);
+			{
+				PFirstPersonPresentation presentation = PFirstPersonPresentation.create(pose.frame());
+				Matrix4f matrix = new Matrix4f();
+				if (presentation != null && presentation.boneMatrix(pose.root().name(), matrix))
+				{
+					PTransform sampled = PPlayerAnimationSpace.toFirstPersonGeometrySpace(PTransform.fromMatrix(matrix), pose.frame().definition());
+					PPlayerAnimationSpace.applyChannelOverride(matrix, pose.transform(), sampled);
+					submitFirstPerson(pose.root(), pose.frame(), matrix, poseStack, packedLight);
+				}
+			}
 	}
 
 	/**
-	 * Performs the render operation.
-	 * @param root the root to use.
-	 * @param frame the frame to use.
-	 * @param transform the transform to use.
-	 * @param poseStack the pose stack to use.
-	 * @param packedLight the packed light to use.
+	 * First-person meshes are drawn after Minecraft has written hand depth. An
+	 * immediate draw here would still test against the world depth buffer.
+	 *
+	 * @param root the root
+	 * @param frame the frame matrices or sampled animation values used by this operation
+	 * @param transform the transform
+	 * @param poseStack the current model-to-render pose stack
+	 * @param packedLight the packed block and sky light coordinates
 	 */
-	private static void render(PBakedBone root,
-	                           PPlayerAnimationFrame frame,
-	                           PTransform transform,
-	                           PoseStack poseStack,
-	                           int packedLight)
+	private static void submitFirstPerson(PBakedBone root, PPlayerAnimationFrame frame,
+										  Matrix4f transform,
+										  PoseStack poseStack, int packedLight)
 	{
 		BoneFrame local = frame.localTransform(root.name());
 		if (local == null)
 			return;
-
 		poseStack.pushPose();
 		try
 		{
-			poseStack.mulPose(transform.matrix());
+			poseStack.mulPose(transform);
 			poseStack.scale(safeInverse(local.scale().x), safeInverse(local.scale().y), safeInverse(local.scale().z));
 			poseStack.mulPose(new Quaternionf(local.rotation()).invert());
 			poseStack.translate(-local.translation().x, -local.translation().y, -local.translation().z);
-			root.instantDraw(
-					poseStack,
-					frame.resolver(),
-					(bone, mesh, inherited) -> inherited,
-					new PMeshRenderContext(
-							PRenderTypes.RenderTypeProvider::trianglesTranslucent,
-							-1,
-							packedLight,
-							OverlayTexture.NO_OVERLAY));
+			submitFirstPersonBone(root, frame.resolver(), poseStack,
+								  new PMeshRenderContext(PRenderTypes.RenderTypeProvider::trianglesTranslucent, -1, packedLight, OverlayTexture.NO_OVERLAY));
+		}
+		finally
+		{
+			poseStack.popPose();
+		}
+	}
+
+	private static void submit(PBakedBone root, PPlayerAnimationFrame frame,
+							   Matrix4f transform,
+							   PoseStack poseStack, int packedLight)
+	{
+		BoneFrame local = frame.localTransform(root.name());
+		if (local == null)
+			return;
+		poseStack.pushPose();
+		try
+		{
+			poseStack.mulPose(transform);
+			poseStack.scale(safeInverse(local.scale().x), safeInverse(local.scale().y), safeInverse(local.scale().z));
+			poseStack.mulPose(new Quaternionf(local.rotation()).invert());
+			poseStack.translate(-local.translation().x, -local.translation().y, -local.translation().z);
+			submitBone(root, frame.resolver(), poseStack,
+					   new PMeshRenderContext(PRenderTypes.RenderTypeProvider::trianglesTranslucent, -1, packedLight, OverlayTexture.NO_OVERLAY));
+		}
+		finally
+		{
+			poseStack.popPose();
+		}
+	}
+
+	private static void submitBone(PBakedBone bone, PAnimationPoseResolver<?> resolver,
+								   PoseStack poseStack, PMeshRenderContext inherited)
+	{
+		if (!resolver.isVisible(bone))
+			return;
+		BoneFrame frame = resolver.resolve(bone).localTransform();
+		poseStack.pushPose();
+		try
+		{
+			poseStack.translate(frame.translation().x(), frame.translation().y(), frame.translation().z());
+			poseStack.mulPose(frame.rotation());
+			poseStack.scale(frame.scale().x(), frame.scale().y(), frame.scale().z());
+			for (PBakedMesh mesh : bone.meshes())
+			{
+				if (mesh.textureReference().isEmpty())
+					continue;
+				PMeshRenderMaterial material = PMeshRenderMaterial.resolve(mesh, inherited);
+				PRenderQueue.submitEntityMesh(
+					material.resolveRenderType(inherited, PResourceCache.ATLAS_LOCATION),
+					material.mesh().geometry(),
+					new PInstanceHeader(new Matrix4f(poseStack.last().pose()), inherited.color(),
+										material.packedLight(), inherited.packedOverlay()));
+			}
+			for (PBakedBone child : bone.children())
+				submitBone(child, resolver, poseStack, inherited);
+		}
+		finally
+		{
+			poseStack.popPose();
+		}
+	}
+
+	private static void submitFirstPersonBone(PBakedBone bone, PAnimationPoseResolver<?> resolver,
+											  PoseStack poseStack, PMeshRenderContext inherited)
+	{
+		if (!resolver.isVisible(bone))
+			return;
+		BoneFrame frame = resolver.resolve(bone).localTransform();
+		poseStack.pushPose();
+		try
+		{
+			poseStack.translate(frame.translation().x(), frame.translation().y(), frame.translation().z());
+			poseStack.mulPose(frame.rotation());
+			poseStack.scale(frame.scale().x(), frame.scale().y(), frame.scale().z());
+			for (PBakedMesh mesh : bone.meshes())
+			{
+				if (mesh.textureReference().isEmpty())
+					continue;
+				PMeshRenderMaterial material = PMeshRenderMaterial.resolve(mesh, inherited);
+				PRenderQueue.submitFirstPersonMesh(
+					material.resolveRenderType(inherited, PResourceCache.ATLAS_LOCATION),
+					material.mesh().geometry(),
+					new PInstanceHeader(new Matrix4f(poseStack.last().pose()), inherited.color(),
+										material.packedLight(), inherited.packedOverlay()));
+			}
+			for (PBakedBone child : bone.children())
+				submitFirstPersonBone(child, resolver, poseStack, inherited);
 		}
 		finally
 		{

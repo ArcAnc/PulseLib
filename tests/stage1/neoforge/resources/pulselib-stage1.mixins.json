@@ -3,6 +3,17 @@
   "minVersion": "0.8",
   "package": "com.arcanc.pulselib.test.stage1.mixin",
   "compatibilityLevel": "JAVA_25",
-  "client": ["Stage42b4QueueMixin", "Stage42cQueueMixin", "Stage42cOitMixin", "Stage42cDepthMixin", "Stage43bGuiMixin", "Stage43bNativeGuiMixin", "Stage43bOversizedMixin"],
-  "injectors": {"defaultRequire": 1}
+  "client": [
+    "Stage42b4QueueMixin",
+    "Stage42cQueueMixin",
+    "Stage42cOitMixin",
+    "Stage42cDepthMixin",
+    "Stage43bGuiMixin",
+    "Stage43bNativeGuiMixin",
+    "Stage43bOversizedMixin",
+    "Stage52AttachmentQueueMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }

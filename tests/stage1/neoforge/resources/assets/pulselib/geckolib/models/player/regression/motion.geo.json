@@ -1,0 +1,85 @@
+{
+  "format_version": "1.12.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.motion_regression",
+        "texture_width": 16,
+        "texture_height": 16
+      },
+      "bones": [
+        {
+          "name": "root",
+          "pivot": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "body",
+          "pivot": [
+            0,
+            8.0,
+            0
+          ],
+          "parent": "root"
+        },
+        {
+          "name": "arm",
+          "pivot": [
+            8.0,
+            8.0,
+            0
+          ],
+          "parent": "body"
+        },
+        {
+          "name": "item",
+          "pivot": [
+            8.0,
+            16.0,
+            0
+          ],
+          "parent": "arm"
+        },
+        {
+          "name": "camera",
+          "pivot": [
+            3.2,
+            24.0,
+            4.8
+          ],
+          "parent": "root"
+        },
+        {
+          "name": "ball",
+          "pivot": [
+            9.6,
+            11.2,
+            1.6
+          ],
+          "parent": "arm",
+          "cubes": [
+            {
+              "origin": [
+                8.6,
+                10.2,
+                0.6000000000000001
+              ],
+              "size": [
+                2,
+                2,
+                2
+              ],
+              "uv": [
+                0,
+                0
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -13,7 +13,6 @@ package com.arcanc.pulselib.util.helpers;
 import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.GltfConstants;
-import de.javagl.jgltf.model.ImageModel;
 import de.javagl.jgltf.model.MaterialModel;
 import de.javagl.jgltf.model.TextureModel;
 import de.javagl.jgltf.model.v2.MaterialModelV2;
@@ -26,29 +25,34 @@ import java.nio.*;
 public class PLibParserHelper
 {
 	/**
-	 * Extracts the texture name.
+	 * Extracts the canonical logical texture reference used by model registration.
+	 * Named textures/images and GLB buffer views take precedence over image storage URIs.
 	 * @param material the material to use.
 	 * @return the value produced by this operation.
 	 */
 	public static String extractTextureName(MaterialModel material)
 	{
-		if (!(material instanceof MaterialModelV2 v2))
+		if (!(material instanceof MaterialModelV2 mat))
 			return "";
-		TextureModel texture = v2.getBaseColorTexture();
+
+		TextureModel texture = mat.getBaseColorTexture();
 		if (texture == null)
 			return "";
-		ImageModel image = texture.getImageModel();
-		if (image != null)
-		{
-			String uri = image.getUri();
-			if (uri != null && !uri.isBlank())
-				return uri;
-			String imageName = image.getName();
-			if (imageName != null && !imageName.isBlank())
-				return imageName;
-		}
-		String textureName = texture.getName();
-		return textureName == null ? "" : textureName;
+
+		String name = texture.getName();
+		if (name == null && texture.getImageModel() != null)
+			name = texture.getImageModel().getName();
+
+		if (name == null &&
+				texture.getImageModel() != null &&
+				texture.getImageModel().getBufferViewModel() != null)
+			name = texture.getImageModel().getBufferViewModel().getName();
+
+		if (name == null)
+			return "default_texture";
+
+		int lastDot = name.lastIndexOf('.');
+		return (lastDot > 0) ? name.substring(0, lastDot) : name;
 	}
 
 	/**
@@ -60,23 +64,23 @@ public class PLibParserHelper
 	{
 		if (accessor == null)
 			return FloatBuffer.allocate(0);
-		
+
 		if (accessor.getComponentType() != GltfConstants.GL_FLOAT)
 			throw new IllegalArgumentException("Accessor has wrong componentType. Type: " + accessor.getComponentType());
-		
+
 		AccessorData data = accessor.getAccessorData();
 		ByteBuffer bb = data.createByteBuffer();
 		bb.order(ByteOrder.LITTLE_ENDIAN);
 		FloatBuffer floatBuffer = bb.asFloatBuffer();
-		
+
 		int componentCount = accessor.getElementType().getNumComponents();
 		int totalFloats = accessor.getCount() * componentCount;
-		
+
 		floatBuffer.limit(totalFloats);
-		
+
 		return floatBuffer;
 	}
-	
+
 	/**
 	 * Returns the byte buffer.
 	 * @param accessor the accessor to use.
@@ -86,14 +90,14 @@ public class PLibParserHelper
 	{
 		if (accessor == null)
 			return null;
-		
+
 		AccessorData data = accessor.getAccessorData();
-		
+
 		ByteBuffer buffer = data.createByteBuffer();
-		
+
 		buffer.order(ByteOrder.LITTLE_ENDIAN);
 		buffer.rewind();
-		
+
 		int componentSize = switch (accessor.getComponentType())
 		{
 			case GltfConstants.GL_UNSIGNED_BYTE -> 1;
@@ -101,14 +105,14 @@ public class PLibParserHelper
 			case GltfConstants.GL_UNSIGNED_INT -> 4;
 			default -> throw new IllegalStateException("Unsupported component type: " + accessor.getComponentType());
 		};
-		
+
 		int componentCount =
 				accessor.getElementType().getNumComponents();
-		
+
 		int expectedSize = accessor.getCount() * componentCount * componentSize;
-		
+
 		buffer.limit(expectedSize);
-		
+
 		return buffer;
 	}
 }

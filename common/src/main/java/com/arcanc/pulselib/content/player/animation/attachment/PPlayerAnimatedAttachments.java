@@ -10,6 +10,7 @@
 package com.arcanc.pulselib.content.player.animation.attachment;
 
 import com.arcanc.pulselib.content.model.animation.PTransform;
+import com.arcanc.pulselib.content.player.animation.PPlayerAnimationSpace;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationAnchor;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationAnchorPose;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
@@ -19,6 +20,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.resources.Identifier;
+import org.joml.Matrix4f;
 
 import java.util.*;
 
@@ -52,38 +54,62 @@ public final class PPlayerAnimatedAttachments
 	 * Renders the third person.
 	 * @param player the player to use.
 	 * @param poseStack the pose stack to use.
-	 * @param submitNodeCollector the submit node collector to use.
+	 * @param buffers the submit node collector to use.
 	 * @param packedLight the packed light to use.
 	 * @param partialTick the partial tick to use.
 	 */
 	public static void renderThirdPerson(AbstractClientPlayer player,
 	                                     PoseStack poseStack,
-	                                     SubmitNodeCollector submitNodeCollector,
+	                                     SubmitNodeCollector buffers,
 	                                     int packedLight,
 	                                     float partialTick)
 	{
 		for (PPlayerAnimationAnchorPose pose : PPlayerAnimations.animationAnchorPoses(player, partialTick))
-			render(player, pose.animation(), pose.anchor(), pose.transform(), pose.weight(), false, poseStack, submitNodeCollector, packedLight, partialTick);
+		{
+			Matrix4f matrix = new Matrix4f();
+			if (PPlayerAnimations.attachmentMatrix(player, pose.animation(), pose.anchor(), partialTick, matrix))
+				render(player, pose.animation(), pose.anchor(), pose.transform(), matrix, pose.weight(), poseStack, buffers, packedLight, partialTick);
+		}
 	}
 
 	/**
 	 * Renders the first person.
 	 * @param player the player to use.
-	 * @param firstPersonPresentation the first person presentation to use.
+	 * @param presentation the first person presentation to use.
 	 * @param poseStack the pose stack to use.
-	 * @param submitNodeCollector the submit node collector to use.
+	 * @param buffers the submit node collector to use.
 	 * @param packedLight the packed light to use.
 	 * @param partialTick the partial tick to use.
 	 */
-	public static void renderFirstPerson(AbstractClientPlayer player,
-	                                    PFirstPersonRenderPresentation firstPersonPresentation,
-	                                    PoseStack poseStack,
-	                                    SubmitNodeCollector submitNodeCollector,
-	                                    int packedLight,
-	                                    float partialTick)
+	public static void renderFirstPerson(AbstractClientPlayer player, PFirstPersonRenderPresentation presentation,
+	                                     PoseStack poseStack, SubmitNodeCollector buffers, int packedLight, float partialTick)
 	{
-		for (PPlayerFirstPersonAnchorPose pose : firstPersonPresentation.animationAnchors())
-			render(player, pose.animation(), pose.anchor(), pose.transform(), pose.weight(), true, poseStack, submitNodeCollector, packedLight, partialTick);
+		for (PPlayerFirstPersonAnchorPose pose : presentation.animationAnchors())
+		{
+			List<PPlayerAnimatedAttachmentRenderer> renderers = RENDERERS.get(pose.anchor());
+			if (renderers == null)
+				continue;
+			for (PPlayerAnimatedAttachmentRenderer renderer : renderers.stream().
+					sorted(Comparator.comparing(value -> value.getClass().getName())).toList())
+			{
+				poseStack.pushPose();
+				try
+				{
+					Matrix4f matrix = new Matrix4f();
+					if (PPlayerAnimations.firstPersonAttachmentMatrix(player, pose.animation(), pose.anchor(), partialTick, matrix))
+						PPlayerAnimationSpace.applyChannelOverride(matrix, pose.transform(), PTransform.fromMatrix(matrix));
+					else
+						pose.transform().matrix(matrix);
+					poseStack.mulPose(matrix);
+					renderer.render(new PPlayerAnimatedAttachmentContext(player, pose.animation(), pose.anchor(), pose.transform(),
+						pose.weight(), true, poseStack, buffers, packedLight, partialTick));
+				}
+				finally
+				{
+					poseStack.popPose();
+				}
+			}
+		}
 	}
 
 	/**
@@ -92,10 +118,10 @@ public final class PPlayerAnimatedAttachments
 	 * @param animation the animation to use.
 	 * @param anchor the anchor to use.
 	 * @param transform the transform to use.
+	 * @param matrix the exact attachment matrix, including inherited affine transforms.
 	 * @param weight the weight to use.
-	 * @param firstPerson the first person to use.
 	 * @param poseStack the pose stack to use.
-	 * @param submitNodeCollector the submit node collector to use.
+	 * @param buffers the submit node collector to use.
 	 * @param packedLight the packed light to use.
 	 * @param partialTick the partial tick to use.
 	 */
@@ -103,10 +129,10 @@ public final class PPlayerAnimatedAttachments
 	                           Identifier animation,
 	                           PPlayerAnimationAnchor anchor,
 	                           PTransform transform,
+	                           Matrix4f matrix,
 	                           float weight,
-	                           boolean firstPerson,
 	                           PoseStack poseStack,
-	                           SubmitNodeCollector submitNodeCollector,
+	                           SubmitNodeCollector buffers,
 	                           int packedLight,
 	                           float partialTick)
 	{
@@ -118,8 +144,8 @@ public final class PPlayerAnimatedAttachments
 			poseStack.pushPose();
 			try
 			{
-				poseStack.mulPose(transform.matrix());
-				renderer.render(new PPlayerAnimatedAttachmentContext(player, animation, anchor, transform, weight, firstPerson, poseStack, submitNodeCollector, packedLight, partialTick));
+				poseStack.mulPose(matrix);
+				renderer.render(new PPlayerAnimatedAttachmentContext(player, animation, anchor, transform, weight, false, poseStack, buffers, packedLight, partialTick));
 			}
 			finally
 			{

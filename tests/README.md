@@ -129,3 +129,22 @@ See journal section 32 and `docs/porting/evidence/stage-5.1.json`. Native player
 rig/item/camera/armor/deformer rendering and PlayerMotionHarness remain stage 5.2;
 this core probe does not claim that matrix is complete. Fixtures remain excluded
 from release JARs, and existing user worlds must never be used for these runs.
+
+Stage 5.2a ports exact player anchor/mesh attachment matrices and native hand
+queue submission. Use `-PpulseStage1Smoke -PpulseStage52aProbe -PpulseStage2Probe`
+with a new isolated `-PpulseVerificationDir=stage52a-final-runs` server/client
+pair; the fixture clears the Pulse held item and supplies a vanilla stick so
+GPU hand witnesses refer to player mesh geometry. It runs 996 matrix/physics
+cases from the pinned PlayerMotionHarness attachment subset, covering Gecko and
+embedded glTF, five blend modes, fractional weights, ROOT policy, transitions,
+two definitions, reload, caller restoration and pending-world-queue isolation.
+A test-only queue mixin observes actual compiler appends and GPU hand flushes
+without cancelling them. Four recovery suites check eight callback exceptions
+and edited affine commands. The pinned assets stay unchanged; the logical texture
+name regression runs in `PLibParserTextureTest`. `verify_player_attachment_api.py`
+checks five types / 32 members, including canonical `buffers()` and the retained
+native collector accessor. See journal section 33 / `docs/porting/evidence/stage-5.2a.json`.
+This is not the complete M-P2/M-P3 or native player matrix: camera, rig/items,
+armor/deformers, Fabulous targets, server extraction and real respawn remain
+5.2b. Run the existing 5.1 smoke against its own original server flags, which
+preserve its required Pulse held item, in a separate disposable world.
