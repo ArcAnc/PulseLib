@@ -2,6 +2,9 @@
  * @author ArcAnc
  * Created at: 09.09.2026
  * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
  */
 
 package com.arcanc.pulselib.content.player.animation.attachment;
@@ -55,7 +58,7 @@ public final class PPlayerAutomaticMeshAttachments
 		Set<String> skeletonBones = new HashSet<>(definition.bindings().values());
 		List<PBakedBone> roots = new ArrayList<>();
 		for (PBakedBone bone : definition.modelData().getModel().bones())
-			findRoots(bone, skeletonBones, animatedBones, roots);
+			findRoots(bone, skeletonBones, animatedBones, false, roots);
 		return List.copyOf(roots);
 	}
 
@@ -98,24 +101,23 @@ public final class PPlayerAutomaticMeshAttachments
 	 * @param bone the bone to use.
 	 * @param skeletonBones the skeleton bones to use.
 	 * @param animatedBones the animated bones to use.
+	 * @param animatedParent whether the parent inherits animation.
 	 * @param roots the roots to use.
 	 */
 	private static void findRoots(PBakedBone bone,
 	                              Set<String> skeletonBones,
 	                              Set<String> animatedBones,
+	                              boolean animatedParent,
 	                              List<PBakedBone> roots)
 	{
-		if (skeletonBones.contains(bone.name()))
-			return;
-		if (!containsAnimatedBone(bone, animatedBones))
-			return;
-		if (containsMesh(bone))
+		boolean inheritsAnimation = animatedParent || skeletonBones.contains(bone.name()) || animatedBones.contains(bone.name());
+		if (!skeletonBones.contains(bone.name()) && (inheritsAnimation || containsAnimatedBone(bone, animatedBones)) && containsMesh(bone))
 		{
 			roots.add(bone);
 			return;
 		}
 		for (PBakedBone child : bone.children())
-			findRoots(child, skeletonBones, animatedBones, roots);
+			findRoots(child, skeletonBones, animatedBones, inheritsAnimation, roots);
 	}
 
 	/**

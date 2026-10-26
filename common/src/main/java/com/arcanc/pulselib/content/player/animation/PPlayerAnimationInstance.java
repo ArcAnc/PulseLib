@@ -14,6 +14,7 @@ import com.arcanc.pulselib.content.animatable.PAnimatable;
 import com.arcanc.pulselib.content.animatable.PAnimationController;
 import com.arcanc.pulselib.content.animatable.PAnimationManager;
 import com.arcanc.pulselib.content.animatable.instance.InstanceAnimationManager;
+import com.arcanc.pulselib.content.model.animation.PAnimationEvaluationContext;
 import com.arcanc.pulselib.content.model.animation.PAnimationPoseResolver;
 import com.arcanc.pulselib.content.model.animation.PTransitionInterruptionPolicy;
 import com.arcanc.pulselib.content.model.baked.PBakedModel;
@@ -28,7 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Provides support for player animation instance.
+ * Per-player playback, activation crossfades and sampled pose state for one animation definition.
  */
 public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimationInstance>
 {
@@ -36,7 +37,6 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 	private final Identifier id;
 	private final PPlayerAnimationDefinition definition;
 	private final PAnimationManager<PPlayerAnimationInstance> animationManager;
-	private boolean wasApplying;
 	private boolean targetActive;
 	private float activation;
 	private float previousActivation;
@@ -50,15 +50,15 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 	private float firstPersonTransitionTarget;
 	private float firstPersonTransitionElapsed;
 	private float firstPersonTransitionDuration;
-	@Nullable
-	private PPlayerAnimationFrame cachedFrame;
+	private @Nullable PPlayerAnimationFrame cachedFrame;
 	private int cachedFramePartialTickBits;
 
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param player the player to use.
-	 * @param id the id to use.
-	 * @param definition the definition to use.
+	 * Creates independent playback and activation-transition state for one player animation.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param id the namespaced resource or registration identifier
+	 * @param definition the immutable configuration to register or evaluate
 	 */
 	PPlayerAnimationInstance(Player player, Identifier id, PPlayerAnimationDefinition definition)
 	{
@@ -70,8 +70,9 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 	}
 
 	/**
-	 * Performs the player operation.
-	 * @return the value produced by this operation.
+	 * Returns the player whose animation or presentation is being processed.
+	 *
+	 * @return the player whose animation or presentation is being processed
 	 */
 	public Player player()
 	{
@@ -79,8 +80,9 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 	}
 
 	/**
-	 * Updates the player.
-	 * @param player the player to use.
+	 * Replaces the current player reference while retaining this instance's animation state.
+	 *
+	 * @param player the player whose animation or presentation is being processed
 	 */
 	void updatePlayer(Player player)
 	{
@@ -88,8 +90,9 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 	}
 
 	/**
-	 * Performs the id operation.
-	 * @return the value produced by this operation.
+	 * Returns the namespaced resource or registration identifier.
+	 *
+	 * @return the namespaced resource or registration identifier
 	 */
 	public Identifier id()
 	{
@@ -97,8 +100,9 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 	}
 
 	/**
-	 * Performs the definition operation.
-	 * @return the value produced by this operation.
+	 * Returns the immutable configuration to register or evaluate.
+	 *
+	 * @return the immutable configuration to register or evaluate
 	 */
 	public PPlayerAnimationDefinition definition()
 	{
@@ -106,9 +110,7 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 	}
 
 	/**
-	 * Returns the animation manager.
-	 * @param key the key to use.
-	 * @return the value produced by this operation.
+	 * {@inheritDoc}
 	 */
 	@Override
 	public PAnimationManager<PPlayerAnimationInstance> getAnimationManager(AnimManagerKey key)
@@ -117,8 +119,7 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 	}
 
 	/**
-	 * Registers the animation controllers.
-	 * @param registrar the registrar to use.
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void registerAnimationControllers(PAnimationManager.PAnimationRegistrar<PPlayerAnimationInstance> registrar)
@@ -127,26 +128,29 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 	}
 
 	/**
-	 * Performs the controller operation.
-	 * @param controllerName the controller name to use.
-	 * @return the value produced by this operation.
+	 * Returns the named controller belonging to this animation instance.
+	 *
+	 * @param controllerName the registered controller name
+	 * @return the named controller belonging to this animation instance, or {@code null} when the requested value is unavailable
 	 */
-	@Nullable PAnimationController<PPlayerAnimationInstance> controller(String controllerName)
+	@Nullable
+	PAnimationController<PPlayerAnimationInstance> controller(String controllerName)
 	{
 		return this.animationManager.getControllers().get(controllerName);
 	}
 
 	/**
-	 * Stops the all controllers.
+	 * Stops all controllers owned by this player animation instance.
 	 */
 	void stopAllControllers()
 	{
-		this.animationManager.getControllers().values().forEach(PAnimationController :: stop);
+		this.animationManager.getControllers().values().forEach(PAnimationController::stop);
 	}
 
 	/**
-	 * Performs the synchronize operation.
-	 * @param instances the instances to use.
+	 * Aligns compatible cyclic playback with other instances in the synchronization group.
+	 *
+	 * @param instances the instances
 	 */
 	static void synchronize(List<PPlayerAnimationInstance> instances)
 	{
@@ -171,8 +175,9 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 	}
 
 	/**
-	 * Performs the tick operation.
-	 * @param shouldApply the should apply to use.
+	 * Advances controller playback and activation transitions for the current player tick.
+	 *
+	 * @param shouldApply the should apply
 	 */
 	void tick(boolean shouldApply)
 	{
@@ -182,9 +187,6 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 			return;
 
 		this.animationManager.bindModel(model);
-		if (!shouldApply && this.wasApplying)
-			stopAllControllers();
-		this.wasApplying = shouldApply;
 		updateActivation(shouldApply);
 		updateFirstPersonActivation(shouldApply && hasActiveController());
 		if (shouldApply || this.activation > 0.0f)
@@ -192,8 +194,9 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 	}
 
 	/**
-	 * Determines whether contributing.
-	 * @return the value produced by this operation.
+	 * Returns whether the instance can contribute to third-person player animation.
+	 *
+	 * @return whether the instance can contribute to third-person player animation
 	 */
 	boolean isContributing()
 	{
@@ -201,19 +204,10 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 	}
 
 	/**
-	 * Determines whether the object has active controller.
-	 * @return the value produced by this operation.
-	 */
-	boolean hasActiveController()
-	{
-		return this.animationManager.getControllers().values().stream().anyMatch(controller ->
-				controller.isPlaying() || controller.isPaused());
-	}
-
-	/**
-	 * Performs the activation weight operation.
-	 * @param partialTick the partial tick to use.
-	 * @return the value produced by this operation.
+	 * Samples the third-person activation crossfade weight.
+	 *
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the interpolated third-person activation weight
 	 */
 	float activationWeight(float partialTick)
 	{
@@ -221,8 +215,9 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 	}
 
 	/**
-	 * Determines whether first person contributing.
-	 * @return the value produced by this operation.
+	 * Returns whether the instance can contribute to first-person presentation.
+	 *
+	 * @return whether the instance can contribute to first-person presentation
 	 */
 	boolean isFirstPersonContributing()
 	{
@@ -230,9 +225,10 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 	}
 
 	/**
-	 * Performs the first person activation weight operation.
-	 * @param partialTick the partial tick to use.
-	 * @return the value produced by this operation.
+	 * Samples the first-person activation crossfade weight.
+	 *
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the interpolated first-person activation weight
 	 */
 	float firstPersonActivationWeight(float partialTick)
 	{
@@ -240,10 +236,11 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 	}
 
 	/**
-	 * Performs the controller animation time operation.
-	 * @param controllerName the controller name to use.
-	 * @param partialTick the partial tick to use.
-	 * @return the value produced by this operation.
+	 * Returns the named controller's interpolated animation time in seconds.
+	 *
+	 * @param controllerName the registered controller name
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the named controller's interpolated animation time in seconds
 	 */
 	float controllerAnimationTime(String controllerName, float partialTick)
 	{
@@ -251,29 +248,28 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 		return controller == null ? 0.0f : controller.getInterpolatedTime(partialTick) / 20.0f;
 	}
 
-	/**
-	 * Updates the activation.
-	 * @param shouldApply the should apply to use.
-	 */
+	private boolean hasActiveController()
+	{
+		return this.animationManager.getControllers().values().stream().anyMatch(controller -> controller.isPlaying() || controller.isPaused());
+	}
+
 	private void updateActivation(boolean shouldApply)
 	{
 		this.previousActivation = this.activation;
 		if (shouldApply != this.targetActive)
-		{
 			if (this.transitionElapsed < this.definition.crossfadeDuration() &&
-					this.definition.transitionInterruptionPolicy() == PTransitionInterruptionPolicy.COMPLETE_CURRENT)
+				this.definition.transitionInterruptionPolicy() == PTransitionInterruptionPolicy.COMPLETE_CURRENT)
 			{
 				// The current fade is allowed to finish; the new request is sampled next tick.
 			}
 			else
 			{
-			this.transitionStart = this.definition.transitionInterruptionPolicy() == PTransitionInterruptionPolicy.RESTART ?
-						(this.targetActive ? 1.0f : 0.0f) : this.activation;
+				this.transitionStart = this.definition.transitionInterruptionPolicy() == PTransitionInterruptionPolicy.RESTART ? (this.targetActive ? 1.0f : 0.0f) : this.activation;
 				this.transitionTarget = shouldApply ? 1.0f : 0.0f;
 				this.transitionElapsed = 0.0f;
 				this.targetActive = shouldApply;
 			}
-		}
+
 		float duration = this.definition.crossfadeDuration();
 		if (duration <= 0.0f)
 		{
@@ -285,10 +281,6 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 		this.activation = Mth.lerp(alpha, this.transitionStart, this.transitionTarget);
 	}
 
-	/**
-	 * Updates the first person activation.
-	 * @param shouldApply the should apply to use.
-	 */
 	private void updateFirstPersonActivation(boolean shouldApply)
 	{
 		var settings = this.definition.firstPersonSettings();
@@ -299,84 +291,68 @@ public final class PPlayerAnimationInstance implements PAnimatable<PPlayerAnimat
 			this.firstPersonActivation = 0.0f;
 			return;
 		}
-
 		if (shouldApply != this.firstPersonTargetActive)
 		{
 			if (this.firstPersonTransitionElapsed < this.firstPersonTransitionDuration &&
-					this.definition.transitionInterruptionPolicy() == PTransitionInterruptionPolicy.COMPLETE_CURRENT)
+				this.definition.transitionInterruptionPolicy() == PTransitionInterruptionPolicy.COMPLETE_CURRENT)
 				return;
-
-			this.firstPersonTransitionStart = this.definition.transitionInterruptionPolicy() == PTransitionInterruptionPolicy.RESTART ?
-					(this.firstPersonTargetActive ? 1.0f : 0.0f) : this.firstPersonActivation;
+			this.firstPersonTransitionStart = this.definition.transitionInterruptionPolicy() == PTransitionInterruptionPolicy.RESTART ? (this.firstPersonTargetActive ? 1.0f : 0.0f) : this.firstPersonActivation;
 			this.firstPersonTransitionTarget = shouldApply ? 1.0f : 0.0f;
 			this.firstPersonTransitionDuration = shouldApply ? settings.transitionIn() : settings.transitionOut();
 			this.firstPersonTransitionElapsed = 0.0f;
 			this.firstPersonTargetActive = shouldApply;
 		}
-
 		if (this.firstPersonTransitionDuration <= 0.0f)
 		{
 			this.firstPersonActivation = this.firstPersonTargetActive ? 1.0f : 0.0f;
 			return;
 		}
-
 		this.firstPersonTransitionElapsed = Math.min(this.firstPersonTransitionElapsed + 1.0f, this.firstPersonTransitionDuration);
 		float alpha = this.definition.crossfadeEasing().transform(this.firstPersonTransitionElapsed / this.firstPersonTransitionDuration);
 		this.firstPersonActivation = Mth.lerp(alpha, this.firstPersonTransitionStart, this.firstPersonTransitionTarget);
 	}
 
 	/**
-	 * Samples the frame.
-	 * @param partialTick the partial tick to use.
-	 * @return the value produced by this operation.
+	 * Samples this instance into a frame of resolved animation bone transforms.
+	 *
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the sampled bone and action-anchor frame, or {@code null} when the requested value is unavailable
 	 */
 	public @Nullable PPlayerAnimationFrame sampleFrame(float partialTick)
 	{
 		int partialTickBits = Float.floatToIntBits(partialTick);
 		if (this.cachedFrame != null && this.cachedFramePartialTickBits == partialTickBits)
 			return this.cachedFrame;
-
-		PBakedModel model =
-				this.definition.modelData().getModel();
-		
+		PBakedModel model = this.definition.modelData().getModel();
 		if (model == null)
 			return null;
-		
-		PAnimationPoseResolver<PPlayerAnimationInstance> resolver =
-				new PAnimationPoseResolver<>(
-						model,
-						this.animationManager.
-										getControllers().
-										values(),
-						(controller, tick) ->
-						{
-							MolangParser.Context context =
-									new MolangParser.Context().
-											query(
-												"anim_time",
-												controller.getInterpolatedTime(tick)).
-											randomSeed(
-												this.animationManager.key().key());
-							
-							this.definition.populateMolangContext(
-									this.player,
-									this,
-									controller,
-									context,
-									tick
-							);
-							
-							return context;
-						},
-						partialTick
-				);
-		
-		this.cachedFrame = new PPlayerAnimationFrame(
-				this.definition,
-				resolver
-		);
+
+		PAnimationPoseResolver<PPlayerAnimationInstance> resolver = new PAnimationPoseResolver<>(
+			model,
+			this.animationManager.getControllers().values(),
+			(controller, tick) ->
+			{
+				MolangParser.Context context = new MolangParser.Context().query("anim_time", PAnimationEvaluationContext.ticksToSeconds(controller.getInterpolatedTime(tick))).randomSeed(this.animationManager.key().key());
+				this.definition.populateMolangContext(this.player, this, controller, context, tick);
+				return context;
+			},
+			partialTick);
+		this.cachedFrame = new PPlayerAnimationFrame(this.definition, resolver);
 		this.cachedFramePartialTickBits = partialTickBits;
 		return this.cachedFrame;
-		
+	}
+
+	/**
+	 * Samples the named animation bone into a player-space pose contribution.
+	 *
+	 * @param boneName the animation bone name
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the sampled player bone contribution, or {@code null} when the requested value is unavailable
+	 */
+	@Nullable
+	PPlayerBonePose sample(String boneName, float partialTick)
+	{
+		PPlayerAnimationFrame frame = sampleFrame(partialTick);
+		return frame == null ? null : frame.canonicalModelDelta(boneName);
 	}
 }

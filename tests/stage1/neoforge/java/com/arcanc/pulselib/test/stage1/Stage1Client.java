@@ -68,6 +68,8 @@ public final class Stage1Client implements IPulseClientPlugin
 		bus.addListener((RegisterSpecialModelRendererEvent event) ->
 				event.register(PLibDatabase.rl("test_block"), Boolean.getBoolean("pulselib.stage43cProbe") ? Stage43cItemProbe.Unbaked.MAP_CODEC : Boolean.getBoolean("pulselib.stage43bProbe") ? Stage43bGuiProbe.Unbaked.MAP_CODEC : TestBlockItemRenderer.Unbaked.MAP_CODEC));
 		NeoForge.EVENT_BUS.addListener(Stage1Client::tick);
+		if (Boolean.getBoolean("pulselib.stage51Probe"))
+			Stage51PlayerProbe.register();
 		if (Boolean.getBoolean("pulselib.stage43cProbe"))
 			Stage43cItemProbe.register();
 		if (Boolean.getBoolean("pulselib.stage43b2Probe"))
@@ -142,6 +144,8 @@ public final class Stage1Client implements IPulseClientPlugin
 	public void registerModels(PModelRegistrar event)
 	{
 		Stage2PluginProbe.models++;
+		if (Boolean.getBoolean("pulselib.stage51Probe"))
+			event.model(Stage51PlayerProbe.MODEL).texture("0", PLibDatabase.rl("stage42a_white"));
 		if (Boolean.getBoolean("pulselib.stage43b2Probe"))
 			event.model(Stage43b2HelperProbe.MODEL).texture("0", Stage42aWorldStageProbe.WHITE);
 		if (Boolean.getBoolean("pulselib.stage43cProbe") || Boolean.getBoolean("pulselib.stage43bProbe") || Boolean.getBoolean("pulselib.stage42b4Probe") || Boolean.getBoolean("pulselib.stage42cProbe"))
@@ -177,12 +181,16 @@ public final class Stage1Client implements IPulseClientPlugin
 	public void registerPlayerAnimations(PPlayerAnimationRegistrar registrar)
 	{
 		Stage2PluginProbe.playerAnimations++;
+		if (Boolean.getBoolean("pulselib.stage51Probe"))
+			Stage51PlayerProbe.registerAnimations(registrar);
 	}
 
 	@Override
 	public void registerAnimatedAttachments(PAnimatedAttachmentRegistrar registrar)
 	{
 		Stage2PluginProbe.animatedAttachments++;
+		if (Boolean.getBoolean("pulselib.stage51Probe"))
+			Stage51PlayerProbe.registerAttachments(registrar);
 	}
 
 	private static void tick(ClientTickEvent.Post event)
@@ -231,6 +239,8 @@ public final class Stage1Client implements IPulseClientPlugin
 					message -> LogUtils.getLogger().info("{}", message.getString()));
 		}
 		boolean pluginProbe = Boolean.getBoolean("pulselib.stage2Probe");
+		if (Boolean.getBoolean("pulselib.stage51Probe"))
+			Stage51PlayerProbe.tick(worldTicks);
 		if (Boolean.getBoolean("pulselib.stage42b2Probe"))
 			Stage42b2FabulousProbe.tick(worldTicks);
 		if (Boolean.getBoolean("pulselib.stage42b1Probe"))

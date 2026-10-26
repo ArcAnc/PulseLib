@@ -11,36 +11,50 @@ package com.arcanc.pulselib.content.player.animation;
 
 import com.arcanc.pulselib.content.animatable.PAnimationController;
 import com.arcanc.pulselib.content.animatable.PAnimationManager;
-import com.arcanc.pulselib.content.model.animation.PPoseEasing;
-import com.arcanc.pulselib.content.model.animation.PTransitionInterruptionPolicy;
 import com.arcanc.pulselib.content.model.deformer.PDeformerStack;
 import com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonSettings;
 import com.arcanc.pulselib.content.renderer.modelData.PModelData;
+import com.arcanc.pulselib.content.model.animation.PPoseEasing;
+import com.arcanc.pulselib.content.model.animation.PTransitionInterruptionPolicy;
 import com.arcanc.pulselib.data.gecko.MolangParser;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import org.joml.Vector3f;
 import org.jspecify.annotations.Nullable;
+import org.joml.Vector3f;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Predicate;
 
 /**
- * Describes player animation.
+ * Immutable player animation configuration containing model bindings, masks, weights, controllers,
+ * transitions and first-person presentation policies.
  */
 public final class PPlayerAnimationDefinition
 {
 	private final PModelData modelData;
 	private final Predicate<Player> predicate;
 	private final Map<PPlayerPart, String> bindings;
+	private final Set<PPlayerPart> mask;
 	private final PPlayerAnimationMask partMask;
 	private final PPlayerAnimationBlendMode blendMode;
 	private final PPlayerAnimationWeight weight;
 	private final Map<PPlayerPart, PPlayerAnimationWeight> partWeights;
 	private final Map<String, PPlayerAnimationWeight> boneWeights;
 	private final Set<String> meshAttachmentRoots;
+	private final Map<PPlayerAnimationAnchor, String> anchors;
+	private final PPlayerFirstPersonSettings firstPersonSettings;
+	private final ItemRenderPolicy itemRenderPolicy;
+	private final @Nullable String itemVisibilityController;
+	private final @Nullable ItemVisibilityPolicy itemVisibilityPolicy;
 	private final List<PPlayerAnimationDeformer> deformers;
 	private final Vector3f rootPivot;
 	private final int priority;
@@ -51,29 +65,23 @@ public final class PPlayerAnimationDefinition
 	private final ControllerRegistrar controllerRegistrar;
 	private final MolangContextProvider molangContextProvider;
 
-	private final Map<PPlayerAnimationAnchor, String> anchors;
-	private final PPlayerFirstPersonSettings firstPersonSettings;
-	private final ItemRenderPolicy itemRenderPolicy;
-	@Nullable
-	private final String itemVisibilityController;
-	@Nullable
-	private final ItemVisibilityPolicy itemVisibilityPolicy;
-
-	/**
-	 * Creates an instance of the enclosing type.
-	 * @param builder the builder to use.
-	 */
 	private PPlayerAnimationDefinition(Builder builder)
 	{
 		this.modelData = builder.modelData;
 		this.predicate = builder.predicate;
 		this.bindings = Map.copyOf(builder.bindings);
-		this.partMask = builder.partMask == null ? PPlayerAnimationMask.of(builder.mask) : builder.partMask;
+		this.mask = Set.copyOf(builder.mask);
+		this.partMask = builder.partMask == null ? PPlayerAnimationMask.of(this.mask) : builder.partMask;
 		this.blendMode = builder.blendMode;
 		this.weight = builder.weight;
 		this.partWeights = Map.copyOf(builder.partWeights);
 		this.boneWeights = Map.copyOf(builder.boneWeights);
 		this.meshAttachmentRoots = Set.copyOf(builder.meshAttachmentRoots);
+		this.anchors = Map.copyOf(builder.anchors);
+		this.firstPersonSettings = builder.firstPersonSettings;
+		this.itemRenderPolicy = builder.itemRenderPolicy;
+		this.itemVisibilityController = builder.itemVisibilityController;
+		this.itemVisibilityPolicy = builder.itemVisibilityPolicy;
 		this.deformers = List.copyOf(builder.deformers);
 		this.rootPivot = new Vector3f(builder.rootPivot);
 		this.priority = builder.priority;
@@ -83,17 +91,13 @@ public final class PPlayerAnimationDefinition
 		this.syncGroup = builder.syncGroup;
 		this.controllerRegistrar = builder.controllerRegistrar;
 		this.molangContextProvider = builder.molangContextProvider;
-		this.anchors = Map.copyOf(builder.anchors);
-		this.firstPersonSettings = builder.firstPersonSettings;
-		this.itemRenderPolicy = builder.itemRenderPolicy;
-		this.itemVisibilityController = builder.itemVisibilityController;
-		this.itemVisibilityPolicy = builder.itemVisibilityPolicy;
 	}
 
 	/**
-	 * Performs the builder operation.
-	 * @param modelData the model data to use.
-	 * @return the value produced by this operation.
+	 * Starts a player animation definition for the supplied model.
+	 *
+	 * @param modelData the canonical model and loader selection
+	 * @return a builder bound to the supplied model selection
 	 */
 	public static Builder builder(PModelData modelData)
 	{
@@ -101,8 +105,9 @@ public final class PPlayerAnimationDefinition
 	}
 
 	/**
-	 * Performs the model data operation.
-	 * @return the value produced by this operation.
+	 * Returns the canonical model and loader selection.
+	 *
+	 * @return the canonical model and loader selection
 	 */
 	public PModelData modelData()
 	{
@@ -110,9 +115,10 @@ public final class PPlayerAnimationDefinition
 	}
 
 	/**
-	 * Performs the should apply operation.
-	 * @param player the player to use.
-	 * @return the value produced by this operation.
+	 * Tests the activation predicate against the current player.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @return whether the supplied inputs match this predicate
 	 */
 	public boolean shouldApply(Player player)
 	{
@@ -120,8 +126,9 @@ public final class PPlayerAnimationDefinition
 	}
 
 	/**
-	 * Performs the bindings operation.
-	 * @return the value produced by this operation.
+	 * Returns the attachment bone-to-anchor bindings.
+	 *
+	 * @return the attachment bone-to-anchor bindings
 	 */
 	public Map<PPlayerPart, String> bindings()
 	{
@@ -129,11 +136,22 @@ public final class PPlayerAnimationDefinition
 	}
 
 	/**
-	 * Performs the applies to operation.
-	 * @param player the player to use.
-	 * @param part the part to use.
-	 * @param partialTick the partial tick to use.
-	 * @return the value produced by this operation.
+	 * Returns the mask selecting participating bones or player parts.
+	 *
+	 * @return the mask selecting participating bones or player parts
+	 */
+	public Set<PPlayerPart> mask()
+	{
+		return this.mask;
+	}
+
+	/**
+	 * Tests the part mask for the player at the supplied render interpolation fraction.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param part the player model part receiving the contribution
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return whether the supplied inputs match this predicate
 	 */
 	public boolean appliesTo(Player player, PPlayerPart part, float partialTick)
 	{
@@ -141,8 +159,9 @@ public final class PPlayerAnimationDefinition
 	}
 
 	/**
-	 * Blends the mode.
-	 * @return the value produced by this operation.
+	 * Returns the blend mode.
+	 *
+	 * @return the blend mode
 	 */
 	public PPlayerAnimationBlendMode blendMode()
 	{
@@ -150,10 +169,11 @@ public final class PPlayerAnimationDefinition
 	}
 
 	/**
-	 * Performs the weight operation.
-	 * @param player the player to use.
-	 * @param partialTick the partial tick to use.
-	 * @return the value produced by this operation.
+	 * Samples the overall or part-specific animation contribution weight.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the contribution weight clamped to the range zero to one
 	 */
 	public float weight(Player player, float partialTick)
 	{
@@ -161,11 +181,25 @@ public final class PPlayerAnimationDefinition
 	}
 
 	/**
-	 * Performs the part weight operation.
-	 * @param player the player to use.
-	 * @param part the part to use.
-	 * @param partialTick the partial tick to use.
-	 * @return the value produced by this operation.
+	 * Samples the overall or part-specific animation contribution weight.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param part the player model part receiving the contribution
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the contribution weight clamped to the range zero to one
+	 */
+	public float weight(Player player, PPlayerPart part, float partialTick)
+	{
+		return Math.clamp(weight(player, partialTick) * partWeight(player, part, partialTick), 0.0f, 1.0f);
+	}
+
+	/**
+	 * Samples the configured contribution weight for one player model part.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param part the player model part receiving the contribution
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the part weight clamped to the range zero to one
 	 */
 	public float partWeight(Player player, PPlayerPart part, float partialTick)
 	{
@@ -174,11 +208,12 @@ public final class PPlayerAnimationDefinition
 	}
 
 	/**
-	 * Performs the bone weight operation.
-	 * @param player the player to use.
-	 * @param boneName the bone name to use.
-	 * @param partialTick the partial tick to use.
-	 * @return the value produced by this operation.
+	 * Samples the configured contribution weight for one animation bone.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param boneName the animation bone name
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
+	 * @return the bone weight clamped to the range zero to one
 	 */
 	public float boneWeight(Player player, String boneName, float partialTick)
 	{
@@ -187,9 +222,9 @@ public final class PPlayerAnimationDefinition
 	}
 
 	/**
-	 * Returns explicitly configured roots for meshes attached to the player.
-	 * An empty set enables automatic root discovery.
-	 * @return explicitly configured mesh attachment roots.
+	 * Explicit mesh roots; an empty set enables automatic discovery.
+	 *
+	 * @return the explicit mesh roots, with an empty set selecting automatic discovery
 	 */
 	public Set<String> meshAttachmentRoots()
 	{
@@ -197,71 +232,9 @@ public final class PPlayerAnimationDefinition
 	}
 
 	/**
-	 * Performs the deformers operation.
-	 * @return the value produced by this operation.
-	 */
-	public List<PPlayerAnimationDeformer> deformers()
-	{
-		return this.deformers;
-	}
-
-	/**
-	 * Performs the root pivot operation.
-	 * @return the value produced by this operation.
-	 */
-	public Vector3f rootPivot()
-	{
-		return new Vector3f(this.rootPivot);
-	}
-
-	/**
-	 * Performs the priority operation.
-	 * @return the value produced by this operation.
-	 */
-	public int priority()
-	{
-		return this.priority;
-	}
-
-	/**
-	 * Performs the crossfade duration operation.
-	 * @return the value produced by this operation.
-	 */
-	public float crossfadeDuration()
-	{
-		return this.crossfadeDuration;
-	}
-
-	/**
-	 * Performs the crossfade easing operation.
-	 * @return the value produced by this operation.
-	 */
-	public PPoseEasing crossfadeEasing()
-	{
-		return this.crossfadeEasing;
-	}
-
-	/**
-	 * Performs the transition interruption policy operation.
-	 * @return the value produced by this operation.
-	 */
-	public PTransitionInterruptionPolicy transitionInterruptionPolicy()
-	{
-		return this.transitionInterruptionPolicy;
-	}
-
-	/**
-	 * Synchronizes the group.
-	 * @return the value produced by this operation.
-	 */
-	public String syncGroup()
-	{
-		return this.syncGroup;
-	}
-
-	/**
-	 * Performs the anchors operation.
-	 * @return the value produced by this operation.
+	 * Returns the anchors.
+	 *
+	 * @return the anchors
 	 */
 	public Map<PPlayerAnimationAnchor, String> anchors()
 	{
@@ -269,8 +242,9 @@ public final class PPlayerAnimationDefinition
 	}
 
 	/**
-	 * Performs the first person settings operation.
-	 * @return the value produced by this operation.
+	 * Returns the first person settings.
+	 *
+	 * @return the first person settings
 	 */
 	public PPlayerFirstPersonSettings firstPersonSettings()
 	{
@@ -278,8 +252,9 @@ public final class PPlayerAnimationDefinition
 	}
 
 	/**
-	 * Performs the item render policy operation.
-	 * @return the value produced by this operation.
+	 * Decides whether this definition suppresses a physical first-person hand item.
+	 *
+	 * @return the legacy held-item rendering policy
 	 */
 	public ItemRenderPolicy itemRenderPolicy()
 	{
@@ -287,8 +262,9 @@ public final class PPlayerAnimationDefinition
 	}
 
 	/**
-	 * The controller that supplies {@link #itemVisibilityPolicy()}'s timeline, if configured.
-	 * Its sampled time is expressed in seconds.
+	 * Controller used to sample {@link #itemVisibilityPolicy()} , when configured.
+	 *
+	 * @return the controller name used for item visibility, or {@code null} when unconfigured
 	 */
 	public @Nullable String itemVisibilityController()
 	{
@@ -296,17 +272,89 @@ public final class PPlayerAnimationDefinition
 	}
 
 	/**
-	 * A phase-based first-person item visibility policy, if configured.
-	 * It supplements {@link #itemRenderPolicy()} rather than replacing it.
+	 * Optional phase-based item visibility policy, combined with {@link #itemRenderPolicy()} .
+	 *
+	 * @return the item visibility callback, or {@code null} when unconfigured
 	 */
 	public @Nullable ItemVisibilityPolicy itemVisibilityPolicy()
 	{
 		return this.itemVisibilityPolicy;
 	}
-	
+
 	/**
-	 * Registers the controllers.
-	 * @param registrar the registrar to use.
+	 * Returns the deformers.
+	 *
+	 * @return the deformers
+	 */
+	public List<PPlayerAnimationDeformer> deformers()
+	{
+		return this.deformers;
+	}
+
+	/**
+	 * Returns a copy of the root pivot used for animation-space conversion.
+	 *
+	 * @return a copy of the root pivot used for animation-space conversion
+	 */
+	public Vector3f rootPivot()
+	{
+		return new Vector3f(this.rootPivot);
+	}
+
+	/**
+	 * Returns the ordering priority of the contribution.
+	 *
+	 * @return the ordering priority of the contribution
+	 */
+	public int priority()
+	{
+		return this.priority;
+	}
+
+	/**
+	 * Returns the crossfade duration.
+	 *
+	 * @return the crossfade duration
+	 */
+	public float crossfadeDuration()
+	{
+		return this.crossfadeDuration;
+	}
+
+	/**
+	 * Returns the crossfade easing.
+	 *
+	 * @return the crossfade easing
+	 */
+	public PPoseEasing crossfadeEasing()
+	{
+		return this.crossfadeEasing;
+	}
+
+	/**
+	 * Returns the transition interruption policy.
+	 *
+	 * @return the transition interruption policy
+	 */
+	public PTransitionInterruptionPolicy transitionInterruptionPolicy()
+	{
+		return this.transitionInterruptionPolicy;
+	}
+
+	/**
+	 * Returns the sync group.
+	 *
+	 * @return the sync group
+	 */
+	public String syncGroup()
+	{
+		return this.syncGroup;
+	}
+
+	/**
+	 * Declares this definition's animation controllers in a new player animation manager.
+	 *
+	 * @param registrar the active registration scope for this callback
 	 */
 	void registerControllers(PAnimationManager.PAnimationRegistrar<PPlayerAnimationInstance> registrar)
 	{
@@ -314,116 +362,144 @@ public final class PPlayerAnimationDefinition
 	}
 
 	/**
-	 * Performs the populate molang context operation.
-	 * @param player the player to use.
-	 * @param instance the instance to use.
-	 * @param controller the controller to use.
-	 * @param context the context to use.
-	 * @param partialTick the partial tick to use.
+	 * Populates frame-specific Molang queries for the supplied player animation controller.
+	 *
+	 * @param player the player whose animation or presentation is being processed
+	 * @param instance the instance
+	 * @param controller the controller supplying playback and persistent expression state
+	 * @param context the Molang context containing current frame and instance values
+	 * @param partialTick the interpolation fraction between the previous and current game ticks
 	 */
 	void populateMolangContext(Player player,
-	                           PPlayerAnimationInstance instance,
-	                           PAnimationController<PPlayerAnimationInstance> controller,
-	                           MolangParser.Context context,
-	                           float partialTick)
+							   PPlayerAnimationInstance instance,
+							   PAnimationController<PPlayerAnimationInstance> controller,
+							   MolangParser.Context context,
+							   float partialTick)
 	{
 		this.molangContextProvider.populate(player, instance, controller, context, partialTick);
 	}
 
+	/**
+	 * Declares the animation controllers owned by a player animation instance.
+	 */
 	@FunctionalInterface
-/**
- * Defines the contract for controller registrar.
- */
 	public interface ControllerRegistrar
 	{
-		ControllerRegistrar EMPTY = registrar -> {};
+		/**
+		 * Controller registration callback that adds no controllers.
+		 */
+		ControllerRegistrar EMPTY = registrar ->
+		{
+		};
 
 		/**
-		 * Performs the register operation.
-		 * @param registrar the registrar to use.
+		 * Adds controller factories to the supplied animation manager registrar.
+		 *
+		 * @param registrar the active registration scope for this callback
 		 */
 		void register(PAnimationManager.PAnimationRegistrar<PPlayerAnimationInstance> registrar);
 	}
 
+	/**
+	 * Populates player-specific Molang values before a controller is sampled.
+	 */
 	@FunctionalInterface
-/**
- * Defines the contract for molang context provider.
- */
 	public interface MolangContextProvider
 	{
-		MolangContextProvider EMPTY = (player, instance, controller, context, partialTick) -> {};
+		/**
+		 * Context callback that adds no values.
+		 */
+		MolangContextProvider EMPTY = (player, instance, controller, context, partialTick) ->
+		{
+		};
 
 		/**
-		 * Performs the populate operation.
-		 * @param player the player to use.
-		 * @param instance the instance to use.
-		 * @param controller the controller to use.
-		 * @param context the context to use.
-		 * @param partialTick the partial tick to use.
+		 * Updates the supplied Molang context with current player and frame values.
+		 *
+		 * @param player the player whose animation or presentation is being processed
+		 * @param instance the instance
+		 * @param controller the controller supplying playback and persistent expression state
+		 * @param context the Molang context containing current frame and instance values
+		 * @param partialTick the interpolation fraction between the previous and current game ticks
 		 */
 		void populate(Player player,
-		              PPlayerAnimationInstance instance,
-		              PAnimationController<PPlayerAnimationInstance> controller,
-		              MolangParser.Context context,
-		              float partialTick);
+					  PPlayerAnimationInstance instance,
+					  PAnimationController<PPlayerAnimationInstance> controller,
+					  MolangParser.Context context,
+					  float partialTick);
 	}
 
+	/**
+	 * Legacy policy that decides whether vanilla first-person rendering should hide a held item.
+	 */
 	@FunctionalInterface
-/**
- * Defines the contract for item render policy.
- */
 	public interface ItemRenderPolicy
 	{
+		/**
+		 * Keeps vanilla held-item rendering enabled.
+		 */
 		ItemRenderPolicy RENDER = (player, hand, stack) -> false;
+		/**
+		 * Hides vanilla held-item rendering.
+		 */
 		ItemRenderPolicy HIDE = (player, hand, stack) -> true;
 
 		/**
-		 * Performs the hide operation.
-		 * @param player the player to use.
-		 * @param hand the hand to use.
-		 * @param stack the stack to use.
-		 * @return the value produced by this operation.
+		 * Returns whether vanilla rendering should hide the item in the supplied hand.
+		 *
+		 * @param player the player whose animation or presentation is being processed
+		 * @param hand the interaction hand being rendered
+		 * @param stack the item stack supplying render or animation state
+		 * @return whether vanilla rendering should hide the item in the supplied hand
 		 */
-		boolean hide(LocalPlayer player,
-		             InteractionHand hand,
-		             ItemStack stack);
+		boolean hide(LocalPlayer player, InteractionHand hand, ItemStack stack);
 	}
 
-/**
- * Enumerates the available item visibility values.
- */
+	/**
+	 * Visibility decision for a held item in animated first-person presentation.
+	 */
 	public enum ItemVisibility
 	{
+		/**
+		 * Includes the held item in the first-person presentation.
+		 */
 		VISIBLE,
+		/**
+		 * Omits the held item from the first-person presentation.
+		 */
 		HIDDEN
 	}
 
+	/**
+	 * Samples held-item visibility against a selected animation controller clock.
+	 */
 	@FunctionalInterface
-/**
- * Defines the contract for item visibility policy.
- */
 	public interface ItemVisibilityPolicy
 	{
+		/**
+		 * Always includes the held item.
+		 */
 		ItemVisibilityPolicy VISIBLE = (player, hand, animationTime, stack) -> ItemVisibility.VISIBLE;
+		/**
+		 * Always hides the held item.
+		 */
 		ItemVisibilityPolicy HIDDEN = (player, hand, animationTime, stack) -> ItemVisibility.HIDDEN;
 
 		/**
-		 * Performs the visibility operation.
-		 * @param player the player to use.
-		 * @param hand the hand to use.
-		 * @param animationTime the animation time to use.
-		 * @param stack the stack to use.
-		 * @return the value produced by this operation.
+		 * Selects held-item visibility at the supplied animation playback time.
+		 *
+		 * @param player the player whose animation or presentation is being processed
+		 * @param hand the interaction hand being rendered
+		 * @param animationTime the animation playback position supplied to this operation
+		 * @param stack the item stack supplying render or animation state
+		 * @return the held-item visibility decision at the supplied animation time
 		 */
-		ItemVisibility visibility(LocalPlayer player,
-		                          InteractionHand hand,
-		                          float animationTime,
-		                          ItemStack stack);
+		ItemVisibility visibility(LocalPlayer player, InteractionHand hand, float animationTime, ItemStack stack);
 	}
 
-/**
- * Builds builder.
- */
+	/**
+	 * Builds a player animation definition with explicit model-part bindings and presentation policies.
+	 */
 	public static final class Builder
 	{
 		private final PModelData modelData;
@@ -436,6 +512,11 @@ public final class PPlayerAnimationDefinition
 		private final Map<PPlayerPart, PPlayerAnimationWeight> partWeights = new LinkedHashMap<>();
 		private final Map<String, PPlayerAnimationWeight> boneWeights = new LinkedHashMap<>();
 		private final Set<String> meshAttachmentRoots = new LinkedHashSet<>();
+		private final Map<PPlayerAnimationAnchor, String> anchors = new LinkedHashMap<>();
+		private PPlayerFirstPersonSettings firstPersonSettings = PPlayerFirstPersonSettings.DISABLED;
+		private ItemRenderPolicy itemRenderPolicy = ItemRenderPolicy.RENDER;
+		private @Nullable String itemVisibilityController;
+		private @Nullable ItemVisibilityPolicy itemVisibilityPolicy;
 		private final List<PPlayerAnimationDeformer> deformers = new ArrayList<>();
 		private Vector3f rootPivot = new Vector3f();
 		private int priority;
@@ -446,27 +527,16 @@ public final class PPlayerAnimationDefinition
 		private ControllerRegistrar controllerRegistrar = ControllerRegistrar.EMPTY;
 		private MolangContextProvider molangContextProvider = MolangContextProvider.EMPTY;
 
-		private final Map<PPlayerAnimationAnchor, String> anchors = new HashMap<>();
-		private PPlayerFirstPersonSettings firstPersonSettings = PPlayerFirstPersonSettings.DISABLED;
-		private ItemRenderPolicy itemRenderPolicy = ItemRenderPolicy.RENDER;
-		@Nullable
-		private String itemVisibilityController;
-		@Nullable
-		private ItemVisibilityPolicy itemVisibilityPolicy;
-
-		/**
-		 * Creates an instance of the enclosing type.
-		 * @param modelData the model data to use.
-		 */
 		private Builder(PModelData modelData)
 		{
 			this.modelData = Objects.requireNonNull(modelData);
 		}
 
 		/**
-		 * Performs the when operation.
-		 * @param predicate the predicate to use.
-		 * @return the value produced by this operation.
+		 * Sets the predicate that activates this player animation.
+		 *
+		 * @param predicate the predicate
+		 * @return this builder
 		 */
 		public Builder when(Predicate<Player> predicate)
 		{
@@ -475,10 +545,11 @@ public final class PPlayerAnimationDefinition
 		}
 
 		/**
-		 * Performs the bind operation.
-		 * @param part the part to use.
-		 * @param boneName the bone name to use.
-		 * @return the value produced by this operation.
+		 * Binds a vanilla player model part to a named animation bone.
+		 *
+		 * @param part the player model part receiving the contribution
+		 * @param boneName the animation bone name
+		 * @return this builder
 		 */
 		public Builder bind(PPlayerPart part, String boneName)
 		{
@@ -487,11 +558,12 @@ public final class PPlayerAnimationDefinition
 			this.bindings.put(Objects.requireNonNull(part), boneName);
 			return this;
 		}
-		
+
 		/**
-		 * Performs the mask operation.
-		 * @param parts the parts to use.
-		 * @return the value produced by this operation.
+		 * Sets the player parts eligible to receive this animation.
+		 *
+		 * @param parts the player parts included by the mask
+		 * @return this builder
 		 */
 		public Builder mask(PPlayerPart... parts)
 		{
@@ -501,11 +573,12 @@ public final class PPlayerAnimationDefinition
 			this.partMask = null;
 			return this;
 		}
-		
+
 		/**
-		 * Performs the mask operation.
-		 * @param mask the mask to use.
-		 * @return the value produced by this operation.
+		 * Sets the player parts eligible to receive this animation.
+		 *
+		 * @param mask the mask selecting participating bones or player parts
+		 * @return this builder
 		 */
 		public Builder mask(PPlayerAnimationMask mask)
 		{
@@ -515,9 +588,10 @@ public final class PPlayerAnimationDefinition
 		}
 
 		/**
-		 * Blends the mode.
-		 * @param blendMode the blend mode to use.
-		 * @return the value produced by this operation.
+		 * Selects the transform-space blending policy.
+		 *
+		 * @param blendMode the blend mode
+		 * @return this builder
 		 */
 		public Builder blendMode(PPlayerAnimationBlendMode blendMode)
 		{
@@ -526,9 +600,10 @@ public final class PPlayerAnimationDefinition
 		}
 
 		/**
-		 * Performs the weight operation.
-		 * @param weight the weight to use.
-		 * @return the value produced by this operation.
+		 * Sets the overall constant or dynamically sampled animation weight.
+		 *
+		 * @param weight the contribution weight
+		 * @return this builder
 		 */
 		public Builder weight(float weight)
 		{
@@ -536,9 +611,10 @@ public final class PPlayerAnimationDefinition
 		}
 
 		/**
-		 * Performs the weight operation.
-		 * @param weight the weight to use.
-		 * @return the value produced by this operation.
+		 * Sets the overall constant or dynamically sampled animation weight.
+		 *
+		 * @param weight the contribution weight
+		 * @return this builder
 		 */
 		public Builder weight(PPlayerAnimationWeight weight)
 		{
@@ -547,10 +623,11 @@ public final class PPlayerAnimationDefinition
 		}
 
 		/**
-		 * Performs the part weight operation.
-		 * @param part the part to use.
-		 * @param weight the weight to use.
-		 * @return the value produced by this operation.
+		 * Sets the weight provider for one player part.
+		 *
+		 * @param part the player model part receiving the contribution
+		 * @param weight the contribution weight
+		 * @return this builder
 		 */
 		public Builder partWeight(PPlayerPart part, float weight)
 		{
@@ -558,10 +635,11 @@ public final class PPlayerAnimationDefinition
 		}
 
 		/**
-		 * Performs the part weight operation.
-		 * @param part the part to use.
-		 * @param weight the weight to use.
-		 * @return the value produced by this operation.
+		 * Sets the weight provider for one player part.
+		 *
+		 * @param part the player model part receiving the contribution
+		 * @param weight the contribution weight
+		 * @return this builder
 		 */
 		public Builder partWeight(PPlayerPart part, PPlayerAnimationWeight weight)
 		{
@@ -570,10 +648,11 @@ public final class PPlayerAnimationDefinition
 		}
 
 		/**
-		 * Performs the bone weight operation.
-		 * @param boneName the bone name to use.
-		 * @param weight the weight to use.
-		 * @return the value produced by this operation.
+		 * Sets the weight provider for one animation bone.
+		 *
+		 * @param boneName the animation bone name
+		 * @param weight the contribution weight
+		 * @return this builder
 		 */
 		public Builder boneWeight(String boneName, float weight)
 		{
@@ -581,10 +660,11 @@ public final class PPlayerAnimationDefinition
 		}
 
 		/**
-		 * Performs the bone weight operation.
-		 * @param boneName the bone name to use.
-		 * @param weight the weight to use.
-		 * @return the value produced by this operation.
+		 * Sets the weight provider for one animation bone.
+		 *
+		 * @param boneName the animation bone name
+		 * @param weight the contribution weight
+		 * @return this builder
 		 */
 		public Builder boneWeight(String boneName, PPlayerAnimationWeight weight)
 		{
@@ -595,11 +675,10 @@ public final class PPlayerAnimationDefinition
 		}
 
 		/**
-		 * Attaches the meshes rooted at the specified bone to the player model.
-		 * Once at least one root is configured, automatic attachment discovery is disabled.
-		 * The root and every descendant mesh render only while this definition has an active animation.
-		 * @param boneName the root bone name.
-		 * @return this builder.
+		 * Marks the model subtree rooted at {@code boneName} for player-mesh attachment rendering.
+		 *
+		 * @param boneName the animation bone name
+		 * @return this builder
 		 */
 		public Builder meshAttachment(String boneName)
 		{
@@ -610,24 +689,81 @@ public final class PPlayerAnimationDefinition
 		}
 
 		/**
-		 * Performs the deform operation.
-		 * @param part the part to use.
-		 * @param stack the stack to use.
-		 * @param values the values to use.
-		 * @return the value produced by this operation.
+		 * Binds an action or attachment anchor to a named animation bone.
+		 *
+		 * @param anchor the anchor
+		 * @param boneName the animation bone name
+		 * @return this builder
+		 */
+		public Builder anchor(PPlayerAnimationAnchor anchor, String boneName)
+		{
+			if (boneName == null || boneName.isBlank())
+				throw new IllegalArgumentException("Player animation anchor bone name cannot be blank");
+			this.anchors.put(Objects.requireNonNull(anchor), boneName);
+			return this;
+		}
+
+		/**
+		 * Sets first-person activation, transition and camera behavior.
+		 *
+		 * @param settings the settings
+		 * @return this builder
+		 */
+		public Builder firstPerson(PPlayerFirstPersonSettings settings)
+		{
+			this.firstPersonSettings = Objects.requireNonNull(settings);
+			return this;
+		}
+
+		/**
+		 * Sets the legacy vanilla held-item visibility callback.
+		 *
+		 * @param itemRenderPolicy the item render policy
+		 * @return this builder
+		 */
+		public Builder itemRenderPolicy(ItemRenderPolicy itemRenderPolicy)
+		{
+			this.itemRenderPolicy = Objects.requireNonNull(itemRenderPolicy);
+			return this;
+		}
+
+		/**
+		 * Controls per-hand visibility at a named controller's interpolated time in seconds.
+		 *
+		 * @param controllerName the registered controller name
+		 * @param itemVisibilityPolicy the item visibility policy
+		 * @return this builder
+		 */
+		public Builder itemVisibility(String controllerName, ItemVisibilityPolicy itemVisibilityPolicy)
+		{
+			if (controllerName == null || controllerName.isBlank())
+				throw new IllegalArgumentException("Item visibility controller name cannot be blank");
+			this.itemVisibilityController = controllerName;
+			this.itemVisibilityPolicy = Objects.requireNonNull(itemVisibilityPolicy);
+			return this;
+		}
+
+		/**
+		 * Adds an animated deformation stack for one player model part.
+		 *
+		 * @param part the player model part receiving the contribution
+		 * @param stack the item stack supplying render or animation state
+		 * @param values the values
+		 * @return this builder
 		 */
 		public Builder deform(PPlayerPart part,
-		                      PDeformerStack stack,
-		                      PPlayerAnimationDeformerValueSource values)
+							  PDeformerStack stack,
+							  PPlayerAnimationDeformerValueSource values)
 		{
 			this.deformers.add(new PPlayerAnimationDeformer(part, stack, values));
 			return this;
 		}
-		
+
 		/**
-		 * Performs the root pivot operation.
-		 * @param rootPivot the root pivot to use.
-		 * @return the value produced by this operation.
+		 * Sets the root pivot used when converting animation transforms to player space.
+		 *
+		 * @param rootPivot the root pivot
+		 * @return this builder
 		 */
 		public Builder rootPivot(Vector3f rootPivot)
 		{
@@ -636,21 +772,23 @@ public final class PPlayerAnimationDefinition
 		}
 
 		/**
-		 * Performs the root pivot operation.
-		 * @param x the x to use.
-		 * @param y the y to use.
-		 * @param z the z to use.
-		 * @return the value produced by this operation.
+		 * Sets the root pivot used when converting animation transforms to player space.
+		 *
+		 * @param x the x component or coordinate
+		 * @param y the y component or coordinate
+		 * @param z the z component or coordinate
+		 * @return this builder
 		 */
 		public Builder rootPivot(float x, float y, float z)
 		{
 			return rootPivot(new Vector3f(x, y, z));
 		}
-		
+
 		/**
-		 * Performs the priority operation.
-		 * @param priority the priority to use.
-		 * @return the value produced by this operation.
+		 * Sets the order in which this animation is combined with other definitions.
+		 *
+		 * @param priority the ordering priority of the contribution
+		 * @return this builder
 		 */
 		public Builder priority(int priority)
 		{
@@ -659,11 +797,12 @@ public final class PPlayerAnimationDefinition
 		}
 
 		/**
-		 * Performs the crossfade operation.
-		 * @param duration the duration to use.
-		 * @param easing the easing to use.
-		 * @param interruptionPolicy the interruption policy to use.
-		 * @return the value produced by this operation.
+		 * Configures activation crossfades and their interruption behavior.
+		 *
+		 * @param duration the duration of the effect or transition in game ticks
+		 * @param easing the crossfade progress easing curve
+		 * @param interruptionPolicy the policy for interrupting an active crossfade
+		 * @return this builder
 		 */
 		public Builder crossfade(float duration, PPoseEasing easing, PTransitionInterruptionPolicy interruptionPolicy)
 		{
@@ -676,9 +815,10 @@ public final class PPlayerAnimationDefinition
 		}
 
 		/**
-		 * Synchronizes the group.
-		 * @param syncGroup the sync group to use.
-		 * @return the value produced by this operation.
+		 * Sets the group used to synchronize cyclic controller playback.
+		 *
+		 * @param syncGroup the sync group
+		 * @return this builder
 		 */
 		public Builder syncGroup(String syncGroup)
 		{
@@ -687,9 +827,10 @@ public final class PPlayerAnimationDefinition
 		}
 
 		/**
-		 * Performs the controllers operation.
-		 * @param controllerRegistrar the controller registrar to use.
-		 * @return the value produced by this operation.
+		 * Sets the callback that declares this definition's controllers.
+		 *
+		 * @param controllerRegistrar the controller registrar
+		 * @return this builder
 		 */
 		public Builder controllers(ControllerRegistrar controllerRegistrar)
 		{
@@ -698,70 +839,21 @@ public final class PPlayerAnimationDefinition
 		}
 
 		/**
-		 * Performs the populate molang context operation.
-		 * @param provider the provider to use.
-		 * @return the value produced by this operation.
+		 * Sets the callback that populates player-specific Molang values.
+		 *
+		 * @param provider the provider
+		 * @return this builder
 		 */
 		public Builder populateMolangContext(MolangContextProvider provider)
 		{
 			this.molangContextProvider = Objects.requireNonNull(provider);
 			return this;
 		}
-		
-		/**
-		 * Performs the anchor operation.
-		 * @param playerAnimationAnchor the player animation anchor to use.
-		 * @param boneName the bone name to use.
-		 * @return the value produced by this operation.
-		 */
-		public Builder anchor(PPlayerAnimationAnchor playerAnimationAnchor, String boneName)
-		{
-			Objects.requireNonNull(playerAnimationAnchor);
-			Objects.requireNonNull(boneName);
-			this.anchors.put(playerAnimationAnchor, boneName);
-			return this;
-		}
-		
-		/**
-		 * Performs the first person operation.
-		 * @param settings the settings to use.
-		 * @return the value produced by this operation.
-		 */
-		public Builder firstPerson(PPlayerFirstPersonSettings settings)
-		{
-			this.firstPersonSettings = Objects.requireNonNull(settings);
-			return this;
-		}
 
 		/**
-		 * Performs the item render policy operation.
-		 * @param itemRenderPolicy the item render policy to use.
-		 * @return the value produced by this operation.
-		 */
-		public Builder itemRenderPolicy(ItemRenderPolicy itemRenderPolicy)
-		{
-			this.itemRenderPolicy = Objects.requireNonNull(itemRenderPolicy);
-			return this;
-		}
-
-		/**
-		 * Controls item visibility at a particular phase of a named controller's timeline.
-		 * The supplied time is interpolated and expressed in seconds, independently of
-		 * activation crossfade weight. A hidden result is combined with
-		 * {@link #itemRenderPolicy(ItemRenderPolicy)}.
-		 */
-		public Builder itemVisibility(String controllerName, ItemVisibilityPolicy itemVisibilityPolicy)
-		{
-			if (controllerName == null || controllerName.isBlank())
-				throw new IllegalArgumentException("Item visibility controller name cannot be blank");
-			this.itemVisibilityController = controllerName;
-			this.itemVisibilityPolicy = Objects.requireNonNull(itemVisibilityPolicy);
-			return this;
-		}
-
-		/**
-		 * Performs the build operation.
-		 * @return the value produced by this operation.
+		 * Creates an immutable player animation definition from this configuration.
+		 *
+		 * @return the configured player animation definition
 		 */
 		public PPlayerAnimationDefinition build()
 		{

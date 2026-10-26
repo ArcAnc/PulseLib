@@ -9,156 +9,174 @@
 
 package com.arcanc.pulselib.content.player.animation;
 
-
 import com.arcanc.pulselib.content.model.animation.PTransform;
 import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
+import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 /**
- * Provides support for player animation space.
+ * Coordinate conversion between imported player models and vanilla ModelPart space.
  */
 public final class PPlayerAnimationSpace
 {
-	/** Converts glTF coordinate values to Minecraft's player-model coordinates. */
-	private static final Quaternionf GLTF_TO_PLAYER_ROTATION =
-			new Quaternionf().rotationZ((float)Math.PI);
 	/**
-	 * Vertex space used by the baked first-person mesh pass. GLTF mesh vertices
-	 * remain in their source basis. Bone and locator matrices are instead
-	 * converted once by {@code PFirstPersonPresentation}'s MODEL-to-VIEW root.
+	 * Converts glTF model space to the basis expected by vanilla player geometry.
 	 */
-	private static final PTransform PLAYER_MODEL_TO_FIRST_PERSON =
-			PTransform.rotation(GLTF_TO_PLAYER_ROTATION);
+	private static final PTransform GLTF_TO_PLAYER_GEOMETRY =
+		PTransform.rotation(new Quaternionf().rotationZ((float)Math.PI));
 
-	/**
-	 * Creates an instance of the enclosing type.
-	 */
 	private PPlayerAnimationSpace()
 	{
 	}
 
 	/**
-	 * Performs the to player space operation.
-	 * @param vector the vector to use.
-	 * @param definition the definition to use.
-	 * @return the value produced by this operation.
+	 * Converts a source animation value into canonical player animation space.
+	 *
+	 * @param vector the vector
+	 * @param definition the immutable configuration to register or evaluate
+	 * @return the transform or value converted into the requested player coordinate space
 	 */
-	public static Vector3f toPlayerSpace(
-			Vector3fc vector,
-			PPlayerAnimationDefinition definition)
+	public static Vector3f toPlayerSpace(Vector3fc vector, PPlayerAnimationDefinition definition)
 	{
 		Vector3f result = new Vector3f(vector);
-		
-		if (!usesGltfCoordinates(definition))
-			return result;
-		
-		return result.mul(
-				-1.0f,
-				-1.0f,
-				1.0f);
+		return usesGltfCoordinates(definition) ? result.mul(-1f, -1f, 1f) : result;
 	}
-	
+
 	/**
-	 * Performs the to player space operation.
-	 * @param rotation the rotation to use.
-	 * @param definition the definition to use.
-	 * @return the value produced by this operation.
+	 * Converts a source animation value into canonical player animation space.
+	 *
+	 * @param rotation the local quaternion rotation
+	 * @param definition the immutable configuration to register or evaluate
+	 * @return the transform or value converted into the requested player coordinate space
 	 */
-	public static Quaternionf toPlayerSpace(
-			Quaternionfc rotation,
-			PPlayerAnimationDefinition definition)
+	public static Quaternionf toPlayerSpace(Quaternionfc rotation, PPlayerAnimationDefinition definition)
 	{
 		Quaternionf result = new Quaternionf(rotation);
-		
-		if (!usesGltfCoordinates(definition))
-			return result;
-		
-		return result.set(
-				-result.x,
-				-result.y,
-				result.z,
-				result.w);
+		return usesGltfCoordinates(definition) ? result.set(-result.x, -result.y, result.z, result.w) : result;
 	}
-	
+
 	/**
-	 * Changes both the source and destination bases of a model transform to
-	 * Minecraft player-model space. For glTF, this is {@code C * M * C^-1}.
+	 * Converts a source animation value into canonical player animation space.
+	 *
+	 * @param pose the pose
+	 * @param definition the immutable configuration to register or evaluate
+	 * @return the transform or value converted into the requested player coordinate space
 	 */
-	public static PTransform toPlayerSpace(
-			PTransform transform,
-			PPlayerAnimationDefinition definition)
+	public static PPlayerBonePose toPlayerSpace(PPlayerBonePose pose, PPlayerAnimationDefinition definition)
 	{
-		if (!usesGltfCoordinates(definition))
-			return transform;
-		return new PTransform(
-				toPlayerSpace(transform.translation(), definition),
-				toPlayerSpace(transform.rotation(), definition),
-				transform.scale());
+		return new PPlayerBonePose(toPlayerSpace(pose.translation(), definition), toPlayerSpace(pose.rotation(), definition),
+								   pose.scale(), pose.hasTranslation(), pose.hasRotation(), pose.hasScale());
 	}
-	
+
 	/**
-	 * Performs the to player geometry space operation.
-	 * @param transform the transform to use.
-	 * @param definition the definition to use.
-	 * @return the value produced by this operation.
+	 * Converts a source animation value into canonical player animation space.
+	 *
+	 * @param transform the transform
+	 * @param definition the immutable configuration to register or evaluate
+	 * @return the transform or value converted into the requested player coordinate space
 	 */
-	public static PTransform toPlayerGeometrySpace(
-			PTransform transform,
-			PPlayerAnimationDefinition definition)
+	public static PTransform toPlayerSpace(PTransform transform, PPlayerAnimationDefinition definition)
 	{
-		if (!usesGltfCoordinates(definition))
-			return transform;
-		return PLAYER_MODEL_TO_FIRST_PERSON.compose(transform);
+		return usesGltfCoordinates(definition) ? new PTransform(toPlayerSpace(transform.translation(), definition),
+																toPlayerSpace(transform.rotation(), definition), transform.scale())
+											   : transform;
 	}
-	
+
 	/**
-	 * Converts a camera-relative transform for a mesh attached to the animated
-	 * model. Unlike vanilla arms and items, glTF mesh vertices already use the
-	 * glTF source basis, so a glTF transform reduces to {@code M} here.
+	 * Converts a model transform for geometry rendered by vanilla player parts.
+	 *
+	 * @param transform the transform
+	 * @param definition the immutable configuration to register or evaluate
+	 * @return the transform or value converted into the requested player coordinate space
 	 */
-	public static PTransform toFirstPersonGeometrySpace(
-			PTransform transform,
-			PPlayerAnimationDefinition definition)
+	public static PTransform toPlayerGeometrySpace(PTransform transform, PPlayerAnimationDefinition definition)
 	{
-		return PLAYER_MODEL_TO_FIRST_PERSON.compose(toPlayerGeometrySpace(transform, definition));
+		return usesGltfCoordinates(definition) ? GLTF_TO_PLAYER_GEOMETRY.compose(transform) : transform;
 	}
-	
+
 	/**
-	 * Performs the to player space operation.
-	 * @param pose the pose to use.
-	 * @param definition the definition to use.
-	 * @return the value produced by this operation.
+	 * Converts a camera-relative transform for imported mesh geometry. glTF
+	 * vertices remain in their source basis, so the two basis changes cancel.
+	 *
+	 * @param transform the transform
+	 * @param definition the immutable configuration to register or evaluate
+	 * @return the transform or value converted into the requested player coordinate space
 	 */
-	static PPlayerBonePose toPlayerSpace(
-			PPlayerBonePose pose,
-			PPlayerAnimationDefinition definition)
+	public static PTransform toFirstPersonGeometrySpace(PTransform transform, PPlayerAnimationDefinition definition)
 	{
-		return new PPlayerBonePose(
-				toPlayerSpace(
-						pose.translation(),
-						definition),
-				toPlayerSpace(
-						pose.rotation(),
-						definition),
-				new Vector3f(pose.scale()),
-				pose.hasTranslation(),
-				pose.hasRotation(),
-				pose.hasScale());
+		return usesGltfCoordinates(definition) ? GLTF_TO_PLAYER_GEOMETRY.compose(toPlayerGeometrySpace(transform, definition)) : transform;
 	}
-	
+
 	/**
-	 * Performs the uses gltf coordinates operation.
-	 * @param definition the definition to use.
-	 * @return the value produced by this operation.
+	 * The visual ROOT matrix in source axes; the native player and camera share this pivot convention.
+	 *
+	 * @param pose the pose
+	 * @param pivot the local pivot used when composing the bone transform
+	 * @param weight the contribution weight
+	 * @param destination the mutable object receiving the result
+	 * @return the four-by-four transform matrix
 	 */
-	private static boolean usesGltfCoordinates(
-			PPlayerAnimationDefinition definition)
+	public static Matrix4f visualRootMatrix(PPlayerBonePose pose, Vector3f pivot, float weight, Matrix4f destination)
 	{
-		return definition.modelData().
-				getModelLoaderId().
-				equals(PGltfModelLoader.INSTANCE.id());
+		Vector3f translation = pose.translation().mul(weight);
+		Quaternionf rotation = new Quaternionf().slerp(pose.rotation(), weight);
+		Vector3f scale = new Vector3f(1).lerp(pose.scale(), weight);
+		return destination.identity().translate(translation).translate(pivot).rotate(rotation).scale(scale).translate(-pivot.x, -pivot.y, -pivot.z);
+	}
+
+	/**
+	 * Changes both the transform input and output basis for native anchor geometry.
+	 *
+	 * @param matrix the matrix
+	 * @param definition the immutable configuration to register or evaluate
+	 * @return the transform or value converted into the requested player coordinate space
+	 */
+	public static Matrix4f toPlayerSpace(Matrix4f matrix, PPlayerAnimationDefinition definition)
+	{
+		if (usesGltfCoordinates(definition))
+			matrix.scale(-1, -1, 1).scaleLocal(-1, -1, 1);
+
+		return matrix;
+	}
+
+	/**
+	 * Changes the output basis while imported mesh vertices retain their source basis.
+	 *
+	 * @param matrix the matrix
+	 * @param definition the immutable configuration to register or evaluate
+	 * @return the transform or value converted into the requested player coordinate space
+	 */
+	public static Matrix4f toPlayerGeometrySpace(Matrix4f matrix, PPlayerAnimationDefinition definition)
+	{
+		if (usesGltfCoordinates(definition))
+			matrix.scaleLocal(-1, -1, 1);
+
+		return matrix;
+	}
+
+	/**
+	 * Preserves a caller's command edits while restoring the exact frame matrix underneath its TRS channels.
+	 *
+	 * @param exact the exact
+	 * @param command the command
+	 * @param sampled the sampled
+	 * @return the four-by-four transform matrix
+	 */
+	public static Matrix4f applyChannelOverride(Matrix4f exact, PTransform command, PTransform sampled)
+	{
+		Matrix4f authored = command.matrix();
+		Matrix4f baseline = sampled.matrix();
+		if (!authored.equals(baseline, 1.0e-5f))
+			authored.mul(baseline.invert()).mul(exact, exact);
+
+		return exact;
+	}
+
+	private static boolean usesGltfCoordinates(PPlayerAnimationDefinition definition)
+	{
+		return definition.modelData().getModelLoaderId().equals(PGltfModelLoader.INSTANCE.id());
 	}
 }

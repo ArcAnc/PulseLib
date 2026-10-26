@@ -9,249 +9,368 @@
 
 package com.arcanc.pulselib.content.player.animation;
 
-
 import com.arcanc.pulselib.content.model.animation.BoneFrame;
 import com.arcanc.pulselib.content.model.animation.PAnimationPoseResolver;
 import com.arcanc.pulselib.content.model.animation.PTransform;
-import org.jetbrains.annotations.ApiStatus;
+import com.arcanc.pulselib.content.model.baked.PBakedModel;
+import org.jspecify.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import org.jspecify.annotations.Nullable;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * Provides support for player animation frame.
+ * One canonical evaluated player-animation pose.  Consumers use this shared
+ * frame rather than independently sampling animation channels.
  */
 public final class PPlayerAnimationFrame
 {
 	private final PPlayerAnimationDefinition definition;
 	private final PAnimationPoseResolver<PPlayerAnimationInstance> resolver;
-	
-	@Nullable
-	private final String rootBone;
-	private final Map<String, PTransform> fullTransforms = new HashMap<>();
-	private final Set<String> missingFullTransforms = new HashSet<>();
-	
+	private final @Nullable String rootBone;
+	private final Map<String, Matrix4f> modelMatrices = new HashMap<>();
+	private final Map<String, Matrix4f> bindMatrices = new HashMap<>();
+	private final Map<String, PTransform> transforms = new HashMap<>();
+	private final Set<String> missingTransforms = new HashSet<>();
+
 	/**
-	 * Creates an instance of the enclosing type.
-	 * @param definition the definition to use.
-	 * @param resolver the resolver to use.
+	 * Creates a sampled frame backed by the supplied animation definition and pose resolver.
+	 *
+	 * @param definition the immutable configuration to register or evaluate
+	 * @param resolver the resolver
 	 */
 	PPlayerAnimationFrame(PPlayerAnimationDefinition definition,
-	                             PAnimationPoseResolver<PPlayerAnimationInstance> resolver)
+						  PAnimationPoseResolver<PPlayerAnimationInstance> resolver)
 	{
-		this.definition = Objects.requireNonNull(definition);
-		this.resolver = Objects.requireNonNull(resolver);
+		this.definition = definition;
+		this.resolver = resolver;
 		this.rootBone = definition.bindings().get(PPlayerPart.ROOT);
 	}
-	
+
 	/**
-	 * Performs the definition operation.
-	 * @return the value produced by this operation.
+	 * Returns the immutable configuration to register or evaluate.
+	 *
+	 * @return the immutable configuration to register or evaluate
 	 */
 	public PPlayerAnimationDefinition definition()
 	{
 		return this.definition;
 	}
-	
+
 	/**
-	 * Performs the resolver operation.
-	 * @return the value produced by this operation.
+	 * Returns the resolver.
+	 *
+	 * @return the resolver
 	 */
-	@ApiStatus.Internal
 	public PAnimationPoseResolver<PPlayerAnimationInstance> resolver()
 	{
 		return this.resolver;
 	}
 
 	/**
-	 * Performs the local transform operation.
-	 * @param boneName the bone name to use.
-	 * @return the value produced by this operation.
+	 * Returns the sampled local transform of the named animation bone.
+	 *
+	 * @param boneName the animation bone name
+	 * @return the sampled local transform of the named animation bone, or {@code null} when the requested value is unavailable
 	 */
-	@Nullable
-	public BoneFrame localTransform(String boneName)
+	public @Nullable BoneFrame localTransform(String boneName)
 	{
 		PAnimationPoseResolver.BonePose pose = this.resolver.resolve(boneName);
 		return pose == null ? null : pose.localTransform();
 	}
-	
+
 	/**
-	 * Delta for Minecraft's third-person ModelPart bridge, derived from the same
-	 * canonical MODEL-space pose exposed by {@link #modelMatrix(String, Matrix4f)}.
+	 * Returns the named bone's animation delta in canonical player model space.
+	 *
+	 * @param boneName the animation bone name
+	 * @return the named bone's animation delta in canonical player model space, or {@code null} when the requested value is unavailable
 	 */
 	public @Nullable PPlayerBonePose canonicalModelDelta(String boneName)
 	{
-		PTransform current = fullTransform(boneName);
+		PTransform current = transform(boneName);
 		PTransform bind = bindTransform(boneName);
 		if (current == null || bind == null)
 			return null;
-
 		if (this.rootBone != null && !boneName.equals(this.rootBone))
 		{
-			PTransform rootCurrent = fullTransform(this.rootBone);
+			PTransform rootCurrent = transform(this.rootBone);
 			PTransform rootBind = bindTransform(this.rootBone);
 			if (rootCurrent == null || rootBind == null)
 				return null;
-			current = rootCurrent.inverse().compose(current);
-			bind = rootBind.inverse().compose(bind);
+			Matrix4f currentMatrix = new Matrix4f();
+			Matrix4f bindMatrix = new Matrix4f();
+			Matrix4f rootMatrix = new Matrix4f();
+			if (!modelMatrix(boneName, currentMatrix) || !bindMatrix(boneName, bindMatrix) ||
+				!modelMatrix(this.rootBone, rootMatrix))
+				return null;
+
+			current = PTransform.fromMatrix(rootMatrix.invert().mul(currentMatrix));
+			if (!bindMatrix(this.rootBone, rootMatrix))
+				return null;
+
+			bind = PTransform.fromMatrix(rootMatrix.invert().mul(bindMatrix));
 		}
-
 		Vector3f translation = current.translation().sub(bind.translation());
-		Quaternionf currentRotation = current.rotation();
-		Quaternionf bindRotation = bind.rotation();
-		Quaternionf rotation = new Quaternionf(bindRotation).invert().premul(currentRotation);
-		Vector3f currentScale = current.scale();
-		Vector3f bindScale = bind.scale();
-		Vector3f scale = new Vector3f(
-				ratio(currentScale.x, bindScale.x),
-				ratio(currentScale.y, bindScale.y),
-				ratio(currentScale.z, bindScale.z));
-		boolean hasTranslation = translation.lengthSquared() > 1.0e-10f;
-		boolean hasRotation = Math.abs(currentRotation.dot(bindRotation)) < 0.999999f;
-		boolean hasScale = Math.abs(scale.x - 1.0f) > 1.0e-5f ||
-				Math.abs(scale.y - 1.0f) > 1.0e-5f ||
-				Math.abs(scale.z - 1.0f) > 1.0e-5f;
-		if (!hasTranslation && !hasRotation && !hasScale)
-			return null;
-		
-		return new PPlayerBonePose(
-				translation,
-				rotation,
-				scale,
-				hasTranslation,
-				hasRotation,
-				hasScale
-		);
-	}
-	
-	/**
-	 * Performs the model transform operation.
-	 * @param boneName the bone name to use.
-	 * @return the value produced by this operation.
-	 */
-	@Nullable
-	public PTransform modelTransform(String boneName)
-	{
-		return fullTransform(boneName);
+		Quaternionf rotation = new Quaternionf(bind.rotation()).invert().premul(current.rotation());
+		Vector3f scale = new Vector3f(ratio(current.scale().x, bind.scale().x),
+									  ratio(current.scale().y, bind.scale().y), ratio(current.scale().z, bind.scale().z));
+		boolean translated = translation.lengthSquared() > 1.0e-10f;
+		boolean rotated = Math.abs(current.rotation().dot(bind.rotation())) < 0.999999f;
+		boolean scaled = Math.abs(scale.x - 1f) > 1.0e-5f || Math.abs(scale.y - 1f) > 1.0e-5f || Math.abs(scale.z - 1f) > 1.0e-5f;
+		return translated || rotated || scaled ? new PPlayerBonePose(translation, rotation, scale, translated, rotated, scaled) : null;
 	}
 
 	/**
-	 * Writes this bone's resolved canonical MODEL-space matrix.  It includes the
-	 * evaluated local TRS, every parent bone and the imported model hierarchy.
-	 * Presentation code must consume this matrix rather than reinterpreting
-	 * animation channels.
+	 * Returns the current model-space transform of the named bone.
+	 *
+	 * @param boneName the animation bone name
+	 * @return the current model-space transform of the named bone, or {@code null} when the requested value is unavailable
+	 */
+	public @Nullable PTransform modelTransform(String boneName)
+	{
+		return transform(boneName);
+	}
+
+	/**
+	 * Writes the exact parent matrix product, including inherited nonuniform scale.
+	 *
+	 * @param boneName the animation bone name
+	 * @param destination the mutable object receiving the result
+	 * @return whether the requested transform was resolved and written to the destination
 	 */
 	public boolean modelMatrix(String boneName, Matrix4f destination)
 	{
-		Objects.requireNonNull(destination);
-		PTransform transform = fullTransform(boneName);
-		if (transform == null)
+		return hierarchyMatrix(boneName, destination, false);
+	}
+
+	/**
+	 * Writes the exact bind hierarchy in the same source-model basis.
+	 *
+	 * @param boneName the animation bone name
+	 * @param destination the mutable object receiving the result
+	 * @return whether the requested transform was resolved and written to the destination
+	 */
+	public boolean bindMatrix(String boneName, Matrix4f destination)
+	{
+		return hierarchyMatrix(boneName, destination, true);
+	}
+
+	private boolean hierarchyMatrix(String boneName, Matrix4f destination, boolean bind)
+	{
+		Map<String, Matrix4f> matrices = bind ? this.bindMatrices : this.modelMatrices;
+		Matrix4f cached = matrices.get(boneName);
+		if (cached != null)
+		{
+			destination.set(cached);
+			return true;
+		}
+		PBakedModel model = this.definition.modelData().getModel();
+		if (model == null || model.boneIndex(boneName) < 0)
 			return false;
-		transform.matrix(destination);
+
+		int index = model.boneIndex(boneName);
+		int parent = model.parentIndex(index);
+		destination.identity();
+		if (parent >= 0 && !hierarchyMatrix(model.bone(parent).name(), destination, bind))
+			return false;
+
+		if (bind)
+			destination.translate(model.bone(index).basePosition()).rotate(model.bone(index).baseRotation());
+
+		else
+		{
+			BoneFrame local = localTransform(boneName);
+			if (local == null)
+				return false;
+
+			destination.translate(local.translation()).rotate(local.rotation()).scale(local.scale());
+		}
+		matrices.put(boneName, new Matrix4f(destination));
 		return true;
 	}
 
 	/**
-	 * Performs the root relative transform operation.
-	 * @param boneName the bone name to use.
-	 * @return the value produced by this operation.
+	 * Returns the unanimated model-space transform of the named bone.
+	 *
+	 * @param boneName the animation bone name
+	 * @return the unanimated model-space transform of the named bone, or {@code null} when the requested value is unavailable
 	 */
-	@Nullable
-	public PTransform rootRelativeTransform(String boneName)
+	public @Nullable PTransform bindTransform(String boneName)
 	{
-		PTransform transform = fullTransform(boneName);
-		if (transform == null)
-			return null;
-
-		String referenceBone = this.rootBone == null ?
-				this.definition.bindings().get(PPlayerPart.HEAD) :
-				this.rootBone;
-		if (referenceBone == null)
-			return transform;
-
-		PTransform rootBind = bindTransform(referenceBone);
-		return rootBind == null ? transform : rootBind.inverse().compose(transform);
+		PAnimationPoseResolver.BonePose pose = this.resolver.resolve(boneName);
+		return pose == null ? null : pose.bindTransform();
 	}
-	
+
 	/**
-	 * Performs the full transform operation.
-	 * @param boneName the bone name to use.
-	 * @return the value produced by this operation.
+	 * Returns the current MODEL transform in the ROOT bind frame (or HEAD bind
+	 * frame for rootless rigs). This includes animated ROOT motion and is for
+	 * callers whose outer stack has not already applied that motion.
+	 *
+	 * @param boneName the animation bone name
+	 * @return the current MODEL transform in the ROOT bind frame (or HEAD bind
+ frame for rootless rigs). This includes animated ROOT motion and is for
+ callers whose outer stack has not already applied that motion, or {@code null} when the requested value is unavailable
 	 */
-	@Nullable
-	private PTransform fullTransform(String boneName)
+	public @Nullable PTransform rootRelativeTransform(String boneName)
 	{
-		PTransform cached = this.fullTransforms.get(boneName);
-		if (cached != null)
-			return cached;
-		if (this.missingFullTransforms.contains(boneName))
+		Matrix4f matrix = new Matrix4f();
+		if (!modelMatrix(boneName, matrix))
 			return null;
 
-		PAnimationPoseResolver.BonePose pose =
-				this.resolver.resolve(boneName);
-		if (pose == null)
-		{
-			this.missingFullTransforms.add(boneName);
-			return null;
-		}
+		String reference = this.rootBone == null ? this.definition.bindings().get(PPlayerPart.HEAD) : this.rootBone;
+		Matrix4f bind = new Matrix4f();
+		if (reference != null && bindMatrix(reference, bind))
+			bind.invert().mul(matrix, matrix);
 
-		PTransform transform = pose.modelTransform();
-		this.fullTransforms.put(boneName, transform);
-		return transform;
+		return PTransform.fromMatrix(matrix);
 	}
-	
+
 	/**
-	 * Performs the action transform operation.
-	 * @param anchor the anchor to use.
-	 * @return the value produced by this operation.
+	 * Returns a bone in the current ROOT frame for a PoseStack that already
+	 * contains visual ROOT motion. Without ROOT, the head bind frame remains
+	 * the reference used by existing rootless player rigs.
+	 *
+	 * @param boneName the animation bone name
+	 * @return a bone in the current ROOT frame for a PoseStack that already
+ contains visual ROOT motion. Without ROOT, the head bind frame remains
+ the reference used by existing rootless player rigs, or {@code null} when the requested value is unavailable
 	 */
-	@Nullable
-	public PTransform actionTransform(PPlayerAnimationAnchor anchor)
+	public @Nullable PTransform currentRootRelativeTransform(String boneName)
 	{
-		String boneName = this.definition.anchors().get(anchor);
-		return boneName == null ? null : modelTransform(boneName);
+		Matrix4f matrix = new Matrix4f();
+		return currentRootRelativeMatrix(boneName, matrix) ? PTransform.fromMatrix(matrix) : null;
 	}
-	
-	/** The FIRST_PERSON_CAMERA anchor delta in canonical MODEL space. */
-	@Nullable
-	public PTransform cameraAnchorModelDelta()
+
+	/**
+	 * Exact rendering form of {@link #currentRootRelativeTransform(String)} .
+	 *
+	 * @param boneName the animation bone name
+	 * @param destination the mutable object receiving the result
+	 * @return whether the requested transform was resolved and written to the destination
+	 */
+	public boolean currentRootRelativeMatrix(String boneName, Matrix4f destination)
+	{
+		if (!modelMatrix(boneName, destination))
+			return false;
+
+		String reference = this.rootBone == null ? this.definition.bindings().get(PPlayerPart.HEAD) : this.rootBone;
+		if (reference == null)
+			return true;
+
+		Matrix4f root = new Matrix4f();
+		boolean resolved = this.rootBone == null ? bindMatrix(reference, root) : modelMatrix(reference, root);
+		if (resolved)
+			root.invert().mul(destination, destination);
+
+		return true;
+	}
+
+	/**
+	 * Returns the full MODEL-space socket, including ROOT and every parent.
+	 *
+	 * @param anchor the anchor
+	 * @return the full MODEL-space socket, including ROOT and every parent, or {@code null} when the requested value is unavailable
+	 */
+	public @Nullable PTransform actionTransform(PPlayerAnimationAnchor anchor)
+	{
+		String bone = this.definition.anchors().get(anchor);
+		return bone == null ? null : transform(bone);
+	}
+
+	/**
+	 * Camera-origin displacement and orientation relative to bind, in the same
+	 * normalized source-model frame used by the native player. This is a pose
+	 * delta at the camera point, not the affine delta's translation at zero.
+	 *
+	 * @return the animated camera-anchor delta in model space, or {@code null} when the requested value is unavailable
+	 */
+	public @Nullable PTransform cameraAnchorModelDelta()
 	{
 		String cameraBone = this.definition.anchors().get(PPlayerAnimationAnchors.FIRST_PERSON_CAMERA);
 		if (cameraBone == null)
 			return null;
-		PTransform current = fullTransform(cameraBone);
+
+		PTransform current = transform(cameraBone);
 		PTransform bind = bindTransform(cameraBone);
-		return current == null || bind == null ? null : current.compose(bind.inverse());
+		Matrix4f currentMatrix = new Matrix4f();
+		Matrix4f bindMatrix = new Matrix4f();
+		if (current == null || bind == null || !currentRootRelativeMatrix(cameraBone, currentMatrix) ||
+			!bindMatrix(cameraBone, bindMatrix))
+			return null;
+
+		Quaternionf currentRotation = current.rotation();
+		Quaternionf bindRotation = bind.rotation();
+		String reference = this.rootBone == null ? this.definition.bindings().get(PPlayerPart.HEAD) : this.rootBone;
+		if (reference != null)
+		{
+			PTransform referenceBind = bindTransform(reference);
+			Matrix4f referenceMatrix = new Matrix4f();
+			if (referenceBind == null || !bindMatrix(reference, referenceMatrix))
+				return null;
+
+			referenceMatrix.invert().mul(bindMatrix, bindMatrix);
+			bindRotation.premul(referenceBind.rotation().invert());
+			if (this.rootBone == null)
+				currentRotation.premul(referenceBind.rotation().invert());
+
+			else
+			{
+				PTransform root = transform(reference);
+				if (root == null)
+					return null;
+
+				currentRotation.premul(root.rotation().invert());
+				PPlayerBonePose rootDelta = canonicalModelDelta(reference);
+				if (rootDelta != null)
+				{
+					PPlayerAnimationSpace.visualRootMatrix(rootDelta, this.definition.rootPivot(), 1, referenceMatrix);
+					referenceMatrix.mul(currentMatrix, currentMatrix);
+					currentRotation.premul(rootDelta.rotation());
+				}
+			}
+		}
+		/*
+		 * D = C_visual * inverse(B_visual), p_bind = B_visual * (0,0,0,1).
+		 * Displacement = D * p_bind - p_bind. Both operands use the same
+		 * reference frame; parent/pivot/scale effects are already in C_visual.
+		 */
+		Vector3f bindPoint = bindMatrix.getTranslation(new Vector3f());
+		Matrix4f affineDelta = currentMatrix.mul(new Matrix4f(bindMatrix).invert());
+		Vector3f displacement = affineDelta.transformPosition(new Vector3f(bindPoint)).sub(bindPoint);
+		Quaternionf rotation = currentRotation.mul(bindRotation.invert()).normalize();
+		Vector3f scale = new Vector3f(ratio(current.scale().x, bind.scale().x),
+									  ratio(current.scale().y, bind.scale().y), ratio(current.scale().z, bind.scale().z));
+		return new PTransform(displacement, rotation, scale);
 	}
 
-	/**
-	 * Binds the transform.
-	 * @param boneName the bone name to use.
-	 * @return the value produced by this operation.
-	 */
-	@Nullable
-	public PTransform bindTransform(String boneName)
+	private @Nullable PTransform transform(String boneName)
 	{
-		PAnimationPoseResolver.BonePose pose =
-				this.resolver.resolve(boneName);
-		
-		return pose == null ?
-				null :
-			pose.bindTransform();
+		PTransform cached = this.transforms.get(boneName);
+		if (cached != null)
+			return cached;
+		if (this.missingTransforms.contains(boneName))
+			return null;
+		PAnimationPoseResolver.BonePose pose = this.resolver.resolve(boneName);
+		if (pose == null)
+		{
+			this.missingTransforms.add(boneName);
+			return null;
+		}
+		PTransform transform = pose.modelTransform();
+		Matrix4f matrix = new Matrix4f();
+		if (modelMatrix(boneName, matrix))
+			transform = new PTransform(matrix.getTranslation(new Vector3f()), transform.rotation(), transform.scale());
+
+		this.transforms.put(boneName, transform);
+		return transform;
 	}
-	
-	/**
-	 * Performs the ratio operation.
-	 * @param value the value to use.
-	 * @param base the base to use.
-	 * @return the value produced by this operation.
-	 */
+
 	private static float ratio(float value, float base)
 	{
 		return Math.abs(base) < 1.0e-6f ? value : value / base;
 	}
-	
 }

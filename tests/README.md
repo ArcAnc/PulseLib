@@ -114,3 +114,18 @@ section 30 and `docs/porting/evidence/stage-4.3c.json` for exact commands,
 accepted logs, source isolation and limitations. Stage 4 is complete within
 these NeoForge boundaries; player migration is stage 5, Fabric runtime stage 6,
 and the full testmod/compiled API/performance matrix stage 7.
+
+Stage 5.1 restores the canonical player core and camera/hierarchy math. The opt-in
+NeoForge probe uses `-PpulseStage1Smoke -PpulseStage51Probe -PpulseStage2Probe`
+with isolated `-PpulseVerificationDir=stage51-final-runs` and a new disposable
+server world. It checks two actual Player UUIDs times two plugin definitions,
+independent managers/controllers/Molang contexts and clocks, sample cache,
+owner replacement, seconds at the Molang boundary, weighted ModelPart application
+and restoration, idempotent attachment registration and cleanup. Two suites
+before/after resource reload and the shutdown assertion must pass. The 16 pinned
+PlayerHierarchy/PlayerCamera JUnit tests and two mesh-root regressions run through
+`:common:test`; `verify_player_core_api.py` checks 27 types / 203 members.
+See journal section 32 and `docs/porting/evidence/stage-5.1.json`. Native player
+rig/item/camera/armor/deformer rendering and PlayerMotionHarness remain stage 5.2;
+this core probe does not claim that matrix is complete. Fixtures remain excluded
+from release JARs, and existing user worlds must never be used for these runs.

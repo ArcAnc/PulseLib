@@ -43,7 +43,9 @@ public final class PPlayerAnimatedAttachments
 	public static void register(PPlayerAnimatedAttachmentRenderer renderer)
 	{
 		Objects.requireNonNull(renderer);
-		RENDERERS.computeIfAbsent(Objects.requireNonNull(renderer.anchor()), ignored -> new ArrayList<>()).add(renderer);
+		List<PPlayerAnimatedAttachmentRenderer> renderers = RENDERERS.computeIfAbsent(Objects.requireNonNull(renderer.anchor()), ignored -> new ArrayList<>());
+		if (!renderers.contains(renderer))
+			renderers.add(renderer);
 	}
 
 	/**
