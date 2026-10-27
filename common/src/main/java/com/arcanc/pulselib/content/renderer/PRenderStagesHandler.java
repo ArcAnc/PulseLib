@@ -27,6 +27,11 @@ public class PRenderStagesHandler
 	{
 		PRenderQueue.flushOpaque(PRenderQueue.RenderStage.ENTITIES);
 		PRenderQueue.flushOpaque(PRenderQueue.RenderStage.SOLID_BLOCKS);
+	}
+
+	/** Captures native depth writers after their batches finish, before terrain and particles. */
+	public static void afterNativeFeatures()
+	{
 		PRenderQueue.captureWorldDepth(Minecraft.getInstance().getMainRenderTarget());
 	}
 

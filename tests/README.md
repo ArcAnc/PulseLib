@@ -212,10 +212,16 @@ on NeoForge requires a new `player-occlusion-smoke` server world and a client
 marker `.pulselib-player-occlusion` in a fresh `-PpulseVerificationDir` directory.
 It tests 48 world states / 252 RGB-depth comparisons with native players,
 opaque/translucent PulseLib entities, both depth orders and transparency modes,
-before/after reload. The current baseline **fails 36 behind-player translucent
-RGB checks** and intentionally exits nonzero after writing the complete
-`player-occlusion-results.json`. This is a reproduced defect, not a passing
-migration gate. See journal section 38 and committed raw GPU evidence.
+before/after reload. The diagnostic baseline at commit `4195074` failed
+36 behind-player translucent RGB checks and exited nonzero after writing the
+complete `player-occlusion-results.json`. Frozen failing evidence remains in
+journal section 38. The completed fix in section 39 passes all 252 comparisons;
+depth is captured after native feature batches, before translucent terrain.
+The fixture uses native sea lanterns for background contrast, retaining every
+assertion and tolerance. Replaying old depth ordering on that same scene still
+fails exactly 36 checks. H13 (32 cases) and H14 (1152 cases, Fast/Fancy/Fabulous,
+water/glass/particles/rain and reload) pass with normal client/server exits.
+Fabric runtime parity remains stage 6.
 
 Item API update (2026-10-28): animated items now implement `PAnimatable` directly;
 the separate item marker/renderer accessor was removed by explicit user request.

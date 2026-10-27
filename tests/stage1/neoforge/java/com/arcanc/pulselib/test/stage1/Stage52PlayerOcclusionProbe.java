@@ -65,6 +65,7 @@ public final class Stage52PlayerOcclusionProbe
 	private static final List<String> FAILURES = new ArrayList<>();
 	private static final int[][] SAMPLES = new int[9][2];
 	private static List<float[]> early = List.of();
+	private static List<float[]> afterNativeFeatures = List.of();
 	private static List<float[]> beforeResolve = List.of();
 	private static List<float[]> nativeItem = List.of();
 	private static boolean started;
@@ -91,6 +92,7 @@ public final class Stage52PlayerOcclusionProbe
 	public static void register()
 	{
 		NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, Stage52PlayerOcclusionProbe::opaque);
+		NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, Stage52PlayerOcclusionProbe::nativeFeatures);
 		NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, Stage52PlayerOcclusionProbe::nativeLayers);
 		NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, Stage52PlayerOcclusionProbe::finish);
 		NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, Stage52PlayerOcclusionProbe::shutdown);
@@ -227,6 +229,12 @@ public final class Stage52PlayerOcclusionProbe
 		armed = true;
 	}
 
+	private static void nativeFeatures(RenderLevelStageEvent.AfterTranslucentFeatures event)
+	{
+		if (armed && !advance)
+			afterNativeFeatures = pixels(Minecraft.getInstance().getMainRenderTarget());
+	}
+
 	private static void nativeLayers(RenderLevelStageEvent.AfterWeather event)
 	{
 		if (!armed || advance)
@@ -246,7 +254,7 @@ public final class Stage52PlayerOcclusionProbe
 		List<float[]> result = pixels(mc.getMainRenderTarget());
 		List<Pixel> pixels = new ArrayList<>();
 		for (int sample = 0; sample < 9; sample++)
-			pixels.add(new Pixel(SAMPLES[sample][0], SAMPLES[sample][1], early.get(sample), beforeResolve.get(sample), nativeItem.get(sample), result.get(sample)));
+			pixels.add(new Pixel(SAMPLES[sample][0], SAMPLES[sample][1], early.get(sample), afterNativeFeatures.get(sample), beforeResolve.get(sample), nativeItem.get(sample), result.get(sample)));
 		RECORDS.add(new CaseData(phase, Minecraft.useShaderTransparency(), step / 6 == 0 ? "opaque" : "translucent", STATES[state()], pixels));
 		writeReport();
 		if (state() == 5)
@@ -364,7 +372,7 @@ public final class Stage52PlayerOcclusionProbe
 			throw new AssertionError(message);
 	}
 
-	private record Pixel(int x, int y, float[] afterOpaque, float[] beforeResolve, float[] nativeItem, float[] finalFrame)
+	private record Pixel(int x, int y, float[] afterOpaque, float[] afterNativeFeatures, float[] beforeResolve, float[] nativeItem, float[] finalFrame)
 	{
 	}
 

@@ -28,7 +28,7 @@ public final class Stage52PlayerOcclusionScene
 		for (String command : new String[] {
 				"kill @e[type=pulselib:test_entity]",
 				"fill -8 79 -9 8 79 8 minecraft:stone",
-				"fill -8 80 6 8 86 6 minecraft:white_concrete",
+				"fill -8 80 6 8 86 6 minecraft:sea_lantern",
 				"summon pulselib:test_entity 0 80 2 {NoAI:1b,NoGravity:1b,PersistenceRequired:1b,Silent:1b}",
 				"gamemode creative @s",
 				"tp @s 0 80 -6 0 0",
