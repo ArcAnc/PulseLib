@@ -15,7 +15,9 @@
     "Stage52CameraMixin",
     "Stage52RootMixin",
     "Stage52RigMixin",
-    "Stage52RigFeatureMixin"
+    "Stage52RigFeatureMixin",
+    "Stage52PartBuffersMixin",
+    "Stage52ItemBuffersMixin"
   ],
   "injectors": {
     "defaultRequire": 1

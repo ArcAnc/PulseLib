@@ -24,6 +24,45 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class PModelPartSnapshotTest
 {
 	@Test
+	void queuedPosesRemainIndependentAcrossReuseAndNestedReplay()
+	{
+		var child = new ModelPart(List.of(), Map.of());
+		var root = new ModelPart(List.of(), Map.of("sleeve", child));
+		root.x = 1;
+		child.xScale = 2;
+		child.visible = false;
+		var first = PModelPartSnapshot.capture(root);
+		root.x = 3;
+		child.xScale = 4;
+		child.visible = true;
+		var second = PModelPartSnapshot.capture(root);
+		root.x = 5;
+		child.xScale = 6;
+		try (var caller = PModelPartSnapshot.capture(root))
+		{
+			first.restore();
+			assertEquals(1, root.x);
+			assertEquals(2, child.xScale);
+			assertFalse(child.visible);
+			try (var outer = PModelPartSnapshot.capture(root))
+			{
+				second.restore();
+				assertEquals(3, root.x);
+				assertEquals(4, child.xScale);
+				assertTrue(child.visible);
+			}
+			assertEquals(1, root.x);
+			assertFalse(child.visible);
+		}
+		assertEquals(5, root.x);
+		assertEquals(6, child.xScale);
+		first.restore();
+		assertEquals(1, root.x);
+		assertEquals(2, child.xScale);
+		assertFalse(child.visible);
+	}
+
+	@Test
 	void nestedFailureRestoresOuterThenCallerIncludingChildren()
 	{
 		var child = new ModelPart(List.of(), Map.of());

@@ -34,6 +34,12 @@ public final class PModelPartSnapshot implements AutoCloseable
 	@Override
 	public void close()
 	{
+		this.restore();
+	}
+
+	/** Replays the saved pose without replacing the snapshot with the consumer's current state. */
+	public void restore()
+	{
 		this.parts.forEach(SavedPart::restore);
 	}
 

@@ -179,6 +179,8 @@ public final class Stage52CameraProbe
 			Stage2PluginProbe.verify(true);
 			if (Boolean.getBoolean("pulselib.stage52b2Probe"))
 				Stage52RigProbe.completed();
+			if (Boolean.getBoolean("pulselib.stage52b2bProbe"))
+				Stage52PartsProbe.completed();
 			PLibDatabase.LOGGER.info("STAGE 5.2b.1 NATIVE PLAYER PASS: cameraCases={}, cameraChecks={}, rootSuites={}, nativeWorldRoots={}, foreignCameras={}, formats=Gecko/glTF, F/G/H weights=0.25/0.6/1, VANILLA, extraction/nested failure/recovery/reload PASS", VERIFIED.size(), cameraChecks, Stage52RootProbe.suites(), Stage52RootProbe.worldSamples(), foreignChecks);
 			completed = true;
 			mc.stop();
@@ -204,6 +206,8 @@ public final class Stage52CameraProbe
 		}
 		if (Boolean.getBoolean("pulselib.stage52b2Probe") && selectedScene.clip.equals("H") && selectedScene.weight == 1)
 			Stage52RigProbe.verify(selectedScene.id, selectedScene.clip);
+		if (Boolean.getBoolean("pulselib.stage52b2bProbe") && selectedScene.clip.equals("H") && selectedScene.weight == 1)
+			Stage52PartsProbe.verify();
 		sceneIndex++;
 		startTick = -1;
 	}

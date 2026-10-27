@@ -179,3 +179,20 @@ restoration and native vertex emission. Stage 5.2a is the separate unchanged
 GPU hand regression. ModelPart/arm queues, armor/deformer lifetime, Fabulous
 player pixels and the remaining server/respawn witnesses are still open in
 **5.2b.2b**; this result does not complete stage 5. See section 35 of the journal.
+
+Stage **5.2b.2b** adds native ModelPart pose snapshots, native hand/layer scopes,
+and queued item quad/tint ownership with nested scratch restoration. Extend the
+5.2b native player probe with `-PpulseStage52b2bProbe`:
+
+```bash
+./gradlew :neoforge:runClient -PpulseStage1Smoke -PpulseStage52bProbe -PpulseStage52b2Probe -PpulseStage52b2bProbe -PpulseStage2Probe -PpulseVerificationDir=stage52b2b-manual-runs --no-daemon --console=plain
+```
+
+Use a new disposable world/server as above and keep its console open for normal
+`stop`. Four suites cover both format scenes before/after reload, opposite sleeve
+flags, native ModelPart main/outline/crumbling and item main/outline/foil calls,
+real ItemStackRenderState reuse, and nested hand/part/item/layer failure/recovery.
+Recording buffers apply only to direct suites; unchanged 5.2a GPU hand and
+4.3b/4.3c GUI/glint probes verify real draws separately. Armor/deformer sampled
+values, cube bindings and remaining Fabulous/player server witnesses stay open
+in **5.2b.2c**. See section 36 of the migration journal for evidence and limits.
