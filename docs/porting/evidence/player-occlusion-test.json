@@ -1,0 +1,484 @@
+{
+  "diagnostic": "native player / PulseLib world entity occlusion",
+  "date": "2026-10-27",
+  "startHead": "8f13967a0136db6ed598b60c957eafef529fd54a",
+  "frozenRefs": {
+    "26.1": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1",
+    "1.21.1-multiloader": "7ce6f024b307bb821ce543344d3896c8e1fcf26b"
+  },
+  "testStatus": "FAIL",
+  "migrationStageCompleted": false,
+  "productionFixApplied": false,
+  "nextPriority": "Fix player/OIT world depth ordering, rerun this matrix and existing H13/H14 terrain/particles/weather; then resume 5.2b.2c.2",
+  "scope": {
+    "nativePlayer": "Real RemotePlayer / stock AvatarRenderer, native skin and pipelines unchanged",
+    "entity": "Real registered TestEntity through Common PEntityRenderer/GPU backend, existing Gecko stage42b3_owner cuboid",
+    "controls": [
+      "background",
+      "player only",
+      "entity behind only",
+      "both behind",
+      "entity in front only",
+      "both front"
+    ],
+    "materials": [
+      "opaque red emissive",
+      "translucent red emissive"
+    ],
+    "samples": 9,
+    "warmupTicksAfterModeSwitch": 40,
+    "modes": "Improved Transparency off/on, before/after resource reload",
+    "drawsRemovedOrDepthDisabledForTest": false,
+    "originalComplexDemoMeshMatrixCovered": false
+  },
+  "result": {
+    "states": 48,
+    "comparisons": 252,
+    "passed": 216,
+    "failed": 36,
+    "failureKind": "Translucent entity behind native player changes RGB",
+    "failedPerPhase": 9,
+    "opaqueAndInverseOrdersPassed": true,
+    "depthInvariantsPassed": true,
+    "allVisibilityControlsPassedInFinalRun": true,
+    "realEntitySubmissions": 13679,
+    "fullIndependentRuns": 2,
+    "sameFailurePatternDebugAndNormal": true,
+    "clientJavaExitCodes": [
+      255,
+      255
+    ],
+    "clientGradleExitCodes": [
+      1,
+      1
+    ],
+    "dedicatedServerExit": 0,
+    "serverConsoleStop": true,
+    "dedicatedClientClassLoads": 0,
+    "dedicatedNewClientProbeLoads": 0
+  },
+  "localization": {
+    "observed": "Native player RGB/depth are correct before late composition; final RGB gains red from a rear entity while nearest depth is unchanged",
+    "readbackBoundary": "AfterOpaqueFeatures still contains background depth; by AfterWeather main contains nearer player depth",
+    "sourceConnection": "PRenderStagesHandler.afterBlockEntities captures worldOpaqueDepth early; PGlMultiDrawExecutor.executeWorld later uses this captured depth for OIT",
+    "conclusion": "The early world depth snapshot omits later native player depth; OIT admits rear entity fragments and the late compositor changes already-correct player color",
+    "fixVerified": false
+  },
+  "phases": [
+    {
+      "phase": 0,
+      "improved": false,
+      "afterReload": false,
+      "states": 12,
+      "comparisons": 63,
+      "failures": 9,
+      "centerControl": {
+        "x": 480,
+        "y": 276,
+        "afterOpaque": [
+          0.5137255,
+          0.5294118,
+          0.5372549,
+          1.0,
+          0.9958577
+        ],
+        "beforeResolve": [
+          0.43137255,
+          0.5803922,
+          0.42745098,
+          1.0,
+          0.99152493
+        ],
+        "nativeItem": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.9958577
+        ],
+        "finalFrame": [
+          0.43137255,
+          0.5803922,
+          0.42745098,
+          1.0,
+          0.99152493
+        ]
+      },
+      "centerTranslucentBehind": {
+        "x": 480,
+        "y": 276,
+        "afterOpaque": [
+          0.5137255,
+          0.5294118,
+          0.5372549,
+          1.0,
+          0.9958577
+        ],
+        "beforeResolve": [
+          0.43137255,
+          0.5803922,
+          0.42745098,
+          1.0,
+          0.99152493
+        ],
+        "nativeItem": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.9958577
+        ],
+        "finalFrame": [
+          0.85882354,
+          0.14509805,
+          0.105882354,
+          1.0,
+          0.99152493
+        ]
+      }
+    },
+    {
+      "phase": 1,
+      "improved": true,
+      "afterReload": false,
+      "states": 12,
+      "comparisons": 63,
+      "failures": 9,
+      "centerControl": {
+        "x": 480,
+        "y": 276,
+        "afterOpaque": [
+          0.5137255,
+          0.5294118,
+          0.5372549,
+          1.0,
+          0.9958577
+        ],
+        "beforeResolve": [
+          0.43137255,
+          0.5803922,
+          0.42745098,
+          1.0,
+          0.99152493
+        ],
+        "nativeItem": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.9958577
+        ],
+        "finalFrame": [
+          0.43137255,
+          0.5803922,
+          0.42745098,
+          1.0,
+          0.99152493
+        ]
+      },
+      "centerTranslucentBehind": {
+        "x": 480,
+        "y": 276,
+        "afterOpaque": [
+          0.5137255,
+          0.5294118,
+          0.5372549,
+          1.0,
+          0.9958577
+        ],
+        "beforeResolve": [
+          0.43137255,
+          0.5803922,
+          0.42745098,
+          1.0,
+          0.99152493
+        ],
+        "nativeItem": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.9958577
+        ],
+        "finalFrame": [
+          0.85882354,
+          0.14509805,
+          0.105882354,
+          1.0,
+          0.99152493
+        ]
+      }
+    },
+    {
+      "phase": 2,
+      "improved": false,
+      "afterReload": true,
+      "states": 12,
+      "comparisons": 63,
+      "failures": 9,
+      "centerControl": {
+        "x": 480,
+        "y": 276,
+        "afterOpaque": [
+          0.5137255,
+          0.5294118,
+          0.5372549,
+          1.0,
+          0.9958577
+        ],
+        "beforeResolve": [
+          0.43137255,
+          0.5803922,
+          0.42745098,
+          1.0,
+          0.99152493
+        ],
+        "nativeItem": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.9958577
+        ],
+        "finalFrame": [
+          0.43137255,
+          0.5803922,
+          0.42745098,
+          1.0,
+          0.99152493
+        ]
+      },
+      "centerTranslucentBehind": {
+        "x": 480,
+        "y": 276,
+        "afterOpaque": [
+          0.5137255,
+          0.5294118,
+          0.5372549,
+          1.0,
+          0.9958577
+        ],
+        "beforeResolve": [
+          0.43137255,
+          0.5803922,
+          0.42745098,
+          1.0,
+          0.99152493
+        ],
+        "nativeItem": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.9958577
+        ],
+        "finalFrame": [
+          0.85882354,
+          0.14509805,
+          0.105882354,
+          1.0,
+          0.99152493
+        ]
+      }
+    },
+    {
+      "phase": 3,
+      "improved": true,
+      "afterReload": true,
+      "states": 12,
+      "comparisons": 63,
+      "failures": 9,
+      "centerControl": {
+        "x": 480,
+        "y": 276,
+        "afterOpaque": [
+          0.5137255,
+          0.5294118,
+          0.5372549,
+          1.0,
+          0.9958577
+        ],
+        "beforeResolve": [
+          0.43137255,
+          0.5803922,
+          0.42745098,
+          1.0,
+          0.99152493
+        ],
+        "nativeItem": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.9958577
+        ],
+        "finalFrame": [
+          0.43137255,
+          0.5803922,
+          0.42745098,
+          1.0,
+          0.99152493
+        ]
+      },
+      "centerTranslucentBehind": {
+        "x": 480,
+        "y": 276,
+        "afterOpaque": [
+          0.5137255,
+          0.5294118,
+          0.5372549,
+          1.0,
+          0.9958577
+        ],
+        "beforeResolve": [
+          0.43137255,
+          0.5803922,
+          0.42745098,
+          1.0,
+          0.99152493
+        ],
+        "nativeItem": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.9958577
+        ],
+        "finalFrame": [
+          0.85882354,
+          0.14509805,
+          0.105882354,
+          1.0,
+          0.99152493
+        ]
+      }
+    }
+  ],
+  "debugger": {
+    "skill": "/home/arcanc/.cache/JetBrains/IntelliJIdea2026.2/aia/agents/.agents/skills/ij-debugger/SKILL.md",
+    "nonSuspendingEventsDrained": true,
+    "observedOrder": [
+      "afterOpaque",
+      "afterParticles",
+      "composite"
+    ],
+    "nativeTransparencyFalseTargets": 5,
+    "mainDepthObject": "com.mojang.blaze3d.opengl.GlTexture@325330e3",
+    "breakpointErrors": [],
+    "pausedStackOrValuesCaptured": false,
+    "pausedSessionEndedBeforeStackRequest": true,
+    "agentBreakpointsRemoved": true,
+    "userDisabledExceptionBreakpointsPreserved": 2,
+    "temporaryRemoteConfigurationRemoved": true,
+    "sessionsRemaining": 0
+  },
+  "verification": {
+    "fixtureCompile": "PASS",
+    "newJavaAstStyle": "PASS",
+    "fullBuildRun": false,
+    "JUnitRun": false,
+    "sourceApiChanged": false,
+    "intendedProductionFilesUnchanged": 409,
+    "intendedProductionManifestSha256": "6f055de55b5aaaff1eab18c334107908e274179ecefe59fac106c8414bd84c98",
+    "preexistingEditsValidated": false
+  },
+  "attempts": [
+    "Remote attach IPv4 failed because Gradle JDWP bound IPv6 ::1; attaching to ::1 worked",
+    "Original Camera fixture rejected a debug directory lacking stage52b prefix; corrected fresh directory kept guard unchanged and that run exited 0",
+    "First pixel fixture failed player-only readiness guard, which was not counted as defect evidence; partial reports/screenshots and warmup added, strict visibility checks retained",
+    "Full debug run and final independent non-debug run each completed all states and failed exactly 36 behind-player translucent RGB comparisons; failed exit codes are not presented as successful clients"
+  ],
+  "isolation": {
+    "initialTrackedDirtyFiles": 49,
+    "dirtyJavaCompileInputs": 45,
+    "projection": "/tmp/pulselib-player-occlusion-zsthol60/projection.gradle",
+    "unrelatedAdditionalEdit": "PAnimatable.java Javadoc changed externally during the run and was preserved",
+    "protectedFiles": 188,
+    "protectedManifestSha256": "86aac3cbf1dca53811028dae32d3d7ebf154255e7f3495b7eea8f1cd03aebe42",
+    "sourceRefsUnchanged": true,
+    "publishedOrPushed": false
+  },
+  "artifacts": {
+    "player-occlusion-measurements.json.gz": {
+      "sha256": "2a635f22820249583704242d172e04446aa4daab7adaeec508d3df87a4ba29f4",
+      "bytes": 2258
+    },
+    "player-occlusion-player-control.png": {
+      "sha256": "2f1a44d4fdbf86781c820eb822f59596f23c2f2e15be718741d9b7688e03276e",
+      "bytes": 265229
+    },
+    "player-occlusion-translucent-behind.png": {
+      "sha256": "f8dcbae26bad3fdb24379b05b9f1f10bac070399c0f417f7ad4d5275d48a8ed9",
+      "bytes": 266319
+    }
+  },
+  "logs": {
+    "fixture-compile": {
+      "path": "/tmp/pulselib-player-occlusion-zsthol60/fixture-compile.log",
+      "sha256": "481ee7ffb6351299423907cbb09acf279abd1633997e1374e11b8d16b6666cf3",
+      "excerpts": [
+        "BUILD SUCCESSFUL in 11s"
+      ]
+    },
+    "client-controls": {
+      "path": "/tmp/pulselib-player-occlusion-zsthol60/client-controls.log",
+      "sha256": "88f81afb6642cda0c95298db119e5a4b8576e45d201a167bc8b6d00c98fe0b2a",
+      "excerpts": [
+        "[19:40:34] [Render thread/INFO] [Pulse Lib/]: PLAYER OCCLUSION MATRIX: phase=0, improved=false, material=opaque, states=6, comparisons=36, mismatches=0",
+        "[19:40:37] [Render thread/INFO] [Pulse Lib/]: PLAYER OCCLUSION MATRIX: phase=0, improved=false, material=translucent, states=12, comparisons=63, mismatches=9",
+        "[19:40:39] [Render thread/INFO] [Pulse Lib/]: PLAYER OCCLUSION MATRIX: phase=1, improved=true, material=opaque, states=18, comparisons=99, mismatches=9",
+        "[19:40:42] [Render thread/INFO] [Pulse Lib/]: PLAYER OCCLUSION MATRIX: phase=1, improved=true, material=translucent, states=24, comparisons=126, mismatches=18",
+        "[19:40:56] [Render thread/INFO] [Pulse Lib/]: PLAYER OCCLUSION MATRIX: phase=2, improved=false, material=opaque, states=30, comparisons=162, mismatches=18",
+        "[19:41:01] [Render thread/INFO] [Pulse Lib/]: PLAYER OCCLUSION MATRIX: phase=2, improved=false, material=translucent, states=36, comparisons=189, mismatches=27",
+        "[19:41:03] [Render thread/INFO] [Pulse Lib/]: PLAYER OCCLUSION MATRIX: phase=3, improved=true, material=opaque, states=42, comparisons=225, mismatches=27",
+        "[19:41:06] [Render thread/INFO] [Pulse Lib/]: PLAYER OCCLUSION MATRIX: phase=3, improved=true, material=translucent, states=48, comparisons=252, mismatches=36",
+        "[19:41:06] [Render thread/INFO] [Pulse Lib/]: PLAYER OCCLUSION FAIL: states=48, comparisons=252, mismatches=36, submissions=1113; controls, opaque/translucent, both directions, native modes before/after reload",
+        "> Process 'command '/usr/lib/jvm/java-25-openjdk/bin/java'' finished with non-zero exit value 255",
+        "BUILD FAILED in 1m 1s"
+      ]
+    },
+    "client-verified": {
+      "path": "/tmp/pulselib-player-occlusion-zsthol60/client-verified.log",
+      "sha256": "c9f3015a1f16c7ec1f294060406380b0fc1e5da4803328217187b03ca66283fc",
+      "excerpts": [
+        "[19:43:04] [Render thread/INFO] [Pulse Lib/]: PLAYER OCCLUSION MATRIX: phase=0, improved=false, material=opaque, states=6, comparisons=36, mismatches=0",
+        "[19:43:06] [Render thread/INFO] [Pulse Lib/]: PLAYER OCCLUSION MATRIX: phase=0, improved=false, material=translucent, states=12, comparisons=63, mismatches=9",
+        "[19:43:08] [Render thread/INFO] [Pulse Lib/]: PLAYER OCCLUSION MATRIX: phase=1, improved=true, material=opaque, states=18, comparisons=99, mismatches=9",
+        "[19:43:09] [Render thread/INFO] [Pulse Lib/]: PLAYER OCCLUSION MATRIX: phase=1, improved=true, material=translucent, states=24, comparisons=126, mismatches=18",
+        "[19:43:16] [Render thread/INFO] [Pulse Lib/]: PLAYER OCCLUSION MATRIX: phase=2, improved=false, material=opaque, states=30, comparisons=162, mismatches=18",
+        "[19:43:18] [Render thread/INFO] [Pulse Lib/]: PLAYER OCCLUSION MATRIX: phase=2, improved=false, material=translucent, states=36, comparisons=189, mismatches=27",
+        "[19:43:20] [Render thread/INFO] [Pulse Lib/]: PLAYER OCCLUSION MATRIX: phase=3, improved=true, material=opaque, states=42, comparisons=225, mismatches=27",
+        "[19:43:22] [Render thread/INFO] [Pulse Lib/]: PLAYER OCCLUSION MATRIX: phase=3, improved=true, material=translucent, states=48, comparisons=252, mismatches=36",
+        "[19:43:22] [Render thread/INFO] [Pulse Lib/]: PLAYER OCCLUSION FAIL: states=48, comparisons=252, mismatches=36, submissions=13679; controls, opaque/translucent, both directions, native modes before/after reload",
+        "> Process 'command '/usr/lib/jvm/java-25-openjdk/bin/java'' finished with non-zero exit value 255",
+        "BUILD FAILED in 43s"
+      ]
+    },
+    "server": {
+      "path": "/tmp/pulselib-player-occlusion-zsthol60/server.log",
+      "sha256": "d245fcfb4f59fb3ce414c91044570cabeced9af86f56615710309f48d0520a9c",
+      "excerpts": [
+        "[19:38:31] [Server thread/INFO] [minecraft/DedicatedServer]: Done (0.414s)! For help, type \"help\"",
+        "[19:38:32] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved",
+        "[19:44:37] [Server thread/INFO] [minecraft/MinecraftServer]: Stopping server",
+        "[19:44:37] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved",
+        "BUILD SUCCESSFUL in 6m 22s"
+      ]
+    },
+    "debug-client-corrected": {
+      "path": "/tmp/pulselib-player-occlusion-zsthol60/debug-client-corrected.log",
+      "sha256": "6fc3e9e0d69805095c11c7cbe60ba900c564c1dad8569548964662aa22c7c72d",
+      "excerpts": [
+        "[19:33:52] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.1 NATIVE PLAYER PASS: cameraCases=40, cameraChecks=489, rootSuites=4, nativeWorldRoots=457, foreignCameras=4, formats=Gecko/glTF, F/G/H weights=0.25/0.6/1, VANILLA, extraction/nested failure/recovery/reload PASS",
+        "BUILD SUCCESSFUL in 1m 17s"
+      ]
+    },
+    "style": {
+      "path": "/tmp/pulselib-player-occlusion-zsthol60/style.log",
+      "sha256": "70f44be483aa079dbea8d6f65fa0ce8d02e7fffa2fdfa8e3d054c569e64a4715",
+      "excerpts": [
+        "All affected/new Java parses; no unnecessary single-statement control braces"
+      ]
+    }
+  }
+}

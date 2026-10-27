@@ -206,3 +206,13 @@ and a fresh `-PpulseVerificationDir`, as recorded in journal section 37.
 Binding snapshots preserve callbacks; extracted channel values and armor owner
 isolation remain checkpoint 5.2b.2c.2. This suite does not establish Fabulous
 player/armor pixel parity or Fabric runtime support.
+
+Player occlusion diagnostic: `-PpulseStage1Smoke -PpulsePlayerOcclusionProbe`
+on NeoForge requires a new `player-occlusion-smoke` server world and a client
+marker `.pulselib-player-occlusion` in a fresh `-PpulseVerificationDir` directory.
+It tests 48 world states / 252 RGB-depth comparisons with native players,
+opaque/translucent PulseLib entities, both depth orders and transparency modes,
+before/after reload. The current baseline **fails 36 behind-player translucent
+RGB checks** and intentionally exits nonzero after writing the complete
+`player-occlusion-results.json`. This is a reproduced defect, not a passing
+migration gate. See journal section 38 and committed raw GPU evidence.

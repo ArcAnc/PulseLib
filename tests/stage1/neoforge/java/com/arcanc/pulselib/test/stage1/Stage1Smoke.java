@@ -50,6 +50,11 @@ public final class Stage1Smoke
 		if (!(event.getEntity() instanceof ServerPlayer player))
 			return;
 		var server = player.level().getServer();
+		if (Boolean.getBoolean("pulselib.playerOcclusionProbe"))
+		{
+			Stage52PlayerOcclusionScene.prepare(player);
+			return;
+		}
 		if (Boolean.getBoolean("pulselib.stage43cProbe"))
 		{
 			Stage43cItemScene.prepare(player);

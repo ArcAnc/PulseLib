@@ -71,6 +71,8 @@ if (providers.gradleProperty('pulseStage1Smoke').isPresent()) {
         runs {
             configureEach {
                 gameDirectory = layout.buildDirectory.dir("${providers.gradleProperty('pulseVerificationDir').getOrElse('stage1-runs')}/${it.name}").get().asFile
+                if (providers.gradleProperty('pulsePlayerOcclusionProbe').isPresent())
+                    systemProperty 'pulselib.playerOcclusionProbe', 'true'
                 if (providers.gradleProperty('pulseStage52b2bProbe').isPresent()) {
                     systemProperty 'pulselib.stage52b2bProbe', 'true'
                 }
