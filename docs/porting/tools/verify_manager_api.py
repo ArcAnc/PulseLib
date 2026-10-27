@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check stage 3.1 declarations against the immutable stage 0 API baseline.
+"""Check manager declarations and explicitly approved removals against the frozen API baseline.
 ArcAnc, created 21.10.2026, copyright 2026. Arc's License of Common Sense; see LICENSE.txt.
 """
 import argparse
@@ -31,6 +31,11 @@ def main():
         output.seek(0)
         rows = [json.loads(line) for line in output]
     current = {r['fqcn']: r for r in rows}
+    changes_file = ROOT / 'docs/porting/approved-api-changes.json'
+    approved = json.loads(changes_file.read_text())
+    assert approved['baselineCommit'] == '7ce6f024b307bb821ce543344d3896c8e1fcf26b'
+    removals = {entry['type']: entry for entry in approved['removedTypes']}
+    assert len(removals) == len(approved['removedTypes']), 'Duplicate approved removal'
     names = ['content.animatable.' + n for n in ['PAnimatable', 'PAnimationManager', 'AnimManagerKey',
              'PItemAnimatable', 'PItemStackAnimationData', 'PItemStackAnimationIds',
              'instance.InstanceAnimationManager', 'singleton.SingletonAnimationManager']]
@@ -38,36 +43,41 @@ def main():
     selected = sorted(n for n in baseline if any(n == PREFIX + value or n.startswith(PREFIX + value + '.') for value in names))
     contracts = ['kind', 'modifiers', 'annotations', 'type_parameters', 'extends', 'implements', 'permits', 'record_components']
     results = []
+    removed = []
+    assert set(removals) <= set(selected), 'Approved removal outside the audited manager API'
     for name in selected:
+        if name in removals:
+            assert name not in current, f'Requested removal still exists: {name}'
+            assert removals[name]['authorization'] and not removals[name]['compatibilityAliasRetained']
+            removed.append({**removals[name], 'canonicalMembers': baseline[name]['members']})
+            continue
         assert name in current, f'Missing type: {name}'
         assert sum(row['fqcn'] == name for row in rows) == 1, f'Duplicate type: {name}'
         before, after = baseline[name], current[name]
         assert normalized({k: before[k] for k in contracts}) == normalized({k: after[k] for k in contracts}), f'Type changed: {name}'
         expected = json.loads(json.dumps(before['members']))
         actual = after['members']
-        changes, deferred, extras = [], [], []
-        if name == PREFIX + 'content.animatable.PItemAnimatable':
-            # BEWLR was removed by Minecraft; the nullable default retains its original semantics.
-            for member in expected:
-                if member['name'] == 'getPulseItemRenderer':
-                    member['signature'] = member['signature'].replace('BlockEntityWithoutLevelRenderer', 'SpecialModelRenderer<?>')
-                    member['annotations'] = ['@Nullable']
-            changes.append('getPulseItemRenderer: removed Minecraft BEWLR -> @Nullable SpecialModelRenderer<?>')
+        changes, extras = [], []
         if name == PREFIX + 'util.helpers.PLibHelper':
-            deferred = [m['signature'] for m in expected if m['name'] == 'renderModelInGui']
-            expected = [m for m in expected if m['name'] != 'renderModelInGui']
+            for member in expected:
+                if member['name'] == 'renderModelInGui':
+                    serialized = json.dumps(member).replace('GuiGraphics', 'GuiGraphicsExtractor')
+                    member.update(json.loads(serialized))
+                    changes.append('GuiGraphics -> GuiGraphicsExtractor; canonical GUI helper restored in stage 4')
             extras = [m['signature'] for m in actual if m['name'] in ['livingRenderState', 'entityRenderState']]
             actual = [m for m in actual if m['name'] not in ['livingRenderState', 'entityRenderState']]
         assert sorted(map(normalized, expected)) == sorted(map(normalized, actual)), f'Members changed: {name}'
         results.append({'type': name, 'preservedMembers': len(expected), 'minecraftAdaptations': changes,
-                        'deferredToStage4': deferred, 'additional26_1Members': extras})
-    report = {'status': 'PASS_WITH_EXPLICIT_STAGE4_DEBT', 'baselineCommit': '7ce6f024b307bb821ce543344d3896c8e1fcf26b',
+                        'additional26_1Members': extras})
+    assert len(removed) == len(removals), 'An approved removal was not verified'
+    report = {'status': 'PASS_WITH_EXPLICIT_USER_REQUESTED_REMOVALS', 'baselineCommit': '7ce6f024b307bb821ce543344d3896c8e1fcf26b',
               'baselineChecksums': 'unchanged', 'types': results,
-              'scope': 'Stage 3.1 source declarations; full compiled/behavioral API verification remains stage 7'}
+              'approvedRemovedTypes': removed,
+              'scope': 'Manager source declarations including full PLibHelper; full compiled library audit remains stage 7'}
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(json.dumps(report, indent=2) + '\n')
-    print(f'MANAGER API PASS: {len(results)} canonical types; one MC renderer adaptation, one GUI method deferred to stage 4')
+    print(f'MANAGER API PASS: {len(results)} preserved canonical types; {len(removed)} explicitly approved type removals; no deferred manager/helper declarations')
 
 
 if __name__ == '__main__':

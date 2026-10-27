@@ -216,3 +216,8 @@ before/after reload. The current baseline **fails 36 behind-player translucent
 RGB checks** and intentionally exits nonzero after writing the complete
 `player-occlusion-results.json`. This is a reproduced defect, not a passing
 migration gate. See journal section 38 and committed raw GPU evidence.
+
+Item API update (2026-10-28): animated items now implement `PAnimatable` directly;
+the separate item marker/renderer accessor was removed by explicit user request.
+The unchanged `-PpulseStage31Probe` verifies real copy/split/stacking/NBT/network
+identity and manager lifecycle with that contract. See [API checkpoint](../docs/porting/item-api-removal.md).

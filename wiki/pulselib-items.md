@@ -2,7 +2,7 @@
 
 Items need a slightly different setup from entities and block entities. Minecraft creates one `Item` object for the item type, but the player can hold many `ItemStack`s of that type. If animation state lived directly on the item object, every stack would share the same animation.
 
-PulseLib handles this by using [`AnimManagerKey`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/animatable/AnimManagerKey.java) and [`SingletonAnimationManager`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/animatable/singleton/SingletonAnimationManager.java). The item implements [`PItemAnimatable`](../common/src/main/java/com/arcanc/pulselib/content/animatable/PItemAnimatable.java), while its manager is resolved per key.
+PulseLib handles this by using [`AnimManagerKey`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/animatable/AnimManagerKey.java) and [`SingletonAnimationManager`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/animatable/singleton/SingletonAnimationManager.java). The item implements [`PAnimatable`](../common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimatable.java), while its manager is resolved per key.
 
 ## Item model definition
 
@@ -13,28 +13,32 @@ The old `models/item/<item>.json` file with `"parent": "builtin/entity"` does no
 The important part here is `getAnimationManager`. Use the key passed into the method, not a single field shared by every stack.
 
 ```java
-public class WandItem extends Item implements PItemAnimatable<WandItem> {
-    private static final PRawAnimation IDLE = PRawAnimation.begin()
-            .thenLoop("idle")
-            .build();
+public class WandItem extends Item implements PAnimatable<WandItem>
+{
+	private static final PRawAnimation IDLE = PRawAnimation.begin().
+			thenLoop("idle").
+			build();
 
-    public WandItem(Properties properties) {
-        super(properties);
-    }
+	public WandItem(Properties properties)
+	{
+		super(properties);
+	}
 
-    @Override
-    public PAnimationManager<WandItem> getAnimationManager(AnimManagerKey key) {
-        return SingletonAnimationManager.getManager(key, this);
-    }
+	@Override
+	public PAnimationManager<WandItem> getAnimationManager(AnimManagerKey key)
+	{
+		return SingletonAnimationManager.getManager(key, this);
+	}
 
-    @Override
-    public void registerAnimationControllers(PAnimationManager.PAnimationRegistrar<WandItem> registrar) {
-        registrar.add("idle", () -> state -> {
-            state.controller().play(IDLE);
-            return ControllerState.PLAY;
-        });
-    }
-
+	@Override
+	public void registerAnimationControllers(PAnimationManager.PAnimationRegistrar<WandItem> registrar)
+	{
+		registrar.add("idle", () -> state ->
+		{
+			state.controller().play(IDLE);
+			return ControllerState.PLAY;
+		});
+	}
 }
 ```
 
@@ -114,13 +118,13 @@ The decoded `PModelData` is a separate object, but `getModel()` looks up its can
 
 ## Stack-specific state
 
-`AnimManagerKey.of(ItemStack)` uses a transient client runtime ID assigned by `ItemStackMixin` to a nonempty `PItemAnimatable` stack. Independently created identical stacks receive different keys and controllers. Count, durability and component mutations keep the same key. IDs are never stored in components, NBT or network packets; loading or receiving a stack starts a new identity.
+`AnimManagerKey.of(ItemStack)` uses a transient client runtime ID assigned by `ItemStackMixin` to a nonempty stack whose item implements `PAnimatable`. Independently created identical stacks receive different keys and controllers. Count, durability and component mutations keep the same key. IDs are never stored in components, NBT or network packets; loading or receiving a stack starts a new identity.
 
 `copy()` and `copyWithCount()` inherit the source identity, even before first rendering. A partial `split()` gives the detached part a fresh ID; a full split transfers the ID and clears the source. Ordinary items and `ItemStack.EMPTY` receive no ID. Runtime IDs do not change component equality or vanilla stacking. Independent copies of the same source intentionally share animation state; use genuinely independent stacks when independent playback is required.
 
 Use `PLibHelper.createManager(this)` in an item field initializer and resolve contexts with `PLibHelper.getManager(this, key)` after construction. Creation defers controller registration until the first access. `createInstanceManager` and `createSingletonManager` explicitly choose ownership. The singleton cache separates both owner references and context keys. Identity assignment and copying do not allocate managers or controllers.
 
-`PItemAnimatable.getPulseItemRenderer()` returns nullable `SpecialModelRenderer<?>` on Minecraft 26.1.2 because the old `BlockEntityWithoutLevelRenderer` no longer exists. Register the special renderer and item JSON as shown above; merely overriding this accessor does not register a renderer. Identity is client-local; the mixin is not loaded on a dedicated server.
+The item animation contract is `PAnimatable`; renderer registration is independent. Register the special renderer and item JSON as shown above. Identity is client-local; the mixin is not loaded on a dedicated server.
 
 Classes used:
 

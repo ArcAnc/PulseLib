@@ -9,7 +9,7 @@
 
 package com.arcanc.pulselib.content.mixin;
 
-import com.arcanc.pulselib.content.animatable.PItemAnimatable;
+import com.arcanc.pulselib.content.animatable.PAnimatable;
 import com.arcanc.pulselib.content.animatable.PItemStackAnimationData;
 import com.arcanc.pulselib.content.animatable.PItemStackAnimationIds;
 import net.minecraft.world.item.ItemStack;
@@ -66,10 +66,8 @@ public abstract class ItemStackMixin implements PItemStackAnimationData
 			return id;
 		}
 		ItemStack stack = (ItemStack)(Object)this;
-		if (stack.isEmpty() || !(stack.getItem() instanceof PItemAnimatable<?>))
-		{
+		if (stack.isEmpty() || !(stack.getItem() instanceof PAnimatable<?>))
 			return 0;
-		}
 		synchronized (this)
 		{
 			if (this.pulselib$animationId == 0)

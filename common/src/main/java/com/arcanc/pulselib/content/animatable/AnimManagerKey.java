@@ -52,9 +52,7 @@ public record AnimManagerKey(long key)
 	{
 		long id = ((PItemStackAnimationData)(Object)stack).pulselib$getOrCreateAnimationId();
 		if (stack.isEmpty() || id == 0)
-		{
-			throw new IllegalArgumentException("Animation keys require a nonempty PItemAnimatable stack");
-		}
+			throw new IllegalArgumentException("Animation keys require a nonempty animated ItemStack");
 		return new AnimManagerKey(Long.MIN_VALUE | id);
 	}
 	

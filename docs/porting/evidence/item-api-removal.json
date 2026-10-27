@@ -1,0 +1,253 @@
+{
+  "checkpoint": "Remove redundant item animatable contract",
+  "date": "2026-10-28",
+  "status": "PASS",
+  "startHead": "4195074dd9d42a7b7ae66d642b821214d7de748d",
+  "frozenRefs": {
+    "26.1": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1",
+    "1.21.1-multiloader": "7ce6f024b307bb821ce543344d3896c8e1fcf26b"
+  },
+  "userAuthorization": "Remove PItemAnimatable entirely, use PAnimatable in ItemStackMixin, then finish depth fix",
+  "api": {
+    "removedType": "com.arcanc.pulselib.content.animatable.PItemAnimatable",
+    "removedAccessor": "getPulseItemRenderer()",
+    "shimRetained": false,
+    "replacement": "Item implements PAnimatable<T>",
+    "rendererRegistration": "Independent SpecialModelRenderer codec + item JSON",
+    "baselineChecksumsUnchanged": true,
+    "audit": {
+      "status": "PASS_WITH_EXPLICIT_USER_REQUESTED_REMOVALS",
+      "baselineCommit": "7ce6f024b307bb821ce543344d3896c8e1fcf26b",
+      "baselineChecksums": "unchanged",
+      "types": [
+        {
+          "type": "com.arcanc.pulselib.content.animatable.AnimManagerKey",
+          "preservedMembers": 9,
+          "minecraftAdaptations": [],
+          "additional26_1Members": []
+        },
+        {
+          "type": "com.arcanc.pulselib.content.animatable.PAnimatable",
+          "preservedMembers": 2,
+          "minecraftAdaptations": [],
+          "additional26_1Members": []
+        },
+        {
+          "type": "com.arcanc.pulselib.content.animatable.PAnimationManager",
+          "preservedMembers": 17,
+          "minecraftAdaptations": [],
+          "additional26_1Members": []
+        },
+        {
+          "type": "com.arcanc.pulselib.content.animatable.PAnimationManager.PAnimationRegistrar",
+          "preservedMembers": 12,
+          "minecraftAdaptations": [],
+          "additional26_1Members": []
+        },
+        {
+          "type": "com.arcanc.pulselib.content.animatable.PAnimationManager.PAnimationRegistrar.Entry",
+          "preservedMembers": 6,
+          "minecraftAdaptations": [],
+          "additional26_1Members": []
+        },
+        {
+          "type": "com.arcanc.pulselib.content.animatable.PAnimationManager.PAnimationRegistrar.GraphEntry",
+          "preservedMembers": 6,
+          "minecraftAdaptations": [],
+          "additional26_1Members": []
+        },
+        {
+          "type": "com.arcanc.pulselib.content.animatable.PItemStackAnimationData",
+          "preservedMembers": 3,
+          "minecraftAdaptations": [],
+          "additional26_1Members": []
+        },
+        {
+          "type": "com.arcanc.pulselib.content.animatable.PItemStackAnimationIds",
+          "preservedMembers": 1,
+          "minecraftAdaptations": [],
+          "additional26_1Members": []
+        },
+        {
+          "type": "com.arcanc.pulselib.content.animatable.instance.InstanceAnimationManager",
+          "preservedMembers": 7,
+          "minecraftAdaptations": [],
+          "additional26_1Members": []
+        },
+        {
+          "type": "com.arcanc.pulselib.content.animatable.singleton.SingletonAnimationManager",
+          "preservedMembers": 7,
+          "minecraftAdaptations": [],
+          "additional26_1Members": []
+        },
+        {
+          "type": "com.arcanc.pulselib.content.mixin.ItemStackMixin",
+          "preservedMembers": 4,
+          "minecraftAdaptations": [],
+          "additional26_1Members": []
+        },
+        {
+          "type": "com.arcanc.pulselib.util.helpers.PLibHelper",
+          "preservedMembers": 9,
+          "minecraftAdaptations": [
+            "GuiGraphics -> GuiGraphicsExtractor; canonical GUI helper restored in stage 4"
+          ],
+          "additional26_1Members": [
+            "public static <T extends LivingEntity & PAnimatable<T>, RS extends PEntityRenderState<T>> RS livingRenderState(Supplier<RS>)",
+            "public static <T extends LivingEntity & PAnimatable<T>> PEntityRenderState.LivingImpl<T> livingRenderState()",
+            "public static <T extends Entity & PAnimatable<T>, RS extends PEntityRenderState<T>> RS entityRenderState(Supplier<RS>)",
+            "public static <T extends Entity & PAnimatable<T>> PEntityRenderState.Impl<T> entityRenderState()"
+          ]
+        }
+      ],
+      "approvedRemovedTypes": [
+        {
+          "type": "com.arcanc.pulselib.content.animatable.PItemAnimatable",
+          "date": "2026-10-28",
+          "authorization": "Explicit user request to remove the interface entirely and use PAnimatable for ItemStack identity.",
+          "replacement": "Item classes implement PAnimatable<T>; SpecialModelRenderer registration remains independent.",
+          "removedMember": "getPulseItemRenderer()",
+          "compatibilityAliasRetained": false,
+          "canonicalMembers": [
+            {
+              "kind": "method",
+              "name": "getPulseItemRenderer",
+              "signature": "default public BlockEntityWithoutLevelRenderer getPulseItemRenderer()",
+              "parameters": [],
+              "receiver": "",
+              "annotations": [],
+              "default": "",
+              "implicit": false
+            }
+          ]
+        }
+      ],
+      "scope": "Manager source declarations including full PLibHelper; full compiled library audit remains stage 7"
+    }
+  },
+  "tests": {
+    "common": {
+      "tests": 229,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "fabric": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "runtime": {
+    "identityCases": 16,
+    "realItemImplementsOnly": "PAnimatable<TestBlockItem>",
+    "copyAndSplit": true,
+    "ordinaryItemsAndEmptyUnassigned": true,
+    "nbtAndNetwork": true,
+    "vanillaMergeAndComponents": true,
+    "concurrentReaders": 8,
+    "copyBenchmarkCount": 100000,
+    "independentManagersControllersPhases": true,
+    "copySharesManager": true,
+    "normalShutdownCachesEmpty": true,
+    "survivingRuntimeIdRetained": true,
+    "clientExit": 0,
+    "serverExit": 0,
+    "clientClassLoadsOnDedicated": 0
+  },
+  "artifacts": {
+    "common": {
+      "jar": "common/build/libs/pulselib-26.1.2-common-1.1.5.3.jar",
+      "providers": {},
+      "javaUnits": 360,
+      "classes": 558,
+      "major": 69,
+      "sha256": "039b65513e49e73a8d7382aaf5d0934fd0d29fc7d67fc280ba638595cca10cee"
+    },
+    "neoforge": {
+      "jar": "neoforge/build/libs/pulselib-26.1.2-neoforge-1.1.5.3.jar",
+      "providers": {
+        "platform.IPulsePlatform": "com.arcanc.pulselib.neoforge.NeoForgePlatform",
+        "platform.IPulseCameraService": "com.arcanc.pulselib.neoforge.NeoForgeCameraService",
+        "plugin.IPulsePluginFinder": "com.arcanc.pulselib.neoforge.NeoForgePulsePluginFinder"
+      },
+      "javaUnits": 371,
+      "classes": 570,
+      "major": 69,
+      "sha256": "6ddf9e5257a1c7d95d04baf042ba22081aabdc89854f9c5d888e25e0e524abfc"
+    },
+    "fabric": {
+      "jar": "fabric/build/libs/pulselib-26.1.2-fabric-1.1.5.3.jar",
+      "providers": {
+        "platform.IPulsePlatform": "com.arcanc.pulselib.fabric.FabricPlatform",
+        "platform.IPulseCameraService": "com.arcanc.pulselib.fabric.FabricCameraService",
+        "plugin.IPulsePluginFinder": "com.arcanc.pulselib.fabric.FabricPulsePluginFinder"
+      },
+      "javaUnits": 364,
+      "classes": 562,
+      "major": 69,
+      "sha256": "7d516581bd7ef4668ced312720ed76dd3ee44343b511197e629df3bd09d39ac1"
+    }
+  },
+  "isolation": {
+    "initialTrackedChanges": 52,
+    "preexistingUntrackedDepthEvidence": 3,
+    "initialDepthCandidatePreserved": true,
+    "compileProjection": "/tmp/pulselib-item-api-2oeze_yt/projection.gradle",
+    "depthCandidateInputsReplacedByHeadForThisCheckpoint": true,
+    "overlaps": [
+      "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemStackMixin.java",
+      "docs/porting/26.1.2-multiloader.md",
+      "tests/README.md"
+    ],
+    "adoptedExistingFormatting": "Only removal of braces on the changed stack eligibility guard; other existing edits remain unstaged",
+    "protectedFiles": 188,
+    "protectedManifestSha256": "86aac3cbf1dca53811028dae32d3d7ebf154255e7f3495b7eea8f1cd03aebe42",
+    "pushedOrPublished": false
+  },
+  "next": "Finish existing depth capture candidate and complete H14 before its separate commit",
+  "logs": {
+    "build": {
+      "path": "/tmp/pulselib-item-api-2oeze_yt/build.log",
+      "sha256": "0a3805c1b00dee7768838cf5d6ba541fbcf15fc2a4b935dc057fdbbce8f453dc",
+      "excerpts": [
+        "BUILD SUCCESSFUL in 28s"
+      ]
+    },
+    "build-final": {
+      "path": "/tmp/pulselib-item-api-2oeze_yt/build-final.log",
+      "sha256": "1be5778f1301b6cd51a54b8f1a300682fbebe572036855a5f650c5cab22a10b6",
+      "excerpts": [
+        "BUILD SUCCESSFUL in 25s"
+      ]
+    },
+    "client": {
+      "path": "/tmp/pulselib-item-api-2oeze_yt/client.log",
+      "sha256": "9c0949b6c209a1bbbcb01e1892f2ea9cde2277f6cc97ca1522d57ebada2b3036",
+      "excerpts": [
+        "[00:05:39] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSIONS PASS: 16 cases, copy-sharing limitation, independent controllers and phases",
+        "[00:05:50] [Render thread/INFO] [Pulse Lib/]: STAGE 2 CLIENT PLUGINS PASS: ids=[pulselib:stage1_client, pulselib:stage2_common], common=1, channels=1, events=1, deformers=1, client=1, server=0, models=2",
+        "[00:05:50] [Render thread/INFO] [Pulse Lib/]: STAGE 3.1 MANAGER SHUTDOWN PASS: singleton=0, instance=0, surviving ID retained",
+        "BUILD SUCCESSFUL in 33s"
+      ]
+    },
+    "server": {
+      "path": "/tmp/pulselib-item-api-2oeze_yt/server.log",
+      "sha256": "6ff9b52c8abea7b20eb17c395add0681508875fbf46c2e48369ac4299787b008",
+      "excerpts": [
+        "[00:04:49] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved",
+        "[00:04:49] [Server thread/INFO] [Pulse Lib/]: STAGE 2 SERVER PLUGINS PASS: ids=[pulselib:stage2_common, pulselib:stage2_server], common=1, channels=1, events=1, deformers=1, client=0, server=1, models=0",
+        "[00:07:14] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved",
+        "BUILD SUCCESSFUL in 2m 41s"
+      ]
+    },
+    "manager-api": {
+      "path": "/tmp/pulselib-item-api-2oeze_yt/manager-api.log",
+      "sha256": "5f3373f7f36d119cf0a871d2eddb1cbfa05bce43895b5d8450d73c3542b63042",
+      "excerpts": [
+        "MANAGER API PASS: 12 preserved canonical types; 1 explicitly approved type removals; no deferred manager/helper declarations"
+      ]
+    }
+  }
+}
