@@ -15,10 +15,12 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.core.Direction;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * Provides support for deformed cuboid.
@@ -27,7 +29,7 @@ public final class PDeformedCuboid extends ModelPart.Cube
 {
 	private static final float MODEL_SCALE = 1.0f / 16.0f;
 	private final List<Face> faces;
-	private volatile PPlayerVertexDeformer deformer = PPlayerVertexDeformer.IDENTITY;
+	private volatile Binding binding = Binding.IDENTITY;
 
 	/**
 	 * Creates an instance of the enclosing type.
@@ -63,12 +65,34 @@ public final class PDeformedCuboid extends ModelPart.Cube
 	 */
 	void setDeformer(PPlayerVertexDeformer deformer)
 	{
-		this.deformer = deformer;
+		this.binding = deformer == PPlayerVertexDeformer.IDENTITY ? Binding.IDENTITY : new Binding(deformer, null);
 	}
 
 	PPlayerVertexDeformer getDeformer()
 	{
-		return this.deformer;
+		return this.binding.deformer;
+	}
+
+	Binding getBinding()
+	{
+		return this.binding;
+	}
+
+	void setBinding(Binding binding)
+	{
+		this.binding = binding;
+	}
+
+	/** Samples every emitted local quad, including vertex-dependent custom operations, without retaining their callbacks. */
+	Binding freezeBinding()
+	{
+		Binding active = this.binding;
+		if (active.quads != null || active.deformer == PPlayerVertexDeformer.IDENTITY)
+			return active;
+		List<Quad> quads = new ArrayList<>();
+		for (Face face : this.faces)
+			face.tessellate(active.deformer, quad -> quads.add(quad.freeze()));
+		return new Binding(PPlayerVertexDeformer.IDENTITY, List.copyOf(quads));
 	}
 
 	/**
@@ -82,14 +106,47 @@ public final class PDeformedCuboid extends ModelPart.Cube
 	@Override
 	public void compile(PoseStack.Pose pose, VertexConsumer consumer, int packedLight, int packedOverlay, int color)
 	{
-		PPlayerVertexDeformer active = this.deformer;
-		if (active == PPlayerVertexDeformer.IDENTITY)
+		Binding active = this.binding;
+		if (active.quads != null)
+		{
+			for (Quad quad : active.quads)
+				quad.render(pose, consumer, packedLight, packedOverlay, color);
+			return;
+		}
+		if (active.deformer == PPlayerVertexDeformer.IDENTITY)
 		{
 			super.compile(pose, consumer, packedLight, packedOverlay, color);
 			return;
 		}
 		for (Face face : this.faces)
-			face.render(pose, consumer, packedLight, packedOverlay, color, active);
+			face.render(pose, consumer, packedLight, packedOverlay, color, active.deformer);
+	}
+
+	/** Live invocation bindings and immutable submitted geometry are restored by the same scope. */
+	record Binding(PPlayerVertexDeformer deformer, @Nullable List<Quad> quads)
+	{
+		private static final Binding IDENTITY = new Binding(PPlayerVertexDeformer.IDENTITY, null);
+	}
+
+	/** All vectors are created by tessellation, remain private and are never modified during replay. */
+	private record Quad(Vector3f p00, Vector3f p10, Vector3f p11, Vector3f p01, Vector3f normal,
+			float u0, float v0, float u1, float v1)
+	{
+		private Quad freeze()
+		{
+			// A custom operation may keep its input vectors; submitted vertices must not alias them.
+			return new Quad(new Vector3f(this.p00), new Vector3f(this.p10), new Vector3f(this.p11), new Vector3f(this.p01),
+					new Vector3f(this.normal), this.u0, this.v0, this.u1, this.v1);
+		}
+
+		private void render(PoseStack.Pose pose, VertexConsumer consumer, int light, int overlay, int color)
+		{
+			Vector3f transformedNormal = new Vector3f(this.normal).mul(pose.normal());
+			Face.emit(pose, consumer, this.p00, color, this.u0, this.v0, overlay, light, transformedNormal);
+			Face.emit(pose, consumer, this.p10, color, this.u1, this.v0, overlay, light, transformedNormal);
+			Face.emit(pose, consumer, this.p11, color, this.u1, this.v1, overlay, light, transformedNormal);
+			Face.emit(pose, consumer, this.p01, color, this.u0, this.v1, overlay, light, transformedNormal);
+		}
 	}
 
 	/**
@@ -154,6 +211,11 @@ public final class PDeformedCuboid extends ModelPart.Cube
 		 */
 		void render(PoseStack.Pose pose, VertexConsumer consumer, int light, int overlay, int color, PPlayerVertexDeformer deformer)
 		{
+			this.tessellate(deformer, quad -> quad.render(pose, consumer, light, overlay, color));
+		}
+
+		private void tessellate(PPlayerVertexDeformer deformer, Consumer<Quad> output)
+		{
 			int uSegments = segments(this.p00.distance(this.p10));
 			int vSegments = segments(this.p00.distance(this.p01));
 			for (int y = 0; y < vSegments; y++)
@@ -164,11 +226,10 @@ public final class PDeformedCuboid extends ModelPart.Cube
 					float x0 = (float)x / uSegments, x1 = (float)(x + 1) / uSegments;
 					Vector3f q00 = interpolate(x0, y0), q10 = interpolate(x1, y0), q11 = interpolate(x1, y1), q01 = interpolate(x0, y1);
 					deformer.deform(q00); deformer.deform(q10); deformer.deform(q11); deformer.deform(q01);
-					Vector3f normal = new Vector3f(q10).sub(q00).cross(new Vector3f(q01).sub(q00)).normalize().mul(pose.normal());
-					emit(pose, consumer, q00, color, lerp(this.u0, this.u1, x0) / this.textureWidth, lerp(this.v0, this.v1, y0) / this.textureHeight, overlay, light, normal);
-					emit(pose, consumer, q10, color, lerp(this.u0, this.u1, x1) / this.textureWidth, lerp(this.v0, this.v1, y0) / this.textureHeight, overlay, light, normal);
-					emit(pose, consumer, q11, color, lerp(this.u0, this.u1, x1) / this.textureWidth, lerp(this.v0, this.v1, y1) / this.textureHeight, overlay, light, normal);
-					emit(pose, consumer, q01, color, lerp(this.u0, this.u1, x0) / this.textureWidth, lerp(this.v0, this.v1, y1) / this.textureHeight, overlay, light, normal);
+					Vector3f normal = new Vector3f(q10).sub(q00).cross(new Vector3f(q01).sub(q00)).normalize();
+					output.accept(new Quad(q00, q10, q11, q01, normal,
+							lerp(this.u0, this.u1, x0) / this.textureWidth, lerp(this.v0, this.v1, y0) / this.textureHeight,
+							lerp(this.u0, this.u1, x1) / this.textureWidth, lerp(this.v0, this.v1, y1) / this.textureHeight));
 				}
 			}
 		}

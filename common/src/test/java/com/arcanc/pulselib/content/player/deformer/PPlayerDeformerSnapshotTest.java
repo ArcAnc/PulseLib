@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class PPlayerDeformerSnapshotTest
 {
@@ -131,6 +132,174 @@ class PPlayerDeformerSnapshotTest
 		cube.setDeformer(PPlayerVertexDeformer.IDENTITY);
 		snapshot.restore();
 		assertEquals(2, minX(cube), 1.0e-6);
+	}
+
+	@Test
+	void submittedGeometryStopsCallingLiveValuesAndOperations()
+	{
+		var cube = cube();
+		float[] value = {16};
+		int[] calls = {0};
+		cube.setDeformer(position ->
+		{
+			calls[0]++;
+			position.add(value[0], position.x < 1 ? 2 : -3, 0);
+		});
+		List<Vertex> expected = completeVertices(cube, new PoseStack(), -1, 0, 15728880);
+		var submitted = PPlayerDeformerSnapshot.captureGeometryCubes(List.of(cube));
+		int capturedCalls = calls[0];
+		value[0] = 1024;
+		cube.setDeformer(position ->
+		{
+			throw new AssertionError("Later operation must not execute");
+		});
+		submitted.restore();
+		assertEquals(expected, completeVertices(cube, new PoseStack(), -1, 0, 15728880));
+		assertEquals(expected, completeVertices(cube, new PoseStack(), -1, 0, 15728880));
+		assertEquals(capturedCalls, calls[0]);
+		assertSame(PPlayerVertexDeformer.IDENTITY, cube.getDeformer());
+	}
+
+	@Test
+	void frozenVerticesDoNotAliasVectorsRetainedByCustomOperations()
+	{
+		var cube = cube();
+		List<Vector3f> retained = new ArrayList<>();
+		cube.setDeformer(position ->
+		{
+			position.add(16, 0, 0);
+			retained.add(position);
+		});
+		var snapshot = PPlayerDeformerSnapshot.captureGeometryCubes(List.of(cube));
+		retained.forEach(position -> position.set(500));
+		snapshot.restore();
+		assertEquals(1, minX(cube), 1.0e-6);
+	}
+
+	@Test
+	void frozenGeometryUsesReplayPoseNormalsUvAndDrawAttributes()
+	{
+		var cube = cube();
+		cube.setDeformer(position -> position.add(position.y * position.y, 2 * position.z, position.x * 0.25f));
+		var poses = new PoseStack();
+		poses.translate(0.2f, 0.3f, -0.4f);
+		poses.scale(-2, 0.5f, 3);
+		var expected = completeVertices(cube, poses, 0x12345678, 19, 73);
+		var snapshot = PPlayerDeformerSnapshot.captureGeometryCubes(List.of(cube));
+		cube.setDeformer(PPlayerVertexDeformer.IDENTITY);
+		snapshot.restore();
+		assertEquals(expected, completeVertices(cube, poses, 0x12345678, 19, 73));
+		var differentLight = completeVertices(cube, poses, -1, 23, 101);
+		assertNotEquals(expected, differentLight);
+		assertEquals(expected.getFirst().position, differentLight.getFirst().position);
+		assertEquals(expected.getFirst().normal, differentLight.getFirst().normal);
+		assertEquals(101, differentLight.getFirst().light);
+		assertEquals(23, differentLight.getFirst().overlay);
+	}
+
+	@Test
+	void frozenSnapshotsKeepTwoIndependentOwnersAndNestedCallerBindings()
+	{
+		var cube = cube();
+		var cubes = List.of(cube);
+		float[] firstValue = {16};
+		float[] secondValue = {32};
+		cube.setDeformer(position -> position.add(firstValue[0], 0, 0));
+		var first = PPlayerDeformerSnapshot.captureGeometryCubes(cubes);
+		cube.setDeformer(position -> position.add(secondValue[0], 0, 0));
+		var second = PPlayerDeformerSnapshot.captureGeometryCubes(cubes);
+		firstValue[0] = secondValue[0] = 1000;
+		PPlayerVertexDeformer liveCaller = position -> position.add(48, 0, 0);
+		cube.setDeformer(liveCaller);
+		try (var caller = PPlayerDeformerSnapshot.captureCubes(cubes))
+		{
+			first.restore();
+			assertThrows(IllegalStateException.class, () ->
+			{
+				try (var outer = PPlayerDeformerSnapshot.captureCubes(cubes))
+				{
+					second.restore();
+					assertEquals(2, minX(cube), 1.0e-6);
+					throw new IllegalStateException("nested frozen geometry");
+				}
+			});
+			assertEquals(1, minX(cube), 1.0e-6);
+		}
+		assertSame(liveCaller, cube.getDeformer());
+		assertEquals(3, minX(cube), 1.0e-6);
+	}
+
+	@Test
+	void failedSamplingDoesNotMutateAnyCallerBindingOrOlderSnapshot()
+	{
+		var first = cube();
+		var second = cube();
+		PPlayerVertexDeformer firstBinding = position -> position.add(16, 0, 0);
+		PPlayerVertexDeformer failedBinding = position ->
+		{
+			throw new IllegalStateException("custom sampling failure");
+		};
+		first.setDeformer(firstBinding);
+		var older = PPlayerDeformerSnapshot.captureGeometryCubes(List.of(first));
+		second.setDeformer(failedBinding);
+		assertThrows(IllegalStateException.class, () -> PPlayerDeformerSnapshot.captureGeometryCubes(List.of(first, second)));
+		assertSame(firstBinding, first.getDeformer());
+		assertSame(failedBinding, second.getDeformer());
+		older.restore();
+		assertEquals(1, minX(first), 1.0e-6);
+	}
+
+	@Test
+	void identityAndAlreadyFrozenGeometryAreNotResampled()
+	{
+		var cube = cube();
+		var vanilla = completeVertices(cube, new PoseStack(), -1, 0, 15728880);
+		var identity = PPlayerDeformerSnapshot.captureGeometryCubes(List.of(cube));
+		cube.setDeformer(position -> position.add(16, 0, 0));
+		identity.restore();
+		assertEquals(vanilla, completeVertices(cube, new PoseStack(), -1, 0, 15728880));
+		cube.setDeformer(position -> position.add(16, 0, 0));
+		var first = PPlayerDeformerSnapshot.captureGeometryCubes(List.of(cube));
+		first.restore();
+		var second = PPlayerDeformerSnapshot.captureGeometryCubes(List.of(cube));
+		cube.setDeformer(PPlayerVertexDeformer.IDENTITY);
+		second.restore();
+		assertEquals(1, minX(cube), 1.0e-6);
+	}
+
+	@Test
+	void mirrorGrowthVisibleFacesAndSegmentLimitsKeepExactGeometry()
+	{
+		for (boolean mirror : List.of(false, true))
+		{
+			var cube = new PDeformedCuboid(3, 7, -2, 1, -1, 19, 3, 5, 0.2f, 0.4f, 0.6f, mirror, 128, 64,
+					EnumSet.of(Direction.NORTH, Direction.UP, Direction.EAST));
+			cube.setDeformer(position -> position.mul(1.2f, 1.3f, 0.8f));
+			var expected = completeVertices(cube, new PoseStack(), -1, 0, 15728880);
+			var snapshot = PPlayerDeformerSnapshot.captureGeometryCubes(List.of(cube));
+			cube.setDeformer(PPlayerVertexDeformer.IDENTITY);
+			snapshot.restore();
+			assertEquals(expected, completeVertices(cube, new PoseStack(), -1, 0, 15728880));
+		}
+	}
+
+	private static List<Vertex> completeVertices(PDeformedCuboid cube, PoseStack poses, int color, int overlay, int light)
+	{
+		List<Vertex> vertices = new ArrayList<>();
+		VertexConsumer consumer = (VertexConsumer)Proxy.newProxyInstance(VertexConsumer.class.getClassLoader(), new Class<?>[] {VertexConsumer.class}, (proxy, method, args) ->
+		{
+			if (method.getName().equals("addVertex"))
+				vertices.add(new Vertex(new Vector3f((float)args[0], (float)args[1], (float)args[2]),
+						(int)args[3], (float)args[4], (float)args[5], (int)args[6], (int)args[7],
+						new Vector3f((float)args[8], (float)args[9], (float)args[10])));
+			return method.getReturnType() == VertexConsumer.class ? proxy : null;
+		});
+		cube.compile(poses.last(), consumer, light, overlay, color);
+		return vertices;
+	}
+
+	private record Vertex(Vector3f position, int color, float u, float v, int overlay, int light, Vector3f normal)
+	{
 	}
 
 	private static PDeformedCuboid cube()

@@ -23,15 +23,21 @@ public final class PModelPartSnapshot implements AutoCloseable
 	private final List<SavedPart> parts;
 	private final PPlayerDeformerSnapshot deformers;
 
-	private PModelPartSnapshot(ModelPart root)
+	private PModelPartSnapshot(ModelPart root, boolean freezeGeometry)
 	{
 		this.parts = root.getAllParts().stream().map(SavedPart::new).toList();
-		this.deformers = PPlayerDeformerSnapshot.capture(root);
+		this.deformers = freezeGeometry ? PPlayerDeformerSnapshot.captureGeometry(root) : PPlayerDeformerSnapshot.capture(root);
 	}
 
 	public static PModelPartSnapshot capture(ModelPart root)
 	{
-		return new PModelPartSnapshot(root);
+		return new PModelPartSnapshot(root, false);
+	}
+
+	/** Captures node inputs now; ordinary invocation scopes deliberately retain live caller bindings. */
+	public static PModelPartSnapshot captureForSubmit(ModelPart root)
+	{
+		return new PModelPartSnapshot(root, true);
 	}
 
 	@Override

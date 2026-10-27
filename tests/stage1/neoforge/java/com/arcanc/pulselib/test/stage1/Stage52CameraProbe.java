@@ -207,7 +207,7 @@ public final class Stage52CameraProbe
 		if (Boolean.getBoolean("pulselib.stage52b2Probe") && selectedScene.clip.equals("H") && selectedScene.weight == 1)
 			Stage52RigProbe.verify(selectedScene.id, selectedScene.clip);
 		if (Boolean.getBoolean("pulselib.stage52b2bProbe") && selectedScene.clip.equals("H") && selectedScene.weight == 1)
-			Stage52PartsProbe.verify();
+			Stage52PartsProbe.verify(selectedScene.id, selectedScene.clip);
 		sceneIndex++;
 		startTick = -1;
 	}

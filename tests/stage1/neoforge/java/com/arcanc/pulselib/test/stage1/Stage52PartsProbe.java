@@ -13,8 +13,12 @@ import com.arcanc.pulselib.content.mixin.PoseStackAccessor;
 import com.arcanc.pulselib.content.model.deformer.PChannelReference;
 import com.arcanc.pulselib.content.model.deformer.PDeformerInstance;
 import com.arcanc.pulselib.content.model.deformer.PDeformerStack;
+import com.arcanc.pulselib.content.model.deformer.PDeformerPrepareContext;
+import com.arcanc.pulselib.content.model.deformer.PMeshDeformer;
 import com.arcanc.pulselib.content.model.deformer.PStretchDeformer;
 import com.arcanc.pulselib.content.model.deformer.PStretchDefinition;
+import com.arcanc.pulselib.content.model.animation.PRawAnimation;
+import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
 import com.arcanc.pulselib.content.player.animation.PPlayerPart;
 import com.arcanc.pulselib.content.player.deformer.PPlayerMeshDeformers;
 import com.arcanc.pulselib.content.renderer.base.PModelPartSnapshot;
@@ -23,7 +27,10 @@ import com.arcanc.pulselib.util.PLibDatabase;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.QuadInstance;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.authlib.GameProfile;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.RemotePlayer;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -37,6 +44,7 @@ import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -48,6 +56,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.BiFunction;
 
 /** Actual hand submissions, deferred ModelPart passes and item state reuse/nested recovery. */
@@ -61,6 +70,10 @@ public final class Stage52PartsProbe
 	private static int itemQuads;
 	private static int deformerSuites;
 	private static int deformerFailures;
+	private static int valueSuites;
+	private static int valueFailures;
+	private static int reloadReplays;
+	private static final List<FrozenPart> BEFORE_RELOAD = new ArrayList<>();
 	private static final Set<String> PART_PASSES = new HashSet<>();
 	private static final Set<String> ITEM_PASSES = new HashSet<>();
 
@@ -73,8 +86,10 @@ public final class Stage52PartsProbe
 		check(suites == 4 && failures == 32 && partVertices > 0 && itemQuads > 0, "Both formats/phases and all nested failure/recovery suites");
 		check(PART_PASSES.equals(Set.of("main", "outline", "crumbling")) && ITEM_PASSES.equals(Set.of("main", "outline", "foil")), "All native feature branches observed");
 		check(deformerSuites == 4 && deformerFailures == 8, "Cube binding replay/recovery in both formats before/after reload");
+		check(valueSuites == 4 && valueFailures == 8 && reloadReplays == 2 && BEFORE_RELOAD.isEmpty(), "Frozen values, two owners, controller stop, custom branches and old nodes across actual reload");
 		PLibDatabase.LOGGER.info("STAGE 5.2b.2b PART/ITEM PASS: suites={}, expectedFailures={}, partVertices={}, itemQuads={}, partPasses={}, itemPasses={}, hand/modelPart/item snapshot/nested failure/recovery/reload PASS", suites, failures, partVertices, itemQuads, PART_PASSES, ITEM_PASSES);
 		PLibDatabase.LOGGER.info("STAGE 5.2b.2c.1 CUBE BINDINGS PASS: suites={}, expectedFailures={}, native main/outline/crumbling geometry, model reuse/nested recovery/reload PASS; channel sampling/armor owner extraction pending", deformerSuites, deformerFailures);
+		PLibDatabase.LOGGER.info("STAGE 5.2b.2c.2a FROZEN VALUES PASS: suites={}, expectedFailures={}, oldNodesAfterReload={}, two owners/controller stop/custom position-dependent channels/operation mutation/main/outline/crumbling/nested recovery PASS; automatic main/armor extraction pending", valueSuites, valueFailures, reloadReplays);
 	}
 
 	public static @Nullable VertexConsumer partBuffer(String pass)
@@ -124,7 +139,7 @@ public final class Stage52PartsProbe
 		});
 	}
 
-	public static void verify()
+	public static void verify(Identifier definition, String clip)
 	{
 		var mc = Minecraft.getInstance();
 		var renderer = mc.getEntityRenderDispatcher().getPlayerRenderer(mc.player);
@@ -241,6 +256,7 @@ public final class Stage52PartsProbe
 			stack(featurePoses, featureEntry, featureDepth);
 			verifyItems(poses);
 			verifyDeformerBindings(poses);
+			verifyFrozenValues(poses, definition, clip);
 			stack(poses, entry, depth);
 			suites++;
 		}
@@ -250,6 +266,140 @@ public final class Stage52PartsProbe
 			partDraw = null;
 			itemDraw = null;
 		}
+	}
+
+	private static void verifyFrozenValues(PoseStack poses, Identifier definition, String clip)
+	{
+		if (valueSuites == 2)
+		{
+			for (FrozenPart previous : BEFORE_RELOAD)
+			{
+				geometryMatches(previous.vertices, part(new ModelPartFeatureRenderer(), previous.node, previous.transforms, null));
+				reloadReplays++;
+			}
+			BEFORE_RELOAD.clear();
+		}
+		var mc = Minecraft.getInstance();
+		var model = mc.getEntityRenderDispatcher().getPlayerRenderer(mc.player).getModel();
+		var arm = model.rightArm;
+		var other = new RemotePlayer(mc.level, new GameProfile(new UUID(0, 0x525c20 + valueSuites), "FrozenOther"));
+		var id = PLibDatabase.rl("stage52c2a_values");
+		float[] operation = {1};
+		int[] reads = {0};
+		Set<String> queries = new HashSet<>();
+		PMeshDeformer<Integer> custom = new PMeshDeformer<>()
+		{
+			@Override
+			public Identifier id()
+			{
+				return PLibDatabase.rl("stage52c2a_custom");
+			}
+
+			@Override
+			public MapCodec<Integer> codec()
+			{
+				return MapCodec.unit(0);
+			}
+
+			@Override
+			public void prepare(PDeformerPrepareContext context, Integer ignored)
+			{
+				context.add((position, values) ->
+				{
+					String name = (position.x < -1 ? "negative/" : "positive/") + (int)Math.floor(position.y);
+					float value = values.resolve(new PChannelReference<>(name, Math.abs(position.z) * 0.125f));
+					position.x += value * operation[0];
+				});
+			}
+		};
+		var stack = PDeformerStack.compile(List.of(new PDeformerInstance<>(custom, 0)));
+		try (var caller = PModelPartSnapshot.capture(model.root()))
+		{
+			arm.visible = true;
+			arm.skipDraw = false;
+			check(PPlayerAnimations.getHandle(other, definition).play("motion", PRawAnimation.begin().thenLoop(clip).build()), "Second owner controller starts");
+			PPlayerMeshDeformers.register(id, PPlayerPart.RIGHT_ARM, player -> player == mc.player || player == other, stack, (player, reference) ->
+			{
+				reads[0]++;
+				queries.add(reference.name());
+				float playing = PPlayerAnimations.getHandle(player, definition).isPlaying("motion") ? 1 : 9;
+				return (player == other ? 24 : 8) * playing + reference.defaultValue();
+			});
+			PPlayerMeshDeformers.apply(mc.player, model);
+			int hiddenReads = reads[0];
+			arm.visible = false;
+			frozenNode(arm, poses);
+			arm.visible = true;
+			arm.skipDraw = true;
+			frozenNode(arm, poses);
+			arm.skipDraw = false;
+			model.root().visible = false;
+			frozenNode(model.root(), poses);
+			model.root().visible = true;
+			check(reads[0] == hiddenReads, "Hidden root/descendants and skipDraw cubes do not evaluate custom callbacks");
+			List<Vector3f> firstVertices = geometry(arm, poses);
+			var first = frozenNode(arm, poses);
+			PPlayerMeshDeformers.apply(other, model);
+			List<Vector3f> secondVertices = geometry(arm, poses);
+			var second = frozenNode(arm, poses);
+			check(queries.size() > 3 && !firstVertices.equals(secondVertices), "Custom operation samples many vertex-dependent channel references and distinguishes owners");
+			PPlayerAnimations.getHandle(mc.player, definition).stopAll();
+			PPlayerAnimations.getHandle(other, definition).stopAll();
+			operation[0] = 100;
+			PPlayerMeshDeformers.unregister(id);
+			PPlayerMeshDeformers.apply(mc.player, model);
+			List<Vector3f> reused = geometry(arm, poses);
+			List<SavedPart> transforms = save(arm);
+			int readsBeforeReplay = reads[0];
+			var feature = new ModelPartFeatureRenderer();
+			geometryMatches(firstVertices, part(feature, first, transforms, null));
+			geometryMatches(secondVertices, part(feature, second, transforms, null));
+			expectValueFailure("outer values", () -> part(feature, first, transforms, () ->
+			{
+				expectValueFailure("inner values", () -> part(feature, second, transforms, () ->
+				{
+					throw new IllegalStateException("inner values");
+				}));
+				check(firstVertices.equals(geometry(arm, poses)), "Nested failure restores enclosing frozen geometry");
+				throw new IllegalStateException("outer values");
+			}));
+			geometryMatches(firstVertices, part(feature, first, transforms, null));
+			check(reused.equals(geometry(arm, poses)) && reads[0] == readsBeforeReplay, "Replay never calls live values or prepared operations, and restores caller bindings");
+			if (valueSuites < 2)
+				BEFORE_RELOAD.add(new FrozenPart(first, firstVertices, transforms));
+			PLibDatabase.LOGGER.info("STAGE 5.2b.2c.2a VALUES CASE PASS: suite={}, queries={}, readsBeforeReplay={}, readsAfterReplay={}, vertices={}, oldNodesAfterReload={}", valueSuites, queries.size(), readsBeforeReplay, reads[0], firstVertices.size(), reloadReplays);
+			valueSuites++;
+		}
+		finally
+		{
+			PPlayerMeshDeformers.unregister(id);
+			PPlayerAnimations.getHandle(other, definition).stopAll();
+			check(PPlayerAnimations.getHandle(mc.player, definition).play("motion", PRawAnimation.begin().thenLoop(clip).build()), "Restore fixture controller after value suite");
+		}
+	}
+
+	private static SubmitNodeStorage.ModelPartSubmit frozenNode(ModelPart arm, PoseStack poses)
+	{
+		return new SubmitNodeStorage.ModelPartSubmit(poses.last().copy(), arm, 15728880, 0, null, false, false, -1,
+				new ModelFeatureRenderer.CrumblingOverlay(0, poses.last().copy()), 0xff123456);
+	}
+
+	private static void expectValueFailure(String message, Runnable action)
+	{
+		try
+		{
+			action.run();
+			throw new AssertionError("Missing expected value failure " + message);
+		}
+		catch (IllegalStateException failure)
+		{
+			check(message.equals(failure.getMessage()), "Value failure propagated");
+			valueFailures++;
+		}
+	}
+
+	private record FrozenPart(SubmitNodeStorage.ModelPartSubmit node, List<Vector3f> vertices, List<SavedPart> transforms)
+	{
 	}
 
 	private static void verifyDeformerBindings(PoseStack poses)

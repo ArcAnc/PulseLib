@@ -227,3 +227,18 @@ Item API update (2026-10-28): animated items now implement `PAnimatable` directl
 the separate item marker/renderer accessor was removed by explicit user request.
 The unchanged `-PpulseStage31Probe` verifies real copy/split/stacking/NBT/network
 identity and manager lifecycle with that contract. See [API checkpoint](../docs/porting/item-api-removal.md).
+
+Stage **5.2b.2c.2a** extends the existing `-PpulseStage52b2bProbe` native suite.
+Use it with `-PpulseStage1Smoke -PpulseStage52bProbe -PpulseStage52b2Probe`
+and a fresh directory starting with `stage52b`. Submitted ModelPart nodes now
+freeze every emitted local deformed quad, preserving arbitrary position-based
+custom channel queries without retaining their value/operation closures in the
+saved binding. Ordinary restoration scopes keep live caller semantics.
+
+Four Gecko/glTF suites cover two owners, real controller stop, operation mutation,
+hidden parents/skipDraw, main/outline/crumbling, nested failures and old nodes
+replayed after actual resource reload. The unchanged GPU hand and GUI/glint
+suites validate real draws separately. Automatic main/first-person/armor
+RenderState extraction and removal of the armor `state.id` lookup remain
+**5.2b.2c.2b**. This checkpoint does not complete stage 5 or Fabric runtime.
+See journal section 40 and its structured evidence.

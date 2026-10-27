@@ -24,7 +24,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Objects;
 
-/** Captures transforms and visibility before a shared native ModelPart can be reused. */
+/** Captures transforms, visibility and deformed geometry before a shared native ModelPart can be reused. */
 @Mixin(SubmitNodeStorage.ModelPartSubmit.class)
 public abstract class ModelPartSubmitMixin implements PModelPartSubmitState
 {
@@ -38,7 +38,7 @@ public abstract class ModelPartSubmitMixin implements PModelPartSubmitState
 	@Inject(method = "<init>", at = @At("TAIL"))
 	private void pulselib$capturePart(CallbackInfo callback)
 	{
-		this.pulselib$pose = PModelPartSnapshot.capture(this.modelPart);
+		this.pulselib$pose = PModelPartSnapshot.captureForSubmit(this.modelPart);
 	}
 
 	@Override
