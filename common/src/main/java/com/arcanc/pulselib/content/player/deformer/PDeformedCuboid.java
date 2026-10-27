@@ -66,6 +66,11 @@ public final class PDeformedCuboid extends ModelPart.Cube
 		this.deformer = deformer;
 	}
 
+	PPlayerVertexDeformer getDeformer()
+	{
+		return this.deformer;
+	}
+
 	/**
 	 * Performs the compile operation.
 	 * @param pose the pose to use.

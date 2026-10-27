@@ -196,3 +196,13 @@ Recording buffers apply only to direct suites; unchanged 5.2a GPU hand and
 4.3b/4.3c GUI/glint probes verify real draws separately. Armor/deformer sampled
 values, cube bindings and remaining Fabulous/player server witnesses stay open
 in **5.2b.2c**. See section 36 of the migration journal for evidence and limits.
+
+Stage 5.2b.2c.1 extends the existing `-PpulseStage52b2bProbe` native part/item
+suite with cube binding replay checks in main/outline/crumbling passes, nested
+failure recovery, and real deformed vertex comparisons before/after reload.
+Use it with `-PpulseStage1Smoke -PpulseStage52bProbe -PpulseStage52b2Probe`
+and a fresh `-PpulseVerificationDir`, as recorded in journal section 37.
+`verify_player_deformer_api.py` audits all six canonical player deformer types.
+Binding snapshots preserve callbacks; extracted channel values and armor owner
+isolation remain checkpoint 5.2b.2c.2. This suite does not establish Fabulous
+player/armor pixel parity or Fabric runtime support.

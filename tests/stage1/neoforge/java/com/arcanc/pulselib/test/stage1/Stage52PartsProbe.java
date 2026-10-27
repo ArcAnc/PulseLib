@@ -10,6 +10,14 @@
 package com.arcanc.pulselib.test.stage1;
 
 import com.arcanc.pulselib.content.mixin.PoseStackAccessor;
+import com.arcanc.pulselib.content.model.deformer.PChannelReference;
+import com.arcanc.pulselib.content.model.deformer.PDeformerInstance;
+import com.arcanc.pulselib.content.model.deformer.PDeformerStack;
+import com.arcanc.pulselib.content.model.deformer.PStretchDeformer;
+import com.arcanc.pulselib.content.model.deformer.PStretchDefinition;
+import com.arcanc.pulselib.content.player.animation.PPlayerPart;
+import com.arcanc.pulselib.content.player.deformer.PPlayerMeshDeformers;
+import com.arcanc.pulselib.content.renderer.base.PModelPartSnapshot;
 import com.arcanc.pulselib.platform.PClientRenderHooks;
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -30,11 +38,13 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.jspecify.annotations.Nullable;
+import org.joml.Vector3f;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,6 +59,8 @@ public final class Stage52PartsProbe
 	private static int failures;
 	private static int partVertices;
 	private static int itemQuads;
+	private static int deformerSuites;
+	private static int deformerFailures;
 	private static final Set<String> PART_PASSES = new HashSet<>();
 	private static final Set<String> ITEM_PASSES = new HashSet<>();
 
@@ -60,7 +72,9 @@ public final class Stage52PartsProbe
 	{
 		check(suites == 4 && failures == 32 && partVertices > 0 && itemQuads > 0, "Both formats/phases and all nested failure/recovery suites");
 		check(PART_PASSES.equals(Set.of("main", "outline", "crumbling")) && ITEM_PASSES.equals(Set.of("main", "outline", "foil")), "All native feature branches observed");
+		check(deformerSuites == 4 && deformerFailures == 8, "Cube binding replay/recovery in both formats before/after reload");
 		PLibDatabase.LOGGER.info("STAGE 5.2b.2b PART/ITEM PASS: suites={}, expectedFailures={}, partVertices={}, itemQuads={}, partPasses={}, itemPasses={}, hand/modelPart/item snapshot/nested failure/recovery/reload PASS", suites, failures, partVertices, itemQuads, PART_PASSES, ITEM_PASSES);
+		PLibDatabase.LOGGER.info("STAGE 5.2b.2c.1 CUBE BINDINGS PASS: suites={}, expectedFailures={}, native main/outline/crumbling geometry, model reuse/nested recovery/reload PASS; channel sampling/armor owner extraction pending", deformerSuites, deformerFailures);
 	}
 
 	public static @Nullable VertexConsumer partBuffer(String pass)
@@ -74,6 +88,7 @@ public final class Stage52PartsProbe
 			{
 				partVertices++;
 				PART_PASSES.add(pass);
+				draw.vertices.computeIfAbsent(pass, ignored -> new ArrayList<>()).add(new Vector3f((float)args[0], (float)args[1], (float)args[2]));
 				matches(draw.expected, "Deferred " + pass + " uses captured ModelPart pose/scale/visibility");
 				if (!draw.fired && draw.firstVertex != null)
 				{
@@ -225,6 +240,7 @@ public final class Stage52PartsProbe
 			matches(reused, "Deferred part recovery");
 			stack(featurePoses, featureEntry, featureDepth);
 			verifyItems(poses);
+			verifyDeformerBindings(poses);
 			stack(poses, entry, depth);
 			suites++;
 		}
@@ -233,6 +249,96 @@ public final class Stage52PartsProbe
 			restore(caller);
 			partDraw = null;
 			itemDraw = null;
+		}
+	}
+
+	private static void verifyDeformerBindings(PoseStack poses)
+	{
+		var mc = Minecraft.getInstance();
+		var model = mc.getEntityRenderDispatcher().getPlayerRenderer(mc.player).getModel();
+		var part = model.rightArm;
+		var id = PLibDatabase.rl("stage52c1_binding");
+		var stack = PDeformerStack.compile(List.of(new PDeformerInstance<>(PStretchDeformer.INSTANCE,
+				new PStretchDefinition(new Vector3f(), new Vector3f(1, 0, 0), PChannelReference.constant(1)))));
+		try (var caller = PModelPartSnapshot.capture(model.root()))
+		{
+			part.visible = true;
+			part.skipDraw = false;
+			PPlayerMeshDeformers.register(id, PPlayerPart.RIGHT_ARM, player -> player == mc.player, stack, (player, reference) -> 2);
+			PPlayerMeshDeformers.apply(mc.player, model);
+			List<Vector3f> firstVertices = geometry(part, poses);
+			var first = new SubmitNodeStorage.ModelPartSubmit(poses.last().copy(), part, 15728880, 0, null, false, false, -1,
+					new ModelFeatureRenderer.CrumblingOverlay(0, poses.last().copy()), 0xff123456);
+			PPlayerMeshDeformers.unregister(id);
+			PPlayerMeshDeformers.register(id, PPlayerPart.RIGHT_ARM, player -> player == mc.player, stack, (player, reference) -> 3);
+			PPlayerMeshDeformers.apply(mc.player, model);
+			List<Vector3f> secondVertices = geometry(part, poses);
+			var second = new SubmitNodeStorage.ModelPartSubmit(poses.last().copy(), part, 15728880, 0, null, false, false, -1,
+					new ModelFeatureRenderer.CrumblingOverlay(0, poses.last().copy()), 0xff123456);
+			PPlayerMeshDeformers.unregister(id);
+			PPlayerMeshDeformers.apply(mc.player, model);
+			List<Vector3f> reusedVertices = geometry(part, poses);
+			check(!firstVertices.equals(secondVertices) && !firstVertices.equals(reusedVertices), "Real deformed geometry differs across bindings and identity");
+			List<SavedPart> transforms = save(part);
+			var feature = new ModelPartFeatureRenderer();
+			geometryMatches(firstVertices, part(feature, first, transforms, null));
+			geometryMatches(secondVertices, part(feature, second, transforms, null));
+			check(reusedVertices.equals(geometry(part, poses)), "Deferred draws restore caller cube bindings");
+			expectDeformerFailure("outer cube", () -> part(feature, first, transforms, () ->
+			{
+				expectDeformerFailure("inner cube", () -> part(feature, second, transforms, () ->
+				{
+					throw new IllegalStateException("inner cube");
+				}));
+				check(firstVertices.equals(geometry(part, poses)), "Nested failed draw restores enclosing cube geometry");
+				throw new IllegalStateException("outer cube");
+			}));
+			check(reusedVertices.equals(geometry(part, poses)), "Failed outer draw restores caller cube bindings");
+			geometryMatches(firstVertices, part(feature, first, transforms, null));
+			check(reusedVertices.equals(geometry(part, poses)), "Repeated node replay restores caller cube bindings");
+			deformerSuites++;
+		}
+		finally
+		{
+			PPlayerMeshDeformers.unregister(id);
+		}
+	}
+
+	private static List<Vector3f> geometry(ModelPart part, PoseStack poses)
+	{
+		List<Vector3f> vertices = new ArrayList<>();
+		part.render(poses, consumer((name, args) ->
+		{
+			if (name.equals("addVertex"))
+				vertices.add(new Vector3f((float)args[0], (float)args[1], (float)args[2]));
+			return null;
+		}), 15728880, 0, -1);
+		check(!vertices.isEmpty(), "Native cube emits geometry");
+		return vertices;
+	}
+
+	private static void geometryMatches(List<Vector3f> expected, Map<String, List<Vector3f>> passes)
+	{
+		check(passes.keySet().equals(Set.of("main", "outline", "crumbling")), "Frozen cube geometry reaches all native part passes");
+		for (var vertices : passes.values())
+		{
+			check(vertices.size() == expected.size(), "Native pass preserves cube vertex count");
+			for (int index = 0; index < vertices.size(); index++)
+				check(vertices.get(index).distanceSquared(expected.get(index)) < 1.0e-10f, "Native pass uses the queued binding's geometry");
+		}
+	}
+
+	private static void expectDeformerFailure(String message, Runnable action)
+	{
+		try
+		{
+			action.run();
+			throw new AssertionError("Missing expected cube failure " + message);
+		}
+		catch (IllegalStateException failure)
+		{
+			check(message.equals(failure.getMessage()), "Cube failure propagated");
+			deformerFailures++;
 		}
 	}
 
@@ -361,14 +467,16 @@ public final class Stage52PartsProbe
 		return result;
 	}
 
-	private static void part(ModelPartFeatureRenderer feature, SubmitNodeStorage.ModelPartSubmit node, List<SavedPart> expected, @Nullable Runnable first)
+	private static Map<String, List<Vector3f>> part(ModelPartFeatureRenderer feature, SubmitNodeStorage.ModelPartSubmit node, List<SavedPart> expected, @Nullable Runnable first)
 	{
 		PartDraw previous = partDraw;
-		partDraw = new PartDraw(expected, first);
+		PartDraw draw = new PartDraw(expected, first);
+		partDraw = draw;
 		try
 		{
 			var buffers = Minecraft.getInstance().renderBuffers();
 			invoke(feature, "render", Map.of(RenderTypes.outline(PLibDatabase.rl("textures/stage42a_white.png")), List.of(node)), buffers.bufferSource(), buffers.outlineBufferSource(), buffers.crumblingBufferSource());
+			return draw.vertices;
 		}
 		finally
 		{
@@ -491,6 +599,7 @@ public final class Stage52PartsProbe
 	{
 		private final List<SavedPart> expected;
 		private final @Nullable Runnable firstVertex;
+		private final Map<String, List<Vector3f>> vertices = new HashMap<>();
 		private boolean fired;
 
 		private PartDraw(List<SavedPart> expected, @Nullable Runnable firstVertex)

@@ -9,21 +9,24 @@
 
 package com.arcanc.pulselib.content.renderer.base;
 
+import com.arcanc.pulselib.content.player.deformer.PPlayerDeformerSnapshot;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
 
-/** Invocation-local restoration of a shared vanilla model, including child visibility and scales. */
+/** Restores shared model transforms, visibility and cube deformer bindings, including children. */
 @ApiStatus.Internal
 public final class PModelPartSnapshot implements AutoCloseable
 {
 	private final List<SavedPart> parts;
+	private final PPlayerDeformerSnapshot deformers;
 
 	private PModelPartSnapshot(ModelPart root)
 	{
 		this.parts = root.getAllParts().stream().map(SavedPart::new).toList();
+		this.deformers = PPlayerDeformerSnapshot.capture(root);
 	}
 
 	public static PModelPartSnapshot capture(ModelPart root)
@@ -41,6 +44,7 @@ public final class PModelPartSnapshot implements AutoCloseable
 	public void restore()
 	{
 		this.parts.forEach(SavedPart::restore);
+		this.deformers.restore();
 	}
 
 	private record SavedPart(ModelPart part, PartPose pose, float xScale, float yScale, float zScale, boolean visible, boolean skipDraw)
