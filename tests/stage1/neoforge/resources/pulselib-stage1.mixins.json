@@ -13,7 +13,9 @@
     "Stage43bOversizedMixin",
     "Stage52AttachmentQueueMixin",
     "Stage52CameraMixin",
-    "Stage52RootMixin"
+    "Stage52RootMixin",
+    "Stage52RigMixin",
+    "Stage52RigFeatureMixin"
   ],
   "injectors": {
     "defaultRequire": 1

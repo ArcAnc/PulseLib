@@ -323,6 +323,24 @@ public final class PPlayerAnimations
 		return originalPose;
 	}
 
+	/** Captures ordered rig contributions before the live owner can change or leave the level. */
+	static PPlayerRigPose captureRig(Player player, float partialTick)
+	{
+		List<PPlayerRigPose.Contribution> contributions = new ArrayList<>();
+		applyDefinitions(player, partialTick, allParts(), (part, pose, definition, weight) ->
+				contributions.add(new PPlayerRigPose.Contribution(part, playerModelSpace(pose, definition), definition.blendMode(), weight)));
+		return new PPlayerRigPose(contributions);
+	}
+
+	/** Reuses canonical part blending against the consumer's vanilla base pose. */
+	static void applyRig(PlayerModel model, List<PPlayerRigPose.Contribution> contributions)
+	{
+		PPlayerModelPose originalPose = PPlayerModelPose.capture(model, allParts());
+		for (PPlayerRigPose.Contribution contribution : contributions)
+			for (ModelPart part : contribution.part().resolve(model))
+				apply(part, originalPose.part(part), contribution.pose(), contribution.mode(), contribution.weight());
+	}
+
 	/**
 	 * Applies animation contributions to one player model part and returns restoration state.
 	 *

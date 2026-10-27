@@ -10,9 +10,11 @@
 package com.arcanc.pulselib.content.mixin;
 
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
+import com.arcanc.pulselib.content.player.animation.PPlayerRigPose;
 import com.arcanc.pulselib.content.renderer.PWorldRenderEligibility;
 import com.arcanc.pulselib.content.renderer.base.PPartialTickRenderState;
 import com.arcanc.pulselib.content.renderer.base.PPlayerRootRenderState;
+import com.arcanc.pulselib.content.renderer.base.PPlayerRigRenderState;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -55,6 +57,8 @@ public abstract class EntityRendererExtractionMixin
 						PWorldRenderEligibility.markGeometry();
 				}
 			}
+			if (state instanceof PPlayerRigRenderState rig)
+				rig.pulselib$setPlayerRig(entity instanceof Player player ? PPlayerRigPose.capture(player, partialTick) : null);
 			return state;
 		});
 	}

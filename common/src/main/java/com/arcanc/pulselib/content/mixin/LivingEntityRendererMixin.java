@@ -9,12 +9,11 @@
 
 package com.arcanc.pulselib.content.mixin;
 
-import com.arcanc.pulselib.content.renderer.base.PRenderState;
-import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
-import net.minecraft.client.Minecraft;
+import com.arcanc.pulselib.content.player.animation.PPlayerRigPose;
+import com.arcanc.pulselib.content.renderer.base.PPlayerRigRenderState;
 import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
-import net.minecraft.world.entity.player.Player;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -34,9 +33,11 @@ public abstract class LivingEntityRendererMixin
 	@Inject(method = "setupAnim", at = @At("TAIL"))
 	private void pulselib$applyPlayerAnimations(AvatarRenderState state, CallbackInfo ci)
 	{
-		if (Minecraft.getInstance().level == null ||
-				!(Minecraft.getInstance().level.getEntity(state.id) instanceof Player player))
-			return;
-		PPlayerAnimations.apply(player, (PlayerModel)(Object)this, PRenderState.partialTick(state), PPlayerAnimations.allParts());
+		if (state instanceof PPlayerRigRenderState snapshot)
+		{
+			@Nullable PPlayerRigPose rig = snapshot.pulselib$getPlayerRig();
+			if (rig != null)
+				rig.apply((PlayerModel)(Object)this);
+		}
 	}
 }

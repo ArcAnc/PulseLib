@@ -1,0 +1,278 @@
+{
+  "checkpoint": "5.2b.2a",
+  "status": "complete within extracted rig/current PlayerModel pose boundaries",
+  "date": "2026-10-27",
+  "startHead": "0fb7e026c4de13e4a076872a758ed0fda3a9502b",
+  "frozenRefs": {
+    "1.21.1-multiloader": "7ce6f024b307bb821ce543344d3896c8e1fcf26b",
+    "26.1": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1"
+  },
+  "nextCheckpoint": "5.2b.2b",
+  "remaining": [
+    "deferred ModelPart/arm/item ownership",
+    "armor/deformer capture and lifetime",
+    "arbitrary target eligibility and Fabulous player pixel-depth parity",
+    "M-P2 dedicated root extraction / real respawn",
+    "Fabric runtime (6)",
+    "full testmod / compiled API / final GPU and performance (7)"
+  ],
+  "architecture": {
+    "rig": "immutable sampled ordered contributions, no retained Player/definition/manager/model",
+    "evaluator": "canonical applyDefinitions/playerModelSpace/private apply, no new evaluator",
+    "restoration": "native LivingEntityRenderer.submit and ModelFeatureRenderer.renderModel invocation scopes, whole hierarchy transforms/scales/visibility/skipDraw; feature pose/normal/depth finally",
+    "ThreadLocalAdded": 0,
+    "canonicalPublicSignaturesChanged": 0
+  },
+  "tests": {
+    "common": {
+      "tests": 223,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "fabric": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "artifacts": {
+    "common": {
+      "units": 353,
+      "classes": 550,
+      "classMajor": [
+        69
+      ],
+      "sha256": "1403a71092aed3d3b80c8fea6c8aec129d9610b33a3155ddc42711c96332604f",
+      "jar": "common/build/libs/pulselib-26.1.2-common-1.1.5.3.jar",
+      "providers": {}
+    },
+    "neoforge": {
+      "units": 364,
+      "classes": 562,
+      "classMajor": [
+        69
+      ],
+      "sha256": "1011ef46b2e566dd02cc302cb70a42d340a9e81b186168d848e35e5450c026ce",
+      "jar": "neoforge/build/libs/pulselib-26.1.2-neoforge-1.1.5.3.jar",
+      "providers": {
+        "platform.IPulsePlatform": "com.arcanc.pulselib.neoforge.NeoForgePlatform",
+        "platform.IPulseCameraService": "com.arcanc.pulselib.neoforge.NeoForgeCameraService",
+        "plugin.IPulsePluginFinder": "com.arcanc.pulselib.neoforge.NeoForgePulsePluginFinder"
+      }
+    },
+    "fabric": {
+      "units": 357,
+      "classes": 554,
+      "classMajor": [
+        69
+      ],
+      "sha256": "9c0f8c5dd539fcd84be92caf05c99b6322e33df43af0de8fbcdb64042ebbfe44",
+      "jar": "fabric/build/libs/pulselib-26.1.2-fabric-1.1.5.3.jar",
+      "providers": {
+        "platform.IPulsePlatform": "com.arcanc.pulselib.fabric.FabricPlatform",
+        "platform.IPulseCameraService": "com.arcanc.pulselib.fabric.FabricCameraService",
+        "plugin.IPulsePluginFinder": "com.arcanc.pulselib.fabric.FabricPulsePluginFinder"
+      }
+    }
+  },
+  "runtime": {
+    "rigSuites": 4,
+    "expectedNestedExceptions": 16,
+    "nativeVertexEmissions": 1736,
+    "worldDeferredExcludingManual": 2828,
+    "cameraCases": 40,
+    "rootSuites": 4,
+    "foreignCameraChecks": 4,
+    "gpuHandFrames": 4067,
+    "gpuGeneratedPrimitives": 222704,
+    "matrixPhysicsCases": 996,
+    "formats": [
+      "Gecko",
+      "glTF"
+    ],
+    "reload": true,
+    "acceptedClientExits": [
+      0,
+      0
+    ],
+    "acceptedDedicatedServerExit": 0,
+    "dedicatedClientClassLoads": 0,
+    "dedicatedRigRootCameraProbeLoads": 0,
+    "normalConsoleStop": true,
+    "pixelParityClaimed": false
+  },
+  "isolation": {
+    "preexistingTrackedEdits": 44,
+    "dirtyJavaInputs": 40,
+    "protectedFiles": 188,
+    "protectedManifestSha256": "86aac3cbf1dca53811028dae32d3d7ebf154255e7f3495b7eea8f1cd03aebe42",
+    "projectionInitScript": "/tmp/pulselib-stage52b2-gkitge7l/index-check.gradle",
+    "overlaps": [
+      "PPlayerAnimations imports",
+      "journal deletions",
+      "tests README deletions"
+    ],
+    "noSourceBranchChanges": true,
+    "publishedOrPushed": false
+  },
+  "graphicsUnchanged": {
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlDynamicGeometry.java": "ef173cb8592c36c8deb1252afc69abb8b1bb78d14bf9fe3db3ca3bd0447e0ce9",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlFrameArena.java": "75267c6fde8cb5d942e9cab02163dcc7ac199306c29e8d1b360b0c18056470fe",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlGeometryArena.java": "52539ba678423df4aa46f55dca7c04632eb21f7c0bfa41ba2b7b6e791a067ae3",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlIndirectStream.java": "c3c238c5d2fecf9ffdfc0044905c14c8d3968f5a96a26cb373cfc420bf1237d4",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlInstanceStream.java": "a2a026cc636d9fc2e0d0ca5199178ab6963d6707c919236a1cfb8ffd28a8099a",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java": "8e87fd1172a14c6a4382b7e7cfd7dd5c2359eebe194f425074cc2c2600e9b52d",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlRenderHost.java": "baba32946c29b0a639e8f1803f34bbf84c1a5e117eaedf813743eee1c7b30416",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlResourceRegistry.java": "ced196a145d769f9d116b6063397bb54e604efaf6b05a1060b86db8353470a84",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java": "b40a4b8fb9e5e2cef99b5eb806429828aeb76e6749308ed0ccaea322685d41be",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/package-info.java": "c39b48f5d48b8b12a7ab0a60433493cbc2564e97dba7995f4ab0f8bea34cea9b",
+    "common/src/main/resources/assets/pulselib/atlases/atlas.json": "a4e2be76bf36c68188dd5b8b3269ce97621abca89c56fde3bad8812589146cd6",
+    "common/src/main/resources/assets/pulselib/geckolib.zip": "3e1577c14b1be39f38288a08a784ee9eb555cd843d71324f297ae135a31615fb",
+    "common/src/main/resources/assets/pulselib/glmodels.zip": "93792d7ac3e77453b7d08bcb0cc829b83e0abc9f75d8210c9014b80615526bde",
+    "common/src/main/resources/assets/pulselib/items.zip": "8da45b48f5ba6b9426afc9f4f775443dd72957249b073c3531b1ac7e72562839",
+    "common/src/main/resources/assets/pulselib/models.zip": "c81433032c0b9e766e5a52255d55effb6359dd941c7ecd17b7497c0c4ea1e831",
+    "common/src/main/resources/assets/pulselib/shaders/core/oit_composite.fsh": "c7bda2ec92883ea5a4ad090fdb16c1cc4561e467c85ebbf875169c033dcb6385",
+    "common/src/main/resources/assets/pulselib/shaders/core/oit_composite.vsh": "47109b410ead6ac9297ba7ff60a119fc87cb3cd12336c5dab62f8baf556e3913",
+    "common/src/main/resources/assets/pulselib/shaders/core/oit_fabulous_composite.fsh": "60c365d9577d9a13eec82018020ffe437baafb4cd898fdb64b8ace98b2c5a58a",
+    "common/src/main/resources/assets/pulselib/shaders/core/oit_fabulous_metadata.fsh": "49bea446c856a29b3f064be64694444bc1207178758a2411e15843eaecdffe02",
+    "common/src/main/resources/assets/pulselib/shaders/core/triangles.fsh": "232228f436b969c7957a75b6d9e538081af8cce0579a8f79668f610e00dc37d0",
+    "common/src/main/resources/assets/pulselib/shaders/core/triangles.vsh": "d7cfa97cdba1ce93dd040d9ba483ed9eb87c1a011077fc00a75cdeba9e2231df",
+    "common/src/main/resources/assets/pulselib/shaders/core/triangles_instant.fsh": "38c2aa066bf7bf1334c282c12dabc435fa13e4d74b4f33daade2e74dcfc2eb0b",
+    "common/src/main/resources/assets/pulselib/shaders/core/triangles_instant.vsh": "66f5cf600bd8c2ad0dc97b4d026091dc9146856706389f16dcfdbd0008326e1f",
+    "common/src/main/resources/assets/pulselib/shaders/core/triangles_oit.fsh": "e3d44e72c41b213ca5816b5f22e8438f7b4a2dd781fee7611b3e3dbbd4cae9d0",
+    "common/src/main/resources/assets/pulselib/shaders/core/triangles_oit_depth.fsh": "bf98a6cea3b16b8ee9e45fdeb0e31c48eb6de5340ce97b82fccdf44fe464c7fc",
+    "common/src/main/resources/assets/pulselib/shaders/core/triangles_oit_depth_peel.fsh": "f00e3fa5d9b0d149f01309ce9abf338b22cf8801e7bd85ec35abf3a0866a00c8",
+    "common/src/main/resources/assets/pulselib/shaders/include/deformers.glsl": "9a1f6eee0a5fef10882531b07a44463cc110a94e531c74fda757187f66d4142f",
+    "common/src/main/resources/assets/pulselib/template/player/player_model_template.bbmodel": "404db85af63262309f24e319a49162def61258b0f4aa6d5fe66a7a869954e127",
+    "common/src/main/resources/assets/pulselib/template/player/player_model_template.gltf": "c5fe4817e44498c0808fccd3e33fdbdd9a6bb07a4db97df8efb8dfe62e614045",
+    "common/src/main/resources/assets/pulselib/textures.zip": "7330f2151870a56a0c80da5a775d4da6cede0c9ccabb825b1a1c9b6438813af9"
+  },
+  "intendedSourceSha256": {
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/EntityRendererExtractionMixin.java": "72e7b84ada57186ab6f94b0a31a53386380a3ba10991309969745292ae6a4877",
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/LivingEntityRendererMixin.java": "143af8156774111f01ebdb6e226fd6511da3fce6dbc844a81234606b9f7acd3f",
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java": "2610840af55ff85291b4be31ff954a2b73fd966bb3514102410b8ce09d8115d3",
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerRigRenderStateMixin.java": "4f6629cd6186bad7183a3b10fc0b332045e381fe9fd0f491aec9bdb56bfcd3fa",
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerRigSubmitMixin.java": "56448b183c8500808af6e34add4aacf8d943ea52ea545053b44c9d87fd02ea57",
+    "common/src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerAnimations.java": "f0372d58e914d4d91183f7fa5c3b4f8399d81f32d0f8d6f27549a42bd06c235a",
+    "common/src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerRigPose.java": "e4d79e97baf5cdbf8d59c70a9f974777ff2b1d70573ab4a0c165a5de2455b968",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/base/PModelPartSnapshot.java": "74223efddaa497098aec430448c75b7c22bf3b820798ec707d1c71ce710436a6",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/base/PPlayerRigRenderState.java": "0fdfaf8b0fc1f2af278c1a564c747c51e5d90d4b957de0f563cbe6debf5966c3",
+    "common/src/main/resources/pulselib.mixins.json": "00d5b4ab31f1754b1adfbc14ee46486b25e9989151969f0d0c10c26b5acdb055",
+    "common/src/test/java/com/arcanc/pulselib/content/player/animation/PPlayerRigPoseTest.java": "27d4616ed66d43986c46eb5afa1236ebdf92dc487a95e71a6a277446aa019f39",
+    "common/src/test/java/com/arcanc/pulselib/content/renderer/PModelPartSnapshotTest.java": "89f67803367ddffcdd235e0fab471615e4a600af63818aee01f096de9c7bcce8",
+    "neoforge/build.gradle": "92300d6a172003ecf28e0fe3181d89514943b537b3082466ce3cf407414af892",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage52CameraProbe.java": "930684b3aff648bd89d24186c91792919d3f1d28d2200279bd74eb61984b45b7",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage52RigProbe.java": "a1092088b95a22b2941c045f33df4142fd3eacb7f499e477eeedd9b381c0ffef",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/mixin/Stage52RigFeatureMixin.java": "47928b5fd40fbce7ec6d95a84cae85bc0b5a91ee92a8cb8318fd4a5f8d29cc02",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/mixin/Stage52RigMixin.java": "1cd30e1c6799200cb918129b8cc12744dc660314e227bbc64a378c04bce9e7ef",
+    "tests/stage1/neoforge/resources/pulselib-stage1.mixins.json": "37e5edbe584e966a75140e7939737938bb07e973c1dd77d8d3202de3e8bbb3fc"
+  },
+  "logs": {
+    "compile": {
+      "path": "/tmp/pulselib-stage52b2-gkitge7l/compile.log",
+      "sha256": "a586fab57c2421d2898dc7ee6a69c019e27ce696c40637dd48d10dee2b398b3d",
+      "excerpts": [
+        "BUILD SUCCESSFUL in 16s"
+      ]
+    },
+    "rig-tests": {
+      "path": "/tmp/pulselib-stage52b2-gkitge7l/rig-tests.log",
+      "sha256": "ee742409655618f3bb7526a233fdcd31403b6ece3d971df6587ae63492d0c38a",
+      "excerpts": [
+        "BUILD SUCCESSFUL in 10s"
+      ]
+    },
+    "fixture-compile": {
+      "path": "/tmp/pulselib-stage52b2-gkitge7l/fixture-compile.log",
+      "sha256": "5a6ed04c80f46170fe8376cd49f045e0edf7c8600b044a10ab315b468cd46437",
+      "excerpts": [
+        "BUILD SUCCESSFUL in 15s"
+      ]
+    },
+    "build-final": {
+      "path": "/tmp/pulselib-stage52b2-gkitge7l/build-final.log",
+      "sha256": "7f630e125f49dc88840e066d662ec1edc452bb4e811910ef1fda9bcc10c1100b",
+      "excerpts": [
+        "STAGE 2 SERVICE PROVIDERS / LEGACY REMOVAL / COMMON BOUNDARY PASS: /mnt/MainDrive/Programs/MC mods/ArcsLib/build/reports/porting/stage-2-build.json",
+        "BUILD SUCCESSFUL in 22s"
+      ]
+    },
+    "client-verified": {
+      "path": "/tmp/pulselib-stage52b2-gkitge7l/client-verified.log",
+      "sha256": "d8eafaf8068a6c7e9ca3cc5aa93f0240f35e23a09ca6d31a3d57b59202a13d3e",
+      "excerpts": [
+        "[18:21:18] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.1 PRE-RELOAD PASS: cameraCases=20, nativeCameraChecks=1225, rootSuites=2, foreignCameras=2",
+        "[18:21:28] [Render thread/INFO] [Pulse Lib/]: STAGE 2 CLIENT PLUGINS PASS: ids=[pulselib:stage1_client, pulselib:stage2_common], common=1, channels=1, events=1, deformers=1, client=1, server=0, models=2",
+        "[18:21:28] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.2a RIG PASS: suites=4, vertices=1736, worldDeferred=2828, expectedFailures=16, extraction/owner isolation, native submit/deferred nested failure/recovery/reload PASS",
+        "[18:21:28] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.1 NATIVE PLAYER PASS: cameraCases=40, cameraChecks=2865, rootSuites=4, nativeWorldRoots=2844, foreignCameras=4, formats=Gecko/glTF, F/G/H weights=0.25/0.6/1, VANILLA, extraction/nested failure/recovery/reload PASS",
+        "[18:21:28] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.1 NATIVE PLAYER SHUTDOWN PASS",
+        "BUILD SUCCESSFUL in 36s"
+      ]
+    },
+    "client-regression": {
+      "path": "/tmp/pulselib-stage52b2-gkitge7l/client-regression.log",
+      "sha256": "0b1a8b83d8fc80f9ec73e973c8a94bb39e1c75ed2f0a07968468288215c8e4e1",
+      "excerpts": [
+        "[18:20:04] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2a PRE-RELOAD PASS: cases=498, nativeThird=[[6137, 8681], [0, 0]], nativeFirst=[[966, 1284], [0, 0]], GPU hand frames=[[966, 1284], [0, 0]]",
+        "[18:20:38] [Render thread/INFO] [Pulse Lib/]: STAGE 2 CLIENT PLUGINS PASS: ids=[pulselib:stage1_client, pulselib:stage2_common], common=1, channels=1, events=1, deformers=1, client=1, server=0, models=2",
+        "[18:20:38] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2a ATTACHMENTS PASS: matrixPhysicsCases=996, formats=Gecko/glTF, blendModes=5, weights=0.25/0.6/1, ROOT masks/part/bone weights/transitions/two definitions/reload/queue isolation PASS; nativeThird=[[6137, 9435], [7330, 1110]], nativeFirst=[[966, 1664], [1195, 242]], GPU hand frames=[[966, 1664], [1195, 242]], generatedPrimitives=222704, callbackFailures=4, callbacks third=24713, first=5063",
+        "[18:20:38] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2a ATTACHMENTS SHUTDOWN PASS",
+        "BUILD SUCCESSFUL in 1m 24s"
+      ]
+    },
+    "server-accepted": {
+      "path": "/tmp/pulselib-stage52b2-gkitge7l/server-accepted.log",
+      "sha256": "215184d15e848a1ea9919e9a94f894f441406a4ad2792012d38b25ef6ea54e4d",
+      "excerpts": [
+        "[18:18:46] [Server thread/INFO] [minecraft/DedicatedServer]: Done (0.365s)! For help, type \"help\"",
+        "[18:18:47] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved",
+        "[18:18:47] [Server thread/INFO] [Pulse Lib/]: STAGE 2 SERVER PLUGINS PASS: ids=[pulselib:stage2_common, pulselib:stage2_server], common=1, channels=1, events=1, deformers=1, client=0, server=1, models=0",
+        "[18:22:04] [Server thread/INFO] [minecraft/MinecraftServer]: Stopping server",
+        "[18:22:05] [Server thread/INFO] [minecraft/MinecraftServer]: ThreadedAnvilChunkStorage: All dimensions are saved",
+        "BUILD SUCCESSFUL in 3m 35s"
+      ]
+    },
+    "core-api": {
+      "path": "/tmp/pulselib-stage52b2-gkitge7l/core-api.log",
+      "sha256": "05991d41195e8f05f9a95353766ce3c6995b9fb306aeba62b196fe0f6c3e386f",
+      "excerpts": [
+        "PLAYER CORE API PASS: 27 canonical types / 203 declared members"
+      ]
+    },
+    "attachment-api": {
+      "path": "/tmp/pulselib-stage52b2-gkitge7l/attachment-api.log",
+      "sha256": "5258ac042cc7be2dbae4f514ee11219f85d7ac495ed2c7a2db0206761cf424b2",
+      "excerpts": [
+        "PLAYER ATTACHMENT API PASS: 5 canonical types / 32 declared members"
+      ]
+    },
+    "context-api": {
+      "path": "/tmp/pulselib-stage52b2-gkitge7l/context-api.log",
+      "sha256": "c8e346b8db77b1a445b0b4124699f558e017393e6e899a4631a63564ec82b113",
+      "excerpts": [
+        "RENDER CONTEXT API PASS: 5 canonical types / 20 declared members"
+      ]
+    },
+    "plugin-api": {
+      "path": "/tmp/pulselib-stage52b2-gkitge7l/plugin-api.log",
+      "sha256": "008f6c1ae68399be9f1318005f136fa64b8cab68d30f98b23fe9e6444677e38f",
+      "excerpts": [
+        "PLUGIN API PASS: 38 canonical types; complete declared member contracts preserved"
+      ]
+    }
+  },
+  "intermediateAttempts": [
+    "Initial rig oracle selected clip G (only ROOT); strict nonzero-rig guard failed. Rig suite now selects H (arm + ROOT), production math assertions unchanged.",
+    "Manual draws excluded from worldDeferred counter, followed by accepted rerun.",
+    "First server Gradle stdin closed its console reader; own JVM SIGINT invoked saving shutdown hook. This is not the accepted exit-0 server; final dedicated server uses open stdin and console stop."
+  ],
+  "debugger": {
+    "skill": "ij-debugger",
+    "sessionStarted": false,
+    "readOnlyStatusConfigurationsBreakpointsChecked": true,
+    "runtimeEvidenceClaimed": false,
+    "staticFixtureCause": "G only ROOT; H arm + ROOT"
+  }
+}

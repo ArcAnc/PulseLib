@@ -162,3 +162,20 @@ See journal section 34 / `docs/porting/evidence/stage-5.2b.1.json`. The existing
 5.2a matrix/GPU probe is retained as regression with its own matching server flags.
 Deferred rig/item/ModelPart/armor/deformer capture/restoration, full Fabulous player
 parity, server extraction and real respawn remain checkpoint 5.2b.2.
+
+Stage **5.2b.2a** adds extracted rig commands and invocation scopes restoring the
+shared native PlayerModel after submit and deferred model execution. Its opt-in
+probe extends the 5.2b.1 run:
+
+```bash
+./gradlew :neoforge:runClient -PpulseStage1Smoke -PpulseStage52bProbe -PpulseStage52b2Probe -PpulseStage2Probe -PpulseVerificationDir=stage52b2a-manual-runs --no-daemon --console=plain
+```
+
+Prepare a new disposable server/world as above, use a run directory starting
+with `stage52b`, and keep the server console open for normal `stop`. The probe
+checks Gecko/glTF before and after reload, frozen rig after controller stop and
+missing owner ID, native submit/deferred nested failures, model pose/visibility
+restoration and native vertex emission. Stage 5.2a is the separate unchanged
+GPU hand regression. ModelPart/arm queues, armor/deformer lifetime, Fabulous
+player pixels and the remaining server/respawn witnesses are still open in
+**5.2b.2b**; this result does not complete stage 5. See section 35 of the journal.
