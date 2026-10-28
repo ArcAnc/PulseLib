@@ -19,6 +19,7 @@ import com.arcanc.pulselib.util.PLibDatabase;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.Identifier;
@@ -339,6 +340,26 @@ public final class PPlayerAnimations
 		for (PPlayerRigPose.Contribution contribution : contributions)
 			for (ModelPart part : contribution.part().resolve(model))
 				apply(part, originalPose.part(part), contribution.pose(), contribution.mode(), contribution.weight());
+	}
+
+	static void applyRig(HumanoidModel<?> model, List<PPlayerRigPose.Contribution> contributions)
+	{
+		Map<ModelPart, PPlayerModelPose.PartPose> originals = new IdentityHashMap<>();
+		for (PPlayerRigPose.Contribution contribution : contributions)
+		{
+			@Nullable ModelPart part = switch (contribution.part())
+			{
+				case HEAD -> model.head;
+				case BODY -> model.body;
+				case RIGHT_ARM -> model.rightArm;
+				case LEFT_ARM -> model.leftArm;
+				case RIGHT_LEG -> model.rightLeg;
+				case LEFT_LEG -> model.leftLeg;
+				case ROOT -> null;
+			};
+			if (part != null)
+				apply(part, originals.computeIfAbsent(part, PPlayerModelPose.PartPose::new), contribution.pose(), contribution.mode(), contribution.weight());
+		}
 	}
 
 	/**

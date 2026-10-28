@@ -183,9 +183,11 @@ public final class PPlayerMeshDeformers
 			for (ActiveBinding binding : active)
 				binding.stack.deformInPlace(position, reference -> binding.values.resolve(player, reference));
 		};
-		for (ModelPart.Cube cube : ((PModelPartCubes)(Object)modelPart).pulselib$cubes())
-			if (cube instanceof PDeformedCuboid deformable)
-				deformable.setDeformer(deformer);
+		// Native 26.1 overlays are children sharing the parent's part-local channel space.
+		for (ModelPart child : modelPart.getAllParts())
+			for (ModelPart.Cube cube : ((PModelPartCubes)(Object)child).pulselib$cubes())
+				if (cube instanceof PDeformedCuboid deformable)
+					deformable.setDeformer(deformer);
 	}
 
 	/**

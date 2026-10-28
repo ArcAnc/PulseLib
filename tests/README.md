@@ -238,7 +238,24 @@ saved binding. Ordinary restoration scopes keep live caller semantics.
 Four Gecko/glTF suites cover two owners, real controller stop, operation mutation,
 hidden parents/skipDraw, main/outline/crumbling, nested failures and old nodes
 replayed after actual resource reload. The unchanged GPU hand and GUI/glint
-suites validate real draws separately. Automatic main/first-person/armor
-RenderState extraction and removal of the armor `state.id` lookup remain
-**5.2b.2c.2b**. This checkpoint does not complete stage 5 or Fabric runtime.
-See journal section 40 and its structured evidence.
+suites validate real draws separately. Main/first-person/armor extraction is now
+covered by **5.2b.2c.2b**, below. Stage 5 and Fabric runtime remain incomplete.
+See journal sections 40–41 and their structured evidence.
+
+Stage **5.2b.2c.2b** uses the same `-PpulseStage52b2bProbe` command above.
+`Stage52GeometryProbe` checks main extraction before controller stop and invalid
+owner id; `Stage52ArmorProbe` adds two owners, four native equipment slots,
+modern/registered deformers, one shared custom HumanoidModel for chest/legs,
+texture/glint nodes, first-person arms, main/outline/crumbling, nested failures
+and states retained through real reload. All geometry uses a strict immediate
+canonical oracle. Source values and model selection must never run during
+submit/replay. The fixture activates/deactivates temporary definitions with
+normal animation ticks.
+
+Recording buffers apply only to isolated feature suites. The native camera
+observer wears armor in ordinary world rendering; GL queries count original
+RenderType draws identified by their captured armor entry. Native 26.1 armor
+can itself be a PlayerModel. The accepted run has 80 armor nodes, four hand
+replays and 192 expected exceptions, with real GPU draws in both reload phases.
+No recording consumer replaces world rendering. Canonical test mod/Fabric
+runtime and full Fabulous armor pixel coverage remain later checkpoints.

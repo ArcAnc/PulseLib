@@ -22,6 +22,10 @@ import com.arcanc.pulselib.util.attachments.humanoid.armor.PLibArmorHandler;
 import com.google.common.reflect.TypeToken;
 import com.mojang.blaze3d.textures.TextureFormat;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.model.Model;
+import net.minecraft.client.resources.model.EquipmentClientInfo;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.client.resources.model.sprite.AtlasManager;
@@ -47,16 +51,13 @@ public final class NeoForgeClientLifecycle
 
 	public static void register(IEventBus bus)
 	{
+		PClientRenderHooks.installArmorModels(NeoForgeClientLifecycle::armorModel);
 		PClientRenderHooks.install(TextureFormat::hasStencilAspect, (renderer, pose, collector, light, skin, sleeve, player, right) ->
 		{
 			if (right)
-			{
 				renderer.renderRightHand(pose, collector, light, skin, sleeve, player);
-			}
 			else
-			{
 				renderer.renderLeftHand(pose, collector, light, skin, sleeve, player);
-			}
 		});
 		bus.addListener((RegisterRenderPipelinesEvent event) -> PRenderTypes.register(event::registerPipeline));
 		bus.addListener(NeoForgeClientLifecycle::registerAtlases);
@@ -66,15 +67,19 @@ public final class NeoForgeClientLifecycle
 		NeoForge.EVENT_BUS.addListener((LevelTickEvent.Pre event) ->
 		{
 			if (event.getLevel() instanceof ClientLevel level)
-			{
 				PLibAnimationTicker.clientTick(level);
-			}
 		});
 		NeoForge.EVENT_BUS.addListener((GameShuttingDownEvent event) -> PulseRuntime.disconnected());
 		NeoForge.EVENT_BUS.addListener((ClientTickEvent.Post event) -> PLibAnimationTicker.afterClientTick());
 		NeoForge.EVENT_BUS.addListener((RenderLevelStageEvent.AfterOpaqueFeatures event) -> PRenderStagesHandler.afterOpaqueFeatures());
 		NeoForge.EVENT_BUS.addListener((RenderLevelStageEvent.AfterTranslucentFeatures event) -> PRenderStagesHandler.afterNativeFeatures());
 		NeoForge.EVENT_BUS.addListener((RenderLevelStageEvent.AfterTranslucentParticles event) -> PRenderStagesHandler.afterParticles());
+	}
+
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	private static Model<?> armorModel(ItemStack stack, EquipmentClientInfo.LayerType type, Model<?> model)
+	{
+		return IClientItemExtensions.of(stack).getGenericArmorModel(stack, type, (Model)model);
 	}
 
 	private static void registerAtlases(RegisterTextureAtlasesEvent event)

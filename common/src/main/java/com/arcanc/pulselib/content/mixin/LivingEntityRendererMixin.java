@@ -10,6 +10,7 @@
 package com.arcanc.pulselib.content.mixin;
 
 import com.arcanc.pulselib.content.player.animation.PPlayerRigPose;
+import com.arcanc.pulselib.content.player.deformer.PPlayerModelGeometry;
 import com.arcanc.pulselib.content.renderer.base.PPlayerRigRenderState;
 import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
@@ -39,5 +40,8 @@ public abstract class LivingEntityRendererMixin
 			if (rig != null)
 				rig.apply((PlayerModel)(Object)this);
 		}
+		var geometry = PPlayerModelGeometry.main(state, (PlayerModel)(Object)this);
+		if (geometry != null)
+			geometry.geometry().restore();
 	}
 }

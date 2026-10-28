@@ -3,7 +3,8 @@
   "package": "com.arcanc.pulselib.content.mixin",
   "compatibilityLevel": "JAVA_25",
   "client": [
-    "NeoForgeCameraAccessor"
+    "NeoForgeCameraAccessor",
+    "NeoForgeArmorModelMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -94,6 +94,9 @@ public final class Stage52PartsProbe
 
 	public static @Nullable VertexConsumer partBuffer(String pass)
 	{
+		VertexConsumer geometry = Stage52ArmorProbe.buffer(pass);
+		if (geometry != null)
+			return geometry;
 		PartDraw draw = partDraw;
 		if (draw == null)
 			return null;
@@ -331,8 +334,16 @@ public final class Stage52PartsProbe
 			frozenNode(arm, poses);
 			arm.visible = true;
 			arm.skipDraw = true;
+			boolean sleeveVisible = model.rightSleeve.visible;
+			model.rightSleeve.visible = false;
 			frozenNode(arm, poses);
+			check(reads[0] == hiddenReads, "Hidden arm and skipped own cubes never evaluate callbacks");
+			model.rightSleeve.visible = true;
+			frozenNode(arm, poses);
+			check(reads[0] > hiddenReads, "skipDraw preserves the visible deformed child overlay");
+			model.rightSleeve.visible = sleeveVisible;
 			arm.skipDraw = false;
+			hiddenReads = reads[0];
 			model.root().visible = false;
 			frozenNode(model.root(), poses);
 			model.root().visible = true;

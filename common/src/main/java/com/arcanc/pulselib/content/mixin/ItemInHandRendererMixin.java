@@ -1,6 +1,17 @@
+/**
+ * @author ArcAnc
+ * Created at: 30.07.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
 package com.arcanc.pulselib.content.mixin;
 
 import com.arcanc.pulselib.platform.PClientRenderHooks;
+import com.arcanc.pulselib.content.player.deformer.PPlayerMeshDeformers;
+import com.arcanc.pulselib.content.renderer.base.PModelPartSnapshot;
 import com.arcanc.pulselib.content.player.animation.firstPerson.*;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -52,7 +63,12 @@ public abstract class ItemInHandRendererMixin
 		PFirstPersonRenderContexts.beginPass(player, partialTick);
 		try
 		{
-			original.call(partialTick, poseStack, submitNodeCollector, player, packedLight);
+			var model = Minecraft.getInstance().getEntityRenderDispatcher().getPlayerRenderer(player).getModel();
+			try (var caller = PModelPartSnapshot.capture(model.root()))
+			{
+				PPlayerMeshDeformers.apply(player, model, partialTick);
+				original.call(partialTick, poseStack, submitNodeCollector, player, packedLight);
+			}
 		}
 		finally
 		{

@@ -11,6 +11,8 @@ package com.arcanc.pulselib.content.mixin;
 
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
 import com.arcanc.pulselib.content.player.animation.PPlayerRigPose;
+import com.arcanc.pulselib.content.player.deformer.PPlayerGeometryRenderState;
+import com.arcanc.pulselib.content.player.deformer.PPlayerGeometryRenderer;
 import com.arcanc.pulselib.content.renderer.PWorldRenderEligibility;
 import com.arcanc.pulselib.content.renderer.base.PPartialTickRenderState;
 import com.arcanc.pulselib.content.renderer.base.PPlayerRootRenderState;
@@ -59,6 +61,13 @@ public abstract class EntityRendererExtractionMixin
 			}
 			if (state instanceof PPlayerRigRenderState rig)
 				rig.pulselib$setPlayerRig(entity instanceof Player player ? PPlayerRigPose.capture(player, partialTick) : null);
+			if (state instanceof PPlayerGeometryRenderState geometry)
+			{
+				geometry.pulselib$setPlayerGeometry(null);
+				geometry.pulselib$setSubmittingGeometry(null);
+				if (state instanceof AvatarRenderState avatar && entity instanceof Player player && (Object)this instanceof PPlayerGeometryRenderer renderer)
+					geometry.pulselib$setPlayerGeometry(renderer.pulselib$captureGeometry(player, avatar, partialTick));
+			}
 			return state;
 		});
 	}

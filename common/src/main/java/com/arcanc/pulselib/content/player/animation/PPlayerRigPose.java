@@ -10,6 +10,7 @@
 package com.arcanc.pulselib.content.player.animation;
 
 import net.minecraft.client.model.player.PlayerModel;
+import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -37,6 +38,12 @@ public final class PPlayerRigPose
 
 	/** Applies immutable contributions to the current vanilla pose without resolving a live owner. */
 	public void apply(PlayerModel model)
+	{
+		PPlayerAnimations.applyRig(model, this.contributions);
+	}
+
+	/** Armor uses the same sampled commands against its own vanilla base pose. */
+	public void apply(HumanoidModel<?> model)
 	{
 		PPlayerAnimations.applyRig(model, this.contributions);
 	}

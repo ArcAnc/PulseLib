@@ -9,61 +9,97 @@
 
 package com.arcanc.pulselib.content.mixin;
 
-import com.arcanc.pulselib.content.renderer.base.PRenderState;
-import com.arcanc.pulselib.content.player.deformer.PPlayerMeshDeformers;
+import com.arcanc.pulselib.content.player.deformer.PPlayerArmorGeometryLayer;
+import com.arcanc.pulselib.content.player.deformer.PPlayerGeometryRenderState;
+import com.arcanc.pulselib.content.player.deformer.PPlayerModelGeometry;
+import com.arcanc.pulselib.content.renderer.base.PModelPartSnapshot;
+import com.arcanc.pulselib.platform.PClientRenderHooks;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.client.resources.model.EquipmentClientInfo;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.Unique;
 
-/**
- * Applies PulseLib integration to {@code HumanoidArmorLayer}.
- */
+import java.util.List;
+import java.util.Map;
+
+/** Resolves equipped shapes during extraction and binds immutable entries during native submission. */
 @Mixin(HumanoidArmorLayer.class)
-public abstract class HumanoidArmorLayerMixin
+public abstract class HumanoidArmorLayerMixin implements PPlayerArmorGeometryLayer
 {
-	/**
-	 * Returns the armor model.
-	 * @param state the state to use.
-	 * @param slot the slot to use.
-	 * @return the value produced by this operation.
-	 */
+	@Unique
+	private final Object pulselib$geometryKey = new Object();
+
 	@Shadow
 	protected abstract HumanoidModel<?> getArmorModel(HumanoidRenderState state, EquipmentSlot slot);
 
-	/**
-	 * Performs the pulselib$apply player deformers to armor operation.
-	 * @param poseStack the pose stack to use.
-	 * @param submitNodeCollector the submit node collector to use.
-	 * @param itemStack the item stack to use.
-	 * @param slot the slot to use.
-	 * @param packedLight the packed light to use.
-	 * @param state the state to use.
-	 * @param callback the callback to use.
-	 */
-	@Inject(method = "renderArmorPiece", at = @At("HEAD"))
-	private void pulselib$applyPlayerDeformersToArmor(PoseStack poseStack,
-	                                                  SubmitNodeCollector submitNodeCollector,
-	                                                  ItemStack itemStack,
-	                                                  EquipmentSlot slot,
-	                                                  int packedLight,
-	                                                  HumanoidRenderState state,
-	                                                  CallbackInfo callback)
+	@Override
+	public void pulselib$captureArmorGeometry(Player player, AvatarRenderState state, float partialTick,
+			Map<Object, Map<EquipmentSlot, PPlayerModelGeometry.Entry>> armor)
 	{
-		if (!(state instanceof AvatarRenderState avatar) || Minecraft.getInstance().level == null ||
-				!(Minecraft.getInstance().level.getEntity(avatar.id) instanceof Player player))
+		for (EquipmentSlot slot : List.of(EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.HEAD))
+		{
+			ItemStack stack = switch (slot)
+			{
+				case CHEST -> state.chestEquipment;
+				case LEGS -> state.legsEquipment;
+				case FEET -> state.feetEquipment;
+				case HEAD -> state.headEquipment;
+				default -> ItemStack.EMPTY;
+			};
+			if (!HumanoidArmorLayer.shouldRender(stack, slot))
+				continue;
+			HumanoidModel<?> original = this.getArmorModel(state, slot);
+			EquipmentClientInfo.LayerType type = state.isBaby && state.entityType != EntityType.ARMOR_STAND ?
+					EquipmentClientInfo.LayerType.HUMANOID_BABY : slot == EquipmentSlot.LEGS ?
+					EquipmentClientInfo.LayerType.HUMANOID_LEGGINGS : EquipmentClientInfo.LayerType.HUMANOID;
+			try (var caller = PModelPartSnapshot.capture(original.root()))
+			{
+				PPlayerModelGeometry.setup(original, state);
+				var model = PClientRenderHooks.armorModel(stack, type, original);
+				var entry = PPlayerModelGeometry.capture(player, state, partialTick, original, model);
+				PPlayerModelGeometry.putArmor(armor, this.pulselib$geometryKey, slot, entry);
+			}
+		}
+	}
+
+	@WrapMethod(method = "renderArmorPiece")
+	private void pulselib$submitExtractedArmor(PoseStack poses, SubmitNodeCollector collector, ItemStack stack,
+			EquipmentSlot slot, int light, HumanoidRenderState state, Operation<Void> original)
+	{
+		var owner = state instanceof PPlayerGeometryRenderState access ? access : null;
+		var geometry = owner == null ? null : owner.pulselib$getPlayerGeometry();
+		var entry = geometry == null ? null : geometry.armor(this.pulselib$geometryKey, slot);
+		if (entry == null)
+		{
+			original.call(poses, collector, stack, slot, light, state);
 			return;
-		PPlayerMeshDeformers.apply(player, this.getArmorModel(state, slot), PRenderState.partialTick(state));
+		}
+		var previous = owner.pulselib$getSubmittingGeometry();
+		owner.pulselib$setSubmittingGeometry(entry);
+		int depth = ((PoseStackAccessor)poses).pulselib$getDepth();
+		PoseStack.Pose pose = poses.last().copy();
+		try (var caller = PModelPartSnapshot.capture(entry.model().root()))
+		{
+			original.call(poses, collector, stack, slot, light, state);
+		}
+		finally
+		{
+			owner.pulselib$setSubmittingGeometry(previous);
+			while (((PoseStackAccessor)poses).pulselib$getDepth() > depth)
+				poses.popPose();
+			poses.last().set(pose);
+		}
 	}
 }

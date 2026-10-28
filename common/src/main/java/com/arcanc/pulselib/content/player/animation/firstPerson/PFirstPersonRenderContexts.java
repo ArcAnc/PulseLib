@@ -40,14 +40,27 @@ public final class PFirstPersonRenderContexts
 	public static void beginPass(LocalPlayer player, float partialTick)
 	{
 		RenderSystem.assertOnRenderThread();
-		beginPass(PPlayerAnimations.firstPersonPresentation(player, partialTick));
+		beginPass(PPlayerAnimations.firstPersonPresentation(player, partialTick), partialTick);
 	}
 
 	/** Binds an already sampled presentation independently of animation evaluation. */
 	static void beginPass(@Nullable PFirstPersonRenderPresentation presentation)
 	{
+		beginPass(presentation, 0);
+	}
+
+	static void beginPass(@Nullable PFirstPersonRenderPresentation presentation, float partialTick)
+	{
 		RenderSystem.assertOnRenderThread();
-		PASSES.push(new Pass(presentation));
+		PASSES.push(new Pass(presentation, partialTick));
+	}
+
+	/** Returns the current native pass's extraction fraction, including nested hand submissions. */
+	static float partialTick(float fallback)
+	{
+		RenderSystem.assertOnRenderThread();
+		Pass pass = PASSES.peek();
+		return pass == null ? fallback : pass.partialTick;
 	}
 
 	/** Releases this pass's hand frames and restores the enclosing pass. */
@@ -108,11 +121,13 @@ public final class PFirstPersonRenderContexts
 	private static final class Pass
 	{
 		private final @Nullable PFirstPersonRenderPresentation presentation;
+		private final float partialTick;
 		private @Nullable HandFrame hand;
 
-		private Pass(@Nullable PFirstPersonRenderPresentation presentation)
+		private Pass(@Nullable PFirstPersonRenderPresentation presentation, float partialTick)
 		{
 			this.presentation = presentation;
+			this.partialTick = partialTick;
 		}
 	}
 

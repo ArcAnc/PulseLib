@@ -16,6 +16,8 @@
     "Stage52RootMixin",
     "Stage52RigMixin",
     "Stage52RigFeatureMixin",
+    "Stage52ArmorBuffersMixin",
+    "Stage52ArmorGpuMixin",
     "Stage52PartBuffersMixin",
     "Stage52ItemBuffersMixin"
   ],

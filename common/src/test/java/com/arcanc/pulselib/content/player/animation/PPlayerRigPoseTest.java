@@ -12,6 +12,7 @@ package com.arcanc.pulselib.content.player.animation;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.player.PlayerModel;
+import net.minecraft.client.model.HumanoidModel;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.junit.jupiter.api.Test;
@@ -83,6 +84,37 @@ class PPlayerRigPoseTest
 	{
 		return new PPlayerRigPose.Contribution(PPlayerPart.BODY,
 				new PPlayerBonePose(new Vector3f(x, 0, 0), new Quaternionf(), new Vector3f(1), true, false, false), mode, weight);
+	}
+
+	@Test
+	void armorRigMatchesCanonicalPlayerBlendingOnEveryNativePart()
+	{
+		for (var mode : PPlayerAnimationBlendMode.values())
+			for (float weight : new float[] {0.25f, 0.6f, 1})
+			{
+				var player = model();
+				var armor = new HumanoidModel<>(LayerDefinition.create(HumanoidModel.createMesh(CubeDeformation.NONE, 0), 64, 64).bakeRoot());
+				var source = List.of(player.head, player.body, player.rightArm, player.leftArm, player.rightLeg, player.leftLeg);
+				var target = List.of(armor.head, armor.body, armor.rightArm, armor.leftArm, armor.rightLeg, armor.leftLeg);
+				for (int i = 0; i < source.size(); i++)
+				{
+					source.get(i).x += 3;
+					source.get(i).yRot = 0.2f;
+					source.get(i).zScale = 2;
+					target.get(i).loadPose(source.get(i).storePose());
+				}
+				var contributions = new ArrayList<PPlayerRigPose.Contribution>();
+				for (PPlayerPart part : PPlayerPart.values())
+					if (part != PPlayerPart.ROOT)
+						for (float amount : new float[] {0.5f, 1})
+							contributions.add(new PPlayerRigPose.Contribution(part,
+								new PPlayerBonePose(new Vector3f(amount), new Quaternionf().rotationX(0.3f), new Vector3f(1.5f), true, true, true), mode, weight));
+				var rig = new PPlayerRigPose(contributions);
+				rig.apply(player);
+				rig.apply(armor);
+				for (int i = 0; i < source.size(); i++)
+					assertEquals(source.get(i).storePose(), target.get(i).storePose(), mode + " / " + weight + " / " + i);
+			}
 	}
 
 	private static PlayerModel model()

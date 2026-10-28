@@ -161,6 +161,7 @@ public final class Stage52CameraProbe
 			reload.join();
 			reload = null;
 			phase = 1;
+			Stage52ArmorProbe.afterReload();
 		}
 		createObserver();
 		if (sceneIndex == SCENES.size())
@@ -181,6 +182,10 @@ public final class Stage52CameraProbe
 				Stage52RigProbe.completed();
 			if (Boolean.getBoolean("pulselib.stage52b2bProbe"))
 				Stage52PartsProbe.completed();
+			if (Boolean.getBoolean("pulselib.stage52b2bProbe"))
+				Stage52GeometryProbe.completed();
+			if (Boolean.getBoolean("pulselib.stage52b2bProbe"))
+				Stage52ArmorProbe.completed();
 			PLibDatabase.LOGGER.info("STAGE 5.2b.1 NATIVE PLAYER PASS: cameraCases={}, cameraChecks={}, rootSuites={}, nativeWorldRoots={}, foreignCameras={}, formats=Gecko/glTF, F/G/H weights=0.25/0.6/1, VANILLA, extraction/nested failure/recovery/reload PASS", VERIFIED.size(), cameraChecks, Stage52RootProbe.suites(), Stage52RootProbe.worldSamples(), foreignChecks);
 			completed = true;
 			mc.stop();
@@ -208,6 +213,10 @@ public final class Stage52CameraProbe
 			Stage52RigProbe.verify(selectedScene.id, selectedScene.clip);
 		if (Boolean.getBoolean("pulselib.stage52b2bProbe") && selectedScene.clip.equals("H") && selectedScene.weight == 1)
 			Stage52PartsProbe.verify(selectedScene.id, selectedScene.clip);
+		if (Boolean.getBoolean("pulselib.stage52b2bProbe") && selectedScene.clip.equals("H") && selectedScene.weight == 1)
+			Stage52GeometryProbe.verify(selectedScene.id, selectedScene.clip);
+		if (Boolean.getBoolean("pulselib.stage52b2bProbe") && selectedScene.clip.equals("H") && selectedScene.weight == 1)
+			Stage52ArmorProbe.verify(selectedScene.id, selectedScene.clip);
 		sceneIndex++;
 		startTick = -1;
 	}

@@ -77,6 +77,36 @@ class PFirstPersonRenderContextsTest
 	}
 
 	@Test
+	void partialTickBelongsToItsPassAndSurvivesNestedFailure()
+	{
+		assertEquals(0.9f, PFirstPersonRenderContexts.partialTick(0.9f));
+		PFirstPersonRenderContexts.beginPass(presentation(), 0.65f);
+		try
+		{
+			assertEquals(0.65f, PFirstPersonRenderContexts.partialTick(0));
+			assertThrows(IllegalStateException.class, () ->
+			{
+				PFirstPersonRenderContexts.beginPass((PFirstPersonRenderPresentation)null, 0.25f);
+				try
+				{
+					assertEquals(0.25f, PFirstPersonRenderContexts.partialTick(0));
+					throw new IllegalStateException("nested partial tick");
+				}
+				finally
+				{
+					PFirstPersonRenderContexts.endPass();
+				}
+			});
+			assertEquals(0.65f, PFirstPersonRenderContexts.partialTick(0));
+		}
+		finally
+		{
+			PFirstPersonRenderContexts.endPass();
+		}
+		assertEquals(0.9f, PFirstPersonRenderContexts.partialTick(0.9f));
+	}
+
+	@Test
 	void failedNestedPassReleasesItsHandsAndRestoresItsParent()
 	{
 		var outer = presentation();
