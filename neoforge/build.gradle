@@ -76,6 +76,8 @@ if (providers.gradleProperty('pulseStage1Smoke').isPresent()) {
                 if (providers.gradleProperty('pulseStage52b2bProbe').isPresent()) {
                     systemProperty 'pulselib.stage52b2bProbe', 'true'
                 }
+                if (providers.gradleProperty('pulseStage52b3Probe').isPresent())
+                    systemProperty 'pulselib.stage52b3Probe', 'true'
                 if (providers.gradleProperty('pulseStage52b2Probe').isPresent()) {
                     systemProperty 'pulselib.stage52b2Probe', 'true'
                 }

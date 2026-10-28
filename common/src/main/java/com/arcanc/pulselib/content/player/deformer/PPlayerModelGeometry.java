@@ -49,6 +49,12 @@ public final class PPlayerModelGeometry
 		return slots == null ? null : slots.get(slot);
 	}
 
+	/** Armor hooks may choose material or submit additional geometry later. */
+	public boolean hasArmor()
+	{
+		return !this.armor.isEmpty();
+	}
+
 	public static @Nullable Entry submitting(Object state)
 	{
 		return state instanceof PPlayerGeometryRenderState access ? access.pulselib$getSubmittingGeometry() : null;

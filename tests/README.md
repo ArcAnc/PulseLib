@@ -259,3 +259,22 @@ can itself be a PlayerModel. The accepted run has 80 armor nodes, four hand
 replays and 192 expected exceptions, with real GPU draws in both reload phases.
 No recording consumer replaces world rendering. Canonical test mod/Fabric
 runtime and full Fabulous armor pixel coverage remain later checkpoints.
+
+Stage **5.2b.3** adds `-PpulseStage52b3Probe` to the native command above.
+Use `-PpulseStage1Smoke -PpulseStage52bProbe -PpulseStage52b2Probe
+-PpulseStage52b2bProbe -PpulseStage52b3Probe -PpulseStage2Probe` and a fresh
+directory beginning with `stage52b`. `Stage52CallbackProbe` covers arbitrary
+first/third-person anchor callbacks, platform arms, persistent first-person armor,
+legacy anchor/material resolvers, rig/armor extraction and nested exceptions.
+It compares child/sibling mesh matrices against an unmodified reference pass
+using actual decoded Gecko/glTF geometry through dynamic PModelData lookup.
+
+The accepted matrix contains 348 checks, 120 target checks (80 gate + 40 native chain),
+68 expected exceptions and 48 WORLD/GUI/OFFSCREEN queue cases before/after reload.
+Native transparency uses extracted OptionsRenderState, so the probe saves and
+restores both live options and extracted flags. Offscreen queue cases use a real
+separate TextureTarget. Only the probe's unique stage is consumed; world queues
+keep their existing submissions. Already submitted commands retain their owner;
+the caller remains responsible for discarding an aborted local plan.
+These checks establish scope/target/queue behavior. Dedicated Fabulous
+player/armor pixel-depth coverage remains checkpoint 5.2b.4. See journal §42.

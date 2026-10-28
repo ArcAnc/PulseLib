@@ -11,6 +11,8 @@ package com.arcanc.pulselib.content.mixin;
 
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
 import com.arcanc.pulselib.content.player.animation.PPlayerRigPose;
+import com.arcanc.pulselib.content.player.animation.attachment.PPlayerAttachmentEligibility;
+import com.arcanc.pulselib.content.renderer.base.PModelPartSnapshot;
 import com.arcanc.pulselib.content.player.deformer.PPlayerGeometryRenderState;
 import com.arcanc.pulselib.content.player.deformer.PPlayerGeometryRenderer;
 import com.arcanc.pulselib.content.renderer.PWorldRenderEligibility;
@@ -21,7 +23,9 @@ import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.world.entity.Entity;
@@ -44,32 +48,48 @@ public abstract class EntityRendererExtractionMixin
 	@WrapMethod(method = "createRenderState(Lnet/minecraft/world/entity/Entity;F)Lnet/minecraft/client/renderer/entity/state/EntityRenderState;")
 	private EntityRenderState pulselib$captureWorldItems(Entity entity, float partialTick, Operation<EntityRenderState> original)
 	{
-		return PWorldRenderEligibility.capture(() ->
+		try (var caller = entity instanceof Player && (Object)this instanceof LivingEntityRenderer<?, ?, ?> renderer ?
+				PModelPartSnapshot.capture(renderer.getModel().root()) : null)
 		{
-			EntityRenderState state = original.call(entity, partialTick);
-			if (state instanceof PPlayerRootRenderState snapshot)
+			return PWorldRenderEligibility.capture(() ->
 			{
-				snapshot.pulselib$setPlayerRoot(null);
-				if (state instanceof AvatarRenderState && entity instanceof Player player)
+				EntityRenderState state = original.call(entity, partialTick);
+				if (state instanceof PPlayerRootRenderState snapshot)
 				{
-					PoseStack root = new PoseStack();
-					PPlayerAnimations.applyRoot(player, root, partialTick);
-					snapshot.pulselib$setPlayerRoot(root.last().pose());
-					if (!PPlayerAnimations.meshAttachmentPoses(player, partialTick).isEmpty())
+					snapshot.pulselib$setPlayerRoot(null);
+					if (state instanceof AvatarRenderState && entity instanceof Player player)
+					{
+						PoseStack root = new PoseStack();
+						PPlayerAnimations.applyRoot(player, root, partialTick);
+						snapshot.pulselib$setPlayerRoot(root.last().pose());
+						if (!PPlayerAnimations.meshAttachmentPoses(player, partialTick).isEmpty())
+							PWorldRenderEligibility.markGeometry();
+					}
+				}
+				if (state instanceof PPlayerRigRenderState rig)
+				{
+					PPlayerRigPose pose = entity instanceof Player player ? PPlayerRigPose.capture(player, partialTick) : null;
+					rig.pulselib$setPlayerRig(pose);
+					if (pose != null && !pose.isEmpty())
 						PWorldRenderEligibility.markGeometry();
 				}
-			}
-			if (state instanceof PPlayerRigRenderState rig)
-				rig.pulselib$setPlayerRig(entity instanceof Player player ? PPlayerRigPose.capture(player, partialTick) : null);
-			if (state instanceof PPlayerGeometryRenderState geometry)
-			{
-				geometry.pulselib$setPlayerGeometry(null);
-				geometry.pulselib$setSubmittingGeometry(null);
-				if (state instanceof AvatarRenderState avatar && entity instanceof Player player && (Object)this instanceof PPlayerGeometryRenderer renderer)
-					geometry.pulselib$setPlayerGeometry(renderer.pulselib$captureGeometry(player, avatar, partialTick));
-			}
-			return state;
-		});
+				if (state instanceof PPlayerGeometryRenderState geometry)
+				{
+					geometry.pulselib$setPlayerGeometry(null);
+					geometry.pulselib$setSubmittingGeometry(null);
+					if (state instanceof AvatarRenderState avatar && entity instanceof Player player && (Object)this instanceof PPlayerGeometryRenderer renderer)
+					{
+						var shapes = renderer.pulselib$captureGeometry(player, avatar, partialTick);
+						geometry.pulselib$setPlayerGeometry(shapes);
+						if (shapes.hasArmor())
+							PWorldRenderEligibility.markGeometry();
+					}
+				}
+				if (entity instanceof AbstractClientPlayer player && PPlayerAttachmentEligibility.hasRenderer(player, partialTick))
+					PWorldRenderEligibility.markGeometry();
+				return state;
+			});
+		}
 	}
 
 	@Inject(method = "extractRenderState", at = @At("TAIL"))

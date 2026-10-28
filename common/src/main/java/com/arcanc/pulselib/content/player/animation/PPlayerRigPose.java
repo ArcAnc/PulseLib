@@ -42,6 +42,12 @@ public final class PPlayerRigPose
 		PPlayerAnimations.applyRig(model, this.contributions);
 	}
 
+	/** Whether this extraction has no eligible native rig consumers. */
+	public boolean isEmpty()
+	{
+		return this.contributions.isEmpty();
+	}
+
 	/** Armor uses the same sampled commands against its own vanilla base pose. */
 	public void apply(HumanoidModel<?> model)
 	{

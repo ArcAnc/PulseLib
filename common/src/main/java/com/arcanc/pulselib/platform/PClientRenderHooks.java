@@ -11,7 +11,7 @@ package com.arcanc.pulselib.platform;
 
 import com.arcanc.pulselib.content.player.animation.firstPerson.PFirstPersonPassTime;
 import com.arcanc.pulselib.content.player.deformer.PPlayerMeshDeformers;
-import com.arcanc.pulselib.content.renderer.base.PModelPartSnapshot;
+import com.arcanc.pulselib.content.renderer.base.PRenderCallbackScope;
 import com.mojang.blaze3d.textures.TextureFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
@@ -59,7 +59,7 @@ public final class PClientRenderHooks
 	                            SubmitNodeCollector collector, int light, Identifier skin, boolean sleeve,
 	                            AbstractClientPlayer player, boolean right)
 	{
-		try (var caller = PModelPartSnapshot.capture(renderer.getModel().root()))
+		try (var caller = PRenderCallbackScope.capture(pose, renderer.getModel().root()))
 		{
 			float partialTick = PFirstPersonPassTime.partialTick(Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false));
 			PPlayerMeshDeformers.apply(player, renderer.getModel(), partialTick);

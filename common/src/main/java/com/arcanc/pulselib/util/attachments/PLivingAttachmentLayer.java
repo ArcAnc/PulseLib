@@ -11,6 +11,7 @@ package com.arcanc.pulselib.util.attachments;
 
 
 import com.arcanc.pulselib.content.renderer.base.PRenderState;
+import com.arcanc.pulselib.content.renderer.base.PRenderCallbackScope;
 import com.arcanc.pulselib.content.animatable.PAnimationController;
 import com.arcanc.pulselib.content.model.baked.PBakedBone;
 import com.arcanc.pulselib.content.model.baked.PBakedModel;
@@ -19,6 +20,8 @@ import com.arcanc.pulselib.content.renderer.base.PLivingAttachmentRenderState;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -50,7 +53,7 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 			EquipmentSlot.BODY,
 			EquipmentSlot.MAINHAND,
 			EquipmentSlot.OFFHAND);
-	
+
 	/**
 	 * Creates an instance of the enclosing type.
 	 * @param parent the parent to use.
@@ -59,7 +62,7 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 	{
 		super(parent);
 	}
-	
+
 	/**
 	 * Performs the submit operation.
 	 * @param poseStack the pose stack to use.
@@ -75,12 +78,12 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 		List<RenderEntry> entries = ((PLivingAttachmentRenderState)state).pulselib$getAttachments();
 		if (entries == null)
 			return;
-		
+
 		for (RenderEntry entry : entries)
 			renderDefinition(poseStack, light, PRenderState.partialTick(state), entry,
-					binding -> PAttachmentAnchorResolvers.resolve(state, this.getParentModel(), binding.anchor()));
+					binding -> PAttachmentAnchorResolvers.resolve(state, this.getParentModel(), binding.anchor()), this.getParentModel().root());
 	}
-	
+
 	/**
 	 * Extracts the render entries.
 	 * @param entity the entity to use.
@@ -96,13 +99,13 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 			for (PLivingAttachmentDefinition definition : PLivingAttachments.get(stack, slot, entity))
 				addRenderEntry(entries, entity, stack, definition, partialTick);
 		}
-		
+
 		for (PLivingAttachmentDefinition definition : PLivingAttachments.getGlobal(entity))
 			addRenderEntry(entries, entity, ItemStack.EMPTY, definition, partialTick);
-		
+
 		return entries;
 	}
-	
+
 	/**
 	 * Adds the render entry.
 	 * @param entries the entries to use.
@@ -120,11 +123,11 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 		PBakedModel model = definition.modelData().getModel();
 		if (model == null)
 			return;
-		
+
 		Collection<PAnimationController<?>> controllers = definition.animationControllers(entity, stack, model, partialTick);
 		entries.add(new RenderEntry(definition, entity, stack.copy(), controllers));
 	}
-	
+
 	/**
 	 * Renders the first person anchor.
 	 * @param poseStack the pose stack to use.
@@ -141,27 +144,20 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 	                                              ModelPart anchorPart,
 	                                              float partialTick)
 	{
-		float oldXRot = anchorPart.xRot;
-		float oldYRot = anchorPart.yRot;
-		float oldZRot = anchorPart.zRot;
-		try
+		ModelPart modelRoot = entity instanceof AbstractClientPlayer player ?
+				Minecraft.getInstance().getEntityRenderDispatcher().getPlayerRenderer(player).getModel().root() : anchorPart;
+		try (var invocation = PRenderCallbackScope.capture(poseStack, modelRoot))
 		{
 			anchorPart.xRot = 0;
 			anchorPart.yRot = 0;
 			anchorPart.zRot = 0;
-			
+
 			for (RenderEntry entry : extractRenderEntries(entity, partialTick))
 				renderDefinition(poseStack, light, partialTick, entry,
-						binding -> binding.anchor().equals(targetAnchor) ? anchorPart : null);
-		}
-		finally
-		{
-			anchorPart.xRot = oldXRot;
-			anchorPart.yRot = oldYRot;
-			anchorPart.zRot = oldZRot;
+						binding -> binding.anchor().equals(targetAnchor) ? anchorPart : null, modelRoot);
 		}
 	}
-	
+
 	/**
 	 * Renders the definition.
 	 * @param poseStack the pose stack to use.
@@ -175,41 +171,42 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 			int light,
 			float partialTick,
 			RenderEntry entry,
-			AttachmentPartResolver partResolver)
+			AttachmentPartResolver partResolver, ModelPart modelRoot)
 	{
 		PLivingAttachmentDefinition definition = entry.definition();
 		PBakedModel model = definition.modelData().getModel();
 		if (model == null)
 			return;
-		
+
 		for (PAttachmentBinding binding : definition.bindings())
-		{
-			ModelPart vanillaPart = partResolver.resolve(binding);
-			if (vanillaPart == null)
-				continue;
-			
-			PBakedBone bone = findBone(model.bones(), binding.bone());
-			if (bone == null)
-				continue;
-			
-			poseStack.pushPose();
-			vanillaPart.translateAndRotate(poseStack);
-			poseStack.mulPose(Axis.ZP.rotationDegrees(180));
-			PTransform transform = binding.transform();
-			Vector3f offset = transform.offset();
-			Quaternionf rotation = transform.rotation();
-			Vector3f scale = transform.scale();
-			poseStack.translate(offset.x(), offset.y(), offset.z());
-			poseStack.mulPose(rotation);
-			poseStack.scale(scale.x(), scale.y(), scale.z());
-			poseStack.translate(-bone.basePosition().x(), -bone.basePosition().y(), -bone.basePosition().z());
-			
-			drawBone(poseStack, definition, bone, entry.entity(), entry.stack(), entry.controllers(), light, partialTick);
-			
-			poseStack.popPose();
-		}
+			try (var callback = PRenderCallbackScope.capture(poseStack, modelRoot))
+			{
+				ModelPart vanillaPart = partResolver.resolve(binding);
+				if (vanillaPart == null)
+					continue;
+
+				PBakedBone bone = findBone(model.bones(), binding.bone());
+				if (bone == null)
+					continue;
+
+				poseStack.pushPose();
+				vanillaPart.translateAndRotate(poseStack);
+				poseStack.mulPose(Axis.ZP.rotationDegrees(180));
+				PTransform transform = binding.transform();
+				Vector3f offset = transform.offset();
+				Quaternionf rotation = transform.rotation();
+				Vector3f scale = transform.scale();
+				poseStack.translate(offset.x(), offset.y(), offset.z());
+				poseStack.mulPose(rotation);
+				poseStack.scale(scale.x(), scale.y(), scale.z());
+				poseStack.translate(-bone.basePosition().x(), -bone.basePosition().y(), -bone.basePosition().z());
+
+				drawBone(poseStack, definition, bone, entry.entity(), entry.stack(), entry.controllers(), light, partialTick, modelRoot);
+
+				poseStack.popPose();
+			}
 	}
-	
+
 	/**
 	 * Draws the bone.
 	 * @param poseStack the pose stack to use.
@@ -228,11 +225,11 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 	                             ItemStack stack,
 	                             Collection<PAnimationController<?>> controllers,
 	                             int light,
-	                             float partialTick)
+	                             float partialTick, ModelPart modelRoot)
 	{
-		drawBoneUnchecked(poseStack, definition, bone, entity, stack, controllers, light, partialTick);
+		drawBoneUnchecked(poseStack, definition, bone, entity, stack, controllers, light, partialTick, modelRoot);
 	}
-	
+
 	/**
 	 * Draws the bone unchecked.
 	 * @param poseStack the pose stack to use.
@@ -252,24 +249,30 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 	                                      ItemStack stack,
 	                                      Collection<PAnimationController<?>> controllers,
 	                                      int light,
-	                                      float partialTick)
+	                                      float partialTick, ModelPart modelRoot)
 	{
 		PMeshRenderContext context = new PMeshRenderContext(
 				PRenderTypes.RenderTypeProvider :: trianglesCutout,
 				-1,
 				light,
 				OverlayTexture.NO_OVERLAY);
-		
+
 		bone.instantDraw(
 				poseStack,
 				definition.modelData(),
 				(Collection) controllers,
 				(bakedBone, mesh, inherited) ->
-						definition.renderResolver().resolve(entity, stack, bakedBone, mesh, inherited, partialTick),
+				{
+					// Each resolver must finish before traversal continues into another mesh or child bone.
+					try (var callback = PRenderCallbackScope.capture(poseStack, modelRoot))
+					{
+						return definition.renderResolver().resolve(entity, stack, bakedBone, mesh, inherited, partialTick);
+					}
+				},
 				context,
 				partialTick);
 	}
-	
+
 	/**
 	 * Finds the bone.
 	 * @param bones the bones to use.
@@ -282,15 +285,15 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 		{
 			if (bone.name().equals(name))
 				return bone;
-			
+
 			PBakedBone child = findBone(bone.children(), name);
 			if (child != null)
 				return child;
 		}
-		
+
 		return null;
 	}
-	
+
 	@FunctionalInterface
 /**
  * Defines the contract for attachment part resolver.
@@ -304,7 +307,7 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 		 */
 		@Nullable ModelPart resolve(PAttachmentBinding binding);
 	}
-	
+
 /**
  * Immutable value object representing render entry.
  */

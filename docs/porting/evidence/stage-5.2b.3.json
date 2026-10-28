@@ -1,0 +1,465 @@
+{
+  "checkpoint": "5.2b.3",
+  "status": "PASS within documented callback/target/queue scope; overall stage 5 incomplete",
+  "date": "2026-10-28",
+  "author": "ArcAnc",
+  "license": "Arc's License of Common Sense",
+  "startHead": "dee4ea573b0454b24fb248f32ddf06dfc36b4908",
+  "frozenRefs": {
+    "26.1": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1",
+    "1.21.1-multiloader": "7ce6f024b307bb821ce543344d3896c8e1fcf26b"
+  },
+  "implementation": {
+    "perInvocationAndPerCallbackPoseModelScopes": true,
+    "perLegacyMeshResolverScope": true,
+    "fullPlayerExtractionModelScope": true,
+    "normalNestedExceptionRestoration": true,
+    "modelVisibilityAndCubeBindingsPreserved": true,
+    "registeredAnchorCallbacksClassifiedWithoutRendering": true,
+    "rigAndArmorConservativeEligibility": true,
+    "bareInactiveOwnerControls": true,
+    "newQueuesThreadLocalsOrGpuResources": 0,
+    "newRendererCopies": 0,
+    "canonicalApiRemovedOrChanged": false,
+    "internalAdditions": [
+      "PRenderCallbackScope",
+      "PPlayerAttachmentEligibility",
+      "PPlayerRigPose.isEmpty()",
+      "PPlayerModelGeometry.hasArmor()"
+    ]
+  },
+  "junit": {
+    "common": {
+      "tests": 238,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "fabric": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "neoforge": {
+      "tests": 0,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "native": {
+    "cases": [
+      {
+        "suite": 0,
+        "checks": 87,
+        "targetChecks": 30,
+        "callbackCalls": 18,
+        "expectedFailures": 17
+      },
+      {
+        "suite": 1,
+        "checks": 174,
+        "targetChecks": 60,
+        "callbackCalls": 36,
+        "expectedFailures": 34
+      },
+      {
+        "suite": 2,
+        "checks": 261,
+        "targetChecks": 90,
+        "callbackCalls": 54,
+        "expectedFailures": 51
+      },
+      {
+        "suite": 3,
+        "checks": 348,
+        "targetChecks": 120,
+        "callbackCalls": 72,
+        "expectedFailures": 68
+      }
+    ],
+    "checks": 348,
+    "targetChecks": 120,
+    "pureGateChecks": 80,
+    "actualNativeGetTransparencyChainChecks": 40,
+    "modernCallbackCalls": 72,
+    "expectedExceptions": 68,
+    "queueCases": 48,
+    "contexts": [
+      "WORLD",
+      "GUI",
+      "OFFSCREEN"
+    ],
+    "offscreenUsesActualTextureTarget": true,
+    "onlyUniqueTestStageConsumed": true,
+    "queuedCommandsKeepTheirOwner": true,
+    "arbitraryExternalSideEffectsTransactional": false,
+    "formats": [
+      "Gecko",
+      "glTF"
+    ],
+    "phases": [
+      "before real reload",
+      "after real reload"
+    ],
+    "hierarchyOracle": "Public PBakedModel and dynamic PModelData.getModel extension: real decoded motion asset meshes on parent/child/sibling bones, plus separate arm binding; compare each resolver entry to an unmodified pass",
+    "hierarchyMeshCallbacksPerSuite": 4,
+    "initialHierarchyWitnessInsufficient": true,
+    "discriminatingHierarchyBaselineFailedMeshes": [
+      1,
+      2
+    ],
+    "nativeShadersUseExtractedOptionsRenderState": true,
+    "panoramicGateChecked": true,
+    "clientExit": 0,
+    "shutdownAssertions": "PASS"
+  },
+  "previousNativeRegressions": {
+    "cameraCases": 40,
+    "cameraChecks": 1603,
+    "rootSuites": 4,
+    "nativeWorldRoots": 1480,
+    "foreignCameras": 4,
+    "armorNodes": 80,
+    "armorExpectedFailures": 192,
+    "handReplays": 4,
+    "oldStatesAcrossReload": 2,
+    "armorGpuDraws": [
+      1292,
+      1262
+    ],
+    "armorGpuPrimitives": [
+      421192,
+      411412
+    ]
+  },
+  "gpuHandRegression": {
+    "matrixPhysicsCases": 996,
+    "generatedPrimitives": 222416,
+    "callbackFailureSuites": 4,
+    "nativeThird": [
+      [
+        6545,
+        10680
+      ],
+      [
+        6987,
+        1155
+      ]
+    ],
+    "nativeFirstAndGpuFrames": [
+      [
+        1016,
+        1809
+      ],
+      [
+        1132,
+        217
+      ]
+    ],
+    "clientExit": 0,
+    "shutdownAssertions": "PASS"
+  },
+  "guiGlintRegression": {
+    "regions": 192,
+    "nativePhases": 4,
+    "glintComparisons": 32,
+    "clientExit": 0,
+    "shutdownAssertions": "PASS"
+  },
+  "server": {
+    "bootstrap": "Done / common+server plugins 1 each, client 0",
+    "classloadingSha256": "bb06fa02d0aaaeb3000211c614b3d9ca59f7c4d49de798eea25451a3cadd5944",
+    "minecraftClientClassesLoaded": 0,
+    "newClientHelpersOrProbeLoaded": 0,
+    "shutdown": "console stop",
+    "javaExit": 0,
+    "gradleExit": 0,
+    "baselineServerExit": 0
+  },
+  "api": {
+    "canonicalAudits": "PLAYER DEFORMER API PASS: 6 canonical types / 17 declared members; Identifier and non-generic PlayerModel adaptations\nPLAYER CORE API PASS: 27 canonical types / 203 declared members\nPLAYER ATTACHMENT API PASS: 5 canonical types / 32 declared members\nRENDER CONTEXT API PASS: 5 canonical types / 20 declared members\nPLUGIN API PASS: 38 canonical types; complete declared member contracts preserved\nMANAGER API PASS: 12 preserved canonical types; 1 explicitly approved type removals; no deferred manager/helper declarations\n",
+    "frozenChecksumsUnchanged": 6,
+    "changedExistingTypesAgainstStartHead": {
+      "status": "PASS",
+      "startHead": "dee4ea573b0454b24fb248f32ddf06dfc36b4908",
+      "types": [
+        "com.arcanc.pulselib.content.mixin.EntityRendererExtractionMixin",
+        "com.arcanc.pulselib.content.player.animation.PPlayerRigPose",
+        "com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimatedAttachments",
+        "com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonRenderer",
+        "com.arcanc.pulselib.content.player.deformer.PPlayerModelGeometry",
+        "com.arcanc.pulselib.content.player.deformer.PPlayerModelGeometry.Entry",
+        "com.arcanc.pulselib.platform.PClientRenderHooks",
+        "com.arcanc.pulselib.platform.PClientRenderHooks.ArmorModelResolver",
+        "com.arcanc.pulselib.platform.PClientRenderHooks.ArmRenderer",
+        "com.arcanc.pulselib.util.attachments.PLivingAttachmentLayer",
+        "com.arcanc.pulselib.util.attachments.PLivingAttachmentLayer.RenderEntry"
+      ],
+      "preservedMembers": 43,
+      "internalAdditions": [
+        {
+          "type": "com.arcanc.pulselib.content.player.animation.PPlayerRigPose",
+          "signature": "public boolean isEmpty()"
+        },
+        {
+          "type": "com.arcanc.pulselib.content.player.deformer.PPlayerModelGeometry",
+          "signature": "public boolean hasArmor()"
+        }
+      ],
+      "scope": "Public/protected declarations of every changed existing production type, including legacy callback contracts; compare against already-adapted HEAD without altering canonical baseline"
+    },
+    "compiledFullAudit": "Pending stage 7",
+    "inputs": "Initial HEAD plus intended changes; initial user edits excluded"
+  },
+  "style": {
+    "parsedJavaUnits": 11,
+    "unnecessarySingleStatementBraces": 0,
+    "headers": "Existing authors/dates retained; PPlayerFirstPersonRenderer header verified from pinned source: 23.09.2026; new units 28.10.2026",
+    "packages": "No new packages; existing @NullMarked defaults retained",
+    "finalStyleChanges": "Three sole-try control blocks unwrapped; no logic change; final build verified"
+  },
+  "debugger": {
+    "skill": "/home/arcanc/.cache/JetBrains/IntelliJIdea2026.2/aia/agents/.agents/skills/ij-debugger/SKILL.md",
+    "firstConnect": "IPv4 localhost refused, corrected Remote HOST to ::1",
+    "remoteSessionsAttached": true,
+    "sourceLogpointHitCount": 0,
+    "valuesOrStackClaimed": false,
+    "reasonForNativeHarnessFallback": "Source logpoints unbound/not hit; session ended before subsequent drain",
+    "agentBreakpointsAndRemoteConfigRemoved": true,
+    "originalDisabledUserExceptionBreakpoints": 2,
+    "activeSessionsAtFinish": 0
+  },
+  "baseline": {
+    "production": "Unchanged starting HEAD",
+    "log": "client-baseline-final.log",
+    "javaExit": 255,
+    "gradleExit": 1,
+    "animatedStackDepthObserved": 2,
+    "expectedDepth": 0,
+    "scope": "Native assertions prove model/stack and anchor/rig/armor eligibility failures; no debugger values claimed"
+  },
+  "artifacts": {
+    "common": {
+      "jar": "common/build/libs/pulselib-26.1.2-common-1.1.5.3.jar",
+      "providers": {},
+      "javaUnits": 371,
+      "sha256": "bd6b139782abe7fc792e043a5cb5739f6cf9a7ae482e73e2b50ee12592b1b05d",
+      "classes": 574,
+      "classMajors": [
+        69
+      ]
+    },
+    "neoforge": {
+      "jar": "neoforge/build/libs/pulselib-26.1.2-neoforge-1.1.5.3.jar",
+      "providers": {
+        "platform.IPulsePlatform": "com.arcanc.pulselib.neoforge.NeoForgePlatform",
+        "platform.IPulseCameraService": "com.arcanc.pulselib.neoforge.NeoForgeCameraService",
+        "plugin.IPulsePluginFinder": "com.arcanc.pulselib.neoforge.NeoForgePulsePluginFinder"
+      },
+      "javaUnits": 383,
+      "sha256": "c476d0ced78184e73d2ce555a7cb2b97be10a056d371fc486dd77740ac97a987",
+      "classes": 587,
+      "classMajors": [
+        69
+      ]
+    },
+    "fabric": {
+      "jar": "fabric/build/libs/pulselib-26.1.2-fabric-1.1.5.3.jar",
+      "providers": {
+        "platform.IPulsePlatform": "com.arcanc.pulselib.fabric.FabricPlatform",
+        "platform.IPulseCameraService": "com.arcanc.pulselib.fabric.FabricCameraService",
+        "plugin.IPulsePluginFinder": "com.arcanc.pulselib.fabric.FabricPulsePluginFinder"
+      },
+      "javaUnits": 375,
+      "sha256": "a67ab029c9a38684f83d8b75ad600e8dd3371cfd8c2d440df1c5d0dc13364cb9",
+      "classes": 578,
+      "classMajors": [
+        69
+      ]
+    }
+  },
+  "graphicsUnchanged": {
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlDynamicGeometry.java": "ef173cb8592c36c8deb1252afc69abb8b1bb78d14bf9fe3db3ca3bd0447e0ce9",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlFrameArena.java": "75267c6fde8cb5d942e9cab02163dcc7ac199306c29e8d1b360b0c18056470fe",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlGeometryArena.java": "52539ba678423df4aa46f55dca7c04632eb21f7c0bfa41ba2b7b6e791a067ae3",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlIndirectStream.java": "c3c238c5d2fecf9ffdfc0044905c14c8d3968f5a96a26cb373cfc420bf1237d4",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlInstanceStream.java": "a2a026cc636d9fc2e0d0ca5199178ab6963d6707c919236a1cfb8ffd28a8099a",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java": "8e87fd1172a14c6a4382b7e7cfd7dd5c2359eebe194f425074cc2c2600e9b52d",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlRenderHost.java": "baba32946c29b0a639e8f1803f34bbf84c1a5e117eaedf813743eee1c7b30416",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlResourceRegistry.java": "ced196a145d769f9d116b6063397bb54e604efaf6b05a1060b86db8353470a84",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java": "b40a4b8fb9e5e2cef99b5eb806429828aeb76e6749308ed0ccaea322685d41be",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/package-info.java": "c39b48f5d48b8b12a7ab0a60433493cbc2564e97dba7995f4ab0f8bea34cea9b",
+    "common/src/main/resources/assets/pulselib/atlases/atlas.json": "a4e2be76bf36c68188dd5b8b3269ce97621abca89c56fde3bad8812589146cd6",
+    "common/src/main/resources/assets/pulselib/geckolib.zip": "3e1577c14b1be39f38288a08a784ee9eb555cd843d71324f297ae135a31615fb",
+    "common/src/main/resources/assets/pulselib/glmodels.zip": "93792d7ac3e77453b7d08bcb0cc829b83e0abc9f75d8210c9014b80615526bde",
+    "common/src/main/resources/assets/pulselib/items.zip": "8da45b48f5ba6b9426afc9f4f775443dd72957249b073c3531b1ac7e72562839",
+    "common/src/main/resources/assets/pulselib/models.zip": "c81433032c0b9e766e5a52255d55effb6359dd941c7ecd17b7497c0c4ea1e831",
+    "common/src/main/resources/assets/pulselib/shaders/core/oit_composite.fsh": "c7bda2ec92883ea5a4ad090fdb16c1cc4561e467c85ebbf875169c033dcb6385",
+    "common/src/main/resources/assets/pulselib/shaders/core/oit_composite.vsh": "47109b410ead6ac9297ba7ff60a119fc87cb3cd12336c5dab62f8baf556e3913",
+    "common/src/main/resources/assets/pulselib/shaders/core/oit_fabulous_composite.fsh": "60c365d9577d9a13eec82018020ffe437baafb4cd898fdb64b8ace98b2c5a58a",
+    "common/src/main/resources/assets/pulselib/shaders/core/oit_fabulous_metadata.fsh": "49bea446c856a29b3f064be64694444bc1207178758a2411e15843eaecdffe02",
+    "common/src/main/resources/assets/pulselib/shaders/core/triangles.fsh": "232228f436b969c7957a75b6d9e538081af8cce0579a8f79668f610e00dc37d0",
+    "common/src/main/resources/assets/pulselib/shaders/core/triangles.vsh": "d7cfa97cdba1ce93dd040d9ba483ed9eb87c1a011077fc00a75cdeba9e2231df",
+    "common/src/main/resources/assets/pulselib/shaders/core/triangles_instant.fsh": "38c2aa066bf7bf1334c282c12dabc435fa13e4d74b4f33daade2e74dcfc2eb0b",
+    "common/src/main/resources/assets/pulselib/shaders/core/triangles_instant.vsh": "66f5cf600bd8c2ad0dc97b4d026091dc9146856706389f16dcfdbd0008326e1f",
+    "common/src/main/resources/assets/pulselib/shaders/core/triangles_oit.fsh": "e3d44e72c41b213ca5816b5f22e8438f7b4a2dd781fee7611b3e3dbbd4cae9d0",
+    "common/src/main/resources/assets/pulselib/shaders/core/triangles_oit_depth.fsh": "bf98a6cea3b16b8ee9e45fdeb0e31c48eb6de5340ce97b82fccdf44fe464c7fc",
+    "common/src/main/resources/assets/pulselib/shaders/core/triangles_oit_depth_peel.fsh": "f00e3fa5d9b0d149f01309ce9abf338b22cf8801e7bd85ec35abf3a0866a00c8",
+    "common/src/main/resources/assets/pulselib/shaders/include/deformers.glsl": "9a1f6eee0a5fef10882531b07a44463cc110a94e531c74fda757187f66d4142f",
+    "common/src/main/resources/assets/pulselib/template/player/player_model_template.bbmodel": "404db85af63262309f24e319a49162def61258b0f4aa6d5fe66a7a869954e127",
+    "common/src/main/resources/assets/pulselib/template/player/player_model_template.gltf": "c5fe4817e44498c0808fccd3e33fdbdd9a6bb07a4db97df8efb8dfe62e614045",
+    "common/src/main/resources/assets/pulselib/textures.zip": "7330f2151870a56a0c80da5a775d4da6cede0c9ccabb825b1a1c9b6438813af9"
+  },
+  "sourceSha256": {
+    "common/src/main/java/com/arcanc/pulselib/content/player/animation/attachment/PPlayerAnimatedAttachments.java": "ef318c705c22060c17b3228e9e2ac5932ad494965795cd0c7524089048a34736",
+    "common/src/main/java/com/arcanc/pulselib/content/player/animation/PPlayerRigPose.java": "0dad08614eede85bd02db968ed91282ac15aaf7e740e5d095de0085aa06b1c42",
+    "common/src/main/java/com/arcanc/pulselib/content/player/deformer/PPlayerModelGeometry.java": "1c88fa3ec8288644bd2be60b4b3dc8222548710bb91e38a7c6b40b9b77a6f7af",
+    "common/src/main/java/com/arcanc/pulselib/platform/PClientRenderHooks.java": "b41531e2816f09a9977fb6ec468b52bd4edf9365df0cca8d513dc3827798f4a9",
+    "common/src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PPlayerFirstPersonRenderer.java": "8cea53c2cb89850ed5884da67903453b7a6498e492212449347f0e1213aeed7d",
+    "common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentLayer.java": "67604e4f99ce2b4697a846a39caf634198e91ddf76f4bcc4701810d5d7ead2f1",
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/EntityRendererExtractionMixin.java": "ee52efdf1c34d9ad7f62e9b6af93b888a7bcba709fe966a0c4c9a9311a36a0b9",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/base/PRenderCallbackScope.java": "6bf5f61d7487afbbd63a7f63b03d727affa352fc97a91f8c7352fb758e26840d",
+    "common/src/main/java/com/arcanc/pulselib/content/player/animation/attachment/PPlayerAttachmentEligibility.java": "7da60bc5a76855997f308114e9b3f11266d71816da37773cca255fd754d64e68"
+  },
+  "isolation": {
+    "initialTrackedUserEdits": 62,
+    "dirtyJavaInputsProjected": 58,
+    "unchangedDirtyPaths": 55,
+    "javaOverlaps": 5,
+    "journalReadmeOverlaps": 2,
+    "protectedFilesUnchanged": 189,
+    "temporaryWorkspace": "/tmp/pulselib-stage52b3-xtc_2j7y",
+    "originalRefsChanged": false,
+    "pushOrPublish": false
+  },
+  "failedAttempts": [
+    {
+      "log": "/tmp/pulselib-stage52b3-xtc_2j7y/client-baseline-debug.log",
+      "sha256": "d5bd10959ccbbbf501d0c6c0032b03b8bcfc0856a7736f5702564a13b88470b4",
+      "accepted": false,
+      "firstDiagnostic": "java.lang.IllegalStateException: A player animation definition needs at least one bone binding"
+    },
+    {
+      "log": "/tmp/pulselib-stage52b3-xtc_2j7y/client-baseline-final.log",
+      "sha256": "84c31597f173e0bc549cbe606562672e1d41bfc9fe077eabe24691cc1a89cb43",
+      "accepted": false,
+      "firstDiagnostic": "java.lang.AssertionError: Stage 5.2b.3: Callback isolation/target eligibility failures: [World target custom anchor only/false/false, Native transparency chain custom anchor only/false, World target custom anchor only/true/false, Native transparency chain custom anchor only/true, animated stack false/false depth=2/0, animated model false/false, animated stack false/true depth=2/0, animated model false/true, animated stack true/false depth=2/0, animated model true/false, animated stack true/true depth=2/0, animated model true/true, Nested callback restores outer model/stack, Nested outer callback restores caller, Platform arm callback restores caller, World target rig only/false/false, Native transparency chain rig only/false, World target rig only/true/false, Native transparency chain rig only/true, Rig provider extraction restores caller model, World target native armor/false/false, Native transparency chain native armor/false, World target native armor/true/false, Native transparency chain native armor/true, Armor selector extraction restores caller model, Legacy armor stack false, Legacy anchor/resolver model false, Legacy armor stack true, Legacy anchor/resolver model true]"
+    },
+    {
+      "log": "/tmp/pulselib-stage52b3-xtc_2j7y/client-baseline-verified.log",
+      "sha256": "fb8b434880f074a8a32d0a83c305029cbf9dd323e6effbe2d75e3c24e7c77911",
+      "accepted": false,
+      "firstDiagnostic": "java.lang.AssertionError: Stage 5.2b.3: Callback isolation/target eligibility failures: [Native transparency chain bare/true, World target custom anchor only/false/false, Native transparency chain custom anchor only/false, World target custom anchor only/true/false, Native transparency chain custom anchor only/true, animated stack false/false, animated model false/false, animated stack false/true, animated model false/true, animated stack true/false, animated model true/false, animated stack true/true, animated model true/true, Nested callback restores outer model/stack, Nested outer callback restores caller, Platform arm callback restores caller, World target rig only/false/false, Native transparency chain rig only/false, World target rig only/true/false, Native transparency chain rig only/true, Rig provider extraction restores caller model, World target native armor/false/false, Native transparency chain native armor/false, World target native armor/true/false, Native transparency chain native armor/true, Armor selector extraction restores caller model, Legacy armor stack false, Legacy anchor/resolver model false, Legacy armor stack true, Legacy anchor/resolver model true]"
+    },
+    {
+      "log": "/tmp/pulselib-stage52b3-xtc_2j7y/client-baseline.log",
+      "sha256": "76b7e8e9721928a4fbb31bff81e5ceee0549be0ad738ee0591adddb324515a44",
+      "accepted": false,
+      "firstDiagnostic": "java.lang.NullPointerException: Cannot invoke \"com.arcanc.pulselib.content.player.animation.firstPerson.PFirstPersonRenderPresentation.rightArm()\" because \"presentation\" is null"
+    },
+    {
+      "log": "/tmp/pulselib-stage52b3-xtc_2j7y/client-hierarchy-baseline.log",
+      "sha256": "e68ccd06b0cceb1f7e2796908884d5de15633d32cd3869bb34c692b067a3a535",
+      "accepted": false,
+      "firstDiagnostic": "java.lang.AssertionError: Stage 5.2b.3: Callback isolation/target eligibility failures: [Each legacy mesh receives its own unmodified ancestor transform: mesh=1, Each legacy mesh receives its own unmodified ancestor transform: mesh=2]"
+    },
+    {
+      "log": "/tmp/pulselib-stage52b3-xtc_2j7y/fixture-compile.log",
+      "sha256": "cf76f0b7978944471b271f0a82cc28db98c2bbed1c680cd3ae5d32fca882ea41",
+      "accepted": false,
+      "firstDiagnostic": "/mnt/MainDrive/Programs/MC mods/ArcsLib/tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage52CallbackProbe.java:64: error: cannot find symbol"
+    }
+  ],
+  "limits": [
+    "Actual target-boundary/queue checks are not Fabulous player/armor pixel-depth proof",
+    "No universal transaction for external callback side effects; owning local scope retains discard responsibility",
+    "Additional CPU snapshot allocations require stage 7 profiling; no performance parity claim",
+    "M-P2 server extraction / real respawn remains incomplete",
+    "Fabric runtime stage 6 and full testmod/compiled API/final GPU/performance stage 7 remain incomplete"
+  ],
+  "next": "5.2b.4 Fabulous player/armor pixel-depth regression",
+  "localCommitMessage": "fix: isolate player callbacks and retain native render targets (stage 5.2b.3)",
+  "commitShaLocation": "Git history and final report",
+  "logs": {
+    "build-style-verified.log": {
+      "sha256": "7d78c886df5d7706bfc02e954fa59712eb9b2366b2e4a28750186df69ee790e0",
+      "javaExit": 0,
+      "gradleExit": 0,
+      "markers": [
+        "STAGE 2 SERVICE PROVIDERS / LEGACY REMOVAL / COMMON BOUNDARY PASS: /mnt/MainDrive/Programs/MC mods/ArcsLib/build/reports/porting/stage-2-build.json"
+      ]
+    },
+    "client-callback-final.log": {
+      "sha256": "7249af492ca77df60148dc349afd223a6b8530dae1adcf619f29e55e94529c0b",
+      "javaExit": 0,
+      "gradleExit": 0,
+      "markers": [
+        "[15:57:14] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.3 CALLBACK RESULT: suite=0, checks=87, targetChecks=30, callbackCalls=18, expectedFailures=17, errors=[]",
+        "[15:57:14] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.2c.2a VALUES CASE PASS: suite=0, queries=22, readsBeforeReplay=2536, readsAfterReplay=2536, vertices=552, oldNodesAfterReload=0",
+        "[15:57:14] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.2c.2b GEOMETRY CASE PASS: suite=0, extractionReads=920, replayReads=0, vertices=1160",
+        "[15:57:14] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.2c.2b ARMOR CASE PASS: suite=0, registeredReads=7088, modernReads=6144, choices=16, armorNodes=16, handNodes=1, reloadSubmissions=0",
+        "[15:57:18] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.3 CALLBACK RESULT: suite=1, checks=174, targetChecks=60, callbackCalls=36, expectedFailures=34, errors=[]",
+        "[15:57:18] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.2c.2a VALUES CASE PASS: suite=1, queries=22, readsBeforeReplay=2536, readsAfterReplay=2536, vertices=552, oldNodesAfterReload=0",
+        "[15:57:18] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.2c.2b GEOMETRY CASE PASS: suite=1, extractionReads=920, replayReads=0, vertices=1160",
+        "[15:57:18] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.2c.2b ARMOR CASE PASS: suite=1, registeredReads=7088, modernReads=6144, choices=32, armorNodes=32, handNodes=2, reloadSubmissions=0",
+        "[15:57:18] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.1 PRE-RELOAD PASS: cameraCases=20, nativeCameraChecks=720, rootSuites=2, foreignCameras=2",
+        "[15:57:24] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.3 CALLBACK RESULT: suite=2, checks=261, targetChecks=90, callbackCalls=54, expectedFailures=51, errors=[]",
+        "[15:57:24] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.2c.2a VALUES CASE PASS: suite=2, queries=22, readsBeforeReplay=2536, readsAfterReplay=2536, vertices=552, oldNodesAfterReload=2",
+        "[15:57:24] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.2c.2b GEOMETRY CASE PASS: suite=2, extractionReads=920, replayReads=0, vertices=1160",
+        "[15:57:25] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.2c.2b ARMOR CASE PASS: suite=2, registeredReads=7088, modernReads=6144, choices=48, armorNodes=64, handNodes=3, reloadSubmissions=2",
+        "[15:57:28] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.3 CALLBACK RESULT: suite=3, checks=348, targetChecks=120, callbackCalls=72, expectedFailures=68, errors=[]",
+        "[15:57:28] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.2c.2a VALUES CASE PASS: suite=3, queries=22, readsBeforeReplay=2536, readsAfterReplay=2536, vertices=552, oldNodesAfterReload=2",
+        "[15:57:28] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.2c.2b GEOMETRY CASE PASS: suite=3, extractionReads=920, replayReads=0, vertices=1160",
+        "[15:57:28] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.2c.2b ARMOR CASE PASS: suite=3, registeredReads=7088, modernReads=6144, choices=64, armorNodes=80, handNodes=4, reloadSubmissions=2",
+        "[15:57:28] [Render thread/INFO] [Pulse Lib/]: STAGE 2 CLIENT PLUGINS PASS: ids=[pulselib:stage1_client, pulselib:stage2_common], common=1, channels=1, events=1, deformers=1, client=1, server=0, models=2",
+        "[15:57:28] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.3 CALLBACK PASS: suites=4, checks=348, targetChecks=120, callbackCalls=72, expectedFailures=68, queueCases=48",
+        "[15:57:28] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.2a RIG PASS: suites=4, vertices=1736, worldDeferred=7026, expectedFailures=16, extraction/owner isolation, native submit/deferred nested failure/recovery/reload PASS",
+        "[15:57:28] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.2b PART/ITEM PASS: suites=4, expectedFailures=32, partVertices=44520, itemQuads=44, partPasses=[outline, main, crumbling], itemPasses=[outline, main, foil], hand/modelPart/item snapshot/nested failure/recovery/reload PASS",
+        "[15:57:28] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.2c.1 CUBE BINDINGS PASS: suites=4, expectedFailures=8, native main/outline/crumbling geometry, model reuse/nested recovery/reload PASS; channel sampling/armor owner extraction pending",
+        "[15:57:28] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.2c.2a FROZEN VALUES PASS: suites=4, expectedFailures=8, oldNodesAfterReload=2, two owners/controller stop/custom position-dependent channels/operation mutation/main/outline/crumbling/nested recovery PASS; automatic main/armor extraction pending",
+        "[15:57:28] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.2c.2b GEOMETRY PASS: suites=4",
+        "[15:57:28] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.2c.2b ARMOR PASS: suites=4, armorNodes=80, handNodes=4, failures=192, reloadSubmissions=2, GPUdraws=1292/1262, GPUprimitives=421192/411412",
+        "[15:57:28] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.1 NATIVE PLAYER PASS: cameraCases=40, cameraChecks=1603, rootSuites=4, nativeWorldRoots=1480, foreignCameras=4, formats=Gecko/glTF, F/G/H weights=0.25/0.6/1, VANILLA, extraction/nested failure/recovery/reload PASS",
+        "[15:57:28] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.1 NATIVE PLAYER SHUTDOWN PASS"
+      ]
+    },
+    "client-gpu-final.log": {
+      "sha256": "d9f682728bc0bb1353816dc42b11c08e200948b9f2fa0fb072ffb930cb68c5ac",
+      "javaExit": 0,
+      "gradleExit": 0,
+      "markers": [
+        "[16:05:27] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2a PRE-RELOAD PASS: cases=498, nativeThird=[[6545, 9976], [0, 0]], nativeFirst=[[1016, 1454], [0, 0]], GPU hand frames=[[1016, 1454], [0, 0]]",
+        "[16:06:01] [Render thread/INFO] [Pulse Lib/]: STAGE 2 CLIENT PLUGINS PASS: ids=[pulselib:stage1_client, pulselib:stage2_common], common=1, channels=1, events=1, deformers=1, client=1, server=0, models=2",
+        "[16:06:01] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2a ATTACHMENTS PASS: matrixPhysicsCases=996, formats=Gecko/glTF, blendModes=5, weights=0.25/0.6/1, ROOT masks/part/bone weights/transitions/two definitions/reload/queue isolation PASS; nativeThird=[[6545, 10680], [6987, 1155]], nativeFirst=[[1016, 1809], [1132, 217]], GPU hand frames=[[1016, 1809], [1132, 217]], generatedPrimitives=222416, callbackFailures=4, callbacks third=26041, first=5170",
+        "[16:06:01] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2a ATTACHMENTS SHUTDOWN PASS"
+      ]
+    },
+    "client-gui-final.log": {
+      "sha256": "2a7041c789b7db61015d3bbe9b1bfc2b40deda33a5db26ead686ab185368583b",
+      "javaExit": 0,
+      "gradleExit": 0,
+      "markers": [
+        "[16:09:24] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3b FAULT PASS: phase=0, suites=1, native Entity/Item/deferred callback exceptions, discarded meshes, slot pose and collector cleared, host/queue restored, actual PIP/atlas pixels recover",
+        "[16:09:25] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3b GUI PHASE PASS: phase=0, native=atlas, alpha=false, regions=48, RGBcounts=[2048, 1024, 0, 59, 59, 1788], peaks=[255, 255, 255, 255]",
+        "[16:09:26] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3b GUI PHASE PASS: phase=1, native=atlas, alpha=true, regions=96, RGBcounts=[2048, 1024, 0, 59, 59, 1788], peaks=[192, 192, 192, 192]",
+        "[16:09:29] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3b FAULT PASS: phase=2, suites=2, native Entity/Item/deferred callback exceptions, discarded meshes, slot pose and collector cleared, host/queue restored, actual PIP/atlas pixels recover",
+        "[16:09:29] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3b GUI PHASE PASS: phase=2, native=oversized PIP, alpha=false, regions=144, RGBcounts=[2048, 1024, 0, 59, 59, 2164], peaks=[255, 255, 255, 255]",
+        "[16:09:30] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3b GUI PHASE PASS: phase=3, native=oversized PIP, alpha=true, regions=192, RGBcounts=[2048, 1024, 0, 59, 59, 2164], peaks=[192, 192, 192, 192]",
+        "[16:09:33] [Render thread/INFO] [Pulse Lib/]: STAGE 2 CLIENT PLUGINS PASS: ids=[pulselib:stage1_client, pulselib:stage2_common], common=1, channels=1, events=1, deformers=1, client=1, server=0, models=2",
+        "[16:09:33] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3c GLINT PASS: frames=32, foil=358, plain=366",
+        "[16:09:33] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3b GUI COMPLETE: phases=4, regions=192, entity=720, item=724, deferred=722, atlas=712, oversized=374, world=10442, hand/items=724"
+      ]
+    },
+    "server-final.log": {
+      "sha256": "7552634c8adf73d10dd85ab6285e9b25c7842b73a67785a84e6f8375a4cb7987",
+      "javaExit": 0,
+      "gradleExit": 0,
+      "markers": [
+        "[16:03:44] [Server thread/INFO] [minecraft/DedicatedServer]: Done (0.347s)! For help, type \"help\"",
+        "[16:03:46] [Server thread/INFO] [Pulse Lib/]: STAGE 2 SERVER PLUGINS PASS: ids=[pulselib:stage2_common, pulselib:stage2_server], common=1, channels=1, events=1, deformers=1, client=0, server=1, models=0"
+      ]
+    }
+  }
+}

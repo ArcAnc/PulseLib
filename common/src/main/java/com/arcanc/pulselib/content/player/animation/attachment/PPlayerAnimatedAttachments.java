@@ -16,6 +16,7 @@ import com.arcanc.pulselib.content.player.animation.PPlayerAnimationAnchorPose;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
 import com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonAnchorPose;
 import com.arcanc.pulselib.content.player.animation.firstPerson.PFirstPersonRenderPresentation;
+import com.arcanc.pulselib.content.renderer.base.PRenderCallbackScope;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -50,6 +51,12 @@ public final class PPlayerAnimatedAttachments
 			renderers.add(renderer);
 	}
 
+	static boolean hasRenderer(PPlayerAnimationAnchor anchor)
+	{
+		List<PPlayerAnimatedAttachmentRenderer> renderers = RENDERERS.get(anchor);
+		return renderers != null && !renderers.isEmpty();
+	}
+
 	/**
 	 * Renders the third person.
 	 * @param player the player to use.
@@ -64,11 +71,14 @@ public final class PPlayerAnimatedAttachments
 	                                     int packedLight,
 	                                     float partialTick)
 	{
-		for (PPlayerAnimationAnchorPose pose : PPlayerAnimations.animationAnchorPoses(player, partialTick))
+		try (var invocation = PRenderCallbackScope.player(poseStack, player))
 		{
-			Matrix4f matrix = new Matrix4f();
-			if (PPlayerAnimations.attachmentMatrix(player, pose.animation(), pose.anchor(), partialTick, matrix))
-				render(player, pose.animation(), pose.anchor(), pose.transform(), matrix, pose.weight(), poseStack, buffers, packedLight, partialTick);
+			for (PPlayerAnimationAnchorPose pose : PPlayerAnimations.animationAnchorPoses(player, partialTick))
+			{
+				Matrix4f matrix = new Matrix4f();
+				if (PPlayerAnimations.attachmentMatrix(player, pose.animation(), pose.anchor(), partialTick, matrix))
+					render(player, pose.animation(), pose.anchor(), pose.transform(), matrix, pose.weight(), poseStack, buffers, packedLight, partialTick);
+			}
 		}
 	}
 
@@ -84,30 +94,27 @@ public final class PPlayerAnimatedAttachments
 	public static void renderFirstPerson(AbstractClientPlayer player, PFirstPersonRenderPresentation presentation,
 	                                     PoseStack poseStack, SubmitNodeCollector buffers, int packedLight, float partialTick)
 	{
-		for (PPlayerFirstPersonAnchorPose pose : presentation.animationAnchors())
+		try (var invocation = PRenderCallbackScope.player(poseStack, player))
 		{
-			List<PPlayerAnimatedAttachmentRenderer> renderers = RENDERERS.get(pose.anchor());
-			if (renderers == null)
-				continue;
-			for (PPlayerAnimatedAttachmentRenderer renderer : renderers.stream().
-					sorted(Comparator.comparing(value -> value.getClass().getName())).toList())
+			for (PPlayerFirstPersonAnchorPose pose : presentation.animationAnchors())
 			{
-				poseStack.pushPose();
-				try
-				{
-					Matrix4f matrix = new Matrix4f();
-					if (PPlayerAnimations.firstPersonAttachmentMatrix(player, pose.animation(), pose.anchor(), partialTick, matrix))
-						PPlayerAnimationSpace.applyChannelOverride(matrix, pose.transform(), PTransform.fromMatrix(matrix));
-					else
-						pose.transform().matrix(matrix);
-					poseStack.mulPose(matrix);
-					renderer.render(new PPlayerAnimatedAttachmentContext(player, pose.animation(), pose.anchor(), pose.transform(),
-						pose.weight(), true, poseStack, buffers, packedLight, partialTick));
-				}
-				finally
-				{
-					poseStack.popPose();
-				}
+				List<PPlayerAnimatedAttachmentRenderer> renderers = RENDERERS.get(pose.anchor());
+				if (renderers == null)
+					continue;
+				for (PPlayerAnimatedAttachmentRenderer renderer : renderers.stream().
+						sorted(Comparator.comparing(value -> value.getClass().getName())).toList())
+					try (var callback = PRenderCallbackScope.player(poseStack, player))
+					{
+						poseStack.pushPose();
+						Matrix4f matrix = new Matrix4f();
+						if (PPlayerAnimations.firstPersonAttachmentMatrix(player, pose.animation(), pose.anchor(), partialTick, matrix))
+							PPlayerAnimationSpace.applyChannelOverride(matrix, pose.transform(), PTransform.fromMatrix(matrix));
+						else
+							pose.transform().matrix(matrix);
+						poseStack.mulPose(matrix);
+						renderer.render(new PPlayerAnimatedAttachmentContext(player, pose.animation(), pose.anchor(), pose.transform(),
+							pose.weight(), true, poseStack, buffers, packedLight, partialTick));
+					}
 			}
 		}
 	}
@@ -140,17 +147,11 @@ public final class PPlayerAnimatedAttachments
 		if (renderers == null)
 			return;
 		for (PPlayerAnimatedAttachmentRenderer renderer : renderers.stream().sorted(Comparator.comparing(renderer -> renderer.getClass().getName())).toList())
-		{
-			poseStack.pushPose();
-			try
+			try (var callback = PRenderCallbackScope.player(poseStack, player))
 			{
+				poseStack.pushPose();
 				poseStack.mulPose(matrix);
 				renderer.render(new PPlayerAnimatedAttachmentContext(player, animation, anchor, transform, weight, false, poseStack, buffers, packedLight, partialTick));
 			}
-			finally
-			{
-				poseStack.popPose();
-			}
-		}
 	}
 }
