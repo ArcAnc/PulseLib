@@ -59,11 +59,13 @@ import java.util.concurrent.TimeUnit;
 public final class Stage52PlayerOcclusionProbe
 {
 	public static final PModelData MODEL = PModelData.entity(PLibDatabase.rl("stage42b3_owner"), PGeckoModelLoader.INSTANCE.id());
+	private static final boolean ARMOR_MATRIX = Boolean.getBoolean("pulselib.stage52b4aProbe");
 	private static final UUID PLAYER_ID = new UUID(0, 0x526a01);
 	private static final String[] STATES = {"background", "player", "entity-behind", "both-behind", "entity-front", "both-front"};
 	private static final List<CaseData> RECORDS = new ArrayList<>();
 	private static final List<String> FAILURES = new ArrayList<>();
 	private static final int[][] SAMPLES = new int[9][2];
+	private static final Matrix4f READBACK_PROJECTION = new Matrix4f();
 	private static List<float[]> early = List.of();
 	private static List<float[]> afterNativeFeatures = List.of();
 	private static List<float[]> beforeResolve = List.of();
@@ -116,7 +118,7 @@ public final class Stage52PlayerOcclusionProbe
 			player.setId(0x526a01);
 			mc.level.addEntity(player);
 			started = true;
-			deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(180);
+			deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(ARMOR_MATRIX ? 480 : 180);
 			mode();
 		}
 		check(System.nanoTime() < deadline, "Occlusion matrix timed out: phase=" + phase + " step=" + step);
@@ -132,13 +134,15 @@ public final class Stage52PlayerOcclusionProbe
 		{
 			advance = false;
 			step++;
-			if (step == 12)
+			if (step == (ARMOR_MATRIX ? 48 : 12))
 			{
 				step = 0;
 				phase++;
-				if (phase == 4)
+				if (phase == (ARMOR_MATRIX ? 6 : 4))
 				{
 					completed = true;
+					if (ARMOR_MATRIX)
+						Stage52ArmorOcclusionProbe.complete();
 					writeReport();
 					mc.options.improvedTransparency().set(originalImproved);
 					mc.options.graphicsPreset().set(originalPreset);
@@ -150,7 +154,7 @@ public final class Stage52PlayerOcclusionProbe
 					mc.stop();
 					return;
 				}
-				if (phase == 2)
+				if (phase == (ARMOR_MATRIX ? 3 : 2))
 				{
 					reload = mc.reloadResourcePacks();
 					return;
@@ -168,6 +172,8 @@ public final class Stage52PlayerOcclusionProbe
 		mc.player.xRotO = 0;
 		var player = (RemotePlayer)mc.level.getEntity(0x526a01);
 		check(player != null, "Native remote player is present");
+		if (ARMOR_MATRIX)
+			Stage52ArmorOcclusionProbe.equip(player, step / 12, phase);
 		boolean playerCentered = state() == 1 || state() == 3 || state() == 5;
 		place(player, playerCentered ? 0 : -3, 0);
 		player.setYRot(180);
@@ -180,11 +186,19 @@ public final class Stage52PlayerOcclusionProbe
 	private static void mode()
 	{
 		var mc = Minecraft.getInstance();
-		mc.options.improvedTransparency().set(phase % 2 == 1);
+		if (ARMOR_MATRIX)
+			mc.options.graphicsPreset().set(GraphicsPreset.values()[phase % 3]);
+		else
+			mc.options.improvedTransparency().set(phase % 2 == 1);
 		mc.levelRenderer.allChanged();
 		frames = 0;
 		startTick = mc.player.tickCount + 40;
 		armed = false;
+	}
+
+	private static int material()
+	{
+		return step % 12 / 6;
 	}
 
 	private static int state()
@@ -208,9 +222,10 @@ public final class Stage52PlayerOcclusionProbe
 			return;
 		if (!mc.levelRenderer.isSectionCompiledAndVisible(new BlockPos(0, 81, 6)) || ++frames < 8)
 			return;
-		check(Minecraft.useShaderTransparency() == (phase % 2 == 1), "Native mode differs from requested mode");
+		check(Minecraft.useShaderTransparency() == (ARMOR_MATRIX ? phase % 3 == 2 : phase % 2 == 1), "Native mode differs from requested mode");
 		var camera = event.getLevelRenderState().cameraRenderState.pos;
 		var frame = new PGlRenderHost().captureFrame();
+		READBACK_PROJECTION.set(frame.projection());
 		var vp = new Matrix4f(frame.projection()).mul(frame.modelView());
 		RenderTarget target = mc.getMainRenderTarget();
 		List<float[]> values = new ArrayList<>();
@@ -254,13 +269,14 @@ public final class Stage52PlayerOcclusionProbe
 		List<float[]> result = pixels(mc.getMainRenderTarget());
 		List<Pixel> pixels = new ArrayList<>();
 		for (int sample = 0; sample < 9; sample++)
-			pixels.add(new Pixel(SAMPLES[sample][0], SAMPLES[sample][1], early.get(sample), afterNativeFeatures.get(sample), beforeResolve.get(sample), nativeItem.get(sample), result.get(sample)));
-		RECORDS.add(new CaseData(phase, Minecraft.useShaderTransparency(), step / 6 == 0 ? "opaque" : "translucent", STATES[state()], pixels));
+			pixels.add(new Pixel(SAMPLES[sample][0], SAMPLES[sample][1], early.get(sample), afterNativeFeatures.get(sample), beforeResolve.get(sample), nativeItem.get(sample), result.get(sample),
+					distanceFromCamera(Math.min(result.get(sample)[4], nativeItem.get(sample)[4]))));
+		RECORDS.add(new CaseData(phase, READBACK_PROJECTION.get(new float[16]), mc.options.graphicsPreset().get().toString(), ARMOR_MATRIX ? Stage52ArmorOcclusionProbe.variant() : "skin", Minecraft.useShaderTransparency(), material() == 0 ? "opaque" : "translucent", STATES[state()], pixels));
 		writeReport();
 		if (state() == 5)
 			compare();
-		if (phase < 2 && state() != 0)
-			Screenshot.grab(mc.gameDirectory, "player-occlusion-" + phase + "-" + step / 6 + "-" + STATES[state()] + ".png", mc.getMainRenderTarget(), 1,
+		if ((!ARMOR_MATRIX && phase < 2 || ARMOR_MATRIX && phase == 2) && state() != 0)
+			Screenshot.grab(mc.gameDirectory, "player-occlusion-" + phase + "-" + (ARMOR_MATRIX ? Stage52ArmorOcclusionProbe.variant() + "-" : "") + material() + "-" + STATES[state()] + ".png", mc.getMainRenderTarget(), 1,
 					message -> PLibDatabase.LOGGER.info("{}", message.getString()));
 		armed = false;
 		advance = true;
@@ -269,6 +285,8 @@ public final class Stage52PlayerOcclusionProbe
 	private static void compare()
 	{
 		int base = RECORDS.size() - 6;
+		if (ARMOR_MATRIX)
+			Stage52ArmorOcclusionProbe.verifyControl(RECORDS.get(base + 1).pixels.stream().map(Pixel::nearestDistance).toList(), phase, material());
 		for (int sample = 0; sample < 9; sample++)
 		{
 			Pixel background = RECORDS.get(base).pixels.get(sample);
@@ -281,17 +299,24 @@ public final class Stage52PlayerOcclusionProbe
 			check(distance(background.finalFrame, entityBehind.finalFrame) > 0.05f && distance(background.finalFrame, entityFront.finalFrame) > 0.05f, "Entity-only controls emit visible geometry");
 			check(nearestDepth(player) < nearestDepth(background) - 0.0001f, "Native player control writes nearer depth");
 			require(distance(player.finalFrame, bothBehind.finalFrame) < 0.025f, "entity behind player changes RGB", sample, player.finalFrame, bothBehind.finalFrame);
-			require(Math.abs(nearestDepth(player) - nearestDepth(bothBehind)) < 0.000002f, "entity behind player changes nearest depth", sample, player.finalFrame, bothBehind.finalFrame);
+			require(Math.abs(player.nearestDistance - bothBehind.nearestDistance) < 0.0005f, "entity behind player changes nearest depth", sample, player.finalFrame, bothBehind.finalFrame);
 			float transmission = entityFront.finalFrame[1] / background.finalFrame[1];
 			check(background.finalFrame[1] > 0.1f && transmission >= 0 && transmission < 0.9f, "Red entity-only control measures nonzero opacity");
 			float[] expected = new float[3];
 			for (int channel = 0; channel < 3; channel++)
 				expected[channel] = entityFront.finalFrame[channel] + transmission * (player.finalFrame[channel] - background.finalFrame[channel]);
 			require(distance(expected, bothFront.finalFrame) < 0.035f, "entity in front has incorrect ordered-alpha RGB", sample, expected, bothFront.finalFrame);
-			if (step / 6 == 0)
-				require(Math.abs(nearestDepth(entityFront) - nearestDepth(bothFront)) < 0.000002f, "opaque entity in front loses its depth", sample, entityFront.finalFrame, bothFront.finalFrame);
+			if (material() == 0)
+				require(Math.abs(entityFront.nearestDistance - bothFront.nearestDistance) < 0.0005f, "opaque entity in front loses its depth", sample, entityFront.finalFrame, bothFront.finalFrame);
 		}
-		PLibDatabase.LOGGER.info("PLAYER OCCLUSION MATRIX: phase={}, improved={}, material={}, states={}, comparisons={}, mismatches={}", phase, Minecraft.useShaderTransparency(), step / 6 == 0 ? "opaque" : "translucent", RECORDS.size(), comparisons, FAILURES.size());
+		PLibDatabase.LOGGER.info("PLAYER OCCLUSION MATRIX: phase={}, improved={}, material={}, states={}, comparisons={}, mismatches={}", phase, Minecraft.useShaderTransparency(), material() == 0 ? "opaque" : "translucent", RECORDS.size(), comparisons, FAILURES.size());
+	}
+
+	/** Recover view-space distance using this frame's actual projection, including preset far-plane transitions. */
+	private static float distanceFromCamera(float depth)
+	{
+		var view = new Matrix4f(READBACK_PROJECTION).invert().transform(new Vector4f(0, 0, depth * 2 - 1, 1));
+		return -view.z / view.w;
 	}
 
 	private static float nearestDepth(Pixel pixel)
@@ -311,7 +336,7 @@ public final class Stage52PlayerOcclusionProbe
 	{
 		comparisons++;
 		if (!condition)
-			FAILURES.add("phase=" + phase + " material=" + step / 6 + " sample=" + sample + " " + message + " expected=" + java.util.Arrays.toString(expected) + " actual=" + java.util.Arrays.toString(actual));
+			FAILURES.add("phase=" + phase + " material=" + material() + " sample=" + sample + " " + message + " expected=" + java.util.Arrays.toString(expected) + " actual=" + java.util.Arrays.toString(actual));
 	}
 
 	private static List<float[]> pixels(RenderTarget target)
@@ -361,7 +386,7 @@ public final class Stage52PlayerOcclusionProbe
 
 	private static void shutdown(GameShuttingDownEvent event)
 	{
-		check(completed && RECORDS.size() == 48 && comparisons == 252 && submissions > 0, "Entire occlusion matrix and real submissions must finish");
+		check(completed && RECORDS.size() == (ARMOR_MATRIX ? 288 : 48) && comparisons == (ARMOR_MATRIX ? 1512 : 252) && submissions > 0, "Entire occlusion matrix and real submissions must finish");
 		check(FAILURES.isEmpty(), "Player occlusion regression failed: " + FAILURES.size() + " mismatches; see player-occlusion-results.json");
 		PLibDatabase.LOGGER.info("PLAYER OCCLUSION SHUTDOWN PASS");
 	}
@@ -372,11 +397,11 @@ public final class Stage52PlayerOcclusionProbe
 			throw new AssertionError(message);
 	}
 
-	private record Pixel(int x, int y, float[] afterOpaque, float[] afterNativeFeatures, float[] beforeResolve, float[] nativeItem, float[] finalFrame)
+	private record Pixel(int x, int y, float[] afterOpaque, float[] afterNativeFeatures, float[] beforeResolve, float[] nativeItem, float[] finalFrame, float nearestDistance)
 	{
 	}
 
-	private record CaseData(int phase, boolean improved, String material, String state, List<Pixel> pixels)
+	private record CaseData(int phase, float[] projection, String preset, String owner, boolean improved, String material, String state, List<Pixel> pixels)
 	{
 	}
 
@@ -401,8 +426,8 @@ public final class Stage52PlayerOcclusionProbe
 		protected PMeshRenderContext resolveMeshRender(TestEntity owner, PBakedBone bone, PBakedMesh mesh, PMeshRenderContext inherited, float partialTick)
 		{
 			submissions++;
-			return inherited.withColor(step / 6 == 0 ? 0xFFFF0000 : 0x80FF0000).withEmissive(true).
-					withAlphaMode(step / 6 == 0 ? PAlphaMode.OPAQUE : PAlphaMode.TRANSLUCENT);
+			return inherited.withColor(material() == 0 ? 0xFFFF0000 : 0x80FF0000).withEmissive(true).
+					withAlphaMode(material() == 0 ? PAlphaMode.OPAQUE : PAlphaMode.TRANSLUCENT);
 		}
 	}
 }

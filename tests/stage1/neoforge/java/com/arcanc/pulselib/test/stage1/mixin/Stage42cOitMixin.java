@@ -11,6 +11,7 @@ package com.arcanc.pulselib.test.stage1.mixin;
 
 import com.arcanc.pulselib.test.stage1.Stage42cLifecycleProbe;
 import com.arcanc.pulselib.test.stage1.Stage42cResources;
+import com.arcanc.pulselib.test.stage1.Stage52ArmorOcclusionProbe;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -24,6 +25,13 @@ public abstract class Stage42cOitMixin
 {
 	@Unique
 	private Stage42cResources.@Nullable Snapshot pulselib$oldAttachments;
+
+	@Inject(method = "beginDepthPass", at = @At("HEAD"))
+	private void pulselib$observeArmorDepthPass(int layer, CallbackInfo callback)
+	{
+		if (Boolean.getBoolean("pulselib.stage52b4aProbe") && layer == 0)
+			Stage52ArmorOcclusionProbe.depthPass();
+	}
 
 	@Inject(method = "closeBuffers", at = @At("HEAD"))
 	private void pulselib$captureAttachments(CallbackInfo callback)

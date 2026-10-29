@@ -278,3 +278,26 @@ keep their existing submissions. Already submitted commands retain their owner;
 the caller remains responsible for discarding an aborted local plan.
 These checks establish scope/target/queue behavior. Dedicated Fabulous
 player/armor pixel-depth coverage remains checkpoint 5.2b.4. See journal §42.
+
+Stage **5.2b.4a** adds `-PpulseStage52b4aProbe` (implies the original
+player occlusion probe). Run `:neoforge:runServer` first and then
+`:neoforge:runClient`, both with `-PpulseStage1Smoke -PpulseStage52b4aProbe
+-PpulseStage2Probe -PpulseVerificationDir=stage52b4a-runs`.
+Use a new disposable world named `player-occlusion-smoke`, loopback port 25576,
+and the client marker `.pulselib-player-occlusion` in that run directory.
+The probe writes `player-occlusion-results.json` and stops the client normally;
+stop the dedicated server through its console.
+
+The real world matrix covers skin, vanilla armor, a custom NeoForge armor model
+and its fixed BODY deformation, versus opaque/OIT Pulse entities in both depth
+orders. Fast/Fancy/Fabulous are tested before/after reload: 288 states,
+1512 comparisons and 324 independent geometry depth witnesses. A test observer
+requires actual OIT depth passes in each owner/mode/reload group. Reports retain
+raw color/depth and each frame's projection matrix; cross-frame comparisons use
+reconstructed view-space distance. A temporary early-depth mutation failed with
+nine RGB mismatches; it is excluded from production and test sources.
+
+Animated rig/armor motion, arbitrary attachments, ordinary non-OIT alpha and
+water/glass/particle/weather pixel witnesses remain **5.2b.4b**. The full 5.2b.4
+checkpoint and stage 5 are still incomplete. See journal §43 and
+[evidence](../docs/porting/evidence/stage-5.2b.4a.json).

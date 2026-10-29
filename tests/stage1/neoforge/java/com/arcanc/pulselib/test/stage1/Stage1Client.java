@@ -64,6 +64,8 @@ public final class Stage1Client implements IPulseClientPlugin
 
 	public static void register(IEventBus bus)
 	{
+		if (Boolean.getBoolean("pulselib.stage52b4aProbe"))
+			Stage52ArmorOcclusionProbe.register(bus);
 		if (Boolean.getBoolean("pulselib.stage52b2bProbe"))
 			Stage52ArmorProbe.register(bus);
 		bus.addListener(Stage1Client::renderers);
