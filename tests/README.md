@@ -326,3 +326,29 @@ consumers or actual callback geometry; both must fail their pixel assertions.
 They exist only in temporary compile projections. Legacy living attachment and
 water/glass/particle/weather coverage remains **5.2b.4c**; stage 5 is incomplete.
 See journal §44 and [evidence](../docs/porting/evidence/stage-5.2b.4b.json).
+
+
+Stage **5.2b.4c.1** adds `-PpulseStage52b4cProbe` with the same isolated server,
+world and `.pulselib-player-occlusion` client marker. Use
+`-PpulseStage1Smoke -PpulseStage52b4cProbe -PpulseStage2Probe
+-PpulseVerificationDir=stage52b4c1-runs` for both server and client; start the
+client after server Done. This flag implies the player occlusion harness.
+
+The native suite covers third-person **legacy global/item living definitions**:
+bare/global-opaque/global-alpha/item-opaque/item-alpha, each at 0/10 ticks of a
+real decoded Gecko BODY clip. The item definition hides native diamond armor.
+Independent controls cover opaque/OIT Pulse entities in front/behind, all three
+native presets and resource reload: **720 states / 3780 RGB-depth comparisons**,
+**864 green pixel / 540 motion / 120 extraction witnesses**. Real legacy draws
+join the existing entity queue; ordinary alpha uses the instanced shaders and
+main target, with no OIT promotion. Mouse-look is released during this automatic
+suite; raw reports retain actual view/projection matrices and native-target
+presence at readback. Existing RGB/distance tolerances remain unchanged.
+
+The original immediate legacy layer fails the green-alpha pixel assertion in a
+temporary compile projection, while bare/opaque controls pass. Final normal
+classes also pass the original player-depth and native callback/scopes suites.
+**Persistent first-person armor, animated water/glass/particles/weather and
+additional legacy attachment format/controller coverage remain 5.2b.4c.2**.
+Stage 5 remains incomplete. See journal §45 and
+[evidence](../docs/porting/evidence/stage-5.2b.4c.1.json).

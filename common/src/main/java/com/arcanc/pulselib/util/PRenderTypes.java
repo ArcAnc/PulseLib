@@ -106,6 +106,20 @@ public class PRenderTypes
 				withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT)).
 				build());
 
+		private static final RenderPipeline TRIANGLES_ORDINARY_TRANSLUCENT = ordinaryPipeline(false);
+		private static final RenderPipeline TRIANGLES_ORDINARY_EMISSIVE_TRANSLUCENT = ordinaryPipeline(true);
+
+		private static RenderPipeline ordinaryPipeline(boolean emissive)
+		{
+			var builder = RenderPipeline.builder(TRIANGLES_SNIPPET).
+					withLocation(PLibDatabase.rl(emissive ? "pipeline/triangles_ordinary_emissive" : "pipeline/triangles_ordinary")).
+					withSampler("Sampler1").withShaderDefine("ALPHA_CUTOUT", 0.1F).withCull(false).
+					withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT));
+			if (emissive)
+				builder.withShaderDefine("EMISSIVE");
+			return registerPipeline(builder.build());
+		}
+
 		public static final RenderPipeline TRIANGLES_OIT = registerPipeline(RenderPipeline.builder(TRIANGLES_SNIPPET).
 				withLocation(PLibDatabase.rl("pipeline/triangles_oit_no_cull")).
 				withFragmentShader(PLibDatabase.rl("core/triangles_oit")).
@@ -288,6 +302,17 @@ public class PRenderTypes
 		private static final Function<Identifier, RenderType> TRIANGLES_INSTANT_EMISSIVE_CUTOUT = Util.memoize(RenderTypeProvider :: createTrianglesInstantEmissiveCutout);
 		private static final Function<Identifier, RenderType> TRIANGLES_INSTANT_EMISSIVE_TRANSLUCENT = Util.memoize(RenderTypeProvider :: createTrianglesInstantEmissiveTranslucent);
 		
+		private static final Function<Identifier, RenderType> ORDINARY_TRANSLUCENT = Util.memoize(texture -> ordinaryType(texture, false));
+		private static final Function<Identifier, RenderType> ORDINARY_EMISSIVE_TRANSLUCENT = Util.memoize(texture -> ordinaryType(texture, true));
+
+		private static RenderType ordinaryType(Identifier texture, boolean emissive)
+		{
+			var setup = RenderSetup.builder(emissive ? RenderPipelinesProvider.TRIANGLES_ORDINARY_EMISSIVE_TRANSLUCENT :
+					RenderPipelinesProvider.TRIANGLES_ORDINARY_TRANSLUCENT).
+					withTexture("Sampler0", texture).useLightmap().useOverlay().createRenderSetup();
+			return RenderType.create(PLibDatabase.rl(emissive ? "triangles_ordinary_emissive" : "triangles_ordinary").toString(), setup);
+		}
+
 		/**
 		 * Creates the triangles solid.
 		 * @param texture the texture to use.
@@ -718,6 +743,16 @@ public class PRenderTypes
 	public static boolean isTransparent(RenderType renderType)
 	{
 		return renderType.pipeline().getColorTargetState().blendFunction().isPresent();
+	}
+
+	/** Keeps legacy ordinary blending while using the instanced world vertex format and shared executor. */
+	@ApiStatus.Internal
+	public static RenderType ordinaryVariant(RenderType type, Identifier texture)
+	{
+		if (!usesOit(type))
+			return type;
+		return type.pipeline() == RenderPipelinesProvider.TRIANGLES_EMISSIVE_TRANSLUCENT ?
+				RenderTypeProvider.ORDINARY_EMISSIVE_TRANSLUCENT.apply(texture) : RenderTypeProvider.ORDINARY_TRANSLUCENT.apply(texture);
 	}
 
 	/**

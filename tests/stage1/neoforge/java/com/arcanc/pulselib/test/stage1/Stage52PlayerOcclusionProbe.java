@@ -59,8 +59,9 @@ import java.util.concurrent.TimeUnit;
 public final class Stage52PlayerOcclusionProbe
 {
 	public static final PModelData MODEL = PModelData.entity(PLibDatabase.rl("stage42b3_owner"), PGeckoModelLoader.INSTANCE.id());
+	private static final boolean LEGACY_MATRIX = Boolean.getBoolean("pulselib.stage52b4cProbe");
 	private static final boolean MOTION_MATRIX = Boolean.getBoolean("pulselib.stage52b4bProbe");
-	private static final boolean EXTENDED_MATRIX = Boolean.getBoolean("pulselib.stage52b4aProbe") || MOTION_MATRIX;
+	private static final boolean EXTENDED_MATRIX = Boolean.getBoolean("pulselib.stage52b4aProbe") || MOTION_MATRIX || LEGACY_MATRIX;
 	private static final boolean ARMOR_MATRIX = Boolean.getBoolean("pulselib.stage52b4aProbe");
 	private static final UUID PLAYER_ID = new UUID(0, 0x526a01);
 	private static final String[] STATES = {"background", "player", "entity-behind", "both-behind", "entity-front", "both-front"};
@@ -76,6 +77,8 @@ public final class Stage52PlayerOcclusionProbe
 	private static boolean completed;
 	private static boolean advance;
 	private static boolean armed;
+	private static boolean nativeItemTargetPresent;
+	private static final Matrix4f READBACK_VIEW = new Matrix4f();
 	private static boolean originalImproved;
 	private static boolean originalHideGui;
 	private static CameraType originalCamera = CameraType.FIRST_PERSON;
@@ -107,6 +110,8 @@ public final class Stage52PlayerOcclusionProbe
 		var mc = Minecraft.getInstance();
 		if (mc.player == null || mc.level == null || mc.getOverlay() != null || MODEL.getModel() == null)
 			return;
+		if (LEGACY_MATRIX && !Stage52LegacyOcclusionProbe.ready())
+			return;
 		if (MOTION_MATRIX && !Stage52AnimatedOcclusionProbe.ready())
 			return;
 		if (!started)
@@ -122,7 +127,7 @@ public final class Stage52PlayerOcclusionProbe
 			player.setId(0x526a01);
 			mc.level.addEntity(player);
 			started = true;
-			deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(MOTION_MATRIX ? 1200 : ARMOR_MATRIX ? 480 : 180);
+			deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(MOTION_MATRIX || LEGACY_MATRIX ? 1200 : ARMOR_MATRIX ? 480 : 180);
 			mode();
 		}
 		check(System.nanoTime() < deadline, "Occlusion matrix timed out: phase=" + phase + " step=" + step);
@@ -138,13 +143,15 @@ public final class Stage52PlayerOcclusionProbe
 		{
 			advance = false;
 			step++;
-			if (step == (MOTION_MATRIX ? Stage52AnimatedOcclusionProbe.VARIANTS * 12 : ARMOR_MATRIX ? 48 : 12))
+			if (step == (LEGACY_MATRIX ? Stage52LegacyOcclusionProbe.VARIANTS * 12 : MOTION_MATRIX ? Stage52AnimatedOcclusionProbe.VARIANTS * 12 : ARMOR_MATRIX ? 48 : 12))
 			{
 				step = 0;
 				phase++;
 				if (phase == (EXTENDED_MATRIX ? 6 : 4))
 				{
 					completed = true;
+					if (LEGACY_MATRIX)
+						Stage52LegacyOcclusionProbe.complete();
 					if (MOTION_MATRIX)
 						Stage52AnimatedOcclusionProbe.complete();
 					if (ARMOR_MATRIX)
@@ -171,6 +178,8 @@ public final class Stage52PlayerOcclusionProbe
 			frames = 0;
 		}
 		KeyMapping.releaseAll();
+		if (LEGACY_MATRIX)
+			mc.mouseHandler.releaseMouse();
 		place(mc.player, 0, -6);
 		mc.player.setYRot(0);
 		mc.player.yRotO = 0;
@@ -178,6 +187,8 @@ public final class Stage52PlayerOcclusionProbe
 		mc.player.xRotO = 0;
 		var player = (RemotePlayer)mc.level.getEntity(0x526a01);
 		check(player != null, "Native remote player is present");
+		if (LEGACY_MATRIX)
+			Stage52LegacyOcclusionProbe.configure(player, step / 12, phase);
 		if (MOTION_MATRIX)
 			Stage52AnimatedOcclusionProbe.configure(player, step / 12, phase);
 		if (ARMOR_MATRIX)
@@ -188,7 +199,7 @@ public final class Stage52PlayerOcclusionProbe
 		player.yRotO = player.yBodyRot = player.yBodyRotO = player.yHeadRot = player.yHeadRotO = 180;
 		for (var entity : mc.level.entitiesForRendering())
 			if (entity instanceof TestEntity)
-				place(entity, state() >= 2 ? 0 : MOTION_MATRIX ? 64 : 3, state() >= 4 ? -2 : 2);
+				place(entity, state() >= 2 ? 0 : MOTION_MATRIX || LEGACY_MATRIX ? 64 : 3, state() >= 4 ? -2 : 2);
 	}
 
 	private static void mode()
@@ -230,12 +241,15 @@ public final class Stage52PlayerOcclusionProbe
 			return;
 		if (!mc.levelRenderer.isSectionCompiledAndVisible(new BlockPos(0, 81, 6)) || ++frames < 8)
 			return;
+		if (LEGACY_MATRIX)
+			Stage52LegacyOcclusionProbe.verifyExtracted(event.getLevelRenderState(), state());
 		if (MOTION_MATRIX)
 			Stage52AnimatedOcclusionProbe.verifyExtracted(event.getLevelRenderState(), state());
 		check(Minecraft.useShaderTransparency() == (EXTENDED_MATRIX ? phase % 3 == 2 : phase % 2 == 1), "Native mode differs from requested mode");
 		var camera = event.getLevelRenderState().cameraRenderState.pos;
 		var frame = new PGlRenderHost().captureFrame();
 		READBACK_PROJECTION.set(frame.projection());
+		READBACK_VIEW.set(frame.modelView());
 		var vp = new Matrix4f(frame.projection()).mul(frame.modelView());
 		RenderTarget target = mc.getMainRenderTarget();
 		List<float[]> values = new ArrayList<>();
@@ -266,9 +280,10 @@ public final class Stage52PlayerOcclusionProbe
 			return;
 		var mc = Minecraft.getInstance();
 		var item = mc.levelRenderer.getItemEntityTarget();
-		check(item != null, "Visible PulseLib owner retains native item/entity target");
+		check(item != null || LEGACY_MATRIX && Stage52LegacyOcclusionProbe.allowsMissingItemTarget(state()), "Visible PulseLib owner retains native item/entity target");
+		nativeItemTargetPresent = item != null;
 		beforeResolve = pixels(mc.getMainRenderTarget());
-		nativeItem = pixels(item);
+		nativeItem = pixels(item == null ? mc.getMainRenderTarget() : item);
 	}
 
 	private static void finish(RenderLevelStageEvent.AfterLevel event)
@@ -281,13 +296,16 @@ public final class Stage52PlayerOcclusionProbe
 		for (int sample = 0; sample < 9; sample++)
 			pixels.add(new Pixel(SAMPLES[sample][0], SAMPLES[sample][1], early.get(sample), afterNativeFeatures.get(sample), beforeResolve.get(sample), nativeItem.get(sample), result.get(sample),
 					distanceFromCamera(Math.min(result.get(sample)[4], nativeItem.get(sample)[4]))));
-		RECORDS.add(new CaseData(phase, READBACK_PROJECTION.get(new float[16]), mc.options.graphicsPreset().get().toString(), MOTION_MATRIX ? Stage52AnimatedOcclusionProbe.variant() : ARMOR_MATRIX ? Stage52ArmorOcclusionProbe.variant() : "skin", Minecraft.useShaderTransparency(), material() == 0 ? "opaque" : "translucent", STATES[state()], pixels));
+		RECORDS.add(new CaseData(phase, nativeItemTargetPresent, READBACK_VIEW.get(new float[16]), READBACK_PROJECTION.get(new float[16]), mc.options.graphicsPreset().get().toString(), LEGACY_MATRIX ? Stage52LegacyOcclusionProbe.variant() : MOTION_MATRIX ? Stage52AnimatedOcclusionProbe.variant() : ARMOR_MATRIX ? Stage52ArmorOcclusionProbe.variant() : "skin", Minecraft.useShaderTransparency(), material() == 0 ? "opaque" : "translucent", STATES[state()], pixels));
+		if (LEGACY_MATRIX && phase == 0 && state() == 1)
+			Screenshot.grab(mc.gameDirectory, "legacy-control-" + step / 12 + ".png", mc.getMainRenderTarget(), 1,
+					message -> PLibDatabase.LOGGER.info("{}", message.getString()));
 		if (state() == 5)
 			compare();
-		if (!MOTION_MATRIX || state() == 5)
+		if (!(MOTION_MATRIX || LEGACY_MATRIX) || state() == 5)
 			writeReport();
-		if ((!EXTENDED_MATRIX && phase < 2 || EXTENDED_MATRIX && phase == 2 && (!MOTION_MATRIX || state() == 1 || state() == 3 || state() == 5)) && state() != 0)
-			Screenshot.grab(mc.gameDirectory, "player-occlusion-" + phase + "-" + (MOTION_MATRIX ? Stage52AnimatedOcclusionProbe.variant().replace('/', '-') + "-" : ARMOR_MATRIX ? Stage52ArmorOcclusionProbe.variant() + "-" : "") + material() + "-" + STATES[state()] + ".png", mc.getMainRenderTarget(), 1,
+		if ((!EXTENDED_MATRIX && phase < 2 || EXTENDED_MATRIX && phase == 2 && (!(MOTION_MATRIX || LEGACY_MATRIX) || state() == 1 || state() == 3 || state() == 5)) && state() != 0)
+			Screenshot.grab(mc.gameDirectory, "player-occlusion-" + phase + "-" + (LEGACY_MATRIX ? Stage52LegacyOcclusionProbe.variant().replace('/', '-') + "-" : MOTION_MATRIX ? Stage52AnimatedOcclusionProbe.variant().replace('/', '-') + "-" : ARMOR_MATRIX ? Stage52ArmorOcclusionProbe.variant() + "-" : "") + material() + "-" + STATES[state()] + ".png", mc.getMainRenderTarget(), 1,
 					message -> PLibDatabase.LOGGER.info("{}", message.getString()));
 		armed = false;
 		advance = true;
@@ -296,6 +314,9 @@ public final class Stage52PlayerOcclusionProbe
 	private static void compare()
 	{
 		int base = RECORDS.size() - 6;
+		if (LEGACY_MATRIX)
+			Stage52LegacyOcclusionProbe.verifyControl(RECORDS.get(base + 1).pixels.stream().map(Pixel::nearestDistance).toList(),
+					RECORDS.get(base + 1).pixels.stream().map(Pixel::finalFrame).toList(), phase, material());
 		if (MOTION_MATRIX)
 			Stage52AnimatedOcclusionProbe.verifyControl(RECORDS.get(base + 1).pixels.stream().map(Pixel::nearestDistance).toList(),
 					RECORDS.get(base + 1).pixels.stream().map(Pixel::finalFrame).toList(), phase, material());
@@ -400,7 +421,7 @@ public final class Stage52PlayerOcclusionProbe
 
 	private static void shutdown(GameShuttingDownEvent event)
 	{
-		check(completed && RECORDS.size() == (MOTION_MATRIX ? Stage52AnimatedOcclusionProbe.VARIANTS * 72 : ARMOR_MATRIX ? 288 : 48) && comparisons == (MOTION_MATRIX ? Stage52AnimatedOcclusionProbe.VARIANTS * 378 : ARMOR_MATRIX ? 1512 : 252) && submissions > 0, "Entire occlusion matrix and real submissions must finish");
+		check(completed && RECORDS.size() == (LEGACY_MATRIX ? Stage52LegacyOcclusionProbe.VARIANTS * 72 : MOTION_MATRIX ? Stage52AnimatedOcclusionProbe.VARIANTS * 72 : ARMOR_MATRIX ? 288 : 48) && comparisons == (LEGACY_MATRIX ? Stage52LegacyOcclusionProbe.VARIANTS * 378 : MOTION_MATRIX ? Stage52AnimatedOcclusionProbe.VARIANTS * 378 : ARMOR_MATRIX ? 1512 : 252) && submissions > 0, "Entire occlusion matrix and real submissions must finish");
 		check(FAILURES.isEmpty(), "Player occlusion regression failed: " + FAILURES.size() + " mismatches; see player-occlusion-results.json");
 		PLibDatabase.LOGGER.info("PLAYER OCCLUSION SHUTDOWN PASS");
 	}
@@ -415,7 +436,7 @@ public final class Stage52PlayerOcclusionProbe
 	{
 	}
 
-	private record CaseData(int phase, float[] projection, String preset, String owner, boolean improved, String material, String state, List<Pixel> pixels)
+	private record CaseData(int phase, boolean nativeItemTargetPresent, float[] view, float[] projection, String preset, String owner, boolean improved, String material, String state, List<Pixel> pixels)
 	{
 	}
 

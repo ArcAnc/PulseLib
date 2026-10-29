@@ -13,11 +13,17 @@ package com.arcanc.pulselib.util.attachments;
 import com.arcanc.pulselib.content.renderer.base.PRenderState;
 import com.arcanc.pulselib.content.renderer.base.PRenderCallbackScope;
 import com.arcanc.pulselib.content.animatable.PAnimationController;
+import com.arcanc.pulselib.content.model.animation.PAnimationPoseResolver;
 import com.arcanc.pulselib.content.model.baked.PBakedBone;
+import com.arcanc.pulselib.content.model.baked.PBakedMesh;
 import com.arcanc.pulselib.content.model.baked.PBakedModel;
 import com.arcanc.pulselib.content.model.baked.PMeshRenderContext;
+import com.arcanc.pulselib.content.model.baked.PMeshRenderMaterial;
+import com.arcanc.pulselib.content.model.baked.PMeshRenderResolver;
+import com.arcanc.pulselib.content.renderer.PRenderQueue;
 import com.arcanc.pulselib.content.renderer.base.PLivingAttachmentRenderState;
 import com.arcanc.pulselib.util.PRenderTypes;
+import com.arcanc.pulselib.util.PResourceCache;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
@@ -32,6 +38,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.jspecify.annotations.Nullable;
@@ -81,7 +88,7 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 
 		for (RenderEntry entry : entries)
 			renderDefinition(poseStack, light, PRenderState.partialTick(state), entry,
-					binding -> PAttachmentAnchorResolvers.resolve(state, this.getParentModel(), binding.anchor()), this.getParentModel().root());
+					binding -> PAttachmentAnchorResolvers.resolve(state, this.getParentModel(), binding.anchor()), this.getParentModel().root(), true);
 	}
 
 	/**
@@ -154,7 +161,7 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 
 			for (RenderEntry entry : extractRenderEntries(entity, partialTick))
 				renderDefinition(poseStack, light, partialTick, entry,
-						binding -> binding.anchor().equals(targetAnchor) ? anchorPart : null, modelRoot);
+						binding -> binding.anchor().equals(targetAnchor) ? anchorPart : null, modelRoot, false);
 		}
 	}
 
@@ -171,7 +178,7 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 			int light,
 			float partialTick,
 			RenderEntry entry,
-			AttachmentPartResolver partResolver, ModelPart modelRoot)
+			AttachmentPartResolver partResolver, ModelPart modelRoot, boolean queued)
 	{
 		PLivingAttachmentDefinition definition = entry.definition();
 		PBakedModel model = definition.modelData().getModel();
@@ -201,7 +208,7 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 				poseStack.scale(scale.x(), scale.y(), scale.z());
 				poseStack.translate(-bone.basePosition().x(), -bone.basePosition().y(), -bone.basePosition().z());
 
-				drawBone(poseStack, definition, bone, entry.entity(), entry.stack(), entry.controllers(), light, partialTick, modelRoot);
+				drawBone(poseStack, definition, bone, entry.entity(), entry.stack(), entry.controllers(), light, partialTick, modelRoot, queued);
 
 				poseStack.popPose();
 			}
@@ -225,9 +232,9 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 	                             ItemStack stack,
 	                             Collection<PAnimationController<?>> controllers,
 	                             int light,
-	                             float partialTick, ModelPart modelRoot)
+	                             float partialTick, ModelPart modelRoot, boolean queued)
 	{
-		drawBoneUnchecked(poseStack, definition, bone, entity, stack, controllers, light, partialTick, modelRoot);
+		drawBoneUnchecked(poseStack, definition, bone, entity, stack, controllers, light, partialTick, modelRoot, queued);
 	}
 
 	/**
@@ -249,7 +256,7 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 	                                      ItemStack stack,
 	                                      Collection<PAnimationController<?>> controllers,
 	                                      int light,
-	                                      float partialTick, ModelPart modelRoot)
+	                                      float partialTick, ModelPart modelRoot, boolean queued)
 	{
 		PMeshRenderContext context = new PMeshRenderContext(
 				PRenderTypes.RenderTypeProvider :: trianglesCutout,
@@ -257,20 +264,59 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 				light,
 				OverlayTexture.NO_OVERLAY);
 
-		bone.instantDraw(
-				poseStack,
-				definition.modelData(),
-				(Collection) controllers,
-				(bakedBone, mesh, inherited) ->
-				{
-					// Each resolver must finish before traversal continues into another mesh or child bone.
-					try (var callback = PRenderCallbackScope.capture(poseStack, modelRoot))
-					{
-						return definition.renderResolver().resolve(entity, stack, bakedBone, mesh, inherited, partialTick);
-					}
-				},
-				context,
-				partialTick);
+		PMeshRenderResolver resolver = (bakedBone, mesh, inherited) ->
+		{
+			// Each resolver must finish before traversal continues into another mesh or child bone.
+			try (var callback = PRenderCallbackScope.capture(poseStack, modelRoot))
+			{
+				return definition.renderResolver().resolve(entity, stack, bakedBone, mesh, inherited, partialTick);
+			}
+		};
+		if (queued)
+			submitBone(poseStack, bone, modelPose(definition, controllers, partialTick), resolver, context);
+		else
+			bone.instantDraw(poseStack, definition.modelData(), (Collection)controllers, resolver, context, partialTick);
+	}
+
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	private static PAnimationPoseResolver<?> modelPose(PLivingAttachmentDefinition definition,
+			Collection<PAnimationController<?>> controllers, float partialTick)
+	{
+		return new PAnimationPoseResolver(definition.modelData().getModel(), (Collection)controllers,
+				PAnimationPoseResolver.defaultContexts(), partialTick);
+	}
+
+	/** Native layers submit before deferred player geometry; world meshes must join the existing entity pass. */
+	private static void submitBone(PoseStack poses, PBakedBone bone, PAnimationPoseResolver<?> animation,
+			PMeshRenderResolver resolver, PMeshRenderContext inherited)
+	{
+		if (!animation.isVisible(bone))
+			return;
+		var frame = animation.resolve(bone).localTransform();
+		poses.pushPose();
+		try
+		{
+			poses.translate(frame.translation().x(), frame.translation().y(), frame.translation().z());
+			poses.mulPose(frame.rotation());
+			poses.scale(frame.scale().x(), frame.scale().y(), frame.scale().z());
+			for (PBakedMesh mesh : bone.meshes())
+			{
+				if (mesh.textureReference().isEmpty())
+					continue;
+				PMeshRenderContext context = resolver.resolve(bone, mesh, inherited);
+				PMeshRenderMaterial material = PMeshRenderMaterial.resolve(mesh, context);
+				// Legacy direct drawing uses ordinary alpha, even when the world has pending OIT.
+				PRenderQueue.submitEntityMesh(PRenderTypes.ordinaryVariant(material.resolveRenderType(context, PResourceCache.ATLAS_LOCATION), PResourceCache.ATLAS_LOCATION),
+						material.mesh(), context.deformation(), new PRenderQueue.InstanceData(new Matrix4f(poses.last().pose()),
+								context.color(), material.packedLight(), context.packedOverlay()));
+			}
+			for (PBakedBone child : bone.children())
+				submitBone(poses, child, animation, resolver, inherited);
+		}
+		finally
+		{
+			poses.popPose();
+		}
 	}
 
 	/**

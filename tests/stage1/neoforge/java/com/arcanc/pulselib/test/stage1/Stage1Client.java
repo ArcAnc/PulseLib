@@ -159,6 +159,8 @@ public final class Stage1Client implements IPulseClientPlugin
 	public void registerModels(PModelRegistrar event)
 	{
 		Stage2PluginProbe.models++;
+		if (Boolean.getBoolean("pulselib.stage52b4cProbe"))
+			Stage52LegacyOcclusionProbe.registerModels(event);
 		if (Boolean.getBoolean("pulselib.stage52b4bProbe"))
 			Stage52AnimatedOcclusionProbe.registerModels(event);
 		if (Boolean.getBoolean("pulselib.playerOcclusionProbe"))
@@ -196,12 +198,16 @@ public final class Stage1Client implements IPulseClientPlugin
 	public void registerAttachments(PAttachmentRegistrar registrar)
 	{
 		Stage2PluginProbe.attachments++;
+		if (Boolean.getBoolean("pulselib.stage52b4cProbe"))
+			Stage52LegacyOcclusionProbe.registerAttachments(registrar);
 	}
 
 	@Override
 	public void registerPlayerAnimations(PPlayerAnimationRegistrar registrar)
 	{
 		Stage2PluginProbe.playerAnimations++;
+		if (Boolean.getBoolean("pulselib.stage52b4cProbe"))
+			Stage52LegacyOcclusionProbe.registerAnimations(registrar);
 		if (Boolean.getBoolean("pulselib.stage52b4bProbe"))
 			Stage52AnimatedOcclusionProbe.registerAnimations(registrar);
 		Stage52CameraProbe.registerAnimations(registrar);

@@ -14,6 +14,7 @@ import com.arcanc.pulselib.content.player.deformer.PPlayerGeometryRenderState;
 import com.arcanc.pulselib.content.player.deformer.PPlayerModelGeometry;
 import com.arcanc.pulselib.content.renderer.base.PModelPartSnapshot;
 import com.arcanc.pulselib.platform.PClientRenderHooks;
+import com.arcanc.pulselib.util.attachments.PLivingAttachments;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -58,7 +59,7 @@ public abstract class HumanoidArmorLayerMixin implements PPlayerArmorGeometryLay
 				case HEAD -> state.headEquipment;
 				default -> ItemStack.EMPTY;
 			};
-			if (!HumanoidArmorLayer.shouldRender(stack, slot))
+			if (!HumanoidArmorLayer.shouldRender(stack, slot) || PLivingAttachments.hidesVanillaArmor(stack))
 				continue;
 			HumanoidModel<?> original = this.getArmorModel(state, slot);
 			EquipmentClientInfo.LayerType type = state.isBaby && state.entityType != EntityType.ARMOR_STAND ?
