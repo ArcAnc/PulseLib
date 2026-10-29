@@ -188,7 +188,7 @@ public final class Stage52PlayerOcclusionProbe
 		var player = (RemotePlayer)mc.level.getEntity(0x526a01);
 		check(player != null, "Native remote player is present");
 		if (LEGACY_MATRIX)
-			Stage52LegacyOcclusionProbe.configure(player, step / 12, phase);
+			Stage52LegacyOcclusionProbe.configure(player, step / 12, phase, state());
 		if (MOTION_MATRIX)
 			Stage52AnimatedOcclusionProbe.configure(player, step / 12, phase);
 		if (ARMOR_MATRIX)

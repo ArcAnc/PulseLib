@@ -21,6 +21,7 @@ import com.arcanc.pulselib.content.model.baked.PMeshRenderContext;
 import com.arcanc.pulselib.content.model.baked.PMeshRenderMaterial;
 import com.arcanc.pulselib.content.model.baked.PMeshRenderResolver;
 import com.arcanc.pulselib.content.renderer.PRenderQueue;
+import com.arcanc.pulselib.content.renderer.plan.PTransparencyMode;
 import com.arcanc.pulselib.content.renderer.base.PLivingAttachmentRenderState;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.arcanc.pulselib.util.PResourceCache;
@@ -306,9 +307,9 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 				PMeshRenderContext context = resolver.resolve(bone, mesh, inherited);
 				PMeshRenderMaterial material = PMeshRenderMaterial.resolve(mesh, context);
 				// Legacy direct drawing uses ordinary alpha, even when the world has pending OIT.
-				PRenderQueue.submitEntityMesh(PRenderTypes.ordinaryVariant(material.resolveRenderType(context, PResourceCache.ATLAS_LOCATION), PResourceCache.ATLAS_LOCATION),
+				PRenderQueue.submitEntityMesh(material.resolveRenderType(context, PResourceCache.ATLAS_LOCATION),
 						material.mesh(), context.deformation(), new PRenderQueue.InstanceData(new Matrix4f(poses.last().pose()),
-								context.color(), material.packedLight(), context.packedOverlay()));
+								context.color(), material.packedLight(), context.packedOverlay()), PTransparencyMode.ORDINARY);
 			}
 			for (PBakedBone child : bone.children())
 				submitBone(poses, child, animation, resolver, inherited);

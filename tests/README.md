@@ -352,3 +352,16 @@ classes also pass the original player-depth and native callback/scopes suites.
 additional legacy attachment format/controller coverage remain 5.2b.4c.2**.
 Stage 5 remains incomplete. See journal §45 and
 [evidence](../docs/porting/evidence/stage-5.2b.4c.1.json).
+
+
+The ordinary/OIT architecture was corrected after stage 5.2b.4c.1: select
+`PTransparencyMode.ORDINARY` or `PTransparencyMode.OIT` in the new queue
+submission overloads. Both policies use the **same RenderType and GPU pipeline**;
+no extra ordinary render types/pipelines are created. Existing overloads preserve
+the historical defaults. The legacy probe checks six policy-binding/packing/
+cleanup cases, each actual mesh's explicit ordinary policy, and actual backend
+OIT passes: culled-entity controls must never start OIT for ordinary legacy alpha.
+Ignoring policy in the executor fails that assertion. Original player-depth and
+44-pixel GUI/offscreen regressions pass. See migration journal §46 and
+[explicit transparency evidence](../docs/porting/evidence/explicit-transparency-mode.json).
+The next migration checkpoint remains **5.2b.4c.2**.

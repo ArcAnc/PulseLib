@@ -1,0 +1,293 @@
+{
+  "status": "PASS",
+  "change": "Explicit ordinary/OIT submission mode; no additional RenderType/RenderPipeline variants",
+  "date": "2026-10-29",
+  "author": "ArcAnc",
+  "license": "Arc's License of Common Sense",
+  "startHead": "94ba3d446c698aa003e8e01513ccb0115bf1fb52",
+  "implementation": {
+    "mode": "PTransparencyMode.ORDINARY / OIT",
+    "sameRenderTypeAndGpuPipelineForBothModes": true,
+    "newRenderTypes": 0,
+    "newGpuPipelines": 0,
+    "PRenderTypesMatchesCommit": "12962a5",
+    "canonicalPlanRecordsUnchanged": true,
+    "legacyOverloadsKeepHistoricalDefault": true,
+    "explicitModeStoredInBindingAndReadByCompilerAndExecutor": true,
+    "ordinaryVariantRemovedAsRequested": true
+  },
+  "native": {
+    "status": "PASS",
+    "states": 720,
+    "comparisons": 3780,
+    "mismatches": 0,
+    "samples": 6480,
+    "submissions": 26080,
+    "viewMatrices": 1,
+    "nativeTargets": {
+      "False": 16,
+      "True": 704
+    },
+    "maxErrors": {
+      "behindRgb": 0.003921600000000081,
+      "behindDistance": 0,
+      "frontRgb": 0.0075630321071427364,
+      "frontOpaqueDistance": 0
+    },
+    "rawSha256": "b65e5cad7997f3776a4ac4da75acfaf5bc7bd806dbde1a9cc1d9dc2e7b681071"
+  },
+  "policyCases": 6,
+  "greenPixels": 864,
+  "motionWitnesses": 540,
+  "extractionWitnesses": 120,
+  "negative": {
+    "status": "EXPECTED FAIL",
+    "javaExitCode": 255,
+    "gradleExitCode": 1,
+    "mutation": "Executor ignores mode and selects OIT by RenderType",
+    "failure": "Ordinary legacy geometry must not start OIT when the Pulse entity is culled",
+    "projection": "/tmp/pulselib-explicit-alpha-yvkvoyrg/negative.gradle"
+  },
+  "originalRegression": {
+    "states": 48,
+    "comparisons": 252,
+    "mismatches": 0,
+    "exitCode": 0
+  },
+  "guiRegression": {
+    "pixels": 44,
+    "exitCode": 0,
+    "shutdownPass": true,
+    "initialAttempt": "44 pixel PASS but full suite failed due to occlusion server missing demo world owners; final retry uses proper fresh demo scene"
+  },
+  "junit": {
+    "common": {
+      "tests": 240,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "fabric": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "neoforge": {
+      "tests": 0,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "canonicalApi": {
+    "types": 18,
+    "members": 121,
+    "status": "PASS"
+  },
+  "artifacts": {
+    "common": {
+      "classes": 576,
+      "majorVersions": [
+        69
+      ],
+      "sha256": "b63af94bcb537751a93bd4c2b9020e3c1bd73acb0d1dfaf18e88c494bbc6d495"
+    },
+    "neoforge": {
+      "classes": 589,
+      "majorVersions": [
+        69
+      ],
+      "sha256": "a4c703f1789a4cf170243a1a6328f358dece48b5ba0c1d14d1a4da23f8736b0a"
+    },
+    "fabric": {
+      "classes": 580,
+      "majorVersions": [
+        69
+      ],
+      "sha256": "43164dc56d4419d867802b1fc552ad38dc52dbb14bbbb71d48dcbe3f60771747"
+    }
+  },
+  "servers": [
+    {
+      "directory": "stage52b-explicit-alpha-runs",
+      "exitCode": 0,
+      "clientClasses": 0,
+      "helperLoads": 0,
+      "traceSha256": "b8159abb36777156a7665751b165380b3a0bf419f6528fdba500e2a922233f91"
+    },
+    {
+      "directory": "stage52b-explicit-alpha-gui-runs",
+      "exitCode": 0,
+      "clientClasses": 0,
+      "helperLoads": 0,
+      "traceSha256": "cdcfbc737f14aa8214d7e645f68f8c77793bd56f00466867405c961f8196876c"
+    }
+  ],
+  "sourceSha256": {
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/plan/PTransparencyMode.java": "2c9bc77d3b12c6aa825bdc056a23d0d0f30a09abbffd29c4ab5db614bf8e5e75",
+    "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java": "891a0a560c2408fcab191bb3da5f7c2a97af8ba9743ad6874b687bf769a1f68f",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlResourceRegistry.java": "7043a087ae4f5b6283813c8c636020523679f59a13131685561681182cacd56d",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java": "cde06548eb575b90c0044502ede1e2574b0ef48d08762f353eba53f32dcdc5a0",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java": "c64c014df49970b23a6b971af53ad9d637ddb713eb50e6052d5215a64c85edf6",
+    "common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentLayer.java": "28922a4aef2a3fec724999d7052516fddb8e08abc7f71a8376ddc0f9278ce3bb",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage52LegacyOcclusionProbe.java": "19b98a9aafaaa032eb764f5911ccd174f417ecdbce7b89e3b90031ca37a582e7",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage52PlayerOcclusionProbe.java": "8ee0461ae96a30178073d9d9b8131287d2c34c7c5708305bcb20901baac5d9e1",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/mixin/Stage52AttachmentQueueMixin.java": "510cb8f3dc166d13f0a38c9d8e890f944974aa38f5090886a932d5bab3fc1c6e",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/mixin/Stage42cOitMixin.java": "6f042ea6398b866a40ccb40a60786f6630b99fc4c08390d5340a9b39f7a549ed"
+  },
+  "classSha256": {
+    "common/build/classes/java/main/com/arcanc/pulselib/content/renderer/gl/PGlResourceRegistry$PipelineBinding.class": "27e69de6401b0403f831adfaacbd86162b2a2b12ee1f1b160a2fb24ecd8b7cd3",
+    "common/build/classes/java/main/com/arcanc/pulselib/content/renderer/gl/PGlResourceRegistry.class": "030559f775830fd7966214b06a5500bfbb825204e7e2f3794c3f56eaef1631aa",
+    "common/build/classes/java/main/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor$ArenaKey.class": "433ade44c22f88c37d1ab5a1e1a7984ceea7658a53e26924130429f01095b077",
+    "common/build/classes/java/main/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor$Draw.class": "469685306ac2e44291bae2463355f3ce20b66a1de208a639b652bd7632c404b7",
+    "common/build/classes/java/main/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor$OitPass.class": "b472b6adb806d7dcbc43b70d3a44d4410072f9dcee8336752bc056696474d443",
+    "common/build/classes/java/main/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor$RenderTargetAttachments.class": "cb3279fe415e53421256a4c43c7ec3e005b9d941627da88ad63d1c35934bb28b",
+    "common/build/classes/java/main/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.class": "70d6bb4852d6c507c610fc6b4762623e11667b903259ba48ba317fab180a83d1",
+    "common/build/classes/java/main/com/arcanc/pulselib/content/renderer/PRenderQueue$1.class": "ba26ea98b19b5f3ca5b952d0e04c02c592fe6548fb1a8eadb4db332cc1a7ce52",
+    "common/build/classes/java/main/com/arcanc/pulselib/content/renderer/PRenderQueue$InstanceData.class": "e0376364b51dcbb91e3a107198df0000639cac70f817460382c17af5a115d671",
+    "common/build/classes/java/main/com/arcanc/pulselib/content/renderer/PRenderQueue$PreparedMesh.class": "1f171bf275da15c071431388f3edd3e8af1b618d2beb5e5b05c1cc3f2b7c9e4a",
+    "common/build/classes/java/main/com/arcanc/pulselib/content/renderer/PRenderQueue$RenderStage.class": "8bbb15bd3ca54821068332f111fd40d7310891f46e71190f67f8f18b463bae81",
+    "common/build/classes/java/main/com/arcanc/pulselib/content/renderer/PRenderQueue.class": "a5b8994eab7ac4f6aa0c198a5ec38c7239fb17451bd4b6cd2a6c8faab1d07140",
+    "common/build/classes/java/main/com/arcanc/pulselib/content/renderer/plan/PTransparencyMode.class": "73831367f6556b3895216c5e68e63cecb6c6942ddede49cc717a4f9dd8bac85d",
+    "common/build/classes/java/main/com/arcanc/pulselib/util/PRenderTypes$1.class": "f85dd928bb46690edb3fde4f1ff10f7d5f6a9bd26ac4abf21b0b6e2b94ace59e",
+    "common/build/classes/java/main/com/arcanc/pulselib/util/PRenderTypes$RenderPipelinesProvider.class": "f52bcde8f21f842555216e1109959847873efa362ae46c2aa3d61d6b9a0fc568",
+    "common/build/classes/java/main/com/arcanc/pulselib/util/PRenderTypes$RenderTypeProvider.class": "a3d9a2bf9513c82ae01e3afe2099f4ed439b58530eeaec8c88893243b02e90d8",
+    "common/build/classes/java/main/com/arcanc/pulselib/util/PRenderTypes$VertexFormatProvider.class": "ee22804f772e03200dc12034f716c650e8879cf8c47d687c63c1608ca07858a8",
+    "common/build/classes/java/main/com/arcanc/pulselib/util/PRenderTypes.class": "4fd885cadc3a02b21027c27eb4354ff392d20f3c76fbc8bacd340d3bac9fcc6f",
+    "common/build/classes/java/main/com/arcanc/pulselib/util/attachments/PLivingAttachmentLayer$AttachmentPartResolver.class": "c9cb0bd1afe63f2f4099c849d5cfa5d4078d2120b1d297fd11da139af7ba9f04",
+    "common/build/classes/java/main/com/arcanc/pulselib/util/attachments/PLivingAttachmentLayer$RenderEntry.class": "97f2f48dbd57fb7f23724804db85070479a19a0b1632851f5ea81d035374f897",
+    "common/build/classes/java/main/com/arcanc/pulselib/util/attachments/PLivingAttachmentLayer.class": "3ca8649a4857a75574d0a15faf62a05de976ae03dac7cf287c5d5f71e46640d8",
+    "neoforge/build/classes/java/main/com/arcanc/pulselib/content/renderer/gl/PGlResourceRegistry$PipelineBinding.class": "27e69de6401b0403f831adfaacbd86162b2a2b12ee1f1b160a2fb24ecd8b7cd3",
+    "neoforge/build/classes/java/main/com/arcanc/pulselib/content/renderer/gl/PGlResourceRegistry.class": "030559f775830fd7966214b06a5500bfbb825204e7e2f3794c3f56eaef1631aa",
+    "neoforge/build/classes/java/main/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor$ArenaKey.class": "433ade44c22f88c37d1ab5a1e1a7984ceea7658a53e26924130429f01095b077",
+    "neoforge/build/classes/java/main/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor$Draw.class": "469685306ac2e44291bae2463355f3ce20b66a1de208a639b652bd7632c404b7",
+    "neoforge/build/classes/java/main/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor$OitPass.class": "b472b6adb806d7dcbc43b70d3a44d4410072f9dcee8336752bc056696474d443",
+    "neoforge/build/classes/java/main/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor$RenderTargetAttachments.class": "cb3279fe415e53421256a4c43c7ec3e005b9d941627da88ad63d1c35934bb28b",
+    "neoforge/build/classes/java/main/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.class": "70d6bb4852d6c507c610fc6b4762623e11667b903259ba48ba317fab180a83d1",
+    "neoforge/build/classes/java/main/com/arcanc/pulselib/content/renderer/PRenderQueue$1.class": "ba26ea98b19b5f3ca5b952d0e04c02c592fe6548fb1a8eadb4db332cc1a7ce52",
+    "neoforge/build/classes/java/main/com/arcanc/pulselib/content/renderer/PRenderQueue$InstanceData.class": "e0376364b51dcbb91e3a107198df0000639cac70f817460382c17af5a115d671",
+    "neoforge/build/classes/java/main/com/arcanc/pulselib/content/renderer/PRenderQueue$PreparedMesh.class": "1f171bf275da15c071431388f3edd3e8af1b618d2beb5e5b05c1cc3f2b7c9e4a",
+    "neoforge/build/classes/java/main/com/arcanc/pulselib/content/renderer/PRenderQueue$RenderStage.class": "8bbb15bd3ca54821068332f111fd40d7310891f46e71190f67f8f18b463bae81",
+    "neoforge/build/classes/java/main/com/arcanc/pulselib/content/renderer/PRenderQueue.class": "a5b8994eab7ac4f6aa0c198a5ec38c7239fb17451bd4b6cd2a6c8faab1d07140",
+    "neoforge/build/classes/java/main/com/arcanc/pulselib/content/renderer/plan/PTransparencyMode.class": "73831367f6556b3895216c5e68e63cecb6c6942ddede49cc717a4f9dd8bac85d",
+    "neoforge/build/classes/java/main/com/arcanc/pulselib/util/PRenderTypes$1.class": "f85dd928bb46690edb3fde4f1ff10f7d5f6a9bd26ac4abf21b0b6e2b94ace59e",
+    "neoforge/build/classes/java/main/com/arcanc/pulselib/util/PRenderTypes$RenderPipelinesProvider.class": "f52bcde8f21f842555216e1109959847873efa362ae46c2aa3d61d6b9a0fc568",
+    "neoforge/build/classes/java/main/com/arcanc/pulselib/util/PRenderTypes$RenderTypeProvider.class": "a3d9a2bf9513c82ae01e3afe2099f4ed439b58530eeaec8c88893243b02e90d8",
+    "neoforge/build/classes/java/main/com/arcanc/pulselib/util/PRenderTypes$VertexFormatProvider.class": "ee22804f772e03200dc12034f716c650e8879cf8c47d687c63c1608ca07858a8",
+    "neoforge/build/classes/java/main/com/arcanc/pulselib/util/PRenderTypes.class": "4fd885cadc3a02b21027c27eb4354ff392d20f3c76fbc8bacd340d3bac9fcc6f",
+    "neoforge/build/classes/java/main/com/arcanc/pulselib/util/attachments/PLivingAttachmentLayer$AttachmentPartResolver.class": "c9cb0bd1afe63f2f4099c849d5cfa5d4078d2120b1d297fd11da139af7ba9f04",
+    "neoforge/build/classes/java/main/com/arcanc/pulselib/util/attachments/PLivingAttachmentLayer$RenderEntry.class": "97f2f48dbd57fb7f23724804db85070479a19a0b1632851f5ea81d035374f897",
+    "neoforge/build/classes/java/main/com/arcanc/pulselib/util/attachments/PLivingAttachmentLayer.class": "3ca8649a4857a75574d0a15faf62a05de976ae03dac7cf287c5d5f71e46640d8",
+    "fabric/build/classes/java/main/com/arcanc/pulselib/content/renderer/gl/PGlResourceRegistry$PipelineBinding.class": "27e69de6401b0403f831adfaacbd86162b2a2b12ee1f1b160a2fb24ecd8b7cd3",
+    "fabric/build/classes/java/main/com/arcanc/pulselib/content/renderer/gl/PGlResourceRegistry.class": "030559f775830fd7966214b06a5500bfbb825204e7e2f3794c3f56eaef1631aa",
+    "fabric/build/classes/java/main/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor$ArenaKey.class": "433ade44c22f88c37d1ab5a1e1a7984ceea7658a53e26924130429f01095b077",
+    "fabric/build/classes/java/main/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor$Draw.class": "469685306ac2e44291bae2463355f3ce20b66a1de208a639b652bd7632c404b7",
+    "fabric/build/classes/java/main/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor$OitPass.class": "b472b6adb806d7dcbc43b70d3a44d4410072f9dcee8336752bc056696474d443",
+    "fabric/build/classes/java/main/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor$RenderTargetAttachments.class": "cb3279fe415e53421256a4c43c7ec3e005b9d941627da88ad63d1c35934bb28b",
+    "fabric/build/classes/java/main/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.class": "70d6bb4852d6c507c610fc6b4762623e11667b903259ba48ba317fab180a83d1",
+    "fabric/build/classes/java/main/com/arcanc/pulselib/content/renderer/PRenderQueue$1.class": "ba26ea98b19b5f3ca5b952d0e04c02c592fe6548fb1a8eadb4db332cc1a7ce52",
+    "fabric/build/classes/java/main/com/arcanc/pulselib/content/renderer/PRenderQueue$InstanceData.class": "e0376364b51dcbb91e3a107198df0000639cac70f817460382c17af5a115d671",
+    "fabric/build/classes/java/main/com/arcanc/pulselib/content/renderer/PRenderQueue$PreparedMesh.class": "1f171bf275da15c071431388f3edd3e8af1b618d2beb5e5b05c1cc3f2b7c9e4a",
+    "fabric/build/classes/java/main/com/arcanc/pulselib/content/renderer/PRenderQueue$RenderStage.class": "8bbb15bd3ca54821068332f111fd40d7310891f46e71190f67f8f18b463bae81",
+    "fabric/build/classes/java/main/com/arcanc/pulselib/content/renderer/PRenderQueue.class": "a5b8994eab7ac4f6aa0c198a5ec38c7239fb17451bd4b6cd2a6c8faab1d07140",
+    "fabric/build/classes/java/main/com/arcanc/pulselib/content/renderer/plan/PTransparencyMode.class": "73831367f6556b3895216c5e68e63cecb6c6942ddede49cc717a4f9dd8bac85d",
+    "fabric/build/classes/java/main/com/arcanc/pulselib/util/PRenderTypes$1.class": "f85dd928bb46690edb3fde4f1ff10f7d5f6a9bd26ac4abf21b0b6e2b94ace59e",
+    "fabric/build/classes/java/main/com/arcanc/pulselib/util/PRenderTypes$RenderPipelinesProvider.class": "f52bcde8f21f842555216e1109959847873efa362ae46c2aa3d61d6b9a0fc568",
+    "fabric/build/classes/java/main/com/arcanc/pulselib/util/PRenderTypes$RenderTypeProvider.class": "a3d9a2bf9513c82ae01e3afe2099f4ed439b58530eeaec8c88893243b02e90d8",
+    "fabric/build/classes/java/main/com/arcanc/pulselib/util/PRenderTypes$VertexFormatProvider.class": "ee22804f772e03200dc12034f716c650e8879cf8c47d687c63c1608ca07858a8",
+    "fabric/build/classes/java/main/com/arcanc/pulselib/util/PRenderTypes.class": "4fd885cadc3a02b21027c27eb4354ff392d20f3c76fbc8bacd340d3bac9fcc6f",
+    "fabric/build/classes/java/main/com/arcanc/pulselib/util/attachments/PLivingAttachmentLayer$AttachmentPartResolver.class": "c9cb0bd1afe63f2f4099c849d5cfa5d4078d2120b1d297fd11da139af7ba9f04",
+    "fabric/build/classes/java/main/com/arcanc/pulselib/util/attachments/PLivingAttachmentLayer$RenderEntry.class": "97f2f48dbd57fb7f23724804db85070479a19a0b1632851f5ea81d035374f897",
+    "fabric/build/classes/java/main/com/arcanc/pulselib/util/attachments/PLivingAttachmentLayer.class": "3ca8649a4857a75574d0a15faf62a05de976ae03dac7cf287c5d5f71e46640d8"
+  },
+  "rawDirectory": "/tmp/pulselib-explicit-alpha-yvkvoyrg",
+  "logEvidence": {
+    "client-final.log": {
+      "sha256": "9a2ec5a40a0250bf3ffe3b320249767f1c7d9ec3fe12a2beb33fe376b27e599f",
+      "resultLines": [
+        "[19:06:14] [Render thread/INFO] [Pulse Lib/]: STAGE 5.2b.4c.1 LEGACY DEPTH PASS: configured=60, pixelWitnesses=864, motionWitnesses=540, extractionWitnesses=120, legacyTargetWitnesses=48, policyWitnesses=6, oitPasses=[[456, 476, 497, 459, 421, 512, 428, 550, 416, 486], [430, 541, 151, 60, 60, 60, 60, 61, 60, 60], [60, 60, 60, 60, 60, 60, 60, 60, 60, 60], [60, 61, 60, 60, 60, 60, 60, 60, 60, 60], [60, 60, 60, 60, 60, 60, 60, 60, 60, 60], [60, 60, 60, 60, 60, 60, 60, 60, 60, 60]], resolvers=[[0, 0, 2826, 2743, 2653, 2788, 2774, 2904, 2591, 2766], [0, 0, 2375, 180, 181, 181, 180, 182, 179, 181], [0, 0, 181, 181, 178, 179, 179, 179, 177, 258], [0, 0, 179, 181, 179, 179, 179, 180, 182, 182], [0, 0, 179, 179, 181, 177, 179, 177, 179, 179], [0, 0, 180, 180, 180, 180, 179, 178, 177, 178]]",
+        "[19:06:15] [Render thread/INFO] [Pulse Lib/]: STAGE 2 CLIENT PLUGINS PASS: ids=[pulselib:stage1_client, pulselib:stage2_common], common=1, channels=1, events=1, deformers=1, client=1, server=0, models=2",
+        "[19:06:15] [Render thread/INFO] [Pulse Lib/]: PLAYER OCCLUSION PASS: states=720, comparisons=3780, mismatches=0, submissions=26080; controls, opaque/translucent, both directions, native modes before/after reload",
+        "[19:06:15] [Render thread/INFO] [Pulse Lib/]: PLAYER OCCLUSION SHUTDOWN PASS",
+        "BUILD SUCCESSFUL in 6m 1s"
+      ]
+    },
+    "client-negative.log": {
+      "sha256": "acfc0c1bd4c8294a530de0a5659423140cffbd455223bf7c0ed16a3cf32694f1",
+      "resultLines": [
+        "[19:07:23] [Render thread/ERROR] [ne.ne.bu.EventBus/EVENTBUS]: Exception caught during firing event: Ordinary legacy geometry must not start OIT when the Pulse entity is culled",
+        "java.lang.AssertionError: Ordinary legacy geometry must not start OIT when the Pulse entity is culled",
+        "java.lang.AssertionError: Ordinary legacy geometry must not start OIT when the Pulse entity is culled",
+        "java.lang.AssertionError: Ordinary legacy geometry must not start OIT when the Pulse entity is culled",
+        "BUILD FAILED in 42s"
+      ]
+    },
+    "client-original.log": {
+      "sha256": "617554e7fcea59559b9104540c95fc08147d328f4e8cdd4817486cf4cef67271",
+      "resultLines": [
+        "[19:09:33] [Render thread/INFO] [Pulse Lib/]: STAGE 2 CLIENT PLUGINS PASS: ids=[pulselib:stage1_client, pulselib:stage2_common], common=1, channels=1, events=1, deformers=1, client=1, server=0, models=2",
+        "[19:09:33] [Render thread/INFO] [Pulse Lib/]: PLAYER OCCLUSION PASS: states=48, comparisons=252, mismatches=0, submissions=13036; controls, opaque/translucent, both directions, native modes before/after reload",
+        "[19:09:33] [Render thread/INFO] [Pulse Lib/]: PLAYER OCCLUSION SHUTDOWN PASS",
+        "BUILD SUCCESSFUL in 41s"
+      ]
+    },
+    "client-gui-final.log": {
+      "sha256": "cb6a62ffea7a1d182f40d26a0a9b2681ff5f9181ef521246a88a0a9e25cc7beb",
+      "resultLines": [
+        "[19:13:16] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=37, global local alpha order, RGBA/depth=[0.5019608, 0.0, 0.2509804, 1.0, -1.0]",
+        "[19:13:16] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=38, perspective local alpha order, RGBA/depth=[0.5019608, 0.0, 0.2509804, 1.0, -1.0]",
+        "[19:13:16] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=39, discard incomplete renderer, RGBA/depth=[0.0, 0.0, 0.0, 1.0, -1.0]",
+        "[19:13:16] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=40, failed flush did not leave partial geometry, RGBA/depth=[0.0, 0.0, 0.0, 1.0, -1.0]",
+        "[19:13:16] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=41, successful scope after failed flush, RGBA/depth=[0.0, 1.0, 0.0, 1.0, -1.0]",
+        "[19:13:16] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=42, local close must not composite pending world OIT, RGBA/depth=[0.0, 0.0, 0.0, 1.0, 1.0]",
+        "[19:13:16] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=43, world OIT survives local close, RGBA/depth=[0.0, 0.0, 0.5019608, 1.0, 1.0]",
+        "[19:13:16] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a PIXEL PASS: tick=245, case=44, world composite ignores local target override, RGBA/depth=[0.0, 1.0, 0.0, 1.0, -1.0]",
+        "[19:13:16] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a CONTEXT PASS: tick=245, pixelCases=44, nested captured frames/targets, 11 geometry overloads, sorted alpha, world sentinel, discard, LIFO/idempotence, failed flush recovery, first-person routing, native state",
+        "[19:13:19] [Render thread/INFO] [Pulse Lib/]: STAGE 2 CLIENT PLUGINS PASS: ids=[pulselib:stage1_client, pulselib:stage2_common], common=1, channels=1, events=1, deformers=1, client=1, server=0, models=2",
+        "[19:13:19] [Render thread/INFO] [Pulse Lib/]: STAGE 4.3a CONTEXT SHUTDOWN PASS: suites=2, pixels=44",
+        "BUILD SUCCESSFUL in 33s"
+      ]
+    },
+    "build-final.log": {
+      "sha256": "df468be57add53c415dbf3cf0ea8235839ec428db5dd35e0c74d8fc0e999d0fe",
+      "resultLines": [
+        "STAGE 2 SERVICE PROVIDERS / LEGACY REMOVAL / COMMON BOUNDARY PASS: /mnt/MainDrive/Programs/MC mods/ArcsLib/build/reports/porting/stage-2-build.json",
+        "BUILD SUCCESSFUL in 6s"
+      ]
+    },
+    "api.log": {
+      "sha256": "947750bb03efb9a9603052283b4270996c52b5d39b3977ad5911aec8e9fa3c36",
+      "resultLines": [
+        "RENDER PLAN API PASS: 18 canonical types / 121 declared members"
+      ]
+    },
+    "inventory.log": {
+      "sha256": "6e73e3a827268129b5bb5216e280ac4f0734f87a1391a6cf2a0b84454ffb015e",
+      "resultLines": []
+    },
+    "server.log": {
+      "sha256": "7b4fa470225dec12008a59c7ddde64cf56db31338c755b0faff6c1694613de2c",
+      "resultLines": [
+        "[18:58:19] [Server thread/INFO] [Pulse Lib/]: STAGE 2 SERVER PLUGINS PASS: ids=[pulselib:stage2_common, pulselib:stage2_server], common=1, channels=1, events=1, deformers=1, client=0, server=1, models=0",
+        "BUILD SUCCESSFUL in 13m 26s"
+      ]
+    },
+    "server-gui.log": {
+      "sha256": "8935ad614992e2406a548dcd299ce09379444ae7e420c50a0f193c1b6bf64506",
+      "resultLines": [
+        "[19:11:46] [Server thread/INFO] [Pulse Lib/]: STAGE 2 SERVER PLUGINS PASS: ids=[pulselib:stage2_common, pulselib:stage2_server], common=1, channels=1, events=1, deformers=1, client=0, server=1, models=0",
+        "BUILD SUCCESSFUL in 3m 45s"
+      ]
+    }
+  },
+  "protection": {
+    "dirtyPaths": 65,
+    "dirtyJavaInputs": 61,
+    "otherDirtyPathsUnchanged": 59,
+    "protectedFiles": 189,
+    "sourceBranchesUnchanged": true,
+    "push": false
+  },
+  "nextCheckpoint": "5.2b.4c.2 unchanged"
+}

@@ -10,6 +10,10 @@
 package com.arcanc.pulselib.test.stage1.mixin;
 
 import com.arcanc.pulselib.content.renderer.PRenderQueue;
+import com.arcanc.pulselib.content.model.baked.PBakedMesh;
+import com.arcanc.pulselib.content.model.deformer.PMeshDeformation;
+import com.arcanc.pulselib.content.renderer.plan.PTransparencyMode;
+import com.arcanc.pulselib.test.stage1.Stage52LegacyOcclusionProbe;
 import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
 import com.arcanc.pulselib.content.renderer.plan.PInstanceHeader;
 import com.arcanc.pulselib.test.stage1.Stage52AttachmentProbe;
@@ -17,6 +21,7 @@ import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -39,6 +44,14 @@ public abstract class Stage52AttachmentQueueMixin
 	{
 		if (Boolean.getBoolean("pulselib.stage52aProbe"))
 			Stage52AttachmentProbe.queued(stage, geometry, data.transform());
+	}
+
+	@Inject(method = "submitEntityMesh(Lnet/minecraft/client/renderer/rendertype/RenderType;Lcom/arcanc/pulselib/content/model/baked/PBakedMesh;Lcom/arcanc/pulselib/content/model/deformer/PMeshDeformation;Lcom/arcanc/pulselib/content/renderer/PRenderQueue$InstanceData;Lcom/arcanc/pulselib/content/renderer/plan/PTransparencyMode;)V", at = @At("HEAD"))
+	private static void pulselib$observeLegacyPolicy(RenderType type, PBakedMesh mesh, @Nullable PMeshDeformation deformation,
+			PRenderQueue.InstanceData data, PTransparencyMode transparency, CallbackInfo callback)
+	{
+		if (Boolean.getBoolean("pulselib.stage52b4cProbe"))
+			Stage52LegacyOcclusionProbe.submitted(type, transparency);
 	}
 
 	@WrapMethod(method = "flush(Lcom/arcanc/pulselib/content/renderer/PRenderQueue$RenderStage;Lcom/mojang/blaze3d/pipeline/RenderTarget;)V")

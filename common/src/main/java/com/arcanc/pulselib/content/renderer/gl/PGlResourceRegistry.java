@@ -13,18 +13,22 @@ import com.arcanc.pulselib.content.model.baked.PBakedMesh;
 import com.arcanc.pulselib.content.renderer.legacy.GlDynamicGeometry;
 import com.arcanc.pulselib.content.renderer.plan.PMeshHandle;
 import com.arcanc.pulselib.content.renderer.plan.PPipelineHandle;
+import com.arcanc.pulselib.content.renderer.plan.PTransparencyMode;
+import com.arcanc.pulselib.util.PRenderTypes;
 import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
 import com.arcanc.pulselib.content.renderer.plan.PDynamicGeometry;
 import net.minecraft.client.renderer.rendertype.RenderType;
 
+import java.util.EnumMap;
 import java.util.IdentityHashMap;
+import java.util.Objects;
 import java.util.Map;
 
 /** Maps canonical plan handles to the existing Minecraft 26.1 GPU resources. */
 public final class PGlResourceRegistry
 {
-	private final Map<RenderType, PPipelineHandle> pipelines = new IdentityHashMap<>();
-	private final Map<PPipelineHandle, RenderType> pipelineResources = new IdentityHashMap<>();
+	private final Map<RenderType, Map<PTransparencyMode, PPipelineHandle>> pipelines = new IdentityHashMap<>();
+	private final Map<PPipelineHandle, PipelineBinding> pipelineResources = new IdentityHashMap<>();
 	private final Map<PBakedMesh, PMeshHandle> meshes = new IdentityHashMap<>();
 	private final Map<PGeometryData, PMeshHandle> geometry = new IdentityHashMap<>();
 	private final Map<PGlDynamicGeometry, PMeshHandle> dynamic = new IdentityHashMap<>();
@@ -34,12 +38,23 @@ public final class PGlResourceRegistry
 	/** Registers a pipeline by resource identity without hashing its contents. */
 	public PPipelineHandle pipeline(RenderType pipeline)
 	{
-		return this.pipelines.computeIfAbsent(pipeline, resource ->
-		{
-			PPipelineHandle handle = new PPipelineHandle(this.nextHandle++);
-			this.pipelineResources.put(handle, resource);
-			return handle;
-		});
+		return pipeline(pipeline, PRenderTypes.usesOit(pipeline) ? PTransparencyMode.OIT : PTransparencyMode.ORDINARY);
+	}
+
+	/** Registers an explicit policy binding; both modes retain the very same render type and GPU pipeline. */
+	public PPipelineHandle pipeline(RenderType pipeline, PTransparencyMode transparency)
+	{
+		Objects.requireNonNull(pipeline);
+		Objects.requireNonNull(transparency);
+		if (transparency == PTransparencyMode.OIT && !PRenderTypes.usesOit(pipeline))
+			throw new IllegalArgumentException("Render type does not support PulseLib OIT: " + pipeline);
+		return this.pipelines.computeIfAbsent(pipeline, ignored -> new EnumMap<>(PTransparencyMode.class)).
+				computeIfAbsent(transparency, mode ->
+				{
+					PPipelineHandle handle = new PPipelineHandle(this.nextHandle++);
+					this.pipelineResources.put(handle, new PipelineBinding(pipeline, mode));
+					return handle;
+				});
 	}
 
 	/** Registers baked geometry without creating another geometry arena or buffer. */
@@ -56,10 +71,25 @@ public final class PGlResourceRegistry
 	/** Resolves a live pipeline handle owned by this registry. */
 	public RenderType pipeline(PPipelineHandle handle)
 	{
-		RenderType resource = this.pipelineResources.get(handle);
-		if (resource == null)
+		return binding(handle).type();
+	}
+
+	/** Resolves submission policy independently of render-type identity. */
+	public PTransparencyMode transparency(PPipelineHandle handle)
+	{
+		return binding(handle).transparency();
+	}
+
+	private PipelineBinding binding(PPipelineHandle handle)
+	{
+		PipelineBinding binding = this.pipelineResources.get(handle);
+		if (binding == null)
 			throw new IllegalStateException("Unknown PulseLib pipeline handle: " + handle.value());
-		return resource;
+		return binding;
+	}
+
+	private record PipelineBinding(RenderType type, PTransparencyMode transparency)
+	{
 	}
 
 	/** Resolves a live mesh handle owned by this registry. */

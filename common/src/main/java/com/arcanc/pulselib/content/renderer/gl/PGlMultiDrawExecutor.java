@@ -17,6 +17,7 @@ import com.arcanc.pulselib.content.renderer.plan.PRenderCapabilityMatrix;
 import com.arcanc.pulselib.content.renderer.plan.PRenderExecutor;
 import com.arcanc.pulselib.content.renderer.plan.PRenderFrame;
 import com.arcanc.pulselib.content.renderer.plan.PRenderPlan;
+import com.arcanc.pulselib.content.renderer.plan.PTransparencyMode;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.arcanc.pulselib.util.PResourceCache;
 import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
@@ -159,7 +160,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 			List<Draw> draws = new ArrayList<>();
 			for (PDrawGroup group : groups)
 				draws.add(new Draw(this.resources.pipeline(group.pipeline()), "PulseLib mesh " + group.mesh().value(),
-						this.resources.resolve(group.mesh(), this.geometry, frameSlot), group.command(), group.writeDepth()));
+						this.resources.resolve(group.mesh(), this.geometry, frameSlot), group.command(), group.writeDepth(), this.resources.transparency(group.pipeline())));
 			if (this.stateVertices == null)
 				this.stateVertices = RenderSystem.getDevice().createBuffer(() -> "PulseLib pass state vertices", GpuBuffer.USAGE_VERTEX,
 						(long)PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize());
@@ -174,7 +175,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 			List<Draw> oitDraws = new ArrayList<>();
 			for (Draw draw : draws)
 			{
-				if (useOit && !draw.writeDepth() && PRenderTypes.usesOit(draw.type()))
+				if (useOit && !draw.writeDepth() && draw.transparency() == PTransparencyMode.OIT)
 					oitDraws.add(draw);
 				else
 					standardDraws.add(draw);
@@ -367,7 +368,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 		while (end < draws.size())
 		{
 			Draw candidate = draws.get(end);
-			if (candidate.type() != first.type() || candidate.slice().page() != first.slice().page() ||
+			if (candidate.type() != first.type() || candidate.transparency() != first.transparency() || candidate.slice().page() != first.slice().page() ||
 					candidate.slice().indexType() != first.slice().indexType() || candidate.writeDepth() != first.writeDepth())
 				break;
 			end++;
@@ -425,7 +426,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 		GpuBufferSlice dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(
 				frame.modelView(), new Vector4f(1.0F), new Vector3f(), new Matrix4f());
 
-		RenderTargetAttachments attachments = oitPass == OitPass.NONE ? attachments(type) :
+		RenderTargetAttachments attachments = oitPass == OitPass.NONE ? attachments(first) :
 				Objects.requireNonNull(this.activeOitAttachments, "OIT pass attachments");
 
 		try (RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
@@ -515,12 +516,15 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 
 	/**
 	 * Performs the attachments operation.
-	 * @param type the type to use.
+	 * @param draw the draw and its submission policy.
 	 * @return the value produced by this operation.
 	 */
-	private static RenderTargetAttachments attachments(RenderType type)
+	private static RenderTargetAttachments attachments(Draw draw)
 	{
-		RenderTarget target = type.outputTarget().getRenderTarget();
+		RenderType type = draw.type();
+		// Ordinary world alpha runs after the native item/entity target has completed its pass.
+		RenderTarget target = draw.transparency() == PTransparencyMode.ORDINARY && PRenderTypes.usesOit(type) ?
+				Minecraft.getInstance().getMainRenderTarget() : type.outputTarget().getRenderTarget();
 		GpuTextureView color = RenderSystem.outputColorTextureOverride != null ?
 				RenderSystem.outputColorTextureOverride : target.getColorTextureView();
 		GpuTextureView depth = RenderSystem.outputColorTextureOverride != null ? RenderSystem.outputDepthTextureOverride :
@@ -571,7 +575,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
  * Immutable value object representing draw.
  */
 	private record Draw(RenderType type, String label, PGlGeometryArena.Slice slice,
-	                    PDrawCommand command, boolean writeDepth)
+	                    PDrawCommand command, boolean writeDepth, PTransparencyMode transparency)
 	{
 	}
 

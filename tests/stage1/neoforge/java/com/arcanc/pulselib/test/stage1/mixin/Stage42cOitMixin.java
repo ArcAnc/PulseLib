@@ -13,6 +13,7 @@ import com.arcanc.pulselib.test.stage1.Stage42cLifecycleProbe;
 import com.arcanc.pulselib.test.stage1.Stage42cResources;
 import com.arcanc.pulselib.test.stage1.Stage52ArmorOcclusionProbe;
 import com.arcanc.pulselib.test.stage1.Stage52AnimatedOcclusionProbe;
+import com.arcanc.pulselib.test.stage1.Stage52LegacyOcclusionProbe;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,6 +35,8 @@ public abstract class Stage42cOitMixin
 			Stage52ArmorOcclusionProbe.depthPass();
 		if (Boolean.getBoolean("pulselib.stage52b4bProbe") && layer == 0)
 			Stage52AnimatedOcclusionProbe.depthPass();
+		if (Boolean.getBoolean("pulselib.stage52b4cProbe") && layer == 0)
+			Stage52LegacyOcclusionProbe.depthPass();
 	}
 
 	@Inject(method = "closeBuffers", at = @At("HEAD"))

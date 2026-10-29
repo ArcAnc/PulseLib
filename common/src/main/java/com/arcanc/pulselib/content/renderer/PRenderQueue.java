@@ -25,6 +25,7 @@ import com.arcanc.pulselib.content.renderer.plan.PRenderPlan;
 import com.arcanc.pulselib.content.renderer.plan.PRenderFrame;
 import com.arcanc.pulselib.content.model.baked.PDeformedMeshBuffers;
 import com.arcanc.pulselib.content.renderer.plan.PPipelineHandle;
+import com.arcanc.pulselib.content.renderer.plan.PTransparencyMode;
 import com.arcanc.pulselib.content.renderer.plan.PMeshHandle;
 import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
 import com.arcanc.pulselib.content.renderer.plan.PDynamicGeometry;
@@ -363,6 +364,46 @@ public final class PRenderQueue
 		compiler().submit(stage, RESOURCES.pipeline(type), prepared.mesh(), prepared.indexCount(), prepared.header(), transparent);
 	}
 
+	/** Submits one entity mesh with an explicit ordinary/OIT policy. */
+	public static void submitEntityMesh(RenderType type, PBakedMesh mesh, @Nullable PMeshDeformation deformation,
+			InstanceData data, PTransparencyMode transparency)
+	{
+		submit(PRenderContexts.entityStage(), type, mesh, deformation, data, transparency);
+	}
+
+	/** Submits immutable entity geometry with an explicit ordinary/OIT policy. */
+	public static void submitEntityMesh(RenderType type, PGeometryData geometry, PInstanceHeader data, PTransparencyMode transparency)
+	{
+		submit(PRenderContexts.entityStage(), type, geometry, data, transparency);
+	}
+
+	/** Submits dynamic entity geometry with an explicit ordinary/OIT policy. */
+	public static void submitEntityMesh(RenderType type, PDynamicGeometry geometry, PInstanceHeader data, PTransparencyMode transparency)
+	{
+		submit(PRenderContexts.entityStage(), type, geometry, data, transparency);
+	}
+
+	/** Submits a staged mesh without encoding its transparency policy in a different render type. */
+	public static void submit(RenderStage stage, RenderType type, PBakedMesh mesh, @Nullable PMeshDeformation deformation,
+			InstanceData data, PTransparencyMode transparency)
+	{
+		PreparedMesh prepared = prepare(mesh, deformation, data.header());
+		compiler().submit(stage, RESOURCES.pipeline(type, transparency), prepared.mesh(), prepared.indexCount(), prepared.header(), PRenderTypes.isTransparent(type));
+	}
+
+	/** Submits immutable staged geometry with explicit transparency policy. */
+	public static void submit(RenderStage stage, RenderType type, PGeometryData geometry, PInstanceHeader data, PTransparencyMode transparency)
+	{
+		compiler().submit(stage, RESOURCES.pipeline(type, transparency), RESOURCES.geometry(geometry), geometry.indexCount(), data, PRenderTypes.isTransparent(type));
+	}
+
+	/** Submits dynamic staged geometry with explicit transparency policy. */
+	public static void submit(RenderStage stage, RenderType type, PDynamicGeometry geometry, PInstanceHeader data, PTransparencyMode transparency)
+	{
+		PMeshHandle mesh = RESOURCES.dynamic(geometry);
+		compiler().submit(stage, RESOURCES.pipeline(type, transparency), mesh, RESOURCES.indexCount(mesh), data, PRenderTypes.isTransparent(type));
+	}
+
 	/** Executes direct bone/model drawing without consuming or appending world submissions. */
 	public static void drawImmediate(RenderType type, PBakedMesh mesh, @Nullable PMeshDeformation deformation,
 	                                 PInstanceHeader data, PRenderFrame frame)
@@ -430,7 +471,7 @@ public final class PRenderQueue
 	private static boolean canBatchWithOit(PPipelineHandle pipeline)
 	{
 		RenderType type = RESOURCES.pipeline(pipeline);
-		return PRenderTypes.usesOit(type) && type.outputTarget().getRenderTarget().useDepth;
+		return RESOURCES.transparency(pipeline) == PTransparencyMode.OIT && type.outputTarget().getRenderTarget().useDepth;
 	}
 
 	/**
