@@ -82,7 +82,7 @@ public final class Stage52ArmorOcclusionProbe
 				});
 	}
 
-	private static Model<?> custom()
+	static Model<?> custom()
 	{
 		var mesh = HumanoidModel.createMesh(CubeDeformation.NONE, 0);
 		mesh.getRoot().addOrReplaceChild("body", CubeListBuilder.create().texOffs(16, 16).

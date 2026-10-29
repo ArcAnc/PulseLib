@@ -59,6 +59,8 @@ import java.util.concurrent.TimeUnit;
 public final class Stage52PlayerOcclusionProbe
 {
 	public static final PModelData MODEL = PModelData.entity(PLibDatabase.rl("stage42b3_owner"), PGeckoModelLoader.INSTANCE.id());
+	private static final boolean MOTION_MATRIX = Boolean.getBoolean("pulselib.stage52b4bProbe");
+	private static final boolean EXTENDED_MATRIX = Boolean.getBoolean("pulselib.stage52b4aProbe") || MOTION_MATRIX;
 	private static final boolean ARMOR_MATRIX = Boolean.getBoolean("pulselib.stage52b4aProbe");
 	private static final UUID PLAYER_ID = new UUID(0, 0x526a01);
 	private static final String[] STATES = {"background", "player", "entity-behind", "both-behind", "entity-front", "both-front"};
@@ -105,6 +107,8 @@ public final class Stage52PlayerOcclusionProbe
 		var mc = Minecraft.getInstance();
 		if (mc.player == null || mc.level == null || mc.getOverlay() != null || MODEL.getModel() == null)
 			return;
+		if (MOTION_MATRIX && !Stage52AnimatedOcclusionProbe.ready())
+			return;
 		if (!started)
 		{
 			check(Files.isRegularFile(mc.gameDirectory.toPath().resolve(".pulselib-player-occlusion")), "Missing disposable client marker");
@@ -118,7 +122,7 @@ public final class Stage52PlayerOcclusionProbe
 			player.setId(0x526a01);
 			mc.level.addEntity(player);
 			started = true;
-			deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(ARMOR_MATRIX ? 480 : 180);
+			deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(MOTION_MATRIX ? 1200 : ARMOR_MATRIX ? 480 : 180);
 			mode();
 		}
 		check(System.nanoTime() < deadline, "Occlusion matrix timed out: phase=" + phase + " step=" + step);
@@ -134,13 +138,15 @@ public final class Stage52PlayerOcclusionProbe
 		{
 			advance = false;
 			step++;
-			if (step == (ARMOR_MATRIX ? 48 : 12))
+			if (step == (MOTION_MATRIX ? Stage52AnimatedOcclusionProbe.VARIANTS * 12 : ARMOR_MATRIX ? 48 : 12))
 			{
 				step = 0;
 				phase++;
-				if (phase == (ARMOR_MATRIX ? 6 : 4))
+				if (phase == (EXTENDED_MATRIX ? 6 : 4))
 				{
 					completed = true;
+					if (MOTION_MATRIX)
+						Stage52AnimatedOcclusionProbe.complete();
 					if (ARMOR_MATRIX)
 						Stage52ArmorOcclusionProbe.complete();
 					writeReport();
@@ -154,7 +160,7 @@ public final class Stage52PlayerOcclusionProbe
 					mc.stop();
 					return;
 				}
-				if (phase == (ARMOR_MATRIX ? 3 : 2))
+				if (phase == (EXTENDED_MATRIX ? 3 : 2))
 				{
 					reload = mc.reloadResourcePacks();
 					return;
@@ -172,6 +178,8 @@ public final class Stage52PlayerOcclusionProbe
 		mc.player.xRotO = 0;
 		var player = (RemotePlayer)mc.level.getEntity(0x526a01);
 		check(player != null, "Native remote player is present");
+		if (MOTION_MATRIX)
+			Stage52AnimatedOcclusionProbe.configure(player, step / 12, phase);
 		if (ARMOR_MATRIX)
 			Stage52ArmorOcclusionProbe.equip(player, step / 12, phase);
 		boolean playerCentered = state() == 1 || state() == 3 || state() == 5;
@@ -180,13 +188,13 @@ public final class Stage52PlayerOcclusionProbe
 		player.yRotO = player.yBodyRot = player.yBodyRotO = player.yHeadRot = player.yHeadRotO = 180;
 		for (var entity : mc.level.entitiesForRendering())
 			if (entity instanceof TestEntity)
-				place(entity, state() >= 2 ? 0 : 3, state() >= 4 ? -2 : 2);
+				place(entity, state() >= 2 ? 0 : MOTION_MATRIX ? 64 : 3, state() >= 4 ? -2 : 2);
 	}
 
 	private static void mode()
 	{
 		var mc = Minecraft.getInstance();
-		if (ARMOR_MATRIX)
+		if (EXTENDED_MATRIX)
 			mc.options.graphicsPreset().set(GraphicsPreset.values()[phase % 3]);
 		else
 			mc.options.improvedTransparency().set(phase % 2 == 1);
@@ -222,7 +230,9 @@ public final class Stage52PlayerOcclusionProbe
 			return;
 		if (!mc.levelRenderer.isSectionCompiledAndVisible(new BlockPos(0, 81, 6)) || ++frames < 8)
 			return;
-		check(Minecraft.useShaderTransparency() == (ARMOR_MATRIX ? phase % 3 == 2 : phase % 2 == 1), "Native mode differs from requested mode");
+		if (MOTION_MATRIX)
+			Stage52AnimatedOcclusionProbe.verifyExtracted(event.getLevelRenderState(), state());
+		check(Minecraft.useShaderTransparency() == (EXTENDED_MATRIX ? phase % 3 == 2 : phase % 2 == 1), "Native mode differs from requested mode");
 		var camera = event.getLevelRenderState().cameraRenderState.pos;
 		var frame = new PGlRenderHost().captureFrame();
 		READBACK_PROJECTION.set(frame.projection());
@@ -271,12 +281,13 @@ public final class Stage52PlayerOcclusionProbe
 		for (int sample = 0; sample < 9; sample++)
 			pixels.add(new Pixel(SAMPLES[sample][0], SAMPLES[sample][1], early.get(sample), afterNativeFeatures.get(sample), beforeResolve.get(sample), nativeItem.get(sample), result.get(sample),
 					distanceFromCamera(Math.min(result.get(sample)[4], nativeItem.get(sample)[4]))));
-		RECORDS.add(new CaseData(phase, READBACK_PROJECTION.get(new float[16]), mc.options.graphicsPreset().get().toString(), ARMOR_MATRIX ? Stage52ArmorOcclusionProbe.variant() : "skin", Minecraft.useShaderTransparency(), material() == 0 ? "opaque" : "translucent", STATES[state()], pixels));
-		writeReport();
+		RECORDS.add(new CaseData(phase, READBACK_PROJECTION.get(new float[16]), mc.options.graphicsPreset().get().toString(), MOTION_MATRIX ? Stage52AnimatedOcclusionProbe.variant() : ARMOR_MATRIX ? Stage52ArmorOcclusionProbe.variant() : "skin", Minecraft.useShaderTransparency(), material() == 0 ? "opaque" : "translucent", STATES[state()], pixels));
 		if (state() == 5)
 			compare();
-		if ((!ARMOR_MATRIX && phase < 2 || ARMOR_MATRIX && phase == 2) && state() != 0)
-			Screenshot.grab(mc.gameDirectory, "player-occlusion-" + phase + "-" + (ARMOR_MATRIX ? Stage52ArmorOcclusionProbe.variant() + "-" : "") + material() + "-" + STATES[state()] + ".png", mc.getMainRenderTarget(), 1,
+		if (!MOTION_MATRIX || state() == 5)
+			writeReport();
+		if ((!EXTENDED_MATRIX && phase < 2 || EXTENDED_MATRIX && phase == 2 && (!MOTION_MATRIX || state() == 1 || state() == 3 || state() == 5)) && state() != 0)
+			Screenshot.grab(mc.gameDirectory, "player-occlusion-" + phase + "-" + (MOTION_MATRIX ? Stage52AnimatedOcclusionProbe.variant().replace('/', '-') + "-" : ARMOR_MATRIX ? Stage52ArmorOcclusionProbe.variant() + "-" : "") + material() + "-" + STATES[state()] + ".png", mc.getMainRenderTarget(), 1,
 					message -> PLibDatabase.LOGGER.info("{}", message.getString()));
 		armed = false;
 		advance = true;
@@ -285,6 +296,9 @@ public final class Stage52PlayerOcclusionProbe
 	private static void compare()
 	{
 		int base = RECORDS.size() - 6;
+		if (MOTION_MATRIX)
+			Stage52AnimatedOcclusionProbe.verifyControl(RECORDS.get(base + 1).pixels.stream().map(Pixel::nearestDistance).toList(),
+					RECORDS.get(base + 1).pixels.stream().map(Pixel::finalFrame).toList(), phase, material());
 		if (ARMOR_MATRIX)
 			Stage52ArmorOcclusionProbe.verifyControl(RECORDS.get(base + 1).pixels.stream().map(Pixel::nearestDistance).toList(), phase, material());
 		for (int sample = 0; sample < 9; sample++)
@@ -386,7 +400,7 @@ public final class Stage52PlayerOcclusionProbe
 
 	private static void shutdown(GameShuttingDownEvent event)
 	{
-		check(completed && RECORDS.size() == (ARMOR_MATRIX ? 288 : 48) && comparisons == (ARMOR_MATRIX ? 1512 : 252) && submissions > 0, "Entire occlusion matrix and real submissions must finish");
+		check(completed && RECORDS.size() == (MOTION_MATRIX ? Stage52AnimatedOcclusionProbe.VARIANTS * 72 : ARMOR_MATRIX ? 288 : 48) && comparisons == (MOTION_MATRIX ? Stage52AnimatedOcclusionProbe.VARIANTS * 378 : ARMOR_MATRIX ? 1512 : 252) && submissions > 0, "Entire occlusion matrix and real submissions must finish");
 		check(FAILURES.isEmpty(), "Player occlusion regression failed: " + FAILURES.size() + " mismatches; see player-occlusion-results.json");
 		PLibDatabase.LOGGER.info("PLAYER OCCLUSION SHUTDOWN PASS");
 	}

@@ -1,0 +1,468 @@
+{
+  "checkpoint": "5.2b.4b",
+  "status": "PASS within modern rig/armor and registered callback scope; overall 5.2b.4 and stage 5 incomplete",
+  "date": "2026-10-29",
+  "author": "ArcAnc",
+  "license": "Arc's License of Common Sense",
+  "startHead": "a4463cff7e083ba78ea4ab818a49eae886a72e5c",
+  "frozenRefs": {
+    "26.1": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1",
+    "1.21.1-multiloader": "7ce6f024b307bb821ce543344d3896c8e1fcf26b"
+  },
+  "implementation": {
+    "gltfAnimatedMeshNodeChannelsRetained": true,
+    "supportedAnimatedNodesKeepOwnBindTransforms": true,
+    "staticMeshFlatteningAndLocatorMarkerRulesPreserved": true,
+    "parserChangeLines": 7,
+    "canonicalApiChanged": false,
+    "newPublicApi": false,
+    "gpuBackendOrShadersChanged": false,
+    "newRendererOrQueue": false
+  },
+  "junitBaseline": {
+    "tests": 2,
+    "failures": 1,
+    "staticControlPassed": true,
+    "failure": "expected animation length 20, actual 0",
+    "rawXml": "/tmp/pulselib-stage52b4b-07yy4451/junit-baseline.xml"
+  },
+  "junitFinal": {
+    "common": {
+      "tests": 240,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "fabric": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "neoforge": {
+      "tests": 0,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "native": {
+    "states": 1440,
+    "sampleObservations": 12960,
+    "comparisons": 7560,
+    "mismatches": 0,
+    "configuredGroups": 120,
+    "customModelSelections": 24674,
+    "motionDepthWitnesses": 1080,
+    "attachmentPixelWitnesses": 1296,
+    "formatDepthWitnesses": 1080,
+    "anchorOnlyTargetWitnesses": 48,
+    "sampledAnimationTimesTicks": [
+      0,
+      10
+    ],
+    "decodedAnimationLengthTicks": 20,
+    "controlsHeldThroughPublicSeekPause": true,
+    "formats": [
+      "Gecko",
+      "glTF"
+    ],
+    "variants": [
+      "native armor",
+      "custom armor",
+      "bare player / masked rig / opaque registered anchor",
+      "armor + ordinary alpha anchor",
+      "armor + OIT anchor"
+    ],
+    "graphics": [
+      "Fast",
+      "Fancy",
+      "Fabulous"
+    ],
+    "beforeAndAfterRealReload": true,
+    "mainAndNativeItemRgbaDepthAndProjectionRecorded": true,
+    "distanceToleranceWorldUnits": 0.0005,
+    "motionDistanceMinimum": 0.15,
+    "formatDistanceTolerance": 0.002,
+    "rgbTolerances": [
+      0.025,
+      0.035
+    ],
+    "maxBehindRgbError": 0.01568629999999993,
+    "maxFrontRgbError": 0.00941607437507555,
+    "maxBehindDistanceError": 0.0,
+    "maxOpaqueFrontDistanceError": 0.0,
+    "oitGroups": 120,
+    "oitMinimumPassesPerPhase": [
+      60,
+      60,
+      60,
+      60,
+      60,
+      40
+    ],
+    "callbackMinimumOnExpectedGroupsPerPhase": [
+      179,
+      178,
+      175,
+      175,
+      175,
+      119
+    ],
+    "callbackTotalsByKindPerPhase": [
+      [
+        0,
+        0,
+        6214,
+        6167,
+        3296
+      ],
+      [
+        0,
+        0,
+        720,
+        719,
+        719
+      ],
+      [
+        0,
+        0,
+        715,
+        715,
+        797
+      ],
+      [
+        0,
+        0,
+        707,
+        712,
+        715
+      ],
+      [
+        0,
+        0,
+        709,
+        707,
+        708
+      ],
+      [
+        0,
+        0,
+        480,
+        480,
+        479
+      ]
+    ],
+    "meshResolutionCalls": 32365,
+    "countsArePerformanceMeasurements": false,
+    "clientExit": 0,
+    "shutdownAssertions": "PASS",
+    "pixelSummaryByKind": [
+      {
+        "format": "gecko",
+        "kind": "native-armor",
+        "groups": 24,
+        "behindRgbMax": 0.007843150000000021,
+        "frontRgbMax": 0.007193147004853254,
+        "behindDistanceMax": 0.0,
+        "opaqueFrontDistanceMax": 0.0
+      },
+      {
+        "format": "gecko",
+        "kind": "custom-armor",
+        "groups": 24,
+        "behindRgbMax": 0.00784313999999997,
+        "frontRgbMax": 0.00941607437507555,
+        "behindDistanceMax": 0.0,
+        "opaqueFrontDistanceMax": 0.0
+      },
+      {
+        "format": "gecko",
+        "kind": "anchor-only-opaque",
+        "groups": 24,
+        "behindRgbMax": 0.0,
+        "frontRgbMax": 0.005987396551339119,
+        "behindDistanceMax": 0.0,
+        "opaqueFrontDistanceMax": 0.0
+      },
+      {
+        "format": "gecko",
+        "kind": "anchor-alpha",
+        "groups": 24,
+        "behindRgbMax": 0.0039215999999999696,
+        "frontRgbMax": 0.0071301219338842925,
+        "behindDistanceMax": 0.0,
+        "opaqueFrontDistanceMax": 0.0
+      },
+      {
+        "format": "gecko",
+        "kind": "anchor-oit",
+        "groups": 24,
+        "behindRgbMax": 0.0039215999999999696,
+        "frontRgbMax": 0.0071301219338842925,
+        "behindDistanceMax": 0.0,
+        "opaqueFrontDistanceMax": 0.0
+      },
+      {
+        "format": "gltf",
+        "kind": "native-armor",
+        "groups": 24,
+        "behindRgbMax": 0.011764710000000012,
+        "frontRgbMax": 0.008146461037514097,
+        "behindDistanceMax": 0.0,
+        "opaqueFrontDistanceMax": 0.0
+      },
+      {
+        "format": "gltf",
+        "kind": "custom-armor",
+        "groups": 24,
+        "behindRgbMax": 0.01568629999999993,
+        "frontRgbMax": 0.0073838532651568645,
+        "behindDistanceMax": 0.0,
+        "opaqueFrontDistanceMax": 0.0
+      },
+      {
+        "format": "gltf",
+        "kind": "anchor-only-opaque",
+        "groups": 24,
+        "behindRgbMax": 0.0,
+        "frontRgbMax": 0.005987396551339119,
+        "behindDistanceMax": 0.0,
+        "opaqueFrontDistanceMax": 0.0
+      },
+      {
+        "format": "gltf",
+        "kind": "anchor-alpha",
+        "groups": 24,
+        "behindRgbMax": 0.0039215999999999696,
+        "frontRgbMax": 0.008623108805225738,
+        "behindDistanceMax": 0.0,
+        "opaqueFrontDistanceMax": 0.0
+      },
+      {
+        "format": "gltf",
+        "kind": "anchor-oit",
+        "groups": 24,
+        "behindRgbMax": 0.003921600000000081,
+        "frontRgbMax": 0.0071301219338842925,
+        "behindDistanceMax": 0.0,
+        "opaqueFrontDistanceMax": 0.0
+      }
+    ]
+  },
+  "negativeControls": [
+    {
+      "name": "omit armor rig at capture and deferred feature consumers",
+      "javaExit": 255,
+      "gradleExit": 1,
+      "expectedFail": true,
+      "observed": "custom armor time 0 and time 10 both measured distance 5.7641935; motion pixel witness failed",
+      "temporaryProjectionOnly": true,
+      "log": "/tmp/pulselib-stage52b4b-07yy4451/client-negative-rig-both.log",
+      "mutatedMethods": [
+        "PPlayerModelGeometry.setup",
+        "PlayerModelFeatureMixin.pulselib$applyNodeGeometry"
+      ]
+    },
+    {
+      "name": "suppress actual registered attachment submissions",
+      "javaExit": 255,
+      "gradleExit": 1,
+      "expectedFail": true,
+      "observed": "anchor-only opaque pixel matched skin [0.35686275, 0.5176471, 0.3529412], not green attachment",
+      "temporaryProjectionOnly": true,
+      "log": "/tmp/pulselib-stage52b4b-07yy4451/client-negative-callback.log",
+      "mutatedMethods": [
+        "Stage52AnimatedOcclusionProbe registered renderer.render"
+      ]
+    }
+  ],
+  "originalRegression": {
+    "states": 48,
+    "comparisons": 252,
+    "mismatches": 0,
+    "clientExit": 0,
+    "shutdownAssertions": "PASS"
+  },
+  "build": {
+    "exit": 0,
+    "modules": {
+      "common": {
+        "jar": "common/build/libs/pulselib-26.1.2-common-1.1.5.3.jar",
+        "providers": {},
+        "javaUnits": 371,
+        "sha256": "eaded6f31a3e5afcefc1a5b9f3b728ec1aa12df517ffa59e7ed777dd1f3899e4",
+        "classes": 574
+      },
+      "neoforge": {
+        "jar": "neoforge/build/libs/pulselib-26.1.2-neoforge-1.1.5.3.jar",
+        "providers": {
+          "platform.IPulsePlatform": "com.arcanc.pulselib.neoforge.NeoForgePlatform",
+          "platform.IPulseCameraService": "com.arcanc.pulselib.neoforge.NeoForgeCameraService",
+          "plugin.IPulsePluginFinder": "com.arcanc.pulselib.neoforge.NeoForgePulsePluginFinder"
+        },
+        "javaUnits": 383,
+        "sha256": "4c80894f327286811be3ce5b782f8efe8a6262732ca6932f2742f5364d1f25fa",
+        "classes": 587
+      },
+      "fabric": {
+        "jar": "fabric/build/libs/pulselib-26.1.2-fabric-1.1.5.3.jar",
+        "providers": {
+          "platform.IPulsePlatform": "com.arcanc.pulselib.fabric.FabricPlatform",
+          "platform.IPulseCameraService": "com.arcanc.pulselib.fabric.FabricCameraService",
+          "plugin.IPulsePluginFinder": "com.arcanc.pulselib.fabric.FabricPulsePluginFinder"
+        },
+        "javaUnits": 375,
+        "sha256": "b20d1d751014363886104e6a0784a2bd46597e62a227f01e04d4b218d27c60c6",
+        "classes": 578
+      }
+    },
+    "classMajor": 69,
+    "libraryVersion": "1.1.5.3",
+    "providersCommonBoundaryFixtureExclusion": "PASS",
+    "restoredClassFingerprints": {
+      "common/build/classes/java/main/com/arcanc/pulselib/data/gltf/PGltfModelParser.class": "c3a4fbf1dd6276734bdbc2f876f4e7616ec5b4e7d2286762aeaf51eb92f80b3f",
+      "common/build/classes/java/main/com/arcanc/pulselib/content/player/deformer/PPlayerModelGeometry.class": "2ba5650cf991ba52c5a161a61023e286c7043ddf80a1ae3a2ef382d66409a05e",
+      "neoforge/build/classes/java/main/com/arcanc/pulselib/data/gltf/PGltfModelParser.class": "c3a4fbf1dd6276734bdbc2f876f4e7616ec5b4e7d2286762aeaf51eb92f80b3f",
+      "neoforge/build/classes/java/main/com/arcanc/pulselib/content/player/deformer/PPlayerModelGeometry.class": "2ba5650cf991ba52c5a161a61023e286c7043ddf80a1ae3a2ef382d66409a05e",
+      "neoforge/build/classes/java/stage1Smoke/com/arcanc/pulselib/test/stage1/Stage52AnimatedOcclusionProbe.class": "a5cbc8d4845f01eda381064007ab66ba8c986a27bd6f0bfe142999aff76b6e02",
+      "common/build/classes/java/main/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.class": "dc2d02ac3a966d050522f14bd4e9d799fe06172a100311f694b8effb81823bf8",
+      "neoforge/build/classes/java/main/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.class": "dc2d02ac3a966d050522f14bd4e9d799fe06172a100311f694b8effb81823bf8"
+    }
+  },
+  "server": {
+    "finalImplementationRestarted": true,
+    "doneAndPluginProbe": true,
+    "clientClassloads": 0,
+    "newProbeClassloads": 0,
+    "consoleStop": true,
+    "exit": 0,
+    "gpuSceneServerAlsoStoppedWithExit": 0
+  },
+  "api": {
+    "changedProductionTypes": 1,
+    "publicProtectedMembers": 2,
+    "exactBeforeAfterAstEquality": true,
+    "baselineInventoryVerifier": "PASS",
+    "fullCompiledCanonicalAudit": "remains stage 7"
+  },
+  "diagnosticAttempts": [
+    {
+      "log": "client-first.log",
+      "accepted": false,
+      "reason": "Exploratory earlier asset/fixture interrupted by SIGTERM to add frustum-isolated anchor-only control; incomplete, no full PASS claimed"
+    },
+    {
+      "log": "client-final.log",
+      "accepted": false,
+      "reason": "Probe compile used id on EntityRenderState instead of AvatarRenderState; corrected"
+    },
+    {
+      "log": "client-verified.log",
+      "accepted": false,
+      "reason": "Actual glTF mesh-node channel dropped; seek 10 did not retain time; original 132-state prefix had zero pixel mismatches"
+    },
+    {
+      "log": "client-debug.log",
+      "accepted": false,
+      "reason": "Same runtime issue; JDWP connected, logpoints had zero hits; no debugger values claimed"
+    },
+    {
+      "log": "client-decoder-control.log",
+      "accepted": false,
+      "reason": "Strict native guard proved PAnimation length 0.0 and empty boneAnimations for valid animated mesh-node"
+    },
+    {
+      "log": "junit-baseline.log",
+      "accepted": false,
+      "reason": "Test compile used baked-model accessor basePosition instead of raw PBone.pivot; corrected"
+    },
+    {
+      "log": "client-negative-rig.log",
+      "accepted": false,
+      "reason": "Capture-only rig omission left deferred rig consumer active. Nine small depth errors and later cross-format failure are not used as discriminating motion evidence"
+    },
+    {
+      "log": "client-negative-rig-failfast.log",
+      "accepted": false,
+      "reason": "Repeat capture-only mutation produced no errors through first phase; stopped own process. Final counterfactual omits both armor consumers"
+    }
+  ],
+  "debugger": {
+    "skill": "/home/arcanc/.cache/JetBrains/IntelliJIdea2026.2/aia/agents/.agents/skills/ij-debugger/SKILL.md",
+    "jdwpConnected": true,
+    "logpointHits": 0,
+    "valuesClaimed": false,
+    "fallback": "strict native decoder assertions, failing/passing real-parser JUnit, GPU controls",
+    "temporaryConfigRemoved": true,
+    "agentBreakpointsRemoved": true,
+    "originalDisabledUserExceptionBreakpoints": 2,
+    "activeSessions": 0
+  },
+  "preservation": {
+    "initialUserEdits": 64,
+    "projectedJavaInputs": 60,
+    "protectedFilesUnchanged": 189,
+    "productionFilesUnchangedExceptParser": 419,
+    "existingFixtureResourceFilesUnchanged": 13,
+    "frozenRefsChanged": false,
+    "pushOrPublish": false
+  },
+  "limitations": [
+    "Legacy PLivingAttachments pixel integration remains 5.2b.4c",
+    "Water/glass/particles/weather with these animated owners remains 5.2b.4c",
+    "Animation Graph state transitions are not separately retested here; samples use canonical raw playback seek/pause",
+    "Fabric runtime remains stage 6",
+    "M-P2 server extraction and real respawn remain pending",
+    "Allocation/performance parity is not claimed"
+  ],
+  "nextCheckpoint": "5.2b.4c: legacy living attachments and animated-owner environment pixels; then M-P2 server root isolation / real respawn",
+  "inputSha256": {
+    "common/src/main/java/com/arcanc/pulselib/data/gltf/PGltfModelParser.java": "8c0a28dc85c7da1849bd8eb9f885015d729013cb789291303aa0b419902eae8a",
+    "common/src/test/java/com/arcanc/pulselib/content/model/animation/PGltfAnimatedMeshSamplingTest.java": "29288a1d5382f1f972aa484fc6e834aaa799885bbac8d38bc4bce672f040cbe6",
+    "neoforge/build.gradle": "857ee27c271646c56c2fed8493be13f5087029167e3b78b60be2bffd18e1f1e6",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage1Client.java": "b37bd0352b43d02b8838c9cf0f5bd285d8f06c77b28c68a1b3d974b6ca971949",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage42aWorldStageProbe.java": "fbce0105f82a6d4cdbccfe292a8cc848c1be071b4ff8759be3b7b23dd5f0b6df",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage52ArmorOcclusionProbe.java": "4e8338ca96ae05044659a2cea5246ba3d0b7391a4ce5a0aa8ec8fbbffe3b43c1",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage52PlayerOcclusionProbe.java": "130a49f91228508662351a14aa32a1b17323dee6ac9b58d2bdd8f17434d617e4",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage52AnimatedOcclusionProbe.java": "44d9a152c65da60bfdb6c8e5771df4db8ecfda05260dbe845ffa68b44671e3fb",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/mixin/Stage42cOitMixin.java": "0ed3aaf982cd0ca1244a4e5b8748fe0628c67af70193edb61dcb80e764e655ac",
+    "tests/stage1/neoforge/resources/assets/pulselib/geckolib/animations/player/regression/depth_motion.animation.json": "4f6752703657ee45926936998853db5e6384d3d31bb030259e42e2646da3e9a1",
+    "tests/stage1/neoforge/resources/assets/pulselib/geckolib/models/player/regression/depth_motion.geo.json": "b108d567cf6d69b098bbd3e8fab574a2fc8630cbce281eeabac4e884efdab1a1",
+    "tests/stage1/neoforge/resources/assets/pulselib/glmodels/player/regression/depth_motion_gltf.gltf": "809324eb883482aa904fd8c93cf6afdb41c387917aeaf40f019436d796af33bf"
+  },
+  "rawArtifacts": {
+    "acceptedResults": {
+      "path": "/tmp/pulselib-stage52b4b-07yy4451/accepted-results.json",
+      "sha256": "60e9e1a531f6ca0bf067ecb91ba00601a8ef0061402ba7232fea71906e8f885b"
+    },
+    "acceptedLog": {
+      "path": "/tmp/pulselib-stage52b4b-07yy4451/client-fixed-final.log",
+      "sha256": "3d5d5b081003b9d992cb0ddd2ebacbd6af290157759167679d051570ca0369b9"
+    },
+    "classCounters": {
+      "path": "/tmp/pulselib-stage52b4b-07yy4451/native-counters.json",
+      "sha256": "6609464199cb0deced53d00dd0edc9ecae19241853dc2b68913e17fa2fd3a7aa"
+    },
+    "buildLog": {
+      "path": "/tmp/pulselib-stage52b4b-07yy4451/build-final.log",
+      "sha256": "929eac677c024b38126c36e6c37742f5ba36e03df04b424496d72d500086cb83"
+    },
+    "originalResults": {
+      "path": "neoforge/build/stage52b4b-original-runs/client/player-occlusion-results.json",
+      "sha256": "7482d264423cd85da2069802a1143a8f1c0b0da7e993324266bd7825362db5d5"
+    },
+    "originalLog": {
+      "path": "/tmp/pulselib-stage52b4b-07yy4451/client-original.log",
+      "sha256": "f412f5e89fcbee8265a4fc5f0d9c045f6772ec498a22532d4c0a4146e219234b"
+    },
+    "serverLog": {
+      "path": "/tmp/pulselib-stage52b4b-07yy4451/server-final.log",
+      "sha256": "6b52079da22d5e2c7fcc2c548e66dad3719564fe2a98936376a355d4cabd4b23"
+    },
+    "serverClassloading": {
+      "path": "neoforge/build/stage52b4b-runs/server/classloading.log",
+      "sha256": "102b7134a115a1ad29b9f5b92e66d2673357fd551f0389398fc07ad08eba08b3"
+    }
+  }
+}

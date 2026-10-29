@@ -1,0 +1,199 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "PulseLib motion regression"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "root",
+      "children": [
+        1
+      ]
+    },
+    {
+      "name": "body",
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "mesh": 0
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "material": 0,
+          "indices": 3
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "0",
+      "doubleSided": true,
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0
+        },
+        "metallicFactor": 0
+      }
+    }
+  ],
+  "textures": [
+    {
+      "source": 0
+    }
+  ],
+  "images": [
+    {
+      "mimeType": "image/png",
+      "name": "0",
+      "uri": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAADwElEQVR4AeyYTWoUQRTHa2YTIVkpmEBEFBWvkL3ewBN4BeMqeIV4BxfBC7h1nwO4ERQ/MDBxHzCbjPya/KF486qrp7sn/ZEO/HlfVa/6/atqQr15yPx9+vJrWYZXr98uy5BJ74bteja/O6mmM0sAeQ+ePggewvXf/u5e8HAdriW0niYrv+y2ZCUC2lqsj3l6S8Dptz8BiLSz80UAstuSvSDgxeJ4GePj4l6I8eHZ3RDj3/c3yxhNyOgFARRwsHs/AHTwaG87AHSw/fhhAOhga/95AOhN0BsCmhTRZG4lAriLHrQwd9OD4n2W8/jueXp8Fz09vpueHt9VT++anOIEcPc86OO4ix4U5256UJy76kHxLmVBQJcf0PXaEwFd70DX608noOsd6Hr94gScnv8NHvRxPxcXwYPiFz9+Bw+KX559DR4UR2p9dKD10IHyowPlQ18Hduz8897hrAwnL3dmZdg5OpqV4c6T97My8EF2fbuezW/zkaMuihMQT7bNCGvb5oS141wpPZczNe/wcr6MkRq3jn+FACarGWElMaDmhJXEqkK5NV65ZFtJ4VV8dkzOdgnITRpT3CXAe/jgU+Hewwef4lUk+YDGMh/Ivim58hjyHjyxzz54Tt5dhRj2wUMh9pEV50O3Ob0c5NkEihOgh5AW8B4++BTXw0e299DBpzgytQYxkMpJDBxvXc0AOkAH6E1QENAkwU3PpWjQ1rqDI4D/BkIbJAyGAK9ofE1JGAwBTQtNzZ8ISDFzW/yDOQH88gNtDDqQXVcOhgAVSNFAdlM5KAL41ReqFp4bVxCQakaoKSGpZKnmhJoUkhqPTK1BDKRyEgMUjhSwgey6cqUhYpsR1s41J7xmRZcNjxwxxQmIB9VtVrSRgx21iPNuQl8hgEXWbVYwx2LdHBRuc2Cn/MTagEtAG4nbzsEvP1BedCC7rnQJoFEBlJRGBZBdRTIfaCzzgWwrU8VYPzaw8+va2YZIlWbFphoeqUK5FqBu0fG84gQ0bVaQsI0cFByDvBQaA1+bKAhoM2HdXCoyno8vtqWLJNlNZG8IsEWkik/57fyqdm8IaHNXqxbPuN4QwMfEgJDYlp7yK76u7C0BFEKxFvi5Bhb466A3BNiCZNui8FsfdspPrAy9IaDsIzcZGxwB9krENkSti8ERsG6BufEFAU2bFSzSNEe8k7FO7k0i2xDJNUD4uD43PPi+MhQnoGzA2GMTAWPf4Vx90wnIMTT2+HQCxr7DufqmE5BjaOzx6QSMfYdz9U0nIMdQ3+NNv+8/AAAA//+nkgBnAAAABklEQVQDAK3KOL03FMrqAAAAAElFTkSuQmCC"
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 136,
+      "uri": "data:application/octet-stream;base64,zczMvc3MzL0AAAAAzczMPc3MzL0AAAAAAAAAAM3MzD0AAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAD8AAIA/AAABAAIAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPw=="
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 36
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 36,
+      "byteLength": 36
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 72,
+      "byteLength": 24
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 96,
+      "byteLength": 6
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 104,
+      "byteLength": 8
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 112,
+      "byteLength": 24
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC3",
+      "min": [
+        -0.1,
+        -0.1,
+        0
+      ],
+      "max": [
+        0.1,
+        0.1,
+        0
+      ]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC3",
+      "min": [
+        0,
+        0,
+        1
+      ],
+      "max": [
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5123,
+      "count": 3,
+      "type": "SCALAR",
+      "min": [
+        0
+      ],
+      "max": [
+        2
+      ]
+    },
+    {
+      "bufferView": 4,
+      "componentType": 5126,
+      "count": 2,
+      "type": "SCALAR",
+      "min": [
+        0
+      ],
+      "max": [
+        1
+      ]
+    },
+    {
+      "bufferView": 5,
+      "componentType": 5126,
+      "count": 2,
+      "type": "VEC3"
+    }
+  ],
+  "animations": [
+    {
+      "name": "depth",
+      "samplers": [
+        {
+          "input": 4,
+          "output": 5,
+          "interpolation": "LINEAR"
+        }
+      ],
+      "channels": [
+        {
+          "sampler": 0,
+          "target": {
+            "node": 1,
+            "path": "translation"
+          }
+        }
+      ]
+    }
+  ]
+}

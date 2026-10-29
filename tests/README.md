@@ -301,3 +301,28 @@ Animated rig/armor motion, arbitrary attachments, ordinary non-OIT alpha and
 water/glass/particle/weather pixel witnesses remain **5.2b.4b**. The full 5.2b.4
 checkpoint and stage 5 are still incomplete. See journal §43 and
 [evidence](../docs/porting/evidence/stage-5.2b.4a.json).
+
+Stage **5.2b.4b** uses `-PpulseStage52b4bProbe` with the same isolated server/world
+and client marker as 5.2b.4a, in a fresh `stage52b4b-runs` directory. Start
+`:neoforge:runServer`, then `:neoforge:runClient`, each with
+`-PpulseStage1Smoke -PpulseStage52b4bProbe -PpulseStage2Probe
+-PpulseVerificationDir=stage52b4b-runs`. The client writes
+`player-occlusion-results.json`; both its normal exit and shutdown assertions
+must pass. Stop the server through its console.
+
+The matrix samples actual decoded Gecko/glTF keyframes through public seek/pause:
+20 variants, native/custom animated armor, bare masked-rig anchor-only players,
+and opaque/ordinary-alpha/OIT registered callbacks. It verifies 1440 states,
+7560 RGB/depth comparisons, 1080 motion witnesses, 1296 attachment pixel witnesses,
+1080 cross-format witnesses and 48 frustum-isolated anchor target witnesses in
+Fast/Fancy/Fabulous before/after reload. The ordinary alpha pipeline and custom
+armor bake factory are shared with existing fixtures. Release JARs exclude all
+new test assets/classes.
+
+This checkpoint fixes dropped animation channels on a glTF mesh-node beneath
+another node. A real-parser JUnit covers animation/bind transforms and the
+unchanged static mesh path. Final negative controls suppress armor rig at both
+consumers or actual callback geometry; both must fail their pixel assertions.
+They exist only in temporary compile projections. Legacy living attachment and
+water/glass/particle/weather coverage remains **5.2b.4c**; stage 5 is incomplete.
+See journal §44 and [evidence](../docs/porting/evidence/stage-5.2b.4b.json).

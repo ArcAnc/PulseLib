@@ -195,8 +195,14 @@ public class PGltfModelParser
 		if (nodes == null || nodes.isEmpty())
 			return nodeToBone;
 		
+		// Animated mesh nodes need their own transform; flattening them into an ancestor loses their channels.
+		Set<NodeModel> animatedNodes = new HashSet<>();
+		for (AnimationModel animation : model.getAnimationModels())
+			for (AnimationModel.Channel channel : animation.getChannels())
+				if (channel.getNodeModel() != null && decoder(channel.getPath()) != null)
+					animatedNodes.add(channel.getNodeModel());
 		List<NodeModel> joints = nodes.stream().
-				filter(PGltfModelParser :: isBoneNode).
+				filter(node -> isBoneNode(node) || animatedNodes.contains(node) && !isBlockbenchLocatorMarker(node)).
 				toList();
 		Set<String> boneNames = new HashSet<>();
 		

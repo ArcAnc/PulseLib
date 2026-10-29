@@ -64,6 +64,8 @@ public final class Stage1Client implements IPulseClientPlugin
 
 	public static void register(IEventBus bus)
 	{
+		if (Boolean.getBoolean("pulselib.stage52b4bProbe"))
+			Stage52AnimatedOcclusionProbe.register(bus);
 		if (Boolean.getBoolean("pulselib.stage52b4aProbe"))
 			Stage52ArmorOcclusionProbe.register(bus);
 		if (Boolean.getBoolean("pulselib.stage52b2bProbe"))
@@ -157,6 +159,8 @@ public final class Stage1Client implements IPulseClientPlugin
 	public void registerModels(PModelRegistrar event)
 	{
 		Stage2PluginProbe.models++;
+		if (Boolean.getBoolean("pulselib.stage52b4bProbe"))
+			Stage52AnimatedOcclusionProbe.registerModels(event);
 		if (Boolean.getBoolean("pulselib.playerOcclusionProbe"))
 			event.model(Stage52PlayerOcclusionProbe.MODEL).texture("0", Stage42aWorldStageProbe.WHITE);
 		Stage52CameraProbe.registerModels(event);
@@ -198,6 +202,8 @@ public final class Stage1Client implements IPulseClientPlugin
 	public void registerPlayerAnimations(PPlayerAnimationRegistrar registrar)
 	{
 		Stage2PluginProbe.playerAnimations++;
+		if (Boolean.getBoolean("pulselib.stage52b4bProbe"))
+			Stage52AnimatedOcclusionProbe.registerAnimations(registrar);
 		Stage52CameraProbe.registerAnimations(registrar);
 		Stage52AttachmentProbe.registerAnimations(registrar);
 		if (Boolean.getBoolean("pulselib.stage51Probe"))
@@ -208,6 +214,8 @@ public final class Stage1Client implements IPulseClientPlugin
 	public void registerAnimatedAttachments(PAnimatedAttachmentRegistrar registrar)
 	{
 		Stage2PluginProbe.animatedAttachments++;
+		if (Boolean.getBoolean("pulselib.stage52b4bProbe"))
+			Stage52AnimatedOcclusionProbe.registerAttachments(registrar);
 		Stage52AttachmentProbe.registerAttachments(registrar);
 		if (Boolean.getBoolean("pulselib.stage51Probe"))
 			Stage51PlayerProbe.registerAttachments(registrar);

@@ -71,9 +71,11 @@ if (providers.gradleProperty('pulseStage1Smoke').isPresent()) {
         runs {
             configureEach {
                 gameDirectory = layout.buildDirectory.dir("${providers.gradleProperty('pulseVerificationDir').getOrElse('stage1-runs')}/${it.name}").get().asFile
+                if (providers.gradleProperty('pulseStage52b4bProbe').isPresent())
+                    systemProperty 'pulselib.stage52b4bProbe', 'true'
                 if (providers.gradleProperty('pulseStage52b4aProbe').isPresent())
                     systemProperty 'pulselib.stage52b4aProbe', 'true'
-                if (providers.gradleProperty('pulsePlayerOcclusionProbe').isPresent() || providers.gradleProperty('pulseStage52b4aProbe').isPresent())
+                if (providers.gradleProperty('pulsePlayerOcclusionProbe').isPresent() || providers.gradleProperty('pulseStage52b4aProbe').isPresent() || providers.gradleProperty('pulseStage52b4bProbe').isPresent())
                     systemProperty 'pulselib.playerOcclusionProbe', 'true'
                 if (providers.gradleProperty('pulseStage52b2bProbe').isPresent()) {
                     systemProperty 'pulselib.stage52b2bProbe', 'true'

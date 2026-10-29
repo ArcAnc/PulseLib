@@ -81,7 +81,7 @@ public final class Stage42aWorldStageProbe
 
 	public static void register(IEventBus bus)
 	{
-		bus.addListener((RegisterRenderPipelinesEvent event) -> event.registerPipeline(ALPHA_PIPELINE));
+		registerAlpha(bus);
 		NeoForge.EVENT_BUS.addListener(EventPriority.HIGHEST, Stage42aWorldStageProbe::submit);
 		NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, Stage42aWorldStageProbe::early);
 		NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, Stage42aWorldStageProbe::features);
@@ -89,6 +89,16 @@ public final class Stage42aWorldStageProbe
 		NeoForge.EVENT_BUS.addListener(EventPriority.HIGHEST, Stage42aWorldStageProbe::lateSubmission);
 		NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, Stage42aWorldStageProbe::finish);
 		NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, Stage42aWorldStageProbe::shutdown);
+	}
+
+	static void registerAlpha(IEventBus bus)
+	{
+		bus.addListener((RegisterRenderPipelinesEvent event) -> event.registerPipeline(ALPHA_PIPELINE));
+	}
+
+	static RenderType ordinaryAlpha()
+	{
+		return ALPHA;
 	}
 
 	public static void tick(int tick)
