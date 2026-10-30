@@ -16,5 +16,10 @@
     "minecraft": "${minecraft_version}",
     "java": ">=25"
   },
-  "accessWidener": "pulselib.accesswidener"
+  "accessWidener": "pulselib.accesswidener",
+  "entrypoints": {
+    "main": [
+      "com.arcanc.pulselib.fabric.PulseLibFabric"
+    ]
+  }
 }

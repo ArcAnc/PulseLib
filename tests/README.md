@@ -441,3 +441,8 @@ Run `:neoforge:runServer -PpulseStage1Smoke -PpulseServerMotionProbe -PpulseStag
 ### Stage 5.2b.5b: native respawn and animation lifetime
 
 Run `:neoforge:runServer` and then `:neoforge:runClient` with `-PpulseStage1Smoke -PpulseRespawnProbe -PpulseStage2Probe -PpulseVerificationDir=stage525b-runs`. Use an isolated server world/EULA and client `.pulselib-respawn` marker; wait for server Done at loopback 127.0.0.1:25576. The opt-in command invokes real PlayerList.respawn for the connected player twice around a resource reload. Require two SERVER RESPAWN PASS lines, four client suites (Gecko/glTF), CLIENT PASS, SHUTDOWN PASS and client exit 0; then console `stop` the server and require exit 0. No survival death screen or GPU pixel coverage is claimed. See migration journal section 51.
+
+
+### Stage 6.1a: Fabric dedicated-server bootstrap
+
+Run `:fabric:runServer -PpulseFabricBootstrapProbe` with a separate EULA and server configuration in `fabric/build/stage61a-runs/server` (loopback 127.0.0.1:25577). The external `pulselib_stage61` source-set mod supplies BOTH/SERVER/CLIENT candidates; require exactly two loaded plugins, exactly-once registration, actual channel presence, BOOTSTRAP PASS, SHUTDOWN PASS and exit 0. The probe shuts the server down normally. Check classloading.log for absence of Minecraft client/Blaze3D/ClientPoisonPlugin classes. It is excluded from release JARs. Client lifecycle/reload/Mixins and GPU parity remain 6.1b/6.2; see migration journal section 52.

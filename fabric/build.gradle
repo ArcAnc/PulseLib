@@ -22,8 +22,34 @@ loom {
     }
 }
 
-// Stage 1 skeleton. Bootstrap and renderer hooks are implemented in stage 6.
+// Fabric client lifecycle and renderer hooks remain in stage 6.
 // Keep the incomplete Fabric variant out of the existing release workflow.
 tasks.withType(PublishToMavenRepository).configureEach {
     enabled = false
+}
+
+// Disposable dedicated-server bootstrap witnesses; never included in release JARs.
+if (providers.gradleProperty('pulseFabricBootstrapProbe').isPresent()) {
+    sourceSets {
+        stage61Smoke {
+            java.srcDir rootProject.file('tests/stage61/fabric/java')
+            resources.srcDir rootProject.file('tests/stage61/fabric/resources')
+            compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+            runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+        }
+    }
+    loom {
+        mods {
+            pulselib { sourceSet sourceSets.main }
+            pulselib_stage61 { sourceSet sourceSets.stage61Smoke }
+        }
+        runs {
+            server {
+                source sourceSets.stage61Smoke
+                runDir "build/${providers.gradleProperty('pulseVerificationDir').getOrElse('stage61a-runs')}/server"
+                vmArg '-Xlog:class+load=info:file=classloading.log'
+            }
+        }
+    }
+    tasks.named('runServer') { standardInput = System.in }
 }
