@@ -436,3 +436,8 @@ Next: **5.2b.5a — M-P2 server root-extraction isolation**.
 ### Stage 5.2b.5a: dedicated-server root extraction
 
 Run `:neoforge:runServer -PpulseStage1Smoke -PpulseServerMotionProbe -PpulseStage2Probe -PpulseVerificationDir=stage525a-runs` with an isolated server configuration/EULA. The opt-in probe checks two FakePlayerFactory server owners, two definitions/masks and 16 forward/reverse/zero root-motion extraction cases against unchanged physics. It shuts the server down normally after PASS. Require exit 0 and a classloading log without Minecraft client/Blaze3D classes; Gradle SUCCESS alone does not prove server success. Network player/respawn coverage belongs to 5.2b.5b. See migration journal section 50.
+
+
+### Stage 5.2b.5b: native respawn and animation lifetime
+
+Run `:neoforge:runServer` and then `:neoforge:runClient` with `-PpulseStage1Smoke -PpulseRespawnProbe -PpulseStage2Probe -PpulseVerificationDir=stage525b-runs`. Use an isolated server world/EULA and client `.pulselib-respawn` marker; wait for server Done at loopback 127.0.0.1:25576. The opt-in command invokes real PlayerList.respawn for the connected player twice around a resource reload. Require two SERVER RESPAWN PASS lines, four client suites (Gecko/glTF), CLIENT PASS, SHUTDOWN PASS and client exit 0; then console `stop` the server and require exit 0. No survival death screen or GPU pixel coverage is claimed. See migration journal section 51.

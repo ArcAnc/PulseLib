@@ -64,6 +64,8 @@ public final class Stage1Client implements IPulseClientPlugin
 
 	public static void register(IEventBus bus)
 	{
+		if (Boolean.getBoolean("pulselib.respawnProbe"))
+			Stage52RespawnProbe.register();
 		if (Boolean.getBoolean("pulselib.animatedEnvironmentProbe") || Boolean.getBoolean("pulselib.animatedEffectsProbe"))
 			Stage52AnimatedEnvironmentProbe.register(bus);
 		if (Boolean.getBoolean("pulselib.firstPersonArmorProbe"))
@@ -163,6 +165,8 @@ public final class Stage1Client implements IPulseClientPlugin
 	public void registerModels(PModelRegistrar event)
 	{
 		Stage2PluginProbe.models++;
+		if (Boolean.getBoolean("pulselib.respawnProbe"))
+			Stage52RespawnProbe.models(event);
 		if (Boolean.getBoolean("pulselib.animatedEnvironmentProbe") || Boolean.getBoolean("pulselib.animatedEffectsProbe"))
 			Stage52AnimatedEnvironmentProbe.registerModels(event);
 		if (Boolean.getBoolean("pulselib.firstPersonArmorProbe"))
@@ -216,6 +220,8 @@ public final class Stage1Client implements IPulseClientPlugin
 	public void registerPlayerAnimations(PPlayerAnimationRegistrar registrar)
 	{
 		Stage2PluginProbe.playerAnimations++;
+		if (Boolean.getBoolean("pulselib.respawnProbe"))
+			Stage52RespawnProbe.animations(registrar);
 		if (Boolean.getBoolean("pulselib.animatedEnvironmentProbe") || Boolean.getBoolean("pulselib.animatedEffectsProbe"))
 			Stage52AnimatedEnvironmentProbe.registerAnimations(registrar);
 		if (Boolean.getBoolean("pulselib.firstPersonArmorProbe"))
@@ -246,6 +252,11 @@ public final class Stage1Client implements IPulseClientPlugin
 	private static void tick(ClientTickEvent.Post event)
 	{
 		Minecraft minecraft = Minecraft.getInstance();
+		if (Boolean.getBoolean("pulselib.respawnProbe"))
+		{
+			Stage52RespawnProbe.tick();
+			return;
+		}
 		if (Boolean.getBoolean("pulselib.animatedEffectsProbe"))
 		{
 			Stage52AnimatedEffectsProbe.tick();

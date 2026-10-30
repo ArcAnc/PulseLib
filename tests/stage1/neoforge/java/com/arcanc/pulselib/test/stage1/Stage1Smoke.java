@@ -29,6 +29,8 @@ public final class Stage1Smoke
 	public Stage1Smoke(IEventBus bus, ModContainer container)
 	{
 		Stage1Content.register(bus);
+		if (Boolean.getBoolean("pulselib.respawnProbe"))
+			Stage52RespawnScene.register();
 		bus.addListener((EntityAttributeCreationEvent event) ->
 				event.put(Stage1Content.EntityTypeReg.TEST_ENTITY.get(), TestEntity.createAttributes().build()));
 		NeoForge.EVENT_BUS.addListener(Stage1Smoke::joined);
