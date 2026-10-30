@@ -431,3 +431,8 @@ Helpers remain outside release JARs. This compares owner rig formats using
 an existing static Gecko socket mesh; arbitrary legacy mesh clips and
 first-person held-item/map combinations remain outside this checkpoint.
 Next: **5.2b.5a — M-P2 server root-extraction isolation**.
+
+
+### Stage 5.2b.5a: dedicated-server root extraction
+
+Run `:neoforge:runServer -PpulseStage1Smoke -PpulseServerMotionProbe -PpulseStage2Probe -PpulseVerificationDir=stage525a-runs` with an isolated server configuration/EULA. The opt-in probe checks two FakePlayerFactory server owners, two definitions/masks and 16 forward/reverse/zero root-motion extraction cases against unchanged physics. It shuts the server down normally after PASS. Require exit 0 and a classloading log without Minecraft client/Blaze3D classes; Gradle SUCCESS alone does not prove server success. Network player/respawn coverage belongs to 5.2b.5b. See migration journal section 50.

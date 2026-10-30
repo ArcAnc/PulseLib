@@ -38,6 +38,8 @@ public final class Stage1Smoke
 			{
 				Stage2PluginProbe.verify(false);
 			}
+			if (Boolean.getBoolean("pulselib.serverMotionProbe"))
+				Stage52ServerMotionProbe.verify(event.getServer());
 		});
 		if (FMLEnvironment.getDist() == Dist.CLIENT)
 		{

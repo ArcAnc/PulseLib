@@ -40,6 +40,15 @@ import java.util.*;
  */
 public final class PPlayerAnimations
 {
+	/** Keeps client inheritance checks out of common registry initialization. */
+	private static final class ClientAdapters
+	{
+		private static @Nullable PFirstPersonRenderPresentation firstPersonPresentation(LocalPlayer player, float partialTick)
+		{
+			return PPlayerAnimations.firstPersonPresentation((Player)player, partialTick);
+		}
+	}
+
 	private static final Map<Identifier, PPlayerAnimationDefinition> DEFINITIONS = new HashMap<>();
 	private static final Map<UUID, Map<Identifier, PPlayerAnimationInstance>> INSTANCES = new HashMap<>();
 	private static final Set<Identifier> INVALID_FIRST_PERSON_DEFINITIONS = new HashSet<>();
@@ -230,7 +239,7 @@ public final class PPlayerAnimations
 	 */
 	public static @Nullable PFirstPersonRenderPresentation firstPersonPresentation(LocalPlayer player, float partialTick)
 	{
-		return firstPersonPresentation((Player)player, partialTick);
+		return ClientAdapters.firstPersonPresentation(player, partialTick);
 	}
 
 	/**

@@ -438,11 +438,25 @@ public final class PPlayerAnimationDefinition
 		/**
 		 * Keeps vanilla held-item rendering enabled.
 		 */
-		ItemRenderPolicy RENDER = (player, hand, stack) -> false;
+		ItemRenderPolicy RENDER = new ItemRenderPolicy()
+		{
+			@Override
+			public boolean hide(LocalPlayer player, InteractionHand hand, ItemStack stack)
+			{
+				return false;
+			}
+		};
 		/**
 		 * Hides vanilla held-item rendering.
 		 */
-		ItemRenderPolicy HIDE = (player, hand, stack) -> true;
+		ItemRenderPolicy HIDE = new ItemRenderPolicy()
+		{
+			@Override
+			public boolean hide(LocalPlayer player, InteractionHand hand, ItemStack stack)
+			{
+				return true;
+			}
+		};
 
 		/**
 		 * Returns whether vanilla rendering should hide the item in the supplied hand.
@@ -479,11 +493,25 @@ public final class PPlayerAnimationDefinition
 		/**
 		 * Always includes the held item.
 		 */
-		ItemVisibilityPolicy VISIBLE = (player, hand, animationTime, stack) -> ItemVisibility.VISIBLE;
+		ItemVisibilityPolicy VISIBLE = new ItemVisibilityPolicy()
+		{
+			@Override
+			public ItemVisibility visibility(LocalPlayer player, InteractionHand hand, float animationTime, ItemStack stack)
+			{
+				return ItemVisibility.VISIBLE;
+			}
+		};
 		/**
 		 * Always hides the held item.
 		 */
-		ItemVisibilityPolicy HIDDEN = (player, hand, animationTime, stack) -> ItemVisibility.HIDDEN;
+		ItemVisibilityPolicy HIDDEN = new ItemVisibilityPolicy()
+		{
+			@Override
+			public ItemVisibility visibility(LocalPlayer player, InteractionHand hand, float animationTime, ItemStack stack)
+			{
+				return ItemVisibility.HIDDEN;
+			}
+		};
 
 		/**
 		 * Selects held-item visibility at the supplied animation playback time.
@@ -505,7 +533,8 @@ public final class PPlayerAnimationDefinition
 		private final PModelData modelData;
 		private Predicate<Player> predicate = player -> true;
 		private final Map<PPlayerPart, String> bindings = new LinkedHashMap<>();
-		private final EnumSet<PPlayerPart> mask = EnumSet.noneOf(PPlayerPart.class);
+		// EnumSet reflects all enum methods, including client-only model signatures.
+		private final Set<PPlayerPart> mask = new LinkedHashSet<>();
 		private PPlayerAnimationMask partMask;
 		private PPlayerAnimationBlendMode blendMode = PPlayerAnimationBlendMode.ADDITIVE_LOCAL;
 		private PPlayerAnimationWeight weight = PPlayerAnimationWeight.FULL;

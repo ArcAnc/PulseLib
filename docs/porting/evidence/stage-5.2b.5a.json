@@ -1,0 +1,60 @@
+{
+  "stage": "5.2b.5a",
+  "status": "PASS",
+  "base": "29692ce439f679ebf22656e8369ea88ed33f4d02",
+  "server": {
+    "owners": "2 NeoForge FakePlayerFactory ServerPlayer subclasses; no network sessions",
+    "definitions": 2,
+    "instances": 4,
+    "extractionCases": 16,
+    "times": [
+      [
+        0,
+        10
+      ],
+      [
+        10,
+        20
+      ],
+      [
+        20,
+        0
+      ],
+      [
+        10,
+        10
+      ]
+    ],
+    "unchanged": [
+      "position",
+      "velocity",
+      "AABB",
+      "yaw",
+      "pitch"
+    ],
+    "clientClassesLoaded": 0,
+    "shutdown": "server.halt(false)",
+    "exitCode": 0
+  },
+  "checks": {
+    "junit": {
+      "tests": 241,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "publicApiClasses": 6
+  },
+  "artifacts": {
+    "server-complete.log": "0f2d8338dfa41130bb9c3249c360afef6cdc31498f974b42e720946b9d9a2890",
+    "build.log": "b7b79c8f198d04e5c5ba617760e5d4d042dd3fa47c3fc03a2b54698e264e348e",
+    "classloading-final.log": "694d8df8c0e90e95eed2fd219e910db5b2789fbf7629cea39461f2d653f25f90"
+  },
+  "rawDirectory": "/tmp/pulselib-stage525a-8u8pck7d",
+  "remaining": [
+    "5.2b.5b real respawn",
+    "5.2b.4 remaining coverage",
+    "6 Fabric runtime",
+    "7 final API/GPU/allocation/performance"
+  ]
+}

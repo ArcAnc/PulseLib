@@ -12,7 +12,7 @@ package com.arcanc.pulselib.content.player.animation;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.Arrays;
-import java.util.EnumSet;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -39,7 +39,7 @@ public interface PPlayerAnimationMask
 	static PPlayerAnimationMask of(PPlayerPart... parts)
 	{
 		Objects.requireNonNull(parts);
-		EnumSet<PPlayerPart> allowed = EnumSet.noneOf(PPlayerPart.class);
+		Set<PPlayerPart> allowed = new LinkedHashSet<>();
 		Arrays.stream(parts).forEach(part -> allowed.add(Objects.requireNonNull(part)));
 		return of(allowed);
 	}
