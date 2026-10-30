@@ -13,6 +13,7 @@ import com.arcanc.pulselib.api.plugin.IPulseClientPlugin;
 import com.arcanc.pulselib.api.plugin.PulsePlugin;
 import com.arcanc.pulselib.api.registration.PAttachmentRegistrar;
 import com.arcanc.pulselib.api.registration.PModelRegistrar;
+import com.arcanc.pulselib.api.registration.PPlayerAnimationRegistrar;
 import com.arcanc.pulselib.util.PLibDatabase;
 import net.minecraft.resources.Identifier;
 
@@ -32,6 +33,13 @@ public final class ClientPlugin implements IPulseClientPlugin
 		if (ClientProbe.common != 1)
 			throw new AssertionError("Common registration must precede client registration");
 		ClientProbe.client++;
+	}
+
+	@Override
+	public void registerPlayerAnimations(PPlayerAnimationRegistrar registrar)
+	{
+		if (Boolean.getBoolean("pulselib.fabricWorldProbe"))
+			WorldProbe.animations(registrar);
 	}
 
 	@Override

@@ -456,3 +456,30 @@ Run `:fabric:runClient -PpulseFabricClientProbe` with `.pulselib-client-lifecycl
 ### Stage 6.1b.2a: Fabric native atlas and textured reload
 
 Run `:fabric:runClient -PpulseFabricAtlasProbe -PpulseVerificationDir=stage61b2a-runs` with `.pulselib-atlas` in its disposable client directory. Require ATLAS PASS / SHUTDOWN PASS and exit 0: 12 Gecko/glTF models, 24 mesh observations, 648 UV comparisons, 48 GPU atlas pixels across startup/reload, metadata overrides/AUTO classification, fresh models/sprites and closed old GPU texture. Native sprite padding and solidify of zero-alpha RGB are accounted for; no Pulse geometry draw is claimed. The server boundary run uses the same properties, its own EULA/config (loopback 127.0.0.1:25579), console stop after Done and exit 0. Fixture remains outside release JARs; remaining world/Mixin work is 6.1b.2b. See migration journal section 54.
+
+### Stage 6.1b.2b: Fabric world lifecycle and full Common Mixins
+
+Run `:fabric:runServer -PpulseFabricWorldProbe -PpulseVerificationDir=stage61b2b-runs`,
+then the same `:fabric:runClient` after server Done. Prepare a separate accepted
+EULA and properties: fresh flat world `fabric-world-lifecycle`, loopback
+127.0.0.1:25580, online-mode=false, gamemode=creative, force-gamemode=true,
+difficulty=peaceful. Put `.pulselib-world-lifecycle` in the separate client
+directory. The server-only fixture disables mob spawning and enforces creative
+on join. Neither fixture is included in release JARs.
+
+Require MIXIN AUDIT PASS (all 46 merged Common origins / 39 native targets),
+WORLD PASS, WORLD SHUTDOWN PASS and client exit 0. Two real connections of the
+same UUID each cover exact instance/singleton/player tick windows, native
+entity removal, native 200-tick maintenance expiry, actual resource reload,
+and network disconnect clearing all three caches while keeping definitions.
+The probe never ticks or clears production managers itself. The stale-time
+seed uses the existing package-private manager seam; no wall-clock TTL or
+complete render-consumer parity is claimed. Native channel close precedes UI
+teardown. Stop the server with console `stop` and require exit 0 and side-safe
+classloading. Removing only ENTITY_UNLOAD subscription in a temporary source
+projection must fail `real ClientLevel removal dispatch removes native entity manager`.
+
+The Common hand Mixin accepts exactly one of the vanilla five-argument or
+NeoForge six-argument selectors per hand. NeoForge stage 5.2a matrix/GPU hand
+and Fabric atlas fixtures are regression checks. See migration journal §55
+and its structured evidence. Next checkpoint: **6.2 Fabric render hooks/parity**.

@@ -34,6 +34,7 @@ import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Group;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
@@ -153,7 +154,8 @@ public abstract class ItemInHandRendererMixin
 	 * @param player the player to use.
 	 * @param original the original to use.
 	 */
-	@WrapOperation(method = "renderPlayerArm", at = @At(value = "INVOKE", target =
+	@Group(name = "pulselib$rightHand", min = 1, max = 1)
+	@WrapOperation(require = 0, method = "renderPlayerArm", at = @At(value = "INVOKE", target =
 			"Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderRightHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;ZLnet/minecraft/client/player/AbstractClientPlayer;)V"))
 	private void pulselib$renderRightHand(AvatarRenderer<?> renderer,
 	                                     PoseStack poseStack,
@@ -178,7 +180,8 @@ public abstract class ItemInHandRendererMixin
 	 * @param player the player to use.
 	 * @param original the original to use.
 	 */
-	@WrapOperation(method = "renderPlayerArm", at = @At(value = "INVOKE", target =
+	@Group(name = "pulselib$leftHand", min = 1, max = 1)
+	@WrapOperation(require = 0, method = "renderPlayerArm", at = @At(value = "INVOKE", target =
 			"Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderLeftHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;ZLnet/minecraft/client/player/AbstractClientPlayer;)V"))
 	private void pulselib$renderLeftHand(AvatarRenderer<?> renderer,
 	                                    PoseStack poseStack,
@@ -190,6 +193,28 @@ public abstract class ItemInHandRendererMixin
 	                                    Operation<Void> original)
 	{
 		renderArm(renderer, poseStack, submitNodeCollector, packedLight, skin, sleeve, player, original);
+	}
+
+	/** Vanilla has no explicit player argument; exactly one loader signature must match. */
+	@Group(name = "pulselib$rightHand", min = 1, max = 1)
+	@WrapOperation(method = "renderPlayerArm", at = @At(value = "INVOKE", target =
+			"Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderRightHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;Z)V"), require = 0)
+	private void pulselib$renderVanillaRightHand(AvatarRenderer<?> renderer, PoseStack poses,
+	                                              SubmitNodeCollector collector, int light, Identifier skin,
+	                                              boolean sleeve, Operation<Void> original)
+	{
+		renderArm(renderer, poses, collector, light, skin, sleeve, null, original);
+	}
+
+	/** Vanilla has no explicit player argument; exactly one loader signature must match. */
+	@Group(name = "pulselib$leftHand", min = 1, max = 1)
+	@WrapOperation(method = "renderPlayerArm", at = @At(value = "INVOKE", target =
+			"Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderLeftHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;Z)V"), require = 0)
+	private void pulselib$renderVanillaLeftHand(AvatarRenderer<?> renderer, PoseStack poses,
+	                                              SubmitNodeCollector collector, int light, Identifier skin,
+	                                              boolean sleeve, Operation<Void> original)
+	{
+		renderArm(renderer, poses, collector, light, skin, sleeve, null, original);
 	}
 
 	/**
@@ -209,13 +234,13 @@ public abstract class ItemInHandRendererMixin
 	                              int packedLight,
 	                              Identifier skin,
 	                              boolean sleeve,
-	                              AbstractClientPlayer player,
+	                              @Nullable AbstractClientPlayer player,
 	                              Operation<Void> original)
 	{
 		PFirstPersonRenderContext context = PFirstPersonRenderContexts.current();
 		if (context == null || context.map())
 		{
-			original.call(renderer, poseStack, submitNodeCollector, packedLight, skin, sleeve, player);
+			submitArm(renderer, poseStack, submitNodeCollector, packedLight, skin, sleeve, player, original);
 			return;
 		}
 		PFirstPersonArmPose armPose = context.arm() == HumanoidArm.RIGHT ?
@@ -224,7 +249,7 @@ public abstract class ItemInHandRendererMixin
 			return;
 		if (armPose.mode() == PFirstPersonRenderMode.VANILLA)
 		{
-			original.call(renderer, poseStack, submitNodeCollector, packedLight, skin, sleeve, player);
+			submitArm(renderer, poseStack, submitNodeCollector, packedLight, skin, sleeve, player, original);
 			return;
 		}
 		if (armPose.transform() == null)
@@ -236,12 +261,23 @@ public abstract class ItemInHandRendererMixin
 			 * The matrix came from PFirstPersonPresentation's canonical MODEL pose. */
 			PFirstPersonPoseStack.replaceLocalPose(poseStack, context.basePose(), context.baseNormal(),
 					PVanillaFirstPersonArmResolver.resolveArmOrigin(context.arm(), armPose.transform()));
-			original.call(renderer, poseStack, submitNodeCollector, packedLight, skin, sleeve, player);
+			submitArm(renderer, poseStack, submitNodeCollector, packedLight, skin, sleeve, player, original);
 		}
 		finally
 		{
 			poseStack.popPose();
 		}
+	}
+
+	/** Preserves the native invocation arity without changing shared pose handling. */
+	private static void submitArm(AvatarRenderer<?> renderer, PoseStack poses, SubmitNodeCollector collector,
+	                              int light, Identifier skin, boolean sleeve, @Nullable AbstractClientPlayer player,
+	                              Operation<Void> original)
+	{
+		if (player == null)
+			original.call(renderer, poses, collector, light, skin, sleeve);
+		else
+			original.call(renderer, poses, collector, light, skin, sleeve, player);
 	}
 
 	/**

@@ -1,0 +1,278 @@
+[
+  {
+    "mixin": "ItemStackMixin",
+    "targets": [
+      "net.minecraft.world.item.ItemStack"
+    ]
+  },
+  {
+    "mixin": "BlockEntityRenderStateAccessor",
+    "targets": [
+      "net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState"
+    ]
+  },
+  {
+    "mixin": "CameraMixin",
+    "targets": [
+      "net.minecraft.client.Camera"
+    ]
+  },
+  {
+    "mixin": "CubeDefinitionMixin",
+    "targets": [
+      "net.minecraft.client.model.geom.builders.CubeDefinition"
+    ]
+  },
+  {
+    "mixin": "EntityModelSetMixin",
+    "targets": [
+      "net.minecraft.client.model.geom.EntityModelSet"
+    ]
+  },
+  {
+    "mixin": "GameRendererMixin",
+    "targets": [
+      "net.minecraft.client.renderer.GameRenderer"
+    ]
+  },
+  {
+    "mixin": "PictureInPictureRendererMixin",
+    "targets": [
+      "net.minecraft.client.gui.render.pip.PictureInPictureRenderer"
+    ]
+  },
+  {
+    "mixin": "GuiItemAtlasMixin",
+    "targets": [
+      "net.minecraft.client.gui.render.GuiItemAtlas"
+    ]
+  },
+  {
+    "mixin": "GuiGraphicsExtractorAccessor",
+    "targets": [
+      "net.minecraft.client.gui.GuiGraphicsExtractor"
+    ]
+  },
+  {
+    "mixin": "PoseStackAccessor",
+    "targets": [
+      "com.mojang.blaze3d.vertex.PoseStack"
+    ]
+  },
+  {
+    "mixin": "FeatureRenderDispatcherMixin",
+    "targets": [
+      "net.minecraft.client.renderer.feature.FeatureRenderDispatcher"
+    ]
+  },
+  {
+    "mixin": "LevelRendererMixin",
+    "targets": [
+      "net.minecraft.client.renderer.LevelRenderer"
+    ]
+  },
+  {
+    "mixin": "GlBufferAccessor",
+    "targets": [
+      "com.mojang.blaze3d.opengl.GlBuffer"
+    ]
+  },
+  {
+    "mixin": "CommandEncoderAccessor",
+    "targets": [
+      "com.mojang.blaze3d.systems.CommandEncoder"
+    ]
+  },
+  {
+    "mixin": "GlCommandEncoderAccessor",
+    "targets": [
+      "com.mojang.blaze3d.opengl.GlCommandEncoder"
+    ]
+  },
+  {
+    "mixin": "HumanoidArmorLayerMixin",
+    "targets": [
+      "net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer"
+    ]
+  },
+  {
+    "mixin": "ItemInHandRendererMixin",
+    "targets": [
+      "net.minecraft.client.renderer.ItemInHandRenderer"
+    ]
+  },
+  {
+    "mixin": "ItemModelResolverAccessor",
+    "targets": [
+      "net.minecraft.client.renderer.item.ItemModelResolver"
+    ]
+  },
+  {
+    "mixin": "ItemStackRenderStateAccessor",
+    "targets": [
+      "net.minecraft.client.renderer.item.ItemStackRenderState"
+    ]
+  },
+  {
+    "mixin": "LivingEntityRendererMixin",
+    "targets": [
+      "net.minecraft.client.model.player.PlayerModel"
+    ]
+  },
+  {
+    "mixin": "PlayerRigRenderStateMixin",
+    "targets": [
+      "net.minecraft.client.renderer.entity.state.AvatarRenderState"
+    ]
+  },
+  {
+    "mixin": "PlayerRigSubmitMixin",
+    "targets": [
+      "net.minecraft.client.renderer.entity.LivingEntityRenderer"
+    ]
+  },
+  {
+    "mixin": "PlayerModelFeatureMixin",
+    "targets": [
+      "net.minecraft.client.renderer.feature.ModelFeatureRenderer"
+    ]
+  },
+  {
+    "mixin": "PlayerGeometryRenderStateMixin",
+    "targets": [
+      "net.minecraft.client.renderer.entity.state.AvatarRenderState"
+    ]
+  },
+  {
+    "mixin": "PlayerGeometryRendererMixin",
+    "targets": [
+      "net.minecraft.client.renderer.entity.LivingEntityRenderer"
+    ]
+  },
+  {
+    "mixin": "PlayerModelSubmitMixin",
+    "targets": [
+      "net.minecraft.client.renderer.SubmitNodeStorage$ModelSubmit"
+    ]
+  },
+  {
+    "mixin": "ModelPartSubmitMixin",
+    "targets": [
+      "net.minecraft.client.renderer.SubmitNodeStorage$ModelPartSubmit"
+    ]
+  },
+  {
+    "mixin": "ModelPartFeatureRendererMixin",
+    "targets": [
+      "net.minecraft.client.renderer.feature.ModelPartFeatureRenderer"
+    ]
+  },
+  {
+    "mixin": "AvatarHandMixin",
+    "targets": [
+      "net.minecraft.client.renderer.entity.player.AvatarRenderer"
+    ]
+  },
+  {
+    "mixin": "ItemSubmitMixin",
+    "targets": [
+      "net.minecraft.client.renderer.SubmitNodeStorage$ItemSubmit"
+    ]
+  },
+  {
+    "mixin": "ItemFeatureRendererMixin",
+    "targets": [
+      "net.minecraft.client.renderer.feature.ItemFeatureRenderer"
+    ]
+  },
+  {
+    "mixin": "ItemLayerSubmitMixin",
+    "targets": [
+      "net.minecraft.client.renderer.item.ItemStackRenderState$LayerRenderState"
+    ]
+  },
+  {
+    "mixin": "ModelPartCubesMixin",
+    "targets": [
+      "net.minecraft.client.model.geom.ModelPart"
+    ]
+  },
+  {
+    "mixin": "PlayerRootTransformMixin",
+    "targets": [
+      "net.minecraft.client.renderer.entity.LivingEntityRenderer"
+    ]
+  },
+  {
+    "mixin": "SpecialModelWrapperAccessor",
+    "targets": [
+      "net.minecraft.client.renderer.item.SpecialModelWrapper"
+    ]
+  },
+  {
+    "mixin": "SpecialModelWrapperRenderStateExtractor",
+    "targets": [
+      "net.minecraft.client.renderer.item.SpecialModelWrapper"
+    ]
+  },
+  {
+    "mixin": "LivingEntityRendererAccessor",
+    "targets": [
+      "net.minecraft.client.renderer.entity.LivingEntityRenderer"
+    ]
+  },
+  {
+    "mixin": "LivingAttachmentRenderStateMixin",
+    "targets": [
+      "net.minecraft.client.renderer.entity.state.LivingEntityRenderState"
+    ]
+  },
+  {
+    "mixin": "EntityPartialTickRenderStateMixin",
+    "targets": [
+      "net.minecraft.client.renderer.entity.state.EntityRenderState"
+    ]
+  },
+  {
+    "mixin": "EntityRendererExtractionMixin",
+    "targets": [
+      "net.minecraft.client.renderer.entity.EntityRenderer"
+    ]
+  },
+  {
+    "mixin": "WorldEntityRenderStateMixin",
+    "targets": [
+      "net.minecraft.client.renderer.entity.state.EntityRenderState"
+    ]
+  },
+  {
+    "mixin": "SpriteContentsAccessor",
+    "targets": [
+      "net.minecraft.client.renderer.texture.SpriteContents"
+    ]
+  },
+  {
+    "mixin": "CameraAccessor",
+    "targets": [
+      "net.minecraft.client.Camera"
+    ]
+  },
+  {
+    "mixin": "ProjectionMatrixBufferMixin",
+    "targets": [
+      "net.minecraft.client.renderer.ProjectionMatrixBuffer"
+    ]
+  },
+  {
+    "mixin": "ResourceReloadMixin",
+    "targets": [
+      "net.minecraft.server.packs.resources.ReloadableResourceManager"
+    ]
+  },
+  {
+    "mixin": "WeatherEffectRendererMixin",
+    "targets": [
+      "net.minecraft.client.renderer.WeatherEffectRenderer"
+    ]
+  }
+]

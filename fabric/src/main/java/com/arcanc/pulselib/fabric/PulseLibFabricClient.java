@@ -10,6 +10,8 @@
 package com.arcanc.pulselib.fabric;
 
 import com.arcanc.pulselib.content.event.PulseRuntime;
+import com.arcanc.pulselib.content.animatable.PLibAnimationTicker;
+import com.arcanc.pulselib.content.animatable.instance.InstanceAnimationManager;
 import com.arcanc.pulselib.content.model.textures.atlas.PLibSpriteMetadata;
 import com.arcanc.pulselib.content.model.textures.atlas.RuntimeLoader;
 import com.arcanc.pulselib.plugin.PulsePluginManager;
@@ -19,6 +21,9 @@ import com.arcanc.pulselib.util.PResourceCache;
 import com.arcanc.pulselib.util.attachments.PAttachmentAnchorResolvers;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.AtlasRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.SpriteSourceRegistry;
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
@@ -46,6 +51,10 @@ public final class PulseLibFabricClient implements ClientModInitializer
 		resources.registerReloadListener(PLibDatabase.RELOAD_LISTENER_ID, PModelCache::reload);
 		resources.addListenerOrdering(ResourceReloaderKeys.Client.MODELS, PLibDatabase.RELOAD_LISTENER_ID);
 		resources.addListenerOrdering(ResourceReloaderKeys.Client.ATLAS, PLibDatabase.RELOAD_LISTENER_ID);
+		ClientTickEvents.START_LEVEL_TICK.register(PLibAnimationTicker::clientTick);
+		ClientTickEvents.END_CLIENT_TICK.register(client -> PLibAnimationTicker.afterClientTick());
+		ClientEntityEvents.ENTITY_UNLOAD.register((entity, level) -> InstanceAnimationManager.removeManager(entity));
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(PulseRuntime::disconnected));
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> PulseRuntime.disconnected());
 	}
 }

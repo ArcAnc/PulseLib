@@ -27,7 +27,7 @@
   },
   "mixins": [
     {
-      "config": "pulselib.fabric.lifecycle.mixins.json",
+      "config": "pulselib.mixins.json",
       "environment": "client"
     }
   ]
