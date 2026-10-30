@@ -42,6 +42,11 @@ public final class ClientProbe implements ClientModInitializer
 	@Override
 	public void onInitializeClient()
 	{
+		if (Boolean.getBoolean("pulselib.fabricAtlasProbe"))
+		{
+			AtlasProbe.register();
+			return;
+		}
 		ClientTickEvents.END_CLIENT_TICK.register(ClientProbe::tick);
 		ClientLifecycleEvents.CLIENT_STOPPING.register(minecraft ->
 		{

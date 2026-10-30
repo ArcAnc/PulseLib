@@ -10,15 +10,23 @@
 package com.arcanc.pulselib.fabric;
 
 import com.arcanc.pulselib.content.event.PulseRuntime;
+import com.arcanc.pulselib.content.model.textures.atlas.PLibSpriteMetadata;
+import com.arcanc.pulselib.content.model.textures.atlas.RuntimeLoader;
 import com.arcanc.pulselib.plugin.PulsePluginManager;
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.arcanc.pulselib.util.PModelCache;
+import com.arcanc.pulselib.util.PResourceCache;
 import com.arcanc.pulselib.util.attachments.PAttachmentAnchorResolvers;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.AtlasRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.SpriteSourceRegistry;
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.fabricmc.fabric.api.resource.v1.reloader.ResourceReloaderKeys;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.client.resources.model.sprite.AtlasManager;
+
+import java.util.Set;
 
 /** Fabric client registration and shared model-reload lifecycle on the 26.1 foundation. */
 public final class PulseLibFabricClient implements ClientModInitializer
@@ -31,6 +39,9 @@ public final class PulseLibFabricClient implements ClientModInitializer
 	{
 		PAttachmentAnchorResolvers.init();
 		PulsePluginManager.get().registerClient();
+		SpriteSourceRegistry.register(PLibDatabase.rl("runtime_loader"), RuntimeLoader.CODEC);
+		AtlasRegistry.register(new AtlasManager.AtlasConfig(PResourceCache.ATLAS_LOCATION,
+				PResourceCache.ATLAS_FILE_LOCATION, false, Set.of(PLibSpriteMetadata.TYPE)));
 		ResourceLoader resources = ResourceLoader.get(PackType.CLIENT_RESOURCES);
 		resources.registerReloadListener(PLibDatabase.RELOAD_LISTENER_ID, PModelCache::reload);
 		resources.addListenerOrdering(ResourceReloaderKeys.Client.MODELS, PLibDatabase.RELOAD_LISTENER_ID);

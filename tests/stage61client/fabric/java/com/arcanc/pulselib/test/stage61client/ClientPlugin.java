@@ -16,7 +16,7 @@ import com.arcanc.pulselib.api.registration.PModelRegistrar;
 import com.arcanc.pulselib.util.PLibDatabase;
 import net.minecraft.resources.Identifier;
 
-/** Real plugin contributes a model with bones but no GPU/atlas geometry. */
+/** External model declarations for the CPU and opt-in textured atlas probes. */
 @PulsePlugin
 public final class ClientPlugin implements IPulseClientPlugin
 {
@@ -38,6 +38,9 @@ public final class ClientPlugin implements IPulseClientPlugin
 	public void registerModels(PModelRegistrar registrar)
 	{
 		ClientProbe.models++;
-		registrar.model(ClientProbe.DATA);
+		if (Boolean.getBoolean("pulselib.fabricAtlasProbe"))
+			AtlasProbe.models(registrar);
+		else
+			registrar.model(ClientProbe.DATA);
 	}
 }

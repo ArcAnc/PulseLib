@@ -451,3 +451,8 @@ Run `:fabric:runServer -PpulseFabricBootstrapProbe` with a separate EULA and ser
 ### Stage 6.1b.1: Fabric client bootstrap and CPU reload
 
 Run `:fabric:runClient -PpulseFabricClientProbe` with `.pulselib-client-lifecycle` in `fabric/build/stage61b1-runs/client`. Require ordered common/client callbacks once each, two declaration collections, a fresh baked one-bone Gecko model after actual resource reload, six public access-widener targets, CLIENT RELOAD PASS, SHUTDOWN PASS and exit 0. The separate `:fabric:runServer -PpulseFabricClientProbe` boundary run uses its own EULA/properties (loopback 127.0.0.1:25578); console stop after Done, require exit 0 and no client classes loaded. This probe covers title-screen CPU model reload; atlas/mesh/world lifecycle and full render Mixins remain 6.1b.2/6.2. See migration journal section 53.
+
+
+### Stage 6.1b.2a: Fabric native atlas and textured reload
+
+Run `:fabric:runClient -PpulseFabricAtlasProbe -PpulseVerificationDir=stage61b2a-runs` with `.pulselib-atlas` in its disposable client directory. Require ATLAS PASS / SHUTDOWN PASS and exit 0: 12 Gecko/glTF models, 24 mesh observations, 648 UV comparisons, 48 GPU atlas pixels across startup/reload, metadata overrides/AUTO classification, fresh models/sprites and closed old GPU texture. Native sprite padding and solidify of zero-alpha RGB are accounted for; no Pulse geometry draw is claimed. The server boundary run uses the same properties, its own EULA/config (loopback 127.0.0.1:25579), console stop after Done and exit 0. Fixture remains outside release JARs; remaining world/Mixin work is 6.1b.2b. See migration journal section 54.

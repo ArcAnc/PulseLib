@@ -1,0 +1,6 @@
+{
+  "pulselib": {
+    "emissive": true,
+    "alpha_mode": "opaque"
+  }
+}
