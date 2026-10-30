@@ -365,3 +365,22 @@ Ignoring policy in the executor fails that assertion. Original player-depth and
 44-pixel GUI/offscreen regressions pass. See migration journal §46 and
 [explicit transparency evidence](../docs/porting/evidence/explicit-transparency-mode.json).
 The next migration checkpoint remains **5.2b.4c.2**.
+
+
+Stage **5.2b.4c.2a** adds `-PpulseFirstPersonArmorProbe`, alongside
+`-PpulseStage1Smoke -PpulseStage2Probe`, in fresh `stage52b4c2a-runs` server/client
+directories. Server world must be `player-occlusion-smoke`; client marker is
+`.pulselib-first-person-armor`. Start the client after server Done.
+
+The native suite uses two real Gecko/glTF owner rigs, 0/10 ticks, both arms,
+bare/global/item armor, opaque/ordinary alpha and front/behind controls in
+Fast/Fancy/Fabulous before/after reload. **216 states / 9072 comparisons**,
+**1728 green / 1944 motion-depth witnesses**; raw coords/projection/model-view/
+depth-range and three readback boundaries are retained. Hands must be visible
+(`hideGui=false`); held hands are empty and item variants equip a real chestplate.
+Persistent native armor joins the existing FIRST_PERSON queue with explicit
+ORDINARY policy, after native hand depth; direct GUI callback behavior is retained.
+An initial-HEAD layer projection reproduces the missing front-alpha pixel.
+No additional render types/pipelines are introduced. See journal §47 and
+[evidence](../docs/porting/evidence/stage-5.2b.4c.2a.json).
+Animated-owner water/glass/particles/weather remains **5.2b.4c.2b**.

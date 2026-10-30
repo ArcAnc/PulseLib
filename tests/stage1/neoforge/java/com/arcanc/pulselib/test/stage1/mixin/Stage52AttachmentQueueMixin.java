@@ -14,6 +14,7 @@ import com.arcanc.pulselib.content.model.baked.PBakedMesh;
 import com.arcanc.pulselib.content.model.deformer.PMeshDeformation;
 import com.arcanc.pulselib.content.renderer.plan.PTransparencyMode;
 import com.arcanc.pulselib.test.stage1.Stage52LegacyOcclusionProbe;
+import com.arcanc.pulselib.test.stage1.Stage52FirstPersonArmorProbe;
 import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
 import com.arcanc.pulselib.content.renderer.plan.PInstanceHeader;
 import com.arcanc.pulselib.test.stage1.Stage52AttachmentProbe;
@@ -52,6 +53,8 @@ public abstract class Stage52AttachmentQueueMixin
 	{
 		if (Boolean.getBoolean("pulselib.stage52b4cProbe"))
 			Stage52LegacyOcclusionProbe.submitted(type, transparency);
+		if (Boolean.getBoolean("pulselib.firstPersonArmorProbe"))
+			Stage52FirstPersonArmorProbe.submitted(type, transparency);
 	}
 
 	@WrapMethod(method = "flush(Lcom/arcanc/pulselib/content/renderer/PRenderQueue$RenderStage;Lcom/mojang/blaze3d/pipeline/RenderTarget;)V")
@@ -61,6 +64,8 @@ public abstract class Stage52AttachmentQueueMixin
 		try
 		{
 			original.call(stage, depth);
+			if (Boolean.getBoolean("pulselib.firstPersonArmorProbe") && stage == PRenderQueue.RenderStage.FIRST_PERSON)
+				Stage52FirstPersonArmorProbe.afterFlush();
 		}
 		finally
 		{

@@ -1,0 +1,137 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "PulseLib native first-person armor fixture"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "root",
+      "children": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "name": "camera"
+    },
+    {
+      "name": "right_arm",
+      "translation": [
+        0.35,
+        -0.1,
+        -1.2
+      ],
+      "rotation": [
+        0,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "name": "left_arm",
+      "translation": [
+        -0.35,
+        -0.1,
+        -1.2
+      ],
+      "rotation": [
+        0,
+        0,
+        1,
+        0
+      ]
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 56,
+      "uri": "data:application/octet-stream;base64,AAAAAAAAgD8zM7M+zczMvZqZmb8zM7M+zczMvc3MzL8zM7O+zczMvZqZmb8zM7O+zczMvc3MzL8="
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 8
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 8,
+      "byteLength": 24
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 32,
+      "byteLength": 24
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 2,
+      "type": "SCALAR",
+      "min": [
+        0
+      ],
+      "max": [
+        1
+      ]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 2,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 2,
+      "type": "VEC3"
+    }
+  ],
+  "animations": [
+    {
+      "name": "depth",
+      "samplers": [
+        {
+          "input": 0,
+          "output": 1,
+          "interpolation": "LINEAR"
+        },
+        {
+          "input": 0,
+          "output": 2,
+          "interpolation": "LINEAR"
+        }
+      ],
+      "channels": [
+        {
+          "sampler": 0,
+          "target": {
+            "node": 2,
+            "path": "translation"
+          }
+        },
+        {
+          "sampler": 1,
+          "target": {
+            "node": 3,
+            "path": "translation"
+          }
+        }
+      ]
+    }
+  ]
+}

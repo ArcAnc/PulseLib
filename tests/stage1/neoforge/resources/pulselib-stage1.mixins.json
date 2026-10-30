@@ -19,7 +19,8 @@
     "Stage52ArmorBuffersMixin",
     "Stage52ArmorGpuMixin",
     "Stage52PartBuffersMixin",
-    "Stage52ItemBuffersMixin"
+    "Stage52ItemBuffersMixin",
+    "Stage52FirstPersonArmorMixin"
   ],
   "injectors": {
     "defaultRequire": 1

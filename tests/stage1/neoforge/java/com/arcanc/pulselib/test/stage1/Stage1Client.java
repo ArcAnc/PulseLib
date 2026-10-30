@@ -64,6 +64,8 @@ public final class Stage1Client implements IPulseClientPlugin
 
 	public static void register(IEventBus bus)
 	{
+		if (Boolean.getBoolean("pulselib.firstPersonArmorProbe"))
+			Stage52FirstPersonArmorProbe.register();
 		if (Boolean.getBoolean("pulselib.stage52b4bProbe"))
 			Stage52AnimatedOcclusionProbe.register(bus);
 		if (Boolean.getBoolean("pulselib.stage52b4aProbe"))
@@ -159,6 +161,8 @@ public final class Stage1Client implements IPulseClientPlugin
 	public void registerModels(PModelRegistrar event)
 	{
 		Stage2PluginProbe.models++;
+		if (Boolean.getBoolean("pulselib.firstPersonArmorProbe"))
+			Stage52FirstPersonArmorProbe.registerModels(event);
 		if (Boolean.getBoolean("pulselib.stage52b4cProbe"))
 			Stage52LegacyOcclusionProbe.registerModels(event);
 		if (Boolean.getBoolean("pulselib.stage52b4bProbe"))
@@ -198,6 +202,8 @@ public final class Stage1Client implements IPulseClientPlugin
 	public void registerAttachments(PAttachmentRegistrar registrar)
 	{
 		Stage2PluginProbe.attachments++;
+		if (Boolean.getBoolean("pulselib.firstPersonArmorProbe"))
+			Stage52FirstPersonArmorProbe.registerAttachments(registrar);
 		if (Boolean.getBoolean("pulselib.stage52b4cProbe"))
 			Stage52LegacyOcclusionProbe.registerAttachments(registrar);
 	}
@@ -206,6 +212,8 @@ public final class Stage1Client implements IPulseClientPlugin
 	public void registerPlayerAnimations(PPlayerAnimationRegistrar registrar)
 	{
 		Stage2PluginProbe.playerAnimations++;
+		if (Boolean.getBoolean("pulselib.firstPersonArmorProbe"))
+			Stage52FirstPersonArmorProbe.registerAnimations(registrar);
 		if (Boolean.getBoolean("pulselib.stage52b4cProbe"))
 			Stage52LegacyOcclusionProbe.registerAnimations(registrar);
 		if (Boolean.getBoolean("pulselib.stage52b4bProbe"))
@@ -230,6 +238,11 @@ public final class Stage1Client implements IPulseClientPlugin
 	private static void tick(ClientTickEvent.Post event)
 	{
 		Minecraft minecraft = Minecraft.getInstance();
+		if (Boolean.getBoolean("pulselib.firstPersonArmorProbe"))
+		{
+			Stage52FirstPersonArmorProbe.tick();
+			return;
+		}
 		if (Boolean.getBoolean("pulselib.playerOcclusionProbe"))
 		{
 			Stage52PlayerOcclusionProbe.tick();

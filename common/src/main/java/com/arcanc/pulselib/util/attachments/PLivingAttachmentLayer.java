@@ -21,6 +21,7 @@ import com.arcanc.pulselib.content.model.baked.PMeshRenderContext;
 import com.arcanc.pulselib.content.model.baked.PMeshRenderMaterial;
 import com.arcanc.pulselib.content.model.baked.PMeshRenderResolver;
 import com.arcanc.pulselib.content.renderer.PRenderQueue;
+import com.arcanc.pulselib.content.renderer.PRenderContexts;
 import com.arcanc.pulselib.content.renderer.plan.PTransparencyMode;
 import com.arcanc.pulselib.content.renderer.base.PLivingAttachmentRenderState;
 import com.arcanc.pulselib.util.PRenderTypes;
@@ -162,7 +163,8 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 
 			for (RenderEntry entry : extractRenderEntries(entity, partialTick))
 				renderDefinition(poseStack, light, partialTick, entry,
-						binding -> binding.anchor().equals(targetAnchor) ? anchorPart : null, modelRoot, false);
+						binding -> binding.anchor().equals(targetAnchor) ? anchorPart : null, modelRoot,
+							PRenderContexts.current() == PRenderContexts.Context.FIRST_PERSON);
 		}
 	}
 

@@ -1,0 +1,39 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "depth": {
+      "loop": true,
+      "animation_length": 1,
+      "bones": {
+        "right_arm": {
+          "position": {
+            "0": [
+              0,
+              0,
+              0
+            ],
+            "1": [
+              0,
+              0,
+              -6.4
+            ]
+          }
+        },
+        "left_arm": {
+          "position": {
+            "0": [
+              0,
+              0,
+              0
+            ],
+            "1": [
+              0,
+              0,
+              -6.4
+            ]
+          }
+        }
+      }
+    }
+  }
+}
