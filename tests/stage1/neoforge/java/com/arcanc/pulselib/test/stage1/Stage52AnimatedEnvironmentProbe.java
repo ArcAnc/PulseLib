@@ -85,11 +85,12 @@ import java.util.concurrent.TimeUnit;
 /** Independent clear/terrain controls for animated native armor and explicit ordinary/OIT sockets. */
 public final class Stage52AnimatedEnvironmentProbe
 {
-	private static final int PLAYER = 0x526b01;
-	private static final List<PModelData> RIGS = List.of(
+	private static final boolean EFFECTS = Boolean.getBoolean("pulselib.animatedEffectsProbe");
+	static final int PLAYER = 0x526b01;
+	static final List<PModelData> RIGS = List.of(
 			PModelData.direct(PLibDatabase.rl("player/regression/depth_motion"), PGeckoModelLoader.INSTANCE.id()),
 			PModelData.direct(PLibDatabase.rl("player/regression/depth_motion_gltf"), PGltfModelLoader.INSTANCE.id()));
-	private static final List<Identifier> IDS = List.of(PLibDatabase.rl("stage52b4c2b1/gecko"), PLibDatabase.rl("stage52b4c2b1/gltf"));
+	static final List<Identifier> IDS = List.of(PLibDatabase.rl("stage52b4c2b1/gecko"), PLibDatabase.rl("stage52b4c2b1/gltf"));
 	private static final PPlayerAnimationAnchor ANCHOR = new PPlayerAnimationAnchor(PLibDatabase.rl("stage52b4c2b1/body"));
 	private static final String[] KINDS = {"native-armor", "custom-armor", "anchor-opaque", "anchor-ordinary", "anchor-oit"};
 	private static final String[] STATES = {"clear-background", "clear-front", "terrain-background", "terrain-front", "clear-background-behind", "clear-behind", "terrain-background-behind", "terrain-behind"};
@@ -136,12 +137,19 @@ public final class Stage52AnimatedEnvironmentProbe
 			@Override
 			public Model<?> getGenericArmorModel(ItemStack stack, EquipmentClientInfo.LayerType type, Model original)
 			{
-				if (!started || completed || kind() != 1)
+				if (!active() || kind() != 1)
 					return original;
 				selections++;
+				if (EFFECTS)
+					Stage52AnimatedEffectsProbe.selectedArmor();
 				return CUSTOM.computeIfAbsent(original, ignored -> Stage52ArmorOcclusionProbe.custom());
 			}
 		}, Items.DIAMOND_CHESTPLATE));
+		if (EFFECTS)
+		{
+			Stage52AnimatedEffectsProbe.register();
+			return;
+		}
 		NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, Stage52AnimatedEnvironmentProbe::early);
 		NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, Stage52AnimatedEnvironmentProbe::nativeLayers);
 		NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, Stage52AnimatedEnvironmentProbe::finish);
@@ -166,7 +174,7 @@ public final class Stage52AnimatedEnvironmentProbe
 		{
 			int selected = format;
 			registrar.register(IDS.get(format), PPlayerAnimationDefinition.builder(RIGS.get(format)).
-					when(player -> started && !completed && player.getId() == PLAYER && format() == selected).
+					when(player -> active() && player.getId() == PLAYER && format() == selected).
 					bind(PPlayerPart.BODY, "body").anchor(ANCHOR, "body").meshAttachment("no_automatic_mesh").
 					crossfade(0, PPoseEasing.LINEAR, PTransitionInterruptionPolicy.FROM_CURRENT).
 					controllers(controllers -> controllers.add("depth", () -> value -> value.controller().getState())).build());
@@ -186,7 +194,7 @@ public final class Stage52AnimatedEnvironmentProbe
 			@Override
 			public void render(PPlayerAnimatedAttachmentContext context)
 			{
-				if (!started || completed || kind() < 2)
+				if (!active() || kind() < 2)
 					return;
 				check(!context.firstPerson() && context.player().getId() == PLAYER && context.animation().equals(IDS.get(format())), "Active third-person owner submits its socket");
 				var poses = context.poseStack();
@@ -202,10 +210,15 @@ public final class Stage52AnimatedEnvironmentProbe
 					var material = PMeshRenderMaterial.resolve(mesh, inputs);
 					var type = material.resolveRenderType(inputs, PResourceCache.ATLAS_LOCATION);
 					check(PRenderTypes.isTransparent(type) == (kind() >= 3) && PRenderTypes.usesOit(type) == (kind() >= 3), "Same canonical material type supports the explicit policy");
+					if (EFFECTS)
+						Stage52AnimatedEffectsProbe.anchor(new Matrix4f(poses.last().pose()));
 					PRenderQueue.submitEntityMesh(type, material.mesh(), null,
 							new PRenderQueue.InstanceData(new Matrix4f(poses.last().pose()), inputs.color(), material.packedLight(), inputs.packedOverlay()),
 							kind() == 4 ? PTransparencyMode.OIT : PTransparencyMode.ORDINARY);
-					CALLBACKS[phase][group]++;
+					if (EFFECTS)
+						Stage52AnimatedEffectsProbe.submitted();
+					else
+						CALLBACKS[phase][group]++;
 				}
 				finally
 				{
@@ -215,13 +228,27 @@ public final class Stage52AnimatedEnvironmentProbe
 		});
 	}
 
+	private static boolean active()
+	{
+		return EFFECTS ? Stage52AnimatedEffectsProbe.active() : started && !completed;
+	}
+
+	static void clearCustomModels()
+	{
+		CUSTOM.clear();
+	}
+
 	private static int format()
 	{
+		if (EFFECTS)
+			return Stage52AnimatedEffectsProbe.format();
 		return group / 20;
 	}
 
 	private static int kind()
 	{
+		if (EFFECTS)
+			return Stage52AnimatedEffectsProbe.kind();
 		return group % 20 / 4;
 	}
 
@@ -318,7 +345,7 @@ public final class Stage52AnimatedEnvironmentProbe
 		place(owner, state % 2 == 0 ? x - 2 : x, state >= 4 ? 5 : 0, 180);
 	}
 
-	private static void place(Entity entity, double x, double z, float yaw)
+	static void place(Entity entity, double x, double z, float yaw)
 	{
 		entity.setPos(x, 80, z);
 		entity.xo = entity.xOld = x;
@@ -471,7 +498,7 @@ public final class Stage52AnimatedEnvironmentProbe
 		check(condition, message + " phase=" + phase + " group=" + group + " sample=" + sample + " expected=" + java.util.Arrays.toString(expected) + " actual=" + java.util.Arrays.toString(actual));
 	}
 
-	private static float rgb(float[] first, float[] second)
+	static float rgb(float[] first, float[] second)
 	{
 		return Math.max(Math.abs(first[0] - second[0]), Math.max(Math.abs(first[1] - second[1]), Math.abs(first[2] - second[2])));
 	}
@@ -490,7 +517,7 @@ public final class Stage52AnimatedEnvironmentProbe
 		return values;
 	}
 
-	private static float[] pixel(RenderTarget target, int x, int y)
+	static float[] pixel(RenderTarget target, int x, int y)
 	{
 		int previous = GL11.glGetInteger(GL30.GL_READ_FRAMEBUFFER_BINDING);
 		int fbo = GL30.glGenFramebuffers();

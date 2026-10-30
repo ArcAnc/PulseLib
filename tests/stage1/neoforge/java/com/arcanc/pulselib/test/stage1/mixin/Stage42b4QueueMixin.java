@@ -10,6 +10,7 @@
 package com.arcanc.pulselib.test.stage1.mixin;
 
 import com.arcanc.pulselib.test.stage1.Stage42b4TranslucentProbe;
+import com.arcanc.pulselib.test.stage1.Stage52AnimatedEffectsProbe;
 import com.arcanc.pulselib.test.stage1.Stage42cLifecycleProbe;
 import com.arcanc.pulselib.test.stage1.Stage43cItemProbe;
 
@@ -29,6 +30,8 @@ public abstract class Stage42b4QueueMixin
 	@Inject(method = "compositeFabulousTranslucency", at = @At("HEAD"))
 	private static void pulselib$checkNativeResolve(RenderTarget destination, List<RenderTarget> targets, CallbackInfo callback)
 	{
+		if (Boolean.getBoolean("pulselib.animatedEffectsProbe"))
+			Stage52AnimatedEffectsProbe.beforeComposite(destination);
 		if (Boolean.getBoolean("pulselib.stage42b4Probe"))
 			Stage42b4TranslucentProbe.beforeComposite(destination);
 		if (Boolean.getBoolean("pulselib.stage43cProbe"))

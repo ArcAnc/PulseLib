@@ -407,3 +407,27 @@ The opt-in probe/scene are excluded from release JARs. Water results include
 its glass enclosure. Rig formats are compared using an existing Gecko socket
 mesh; arbitrary mesh-controller clips and held-item/map combinations are not
 covered. Animated particles/weather remain **5.2b.4c.2b.2**.
+
+
+Animated native particle/rain pixels (**5.2b.4c.2b.2**): use
+`-PpulseStage1Smoke -PpulseAnimatedEffectsProbe -PpulseStage2Probe` with
+`-PpulseVerificationDir=stage52b4c2b2-runs`. Create a fresh flat server world
+named `animated-effects-smoke`, loopback port 25576; put
+`.pulselib-animated-effects` in its separate client directory. Start
+`:neoforge:runServer`, then `:neoforge:runClient` after server Done.
+
+The opt-in scene disables mob spawning/day progression, uses peaceful,
+clears non-player entities and confines native rain to front/behind columns
+with real roofs. Native SOUL particles use the normal provider. The probe
+reuses the previous Gecko/glTF rigs, native/custom armor and registered
+opaque/explicit ordinary/OIT sockets. Six controls, nine samples and six
+mode/reload phases produce **1440 states / 38880 RGB-depth comparisons**,
+1080 motion and 1080 format witnesses, and 1296 green pixels. Same-frame
+main/native targets and the actual callback transform provide the reference;
+behind fragments may be hidden during composition instead of early clipping.
+`animated-effects-results.json` must report PASS; client exit 0 and
+`ANIMATED EFFECTS SHUTDOWN PASS` are mandatory. Stop the server normally.
+Helpers remain outside release JARs. This compares owner rig formats using
+an existing static Gecko socket mesh; arbitrary legacy mesh clips and
+first-person held-item/map combinations remain outside this checkpoint.
+Next: **5.2b.5a — M-P2 server root-extraction isolation**.

@@ -64,7 +64,7 @@ public final class Stage1Client implements IPulseClientPlugin
 
 	public static void register(IEventBus bus)
 	{
-		if (Boolean.getBoolean("pulselib.animatedEnvironmentProbe"))
+		if (Boolean.getBoolean("pulselib.animatedEnvironmentProbe") || Boolean.getBoolean("pulselib.animatedEffectsProbe"))
 			Stage52AnimatedEnvironmentProbe.register(bus);
 		if (Boolean.getBoolean("pulselib.firstPersonArmorProbe"))
 			Stage52FirstPersonArmorProbe.register();
@@ -163,7 +163,7 @@ public final class Stage1Client implements IPulseClientPlugin
 	public void registerModels(PModelRegistrar event)
 	{
 		Stage2PluginProbe.models++;
-		if (Boolean.getBoolean("pulselib.animatedEnvironmentProbe"))
+		if (Boolean.getBoolean("pulselib.animatedEnvironmentProbe") || Boolean.getBoolean("pulselib.animatedEffectsProbe"))
 			Stage52AnimatedEnvironmentProbe.registerModels(event);
 		if (Boolean.getBoolean("pulselib.firstPersonArmorProbe"))
 			Stage52FirstPersonArmorProbe.registerModels(event);
@@ -216,7 +216,7 @@ public final class Stage1Client implements IPulseClientPlugin
 	public void registerPlayerAnimations(PPlayerAnimationRegistrar registrar)
 	{
 		Stage2PluginProbe.playerAnimations++;
-		if (Boolean.getBoolean("pulselib.animatedEnvironmentProbe"))
+		if (Boolean.getBoolean("pulselib.animatedEnvironmentProbe") || Boolean.getBoolean("pulselib.animatedEffectsProbe"))
 			Stage52AnimatedEnvironmentProbe.registerAnimations(registrar);
 		if (Boolean.getBoolean("pulselib.firstPersonArmorProbe"))
 			Stage52FirstPersonArmorProbe.registerAnimations(registrar);
@@ -234,7 +234,7 @@ public final class Stage1Client implements IPulseClientPlugin
 	public void registerAnimatedAttachments(PAnimatedAttachmentRegistrar registrar)
 	{
 		Stage2PluginProbe.animatedAttachments++;
-		if (Boolean.getBoolean("pulselib.animatedEnvironmentProbe"))
+		if (Boolean.getBoolean("pulselib.animatedEnvironmentProbe") || Boolean.getBoolean("pulselib.animatedEffectsProbe"))
 			Stage52AnimatedEnvironmentProbe.registerAttachments(registrar);
 		if (Boolean.getBoolean("pulselib.stage52b4bProbe"))
 			Stage52AnimatedOcclusionProbe.registerAttachments(registrar);
@@ -246,7 +246,12 @@ public final class Stage1Client implements IPulseClientPlugin
 	private static void tick(ClientTickEvent.Post event)
 	{
 		Minecraft minecraft = Minecraft.getInstance();
-		if (Boolean.getBoolean("pulselib.animatedEnvironmentProbe"))
+		if (Boolean.getBoolean("pulselib.animatedEffectsProbe"))
+		{
+			Stage52AnimatedEffectsProbe.tick();
+			return;
+		}
+		if (Boolean.getBoolean("pulselib.animatedEnvironmentProbe") || Boolean.getBoolean("pulselib.animatedEffectsProbe"))
 		{
 			Stage52AnimatedEnvironmentProbe.tick();
 			return;
