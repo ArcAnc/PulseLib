@@ -20,6 +20,15 @@
   "entrypoints": {
     "main": [
       "com.arcanc.pulselib.fabric.PulseLibFabric"
+    ],
+    "client": [
+      "com.arcanc.pulselib.fabric.PulseLibFabricClient"
     ]
-  }
+  },
+  "mixins": [
+    {
+      "config": "pulselib.fabric.lifecycle.mixins.json",
+      "environment": "client"
+    }
+  ]
 }

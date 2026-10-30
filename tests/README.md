@@ -446,3 +446,8 @@ Run `:neoforge:runServer` and then `:neoforge:runClient` with `-PpulseStage1Smok
 ### Stage 6.1a: Fabric dedicated-server bootstrap
 
 Run `:fabric:runServer -PpulseFabricBootstrapProbe` with a separate EULA and server configuration in `fabric/build/stage61a-runs/server` (loopback 127.0.0.1:25577). The external `pulselib_stage61` source-set mod supplies BOTH/SERVER/CLIENT candidates; require exactly two loaded plugins, exactly-once registration, actual channel presence, BOOTSTRAP PASS, SHUTDOWN PASS and exit 0. The probe shuts the server down normally. Check classloading.log for absence of Minecraft client/Blaze3D/ClientPoisonPlugin classes. It is excluded from release JARs. Client lifecycle/reload/Mixins and GPU parity remain 6.1b/6.2; see migration journal section 52.
+
+
+### Stage 6.1b.1: Fabric client bootstrap and CPU reload
+
+Run `:fabric:runClient -PpulseFabricClientProbe` with `.pulselib-client-lifecycle` in `fabric/build/stage61b1-runs/client`. Require ordered common/client callbacks once each, two declaration collections, a fresh baked one-bone Gecko model after actual resource reload, six public access-widener targets, CLIENT RELOAD PASS, SHUTDOWN PASS and exit 0. The separate `:fabric:runServer -PpulseFabricClientProbe` boundary run uses its own EULA/properties (loopback 127.0.0.1:25578); console stop after Done, require exit 0 and no client classes loaded. This probe covers title-screen CPU model reload; atlas/mesh/world lifecycle and full render Mixins remain 6.1b.2/6.2. See migration journal section 53.

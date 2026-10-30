@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "com.arcanc.pulselib.content.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "ResourceReloadMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
