@@ -1,0 +1,365 @@
+{
+  "stage": "5.2b.4c.2b.1",
+  "date": "2026-10-30",
+  "branch": "26.1.2-multiloader",
+  "parent": "cc70a2c37648d4731c254cedfdc0b69d21ba7422",
+  "status": "PASS",
+  "scope": "Animated native/custom armor and registered opaque/ordinary/OIT anchors in front of / behind stained glass and contained water; Fast/Fancy/Fabulous before/after resource reload",
+  "nextCheckpoint": "5.2b.4c.2b.2",
+  "sourceRefs": {
+    "26.1": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1",
+    "1.21.1-multiloader": "7ce6f024b307bb821ce543344d3896c8e1fcf26b"
+  },
+  "production": {
+    "changedFiles": 0,
+    "declaredApiChanges": 0,
+    "renderTypeOrPipelineAdditions": 0,
+    "shaderChanges": 0,
+    "transparency": "Explicit PTransparencyMode submission using the same canonical translucent RenderType; no variants",
+    "fullCompiledApiAudit": "stage 7"
+  },
+  "environment": {
+    "minecraft": "26.1.2",
+    "neoforge": "26.1.2.95",
+    "java": "25.0.5.0.3",
+    "gradle": "9.2.1",
+    "gpu": "NVIDIA GeForce GTX 1660 Ti",
+    "driver": "615.78.08",
+    "lwjgl": "3.4.1+2",
+    "resolution": [
+      960,
+      640
+    ]
+  },
+  "matrix": {
+    "customGeometryWitnesses": 864,
+    "customGeometryMinimum": 0.05842499999999973,
+    "status": "PASS",
+    "states": 1920,
+    "pixels": 17280,
+    "groups": 240,
+    "comparisons": 10800,
+    "motion": 2160,
+    "formats": 2160,
+    "green": 2592,
+    "selections": 7084,
+    "maxErrors": {
+      "frontRGB": 0.011764730000000001,
+      "behindRGB": 0.018823517999999984,
+      "nativeRGB": 0.01568626599999995,
+      "frontDistance": 0,
+      "behindDistance": 0,
+      "formatDistance": 0
+    },
+    "minMotion": 0.23423199999999866,
+    "terrainAlpha": {
+      "glass": [
+        0.4,
+        0.4
+      ],
+      "contained-water": [
+        0.7058824,
+        0.90588236
+      ]
+    },
+    "presets": [
+      [
+        0,
+        "FAST",
+        false
+      ],
+      [
+        1,
+        "FANCY",
+        false
+      ],
+      [
+        2,
+        "FABULOUS",
+        true
+      ],
+      [
+        3,
+        "FAST",
+        false
+      ],
+      [
+        4,
+        "FANCY",
+        false
+      ],
+      [
+        5,
+        "FABULOUS",
+        true
+      ]
+    ],
+    "callbackGroups": 144,
+    "raw": {
+      "path": "/tmp/pulselib-stage52b4c2b1-t_xazd_b/accepted-results.json",
+      "sha256": "6a514d93b36610c7ce4cd7026968344667bca1246cad26a4b2c47a2eabe82b43"
+    }
+  },
+  "tolerances": {
+    "frontRGB": 0.025,
+    "behindRGB": 0.035,
+    "nativeRGB": 0.025,
+    "preservedDistance": 0.0005,
+    "formatDistance": 0.002,
+    "motionMinimum": 0.15,
+    "terrainStraddleMinimum": 0.5
+  },
+  "oracle": {
+    "controls": 8,
+    "samples": 9,
+    "groups": 240,
+    "states": [
+      "clear-background",
+      "clear-front",
+      "terrain-background",
+      "terrain-front",
+      "clear-background-behind",
+      "clear-behind",
+      "terrain-background-behind",
+      "terrain-behind"
+    ],
+    "behindFormula": "terrainOnlyRGB + (1 - actualTerrainAlpha) * (ownerOnlyRGB - backgroundRGB)",
+    "nativeFormula": "terrainPremultipliedRGB + (1 - actualTerrainAlpha) * backgroundRGB",
+    "targets": [
+      "main",
+      "translucent terrain",
+      "native item/entity"
+    ],
+    "captures": [
+      "actual projection",
+      "actual model-view",
+      "pixel coordinates",
+      "RGBA",
+      "depth"
+    ],
+    "assetScope": "Two owner rig formats using an existing static Gecko attachment mesh; water includes its glass enclosure"
+  },
+  "nativeExit": {
+    "client": 0,
+    "shutdown": "PASS",
+    "dedicatedServer": 0,
+    "serverClientClassLoads": 0,
+    "serverProbeLoads": 0,
+    "consoleStop": true
+  },
+  "negative": {
+    "status": "EXPECTED FAIL",
+    "mutation": "Suppress only actual submitEntityMesh in temporary helper projection; keep registrations, material resolution and callback counters",
+    "javaExit": 255,
+    "gradleExit": 1,
+    "error": "Real socket geometry emits green pixels",
+    "states": 72,
+    "callbacksAtFirstAnchor": 141,
+    "positivePixel": [
+      0.0,
+      1.0,
+      0.0,
+      1.0,
+      0.9910953
+    ],
+    "negativePixel": [
+      0.5529412,
+      0.37254903,
+      0.043137256,
+      1.0,
+      0.9915975
+    ],
+    "raw": {
+      "path": "/tmp/pulselib-stage52b4c2b1-t_xazd_b/negative-results.json",
+      "sha256": "e074e8f28d0c2b6888f7821ae6548c7fb44e5b63811b1435ce7d6b9a578d7f52"
+    },
+    "normalFixtureFingerprintsRestored": 9,
+    "productionFingerprintsUnchanged": {
+      "common": 576,
+      "fabric": 580,
+      "neoforge": 589
+    }
+  },
+  "junit": {
+    "common": {
+      "tests": 240,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "files": 38
+    },
+    "fabric": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "files": 1
+    },
+    "neoforge": {
+      "tests": 0,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "files": 0
+    }
+  },
+  "jars": {
+    "common": {
+      "path": "common/build/libs/pulselib-26.1.2-common-1.1.5.3.jar",
+      "sha256": "1eb025197b0a78853ec05f8fce8f83369a0947837173e99c985ad4cdbb7a3f80",
+      "classes": 576,
+      "units": 372
+    },
+    "neoforge": {
+      "path": "neoforge/build/libs/pulselib-26.1.2-neoforge-1.1.5.3.jar",
+      "sha256": "13c8670f84615c87dba9dae376c570bb09dd682740e07067d15eb4acbb6f4682",
+      "classes": 589,
+      "units": 384
+    },
+    "fabric": {
+      "path": "fabric/build/libs/pulselib-26.1.2-fabric-1.1.5.3.jar",
+      "sha256": "fe7568630dced2c451fe883f63fec25214ead2c0b25aa6ce6ac1bc60eb4fe784",
+      "classes": 580,
+      "units": 376
+    }
+  },
+  "buildBoundaries": [
+    "service providers PASS",
+    "Common loader-dependency boundary PASS",
+    "fixture exclusion PASS",
+    "release class major 69",
+    "inventory/checksums PASS"
+  ],
+  "sourceHashes": {
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage52AnimatedEnvironmentProbe.java": "073abff78d9c6f06eb42e8d51622f3dbdc012c37b9b4dd53dbf8cf82d771f7e9",
+    "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage52AnimatedEnvironmentScene.java": "2aef69ac33ffc0cc13b7b28f1ac03d0d931f6d1d451c032f7aff3dca2693d7d8",
+    "tests/stage1/neoforge/resources/assets/pulselib/textures/stage42a_white.png": "d5a51b6aed15684ec8c123e30fe5703155359d6543b6d7b47cb5766ef44939de",
+    "tests/stage1/neoforge/resources/assets/pulselib/glmodels/player/regression/depth_motion_gltf.gltf": "809324eb883482aa904fd8c93cf6afdb41c387917aeaf40f019436d796af33bf",
+    "tests/stage1/neoforge/resources/assets/pulselib/geckolib/models/entity/stage42b3_owner.geo.json": "49faf36d43ba9d1bd93d982b7f8bc40048b2511c4bda063ab2a885e5fa465e81",
+    "tests/stage1/neoforge/resources/assets/pulselib/geckolib/models/player/regression/depth_motion.geo.json": "b108d567cf6d69b098bbd3e8fab574a2fc8630cbce281eeabac4e884efdab1a1",
+    "tests/stage1/neoforge/resources/assets/pulselib/geckolib/animations/player/regression/depth_motion.animation.json": "4f6752703657ee45926936998853db5e6384d3d31bb030259e42e2646da3e9a1"
+  },
+  "logs": {
+    "compile-isolated.log": {
+      "path": "/tmp/pulselib-stage52b4c2b1-t_xazd_b/compile-isolated.log",
+      "sha256": "f9bd168dac94cb347d3f3b77bb5440e2ec16d666409d935dadeabac5078b9e1d",
+      "results": [
+        "BUILD SUCCESSFUL in 9s"
+      ]
+    },
+    "client-ready.log": {
+      "path": "/tmp/pulselib-stage52b4c2b1-t_xazd_b/client-ready.log",
+      "sha256": "bf6cb351b8ab4ad7103d3181df4220d59812ddecec97445beb9c1a4955825a3f",
+      "results": [
+        "[12:33:37] [Render thread/INFO] [Pulse Lib/]: STAGE 2 CLIENT PLUGINS PASS: ids=[pulselib:stage1_client, pulselib:stage2_common], common=1, channels=1, events=1, deformers=1, client=1, server=0, models=2",
+        "[12:33:37] [Render thread/INFO] [Pulse Lib/]: ANIMATED ENVIRONMENT SHUTDOWN PASS",
+        "BUILD SUCCESSFUL in 8m"
+      ]
+    },
+    "client-negative.log": {
+      "path": "/tmp/pulselib-stage52b4c2b1-t_xazd_b/client-negative.log",
+      "sha256": "f59f561eb047887d40b986d185d0e63df3194291eb7b254eebbac86b9dad798e",
+      "results": [
+        "java.lang.AssertionError: Real socket geometry emits green pixels",
+        "java.lang.AssertionError: Real socket geometry emits green pixels",
+        "java.lang.AssertionError: Real socket geometry emits green pixels",
+        "BUILD FAILED in 36s"
+      ]
+    },
+    "compile-restored.log": {
+      "path": "/tmp/pulselib-stage52b4c2b1-t_xazd_b/compile-restored.log",
+      "sha256": "519c8c8d8e2e7baa78e5e23c736c44775416a4ca867c0e7f278b9814f64662bc",
+      "results": [
+        "BUILD SUCCESSFUL in 6s"
+      ]
+    },
+    "build.log": {
+      "path": "/tmp/pulselib-stage52b4c2b1-t_xazd_b/build.log",
+      "sha256": "3bba1d7522bb351df9da3a7449c3ce9fff65f03a365451de9ea1b0d785c5adb9",
+      "results": [
+        "STAGE 2 SERVICE PROVIDERS / LEGACY REMOVAL / COMMON BOUNDARY PASS: /mnt/MainDrive/Programs/MC mods/ArcsLib/build/reports/porting/stage-2-build.json",
+        "BUILD SUCCESSFUL in 17s"
+      ]
+    },
+    "server-final.log": {
+      "path": "/tmp/pulselib-stage52b4c2b1-t_xazd_b/server-final.log",
+      "sha256": "f8e7d3031f98d0c72df38f1a61de5c3552c482a03de823351db37f04090d05dd",
+      "results": [
+        "[12:19:04] [Server thread/INFO] [Pulse Lib/]: STAGE 2 SERVER PLUGINS PASS: ids=[pulselib:stage2_common, pulselib:stage2_server], common=1, channels=1, events=1, deformers=1, client=0, server=1, models=0",
+        "BUILD SUCCESSFUL in 16m 4s"
+      ]
+    },
+    "inventory.log": {
+      "path": "/tmp/pulselib-stage52b4c2b1-t_xazd_b/inventory.log",
+      "sha256": "6e73e3a827268129b5bb5216e280ac4f0734f87a1391a6cf2a0b84454ffb015e",
+      "results": []
+    }
+  },
+  "attempts": [
+    {
+      "run": "client-initial.log",
+      "status": "INVALID",
+      "reason": "Early source projection overwritten by Gradle conventions; worktree hand Mixin failed before gameplay. Projection moved to projectsEvaluated and descriptor verified via javap."
+    },
+    {
+      "run": "client-isolated.log",
+      "status": "INCOMPLETE",
+      "reason": "Fixture direct owner lookup before native extraction was ready, before pixel comparison; readiness gate added without weakening pixel assertions."
+    },
+    {
+      "run": "client-debug.log / client-debug-values.log / client-debug-paused.log",
+      "status": "INCOMPLETE",
+      "reason": "IDE getter expression type resolution failed; paused diagnostic caused network timeout. No diagnostic run counted as acceptance."
+    }
+  ],
+  "debugger": {
+    "skill": "ij-debugger",
+    "attached": true,
+    "pausedLocation": "Stage52AnimatedEnvironmentProbe.early:355",
+    "values": {
+      "phase": 0,
+      "group": 0,
+      "state": 0,
+      "cameraX": 12.5,
+      "extractedStates": 1
+    },
+    "stack": [
+      "Stage52AnimatedEnvironmentProbe.early:355",
+      "native LevelRenderer event",
+      "GameRenderer worldInvocation"
+    ],
+    "rootCauseOfEveryMissingExtractionClaimed": false,
+    "temporaryConfigRemoved": true,
+    "agentBreakpointsRemoved": true,
+    "disabledUserBreakpointsPreserved": 2,
+    "activeSessions": 0
+  },
+  "protection": {
+    "directory": "/tmp/pulselib-stage52b4c2b1-t_xazd_b",
+    "initialDirtyPaths": 65,
+    "dirtyJavaInputsProjectedFromHead": 61,
+    "otherDirtyPathsByteIdentical": 63,
+    "overlapUserDeltasPreserved": [
+      "docs/porting/26.1.2-multiloader.md",
+      "tests/README.md"
+    ],
+    "protectedFiles": 189,
+    "sourceRefsUnchanged": true,
+    "sourcesAndJavadocUsedWorktree": true,
+    "push": false
+  },
+  "limits": [
+    "Animated particles/weather remain next checkpoint",
+    "Arbitrary legacy mesh-controller clips",
+    "First-person held-item/map combinations",
+    "Both-format arbitrary attachment mesh parsing not audited here",
+    "M-P2 dedicated server root extraction and real respawn",
+    "Fabric runtime",
+    "Full compiled canonical API / GPU allocation and performance audit"
+  ],
+  "commands": {
+    "server": "./gradlew :neoforge:runServer -PpulseStage1Smoke -PpulseAnimatedEnvironmentProbe -PpulseStage2Probe -PpulseVerificationDir=stage52b4c2b1-runs -I /tmp/pulselib-stage52b4c2b1-t_xazd_b/projection.gradle --offline --no-daemon --console=plain",
+    "client": "./gradlew :neoforge:runClient -PpulseStage1Smoke -PpulseAnimatedEnvironmentProbe -PpulseStage2Probe -PpulseVerificationDir=stage52b4c2b1-runs -I /tmp/pulselib-stage52b4c2b1-t_xazd_b/projection.gradle --offline --no-daemon --console=plain",
+    "build": "./gradlew build stage2Evidence -I /tmp/pulselib-stage52b4c2b1-t_xazd_b/projection.gradle -I docs/porting/tools/stage2-evidence.gradle --offline --no-daemon --console=plain"
+  }
+}

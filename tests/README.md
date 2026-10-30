@@ -384,3 +384,26 @@ An initial-HEAD layer projection reproduces the missing front-alpha pixel.
 No additional render types/pipelines are introduced. See journal §47 and
 [evidence](../docs/porting/evidence/stage-5.2b.4c.2a.json).
 Animated-owner water/glass/particles/weather remains **5.2b.4c.2b**.
+
+
+Animated-owner water/glass pixels (**5.2b.4c.2b.1**): use
+`-PpulseStage1Smoke -PpulseAnimatedEnvironmentProbe -PpulseStage2Probe` with
+`-PpulseVerificationDir=stage52b4c2b1-runs`. Create a fresh flat server world
+named `animated-environment-smoke`, loopback port 25576, and place
+`.pulselib-animated-environment` in the separate client directory. Run
+`:neoforge:runServer`, then `:neoforge:runClient` after server Done.
+
+The real native scene contains stained glass, water inside a glass enclosure,
+and a clear control ray. Canonical Gecko/glTF owner clips move native/custom
+armor and registered opaque/explicit ordinary/OIT socket geometry. The two
+alpha modes use the same existing material render type. No new pipelines are
+registered. Eight independent front/behind controls, nine samples and six
+mode/reload phases produce **1920 states / 10800 RGB-depth comparisons**,
+2160 motion and 2160 format depth witnesses, and 2592 green mesh pixels.
+`animated-environment-results.json` preserves the actual matrices, coordinates,
+and main/terrain/item target RGBA/depth. It must report PASS and the client must
+exit 0 with `ANIMATED ENVIRONMENT SHUTDOWN PASS`; then stop the server normally.
+The opt-in probe/scene are excluded from release JARs. Water results include
+its glass enclosure. Rig formats are compared using an existing Gecko socket
+mesh; arbitrary mesh-controller clips and held-item/map combinations are not
+covered. Animated particles/weather remain **5.2b.4c.2b.2**.
