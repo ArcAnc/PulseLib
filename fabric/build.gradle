@@ -120,3 +120,32 @@ if (providers.gradleProperty('pulseFabricWorldProbe').isPresent() || providers.g
         }
     }
 }
+
+// Native item identity/menu/network/GUI consumers; fixture content never enters release artifacts.
+if (providers.gradleProperty('pulseFabricItemProbe').isPresent()) {
+    sourceSets {
+        stage62Item {
+            java.srcDir rootProject.file('tests/stage62item/fabric/java')
+            resources.srcDir rootProject.file('tests/stage62item/fabric/resources')
+            compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+            runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+        }
+    }
+    loom {
+        mods { pulselib_stage62item { sourceSet sourceSets.stage62Item } }
+        runs {
+            client {
+                source sourceSets.stage62Item
+                programArgs '--quickPlayMultiplayer', '127.0.0.1:25582', '--width', '960', '--height', '640'
+                runDir "build/${providers.gradleProperty('pulseVerificationDir').getOrElse('stage62c2-runs')}/client"
+                vmArg '-Xlog:class+load=info:file=classloading.log'
+            }
+            server {
+                source sourceSets.stage62Item
+                runDir "build/${providers.gradleProperty('pulseVerificationDir').getOrElse('stage62c2-runs')}/server"
+                vmArg '-Xlog:class+load=info:file=classloading.log'
+            }
+        }
+    }
+    tasks.named('runServer') { standardInput = System.in }
+}

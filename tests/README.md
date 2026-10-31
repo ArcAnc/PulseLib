@@ -571,3 +571,31 @@ Done and require exit 0 and absence of client classes in classloading.log.
 Fixture code/assets/config are excluded from release JARs. See journal §58
 and structured evidence. Native ItemStack identity and item/GUI consumers remain
 **6.2c.2**; no world/hand recovery or complete item parity is claimed here.
+
+### Stage 6.2c.2: Fabric native item identity, menu/network and GUI consumers
+
+`-PpulseFabricItemProbe` enables a separate `stage62Item` fixture with a shared registered
+animatable item, a dedicated-server menu and client-only special-model/GUI observers.
+It is excluded from every release JAR. Use new `fabric/build/stage62c2-runs/{server,client}`
+directories, client marker `.pulselib-items`, loopback `127.0.0.1:25582`, and disposable
+flat/creative/peaceful world **fabric-item-consumers**. Never use existing saves.
+
+```bash
+./gradlew :fabric:runServer -PpulseFabricItemProbe --offline --no-daemon --console=plain
+./gradlew :fabric:runClient -PpulseFabricItemProbe --offline --no-daemon --console=plain
+./gradlew build stage2Evidence :fabric:compileStage62ItemJava -PpulseFabricItemProbe -I docs/porting/tools/stage2-evidence.gradle --offline --no-daemon --console=plain
+```
+
+Require all 16 native identity regressions, `STAGE62C2 SERVER MENU PASS`, 8 GUI phase
+markers, `GUI COMPLETE`, `GUI SHUTDOWN PASS`, manager shutdown PASS and exit 0.
+The native menu input transfers eight items; decoded full-content packets carry no
+runtime IDs. Each resource epoch covers atlas/oversized PiP × opaque/alpha, eight
+accepted frames each: **384 regions**, actual named-item native route counters, and
+two atlas item/deferred failure/recovery suites. Pixel thresholds remain those of the
+migrated 4.3b fixture. Native observers exclude unnamed hotbar items. `item-results.json`
+contains actual frame records/counters; stop the server with console `stop` and require
+exit 0. An exit code alone is insufficient (an early native network disconnect was
+rejected despite exit 0). Full reconnect/drop/pickup/GC/H15/world-item matrix remains
+stage 7. For the negative control, remove only the copy injection in a temporary
+`ItemStackMixin` projection and require `Copy before first render must assign and
+inherit identity`, then restore inputs. Details/evidence: migration journal §59.
