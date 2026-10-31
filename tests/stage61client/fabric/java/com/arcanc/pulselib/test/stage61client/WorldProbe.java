@@ -60,6 +60,7 @@ public final class WorldProbe
 	private static int phase;
 	private static int connections;
 	private static int disconnects;
+	private static int disconnectBarriers;
 	private static int unloads;
 	private static int expiries;
 	private static int levelTicks;
@@ -106,7 +107,12 @@ public final class WorldProbe
 			if (entity == owner)
 				unloads++;
 		});
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> disconnects++);
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) ->
+		{
+			disconnects++;
+			// Production cleanup is queued first on this same executor during reentrant disconnects.
+			client.execute(() -> disconnectBarriers++);
+		});
 		ClientTickEvents.START_CLIENT_TICK.register(mc ->
 		{
 			if (mc.level != null && stale != null && !expired && !cache(InstanceAnimationManager.class, "MANAGERS").containsKey(stale.manager))
@@ -131,7 +137,7 @@ public final class WorldProbe
 			throw new AssertionError("STAGE61B2B timeout phase=" + phase);
 		if (phase == 5)
 		{
-			if (mc.level != null || disconnects < connections)
+			if (mc.level != null || disconnects < connections || disconnectBarriers < connections)
 				return;
 			check(empty() && disconnects == connections && PPlayerAnimations.get(ID) != null, "native disconnect clears all caches and retains definitions");
 			if (connections == 2)

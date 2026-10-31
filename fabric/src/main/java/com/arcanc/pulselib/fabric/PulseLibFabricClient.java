@@ -14,6 +14,8 @@ import com.arcanc.pulselib.content.animatable.PLibAnimationTicker;
 import com.arcanc.pulselib.content.animatable.instance.InstanceAnimationManager;
 import com.arcanc.pulselib.content.model.textures.atlas.PLibSpriteMetadata;
 import com.arcanc.pulselib.content.model.textures.atlas.RuntimeLoader;
+import com.arcanc.pulselib.content.renderer.PRenderStagesHandler;
+import com.arcanc.pulselib.util.PRenderTypes;
 import com.arcanc.pulselib.plugin.PulsePluginManager;
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.arcanc.pulselib.util.PModelCache;
@@ -26,8 +28,10 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.AtlasRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.SpriteSourceRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.fabricmc.fabric.api.resource.v1.reloader.ResourceReloaderKeys;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.client.resources.model.sprite.AtlasManager;
 
@@ -42,6 +46,10 @@ public final class PulseLibFabricClient implements ClientModInitializer
 	@Override
 	public void onInitializeClient()
 	{
+		PRenderTypes.register(RenderPipelines::register);
+		LevelRenderEvents.AFTER_SOLID_FEATURES.register(context -> PRenderStagesHandler.afterOpaqueFeatures());
+		LevelRenderEvents.AFTER_TRANSLUCENT_FEATURES.register(context -> PRenderStagesHandler.afterNativeFeatures());
+		LevelRenderEvents.END_MAIN.register(context -> PRenderStagesHandler.afterParticles());
 		PAttachmentAnchorResolvers.init();
 		PulsePluginManager.get().registerClient();
 		SpriteSourceRegistry.register(PLibDatabase.rl("runtime_loader"), RuntimeLoader.CODEC);

@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "com.arcanc.pulselib.test.stage61client.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "StagesObserverMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -10,5 +10,11 @@
   },
   "depends": {
     "pulselib": "*"
-  }
+  },
+  "mixins": [
+    {
+      "config": "pulselib-stage62a.mixins.json",
+      "environment": "client"
+    }
+  ]
 }

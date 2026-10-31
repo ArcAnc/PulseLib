@@ -46,7 +46,9 @@ public final class ClientPlugin implements IPulseClientPlugin
 	public void registerModels(PModelRegistrar registrar)
 	{
 		ClientProbe.models++;
-		if (Boolean.getBoolean("pulselib.fabricAtlasProbe"))
+		if (Boolean.getBoolean("pulselib.fabricStagesProbe"))
+			WorldStageProbe.models(registrar);
+		else if (Boolean.getBoolean("pulselib.fabricAtlasProbe"))
 			AtlasProbe.models(registrar);
 		else
 			registrar.model(ClientProbe.DATA);

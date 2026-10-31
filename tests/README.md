@@ -483,3 +483,33 @@ The Common hand Mixin accepts exactly one of the vanilla five-argument or
 NeoForge six-argument selectors per hand. NeoForge stage 5.2a matrix/GPU hand
 and Fabric atlas fixtures are regression checks. See migration journal §55
 and its structured evidence. Next checkpoint: **6.2 Fabric render hooks/parity**.
+
+### Stage 6.2a: Fabric native pipelines and world stages
+
+Run `:fabric:runServer -PpulseFabricStagesProbe -PpulseVerificationDir=stage62a-runs`,
+then the same `:fabric:runClient` after Done. Use a fresh flat world named
+`fabric-world-lifecycle`, loopback 127.0.0.1:25580, separate accepted EULA,
+offline authentication and creative/peaceful server properties. The existing
+server-only WorldScene enforces creative and disables mob spawning. Put
+`.pulselib-world-stages` in the separate client directory.
+
+Require two EPOCH PASS markers, WORLD PASS, SHUTDOWN PASS and client exit 0:
+19 native registered pipelines, stageCalls=[2,2,2], 40 main-target RGB/depth
+samples / 160 component comparisons before/after actual resource reload.
+The probe checks early opaque depth, retained alpha across terrain, three-source
+back-to-front ordinary blending and a late END_MAIN submission without alpha
+depth writes. It uses the existing translucent material render type with
+explicit ORDINARY policy; no custom render types or pipelines. Test Mixin
+observers only observe shared operations; the probe never flushes the queue.
+`world-stages-results.json` stores expected/actual samples and stage counts.
+
+Removing only the production END_MAIN subscription in a temporary source
+projection must fail `native late stage callback must execute once before END_MAIN observer`.
+Restore normal inputs and use the existing world lifecycle fixture for regression.
+Stop the server with console `stop` and require exit 0 / side-safe classloading.
+The lifecycle regression now waits for a completion sentinel on the same client executor
+after production disconnect cleanup; all original cache/definition guards remain.
+Removing the cleanup subscription still fails those guards.
+Fixtures and observer config are excluded from release JARs. See journal §56
+and structured evidence. OIT/Fabulous targets and GUI/item/armor/player consumers
+remain open; next checkpoint is **6.2b OIT/Fabulous parity**.
