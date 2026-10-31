@@ -15,6 +15,7 @@ import com.arcanc.pulselib.content.animatable.instance.InstanceAnimationManager;
 import com.arcanc.pulselib.content.model.textures.atlas.PLibSpriteMetadata;
 import com.arcanc.pulselib.content.model.textures.atlas.RuntimeLoader;
 import com.arcanc.pulselib.content.renderer.PRenderStagesHandler;
+import com.arcanc.pulselib.content.renderer.PModelGuiRenderer;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.arcanc.pulselib.plugin.PulsePluginManager;
 import com.arcanc.pulselib.util.PLibDatabase;
@@ -28,6 +29,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.AtlasRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.SpriteSourceRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.PictureInPictureRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.fabricmc.fabric.api.resource.v1.reloader.ResourceReloaderKeys;
@@ -47,6 +49,7 @@ public final class PulseLibFabricClient implements ClientModInitializer
 	public void onInitializeClient()
 	{
 		PRenderTypes.register(RenderPipelines::register);
+		PictureInPictureRendererRegistry.register(context -> new PModelGuiRenderer(context.bufferSource()));
 		LevelRenderEvents.AFTER_SOLID_FEATURES.register(context -> PRenderStagesHandler.afterOpaqueFeatures());
 		LevelRenderEvents.AFTER_TRANSLUCENT_FEATURES.register(context -> PRenderStagesHandler.afterNativeFeatures());
 		LevelRenderEvents.END_MAIN.register(context -> PRenderStagesHandler.afterParticles());

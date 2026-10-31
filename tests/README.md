@@ -543,3 +543,31 @@ require exit 0 / side-safe classloading. Fixtures stay out of release JARs.
 This covers queue/target composition, not native GUI/item/armor/player render
 consumers. Item/cloud targets are live/read; positive item/cloud contribution
 is not claimed. See journal §57 and structured evidence. Next: **6.2c GUI/PiP/item**.
+
+### Stage 6.2c.1: Fabric native PiP factory and canonical GUI helper
+
+Run `:fabric:runClient -PpulseFabricGuiProbe -PpulseVerificationDir=stage62c1-runs`
+with `.pulselib-gui` in the separate client directory. No world/server connection
+is required. The external Screen calls canonical PLibHelper.renderModelInGui;
+the registered shared renderer is selected by the actual native Fabric PiP pool.
+Require two HELPER PHASE PASS and FAULT PASS markers, GUI COMPLETE, SHUTDOWN PASS,
+and exit 0: 192 RGB samples + 16 text regions = 208 regions across actual reload.
+Six independent PiP renderer identities must prepare each GUI frame. The matrix
+covers animation, scissor/rotation, mirrored/nonuniform scale, copied inputs,
+alpha/overlay, pending global-queue isolation and vanilla GUI text.
+
+Fault suites cover unloaded model, NaN extraction, actual native draw exception,
+caller state restoration, transparent failed target, following draw recovery,
+texture deletion and pixel-pack state. The probe is adapted from the stage
+4.3b.2 helper regression; original author/date and Gecko asset credits remain.
+`gui-results.json` and screenshots store the actual results. Removing only the
+production factory registration in a temporary projection must fail with zero
+native renderer identities instead of six, even though direct renderer recovery
+still passes. Restore normal inputs and repeat the complete GUI suite.
+
+The separate server boundary uses the same property, its own accepted EULA and
+properties (world `fabric-gui-boundary`, loopback port 25581); stop normally after
+Done and require exit 0 and absence of client classes in classloading.log.
+Fixture code/assets/config are excluded from release JARs. See journal §58
+and structured evidence. Native ItemStack identity and item/GUI consumers remain
+**6.2c.2**; no world/hand recovery or complete item parity is claimed here.

@@ -55,7 +55,7 @@ if (providers.gradleProperty('pulseFabricBootstrapProbe').isPresent()) {
 }
 
 // Client lifecycle probe uses its own mod roots and disposable directories.
-if (providers.gradleProperty('pulseFabricClientProbe').isPresent() || providers.gradleProperty('pulseFabricAtlasProbe').isPresent() || providers.gradleProperty('pulseFabricWorldProbe').isPresent() || providers.gradleProperty('pulseFabricStagesProbe').isPresent() || providers.gradleProperty('pulseFabricTransparencyProbe').isPresent()) {
+if (providers.gradleProperty('pulseFabricClientProbe').isPresent() || providers.gradleProperty('pulseFabricAtlasProbe').isPresent() || providers.gradleProperty('pulseFabricWorldProbe').isPresent() || providers.gradleProperty('pulseFabricStagesProbe').isPresent() || providers.gradleProperty('pulseFabricTransparencyProbe').isPresent() || providers.gradleProperty('pulseFabricGuiProbe').isPresent()) {
     sourceSets {
         stage61Client {
             java.srcDir rootProject.file('tests/stage61client/fabric/java')
@@ -72,6 +72,10 @@ if (providers.gradleProperty('pulseFabricClientProbe').isPresent() || providers.
         runs {
             client {
                 source sourceSets.stage61Client
+                if (providers.gradleProperty('pulseFabricGuiProbe').isPresent()) {
+                    vmArg '-Dpulselib.fabricGuiProbe=true'
+                    programArgs '--width', '960', '--height', '640'
+                }
                 if (providers.gradleProperty('pulseFabricTransparencyProbe').isPresent())
                     vmArg '-Dpulselib.fabricTransparencyProbe=true'
                 if (providers.gradleProperty('pulseFabricStagesProbe').isPresent() && !providers.gradleProperty('pulseFabricTransparencyProbe').isPresent())
