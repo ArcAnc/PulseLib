@@ -24,13 +24,16 @@ public final class WorldScene implements ModInitializer
 	{
 		ServerLifecycleEvents.SERVER_STARTED.register(server ->
 		{
-			if (!server.getWorldData().getLevelName().equals("fabric-world-lifecycle"))
-				throw new IllegalStateException("STAGE61B2B requires its disposable named world");
+			String worldName = Boolean.getBoolean("pulselib.fabricTransparencyProbe") ? "fabric-world-transparency" : "fabric-world-lifecycle";
+			if (!server.getWorldData().getLevelName().equals(worldName))
+				throw new IllegalStateException("Fabric world probe requires its disposable named world");
 			for (String command : new String[] {"difficulty peaceful", "defaultgamemode creative",
 					"gamerule minecraft:spawn_mobs false", "kill @e[type=!minecraft:player]"})
 				server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), command);
 			if (server.getGameRules().get(GameRules.SPAWN_MOBS) || server.getDefaultGameType() != GameType.CREATIVE)
 				throw new AssertionError("STAGE61B2B world isolation failed");
+			if (Boolean.getBoolean("pulselib.fabricTransparencyProbe"))
+				TransparencyScene.prepare(server);
 			PLibDatabase.LOGGER.info("STAGE61B2B WORLD SCENE PASS: peaceful, creative, spawn_mobs=false");
 		});
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> handler.player.setGameMode(GameType.CREATIVE));

@@ -55,6 +55,7 @@ public final class WorldStageProbe
 {
 	private static final Identifier WHITE = PLibDatabase.rl("lifecycle/stage62a_white");
 	private static final PModelData DATA = PModelData.direct(PLibDatabase.rl("lifecycle/atlas_gecko_0"), PGeckoModelLoader.INSTANCE.id());
+	private static final Identifier AFTER = PLibDatabase.rl("stage62a/after");
 	private static final Identifier BEFORE = PLibDatabase.rl("stage62a/before");
 	private static final PRenderQueue.RenderStage[] SOURCES = {PRenderQueue.RenderStage.ENTITIES,
 			PRenderQueue.RenderStage.SOLID_BLOCKS, PRenderQueue.RenderStage.TRANSLUCENT_BLOCKS};
@@ -101,7 +102,8 @@ public final class WorldStageProbe
 			alpha(SOURCES[1], quad(), 3, 0.5f, 0x8000FF00);
 			phase = 5;
 		});
-		LevelRenderEvents.END_MAIN.register(context -> finish());
+		LevelRenderEvents.END_MAIN.addPhaseOrdering(Event.DEFAULT_PHASE, AFTER);
+		LevelRenderEvents.END_MAIN.register(AFTER, context -> finish());
 		ClientTickEvents.END_CLIENT_TICK.register(WorldStageProbe::tick);
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client ->
 		{

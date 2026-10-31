@@ -513,3 +513,33 @@ Removing the cleanup subscription still fails those guards.
 Fixtures and observer config are excluded from release JARs. See journal §56
 and structured evidence. OIT/Fabulous targets and GUI/item/armor/player consumers
 remain open; next checkpoint is **6.2b OIT/Fabulous parity**.
+
+### Stage 6.2b: Fabric OIT and native transparency targets
+
+Run `:fabric:runServer -PpulseFabricTransparencyProbe -PpulseVerificationDir=stage62b-runs`,
+then the same `:fabric:runClient` after server SCENE PASS. Use a fresh flat world
+`fabric-world-transparency`, loopback 127.0.0.1:25580, separate accepted EULA
+and creative/peaceful/offline-auth properties. Put `.pulselib-world-transparency`
+in the separate client directory. The server fixture loads scene chunks,
+builds actual glass/water/lit wall and verifies native block states.
+
+Require all 36 PHASE PASS markers, WORLD PASS, SHUTDOWN PASS and client exit 0:
+2 policies x 3 native graphics presets x 3 effects x 2 resource epochs,
+4 accepted frames x 8 lanes per phase = 1152 final RGB/depth cases. The same
+existing translucent material supports explicit OIT and ORDINARY submissions.
+A real extracted marker requests retained targets through PWorldRenderState;
+no production gate is overridden. Readbacks use explicit event phases after
+production callbacks. The test observer independently checks native postchain
+before production resolve and final ordered-alpha/depth afterward, using actual
+terrain/item/particle/weather/cloud target pixels. Every particle/rain phase
+requires positive coverage; weather fragments require real depth below 1.
+`transparency-results.json` saves coverage and 72 same-frame records.
+
+The test-only JVM flag `pulselib.fabricTransparencyNegative=true` skips only
+the production resolve call site: require Java 255 and `final phase=0 lane=0`
+pixel failure after the native oracle. Restore normal inputs, run the complete
+matrix and existing 6.2a stage/ordinary fixture. Then stop server normally and
+require exit 0 / side-safe classloading. Fixtures stay out of release JARs.
+This covers queue/target composition, not native GUI/item/armor/player render
+consumers. Item/cloud targets are live/read; positive item/cloud contribution
+is not claimed. See journal §57 and structured evidence. Next: **6.2c GUI/PiP/item**.

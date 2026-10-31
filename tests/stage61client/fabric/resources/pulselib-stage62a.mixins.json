@@ -3,7 +3,8 @@
   "package": "com.arcanc.pulselib.test.stage61client.mixin",
   "compatibilityLevel": "JAVA_25",
   "client": [
-    "StagesObserverMixin"
+    "StagesObserverMixin",
+    "TransparencyObserverMixin"
   ],
   "injectors": {
     "defaultRequire": 1

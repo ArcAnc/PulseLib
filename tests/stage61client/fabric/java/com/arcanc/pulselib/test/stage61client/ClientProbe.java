@@ -42,6 +42,11 @@ public final class ClientProbe implements ClientModInitializer
 	@Override
 	public void onInitializeClient()
 	{
+		if (Boolean.getBoolean("pulselib.fabricTransparencyProbe"))
+		{
+			TransparencyProbe.register();
+			return;
+		}
 		if (Boolean.getBoolean("pulselib.fabricStagesProbe"))
 		{
 			WorldStageProbe.register();
