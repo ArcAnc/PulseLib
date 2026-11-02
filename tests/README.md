@@ -599,3 +599,33 @@ rejected despite exit 0). Full reconnect/drop/pickup/GC/H15/world-item matrix re
 stage 7. For the negative control, remove only the copy injection in a temporary
 `ItemStackMixin` projection and require `Copy before first render must assign and
 inherit identity`, then restore inputs. Details/evidence: migration journal §59.
+
+### Stage 6.2d.1: Fabric native living/player layers and attachment snapshots
+
+`-PpulseFabricLayersProbe` enables the separate `stage62Layers` external fixture.
+Prepare new `fabric/build/stage62d1-runs/{client,server}` directories, client marker
+`.pulselib-layers`, disposable flat/creative/peaceful world **fabric-living-layers**,
+and loopback `127.0.0.1:25583`. Never use existing saves.
+
+```bash
+./gradlew :fabric:runServer -PpulseFabricLayersProbe --offline --no-daemon --console=plain
+./gradlew :fabric:runClient -PpulseFabricLayersProbe --offline --no-daemon --console=plain
+./gradlew build stage2Evidence :fabric:compileStage62LayersJava -PpulseFabricLayersProbe -I docs/porting/tools/stage2-evidence.gradle --offline --no-daemon --console=plain
+```
+
+Require `STAGE62D1 LAYERS PASS` twice, `PHASE PASS` four times, `COMPLETE`,
+`SHUTDOWN PASS` and client exit 0; stop the server with console `stop` and require
+exit 0. The fixture audits exactly one Common layer per native living renderer,
+player/mannequin skin variants, snapshot partial tick / ItemStack copying / clearing /
+world target eligibility, and **224 GUI regions** across opaque/alpha and reload.
+Real native entity PiPs draw pig/global, armor-stand/item and player/global attachments;
+a registered animated-player callback is observed separately. Native body/equipment
+are masked only in test render states to isolate attachment pixels. `layers-results.json`
+contains counts, peaks, callbacks and audits. Fixture assets/classes stay out of release.
+
+Negative controls use temporary Fabric source projections: remove only the registration
+call and require `Exactly one shared living layer ...: 0`; retain registration and omit
+only the extraction injection, requiring `Native final extraction captures the eligible
+item snapshot`. Restore normal inputs and rerun the full positive suite. An exit code
+without markers is insufficient. Canonical armor-provider API, loader armor/arm bridges
+and deformation/instancing parity remain **6.2d.2**; see migration journal §60.

@@ -29,6 +29,10 @@
     {
       "config": "pulselib.mixins.json",
       "environment": "client"
+    },
+    {
+      "config": "pulselib-fabric.mixins.json",
+      "environment": "client"
     }
   ]
 }

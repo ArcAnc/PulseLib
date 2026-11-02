@@ -1,0 +1,391 @@
+{
+  "stage": "6.2d.1",
+  "status": "PASS",
+  "startedLocalDate": "2026-10-31",
+  "completedLocalDate": "2026-11-01",
+  "branch": "26.1.2-multiloader",
+  "startingHead": "73c56ea95eafacb105a301886c1cc4560ffaab2c",
+  "sourceRefs": {
+    "26.1": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1",
+    "1.21.1-multiloader": "7ce6f024b307bb821ce543344d3896c8e1fcf26b"
+  },
+  "scope": {
+    "completed": [
+      "native Fabric living/humanoid/player layer registration",
+      "post-virtual-extraction attachment snapshot",
+      "native renderer rebuild without duplicate layers",
+      "native entity PiP legacy RGB/alpha draws and registered animated player callback"
+    ],
+    "next": "6.2d.2: restore canonical PArmorModelProvider, loader armor/arm bridges and deformation/instancing parity",
+    "notClaimed": [
+      "armor-provider API restored",
+      "native armor provider shapes",
+      "first-person armor",
+      "animated mesh GPU pixels",
+      "world OIT/depth matrix",
+      "complete stage 6.2d or stage 6",
+      "residual 5.2b.4 and stage 7"
+    ]
+  },
+  "architecture": {
+    "registration": "LivingEntityRenderLayerRegistrationCallback -> unchanged Common PLibArmorHandler.addLayers",
+    "snapshot": "client-only Fabric Mixin on EntityRenderer.createRenderState(Entity,float) RETURN -> unchanged shared extractAttachmentRenderData",
+    "commonProductionChanged": false,
+    "neoForgeProductionChanged": false,
+    "publicEntrypointApiChanged": false,
+    "renderTypesAdded": 0,
+    "pipBackendAdded": false,
+    "accessWidenerChanged": false,
+    "ordinaryOitPolicyUnchanged": true,
+    "newPackageDefaults": "@NullMarked, accepted MC26 adaptation",
+    "missingCanonicalArmorProviderExplicitlyDeferred": "6.2d.2"
+  },
+  "native": {
+    "audits": [
+      {
+        "living": 93,
+        "avatars": 4,
+        "epoch": 0
+      },
+      {
+        "living": 93,
+        "avatars": 4,
+        "epoch": 1
+      }
+    ],
+    "postReloadModelsAndRenderersReplaced": true,
+    "onceOnlyPluginAttachments": 1,
+    "modelCollections": 2,
+    "snapshots": {
+      "checks": 12,
+      "partialTick": 0.37,
+      "capturedCount": 9,
+      "mutatedLiveCount": 1,
+      "capturedCountAfterMutation": 9,
+      "ineligibleNextStateEntries": null,
+      "nativeWorldTargetEligibilitySetAndCleared": true
+    },
+    "callbacksByPhase": [
+      [
+        10,
+        10,
+        10,
+        10
+      ],
+      [
+        65,
+        65,
+        65,
+        65
+      ],
+      [
+        67,
+        67,
+        67,
+        67
+      ],
+      [
+        69,
+        69,
+        69,
+        69
+      ]
+    ],
+    "owners": [
+      "vanilla Pig global attachment",
+      "vanilla ArmorStand item attachment",
+      "RemotePlayer global attachment",
+      "native registered animated player callback"
+    ]
+  },
+  "gpu": {
+    "phases": 4,
+    "epochs": 2,
+    "frames": 32,
+    "framesPerPhase": 8,
+    "regions": 224,
+    "coloredCounts": [
+      1152,
+      1152,
+      375
+    ],
+    "peaks": {
+      "opaque": 255,
+      "alpha": 192
+    },
+    "textCounts": [
+      1944
+    ],
+    "expectedControls": [
+      0,
+      0,
+      0
+    ],
+    "thresholds": {
+      "coloredCountExclusiveMin": 20,
+      "dominantChannelExclusiveMin": 70,
+      "otherChannelExclusiveMax": 12,
+      "opaquePeakInclusiveMin": 245,
+      "alphaPeakExclusiveRange": [
+        70,
+        245
+      ],
+      "textExclusiveMin": 100
+    },
+    "nativeBodyAndArmorMaskedOnlyInFixtureStates": true,
+    "liveItemRemovedAfterExtraction": true,
+    "pixelPackRowRestored": true,
+    "glErrors": 0,
+    "caseFile": "stage-6.2d.1-cases.ndjson",
+    "caseSha256": "dbbbdfe116093dc716af0ad049501b92a03289a0d776e0a4e2a667928bbbfecc"
+  },
+  "negativeControls": {
+    "registration": {
+      "mutation": "temporary Fabric projection omits one registration call",
+      "expected": "Exactly one shared living layer ...: 0",
+      "javaExit": 255,
+      "gradleExit": 1
+    },
+    "extraction": {
+      "mutation": "temporary Fabric projection omits one extraction @Inject annotation",
+      "nativeLayerAuditPasses": true,
+      "expected": "Native final extraction captures the eligible item snapshot",
+      "javaExit": 255,
+      "gradleExit": 1
+    },
+    "normalInputsRestoredAndPositiveSuiteRepeated": true
+  },
+  "acceptedExits": {
+    "initialPositiveClient": 0,
+    "finalPositiveClient": 0,
+    "server": 0,
+    "build": 0,
+    "inventory": 0
+  },
+  "validation": {
+    "classes": {
+      "common": {
+        "unchanged": 581,
+        "gpuUnchanged": 26,
+        "changed": [],
+        "added": []
+      },
+      "fabric": {
+        "unchanged": 586,
+        "gpuUnchanged": 26,
+        "changed": [
+          "com/arcanc/pulselib/fabric/PulseLibFabricClient.class"
+        ],
+        "added": [
+          "com/arcanc/pulselib/fabric/mixin/LivingAttachmentExtractionMixin.class",
+          "com/arcanc/pulselib/fabric/mixin/package-info.class"
+        ]
+      },
+      "neoforge": {
+        "unchanged": 594,
+        "gpuUnchanged": 26,
+        "changed": [],
+        "added": []
+      }
+    },
+    "junit": {
+      "common": {
+        "tests": 240,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "fabric": {
+        "tests": 1,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "neoforge": {
+        "tests": 0,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    "jars": {
+      "pulselib-26.1.2-common-1.1.5.3.jar": "4c4350db7d468f9755f4113834eb08b8f96ba35f4c5dc2df6c5dd50ecfff9bae",
+      "pulselib-26.1.2-fabric-1.1.5.3.jar": "d8c26739b899d0f67b79b67d67c26de5261d61f8651c2d4ae939fa3379612be5",
+      "pulselib-26.1.2-neoforge-1.1.5.3.jar": "6c4b33ebca263a44716971c5713cd3763306f1d528e48b88e3008f76004e9736"
+    },
+    "publicFabricEntrypointApiUnchanged": true,
+    "commonAndNeoForgeJarsUnchanged": true,
+    "fixtureExcluded": true,
+    "serverClientClasses": 0
+  },
+  "junitExecution": {
+    "common": {
+      "executed": 240
+    },
+    "fabric": {
+      "executed": 1
+    },
+    "neoforge": "NO-SOURCE",
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "finalInit": "force Common outputs and fresh test task execution; no production input mutation"
+  },
+  "preliminaryRuns": [
+    {
+      "file": "client-invalid-definition.log",
+      "exit": 0,
+      "accepted": false,
+      "reason": "PLAYER_ANIMATIONS rejects fixture definition without required bone binding; model registration never completes; no PASS markers"
+    },
+    {
+      "file": "client-reload-screen-gate-timeout.log",
+      "exit": 1,
+      "accepted": false,
+      "reason": "first two GPU phases pass; fixture waits for screen == null after reload; switched to future-driven epoch transition; temporary screen type not recorded"
+    }
+  ],
+  "provenance": {
+    "canonicalRegistrationRef": "7ce6f024b307bb821ce543344d3896c8e1fcf26b",
+    "canonicalEntrypointHeader": "12.10.2026",
+    "thinGuiObserverAndCopiedFixtureAssetsCommit": "73c56ea95eafacb105a301886c1cc4560ffaab2c",
+    "originalAssetCredits": "25.10.2026",
+    "newJavaHeaders": "31.10.2026, created before midnight",
+    "license": "Arc's License of Common Sense",
+    "officialLocalFabricSource": {
+      "module": "fabric-rendering-v1:23.3.1+e9207d814c",
+      "sha256": "f2bf736266fa851b0e7c1226d1a1daae79991f8a43595fc84202956078e8f3bc",
+      "classes": [
+        "LivingEntityRenderLayerRegistrationCallback",
+        "EntityRenderersMixin"
+      ]
+    }
+  },
+  "preservation": {
+    "originalDirtyFiles": 67,
+    "protectedFiles": 189,
+    "inputSelection": "HEAD Java projection plus checkpoint; unrelated dirty Java excluded",
+    "sourceRefsChanged": false,
+    "userDeltasCommitted": false,
+    "pushOrPublish": false
+  },
+  "commands": {
+    "client": "./gradlew :fabric:runClient -PpulseFabricLayersProbe -I /tmp/pulselib-stage62d1-i_w9cl5o/projection.gradle --offline --no-daemon --console=plain",
+    "server": "./gradlew :fabric:runServer -PpulseFabricLayersProbe -I /tmp/pulselib-stage62d1-i_w9cl5o/projection.gradle --offline --no-daemon --console=plain",
+    "build": "./gradlew build stage2Evidence :fabric:compileStage62LayersJava -PpulseFabricLayersProbe -I /tmp/pulselib-stage62d1-i_w9cl5o/projection.gradle -I /tmp/pulselib-stage62d1-i_w9cl5o/final-checks.gradle -I docs/porting/tools/stage2-evidence.gradle --offline --no-daemon --console=plain"
+  },
+  "checkpointSourceSha256": {
+    "fabric/build.gradle": "ef59c7476402f9c5742da2253754f8df0cf2b5625529f69644553f0296eeeb3b",
+    "fabric/src/main/java/com/arcanc/pulselib/fabric/PulseLibFabricClient.java": "fc5d1a762c42933b99fde8a25469633c370a9cf94c7ed6dfe80dbc81e147dc2b",
+    "fabric/src/main/java/com/arcanc/pulselib/fabric/mixin/LivingAttachmentExtractionMixin.java": "0bf0390b59b21f2b1ed62958147a2bd05d4bcb121aee810f47165c1c52213f0e",
+    "fabric/src/main/java/com/arcanc/pulselib/fabric/mixin/package-info.java": "d3c73b80cd7136d446185deecc3d8235cb70e120059aaea7cf24188a2238b3f4",
+    "fabric/src/main/resources/fabric.mod.json": "680aedae7e677962888ccdf404391fd761b5d49427355517c9dab2f018e3ccbe",
+    "fabric/src/main/resources/pulselib-fabric.mixins.json": "6fdc9f326b19aeef9574fa18285755fecdb5f9c055e82fcfb8aec60c7f014ffb",
+    "tests/stage62layers/fabric/java/com/arcanc/pulselib/test/stage62layers/LayersProbe.java": "5b9247083b310b400803d161a826e601e98a48c9b32cc4a7e872e553eaf0f56d",
+    "tests/stage62layers/fabric/java/com/arcanc/pulselib/test/stage62layers/LayersScene.java": "50f6808d6c704a82ce19f416bf291a220d14a0cedfbedacf0485e8ffc3bac621",
+    "tests/stage62layers/fabric/java/com/arcanc/pulselib/test/stage62layers/mixin/GuiObserverMixin.java": "8b22f00f512725b2b59186e38a1c2f623af16d44a69b0354550cea61c291e086",
+    "tests/stage62layers/fabric/java/com/arcanc/pulselib/test/stage62layers/mixin/LayerObserverMixin.java": "72a8dcc42c250cd6a399c614c7f9fa5fcae2333f6b8ebbeefa6c6ef683c730de",
+    "tests/stage62layers/fabric/java/com/arcanc/pulselib/test/stage62layers/mixin/package-info.java": "b3e79c3b7ff64be058176bfbd19d550b9bfe9349f49820a7e57589fd4a808836",
+    "tests/stage62layers/fabric/java/com/arcanc/pulselib/test/stage62layers/package-info.java": "05843cdaea1d02797a7c0fe4de8874f25bdb93a75b95da412db7178310bc51f3",
+    "tests/stage62layers/fabric/resources/assets/pulselib/geckolib/animations/stage42b4_owner.animation.json": "635fa3301d0ca9b2a01b799c56e851dc7499fb801bf2ba881de16f9ed3e06156",
+    "tests/stage62layers/fabric/resources/assets/pulselib/geckolib/models/entity/stage42b4_owner.geo.json": "5771f7a0b60abf57f7f2be527f00d7e17ca947cd1edeb07ea4d66d96e1d92403",
+    "tests/stage62layers/fabric/resources/assets/pulselib/textures/lifecycle/stage62a_white.png": "d5a51b6aed15684ec8c123e30fe5703155359d6543b6d7b47cb5766ef44939de",
+    "tests/stage62layers/fabric/resources/fabric.mod.json": "cc058f3451d272fa99437272bd8d8f6d99283ec9f7c7ce13d9271286f434f452",
+    "tests/stage62layers/fabric/resources/pulselib-stage62layers.mixins.json": "ed450ea5726020837663ce014a40e09b89400dc68409be99759df387a09e586a"
+  },
+  "rawEvidence": {
+    "root": "/tmp/pulselib-stage62d1-i_w9cl5o",
+    "sha256": {
+      "build.log": "f54a887a14790c1c2c30b57d52ae619d0c8d46871599502dacd90798c479fa24",
+      "client-final.log": "59ad63539eb69b580c12c5c9bd2364b5711cf9ae8ca6b4c330da4bceb407ee74",
+      "client-invalid-definition.log": "49580954aed3423e9dec0c89ec14decd7cdff57ce9923222474b104247891d73",
+      "client-reload-screen-gate-timeout.log": "53d248b478e053ecb0fb524e6a30c163ac87db0e89051ac06e0b5c0e7d6d9c73",
+      "client.log": "e42cedd12ead26eb7013f9a9e84f84754bd1c1b0a98d07bcf1627fc08a792565",
+      "compile.log": "30848f2b8f88f7d04b0262ac6e8501e795b5b057780bb65d9324f06980d43a29",
+      "inventory.log": "6e73e3a827268129b5bb5216e280ac4f0734f87a1391a6cf2a0b84454ffb015e",
+      "layers-results.json": "c1693f7e82aee9770f29a0c4b4aef5273ffc0390274683aaba86cc1fb10a8b80",
+      "negative-extraction.log": "c4d0c6704cd19a373b35130dc6563c547c9c41d6a11c362fc22fb7fd7967e9eb",
+      "negative-registration.log": "8b100578e990d9b8251d645b80d81c89ac907d0e7783d059435e7ff29cd0f95f",
+      "server-classloading.log": "eae02c883a112953ce5d086f553711feda00aba753b2c254b1b7b3b19fbce8d6",
+      "server.log": "8ea528745aa1ca7e97e7a500dfe82ad104806075a4a567e23342d715cc50a8fb",
+      "stage62d1-layers.png": "e47bed2248ec1c38f262d60f63fd53ed0b275924bf61a27b4ea36695efa9fff5",
+      "validation.json": "aeb4b02c1b4fba793d1d9dac21783841f76086be67f49d3c16c0cacd170ad3ff"
+    },
+    "available": false,
+    "lossRecordedOn": "2026-11-02",
+    "note": "Original /tmp directory cleared during pause before commit; stdout hashes retained as historical records. Game logs, XML, JARs, class files, GUI JSON, PNG and cases survived under module build directories."
+  },
+  "closeout": {
+    "date": "2026-11-02",
+    "sourceHashesMatchRecordedInputs": true,
+    "runtimeSuiteRepeated": false,
+    "inventoryRepeated": "PASS",
+    "retainedArtifacts": {
+      "artifacts": {
+        "fabric/build/stage62d1-runs/client/layers-results.json": "c1693f7e82aee9770f29a0c4b4aef5273ffc0390274683aaba86cc1fb10a8b80",
+        "fabric/build/stage62d1-runs/server/classloading.log": "eae02c883a112953ce5d086f553711feda00aba753b2c254b1b7b3b19fbce8d6",
+        "fabric/build/stage62d1-runs/client/screenshots/stage62d1-layers.png": "e47bed2248ec1c38f262d60f63fd53ed0b275924bf61a27b4ea36695efa9fff5",
+        "common/build/libs/pulselib-26.1.2-common-1.1.5.3.jar": "4c4350db7d468f9755f4113834eb08b8f96ba35f4c5dc2df6c5dd50ecfff9bae",
+        "fabric/build/libs/pulselib-26.1.2-fabric-1.1.5.3.jar": "d8c26739b899d0f67b79b67d67c26de5261d61f8651c2d4ae939fa3379612be5",
+        "neoforge/build/libs/pulselib-26.1.2-neoforge-1.1.5.3.jar": "6c4b33ebca263a44716971c5713cd3763306f1d528e48b88e3008f76004e9736"
+      },
+      "junit": {
+        "common": {
+          "tests": 240,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "fabric": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "neoforge": {
+          "tests": 0,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "classes": {
+        "common": {
+          "total": 581,
+          "gpu": 26,
+          "allMatchTestedJar": true
+        },
+        "fabric": {
+          "total": 589,
+          "gpu": 26,
+          "allMatchTestedJar": true
+        },
+        "neoforge": {
+          "total": 594,
+          "gpu": 26,
+          "allMatchTestedJar": true
+        }
+      },
+      "nativeArchives": {
+        "fabric/build/stage62d1-runs/client/logs/2026-11-01-1.log.gz": "70b37b72c9e5d127c682c360e23eaded5316220503d0996925c67953bca84a91",
+        "fabric/build/stage62d1-runs/client/logs/2026-11-01-2.log.gz": "54dac6fae549fb3653c2b4ceddf289bbf25705e77f2d9aebc99d70cfcdcdb54a",
+        "fabric/build/stage62d1-runs/client/logs/2026-11-01-3.log.gz": "f00e51bf567cebf95a6ab642959878de4dfb6aeccf87847edf2b719d70ac0c42",
+        "fabric/build/stage62d1-runs/client/logs/2026-11-01-4.log.gz": "b8f890a2e334a8c3bdc884c0c68375635a7564f39c14665d6f05570844ad3e66",
+        "fabric/build/stage62d1-runs/client/logs/latest.log": "6bae1abf20d47771332972bbd1ea85dad3a06fa468940c8e3805522e44a883f4",
+        "fabric/build/stage62d1-runs/server/logs/2026-10-31-1.log.gz": "63827608e7ab361aed77304ad25d92b0a15cae803577d4624f60cb62ba0d13fa",
+        "fabric/build/stage62d1-runs/server/logs/latest.log": "e78463d0b822a0222c734b44628f8f76627dd01c097e71afab76e620a491e54e"
+      },
+      "nativeNegativeAndPositiveArchivedLogs": [
+        "extraction",
+        "positive",
+        "registration"
+      ]
+    },
+    "retainedRuntimeExcerpts": {
+      "file": "stage-6.2d.1-runtime.txt",
+      "sha256": "2da1a91b7c1dc4443d5f35917b9769eca50c30d9d819f063236df1b790fcb291"
+    },
+    "recreatedProjection": "/mnt/MainDrive/Programs/MC mods/ArcsLib/fabric/build/stage62d1-closeout-20261102/projection.gradle",
+    "recreatedFinalChecks": "/mnt/MainDrive/Programs/MC mods/ArcsLib/fabric/build/stage62d1-closeout-20261102/final-checks.gradle"
+  }
+}

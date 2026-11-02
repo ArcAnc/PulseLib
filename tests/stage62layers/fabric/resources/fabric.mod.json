@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "pulselib_stage62layers",
+  "version": "1.0.0",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.arcanc.pulselib.test.stage62layers.LayersScene"
+    ],
+    "client": [
+      "com.arcanc.pulselib.test.stage62layers.LayersProbe"
+    ]
+  },
+  "depends": {
+    "pulselib": "*"
+  },
+  "mixins": [
+    {
+      "config": "pulselib-stage62layers.mixins.json",
+      "environment": "client"
+    }
+  ]
+}

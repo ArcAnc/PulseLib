@@ -149,3 +149,32 @@ if (providers.gradleProperty('pulseFabricItemProbe').isPresent()) {
     }
     tasks.named('runServer') { standardInput = System.in }
 }
+
+// Native living/player attachment layer registration and extraction; release excludes this fixture.
+if (providers.gradleProperty('pulseFabricLayersProbe').isPresent()) {
+    sourceSets {
+        stage62Layers {
+            java.srcDir rootProject.file('tests/stage62layers/fabric/java')
+            resources.srcDir rootProject.file('tests/stage62layers/fabric/resources')
+            compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+            runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+        }
+    }
+    loom {
+        mods { pulselib_stage62layers { sourceSet sourceSets.stage62Layers } }
+        runs {
+            client {
+                source sourceSets.stage62Layers
+                programArgs '--quickPlayMultiplayer', '127.0.0.1:25583', '--width', '960', '--height', '640'
+                runDir "build/${providers.gradleProperty('pulseVerificationDir').getOrElse('stage62d1-runs')}/client"
+                vmArg '-Xlog:class+load=info:file=classloading.log'
+            }
+            server {
+                source sourceSets.stage62Layers
+                runDir "build/${providers.gradleProperty('pulseVerificationDir').getOrElse('stage62d1-runs')}/server"
+                vmArg '-Xlog:class+load=info:file=classloading.log'
+            }
+        }
+    }
+    tasks.named('runServer') { standardInput = System.in }
+}

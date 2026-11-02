@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "com.arcanc.pulselib.fabric.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "LivingAttachmentExtractionMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
