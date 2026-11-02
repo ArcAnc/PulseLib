@@ -1,0 +1,406 @@
+{
+  "stage": "6.2d.2b",
+  "status": "PASS",
+  "date": "2026-11-02",
+  "branch": "26.1.2-multiloader",
+  "startingHead": "b5d8937d24267c7be91019fecb0db81222c48a6c",
+  "sourceRefs": {
+    "26.1": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1",
+    "1.21.1-multiloader": "7ce6f024b307bb821ce543344d3896c8e1fcf26b"
+  },
+  "scope": {
+    "completed": [
+      "native Fabric/NeoForge default arm bridge call sites",
+      "both hands and sleeve modes: frozen native deformation replay",
+      "two owners: main and four armor slots, foil/outline/crumbling vertex geometry",
+      "portable frozen native hand geometry in six actual GPU instances, 16/32-bit/dynamic uploads and matrix readback",
+      "resource reload and nested recovery on both loaders"
+    ],
+    "next": "7.1: external canonical testmod/harnesses/assets/disposable automation and packaging",
+    "stage6CompleteWithinDocumentedBounds": true,
+    "notClaimed": [
+      "full animated/hidden/map/held first-person presentation or timing/motion matrix",
+      "new native armor GPU pixel or visual glint matrix",
+      "all GPU deformer operation strategies/fallback modes",
+      "six player owners in the GPU batch (one mesh / six transforms)",
+      "new full GL deletion/lifecycle matrix",
+      "full world OIT/depth / residual 5.2b.4 / stage 7 API/allocation/performance"
+    ]
+  },
+  "architecture": {
+    "productionJavaChanged": false,
+    "productionResourcesChanged": false,
+    "publicApiChanged": false,
+    "newRenderTypes": 0,
+    "newPipelines": 0,
+    "newShaders": 0,
+    "newBackend": false,
+    "ordinaryOitPolicyUnchanged": true,
+    "newProductionPackages": 0,
+    "testPackageDefaults": "@NullMarked: accepted MC26 adaptation",
+    "newBuildFlag": "pulseDeformationParityProbe",
+    "sourceSet": "stage62Deformation",
+    "actualGpuPlanObserverConsumesQueue": false,
+    "controlledCpuRecordingOnly": true,
+    "regularNativeBuffersUnchanged": true,
+    "gpuMeshSource": "actual deferred right-hand/sleeve vertex stream after strict oracle comparison",
+    "gpuAuxiliaryOperationCount": 0,
+    "whiteAtlasViaCanonicalPlugin": true,
+    "modelCollectionsPerClient": 2
+  },
+  "matrix": {
+    "owners": 2,
+    "registeredStretchParts": [
+      "BODY",
+      "RIGHT_ARM",
+      "LEFT_ARM"
+    ],
+    "ownerFactors": [
+      1.5,
+      2.25
+    ],
+    "nativeExtractionPartialTick": 0.65,
+    "nativeVertexDistanceSquaredTolerance": 1e-10,
+    "handCasesPerEpoch": [
+      "right/sleeve",
+      "right/no sleeve",
+      "left/sleeve",
+      "left/no sleeve"
+    ],
+    "nativeArmCallSitesPerEpoch": 2,
+    "actualNativeNodeCounts": {
+      "armor": 64,
+      "hands": 16,
+      "itemInHandArmCalls": 8
+    },
+    "totalVertexComparisons": 173152,
+    "totalExpectedRecoveryFailures": 152,
+    "gpuInstances": 6,
+    "gpuGroups": 4,
+    "gpuSources": [
+      "shared 16-bit immutable",
+      "equal-byte independent 16-bit identity",
+      "32-bit immutable",
+      "dynamic source with two instances"
+    ],
+    "gpuFramesPerEpoch": 8,
+    "resourceEpochs": 2,
+    "loaders": 2,
+    "gpuTotalColorRegions": 192,
+    "rgbToleranceBytes": 4,
+    "dynamicSlotsBound": 9,
+    "actualUploadReadback": [
+      "immutable and dynamic vertex bytes",
+      "16-/32-bit index bytes",
+      "12 matrix floats per actual 96-byte instance header"
+    ],
+    "primitiveFormula": "source.indexCount / 3 * 6",
+    "liveValueQueriesForbiddenDuringReplay": true
+  },
+  "runtime": {
+    "fabric": {
+      "vertexComparisons": 87376,
+      "regions": 96,
+      "handNodes": 8,
+      "nativeArmCalls": 4,
+      "status": "PASS",
+      "epochs": 2,
+      "failures": 76,
+      "armorNodes": 32,
+      "nativeSuites": 2,
+      "gpuPrimitivesPerFrame": [
+        1896
+      ],
+      "clientJavaExit": 0,
+      "clientGradleExit": 0,
+      "serverGradleExit": 0,
+      "serverForbiddenClientClasses": 0,
+      "serverClassloadingRows": 28413,
+      "results": "fabric/build/stage62d2b-runs/client/deformation-results.json",
+      "screenshot": "fabric/build/stage62d2b-runs/client/screenshots/deformation-instances.png"
+    },
+    "neoforge": {
+      "nativeSuites": 2,
+      "armorNodes": 32,
+      "failures": 76,
+      "epochs": 2,
+      "status": "PASS",
+      "nativeArmCalls": 4,
+      "handNodes": 8,
+      "regions": 96,
+      "vertexComparisons": 85776,
+      "gpuPrimitivesPerFrame": [
+        1656
+      ],
+      "clientJavaExit": 0,
+      "clientGradleExit": 0,
+      "serverGradleExit": 0,
+      "serverForbiddenClientClasses": 0,
+      "serverClassloadingRows": 29380,
+      "results": "neoforge/build/stage62d2b-runs/client/deformation-results.json",
+      "screenshot": "neoforge/build/stage62d2b-runs/client/screenshots/deformation-instances.png"
+    }
+  },
+  "negativeControls": {
+    "hand": {
+      "assertion": "Native geometry count matches immediate oracle: 552/24",
+      "javaExit": 255,
+      "gradleExit": 1,
+      "sourceProjectionOnly": true,
+      "workingProductionOverwritten": false
+    },
+    "indirect": {
+      "assertion": "All six deformed native arm GPU instances generate primitives: 1264",
+      "javaExit": 255,
+      "gradleExit": 1,
+      "sourceProjectionOnly": true,
+      "workingProductionOverwritten": false,
+      "expectedPrimitives": 1896,
+      "actualPrimitives": 1264,
+      "cpuPlanStillSixInstancesFourGroups": true
+    }
+  },
+  "normalFabricSuiteRepeatedAfterBothControls": true,
+  "attempts": {
+    "notAccepted": [
+      "main-only deformed guard incorrectly used instanceof PlayerModel for slot-specific armor",
+      "diagnostic compile consumed queue before actual local execution",
+      "standalone UV/overlay did not select white Pulse atlas texel; red [77,0,0]"
+    ],
+    "fixtureCorrectionsOnly": true,
+    "thresholdsUnchanged": true,
+    "debugger": {
+      "routerAvailable": true,
+      "initialSessions": 0,
+      "initialUserDisabledExceptionBreakpoints": 2,
+      "launchOrBreakpointChanges": false,
+      "debuggerValuesClaimed": false,
+      "fallbackReason": "no fixture HEAD-projection classpath configuration; documented launch overrides arguments/workingDirectory/envs only; used actual crash stacks/source and repeated instrumented suites"
+    }
+  },
+  "checks": {
+    "fullBuildExit": 0,
+    "stage2Evidence": "PASS",
+    "inventory": "PASS",
+    "freshTests": {
+      "common": {
+        "tests": 240,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "fabric": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "neoforge": {
+        "tests": 0,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "finalFixtureCompileExit": 0,
+    "postRuntimeStyleReview": "logical import grouping only; bodies and import sets unchanged; both fixture compilations PASS",
+    "production": {
+      "common": {
+        "classesByteIdentical": 592,
+        "gpuClassesByteIdentical": 26,
+        "jar": "common/build/libs/pulselib-26.1.2-common-1.1.5.3.jar",
+        "jarSha256": "a0822f90d25b0af1699daac3fff065585146a23c307a966f0ca5341942d2277b",
+        "jarByteIdentical": true,
+        "fixtureExclusion": "PASS"
+      },
+      "fabric": {
+        "classesByteIdentical": 600,
+        "gpuClassesByteIdentical": 26,
+        "jar": "fabric/build/libs/pulselib-26.1.2-fabric-1.1.5.3.jar",
+        "jarSha256": "67bdf75df715e076cdbb6e04a75f4af2b9b9ab6ce7ebfe6c64f6dd7c4e38f86b",
+        "jarByteIdentical": true,
+        "fixtureExclusion": "PASS"
+      },
+      "neoforge": {
+        "classesByteIdentical": 605,
+        "gpuClassesByteIdentical": 26,
+        "jar": "neoforge/build/libs/pulselib-26.1.2-neoforge-1.1.5.3.jar",
+        "jarSha256": "cb4e0114d2166a5e381a84586c10fbbc764a28809487a6b7052b5467bb8d6974",
+        "jarByteIdentical": true,
+        "fixtureExclusion": "PASS"
+      }
+    },
+    "canonicalArmorProviderSourceByteIdentical": true
+  },
+  "provenance": {
+    "nativeOracleAndModelAdapter": {
+      "commit": "dee4ea5",
+      "header": "28.10.2026"
+    },
+    "partAdapter": {
+      "commit": "ac1dff9",
+      "header": "27.10.2026"
+    },
+    "guiObserverHeader": "31.10.2026",
+    "newHeaders": "02.11.2026",
+    "assets": {
+      "tests/stage62deformation/common/resources/assets/pulselib/textures/stage62d2b_white.png": {
+        "source": "tests/stage61client/fabric/resources/assets/pulselib/textures/lifecycle/stage62a_white.png",
+        "sourceCommit": "b5d8937d24267c7be91019fecb0db81222c48a6c",
+        "byteIdentical": true,
+        "sha256": "d5a51b6aed15684ec8c123e30fe5703155359d6543b6d7b47cb5766ef44939de"
+      },
+      "tests/stage62deformation/common/resources/assets/pulselib/geckolib/models/stage62d2b/white.geo.json": {
+        "source": "tests/stage61client/fabric/resources/assets/pulselib/geckolib/models/lifecycle/atlas_gecko_0.geo.json",
+        "sourceCommit": "b5d8937d24267c7be91019fecb0db81222c48a6c",
+        "byteIdentical": true,
+        "sha256": "473e9843b5e11885cdcdfd4cb36eb2ca001c874b1f41bc39735b8927d322a93f"
+      }
+    }
+  },
+  "workspace": {
+    "originalDirtyFilesPreserved": 67,
+    "protectedFilesPreserved": 189,
+    "javaInputs": "HEAD projection + checkpoint, original dirty Java excluded",
+    "taskDirectory": "fabric/build/stage62d2b-20261102",
+    "serverWorld": "deformation-fixture",
+    "clientMarker": ".pulselib-deformation",
+    "ports": {
+      "fabric": 25586,
+      "neoforge": 25587
+    },
+    "visibleWindow": "960x640",
+    "sourceBranchesUnchanged": true,
+    "pushOrPublish": false
+  },
+  "files": {
+    "fabric/build/stage62d2b-runs/client/deformation-results.json": {
+      "bytes": 8363,
+      "sha256": "6d1815a6b487e24e9bc2cdf3c8102e36d2ce70edbaddf902af9f59dfd4f9b65c"
+    },
+    "fabric/build/stage62d2b-runs/client/screenshots/deformation-instances.png": {
+      "bytes": 27935,
+      "sha256": "93dc45c99af8603b899e48d02b81a71583fc6c9c29fb9132a6efe9b05fead862"
+    },
+    "fabric/build/stage62d2b-runs/server/classloading.log": {
+      "bytes": 5298184,
+      "sha256": "8670bbd2e7e7757d20c2668669f26f52a61fecccaf760eba8c64fb0924032674"
+    },
+    "neoforge/build/stage62d2b-runs/client/deformation-results.json": {
+      "bytes": 8363,
+      "sha256": "19467d518585e314c652ce6953a9295e49af36f982d05d67cc4f14c298422e5f"
+    },
+    "neoforge/build/stage62d2b-runs/client/screenshots/deformation-instances.png": {
+      "bytes": 28112,
+      "sha256": "18f4396c06417e70a3ff5f891b88317fcab9151ab7c87eea0c94718e0fcddc50"
+    },
+    "neoforge/build/stage62d2b-runs/server/classloading.log": {
+      "bytes": 5109968,
+      "sha256": "a50e6b4c368efd2dbc8a8e780a849dd415e03b7328eb22dac9bff9283bf23c76"
+    },
+    "fabric/build/stage62d2b-20261102/final-build.log": {
+      "bytes": 3792,
+      "sha256": "411332a2dabf62686d1cdaa5b8257d4340691da6d540d43eef4424e7da858ddf"
+    },
+    "fabric/build/stage62d2b-20261102/final-fixture-compile.log": {
+      "bytes": 1262,
+      "sha256": "718fd48860c28e57fdb94a8472e361dfe8ad241c9dd1cf725597aeb14d68449e"
+    },
+    "fabric/build/stage62d2b-20261102/fixture-atlas-compile.log": {
+      "bytes": 1364,
+      "sha256": "e648f9a545c779db167851d08c7bfc07a4bb2850c6292b8cf30ae157c2f47b7d"
+    },
+    "fabric/build/stage62d2b-20261102/fixture-compile.log": {
+      "bytes": 1263,
+      "sha256": "d97143e37e83c5f418e0d9c4722bc099566bb7071702a63d0f49d9b766cb92f5"
+    },
+    "fabric/build/stage62d2b-20261102/inventory.log": {
+      "bytes": 165,
+      "sha256": "6e73e3a827268129b5bb5216e280ac4f0734f87a1391a6cf2a0b84454ffb015e"
+    },
+    "fabric/build/stage62d2b-20261102/neoforge-client.log": {
+      "bytes": 217505,
+      "sha256": "c2c1a06dc57c44c37f1b1e8017a1fbbcdc111c9520e93c1b4fea4714fdd94061"
+    },
+    "fabric/build/stage62d2b-20261102/neoforge-server-pre-plugin-classloading.log": {
+      "bytes": 4719666,
+      "sha256": "473683968ba2290604efb6bdea81b2d26ff05fcde114a86e6089651e6c65a2c0"
+    },
+    "fabric/build/stage62d2b-20261102/neoforge-server-pre-plugin.log": {
+      "bytes": 4421575,
+      "sha256": "61ebb8f893f23eb9fded413a1270b39f1e13d3251a441445c59f6ad64351d881"
+    },
+    "fabric/build/stage62d2b-20261102/neoforge-server.log": {
+      "bytes": 4420087,
+      "sha256": "cacaf4da111fce30f77eff48f798750798e469b4425ae1bc5d39c75a3d15f926"
+    },
+    "fabric/build/stage62d2b-20261102/verification.log": {
+      "bytes": 1649,
+      "sha256": "203f71f62bee3b8a95ef8a60e36f9ce552726de6cfa939a5d43081cdb8cccfca"
+    },
+    "fabric/build/stage62d2b-20261102/fabric-client-armor-main-guard.log": {
+      "bytes": 28391,
+      "sha256": "3dc1a0ac8aa472f328682cb91141b54c2f7804d989553c94302ae7cd8caf08ba"
+    },
+    "fabric/build/stage62d2b-20261102/fabric-client-atlas-uv.log": {
+      "bytes": 28258,
+      "sha256": "1c31878a9e5a5d8c40d6b6aeeccd6a0e790089894eda544a5d3ea16449766263"
+    },
+    "fabric/build/stage62d2b-20261102/fabric-client-consuming-compiler.log": {
+      "bytes": 28317,
+      "sha256": "206eb72f9805f3990d5b093631905b5abcea0dc523d4daf6d43727090bd84fd8"
+    },
+    "fabric/build/stage62d2b-20261102/fabric-client-first-pass.log": {
+      "bytes": 22355,
+      "sha256": "202ce438fbecc9e687cd3ca9467b3b58c8d732425a92d4b6f7e43ab915599dad"
+    },
+    "fabric/build/stage62d2b-20261102/fabric-client.log": {
+      "bytes": 22311,
+      "sha256": "2ff5c69120c76eab7b72557a917c2df766b861934ec5623ef9238381e4f91cfa"
+    },
+    "fabric/build/stage62d2b-20261102/fabric-negative-hand.log": {
+      "bytes": 29693,
+      "sha256": "0fec7394561e0e4fb63584c2094d6e97fca58fa3e4953f9f7cc5b1f294001576"
+    },
+    "fabric/build/stage62d2b-20261102/fabric-negative-indirect.log": {
+      "bytes": 29312,
+      "sha256": "e6c5bb40b72d1a5417923edb4aecde631f4d7efced8e1615a45aad6d02a1e75b"
+    },
+    "fabric/build/stage62d2b-20261102/fabric-server-pre-plugin-classloading.log": {
+      "bytes": 5221613,
+      "sha256": "2d8f3351fe35424a5ecf68923bb8ecc9070f3237615a52a6e45019f063a2bb0a"
+    },
+    "fabric/build/stage62d2b-20261102/fabric-server-pre-plugin.log": {
+      "bytes": 9105,
+      "sha256": "aaf9d64bcafd0d7da486411c6d3319ba66abeeb618ac3e9d7f0bcc443357f9e4"
+    },
+    "fabric/build/stage62d2b-20261102/fabric-server.log": {
+      "bytes": 9202,
+      "sha256": "a73f635878808dbd4f448913ee965041c90def1514cf399a92ffce13b1dbede9"
+    },
+    "fabric/build/stage62d2b-20261102/projection.gradle": {
+      "bytes": 444,
+      "sha256": "0122724beb90870c6002a695047b008e5ee9183fe7751a044ea5a56808a61e57"
+    },
+    "fabric/build/stage62d2b-20261102/final-checks.gradle": {
+      "bytes": 302,
+      "sha256": "c2dc141dbad0ab859c574d4328a5f9326cda48c170698297ac800ee1ed6e4640"
+    },
+    "fabric/build/stage62d2b-20261102/verification.json": {
+      "bytes": 1649,
+      "sha256": "203f71f62bee3b8a95ef8a60e36f9ce552726de6cfa939a5d43081cdb8cccfca"
+    },
+    "fabric/build/stage62d2b-20261102/import-format-review.json": {
+      "bytes": 457,
+      "sha256": "86898aec5b287fa83b2c7d456eb5e4af7c27fa01c7a424b50adb74c7a314da56"
+    },
+    "fabric/build/stage62d2b-20261102/debugger-inventory.json": {
+      "bytes": 230,
+      "sha256": "f0b9c7762acaca7cd3666092e7d683a994d2c0b5127104f982ccd201499d9961"
+    },
+    "build/reports/porting/stage-2-build.json": {
+      "bytes": 4235,
+      "sha256": "23625a9cf9f8d00be3699c887cdc884cfa7a54b911c775faaa2f8fd73361c7ab"
+    }
+  }
+}

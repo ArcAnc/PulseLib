@@ -655,3 +655,30 @@ projection described in journal section 61. Full build plus `stage2Evidence`,
 both `compileStage62ArmorJava` tasks and the pinned inventory verifier pass;
 241 JUnit tests are rerun. Production JARs exclude this fixture. See section 61
 and `docs/porting/evidence/stage-6.2d.2a.json` for results and exact limits.
+
+Stage 6.2d.2b validates native arm/deformation and portable GPU instancing parity
+on both loaders, using `-PpulseDeformationParityProbe` / `stage62Deformation`.
+`tests/stage62deformation` adapts the established native vertex oracle: two
+owners, main/four-slot armor/foil/main-outline-crumbling, both hands with sleeves
+on/off, actual ItemInHandRenderer call sites, frozen queries, poison and nested
+failure recovery before/after resource reload. Controlled CPU feature tests use
+recording consumers; normal rendering retains native buffers. Actual deferred
+hand vertices then pass through the existing Pulse compiler/PGl executor as six
+transform/color instances, shared/copy/32-bit/dynamic sources and four draw
+groups. Real GPU primitives, vertex/index/matrix readback and 192 total RGB
+regions pass, including independent native-replay and indirect-count negative
+controls. Production classes and all three release JARs remain byte-identical.
+
+Use separate `:fabric:runServer` / `:fabric:runClient` and
+`:neoforge:runServer` / `:neoforge:runClient` with that property. Prepare only
+own disposable `build/stage62d2b-runs/{client,server}` directories per module,
+flat/creative/peaceful world `deformation-fixture`, client marker
+`.pulselib-deformation`, ports 25586 / 25587, visible 960x640 window. Wait for
+server Done, require NATIVE PASS x2 / EPOCH PASS x2 / COMPLETE / SHUTDOWN PASS and
+client exit 0, then console-stop the server. Use only your own accepted EULA,
+options and properties; never existing user saves. Full build, fresh 241 JUnit,
+stage2Evidence, inventory, class/JAR fingerprints and fixture exclusion pass.
+See journal section 62 and `docs/porting/evidence/stage-6.2d.2b.json` for exact
+bounds, source projection and artifacts. Complete strategy/GPU-deformer modes,
+first-person presentation/motion and final regression/API/performance matrix
+remain stage 7; the next checkpoint is external testmod/packaging 7.1.

@@ -207,3 +207,31 @@ if (providers.gradleProperty('pulseArmorProviderProbe').isPresent()) {
     }
     tasks.named('runServer') { standardInput = System.in }
 }
+
+if (providers.gradleProperty('pulseDeformationParityProbe').isPresent()) {
+    sourceSets {
+        stage62Deformation {
+            java.srcDirs rootProject.file('tests/stage62deformation/common/java'), rootProject.file('tests/stage62deformation/fabric/java')
+            resources.srcDirs rootProject.file('tests/stage62deformation/common/resources'), rootProject.file('tests/stage62deformation/fabric/resources')
+            compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+            runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+        }
+    }
+    loom {
+        mods { pulselib_stage62deformation { sourceSet sourceSets.stage62Deformation } }
+        runs {
+            client {
+                source sourceSets.stage62Deformation
+                programArgs '--quickPlayMultiplayer', '127.0.0.1:25586', '--width', '960', '--height', '640'
+                runDir 'build/stage62d2b-runs/client'
+                vmArg '-Xlog:class+load=info:file=classloading.log'
+            }
+            server {
+                source sourceSets.stage62Deformation
+                runDir 'build/stage62d2b-runs/server'
+                vmArg '-Xlog:class+load=info:file=classloading.log'
+            }
+        }
+    }
+    tasks.named('runServer') { standardInput = System.in }
+}
