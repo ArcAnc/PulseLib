@@ -1,0 +1,8 @@
+{
+  "pulselib:glmodels/item/test_block.glb": "72e83a7ef0a737dae35cd92bee7b7687b5970b686981f2424deceb5e66b15258",
+  "pulselib:textures/item/test_block/pyramid.png": "ea1d76e9bc224c1aa581265e4ff25ddc71dbc27d5bc861c4b5a742952161544a",
+  "pulselib:textures/item/test_block/circle.png": "32249058dd163f0278933d687296ec3ace6439424f5804cb96161b0f32ca5585",
+  "pulselib:geckolib/models/player/demo/player_flip.geo.json": "3e3f0b2493f6ef7dc9614f2ef4eb74fdd6247623fe8980f7dbe006b70bf016f3",
+  "pulselib:geckolib/animations/player/demo/player_flip.animation.json": "00b3c19693956208c10f31b3630e090a945da1d7f2dfa5225b1256c03b82dc6e",
+  "pulselib:textures/entity/test_entity/0.png": "84e28faa3db609e3f68991b917865cfcc17038e6f1bab2c353317e95e207b7f7"
+}

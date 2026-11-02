@@ -1,0 +1,126 @@
+Stage 7.1a — actual accepted runs. Base 6e6fe708e7c60b2d0891f5d87175f0224498c42f
+Raw artifacts: fabric/build/stage71a-20261103
+
+=== fabric-server ===
+PULSE BOOTSTRAP PREPARED: /mnt/MainDrive/Programs/MC mods/ArcsLib/fabric/build/pulselib-tests/bootstrap-fb7981293f4b43d0ab2ddeea170be829/server
+[00:49:26] [Server thread/INFO] (Pulse Lib) PULSE BOOTSTRAP common plugin constructed
+[00:49:28] [Server thread/INFO] (Pulse Lib) PULSE BOOTSTRAP PLUGINS PASS: client=false, candidates=3, loaded=2, origin=file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/fabric/build/libs/pulselib-testmod-bootstrap-26.1.2-1.1.5.3-fabric.jar
+[00:49:28] [Server thread/INFO] (Pulse Lib) PULSE BOOTSTRAP SERVER COMPLETE
+[00:50:41] [Server thread/INFO] (Pulse Lib) PULSE BOOTSTRAP SERVER SHUTDOWN PASS
+PULSE BOOTSTRAP VERIFIED: /mnt/MainDrive/Programs/MC mods/ArcsLib/fabric/build/pulselib-tests/bootstrap-fb7981293f4b43d0ab2ddeea170be829/server
+BUILD SUCCESSFUL in 1m 29s
+
+=== neoforge-server ===
+PULSE BOOTSTRAP PREPARED: /mnt/MainDrive/Programs/MC mods/ArcsLib/neoforge/build/pulselib-tests/bootstrap-fb7981293f4b43d0ab2ddeea170be829/server
+[00:50:55] [modloading-sync-worker/INFO] [Pulse Lib/]: PULSE BOOTSTRAP common plugin constructed
+[00:50:59] [Server thread/INFO] [Pulse Lib/]: PULSE BOOTSTRAP PLUGINS PASS: client=false, candidates=3, loaded=2, origin=file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/neoforge/build/libs/pulselib-testmod-bootstrap-26.1.2-1.1.5.3-neoforge.jar
+[00:50:59] [Server thread/INFO] [Pulse Lib/]: PULSE BOOTSTRAP SERVER COMPLETE
+[00:52:16] [Server thread/INFO] [Pulse Lib/]: PULSE BOOTSTRAP SERVER SHUTDOWN PASS
+PULSE BOOTSTRAP VERIFIED: /mnt/MainDrive/Programs/MC mods/ArcsLib/neoforge/build/pulselib-tests/bootstrap-fb7981293f4b43d0ab2ddeea170be829/server
+BUILD SUCCESSFUL in 1m 34s
+
+=== fabric-client ===
+PULSE BOOTSTRAP PREPARED: /mnt/MainDrive/Programs/MC mods/ArcsLib/fabric/build/pulselib-tests/bootstrap-fb7981293f4b43d0ab2ddeea170be829/client
+[00:53:41] [Render thread/INFO] (Pulse Lib) PULSE BOOTSTRAP common plugin constructed
+[00:53:46] [Render thread/INFO] (Pulse Lib) PULSE BOOTSTRAP PLUGINS PASS: client=true, candidates=3, loaded=2, origin=file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/fabric/build/libs/pulselib-testmod-bootstrap-26.1.2-1.1.5.3-fabric.jar
+[00:53:46] [Render thread/INFO] (Pulse Lib) PULSE BOOTSTRAP ASSETS PASS: checks=6, origin=file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/fabric/build/libs/pulselib-testmod-bootstrap-26.1.2-1.1.5.3-fabric.jar
+[00:53:51] [Render thread/INFO] (Pulse Lib) PULSE BOOTSTRAP WORLD PASS: /mnt/MainDrive/Programs/MC mods/ArcsLib/fabric/build/pulselib-tests/bootstrap-fb7981293f4b43d0ab2ddeea170be829/client/saves/pulselib-bootstrap/.
+[00:53:55] [Render thread/INFO] (Pulse Lib) PULSE BOOTSTRAP ASSETS PASS: checks=12, origin=file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/fabric/build/libs/pulselib-testmod-bootstrap-26.1.2-1.1.5.3-fabric.jar
+[00:53:55] [Render thread/INFO] (Pulse Lib) PULSE BOOTSTRAP CLIENT COMPLETE: assets=12, epochs=2, gltfBones=3, geckoBones=7, geckoAnimations=1
+[00:53:55] [Render thread/INFO] (Pulse Lib) PULSE BOOTSTRAP CLIENT SHUTDOWN PASS
+PULSE BOOTSTRAP VERIFIED: /mnt/MainDrive/Programs/MC mods/ArcsLib/fabric/build/pulselib-tests/bootstrap-fb7981293f4b43d0ab2ddeea170be829/client
+BUILD SUCCESSFUL in 1m 41s
+
+=== neoforge-client ===
+PULSE BOOTSTRAP PREPARED: /mnt/MainDrive/Programs/MC mods/ArcsLib/neoforge/build/pulselib-tests/bootstrap-fb7981293f4b43d0ab2ddeea170be829/client
+[00:54:13] [Render thread/INFO] [Pulse Lib/]: PULSE BOOTSTRAP common plugin constructed
+[00:54:18] [Render thread/INFO] [Pulse Lib/]: PULSE BOOTSTRAP PLUGINS PASS: client=true, candidates=3, loaded=2, origin=file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/neoforge/build/libs/pulselib-testmod-bootstrap-26.1.2-1.1.5.3-neoforge.jar
+[00:54:18] [Render thread/INFO] [Pulse Lib/]: PULSE BOOTSTRAP ASSETS PASS: checks=6, origin=file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/neoforge/build/libs/pulselib-testmod-bootstrap-26.1.2-1.1.5.3-neoforge.jar
+[00:54:22] [Render thread/INFO] [Pulse Lib/]: PULSE BOOTSTRAP WORLD PASS: ./saves/pulselib-bootstrap/.
+[00:54:26] [Render thread/INFO] [Pulse Lib/]: PULSE BOOTSTRAP ASSETS PASS: checks=12, origin=file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/neoforge/build/libs/pulselib-testmod-bootstrap-26.1.2-1.1.5.3-neoforge.jar
+[00:54:26] [Render thread/INFO] [Pulse Lib/]: PULSE BOOTSTRAP CLIENT COMPLETE: assets=12, epochs=2, gltfBones=3, geckoBones=7, geckoAnimations=1
+[00:54:26] [Render thread/INFO] [Pulse Lib/]: PULSE BOOTSTRAP CLIENT SHUTDOWN PASS
+PULSE BOOTSTRAP VERIFIED: /mnt/MainDrive/Programs/MC mods/ArcsLib/neoforge/build/pulselib-tests/bootstrap-fb7981293f4b43d0ab2ddeea170be829/client
+BUILD SUCCESSFUL in 30s
+
+=== negative annotated-plugin control (expected failure, not normal shutdown) ===
+[00:52:25] [Server thread/ERROR] [ne.ne.bu.EventBus/EVENTBUS]: Exception caught during firing event: PULSE BOOTSTRAP: Common plugin lifecycle exactly once
+java.lang.AssertionError: PULSE BOOTSTRAP: Common plugin lifecycle exactly once
+java.lang.AssertionError: PULSE BOOTSTRAP: Common plugin lifecycle exactly once
+[00:53:26] [Server Watchdog/ERROR] [minecraft/ServerWatchdog]: A single server tick took 60.00 seconds (should be max 0.05)
+> Process 'command '/usr/lib/jvm/java-25-openjdk/bin/java'' finished with non-zero exit value 1
+BUILD FAILED in 2m
+
+=== fresh-directory guard cases ===
+{
+  "status": "PASS",
+  "runPrefix": "guards-79d1f569e2d1455dabbc01ccef8ef123",
+  "cases": [
+    {
+      "case": "existing-unmarked",
+      "exit": 1,
+      "filesUnchanged": true
+    },
+    {
+      "case": "existing-marked",
+      "exit": 1,
+      "filesUnchanged": true
+    },
+    {
+      "case": "traversal",
+      "exit": 1
+    },
+    {
+      "case": "symlink",
+      "exit": 1,
+      "targetUnchanged": true
+    },
+    {
+      "case": "no-eula",
+      "exit": 1,
+      "runNotCreated": true
+    }
+  ]
+}
+
+=== build ===
+> Task :neoforge:testmodJarJar NO-SOURCE
+> Task :common:testClasses UP-TO-DATE
+> Task :neoforge:testmodClasses
+> Task :neoforge:testmodJar
+> Task :neoforge:testClasses UP-TO-DATE
+> Task :neoforge:test NO-SOURCE
+> Task :fabric:testmodClasses
+> Task :fabric:testmodJar
+> Task :fabric:testClasses UP-TO-DATE
+> Task :fabric:test
+> Task :common:test
+> Task :stage2Evidence
+STAGE 2 SERVICE PROVIDERS / LEGACY REMOVAL / COMMON BOUNDARY PASS: /mnt/MainDrive/Programs/MC mods/ArcsLib/build/reports/porting/stage-2-build.json
+BUILD SUCCESSFUL in 19s
+
+=== inventory ===
+PASS: Java AST fixture and independent javac/javap counts for seven types
+PASS: pinned source coverage, all migration policies, required APIs and artifact checksums
+
+=== release Fabric ZIP-only metadata difference ===
+{
+  "status": "PASS",
+  "beforeSha256": "67bdf75df715e076cdbb6e04a75f4af2b9b9ab6ce7ebfe6c64f6dd7c4e38f86b",
+  "afterSha256": "bc0b29703ec8abdb7258f68858e3dd58a11322ffead780a49866d092e5eb022e",
+  "byteIdentical": false,
+  "allEntryPayloadsByteIdentical": true,
+  "entryCount": 691,
+  "onlyChanges": "Loom ZIP timestamps (DOS and UT fields) for nested dependency JAR entries and their directory",
+  "baselineTimestamp": "2026-11-02T17:28:10",
+  "changedEntries": [
+    "META-INF/jars/",
+    "META-INF/jars/jackson-annotations-2.13.2.jar",
+    "META-INF/jars/jackson-core-2.13.2.jar",
+    "META-INF/jars/jackson-databind-2.13.2.1.jar",
+    "META-INF/jars/jgltf-impl-v1-2.0.3.jar",
+    "META-INF/jars/jgltf-impl-v2-2.0.3.jar",
+    "META-INF/jars/jgltf-model-2.0.3.jar"
+  ],
+  "proof": "Changing only those timestamp bytes reconstructs the exact initial pinned SHA-256; all decompressed entries and names match."
+}

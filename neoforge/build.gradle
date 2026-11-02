@@ -244,3 +244,5 @@ if (providers.gradleProperty('pulseDeformationParityProbe').isPresent()) {
     }
     tasks.named('runServer') { standardInput = System.in }
 }
+
+apply plugin: 'multiloader-testmod'

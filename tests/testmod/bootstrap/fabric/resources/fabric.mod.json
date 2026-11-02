@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "pulselibtest_bootstrap",
+  "version": "1.0.0",
+  "name": "PulseLib packaged testmod bootstrap (7.1a)",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.arcanc.pulselib.test.bootstrap.fabric.TestModFabric"
+    ],
+    "client": [
+      "com.arcanc.pulselib.test.bootstrap.fabric.TestModFabricClient"
+    ]
+  },
+  "depends": {
+    "pulselib": "*",
+    "minecraft": "26.1.2",
+    "fabric-api": "*",
+    "java": ">=25"
+  }
+}

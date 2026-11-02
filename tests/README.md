@@ -682,3 +682,24 @@ See journal section 62 and `docs/porting/evidence/stage-6.2d.2b.json` for exact
 bounds, source projection and artifacts. Complete strategy/GPU-deformer modes,
 first-person presentation/motion and final regression/API/performance matrix
 remain stage 7; the next checkpoint is external testmod/packaging 7.1.
+
+Stage **7.1a** adds packaged external bootstrap JARs for both loaders, with a
+separate `pulselibtest_bootstrap` identity. Three plugin candidates / two loaded
+plugins, actual JAR CodeSource, side-safe dedicated classloading, six canonical
+GLB/Gecko/texture assets, two resource epochs and native disposable world saves
+pass on both clients and servers. Gradle creates fresh marked run directories;
+existing directories, traversal, symlinks and missing accepted EULA are rejected.
+Production classes/API/GPU remain unchanged; Common/NeoForge release JARs are
+byte-identical, Fabric changes only nested-JAR ZIP timestamps (all entry payloads
+identical). Full build, fresh 241 JUnit, inventory and negative controls pass.
+
+Build `:fabric:testmodJar :neoforge:testmodJar` first, then use
+`tests/testmod/tools/run_bootstrap.py --eula /path/to/your/accepted/eula.txt`;
+`tests/testmod/tools/check_guards.py --output build/reports/bootstrap-guards-UNIQUE`
+repeats the five rejection checks without game launch. The EULA is copied,
+never accepted automatically. Normal game runs use `-PpulseTestJarBootstrap`;
+bootstrap class/resource outputs are absent from their runtime classpaths.
+See [testmod instructions](testmod/README.md), journal section 63 and
+`docs/porting/evidence/stage-7.1a.json`. Complete canonical demo content, source
+mode, canonical `pulseTestMod`/`pulseTestJar` flags and harness consolidation
+remain **7.1b**; final GPU/API/performance matrix remains **7.2**.

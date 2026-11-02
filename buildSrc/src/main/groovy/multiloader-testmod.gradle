@@ -1,0 +1,125 @@
+/**
+ * @author ArcAnc
+ * Created at: 12.10.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
+import groovy.json.JsonSlurper
+import java.nio.file.Files
+import java.nio.file.StandardOpenOption
+
+// Packaging is shared with the canonical testmod; content/harness migration continues in 7.1b.
+sourceSets {
+    testmod {
+        java.srcDirs rootProject.file('tests/testmod/bootstrap/common/java'), rootProject.file("tests/testmod/bootstrap/${project.name}/java")
+        resources.srcDirs rootProject.file('tests/testmod/bootstrap/common/resources'), rootProject.file("tests/testmod/bootstrap/${project.name}/resources")
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+}
+
+def testmodJar = tasks.register('testmodJar', Jar) {
+    group = 'verification'
+    description = 'Packages the isolated 26.1.2 external testmod bootstrap; not the full canonical demo.'
+    dependsOn tasks.named('testmodClasses')
+    from sourceSets.testmod.output
+    from rootProject.file('LICENSE.txt')
+    archiveBaseName = 'pulselib-testmod-bootstrap'
+    archiveVersion = "${minecraft_version}-${mod_version}"
+    archiveClassifier = project.name
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+    duplicatesStrategy = DuplicatesStrategy.FAIL
+    manifest.attributes 'PulseLib-Test-Stage': '7.1a', 'PulseLib-Canonical-Source': '7ce6f024b307bb821ce543344d3896c8e1fcf26b'
+}
+
+def unsupported = ['pulseTestMod', 'pulseTestJar', 'pulseSmokeAuto', 'pulseSmokeWorld', 'pulseOitTest', 'pulseOitPerf', 'pulsePlayerMotionTest', 'pulseItemIdentityTest']
+if (unsupported.any { providers.gradleProperty(it).isPresent() })
+    throw new GradleException('The complete canonical testmod/content/harnesses remain stage 7.1b. Packaged bootstrap uses only -PpulseTestJarBootstrap; it cannot open existing demo worlds.')
+
+if (providers.gradleProperty('pulseTestJarBootstrap').isPresent()) {
+    def packaged = providers.gradleProperty('pulseBootstrapJar').map { rootProject.file(it) }.getOrElse(testmodJar.get().archiveFile.get().asFile)
+    if (!packaged.isFile())
+        throw new GradleException('Build :fabric:testmodJar :neoforge:testmodJar first, then start packaged bootstrap in a separate Gradle invocation.')
+    def runId = providers.gradleProperty('pulseBootstrapRunId').getOrElse(UUID.randomUUID().toString())
+    if (!(runId ==~ /[A-Za-z0-9_-]+/))
+        throw new GradleException('pulseBootstrapRunId must be a simple directory name, never a path.')
+    def root = layout.buildDirectory.dir("pulselib-tests/${runId}").get().asFile.toPath().toAbsolutePath().normalize()
+    def prepare = [:]
+    ['client', 'server'].each { kind ->
+        def directory = root.resolve(kind)
+        prepare[kind] = tasks.register("prepareTestmod${kind.capitalize()}") {
+            doLast {
+                for (def parent = directory; parent != null; parent = parent.parent)
+                    if (Files.isSymbolicLink(parent))
+                        throw new GradleException("Refusing symlink in disposable run path: ${parent}")
+                if (Files.exists(directory))
+                    throw new GradleException("Refusing every existing disposable run directory: ${directory}")
+                byte[] eula = null
+                if (kind == 'server') {
+                    def configured = providers.gradleProperty('pulseTestEulaFile').orNull
+                    if (configured == null)
+                        throw new GradleException('Dedicated bootstrap requires -PpulseTestEulaFile=<your previously accepted eula.txt>; no EULA is accepted automatically.')
+                    def source = rootProject.file(configured).toPath()
+                    if (Files.isSymbolicLink(source) || !Files.isRegularFile(source) || !(Files.readString(source) =~ /(?m)^eula=true\s*$/))
+                        throw new GradleException('pulseTestEulaFile must be a regular previously accepted eula.txt.')
+                    eula = Files.readAllBytes(source)
+                }
+                Files.createDirectories(directory.parent)
+                Files.createDirectory(directory)
+                Files.writeString(directory.resolve('.pulselib-test-run'), 'PulseLib disposable test run\n', StandardOpenOption.CREATE_NEW)
+                if (kind == 'server') {
+                    Files.write(directory.resolve('eula.txt'), eula, StandardOpenOption.CREATE_NEW)
+                    Files.writeString(directory.resolve('server.properties'), 'server-ip=127.0.0.1\nserver-port=0\nonline-mode=false\nlevel-name=pulselib-bootstrap\nlevel-type=minecraft:flat\nlevel-seed=345028449093\ngenerator-settings={"layers":[{"block":"minecraft:bedrock","height":1},{"block":"minecraft:dirt","height":2},{"block":"minecraft:grass_block","height":1}],"biome":"minecraft:plains"}\ngenerate-structures=false\ngamemode=creative\ndifficulty=peaceful\nview-distance=2\nsimulation-distance=2\nspawn-protection=0\nmax-players=1\n', StandardOpenOption.CREATE_NEW)
+                    Files.createDirectory(directory.resolve('pulselib-bootstrap'))
+                    Files.writeString(directory.resolve('pulselib-bootstrap/.pulselib-disposable'), 'PulseLib disposable test world\n', StandardOpenOption.CREATE_NEW)
+                }
+                logger.lifecycle("PULSE BOOTSTRAP PREPARED: ${directory}")
+            }
+        }
+        tasks.matching { it.name == "prepare${kind.capitalize()}Run" || it.name == "configure${kind.capitalize()}Launch" }.configureEach {
+            dependsOn prepare[kind]
+        }
+        tasks.matching { it.name == "run${kind.capitalize()}" }.configureEach {
+            dependsOn prepare[kind]
+            workingDir directory.toFile()
+            doFirst {
+                if (workingDir.toPath().toAbsolutePath().normalize() != directory || !Files.isRegularFile(directory.resolve('.pulselib-test-run')))
+                    throw new GradleException("Unexpected bootstrap JVM working directory: ${workingDir}")
+            }
+            doLast {
+                def result = directory.resolve('bootstrap-results.json').toFile()
+                if (!result.isFile() || new JsonSlurper().parse(result).status != 'PASS')
+                    throw new GradleException("Packaged bootstrap did not produce PASS result: ${directory}")
+                logger.lifecycle("PULSE BOOTSTRAP VERIFIED: ${directory}")
+            }
+        }
+    }
+    if (project.name == 'fabric') {
+        tasks.matching { it.name == 'downloadAssets' }.configureEach { dependsOn prepare['client'] }
+        dependencies { runtimeOnly files(packaged) }
+        loom.runs.configureEach { run ->
+            if (run.name in ['client', 'server']) {
+                run.runDir project.relativePath(root.resolve(run.name).toFile())
+                run.vmArg "-Dpulselib.test.runDirectory=${root.resolve(run.name)}"
+                run.vmArg '-Xlog:class+load=info:file=classloading.log'
+                if (run.name == 'client')
+                    run.programArgs '--width', '960', '--height', '640'
+            }
+        }
+    } else {
+        dependencies { runtimeOnly files(packaged) }
+        neoForge.runs.configureEach { run ->
+            if (run.name in ['client', 'server']) {
+                run.gameDirectory = root.resolve(run.name).toFile()
+                run.systemProperty 'pulselib.test.runDirectory', root.resolve(run.name).toString()
+                run.jvmArgument '-Xlog:class+load=info:file=classloading.log'
+                if (run.name == 'client')
+                    run.programArguments.addAll '--width', '960', '--height', '640'
+            }
+        }
+    }
+}

@@ -1,0 +1,323 @@
+{
+  "stage": "7.1a",
+  "date": "2026-11-03",
+  "status": "PASS",
+  "branch": "26.1.2-multiloader",
+  "baseCommit": "6e6fe708e7c60b2d0891f5d87175f0224498c42f",
+  "sourceRefs": {
+    "26.1": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1",
+    "1.21.1-multiloader": "7ce6f024b307bb821ce543344d3896c8e1fcf26b"
+  },
+  "scope": "Packaged external bootstrap only; full canonical demo content/source mode/harness consolidation remains 7.1b. Final API/GPU/allocation/performance matrix remains 7.2.",
+  "canonicalJavaUnitsAtFrozenSource": 62,
+  "modId": "pulselibtest_bootstrap",
+  "runtimeFlag": "pulseTestJarBootstrap",
+  "validationInputs": "HEAD Java + checkpoint via preserved source projection; original user Java WIP excluded without editing worktree.",
+  "verification": {
+    "status": "PASS",
+    "originalDirtyFilesPreserved": 67,
+    "protectedFilesPreserved": 189,
+    "sourceRefs": {
+      "26.1": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1",
+      "1.21.1-multiloader": "7ce6f024b307bb821ce543344d3896c8e1fcf26b"
+    },
+    "production": {
+      "common": {
+        "classesByteIdentical": 592,
+        "gpuClassesByteIdentical": 26,
+        "jar": "common/build/libs/pulselib-26.1.2-common-1.1.5.3.jar",
+        "jarSha256": "a0822f90d25b0af1699daac3fff065585146a23c307a966f0ca5341942d2277b",
+        "jarByteIdentical": true,
+        "allJarEntryPayloadsByteIdentical": true,
+        "jarBeforeSha256": "a0822f90d25b0af1699daac3fff065585146a23c307a966f0ca5341942d2277b",
+        "fixtureExclusion": "PASS"
+      },
+      "fabric": {
+        "classesByteIdentical": 600,
+        "gpuClassesByteIdentical": 26,
+        "jar": "fabric/build/libs/pulselib-26.1.2-fabric-1.1.5.3.jar",
+        "jarSha256": "bc0b29703ec8abdb7258f68858e3dd58a11322ffead780a49866d092e5eb022e",
+        "jarByteIdentical": false,
+        "allJarEntryPayloadsByteIdentical": true,
+        "jarBeforeSha256": "67bdf75df715e076cdbb6e04a75f4af2b9b9ab6ce7ebfe6c64f6dd7c4e38f86b",
+        "fixtureExclusion": "PASS"
+      },
+      "neoforge": {
+        "classesByteIdentical": 605,
+        "gpuClassesByteIdentical": 26,
+        "jar": "neoforge/build/libs/pulselib-26.1.2-neoforge-1.1.5.3.jar",
+        "jarSha256": "cb4e0114d2166a5e381a84586c10fbbc764a28809487a6b7052b5467bb8d6974",
+        "jarByteIdentical": true,
+        "allJarEntryPayloadsByteIdentical": true,
+        "jarBeforeSha256": "cb4e0114d2166a5e381a84586c10fbbc764a28809487a6b7052b5467bb8d6974",
+        "fixtureExclusion": "PASS"
+      }
+    },
+    "tests": {
+      "common": {
+        "tests": 240,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "fabric": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "neoforge": {
+        "tests": 0,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "canonicalArmorProviderByteIdentical": true,
+    "productionCodeChanged": false,
+    "publicApiChanged": false,
+    "graphicsFoundationChanged": false
+  },
+  "productionFabricZipMetadata": {
+    "status": "PASS",
+    "beforeSha256": "67bdf75df715e076cdbb6e04a75f4af2b9b9ab6ce7ebfe6c64f6dd7c4e38f86b",
+    "afterSha256": "bc0b29703ec8abdb7258f68858e3dd58a11322ffead780a49866d092e5eb022e",
+    "byteIdentical": false,
+    "allEntryPayloadsByteIdentical": true,
+    "entryCount": 691,
+    "onlyChanges": "Loom ZIP timestamps (DOS and UT fields) for nested dependency JAR entries and their directory",
+    "baselineTimestamp": "2026-11-02T17:28:10",
+    "changedEntries": [
+      "META-INF/jars/",
+      "META-INF/jars/jackson-annotations-2.13.2.jar",
+      "META-INF/jars/jackson-core-2.13.2.jar",
+      "META-INF/jars/jackson-databind-2.13.2.1.jar",
+      "META-INF/jars/jgltf-impl-v1-2.0.3.jar",
+      "META-INF/jars/jgltf-impl-v2-2.0.3.jar",
+      "META-INF/jars/jgltf-model-2.0.3.jar"
+    ],
+    "proof": "Changing only those timestamp bytes reconstructs the exact initial pinned SHA-256; all decompressed entries and names match."
+  },
+  "runtime": {
+    "status": "PASS",
+    "runId": "bootstrap-fb7981293f4b43d0ab2ddeea170be829",
+    "cases": {
+      "fabric-server": {
+        "exitCode": 0,
+        "seconds": 89.4,
+        "runDirectory": "fabric/build/pulselib-tests/bootstrap-fb7981293f4b43d0ab2ddeea170be829/server",
+        "result": {
+          "origin": "file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/fabric/build/libs/pulselib-testmod-bootstrap-26.1.2-1.1.5.3-fabric.jar",
+          "candidates": 3,
+          "status": "PASS",
+          "side": "server",
+          "world": "/mnt/MainDrive/Programs/MC mods/ArcsLib/fabric/build/pulselib-tests/bootstrap-fb7981293f4b43d0ab2ddeea170be829/server/pulselib-bootstrap",
+          "loaded": 2
+        }
+      },
+      "neoforge-server": {
+        "exitCode": 0,
+        "seconds": 95.11,
+        "runDirectory": "neoforge/build/pulselib-tests/bootstrap-fb7981293f4b43d0ab2ddeea170be829/server",
+        "result": {
+          "status": "PASS",
+          "candidates": 3,
+          "origin": "file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/neoforge/build/libs/pulselib-testmod-bootstrap-26.1.2-1.1.5.3-neoforge.jar",
+          "loaded": 2,
+          "world": "/mnt/MainDrive/Programs/MC mods/ArcsLib/neoforge/build/pulselib-tests/bootstrap-fb7981293f4b43d0ab2ddeea170be829/server/pulselib-bootstrap",
+          "side": "server"
+        }
+      },
+      "fabric-client": {
+        "exitCode": 0,
+        "seconds": 101.95,
+        "runDirectory": "fabric/build/pulselib-tests/bootstrap-fb7981293f4b43d0ab2ddeea170be829/client",
+        "result": {
+          "geckoAnimations": 1,
+          "assetChecks": 12,
+          "gltfBones": 3,
+          "modelEpochs": 2,
+          "candidates": 3,
+          "side": "client",
+          "status": "PASS",
+          "geckoBones": 7,
+          "origin": "file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/fabric/build/libs/pulselib-testmod-bootstrap-26.1.2-1.1.5.3-fabric.jar",
+          "loaded": 2
+        }
+      },
+      "neoforge-client": {
+        "exitCode": 0,
+        "seconds": 30.85,
+        "runDirectory": "neoforge/build/pulselib-tests/bootstrap-fb7981293f4b43d0ab2ddeea170be829/client",
+        "result": {
+          "loaded": 2,
+          "geckoAnimations": 1,
+          "assetChecks": 12,
+          "gltfBones": 3,
+          "modelEpochs": 2,
+          "candidates": 3,
+          "side": "client",
+          "status": "PASS",
+          "geckoBones": 7,
+          "origin": "file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/neoforge/build/libs/pulselib-testmod-bootstrap-26.1.2-1.1.5.3-neoforge.jar"
+        }
+      }
+    },
+    "jars": {
+      "fabric": {
+        "path": "fabric/build/libs/pulselib-testmod-bootstrap-26.1.2-1.1.5.3-fabric.jar",
+        "sha256": "8a31795c0e3f352f839c8e564ffbd7a5384ac447d5555a713f963e00e82ef144",
+        "classes": 10,
+        "canonicalAssets": 6
+      },
+      "neoforge": {
+        "path": "neoforge/build/libs/pulselib-testmod-bootstrap-26.1.2-1.1.5.3-neoforge.jar",
+        "sha256": "80b7a99c80074137f39703d5035c6b7f5fceee39d22af3e4a441dc54784a0037",
+        "classes": 10,
+        "canonicalAssets": 6
+      }
+    }
+  },
+  "classloadingAndLogs": {
+    "fabric-server": {
+      "classloadingSha256": "29ab1a87c944cd951498adbe57bdd2e394e122db888f47933e29d3828af331f6",
+      "forbiddenClassPrefixesAbsent": [
+        "net.minecraft.client.",
+        "com.mojang.blaze3d.",
+        "com.arcanc.pulselib.test.bootstrap.ClientTestPlugin ",
+        "com.arcanc.pulselib.test.bootstrap.BootstrapClient ",
+        "com.arcanc.pulselib.test.bootstrap.DisposableTestWorlds ",
+        "com.arcanc.pulselib.test.bootstrap.fabric.TestModFabricClient ",
+        "com.arcanc.pulselib.test.bootstrap.neoforge.TestModNeoForgeClient "
+      ],
+      "resultSha256": "d19dd35f072c39cd7d28f135f94ac65794605c1eadf24691d5d32105804a6045",
+      "stdoutSha256": "3c023f03ecf171d01998c555b97d792e1c93828e345762a01ff75f38ff1016d3"
+    },
+    "neoforge-server": {
+      "classloadingSha256": "5ad51ea0a351ceeaca74aa746c83ed2678868d0afe795c9a72d3512976a8176e",
+      "forbiddenClassPrefixesAbsent": [
+        "net.minecraft.client.",
+        "com.mojang.blaze3d.",
+        "com.arcanc.pulselib.test.bootstrap.ClientTestPlugin ",
+        "com.arcanc.pulselib.test.bootstrap.BootstrapClient ",
+        "com.arcanc.pulselib.test.bootstrap.DisposableTestWorlds ",
+        "com.arcanc.pulselib.test.bootstrap.fabric.TestModFabricClient ",
+        "com.arcanc.pulselib.test.bootstrap.neoforge.TestModNeoForgeClient "
+      ],
+      "resultSha256": "c793143102268c95acf8fc1dd9d507804123930b0a198c6c9b0dbd6e258ff4e5",
+      "stdoutSha256": "9ffe4618d47dc7eebe52f9be6ee37170f4502e772bdf82d84fa26a4f15a273ba"
+    },
+    "fabric-client": {
+      "classloadingSha256": "b9bb11a9bd383bc054a8cd319c12882cdd4c8fa39f879c29b4641de7e7c4cdd6",
+      "forbiddenClassPrefixesAbsent": [
+        "com.arcanc.pulselib.test.bootstrap.ServerTestPlugin "
+      ],
+      "resultSha256": "5d2df683ba4cc8dbf678fe4577103e367ae0470e91a2c876bb4278c63f7a067c",
+      "stdoutSha256": "eafbdd74751421ceb4b40de454e33ccc3baf1f7800bdb53a2ed495cdaa87b02f"
+    },
+    "neoforge-client": {
+      "classloadingSha256": "0828bfd0195bc7d6ad1dedb3a0b6b437d2e1973f8be71cedafcd083aec21a6a7",
+      "forbiddenClassPrefixesAbsent": [
+        "com.arcanc.pulselib.test.bootstrap.ServerTestPlugin "
+      ],
+      "resultSha256": "b9a89f8ba36ab127f2b4ac8c479b8e5d1078a785e4bbabb0870aeb0b89353820",
+      "stdoutSha256": "06510bc16c18fd4ed5d043bd3d8661b254671e56b1a53ebf034429accf815d23"
+    }
+  },
+  "guards": {
+    "status": "PASS",
+    "runPrefix": "guards-79d1f569e2d1455dabbc01ccef8ef123",
+    "cases": [
+      {
+        "case": "existing-unmarked",
+        "exit": 1,
+        "filesUnchanged": true
+      },
+      {
+        "case": "existing-marked",
+        "exit": 1,
+        "filesUnchanged": true
+      },
+      {
+        "case": "traversal",
+        "exit": 1
+      },
+      {
+        "case": "symlink",
+        "exit": 1,
+        "targetUnchanged": true
+      },
+      {
+        "case": "no-eula",
+        "exit": 1,
+        "runNotCreated": true
+      }
+    ]
+  },
+  "negativeControl": {
+    "loader": "neoforge",
+    "mutation": "ASM removes CommonTestPlugin @PulsePlugin; every other JAR entry is byte-identical to final positive JAR",
+    "changedEntries": [
+      "com/arcanc/pulselib/test/bootstrap/CommonTestPlugin.class"
+    ],
+    "negativeJarSha256": "f8947b4ee7dcd21f668cbe0bbca687ec643d6745fa87865c64e2750e14313c0a",
+    "javaExit": 1,
+    "gradleExit": 1,
+    "expectedAssertion": "Common plugin lifecycle exactly once",
+    "normalShutdown": false,
+    "watchdog": true,
+    "passResultAbsent": true,
+    "stdoutSha256": "0bda51c1c0702c2fd46a45e299d605183ad6be53d2b7d0350600fb4b2bd71c20"
+  },
+  "canonicalAssets": {
+    "tests/testmod/bootstrap/common/resources/assets/pulselib/glmodels/item/test_block.glb": {
+      "source": "tests/testmod/src/main/resources/assets/pulselib/glmodels/item/test_block.glb",
+      "sha256": "72e83a7ef0a737dae35cd92bee7b7687b5970b686981f2424deceb5e66b15258"
+    },
+    "tests/testmod/bootstrap/common/resources/assets/pulselib/textures/item/test_block/pyramid.png": {
+      "source": "tests/testmod/src/main/resources/assets/pulselib/textures/item/test_block/pyramid.png",
+      "sha256": "ea1d76e9bc224c1aa581265e4ff25ddc71dbc27d5bc861c4b5a742952161544a"
+    },
+    "tests/testmod/bootstrap/common/resources/assets/pulselib/textures/item/test_block/circle.png": {
+      "source": "tests/testmod/src/main/resources/assets/pulselib/textures/item/test_block/circle.png",
+      "sha256": "32249058dd163f0278933d687296ec3ace6439424f5804cb96161b0f32ca5585"
+    },
+    "tests/testmod/bootstrap/common/resources/assets/pulselib/geckolib/models/player/demo/player_flip.geo.json": {
+      "source": "tests/testmod/src/main/resources/assets/pulselib/geckolib/models/player/demo/player_flip.geo.json",
+      "sha256": "3e3f0b2493f6ef7dc9614f2ef4eb74fdd6247623fe8980f7dbe006b70bf016f3"
+    },
+    "tests/testmod/bootstrap/common/resources/assets/pulselib/geckolib/animations/player/demo/player_flip.animation.json": {
+      "source": "tests/testmod/src/main/resources/assets/pulselib/geckolib/animations/player/demo/player_flip.animation.json",
+      "sha256": "00b3c19693956208c10f31b3630e090a945da1d7f2dfa5225b1256c03b82dc6e"
+    },
+    "tests/testmod/bootstrap/common/resources/assets/pulselib/textures/entity/test_entity/0.png": {
+      "source": "tests/testmod/src/main/resources/assets/pulselib/textures/entity/test_entity/0.png",
+      "sha256": "84e28faa3db609e3f68991b917865cfcc17038e6f1bab2c353317e95e207b7f7"
+    }
+  },
+  "sourceDateProvenance": {
+    "buildSrc/src/main/groovy/multiloader-testmod.gradle": "e591523b9f8dfdd0fbe17402616d700e57cf14cd 2026-10-12 first try into multiloader",
+    "tests/testmod/src/main/java/com/arcanc/pulselib/test/CommonTestPlugin.java": "e591523b9f8dfdd0fbe17402616d700e57cf14cd 2026-10-12 first try into multiloader",
+    "tests/testmod/src/main/java/com/arcanc/pulselib/test/DisposableTestWorlds.java": "4b22a67bcf3e1091de92dc5f8e2c94de9ac48eaf 2026-10-13 fixed C1 error and bunch of small fixes"
+  },
+  "launchPlan": "Actual JavaExec and loader-model game directories match; packaged JAR present, loose testmod outputs absent on both loaders.",
+  "logSha256": {
+    "final-build.log": "27a2ad3aeb6c9f281e0679e0a9f46e29cfd8de28dea0bb65267d301c75b390af",
+    "inventory.log": "6e73e3a827268129b5bb5216e280ac4f0734f87a1391a6cf2a0b84454ffb015e",
+    "launch-plan.log": "83268858134d11bed89582c74a323f5b4341cb70e9dc33fd14ab3715aded3b50",
+    "final-runner.log": "e08817413b5ec0b6a78799d6d2945a66b821aeae87c4cf703a6cdd3445c41012",
+    "negative-plugin-final.log": "0bda51c1c0702c2fd46a45e299d605183ad6be53d2b7d0350600fb4b2bd71c20",
+    "final-guards.log": "11a6700a53756f5b1426a2d41a3a2a753ad67a8fb41913fac797ddbfec387644"
+  },
+  "artifactDirectory": "fabric/build/stage71a-20261103",
+  "protectedFilesPreserved": 189,
+  "originalDirtyFilesPreserved": 67,
+  "newRenderTypesOrPipelines": false,
+  "limitations": [
+    "No full canonical demo content/registrations/player renderer/harness consolidation yet (7.1b).",
+    "No new pixel/GPU strategy/performance claims; prior stage evidence remains applicable.",
+    "Source and full canonical JAR flags remain rejected.",
+    "Negative server assertion terminates through watchdog, not normal lifecycle.",
+    "Fabric release JAR differs only ZIP timestamp fields; no claim of full byte identity for that archive."
+  ]
+}
