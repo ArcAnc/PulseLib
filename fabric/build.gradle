@@ -178,3 +178,32 @@ if (providers.gradleProperty('pulseFabricLayersProbe').isPresent()) {
     }
     tasks.named('runServer') { standardInput = System.in }
 }
+
+// Canonical armor-provider fixture; shared suite and assets stay out of release artifacts.
+if (providers.gradleProperty('pulseArmorProviderProbe').isPresent()) {
+    sourceSets {
+        stage62Armor {
+            java.srcDirs rootProject.file('tests/stage62armor/common/java'), rootProject.file('tests/stage62armor/fabric/java')
+            resources.srcDirs rootProject.file('tests/stage62armor/common/resources'), rootProject.file('tests/stage62armor/fabric/resources')
+            compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+            runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+        }
+    }
+    loom {
+        mods { pulselib_stage62armor { sourceSet sourceSets.stage62Armor } }
+        runs {
+            client {
+                source sourceSets.stage62Armor
+                programArgs '--quickPlayMultiplayer', '127.0.0.1:25584', '--width', '960', '--height', '640'
+                runDir 'build/stage62d2a-runs/client'
+                vmArg '-Xlog:class+load=info:file=classloading.log'
+            }
+            server {
+                source sourceSets.stage62Armor
+                runDir 'build/stage62d2a-runs/server'
+                vmArg '-Xlog:class+load=info:file=classloading.log'
+            }
+        }
+    }
+    tasks.named('runServer') { standardInput = System.in }
+}

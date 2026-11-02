@@ -629,3 +629,29 @@ only the extraction injection, requiring `Native final extraction captures the e
 item snapshot`. Restore normal inputs and rerun the full positive suite. An exit code
 without markers is insufficient. Canonical armor-provider API, loader armor/arm bridges
 and deformation/instancing parity remain **6.2d.2**; see migration journal §60.
+
+Stage 6.2d.2a restores the exact canonical `PArmorModelProvider` and captures its
+selected model, animation, slot visibility and frozen deformation during native
+extraction. `-PpulseArmorProviderProbe` enables shared `tests/stage62armor` with
+thin adapters for **both Fabric and NeoForge**. Each loader checks 96 actual
+native entity PiP regions, four equipment slots, one armor stand/two players,
+shared custom model poisoning, ordinary armor, resource reload, nested capture,
+six callback failures and no deferred provider/deformer queries. NeoForge also
+checks humanoid generic extension composition exactly once per eligible slot;
+unrelated equipment types retain their native path. The replay negative control
+fails immediately before native GPU drawing. This does not claim full arm,
+world OIT/depth, first-person or instancing parity; those remain 6.2d.2b.
+
+Use separate `:fabric:runServer` / `:fabric:runClient` and
+`:neoforge:runServer` / `:neoforge:runClient` with that property, wait for server
+Done, require PHASE PASS x4 / COMPLETE / SHUTDOWN PASS and exit 0 on each client,
+then console-stop each server. Runs are confined to each module's
+`build/stage62d2a-runs/{client,server}`, disposable flat/creative/peaceful world
+`armor-provider-fixture`, client marker `.pulselib-armor-provider`, ports
+25584 (Fabric) / 25585 (NeoForge), visible 960x640 window. Prepare these directories
+using only your own accepted EULA/options/properties, never existing user saves.
+For isolated validation of the dirty workspace, use the saved HEAD Java
+projection described in journal section 61. Full build plus `stage2Evidence`,
+both `compileStage62ArmorJava` tasks and the pinned inventory verifier pass;
+241 JUnit tests are rerun. Production JARs exclude this fixture. See section 61
+and `docs/porting/evidence/stage-6.2d.2a.json` for results and exact limits.

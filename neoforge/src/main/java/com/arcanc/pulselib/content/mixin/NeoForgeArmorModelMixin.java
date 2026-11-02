@@ -10,6 +10,7 @@
 package com.arcanc.pulselib.content.mixin;
 
 import com.arcanc.pulselib.content.player.deformer.PPlayerModelGeometry;
+import com.arcanc.pulselib.util.attachments.humanoid.armor.PArmorModelSnapshots;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -31,6 +32,9 @@ public abstract class NeoForgeArmorModelMixin
 			EquipmentClientInfo.LayerType type, Model<?> model, Operation<Model<?>> original,
 			@Local(argsOnly = true) Object state)
 	{
+		var provider = PArmorModelSnapshots.submitting(state);
+		if (provider != null && provider.model() == model)
+			return provider.model();
 		var entry = PPlayerModelGeometry.submitting(state);
 		return entry != null && entry.original() == model ? entry.model() : original.call(extensions, stack, type, model);
 	}

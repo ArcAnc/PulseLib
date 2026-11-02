@@ -55,6 +55,10 @@
     "CameraAccessor",
     "ProjectionMatrixBufferMixin",
     "ResourceReloadMixin",
-    "WeatherEffectRendererMixin"
+    "WeatherEffectRendererMixin",
+    "ArmorProviderStateMixin",
+    "ArmorProviderLayerMixin",
+    "ArmorProviderSubmitMixin",
+    "ArmorProviderFeatureMixin"
   ]
 }

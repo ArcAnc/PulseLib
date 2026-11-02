@@ -1,0 +1,62 @@
+
+[fabric final client]
+[17:22:16] [Render thread/INFO] (Pulse Lib) STAGE62D2A PHASE PASS: phase=0, pixels=[1023, 1158, 8178], draws=108
+[17:22:17] [Render thread/INFO] (Pulse Lib) STAGE62D2A PHASE PASS: phase=1, pixels=[1023, 1158, 9007], draws=136
+[17:22:26] [Render thread/INFO] (Pulse Lib) STAGE62D2A PHASE PASS: phase=2, pixels=[1023, 1158, 8178], draws=108
+[17:22:27] [Render thread/INFO] (Pulse Lib) STAGE62D2A PHASE PASS: phase=3, pixels=[1023, 1158, 2953], draws=304
+[17:22:27] [Render thread/INFO] (Pulse Lib) STAGE62D2A COMPLETE: neo=false, regions=96, draws=[108, 136, 108, 304], selections=724, animations=718, extensions=0, deformations=259328, failures=6, nested=2, retained=1
+[17:22:27] [Render thread/INFO] (Pulse Lib) STAGE62D2A SHUTDOWN PASS
+BUILD SUCCESSFUL in 2m 19s
+
+[fabric final dedicated server]
+[17:09:25] [Server thread/INFO] (Minecraft) Done (0.466s)! For help, type "help"
+[17:22:44] [Server thread/INFO] (Minecraft) Stopping server
+BUILD SUCCESSFUL in 13m 43s
+
+[neoforge final client]
+[17:26:31] [Render thread/INFO] [Pulse Lib/]: STAGE62D2A PHASE PASS: phase=0, pixels=[1023, 1158, 1158], draws=108
+[17:26:32] [Render thread/INFO] [Pulse Lib/]: STAGE62D2A PHASE PASS: phase=1, pixels=[1023, 1158, 8989], draws=104
+[17:26:39] [Render thread/INFO] [Pulse Lib/]: STAGE62D2A PHASE PASS: phase=2, pixels=[1023, 1158, 8178], draws=108
+[17:26:40] [Render thread/INFO] [Pulse Lib/]: STAGE62D2A PHASE PASS: phase=3, pixels=[1023, 1158, 8991], draws=184
+[17:26:40] [Render thread/INFO] [Pulse Lib/]: STAGE62D2A COMPLETE: neo=true, regions=96, draws=[108, 104, 108, 184], selections=536, animations=530, extensions=536, deformations=187056, failures=6, nested=2, retained=1
+[17:26:40] [Render thread/INFO] [Pulse Lib/]: STAGE62D2A SHUTDOWN PASS
+BUILD SUCCESSFUL in 2m 31s
+
+[neoforge final dedicated server]
+[17:17:32] [Server thread/INFO] [minecraft/DedicatedServer]: Done (1.149s)! For help, type "help"
+[17:27:54] [Server thread/INFO] [minecraft/MinecraftServer]: Stopping server
+BUILD SUCCESSFUL in 12m 51s
+
+[Fabric replay disabled negative control — expected failure]
+java.lang.AssertionError: STAGE62D2A: Frozen provider pose before native GPU draw: actual=0.0/1.0 expected=[-5.7, 1.15]
+java.lang.AssertionError: STAGE62D2A: Frozen provider pose before native GPU draw: actual=0.0/1.0 expected=[-5.7, 1.15]
+> Process 'command '/usr/lib/jvm/java-25-openjdk/bin/java'' finished with non-zero exit value 255
+BUILD FAILED in 57s
+
+[Fabric failure-suite wrapper preflight — not accepted]
+Caused by: java.lang.IllegalArgumentException: provider selection failure
+java.lang.IllegalArgumentException: provider selection failure
+BUILD FAILED in 1m 1s
+
+[NeoForge overly broad generic-extension observer preflight — not accepted]
+Caused by: java.lang.AssertionError: STAGE62D2A: No generic armor extension during deferred submission/replay
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.renderer.entity.layers.WingsLayer.submit(WingsLayer.java:44) ~[minecraft-patched-26.1.2.95.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.renderer.entity.layers.WingsLayer.submit(WingsLayer.java:22) ~[minecraft-patched-26.1.2.95.jar:?] {}
+java.lang.AssertionError: STAGE62D2A: No generic armor extension during deferred submission/replay
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.renderer.entity.layers.WingsLayer.submit(WingsLayer.java:44) ~[minecraft-patched-26.1.2.95.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.renderer.entity.layers.WingsLayer.submit(WingsLayer.java:22) ~[minecraft-patched-26.1.2.95.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.renderer.entity.layers.WingsLayer.submit(WingsLayer.java:44) ~[minecraft-patched-26.1.2.95.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.renderer.entity.layers.WingsLayer.submit(WingsLayer.java:22) ~[minecraft-patched-26.1.2.95.jar:?] {}
+
+[final-build.log]
+> Task :neoforge:test NO-SOURCE
+> Task :fabric:test
+> Task :common:test
+STAGE 2 SERVICE PROVIDERS / LEGACY REMOVAL / COMMON BOUNDARY PASS: /mnt/MainDrive/Programs/MC mods/ArcsLib/build/reports/porting/stage-2-build.json
+BUILD SUCCESSFUL in 31s
+
+[inventory.log]
+PASS: Java AST fixture and independent javac/javap counts for seven types
+PASS: pinned source coverage, all migration policies, required APIs and artifact checksums
+
+[verification.log]

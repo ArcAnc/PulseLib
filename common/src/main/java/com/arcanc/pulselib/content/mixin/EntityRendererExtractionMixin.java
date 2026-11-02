@@ -16,6 +16,7 @@ import com.arcanc.pulselib.content.renderer.base.PModelPartSnapshot;
 import com.arcanc.pulselib.content.player.deformer.PPlayerGeometryRenderState;
 import com.arcanc.pulselib.content.player.deformer.PPlayerGeometryRenderer;
 import com.arcanc.pulselib.content.renderer.PWorldRenderEligibility;
+import com.arcanc.pulselib.util.attachments.humanoid.armor.PArmorModelSnapshots;
 import com.arcanc.pulselib.content.renderer.base.PPartialTickRenderState;
 import com.arcanc.pulselib.content.renderer.base.PPlayerRootRenderState;
 import com.arcanc.pulselib.content.renderer.base.PPlayerRigRenderState;
@@ -28,7 +29,9 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 
 import org.spongepowered.asm.mixin.Mixin;
@@ -87,6 +90,8 @@ public abstract class EntityRendererExtractionMixin
 				}
 				if (entity instanceof AbstractClientPlayer player && PPlayerAttachmentEligibility.hasRenderer(player, partialTick))
 					PWorldRenderEligibility.markGeometry();
+				if (entity instanceof LivingEntity living && state instanceof HumanoidRenderState humanoid && (Object)this instanceof LivingEntityRenderer<?, ?, ?> renderer)
+					PArmorModelSnapshots.capture(living, humanoid, renderer, partialTick);
 				return state;
 			});
 		}
