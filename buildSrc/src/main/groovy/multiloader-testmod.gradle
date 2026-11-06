@@ -11,7 +11,7 @@ import groovy.json.JsonSlurper
 import java.nio.file.Files
 import java.nio.file.StandardOpenOption
 
-// Packaging is shared with the canonical testmod; content/harness migration continues in 7.1b.
+// Bootstrap remains independent of canonical demo content; full harness migration continues in 7.1b.2.
 sourceSets {
     testmod {
         java.srcDirs rootProject.file('tests/testmod/bootstrap/common/java'), rootProject.file("tests/testmod/bootstrap/${project.name}/java")
@@ -36,14 +36,42 @@ def testmodJar = tasks.register('testmodJar', Jar) {
     manifest.attributes 'PulseLib-Test-Stage': '7.1a', 'PulseLib-Canonical-Source': '7ce6f024b307bb821ce543344d3896c8e1fcf26b'
 }
 
+// Canonical demo content profile; complete regression harness flags remain guarded.
+sourceSets {
+    demo {
+        java.srcDirs rootProject.file('tests/testmod/demo/common/java'), rootProject.file("tests/testmod/demo/${project.name}/java")
+        resources.srcDirs rootProject.file('tests/testmod/demo/common/resources'), rootProject.file("tests/testmod/demo/${project.name}/resources")
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+}
+def demoJar = tasks.register('demoJar', Jar) {
+    group = 'verification'
+    description = 'Packages canonical demo content; full regression harnesses remain stage 7.1b.2.'
+    from sourceSets.demo.output
+    from rootProject.file('LICENSE.txt')
+    archiveBaseName = 'pulselib-testmod-demo'
+    archiveVersion = "${minecraft_version}-${mod_version}"
+    archiveClassifier = project.name
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+    duplicatesStrategy = DuplicatesStrategy.FAIL
+    manifest.attributes 'PulseLib-Test-Stage': '7.1b.1', 'PulseLib-Canonical-Source': '7ce6f024b307bb821ce543344d3896c8e1fcf26b'
+}
+def demoSource = providers.gradleProperty('pulseDemoContent').isPresent()
+def demoPackaged = providers.gradleProperty('pulseDemoJar').isPresent()
+def demoMode = demoSource || demoPackaged
+if ((demoSource && demoPackaged) || (demoMode && providers.gradleProperty('pulseTestJarBootstrap').isPresent()))
+    throw new GradleException('Select exactly one bootstrap/demo source/demo JAR profile.')
+
 def unsupported = ['pulseTestMod', 'pulseTestJar', 'pulseSmokeAuto', 'pulseSmokeWorld', 'pulseOitTest', 'pulseOitPerf', 'pulsePlayerMotionTest', 'pulseItemIdentityTest']
 if (unsupported.any { providers.gradleProperty(it).isPresent() })
-    throw new GradleException('The complete canonical testmod/content/harnesses remain stage 7.1b. Packaged bootstrap uses only -PpulseTestJarBootstrap; it cannot open existing demo worlds.')
+    throw new GradleException('The complete canonical regression harnesses remain stage 7.1b.2. Packaged bootstrap uses only -PpulseTestJarBootstrap; it cannot open existing demo worlds.')
 
-if (providers.gradleProperty('pulseTestJarBootstrap').isPresent()) {
-    def packaged = providers.gradleProperty('pulseBootstrapJar').map { rootProject.file(it) }.getOrElse(testmodJar.get().archiveFile.get().asFile)
-    if (!packaged.isFile())
-        throw new GradleException('Build :fabric:testmodJar :neoforge:testmodJar first, then start packaged bootstrap in a separate Gradle invocation.')
+if (providers.gradleProperty('pulseTestJarBootstrap').isPresent() || demoMode) {
+    def packaged = providers.gradleProperty('pulseBootstrapJar').map { rootProject.file(it) }.getOrElse((demoMode ? demoJar : testmodJar).get().archiveFile.get().asFile)
+    if (!demoSource && !packaged.isFile())
+        throw new GradleException(demoMode ? 'Build :fabric:demoJar :neoforge:demoJar first, then start the demo in a separate Gradle invocation.' : 'Build :fabric:testmodJar :neoforge:testmodJar first, then start packaged bootstrap in a separate Gradle invocation.')
     def runId = providers.gradleProperty('pulseBootstrapRunId').getOrElse(UUID.randomUUID().toString())
     if (!(runId ==~ /[A-Za-z0-9_-]+/))
         throw new GradleException('pulseBootstrapRunId must be a simple directory name, never a path.')
@@ -91,7 +119,7 @@ if (providers.gradleProperty('pulseTestJarBootstrap').isPresent()) {
                     throw new GradleException("Unexpected bootstrap JVM working directory: ${workingDir}")
             }
             doLast {
-                def result = directory.resolve('bootstrap-results.json').toFile()
+                def result = directory.resolve(demoMode ? 'demo-results.json' : 'bootstrap-results.json').toFile()
                 if (!result.isFile() || new JsonSlurper().parse(result).status != 'PASS')
                     throw new GradleException("Packaged bootstrap did not produce PASS result: ${directory}")
                 logger.lifecycle("PULSE BOOTSTRAP VERIFIED: ${directory}")
@@ -100,23 +128,39 @@ if (providers.gradleProperty('pulseTestJarBootstrap').isPresent()) {
     }
     if (project.name == 'fabric') {
         tasks.matching { it.name == 'downloadAssets' }.configureEach { dependsOn prepare['client'] }
-        dependencies { runtimeOnly files(packaged) }
+        if (demoSource) {
+            sourceSets.main.runtimeClasspath += sourceSets.demo.output
+        } else {
+            dependencies { runtimeOnly files(packaged) }
+        }
+        if (demoSource)
+            loom.mods { pulselib { sourceSet sourceSets.main }; pulselibtest { sourceSet sourceSets.demo } }
         loom.runs.configureEach { run ->
             if (run.name in ['client', 'server']) {
                 run.runDir project.relativePath(root.resolve(run.name).toFile())
                 run.vmArg "-Dpulselib.test.runDirectory=${root.resolve(run.name)}"
                 run.vmArg '-Xlog:class+load=info:file=classloading.log'
+                if (demoMode)
+                    run.vmArg "-Dpulselib.test.demoMode=${demoSource ? 'source' : 'jar'}"
                 if (run.name == 'client')
                     run.programArgs '--width', '960', '--height', '640'
             }
         }
     } else {
-        dependencies { runtimeOnly files(packaged) }
+        if (demoSource) {
+            sourceSets.main.runtimeClasspath += sourceSets.demo.output
+        } else {
+            dependencies { runtimeOnly files(packaged) }
+        }
+        if (demoSource)
+            neoForge.mods { pulselibtest { sourceSet sourceSets.demo } }
         neoForge.runs.configureEach { run ->
             if (run.name in ['client', 'server']) {
                 run.gameDirectory = root.resolve(run.name).toFile()
                 run.systemProperty 'pulselib.test.runDirectory', root.resolve(run.name).toString()
                 run.jvmArgument '-Xlog:class+load=info:file=classloading.log'
+                if (demoMode)
+                    run.systemProperty 'pulselib.test.demoMode', demoSource ? 'source' : 'jar'
                 if (run.name == 'client')
                     run.programArguments.addAll '--width', '960', '--height', '640'
             }

@@ -703,3 +703,25 @@ See [testmod instructions](testmod/README.md), journal section 63 and
 `docs/porting/evidence/stage-7.1a.json`. Complete canonical demo content, source
 mode, canonical `pulseTestMod`/`pulseTestJar` flags and harness consolidation
 remain **7.1b**; final GPU/API/performance matrix remains **7.2**.
+
+Stage **7.1b.1** migrates canonical `pulselibtest` content into shared
+`tests/testmod/demo/common` with thin Fabric/NeoForge adapters: block/entity,
+animated item, three armor pieces, tail attachment and ball/acrobatic demos.
+MC26 native states, item components/registry keys and special item codec retain
+the existing Common/PGl backend and owner callbacks. The previously approved
+PItemAnimatable removal is preserved; items use PAnimatable.
+
+Build `:fabric:demoJar :neoforge:demoJar`, then run
+`python3 tests/testmod/tools/run_demo.py --eula /path/to/your/accepted/eula.txt --output build/reports/demo-UNIQUE`.
+`-PpulseDemoJar` loads the packaged demo; `-PpulseDemoContent` uses source outputs.
+The eight-case source/JAR × loader × client/server matrix checks registry/side
+boundaries, 50 resources in two epochs, actual entity/block/item submissions,
+player handles, armor/tail/socket callbacks and saved disposable worlds. A
+negative JAR with ordinary item metadata instead of native special metadata
+fails the held-item submission guard after resource checks pass. Full build,
+fresh 241 JUnit, inventory and production class/JAR payload checks pass.
+
+See [testmod instructions](testmod/README.md), migration journal section 64 and
+`docs/porting/evidence/stage-7.1b.1.json`. The full canonical harness bundle and
+`pulseTestMod`/`pulseTestJar` flags remain **7.1b.2**, final GPU/API/performance
+matrix **7.2**. Bootstrap 7.1a stays available separately.

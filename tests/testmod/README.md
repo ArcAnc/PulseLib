@@ -2,8 +2,9 @@
 
 Stage **7.1a** provides a packaged bootstrap, ID `pulselibtest_bootstrap`, for
 Minecraft 26.1.2 on Fabric and NeoForge. The complete canonical `pulselibtest`
-demo (blocks/entities/items/renderers/player demos), source mode and consolidation
-of the existing stage harnesses remain **7.1b**. `pulseTestMod`, `pulseTestJar`
+demo content (blocks/entities/items/renderers/player demos) and source/JAR
+profiles are migrated in **7.1b.1** below. Consolidation of the complete canonical
+harness bundle remains **7.1b.2**. `pulseTestMod`, `pulseTestJar`
 and the canonical content/harness flags remain unsupported until that migration.
 
 The `testmod` source set packages only `bootstrap/common` and the current loader's
@@ -69,3 +70,46 @@ dated 03.11.2026. All retain ArcAnc / Arc's License of Common Sense attribution.
 
 See [migration journal](../../docs/porting/26.1.2-multiloader.md) section 63 and
 [recorded evidence](../../docs/porting/evidence/stage-7.1a.json).
+
+
+## Canonical demo content (7.1b.1)
+
+`demo/common`, `demo/fabric` and `demo/neoforge` provide the canonical
+`pulselibtest` game content on Minecraft 26.1.2: block/block entity, entity,
+animated block item, three armor pieces, tail attachment and ball/acrobatic
+player demos. Each loader keeps its native registry/event wiring; renderer
+callbacks run through the existing Common/PGl backend. The special item codec
+is `pulselibtest:test_block`. Key mappings remain V (ball) / B (acrobatic).
+
+Build `:fabric:demoJar :neoforge:demoJar` first. `-PpulseDemoJar` uses the packaged
+JAR, `-PpulseDemoContent` uses the demo source-set outputs/mod roots. Select one
+profile per invocation. The bootstrap profile above remains separate. Full
+`pulseTestMod`/`pulseTestJar` and canonical harness flags stay guarded until
+**7.1b.2**; demo source/JAR profiles do not claim that complete bundle.
+
+```bash
+./gradlew :fabric:demoJar :neoforge:demoJar --offline --no-daemon --console=plain
+python3 tests/testmod/tools/run_demo.py --eula /absolute/path/to/your/accepted/eula.txt --output build/reports/demo-UNIQUE
+```
+
+The runner checks eight client/server cases across both loaders and both modes;
+`--modes jar` or `--modes source` restricts modes. `--gradle-init` accepts the
+source projection described in journal section 64. Fresh-directory, symlink,
+accepted-EULA and marked-world contracts are shared with bootstrap; directories
+are never adopted or reused. Runs finish automatically and preserve their JSON,
+logs, classloading traces and saved worlds. Individual launches use the selected
+profile, `-PpulseBootstrapRunId=UNIQUE` and, on dedicated servers,
+`-PpulseTestEulaFile=/absolute/path/to/your/accepted/eula.txt`.
+
+Each client creates a canonical demo scene, requires new entity/block/item
+submissions in two resource epochs, starts both player demos through canonical
+handles, and verifies native armor setup, ball socket and tail sampling.
+Actual resource bytes and mod-pack origin are checked against the 50-resource
+manifest twice. Forty-five original assets are canonical byte-for-byte copies;
+five MC26 item definitions are generated adaptations. Servers verify registry
+IDs, entity attributes, five items and three equippable armor components without
+loading Minecraft client classes. Complete regression harness consolidation and
+new GPU pixel/performance claims remain the following checkpoints.
+
+See journal section 64 and
+[recorded evidence](../../docs/porting/evidence/stage-7.1b.1.json).
