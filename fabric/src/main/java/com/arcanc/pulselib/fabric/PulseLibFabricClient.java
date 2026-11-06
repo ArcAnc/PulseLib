@@ -24,6 +24,7 @@ import com.arcanc.pulselib.util.PResourceCache;
 import com.arcanc.pulselib.util.attachments.PAttachmentAnchorResolvers;
 import com.arcanc.pulselib.util.attachments.humanoid.armor.PLibArmorHandler;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
@@ -68,6 +69,11 @@ public final class PulseLibFabricClient implements ClientModInitializer
 		ClientTickEvents.START_LEVEL_TICK.register(PLibAnimationTicker::clientTick);
 		ClientTickEvents.END_CLIENT_TICK.register(client -> PLibAnimationTicker.afterClientTick());
 		ClientEntityEvents.ENTITY_UNLOAD.register((entity, level) -> InstanceAnimationManager.removeManager(entity));
+		ClientChunkEvents.CHUNK_UNLOAD.register((level, chunk) ->
+		{
+			for (var block : chunk.getBlockEntities().values())
+				InstanceAnimationManager.removeManager(block);
+		});
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> client.execute(PulseRuntime::disconnected));
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> PulseRuntime.disconnected());
 	}

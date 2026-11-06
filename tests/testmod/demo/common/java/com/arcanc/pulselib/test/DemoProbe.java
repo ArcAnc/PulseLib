@@ -43,6 +43,7 @@ public final class DemoProbe
 	private static int phase;
 	private static int assets;
 	private static boolean scene;
+	private static volatile net.minecraft.core.BlockPos sceneBlock = net.minecraft.core.BlockPos.ZERO;
 	private static int frames;
 	private static int epochs;
 	private static int entityBefore, blockBefore, itemBefore;
@@ -79,6 +80,8 @@ public final class DemoProbe
 		}
 		else if (phase == 3 && scene && ++frames >= 80)
 		{
+			if (Boolean.getBoolean("pulselib.test.animationRegression") && epochs == 0 && !AnimationSamplingHarness.frameWorld())
+				return;
 			verifyScene();
 			epochs++;
 			if (epochs == 1)
@@ -88,9 +91,15 @@ public final class DemoProbe
 			}
 			else
 			{
+				if (Boolean.getBoolean("pulselib.test.animationRegression"))
+				{
+					AnimationSamplingHarness.verifyRemovalHooks();
+					PLibDatabase.LOGGER.info("PULSE ANIMATION COMPLETE: assertions={}, maintenance={}", RegressionChecks.assertions, RegressionChecks.maintenancePasses);
+				}
 				completed = true;
 				DemoChecks.writeResult(Map.of("status", "PASS", "side", "client", "candidates", 3, "loaded", 2,
 						"origin", DemoChecks.jar(ClientTestPlugin.class), "assetChecks", assets, "modelEpochs", epochs,
+						"animation", Map.of("enabled", Boolean.getBoolean("pulselib.test.animationRegression"), "assertions", RegressionChecks.assertions, "maintenance", RegressionChecks.maintenancePasses),
 						"renders", java.util.List.of(TestEntityRender.renders,
 								TestBlockEntityRenderer.renders,
 								TestBlockItemRenderer.renders)));
@@ -111,6 +120,11 @@ public final class DemoProbe
 		}
 	}
 
+	static net.minecraft.core.BlockPos sceneBlockPosition()
+	{
+		return sceneBlock;
+	}
+
 	private static void createScene(Minecraft mc)
 	{
 		mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
@@ -122,6 +136,7 @@ public final class DemoProbe
 			var player = server.getPlayerList().getPlayers().getFirst();
 			var level = player.level();
 			var pos = player.blockPosition().offset(0, 0, 4);
+			sceneBlock = pos.immutable();
 			level.setBlockAndUpdate(pos, DemoContent.block.get().defaultBlockState());
 			((TestBlockEntity)level.getBlockEntity(pos)).changePlayAnimation();
 			var entity = DemoContent.entity.get().create(level, EntitySpawnReason.COMMAND);
@@ -172,6 +187,11 @@ public final class DemoProbe
 
 	private static void models(Minecraft mc)
 	{
+		if (Boolean.getBoolean("pulselib.test.animationRegression"))
+		{
+			AnimationLifecycleHarness.run(TestEntityRender.MODEL_DATA.getModel());
+			AnimationSamplingHarness.run();
+		}
 		var gltf = ClientTestPlugin.GLTF.getModel();
 		DemoChecks.check(IntStream.range(0, gltf.boneCount()).
 				mapToObj(gltf::bone).

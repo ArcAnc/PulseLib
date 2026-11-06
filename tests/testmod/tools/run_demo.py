@@ -22,6 +22,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--gradle-init', type=Path, action='append', default=[])
     parser.add_argument('--modes', nargs='+', choices=['jar', 'source'], default=['jar', 'source'])
+    parser.add_argument('--animation-regression', action='store_true')
     parser.add_argument('--timeout', type=int, default=900)
     args = parser.parse_args()
     output = args.output.resolve()
@@ -59,6 +60,8 @@ def main():
                     result['activeCase'] = key
                     save()
                     command = base + [f':{module}:run{side.capitalize()}', '-P' + ('pulseDemoJar' if mode == 'jar' else 'pulseDemoContent'), '-PpulseBootstrapRunId=' + run_id]
+                    if args.animation_regression:
+                        command += ['-PpulseAnimationRegression']
                     if side == 'server':
                         command += ['-PpulseTestEulaFile=' + str(args.eula.resolve())]
                     stdout = run(command, output / (key + '.log'), args.timeout)
@@ -74,10 +77,16 @@ def main():
                         assert case['assetChecks'] == 2 * len(manifest) and case['modelEpochs'] == 2
                         assert stdout.count('PULSE DEMO SCENE PASS') == 2
                         assert all(count > 20 for count in case['renders'])
+                        if args.animation_regression:
+                            assert case['animation']['enabled'] and case['animation']['assertions'] > 6000 and case['animation']['maintenance'] >= 2
+                            for marker in ['PULSE TEST L1/L4 PASS', 'PULSE TEST M-A3/M-A4/H2/H1 PASS']:
+                                assert stdout.count(marker) == 2, (key, marker)
+                            for marker in ['PULSE TEST L25 WORLD PASS', 'PULSE TEST L25 REMOVAL PASS', 'PULSE ANIMATION COMPLETE']:
+                                assert marker in stdout, (key, marker)
                     else:
                         assert 'PULSE DEMO CONTENT PASS' in stdout
                         trace = (directory / 'classloading.log').read_text()
-                        for prefix in ['net.minecraft.client.', 'com.mojang.blaze3d.', 'com.arcanc.pulselib.test.ClientTestPlugin ', 'com.arcanc.pulselib.test.DemoProbe ', 'com.arcanc.pulselib.test.DemoClient ']:
+                        for prefix in ['net.minecraft.client.', 'com.mojang.blaze3d.', 'com.arcanc.pulselib.test.ClientTestPlugin ', 'com.arcanc.pulselib.test.DemoProbe ', 'com.arcanc.pulselib.test.DemoClient ', 'com.arcanc.pulselib.test.AnimationSamplingHarness ', 'com.arcanc.pulselib.test.AnimationLifecycleHarness ', 'com.arcanc.pulselib.test.mixin.AnimationMaintenanceMixin ']:
                             assert '] ' + prefix not in trace, (key, prefix)
                     result['cases'][key] = {'exitCode': 0, 'runDirectory': str(directory.relative_to(ROOT)), 'result': case}
                     save()

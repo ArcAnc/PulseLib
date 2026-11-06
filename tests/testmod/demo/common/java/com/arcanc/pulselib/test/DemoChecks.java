@@ -170,6 +170,11 @@ public final class DemoChecks
 	public static void checkTime(PAnimationController<?> controller,
 	                            MolangParser.Context context, float partialTick)
 	{
+		if (Boolean.getBoolean("pulselib.test.animationRegression"))
+		{
+			AnimationSamplingHarness.checkTime(controller, context, partialTick);
+			return;
+		}
 		check(Math.abs(MolangParser.evaluate("q.anim_time", context) -
 				controller.getInterpolatedTime(partialTick) / 20f) < 0.000001f,
 				"Renderer/player Molang time must use interpolated seconds");

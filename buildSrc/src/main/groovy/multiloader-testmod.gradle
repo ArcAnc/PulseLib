@@ -61,10 +61,14 @@ def demoJar = tasks.register('demoJar', Jar) {
 def demoSource = providers.gradleProperty('pulseDemoContent').isPresent()
 def demoPackaged = providers.gradleProperty('pulseDemoJar').isPresent()
 def demoMode = demoSource || demoPackaged
+def animationRegression = providers.gradleProperty('pulseAnimationRegression').isPresent()
+def skipAnimationRemoval = providers.gradleProperty('pulseAnimationSkipRemoval').isPresent()
+if ((animationRegression && !demoMode) || (skipAnimationRemoval && !animationRegression))
+    throw new GradleException('Animation regression requires a demo source/JAR profile; skip-removal is an explicit negative control requiring animation regression.')
 if ((demoSource && demoPackaged) || (demoMode && providers.gradleProperty('pulseTestJarBootstrap').isPresent()))
     throw new GradleException('Select exactly one bootstrap/demo source/demo JAR profile.')
 
-def unsupported = ['pulseTestMod', 'pulseTestJar', 'pulseSmokeAuto', 'pulseSmokeWorld', 'pulseOitTest', 'pulseOitPerf', 'pulsePlayerMotionTest', 'pulseItemIdentityTest']
+def unsupported = ['pulseTestMod', 'pulseTestJar', 'pulseSmokeAuto', 'pulseSmokeWorld', 'pulseOitTest', 'pulseOitPerf', 'pulsePlayerMotionTest', 'pulseItemIdentityTest', 'pulseGeckoDemo', 'pulseMotionPhase', 'pulseOitBaseline', 'pulseSmokeReproduce', 'pulseSmokeSkipHook']
 if (unsupported.any { providers.gradleProperty(it).isPresent() })
     throw new GradleException('The complete canonical regression harnesses remain stage 7.1b.2. Packaged bootstrap uses only -PpulseTestJarBootstrap; it cannot open existing demo worlds.')
 
@@ -142,6 +146,11 @@ if (providers.gradleProperty('pulseTestJarBootstrap').isPresent() || demoMode) {
                 run.vmArg '-Xlog:class+load=info:file=classloading.log'
                 if (demoMode)
                     run.vmArg "-Dpulselib.test.demoMode=${demoSource ? 'source' : 'jar'}"
+                if (animationRegression) {
+                    run.vmArg '-Dpulselib.test.animationRegression=true'
+                    if (skipAnimationRemoval)
+                        run.vmArg '-Dpulselib.test.skipAnimationRemoval=true'
+                }
                 if (run.name == 'client')
                     run.programArgs '--width', '960', '--height', '640'
             }
@@ -161,6 +170,11 @@ if (providers.gradleProperty('pulseTestJarBootstrap').isPresent() || demoMode) {
                 run.jvmArgument '-Xlog:class+load=info:file=classloading.log'
                 if (demoMode)
                     run.systemProperty 'pulselib.test.demoMode', demoSource ? 'source' : 'jar'
+                if (animationRegression) {
+                    run.systemProperty 'pulselib.test.animationRegression', 'true'
+                    if (skipAnimationRemoval)
+                        run.systemProperty 'pulselib.test.skipAnimationRemoval', 'true'
+                }
                 if (run.name == 'client')
                     run.programArguments.addAll '--width', '960', '--height', '640'
             }

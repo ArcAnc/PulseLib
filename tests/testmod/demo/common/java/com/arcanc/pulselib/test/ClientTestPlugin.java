@@ -81,6 +81,8 @@ public class ClientTestPlugin implements IPulseClientPlugin
 	public void registerModels(PModelRegistrar registrar)
 	{
 		models++;
+		if (Boolean.getBoolean("pulselib.test.animationRegression"))
+			registrar.model(AnimationSamplingHarness.MODEL_DATA).texture("0", TestEntityRender.ZERO);
 
 		registrar.model(TestEntityRender.MODEL_DATA).texture("tube", TestEntityRender.TUBE).
 				texture("sphere", TestEntityRender.SPHERE).

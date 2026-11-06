@@ -725,3 +725,24 @@ See [testmod instructions](testmod/README.md), migration journal section 64 and
 `docs/porting/evidence/stage-7.1b.1.json`. The full canonical harness bundle and
 `pulseTestMod`/`pulseTestJar` flags remain **7.1b.2**, final GPU/API/performance
 matrix **7.2**. Bootstrap 7.1a stays available separately.
+
+Stage **7.1b.2a** inventories all frozen canonical testmod Java guard/method/
+property/annotation sites and 13 flags. The committed inventory explicitly
+marks remaining suites as deferred; old evidence links are context, not claims
+of full assertion equivalence. `inventory_harnesses.py` uses javac AST to prove
+all 25 Lifecycle/Sampling check argument trees retain their original messages
+and tolerances.
+
+`run_demo.py --animation-regression` adds loaded GLB overlay/pose and Gecko
+sampling suites before/after actual reload, >=21s of renderer-owned manager
+retention, two observed production maintenance callbacks, and immediate native
+entity/chunk unload. The new canonical guard found missing loader subscriptions:
+Fabric chunk and NeoForge entity/chunk hooks now call the existing manager
+removal API on ClientLevel only. Common/GPU classes and public API are unchanged.
+An explicit test-only skip-removal control fails the unchanged L25 assertion.
+
+See [testmod instructions](testmod/README.md), journal section 65 and
+`docs/porting/evidence/stage-7.1b.2a.json`. Full Smoke/identity/world/GPU/native
+injection consolidation and canonical flags remain **7.1b.2b**; final GPU/API/
+performance matrix is **7.2**. Original WIP is excluded from the commit and
+validation uses HEAD plus own loader changes through the saved source projection.

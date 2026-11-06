@@ -19,6 +19,7 @@
     ]
   },
   "mixins": [
-    "pulselib-demo.mixins.json"
+    "pulselib-demo.mixins.json",
+    "pulselib-animation.mixins.json"
   ]
 }

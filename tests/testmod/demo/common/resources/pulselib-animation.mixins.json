@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "com.arcanc.pulselib.test.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "AnimationMaintenanceMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

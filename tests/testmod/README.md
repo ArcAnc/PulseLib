@@ -113,3 +113,38 @@ new GPU pixel/performance claims remain the following checkpoints.
 
 See journal section 64 and
 [recorded evidence](../../docs/porting/evidence/stage-7.1b.1.json).
+
+
+## Canonical animation harness consolidation (7.1b.2a)
+
+`--animation-regression` on `run_demo.py` adds `-PpulseAnimationRegression` to
+all eight source/JAR client/server cases. Clients execute the original loaded
+GLB overlay/snapshot suite and Gecko sampling/Molang suite before and after
+resource reload. They retain active entity/block controllers for at least 21
+seconds across two scheduled maintenance boundaries, observe the actual
+production maintenance calls, then require immediate removal through native
+entity/chunk unload. The production loader subscriptions missing from this
+path are restored on both loaders; the Common animation/GPU core is unchanged.
+
+```bash
+python3 tests/testmod/tools/run_demo.py --animation-regression --eula /path/to/your/accepted/eula.txt --output build/reports/animation-UNIQUE
+python3 tests/testmod/tools/inventory_harnesses.py
+```
+
+`inventory_harnesses.py` extracts only frozen canonical Git objects, parses all
+62 Java files with javac and checks the committed call-site/flag/Mixin inventory.
+It also proves that all 25 canonical animation `check` argument trees are still
+present with unchanged messages/tolerances. `--write` explicitly regenerates
+the inventory after review. Deferred entries remain open; old stage evidence
+links do not claim complete assertion equivalence. Full canonical regression
+flags remain guarded for **7.1b.2b**.
+
+The explicit negative control `-PpulseAnimationSkipRemoval` requires the
+animation regression profile and a demo profile. It cancels only the production
+removeManager body through a test-only client Mixin; the unchanged canonical
+L25 removal assertion must fail. Do not count this as normal shutdown/PASS.
+The positive runner never sets the negative flag. Temporary debugger runs and
+incomplete runs are excluded from accepted results.
+
+See journal section 65 and
+[recorded evidence](../../docs/porting/evidence/stage-7.1b.2a.json).
