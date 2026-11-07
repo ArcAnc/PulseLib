@@ -1,0 +1,213 @@
+CASE jar-fabric-client
+[06:46:08] [Render thread/INFO] (Pulse Lib) PULSE DEMO PLUGINS PASS: client=true, candidates=3, loaded=2, origin=file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/fabric/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-fabric.jar
+[06:46:08] [Render thread/INFO] (Pulse Lib) PULSE TEST L1/L4 PASS: 11 bones, loaded clips [idle, walk], forward/reverse/paused overlay and pose snapshot
+[06:46:08] [Render thread/INFO] (Pulse Lib) PULSE TEST M-A3/M-A4/H2/H1 PASS: loaded Gecko 360/720 poses, uniform spline references and independent Molang contexts
+[06:46:08] [Render thread/INFO] (Pulse Lib) PULSE DEMO ASSETS PASS: checks=50, origin=file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/fabric/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-fabric.jar
+[06:46:13] [Render thread/INFO] (Pulse Lib) PULSE DEMO WORLD PASS: /mnt/MainDrive/Programs/MC mods/ArcsLib/fabric/build/pulselib-tests/demo-27a4dd3f075c40db9dc213e0b19ae338-jar/client/saves/pulselib-bootstrap/.
+[06:46:38] [Render thread/INFO] (Pulse Lib) PULSE TEST L25 WORLD PASS: Entity/BlockEntity retain controllers and Molang state over 2 cleanup cycles
+[06:46:38] [Render thread/INFO] (Pulse Lib) PULSE DEMO SCENE PASS: epoch=1, entity=8562, block=7135, item=5672
+[06:46:41] [Render thread/INFO] (Pulse Lib) PULSE TEST L1/L4 PASS: 11 bones, loaded clips [idle, walk], forward/reverse/paused overlay and pose snapshot
+[06:46:41] [Render thread/INFO] (Pulse Lib) PULSE TEST M-A3/M-A4/H2/H1 PASS: loaded Gecko 360/720 poses, uniform spline references and independent Molang contexts
+[06:46:41] [Render thread/INFO] (Pulse Lib) PULSE DEMO ASSETS PASS: checks=100, origin=file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/fabric/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-fabric.jar
+[06:46:45] [Render thread/INFO] (Pulse Lib) PULSE DEMO SCENE PASS: epoch=2, entity=1428, block=1190, item=952
+[06:46:45] [Render thread/INFO] (Pulse Lib) PULSE TEST L25 REMOVAL PASS: entity removal and client chunk unload hooks release their managers
+[06:46:45] [Render thread/INFO] (Pulse Lib) PULSE ANIMATION COMPLETE: assertions=19225, maintenance=3
+[06:46:45] [Render thread/INFO] (Pulse Lib) PULSE TEST LIFECYCLE WORKLOAD PASS: primitives=3124
+[06:46:46] [Render thread/INFO] (Pulse Lib) PULSE TEST EXPLICIT CLEANUP PASS: buffers=15, textures=27, fbos=4, vaos=2, fences=11
+[06:46:46] [Render thread/INFO] (Pulse Lib) PULSE TEST LIFECYCLE WORKLOAD PASS: primitives=3124
+[06:46:48] [Render thread/INFO] (Pulse Lib) PULSE TEST NATURAL RESOURCES PASS: buffers=15, textures=12, fbos=1, vaos=2, fences=2
+[06:46:48] [Render thread/INFO] (Pulse Lib) PULSE TEST NATURAL DISCONNECT PASS: 1 loader hook calls
+[06:46:48] [Render thread/INFO] (Pulse Lib) PULSE DEMO CLIENT COMPLETE: assets=100, epochs=2, player demos=2
+[06:46:48] [Render thread/INFO] (Pulse Lib) PULSE DEMO CLIENT SHUTDOWN PASS
+PULSE BOOTSTRAP VERIFIED: /mnt/MainDrive/Programs/MC mods/ArcsLib/fabric/build/pulselib-tests/demo-27a4dd3f075c40db9dc213e0b19ae338-jar/client
+BUILD SUCCESSFUL in 58s
+
+CASE jar-neoforge-client
+[06:47:09] [Render thread/INFO] [Pulse Lib/]: PULSE DEMO PLUGINS PASS: client=true, candidates=3, loaded=2, origin=file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/neoforge/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-neoforge.jar
+[06:47:09] [Render thread/INFO] [Pulse Lib/]: PULSE TEST L1/L4 PASS: 11 bones, loaded clips [walk, idle], forward/reverse/paused overlay and pose snapshot
+[06:47:09] [Render thread/INFO] [Pulse Lib/]: PULSE TEST M-A3/M-A4/H2/H1 PASS: loaded Gecko 360/720 poses, uniform spline references and independent Molang contexts
+[06:47:09] [Render thread/INFO] [Pulse Lib/]: PULSE DEMO ASSETS PASS: checks=50, origin=file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/neoforge/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-neoforge.jar
+[06:47:13] [Render thread/INFO] [Pulse Lib/]: PULSE DEMO WORLD PASS: ./saves/pulselib-bootstrap/.
+[06:47:38] [Render thread/INFO] [Pulse Lib/]: PULSE TEST L25 WORLD PASS: Entity/BlockEntity retain controllers and Molang state over 2 cleanup cycles
+[06:47:38] [Render thread/INFO] [Pulse Lib/]: PULSE DEMO SCENE PASS: epoch=1, entity=8652, block=7210, item=5736
+[06:47:41] [Render thread/INFO] [Pulse Lib/]: PULSE TEST L1/L4 PASS: 11 bones, loaded clips [walk, idle], forward/reverse/paused overlay and pose snapshot
+[06:47:41] [Render thread/INFO] [Pulse Lib/]: PULSE TEST M-A3/M-A4/H2/H1 PASS: loaded Gecko 360/720 poses, uniform spline references and independent Molang contexts
+[06:47:41] [Render thread/INFO] [Pulse Lib/]: PULSE DEMO ASSETS PASS: checks=100, origin=file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/neoforge/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-neoforge.jar
+[06:47:45] [Render thread/INFO] [Pulse Lib/]: PULSE DEMO SCENE PASS: epoch=2, entity=1440, block=1200, item=960
+[06:47:45] [Render thread/INFO] [Pulse Lib/]: PULSE TEST L25 REMOVAL PASS: entity removal and client chunk unload hooks release their managers
+[06:47:45] [Render thread/INFO] [Pulse Lib/]: PULSE ANIMATION COMPLETE: assertions=19351, maintenance=3
+[06:47:45] [Render thread/INFO] [Pulse Lib/]: PULSE TEST LIFECYCLE WORKLOAD PASS: primitives=1564
+[06:47:45] [Render thread/INFO] [Pulse Lib/]: PULSE TEST EXPLICIT CLEANUP PASS: buffers=15, textures=27, fbos=4, vaos=2, fences=11
+[06:47:45] [Render thread/INFO] [Pulse Lib/]: PULSE TEST LIFECYCLE WORKLOAD PASS: primitives=1564
+[06:47:45] [Render thread/INFO] [Pulse Lib/]: PULSE TEST NATURAL RESOURCES PASS: buffers=15, textures=12, fbos=1, vaos=2, fences=2
+[06:47:49] [Render thread/INFO] [Pulse Lib/]: PULSE TEST NATURAL DISCONNECT PASS: 1 loader hook calls
+[06:47:49] [Render thread/INFO] [Pulse Lib/]: PULSE DEMO CLIENT COMPLETE: assets=100, epochs=2, player demos=2
+[06:47:49] [Render thread/INFO] [Pulse Lib/]: PULSE DEMO CLIENT SHUTDOWN PASS
+PULSE BOOTSTRAP VERIFIED: /mnt/MainDrive/Programs/MC mods/ArcsLib/neoforge/build/pulselib-tests/demo-27a4dd3f075c40db9dc213e0b19ae338-jar/client
+BUILD SUCCESSFUL in 1m
+
+CASE jar-fabric-server
+[06:48:05] [Server thread/INFO] (Pulse Lib) PULSE DEMO PLUGINS PASS: client=false, candidates=3, loaded=2, origin=file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/fabric/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-fabric.jar
+[06:48:05] [Server thread/INFO] (Pulse Lib) PULSE DEMO CONTENT PASS: block=1, blockEntity=1, entity=1, items=5, armorComponents=3
+[06:48:05] [Server thread/INFO] (Pulse Lib) PULSE DEMO SERVER COMPLETE
+[06:49:21] [Server thread/INFO] (Pulse Lib) PULSE DEMO SERVER SHUTDOWN PASS
+PULSE BOOTSTRAP VERIFIED: /mnt/MainDrive/Programs/MC mods/ArcsLib/fabric/build/pulselib-tests/demo-27a4dd3f075c40db9dc213e0b19ae338-jar/server
+BUILD SUCCESSFUL in 1m 31s
+
+CASE jar-neoforge-server
+[06:49:38] [Server thread/INFO] [Pulse Lib/]: PULSE DEMO PLUGINS PASS: client=false, candidates=3, loaded=2, origin=file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/neoforge/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-neoforge.jar
+[06:49:38] [Server thread/INFO] [Pulse Lib/]: PULSE DEMO CONTENT PASS: block=1, blockEntity=1, entity=1, items=5, armorComponents=3
+[06:49:38] [Server thread/INFO] [Pulse Lib/]: PULSE DEMO SERVER COMPLETE
+[06:50:58] [Server thread/INFO] [Pulse Lib/]: PULSE DEMO SERVER SHUTDOWN PASS
+PULSE BOOTSTRAP VERIFIED: /mnt/MainDrive/Programs/MC mods/ArcsLib/neoforge/build/pulselib-tests/demo-27a4dd3f075c40db9dc213e0b19ae338-jar/server
+BUILD SUCCESSFUL in 1m 36s
+
+CASE source-fabric-client
+[06:51:16] [Render thread/INFO] (Pulse Lib) PULSE DEMO PLUGINS PASS: client=true, candidates=3, loaded=2, origin=file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/fabric/build/classes/java/demo/
+[06:51:16] [Render thread/INFO] (Pulse Lib) PULSE TEST L1/L4 PASS: 11 bones, loaded clips [idle, walk], forward/reverse/paused overlay and pose snapshot
+[06:51:16] [Render thread/INFO] (Pulse Lib) PULSE TEST M-A3/M-A4/H2/H1 PASS: loaded Gecko 360/720 poses, uniform spline references and independent Molang contexts
+[06:51:16] [Render thread/INFO] (Pulse Lib) PULSE DEMO ASSETS PASS: checks=50, origin=file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/fabric/build/classes/java/demo/
+[06:51:20] [Render thread/INFO] (Pulse Lib) PULSE DEMO WORLD PASS: /mnt/MainDrive/Programs/MC mods/ArcsLib/fabric/build/pulselib-tests/demo-27a4dd3f075c40db9dc213e0b19ae338-source/client/saves/pulselib-bootstrap/.
+[06:51:45] [Render thread/INFO] (Pulse Lib) PULSE TEST L25 WORLD PASS: Entity/BlockEntity retain controllers and Molang state over 2 cleanup cycles
+[06:51:45] [Render thread/INFO] (Pulse Lib) PULSE DEMO SCENE PASS: epoch=1, entity=8574, block=7145, item=5684
+[06:51:49] [Render thread/INFO] (Pulse Lib) PULSE TEST L1/L4 PASS: 11 bones, loaded clips [idle, walk], forward/reverse/paused overlay and pose snapshot
+[06:51:49] [Render thread/INFO] (Pulse Lib) PULSE TEST M-A3/M-A4/H2/H1 PASS: loaded Gecko 360/720 poses, uniform spline references and independent Molang contexts
+[06:51:49] [Render thread/INFO] (Pulse Lib) PULSE DEMO ASSETS PASS: checks=100, origin=file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/fabric/build/classes/java/demo/
+[06:51:53] [Render thread/INFO] (Pulse Lib) PULSE DEMO SCENE PASS: epoch=2, entity=1434, block=1195, item=956
+[06:51:53] [Render thread/INFO] (Pulse Lib) PULSE TEST L25 REMOVAL PASS: entity removal and client chunk unload hooks release their managers
+[06:51:53] [Render thread/INFO] (Pulse Lib) PULSE ANIMATION COMPLETE: assertions=19260, maintenance=2
+[06:51:53] [Render thread/INFO] (Pulse Lib) PULSE TEST LIFECYCLE WORKLOAD PASS: primitives=1564
+[06:51:53] [Render thread/INFO] (Pulse Lib) PULSE TEST EXPLICIT CLEANUP PASS: buffers=15, textures=27, fbos=4, vaos=2, fences=11
+[06:51:53] [Render thread/INFO] (Pulse Lib) PULSE TEST LIFECYCLE WORKLOAD PASS: primitives=1564
+[06:51:55] [Render thread/INFO] (Pulse Lib) PULSE TEST NATURAL RESOURCES PASS: buffers=15, textures=12, fbos=1, vaos=2, fences=2
+[06:51:55] [Render thread/INFO] (Pulse Lib) PULSE TEST NATURAL DISCONNECT PASS: 1 loader hook calls
+[06:51:55] [Render thread/INFO] (Pulse Lib) PULSE DEMO CLIENT COMPLETE: assets=100, epochs=2, player demos=2
+[06:51:55] [Render thread/INFO] (Pulse Lib) PULSE DEMO CLIENT SHUTDOWN PASS
+PULSE BOOTSTRAP VERIFIED: /mnt/MainDrive/Programs/MC mods/ArcsLib/fabric/build/pulselib-tests/demo-27a4dd3f075c40db9dc213e0b19ae338-source/client
+BUILD SUCCESSFUL in 57s
+
+CASE source-neoforge-client
+[06:52:14] [Render thread/INFO] [Pulse Lib/]: PULSE DEMO PLUGINS PASS: client=true, candidates=3, loaded=2, origin=file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/neoforge/build/classes/java/demo/
+[06:52:14] [Render thread/INFO] [Pulse Lib/]: PULSE TEST L1/L4 PASS: 11 bones, loaded clips [idle, walk], forward/reverse/paused overlay and pose snapshot
+[06:52:14] [Render thread/INFO] [Pulse Lib/]: PULSE TEST M-A3/M-A4/H2/H1 PASS: loaded Gecko 360/720 poses, uniform spline references and independent Molang contexts
+[06:52:14] [Render thread/INFO] [Pulse Lib/]: PULSE DEMO ASSETS PASS: checks=50, origin=file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/neoforge/build/classes/java/demo/
+[06:52:19] [Render thread/INFO] [Pulse Lib/]: PULSE DEMO WORLD PASS: ./saves/pulselib-bootstrap/.
+[06:52:44] [Render thread/INFO] [Pulse Lib/]: PULSE TEST L25 WORLD PASS: Entity/BlockEntity retain controllers and Molang state over 2 cleanup cycles
+[06:52:44] [Render thread/INFO] [Pulse Lib/]: PULSE DEMO SCENE PASS: epoch=1, entity=8622, block=7185, item=5716
+[06:52:47] [Render thread/INFO] [Pulse Lib/]: PULSE TEST L1/L4 PASS: 11 bones, loaded clips [idle, walk], forward/reverse/paused overlay and pose snapshot
+[06:52:47] [Render thread/INFO] [Pulse Lib/]: PULSE TEST M-A3/M-A4/H2/H1 PASS: loaded Gecko 360/720 poses, uniform spline references and independent Molang contexts
+[06:52:47] [Render thread/INFO] [Pulse Lib/]: PULSE DEMO ASSETS PASS: checks=100, origin=file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/neoforge/build/classes/java/demo/
+[06:52:51] [Render thread/INFO] [Pulse Lib/]: PULSE DEMO SCENE PASS: epoch=2, entity=1440, block=1200, item=960
+[06:52:51] [Render thread/INFO] [Pulse Lib/]: PULSE TEST L25 REMOVAL PASS: entity removal and client chunk unload hooks release their managers
+[06:52:51] [Render thread/INFO] [Pulse Lib/]: PULSE ANIMATION COMPLETE: assertions=19362, maintenance=3
+[06:52:51] [Render thread/INFO] [Pulse Lib/]: PULSE TEST LIFECYCLE WORKLOAD PASS: primitives=3124
+[06:52:51] [Render thread/INFO] [Pulse Lib/]: PULSE TEST EXPLICIT CLEANUP PASS: buffers=15, textures=27, fbos=4, vaos=2, fences=11
+[06:52:51] [Render thread/INFO] [Pulse Lib/]: PULSE TEST LIFECYCLE WORKLOAD PASS: primitives=3124
+[06:52:51] [Render thread/INFO] [Pulse Lib/]: PULSE TEST NATURAL RESOURCES PASS: buffers=15, textures=12, fbos=1, vaos=2, fences=2
+[06:52:54] [Render thread/INFO] [Pulse Lib/]: PULSE TEST NATURAL DISCONNECT PASS: 1 loader hook calls
+[06:52:54] [Render thread/INFO] [Pulse Lib/]: PULSE DEMO CLIENT COMPLETE: assets=100, epochs=2, player demos=2
+[06:52:54] [Render thread/INFO] [Pulse Lib/]: PULSE DEMO CLIENT SHUTDOWN PASS
+PULSE BOOTSTRAP VERIFIED: /mnt/MainDrive/Programs/MC mods/ArcsLib/neoforge/build/pulselib-tests/demo-27a4dd3f075c40db9dc213e0b19ae338-source/client
+BUILD SUCCESSFUL in 58s
+
+CASE source-fabric-server
+[06:53:10] [Server thread/INFO] (Pulse Lib) PULSE DEMO PLUGINS PASS: client=false, candidates=3, loaded=2, origin=file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/fabric/build/classes/java/demo/
+[06:53:10] [Server thread/INFO] (Pulse Lib) PULSE DEMO CONTENT PASS: block=1, blockEntity=1, entity=1, items=5, armorComponents=3
+[06:53:10] [Server thread/INFO] (Pulse Lib) PULSE DEMO SERVER COMPLETE
+[06:54:34] [Server thread/INFO] (Pulse Lib) PULSE DEMO SERVER SHUTDOWN PASS
+PULSE BOOTSTRAP VERIFIED: /mnt/MainDrive/Programs/MC mods/ArcsLib/fabric/build/pulselib-tests/demo-27a4dd3f075c40db9dc213e0b19ae338-source/server
+BUILD SUCCESSFUL in 1m 38s
+
+CASE source-neoforge-server
+[06:54:50] [Server thread/INFO] [Pulse Lib/]: PULSE DEMO PLUGINS PASS: client=false, candidates=3, loaded=2, origin=file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/neoforge/build/classes/java/demo/
+[06:54:50] [Server thread/INFO] [Pulse Lib/]: PULSE DEMO CONTENT PASS: block=1, blockEntity=1, entity=1, items=5, armorComponents=3
+[06:54:50] [Server thread/INFO] [Pulse Lib/]: PULSE DEMO SERVER COMPLETE
+[06:56:13] [Server thread/INFO] [Pulse Lib/]: PULSE DEMO SERVER SHUTDOWN PASS
+PULSE BOOTSTRAP VERIFIED: /mnt/MainDrive/Programs/MC mods/ArcsLib/neoforge/build/pulselib-tests/demo-27a4dd3f075c40db9dc213e0b19ae338-source/server
+BUILD SUCCESSFUL in 1m 39s
+
+NEGATIVE fabric
+[06:56:28] [Render thread/INFO] (Pulse Lib) PULSE TEST client demo plugin constructed
+[06:56:28] [Render thread/INFO] (Pulse Lib) PULSE TEST common plugin constructed
+[06:56:29] [Render thread/INFO] (Pulse Lib) PULSE TEST demo model declarations 1
+[06:56:41] [Render thread/INFO] (Pulse Lib) PULSE TEST demo model declarations 2
+[06:56:48] [Render thread/INFO] (Pulse Lib) PULSE TEST LIFECYCLE WORKLOAD PASS: primitives=3124
+[06:56:48] [Render thread/INFO] (Pulse Lib) PULSE TEST EXPLICIT CLEANUP PASS: buffers=15, textures=27, fbos=4, vaos=2, fences=11
+[06:56:48] [Render thread/INFO] (Pulse Lib) PULSE TEST LIFECYCLE WORKLOAD PASS: primitives=3124
+[06:56:51] [Render thread/INFO] (Pulse Lib) PULSE TEST NEGATIVE CONTROL: loader cleanup hook suppressed
+java.lang.AssertionError: PulseLib smoke test: natural disconnect: GPU buffer leaked: 77
+java.lang.AssertionError: PulseLib smoke test: natural disconnect: GPU buffer leaked: 77
+> Process 'command '/usr/lib/jvm/java-25-openjdk/bin/java'' finished with non-zero exit value 255
+BUILD FAILED in 37s
+
+NEGATIVE neoforge
+[06:57:06] [Render thread/INFO] [Pulse Lib/]: PULSE TEST client demo plugin constructed
+[06:57:06] [Render thread/INFO] [Pulse Lib/]: PULSE TEST common plugin constructed
+[06:57:07] [Render thread/INFO] [Pulse Lib/]: PULSE TEST demo model declarations 1
+[06:57:18] [Render thread/INFO] [Pulse Lib/]: PULSE TEST demo model declarations 2
+[06:57:26] [Render thread/INFO] [Pulse Lib/]: PULSE TEST LIFECYCLE WORKLOAD PASS: primitives=3124
+[06:57:26] [Render thread/INFO] [Pulse Lib/]: PULSE TEST EXPLICIT CLEANUP PASS: buffers=15, textures=27, fbos=4, vaos=2, fences=11
+[06:57:26] [Render thread/INFO] [Pulse Lib/]: PULSE TEST LIFECYCLE WORKLOAD PASS: primitives=3124
+[06:57:26] [Render thread/INFO] [Pulse Lib/]: PULSE TEST NEGATIVE CONTROL: loader cleanup hook suppressed
+[06:57:29] [Render thread/ERROR] [ne.ne.bu.EventBus/EVENTBUS]: Exception caught during firing event: PulseLib smoke test: natural disconnect: GPU buffer leaked: 69
+java.lang.AssertionError: PulseLib smoke test: natural disconnect: GPU buffer leaked: 69
+java.lang.AssertionError: PulseLib smoke test: natural disconnect: GPU buffer leaked: 69
+java.lang.AssertionError: PulseLib smoke test: natural disconnect: GPU buffer leaked: 69
+> Process 'command '/usr/lib/jvm/java-25-openjdk/bin/java'' finished with non-zero exit value 255
+BUILD FAILED in 37s
+
+CHECK optout.log
+[06:57:48] [Render thread/INFO] (Pulse Lib) PULSE DEMO PLUGINS PASS: client=true, candidates=3, loaded=2, origin=file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/fabric/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-fabric.jar
+[06:57:48] [Render thread/INFO] (Pulse Lib) PULSE DEMO ASSETS PASS: checks=50, origin=file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/fabric/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-fabric.jar
+[06:57:53] [Render thread/INFO] (Pulse Lib) PULSE DEMO WORLD PASS: /mnt/MainDrive/Programs/MC mods/ArcsLib/fabric/build/pulselib-tests/stage71b2b1-optout/client/saves/pulselib-bootstrap/.
+[06:57:57] [Render thread/INFO] (Pulse Lib) PULSE DEMO SCENE PASS: epoch=1, entity=1032, block=860, item=644
+[06:58:00] [Render thread/INFO] (Pulse Lib) PULSE DEMO ASSETS PASS: checks=100, origin=file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/fabric/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-fabric.jar
+[06:58:04] [Render thread/INFO] (Pulse Lib) PULSE DEMO SCENE PASS: epoch=2, entity=1428, block=1190, item=952
+[06:58:04] [Render thread/INFO] (Pulse Lib) PULSE DEMO CLIENT SHUTDOWN PASS
+BUILD SUCCESSFUL in 37s
+
+CHECK config-controls.log
+CONFIGURATION CONTROLS PASS 3
+
+CHECK final-build.log
+> Task :neoforge:testClasses UP-TO-DATE
+> Task :neoforge:test NO-SOURCE
+> Task :common:testClasses UP-TO-DATE
+> Task :fabric:testClasses UP-TO-DATE
+> Task :fabric:test
+> Task :common:test
+> Task :stage2Evidence
+STAGE 2 SERVICE PROVIDERS / LEGACY REMOVAL / COMMON BOUNDARY PASS: /mnt/MainDrive/Programs/MC mods/ArcsLib/build/reports/porting/stage-2-build.json
+BUILD SUCCESSFUL in 21s
+
+CHECK inventory-lifecycle.log
+CANONICAL LIFECYCLE ASSERTION PROOF PASS: {'canonicalCheckSites': 11, 'preservedSites': 11, 'additionalCheckSites': 2, 'exactArgumentTreesAfterDeclaredAdaptation': True} {'canonicalCheckSites': 1, 'preservedSites': 1, 'exactArgumentTrees': True}
+
+CHECK inventory-animation.log
+CANONICAL HARNESS INVENTORY PASS: 62 Java units; {'annotation': 204, 'guard': 252, 'method': 263, 'property': 39, 'throw': 45, 'type': 63}
+
+CHECK inventory-pinned.log
+PASS: Java AST fixture and independent javac/javap counts for seven types
+PASS: pinned source coverage, all migration policies, required APIs and artifact checksums
+
+DEBUGGER: non-suspending logpoint; raw event message (repeat run, not accepted matrix)
+Breakpoint reached
+	at com.arcanc.pulselib.test.AnimationSamplingHarness.frameWorld(AnimationSamplingHarness.java:129)
+	at com.arcanc.pulselib.test.DemoProbe.tick(DemoProbe.java:91)
+	at com.arcanc.pulselib.test.fabric.TestModFabricClient$$Lambda/0x0000000013f70a58.onEndTick(Unknown Source:-1)
+	at net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.lambda$static$3(ClientTickEvents.java:43)
+	at net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents$$Lambda/0x0000000013f54cc8.onEndTick(Unknown Source:-1)
+	at net.minecraft.client.Minecraft.handler$beg000$fabric-lifecycle-events-v1$onEndTick(MinecraftMixin.java:41)
+	at net.minecraft.client.Minecraft.tick(Minecraft.java:2035)
+	at net.minecraft.client.Minecraft.runTick(Minecraft.java:1360)
+	at net.minecraft.client.Minecraft.run(Minecraft.java:991)
+	at net.minecraft.client.main.Main.main(Main.java:248)
+	at java.lang.invoke.LambdaForm$DMH/0x000000001322c000.invokeStaticInit(LambdaForm$DMH:-1)
+	at java.lang.invoke.LambdaForm$MH/0x0000000013045400.invokeExact_MT(LambdaForm$MH:-1)
+	at net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider.launch(MinecraftGameProvider.java:517)
+	at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:72)
+	at net.fabricmc.loader.impl.launch.knot.KnotClient.main(KnotClient.java:23)
+	at java.lang.invoke.LambdaForm$DMH/0x0000000013044c00.invokeStatic(LambdaForm$DMH:-1)
+	at java.lang.invoke.LambdaForm$MH/0x0000000013045400.invokeExact_MT(LambdaForm$MH:-1)
+	at net.fabricmc.devlaunchinjector.Main.main(Main.java:86)
+cycles=2; tick=503; maintenanceStart=0

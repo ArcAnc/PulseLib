@@ -124,7 +124,8 @@ public final class AnimationSamplingHarness
 			check(MolangParser.evaluate("v.l25_probe", entry.getValue().persistentMolangContext()) == 42, "L25 reset persistent controller state");
 		}
 		check(System.nanoTime() - start < 90_000_000_000L, "L25 world lifecycle smoke timed out");
-		if (System.nanoTime() - start < 21_000_000_000L || cleanupCycles < 2)
+		if (System.nanoTime() - start < 21_000_000_000L || cleanupCycles < 2 ||
+				RegressionChecks.maintenancePasses - maintenanceStart < 2)
 			return false;
 		check(RegressionChecks.maintenancePasses - maintenanceStart >= 2, "L25 actual production maintenance hook executes twice");
 		lifecycleComplete = true;

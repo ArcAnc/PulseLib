@@ -1,0 +1,545 @@
+{
+  "stage": "7.1b.2b.1",
+  "date": "2026-11-07",
+  "status": "PASS",
+  "baseCommit": "4f41cc5ad397ce2d46a799b984964500d0944696",
+  "sourceRefs": {
+    "26.1": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1",
+    "1.21.1-multiloader": "7ce6f024b307bb821ce543344d3896c8e1fcf26b"
+  },
+  "scope": "Canonical Smoke resources/explicit/native disconnect slice; other Smoke/native render/identity/player/performance suites and full flags remain incomplete.",
+  "inputs": "HEAD source projection + owned fixture/build changes; 67 user dirty deltas excluded/preserved.",
+  "verification": {
+    "status": "PASS",
+    "production": {
+      "common": {
+        "classCount": 592,
+        "allClassesByteIdentical": true,
+        "gpuClassesByteIdentical": 26,
+        "jar": "common/build/libs/pulselib-26.1.2-common-1.1.5.3.jar",
+        "jarPayloadByteIdentical": true,
+        "beforeJarSha256": "a0822f90d25b0af1699daac3fff065585146a23c307a966f0ca5341942d2277b",
+        "afterJarSha256": "a0822f90d25b0af1699daac3fff065585146a23c307a966f0ca5341942d2277b"
+      },
+      "fabric": {
+        "classCount": 600,
+        "allClassesByteIdentical": true,
+        "gpuClassesByteIdentical": 26,
+        "jar": "fabric/build/libs/pulselib-26.1.2-fabric-1.1.5.3.jar",
+        "jarPayloadByteIdentical": true,
+        "beforeJarSha256": "52aa958944ef2e4b98b64fa29320105a299b25d091b09c0dd29f7de162843bf8",
+        "afterJarSha256": "6cdf0a78207bc5506812a5003c7abd376dca42d720236ec465ac68c94c6e1544"
+      },
+      "neoforge": {
+        "classCount": 605,
+        "allClassesByteIdentical": true,
+        "gpuClassesByteIdentical": 26,
+        "jar": "neoforge/build/libs/pulselib-26.1.2-neoforge-1.1.5.3.jar",
+        "jarPayloadByteIdentical": true,
+        "beforeJarSha256": "bdca6a74855493c396fe9c6c4b04a26712b905a307831bfd05d3e00c22cf5e92",
+        "afterJarSha256": "bdca6a74855493c396fe9c6c4b04a26712b905a307831bfd05d3e00c22cf5e92"
+      }
+    },
+    "junit": {
+      "common": {
+        "tests": 240,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "fabric": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "neoforge": {
+        "tests": 0,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "originalDirtyFilesPreserved": 67,
+    "protectedFilesPreserved": 189,
+    "sourceRefs": {
+      "26.1": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1",
+      "1.21.1-multiloader": "7ce6f024b307bb821ce543344d3896c8e1fcf26b"
+    },
+    "canonicalApi": "Production sources and compiled class files unchanged",
+    "graphicsGpuUnchanged": true
+  },
+  "environment": {
+    "Operating System": "Linux (amd64) version 7.3.0-4-cachyos",
+    "Java Version": "25.0.5.0.3, Arch Linux",
+    "Java VM Version": "OpenJDK 64-Bit Server VM (mixed mode, sharing), Arch Linux",
+    "Backend library": "LWJGL version 3.4.1-snapshot",
+    "Backend API": "NVIDIA GeForce GTX 1660 Ti/PCIe/SSE2 GL version 3.3.0 NVIDIA 615.78.08, NVIDIA Corporation",
+    "minecraft": "26.1.2",
+    "fabricLoader": "0.19.5",
+    "fabricApi": "0.155.3+26.1.2",
+    "neoForge": "26.1.2.95",
+    "source": "Actual final-fixture negative-run crash report; no performance measurements claimed"
+  },
+  "matrix": {
+    "runnerCommand": "python3 tests/testmod/tools/run_demo.py --animation-regression --lifecycle-regression --eula fabric/build/stage62d2b-runs/server/eula.txt --gradle-init fabric/build/stage71b2b1-20261107/projection.gradle --output fabric/build/stage71b2b1-20261107/accepted-final",
+    "runId": "demo-27a4dd3f075c40db9dc213e0b19ae338",
+    "fixtureJars": {
+      "fabric": {
+        "path": "fabric/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-fabric.jar",
+        "sha256": "1be212f75b7ecc9425108cc4db90d499205fba14f2918e2f5291268ed6b1b82c"
+      },
+      "neoforge": {
+        "path": "neoforge/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-neoforge.jar",
+        "sha256": "2abd9e07b7a7772c3752e276b7094a31a721c69eb9a2c87969171999e0aad687"
+      }
+    },
+    "cases": {
+      "jar-fabric-client": {
+        "command": [
+          "./gradlew",
+          ":fabric:runClient",
+          "-PpulseDemoJar",
+          "-PpulseAnimationRegression",
+          "-PpulseLifecycleRegression",
+          "-PpulseBootstrapRunId=demo-27a4dd3f075c40db9dc213e0b19ae338-jar",
+          "-I",
+          "fabric/build/stage71b2b1-20261107/projection.gradle",
+          "--offline",
+          "--no-daemon",
+          "--console=plain"
+        ],
+        "runDirectory": "fabric/build/pulselib-tests/demo-27a4dd3f075c40db9dc213e0b19ae338-jar/client",
+        "gradleExit": 0,
+        "result": {
+          "animation": {
+            "maintenance": 3,
+            "enabled": true,
+            "assertions": 19658
+          },
+          "lifecycle": {
+            "hooks": 1,
+            "explicitResources": "buffers=15, textures=27, fbos=4, vaos=2, fences=11",
+            "completed": true,
+            "naturalResources": "buffers=15, textures=12, fbos=1, vaos=2, fences=2"
+          },
+          "loaded": 2,
+          "origin": "file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/fabric/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-fabric.jar",
+          "renders": [
+            10794,
+            8995,
+            7180
+          ],
+          "status": "PASS",
+          "side": "client",
+          "candidates": 3,
+          "modelEpochs": 2,
+          "assetChecks": 100
+        },
+        "generatedPrimitives": [
+          3124,
+          3124
+        ]
+      },
+      "jar-neoforge-client": {
+        "command": [
+          "./gradlew",
+          ":neoforge:runClient",
+          "-PpulseDemoJar",
+          "-PpulseAnimationRegression",
+          "-PpulseLifecycleRegression",
+          "-PpulseBootstrapRunId=demo-27a4dd3f075c40db9dc213e0b19ae338-jar",
+          "-I",
+          "fabric/build/stage71b2b1-20261107/projection.gradle",
+          "--offline",
+          "--no-daemon",
+          "--console=plain"
+        ],
+        "runDirectory": "neoforge/build/pulselib-tests/demo-27a4dd3f075c40db9dc213e0b19ae338-jar/client",
+        "gradleExit": 0,
+        "result": {
+          "origin": "file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/neoforge/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-neoforge.jar",
+          "loaded": 2,
+          "lifecycle": {
+            "hooks": 1,
+            "naturalResources": "buffers=15, textures=12, fbos=1, vaos=2, fences=2",
+            "completed": true,
+            "explicitResources": "buffers=15, textures=27, fbos=4, vaos=2, fences=11"
+          },
+          "animation": {
+            "maintenance": 3,
+            "assertions": 19784,
+            "enabled": true
+          },
+          "assetChecks": 100,
+          "modelEpochs": 2,
+          "candidates": 3,
+          "side": "client",
+          "status": "PASS",
+          "renders": [
+            10896,
+            9080,
+            7240
+          ]
+        },
+        "generatedPrimitives": [
+          1564,
+          1564
+        ]
+      },
+      "jar-fabric-server": {
+        "command": [
+          "./gradlew",
+          ":fabric:runServer",
+          "-PpulseDemoJar",
+          "-PpulseAnimationRegression",
+          "-PpulseLifecycleRegression",
+          "-PpulseBootstrapRunId=demo-27a4dd3f075c40db9dc213e0b19ae338-jar",
+          "-I",
+          "fabric/build/stage71b2b1-20261107/projection.gradle",
+          "--offline",
+          "--no-daemon",
+          "--console=plain",
+          "-PpulseTestEulaFile=fabric/build/stage62d2b-runs/server/eula.txt"
+        ],
+        "runDirectory": "fabric/build/pulselib-tests/demo-27a4dd3f075c40db9dc213e0b19ae338-jar/server",
+        "gradleExit": 0,
+        "result": {
+          "candidates": 3,
+          "origin": "file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/fabric/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-fabric.jar",
+          "loaded": 2,
+          "world": "/mnt/MainDrive/Programs/MC mods/ArcsLib/fabric/build/pulselib-tests/demo-27a4dd3f075c40db9dc213e0b19ae338-jar/server/pulselib-bootstrap",
+          "side": "server",
+          "status": "PASS"
+        }
+      },
+      "jar-neoforge-server": {
+        "command": [
+          "./gradlew",
+          ":neoforge:runServer",
+          "-PpulseDemoJar",
+          "-PpulseAnimationRegression",
+          "-PpulseLifecycleRegression",
+          "-PpulseBootstrapRunId=demo-27a4dd3f075c40db9dc213e0b19ae338-jar",
+          "-I",
+          "fabric/build/stage71b2b1-20261107/projection.gradle",
+          "--offline",
+          "--no-daemon",
+          "--console=plain",
+          "-PpulseTestEulaFile=fabric/build/stage62d2b-runs/server/eula.txt"
+        ],
+        "runDirectory": "neoforge/build/pulselib-tests/demo-27a4dd3f075c40db9dc213e0b19ae338-jar/server",
+        "gradleExit": 0,
+        "result": {
+          "world": "/mnt/MainDrive/Programs/MC mods/ArcsLib/neoforge/build/pulselib-tests/demo-27a4dd3f075c40db9dc213e0b19ae338-jar/server/pulselib-bootstrap",
+          "side": "server",
+          "status": "PASS",
+          "candidates": 3,
+          "origin": "file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/neoforge/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-neoforge.jar",
+          "loaded": 2
+        }
+      },
+      "source-fabric-client": {
+        "command": [
+          "./gradlew",
+          ":fabric:runClient",
+          "-PpulseDemoContent",
+          "-PpulseAnimationRegression",
+          "-PpulseLifecycleRegression",
+          "-PpulseBootstrapRunId=demo-27a4dd3f075c40db9dc213e0b19ae338-source",
+          "-I",
+          "fabric/build/stage71b2b1-20261107/projection.gradle",
+          "--offline",
+          "--no-daemon",
+          "--console=plain"
+        ],
+        "runDirectory": "fabric/build/pulselib-tests/demo-27a4dd3f075c40db9dc213e0b19ae338-source/client",
+        "gradleExit": 0,
+        "result": {
+          "candidates": 3,
+          "modelEpochs": 2,
+          "assetChecks": 100,
+          "animation": {
+            "assertions": 19693,
+            "maintenance": 2,
+            "enabled": true
+          },
+          "lifecycle": {
+            "hooks": 1,
+            "explicitResources": "buffers=15, textures=27, fbos=4, vaos=2, fences=11",
+            "completed": true,
+            "naturalResources": "buffers=15, textures=12, fbos=1, vaos=2, fences=2"
+          },
+          "loaded": 2,
+          "origin": "file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/fabric/build/classes/java/demo/",
+          "renders": [
+            10836,
+            9030,
+            7206
+          ],
+          "status": "PASS",
+          "side": "client"
+        },
+        "generatedPrimitives": [
+          1564,
+          1564
+        ]
+      },
+      "source-neoforge-client": {
+        "command": [
+          "./gradlew",
+          ":neoforge:runClient",
+          "-PpulseDemoContent",
+          "-PpulseAnimationRegression",
+          "-PpulseLifecycleRegression",
+          "-PpulseBootstrapRunId=demo-27a4dd3f075c40db9dc213e0b19ae338-source",
+          "-I",
+          "fabric/build/stage71b2b1-20261107/projection.gradle",
+          "--offline",
+          "--no-daemon",
+          "--console=plain"
+        ],
+        "runDirectory": "neoforge/build/pulselib-tests/demo-27a4dd3f075c40db9dc213e0b19ae338-source/client",
+        "gradleExit": 0,
+        "result": {
+          "renders": [
+            10926,
+            9105,
+            7260
+          ],
+          "origin": "file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/neoforge/build/classes/java/demo/",
+          "loaded": 2,
+          "lifecycle": {
+            "explicitResources": "buffers=15, textures=27, fbos=4, vaos=2, fences=11",
+            "hooks": 1,
+            "naturalResources": "buffers=15, textures=12, fbos=1, vaos=2, fences=2",
+            "completed": true
+          },
+          "animation": {
+            "maintenance": 3,
+            "assertions": 19795,
+            "enabled": true
+          },
+          "assetChecks": 100,
+          "modelEpochs": 2,
+          "candidates": 3,
+          "side": "client",
+          "status": "PASS"
+        },
+        "generatedPrimitives": [
+          3124,
+          3124
+        ]
+      },
+      "source-fabric-server": {
+        "command": [
+          "./gradlew",
+          ":fabric:runServer",
+          "-PpulseDemoContent",
+          "-PpulseAnimationRegression",
+          "-PpulseLifecycleRegression",
+          "-PpulseBootstrapRunId=demo-27a4dd3f075c40db9dc213e0b19ae338-source",
+          "-I",
+          "fabric/build/stage71b2b1-20261107/projection.gradle",
+          "--offline",
+          "--no-daemon",
+          "--console=plain",
+          "-PpulseTestEulaFile=fabric/build/stage62d2b-runs/server/eula.txt"
+        ],
+        "runDirectory": "fabric/build/pulselib-tests/demo-27a4dd3f075c40db9dc213e0b19ae338-source/server",
+        "gradleExit": 0,
+        "result": {
+          "loaded": 2,
+          "origin": "file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/fabric/build/classes/java/demo/",
+          "candidates": 3,
+          "status": "PASS",
+          "side": "server",
+          "world": "/mnt/MainDrive/Programs/MC mods/ArcsLib/fabric/build/pulselib-tests/demo-27a4dd3f075c40db9dc213e0b19ae338-source/server/pulselib-bootstrap"
+        }
+      },
+      "source-neoforge-server": {
+        "command": [
+          "./gradlew",
+          ":neoforge:runServer",
+          "-PpulseDemoContent",
+          "-PpulseAnimationRegression",
+          "-PpulseLifecycleRegression",
+          "-PpulseBootstrapRunId=demo-27a4dd3f075c40db9dc213e0b19ae338-source",
+          "-I",
+          "fabric/build/stage71b2b1-20261107/projection.gradle",
+          "--offline",
+          "--no-daemon",
+          "--console=plain",
+          "-PpulseTestEulaFile=fabric/build/stage62d2b-runs/server/eula.txt"
+        ],
+        "runDirectory": "neoforge/build/pulselib-tests/demo-27a4dd3f075c40db9dc213e0b19ae338-source/server",
+        "gradleExit": 0,
+        "result": {
+          "side": "server",
+          "status": "PASS",
+          "candidates": 3,
+          "origin": "file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/neoforge/build/classes/java/demo/",
+          "loaded": 2,
+          "world": "/mnt/MainDrive/Programs/MC mods/ArcsLib/neoforge/build/pulselib-tests/demo-27a4dd3f075c40db9dc213e0b19ae338-source/server/pulselib-bootstrap"
+        }
+      }
+    }
+  },
+  "negativeControls": {
+    "status": "PASS",
+    "cases": [
+      {
+        "module": "fabric",
+        "command": [
+          "./gradlew",
+          ":fabric:runClient",
+          "-PpulseDemoJar",
+          "-PpulseLifecycleRegression",
+          "-PpulseLifecycleSkipHook",
+          "-PpulseBootstrapRunId=stage71b2b1-negative-fabric",
+          "-I",
+          "fabric/build/stage71b2b1-20261107/projection.gradle",
+          "--offline",
+          "--no-daemon",
+          "--console=plain"
+        ],
+        "gradleExit": 1,
+        "javaExit": 255,
+        "result": "Expected unchanged canonical resource leak assertion; no COMPLETE/PASS",
+        "log": "fabric/build/stage71b2b1-20261107/fabric-negative.log"
+      },
+      {
+        "module": "neoforge",
+        "command": [
+          "./gradlew",
+          ":neoforge:runClient",
+          "-PpulseDemoJar",
+          "-PpulseLifecycleRegression",
+          "-PpulseLifecycleSkipHook",
+          "-PpulseBootstrapRunId=stage71b2b1-negative-neoforge",
+          "-I",
+          "fabric/build/stage71b2b1-20261107/projection.gradle",
+          "--offline",
+          "--no-daemon",
+          "--console=plain"
+        ],
+        "gradleExit": 1,
+        "javaExit": 255,
+        "result": "Expected unchanged canonical resource leak assertion; no COMPLETE/PASS",
+        "log": "fabric/build/stage71b2b1-20261107/neoforge-negative.log"
+      }
+    ]
+  },
+  "defaultProfile": {
+    "status": "PASS",
+    "command": [
+      "./gradlew",
+      ":fabric:runClient",
+      "-PpulseDemoJar",
+      "-PpulseBootstrapRunId=stage71b2b1-optout",
+      "-I",
+      "fabric/build/stage71b2b1-20261107/projection.gradle",
+      "--offline",
+      "--no-daemon",
+      "--console=plain"
+    ],
+    "gradleExit": 0,
+    "result": {
+      "side": "client",
+      "candidates": 3,
+      "modelEpochs": 2,
+      "assetChecks": 100,
+      "animation": {
+        "assertions": 0,
+        "maintenance": 0,
+        "enabled": false
+      },
+      "lifecycle": {
+        "enabled": false
+      },
+      "loaded": 2,
+      "origin": "file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/fabric/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-fabric.jar",
+      "renders": [
+        3330,
+        2775,
+        2182
+      ],
+      "status": "PASS"
+    }
+  },
+  "configurationControls": {
+    "status": "PASS",
+    "cases": [
+      {
+        "name": "lifecycle-without-demo",
+        "command": [
+          "./gradlew",
+          "help",
+          "--offline",
+          "--no-daemon",
+          "--console=plain",
+          "-PpulseLifecycleRegression"
+        ],
+        "gradleExit": 1,
+        "expectedMessage": "Lifecycle regression requires a demo",
+        "gameNotStarted": true
+      },
+      {
+        "name": "skip-without-lifecycle",
+        "command": [
+          "./gradlew",
+          "help",
+          "--offline",
+          "--no-daemon",
+          "--console=plain",
+          "-PpulseDemoJar",
+          "-PpulseLifecycleSkipHook"
+        ],
+        "gradleExit": 1,
+        "expectedMessage": "Lifecycle regression requires a demo",
+        "gameNotStarted": true
+      },
+      {
+        "name": "full-flags-still-guarded",
+        "command": [
+          "./gradlew",
+          "help",
+          "--offline",
+          "--no-daemon",
+          "--console=plain",
+          "-PpulseDemoJar",
+          "-PpulseTestMod"
+        ],
+        "gradleExit": 1,
+        "expectedMessage": "complete canonical regression harnesses remain stage 7.1b.2",
+        "gameNotStarted": true
+      }
+    ]
+  },
+  "assertionProof": "stage-7.1b.2b.1-inventory.json",
+  "production": "All 1797 class files /78 GPU fingerprints and all release JAR payloads identical; no production edits or new render types/pipelines.",
+  "animationWaitFix": "Requires actual maintenance callbacks before asserting; original 21s, two observed tick boundaries, 90s deadline and all 25 assertion trees retained. No production scheduler change.",
+  "debugger": {
+    "skill": "ij-debugger",
+    "transport": "own loopback 127.0.0.1:5023",
+    "observed": "Non-suspending logpoint at frameWorld:129: cycles=2; tick=503; maintenanceStart=0; native END_CLIENT_TICK stack. Repeat passed, maintenance=3 at COMPLETE.",
+    "limitation": "Getter expression could not be typed; no values from that expression claimed. Pause causal role not proven.",
+    "cleanup": "Three owned breakpoints/config removed; two pre-existing disabled user exception breakpoints preserved.",
+    "events": "fabric/build/stage71b2b1-20261107/debug-events.json"
+  },
+  "failedPreparation": [
+    "package-1: sandbox Gradle cache lock denied; retried with approved cache access",
+    "package-2: adapter reflection argument order and Submission.enabled compile errors; fixed",
+    "final-runs: shallow root-bone mesh lookup failed before lifecycle; fixed indexed traversal",
+    "final-runs-2: repeated terminal COMPLETE; stopped diagnostic series and added terminal guard",
+    "accepted-runs: premature actual-maintenance assertion; strengthened wait prerequisites without changing assertions/deadline"
+  ],
+  "remaining": [
+    "7.1b.2b.2 remaining Smoke/plugin/camera/graphics/world/native RenderRegression/World/H14",
+    "Full ItemStackIdentity world/reentry/drop/pickup/GC",
+    "PlayerMotion full suite",
+    "GPU timing/allocation hooks and canonical full source/JAR flags",
+    "7.2 API/GPU/residual/performance report"
+  ],
+  "rawArtifacts": "fabric/build/stage71b2b1-20261107"
+}

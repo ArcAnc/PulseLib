@@ -746,3 +746,9 @@ See [testmod instructions](testmod/README.md), journal section 65 and
 injection consolidation and canonical flags remain **7.1b.2b**; final GPU/API/
 performance matrix is **7.2**. Original WIP is excluded from the commit and
 validation uses HEAD plus own loader changes through the saved source projection.
+
+Stage **7.1b.2b.1** consolidates canonical Smoke explicit/natural GPU resource
+cleanup in the external demo. Use `run_demo.py --lifecycle-regression` (optionally
+with `--animation-regression`) and check the separate lifecycle assertion proof.
+Full Smoke/native graphics, identity/player/performance suites and canonical flags
+remain open. See journal section 66 and [fixture instructions](testmod/README.md).

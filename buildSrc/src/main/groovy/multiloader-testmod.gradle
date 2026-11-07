@@ -63,6 +63,10 @@ def demoPackaged = providers.gradleProperty('pulseDemoJar').isPresent()
 def demoMode = demoSource || demoPackaged
 def animationRegression = providers.gradleProperty('pulseAnimationRegression').isPresent()
 def skipAnimationRemoval = providers.gradleProperty('pulseAnimationSkipRemoval').isPresent()
+def lifecycleRegression = providers.gradleProperty('pulseLifecycleRegression').isPresent()
+def skipDisconnectHook = providers.gradleProperty('pulseLifecycleSkipHook').isPresent()
+if ((lifecycleRegression && !demoMode) || (skipDisconnectHook && !lifecycleRegression))
+    throw new GradleException('Lifecycle regression requires a demo source/JAR profile; skip-hook is an explicit negative control requiring lifecycle regression.')
 if ((animationRegression && !demoMode) || (skipAnimationRemoval && !animationRegression))
     throw new GradleException('Animation regression requires a demo source/JAR profile; skip-removal is an explicit negative control requiring animation regression.')
 if ((demoSource && demoPackaged) || (demoMode && providers.gradleProperty('pulseTestJarBootstrap').isPresent()))
@@ -151,6 +155,11 @@ if (providers.gradleProperty('pulseTestJarBootstrap').isPresent() || demoMode) {
                     if (skipAnimationRemoval)
                         run.vmArg '-Dpulselib.test.skipAnimationRemoval=true'
                 }
+                if (lifecycleRegression) {
+                    run.vmArg '-Dpulselib.test.lifecycleRegression=true'
+                    if (skipDisconnectHook)
+                        run.vmArg '-Dpulselib.test.skipDisconnectHook=true'
+                }
                 if (run.name == 'client')
                     run.programArgs '--width', '960', '--height', '640'
             }
@@ -174,6 +183,11 @@ if (providers.gradleProperty('pulseTestJarBootstrap').isPresent() || demoMode) {
                     run.systemProperty 'pulselib.test.animationRegression', 'true'
                     if (skipAnimationRemoval)
                         run.systemProperty 'pulselib.test.skipAnimationRemoval', 'true'
+                }
+                if (lifecycleRegression) {
+                    run.systemProperty 'pulselib.test.lifecycleRegression', 'true'
+                    if (skipDisconnectHook)
+                        run.systemProperty 'pulselib.test.skipDisconnectHook', 'true'
                 }
                 if (run.name == 'client')
                     run.programArguments.addAll '--width', '960', '--height', '640'

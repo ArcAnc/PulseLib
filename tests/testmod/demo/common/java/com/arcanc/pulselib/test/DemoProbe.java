@@ -57,7 +57,15 @@ public final class DemoProbe
 
 	public static void tick(Minecraft mc)
 	{
+		if (completed)
+			return;
 		DemoChecks.runDirectory();
+		if (phase == 4)
+		{
+			if (SmokeLifecycleHarness.frame())
+				complete(mc);
+			return;
+		}
 		if (++ticks > 3000)
 			throw new AssertionError("PULSE DEMO client deadline phase=" + phase);
 		if (mc.getOverlay() != null || ClientTestPlugin.GLTF.getModel() == null || ClientTestPlugin.GECKO.getModel() == null)
@@ -96,15 +104,13 @@ public final class DemoProbe
 					AnimationSamplingHarness.verifyRemovalHooks();
 					PLibDatabase.LOGGER.info("PULSE ANIMATION COMPLETE: assertions={}, maintenance={}", RegressionChecks.assertions, RegressionChecks.maintenancePasses);
 				}
-				completed = true;
-				DemoChecks.writeResult(Map.of("status", "PASS", "side", "client", "candidates", 3, "loaded", 2,
-						"origin", DemoChecks.jar(ClientTestPlugin.class), "assetChecks", assets, "modelEpochs", epochs,
-						"animation", Map.of("enabled", Boolean.getBoolean("pulselib.test.animationRegression"), "assertions", RegressionChecks.assertions, "maintenance", RegressionChecks.maintenancePasses),
-						"renders", java.util.List.of(TestEntityRender.renders,
-								TestBlockEntityRenderer.renders,
-								TestBlockItemRenderer.renders)));
-				PLibDatabase.LOGGER.info("PULSE DEMO CLIENT COMPLETE: assets={}, epochs={}, player demos=2", assets, epochs);
-				mc.stop();
+				if (Boolean.getBoolean("pulselib.test.lifecycleRegression"))
+				{
+					phase = 4;
+					SmokeLifecycleHarness.begin();
+				}
+				else
+					complete(mc);
 			}
 		}
 		else if (phase == 2 && reload != null && reload.isDone())
@@ -118,6 +124,18 @@ public final class DemoProbe
 			beginEpoch();
 			phase = 3;
 		}
+	}
+
+	private static void complete(Minecraft mc)
+	{
+		completed = true;
+		DemoChecks.writeResult(Map.of("status", "PASS", "side", "client", "candidates", 3, "loaded", 2,
+				"origin", DemoChecks.jar(ClientTestPlugin.class), "assetChecks", assets, "modelEpochs", epochs,
+				"animation", Map.of("enabled", Boolean.getBoolean("pulselib.test.animationRegression"), "assertions", RegressionChecks.assertions, "maintenance", RegressionChecks.maintenancePasses),
+				"lifecycle", Boolean.getBoolean("pulselib.test.lifecycleRegression") ? SmokeLifecycleHarness.result() : Map.of("enabled", false),
+				"renders", java.util.List.of(TestEntityRender.renders, TestBlockEntityRenderer.renders, TestBlockItemRenderer.renders)));
+		PLibDatabase.LOGGER.info("PULSE DEMO CLIENT COMPLETE: assets={}, epochs={}, player demos=2", assets, epochs);
+		mc.stop();
 	}
 
 	static net.minecraft.core.BlockPos sceneBlockPosition()

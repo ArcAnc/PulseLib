@@ -148,3 +148,45 @@ incomplete runs are excluded from accepted results.
 
 See journal section 65 and
 [recorded evidence](../../docs/porting/evidence/stage-7.1b.2a.json).
+
+
+## Smoke resource lifecycle (7.1b.2b.1)
+
+`--lifecycle-regression` on `run_demo.py` adds `-PpulseLifecycleRegression` to
+both demo source/JAR profiles on both loaders. Each client first completes the
+normal asset/scene/reload checks, then populates the actual queue/backend with
+CPU/GPU deformation and explicit ORDINARY/OIT on the existing material type.
+It checks deletion after explicit cleanup, recreates resources and verifies the
+native loader disconnect callback. Capture checks live GL handles; deletion is
+checked inside the callback before other allocations can reuse their names.
+Managers, caches, mappings, queues, buffer/texture wrappers and fences must clear.
+The dedicated server must keep all client harness classes unloaded.
+
+```bash
+python3 tests/testmod/tools/run_demo.py --animation-regression --lifecycle-regression --eula /path/to/your/accepted/eula.txt --output build/reports/lifecycle-UNIQUE
+python3 tests/testmod/tools/inventory_lifecycle.py
+python3 tests/testmod/tools/inventory_harnesses.py
+```
+
+The animation flag is optional. Its retention phase now waits for two actual
+maintenance callbacks as well as the original 21-second/two-boundary criteria;
+the 90-second deadline and all assertions are retained. The ordinary demo without
+these flags keeps its short asset/scene/reload run. COMPLETE is emitted once.
+
+`inventory_lifecycle.py` checks all 11 canonical SmokeResources guard argument
+trees plus the natural-hook guard. The only guard representation adaptation is
+`geometryResources` to the native registry's `meshResources`. The native resource
+inspector derives from the recorded 26.1 Stage42c fixture; its extra guards cover
+all current OIT owners, UBO rings, VAOs, fences and close listeners. The full
+canonical Smoke graphics/pixel/camera suite remains open, as do identity/player/
+render/performance consolidation and the guarded full canonical flags.
+
+For an explicit negative control after packaging, use a new run ID and
+`-PpulseDemoJar -PpulseLifecycleRegression -PpulseLifecycleSkipHook` with either
+loader's `runClient`. The test-only Mixin suppresses the native disconnect body;
+the unchanged canonical resource assertion must report a leak (Java 255 / Gradle
+1), without NATURAL DISCONNECT PASS or CLIENT COMPLETE. The positive runner never
+sets this flag. Profile prerequisites reject invalid flags before game startup.
+
+See journal section 66, [assertion proof](../../docs/porting/evidence/stage-7.1b.2b.1-inventory.json)
+and [recorded evidence](../../docs/porting/evidence/stage-7.1b.2b.1.json).

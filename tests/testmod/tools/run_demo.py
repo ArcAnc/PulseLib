@@ -23,6 +23,7 @@ def main():
     parser.add_argument('--gradle-init', type=Path, action='append', default=[])
     parser.add_argument('--modes', nargs='+', choices=['jar', 'source'], default=['jar', 'source'])
     parser.add_argument('--animation-regression', action='store_true')
+    parser.add_argument('--lifecycle-regression', action='store_true')
     parser.add_argument('--timeout', type=int, default=900)
     args = parser.parse_args()
     output = args.output.resolve()
@@ -62,6 +63,8 @@ def main():
                     command = base + [f':{module}:run{side.capitalize()}', '-P' + ('pulseDemoJar' if mode == 'jar' else 'pulseDemoContent'), '-PpulseBootstrapRunId=' + run_id]
                     if args.animation_regression:
                         command += ['-PpulseAnimationRegression']
+                    if args.lifecycle_regression:
+                        command += ['-PpulseLifecycleRegression']
                     if side == 'server':
                         command += ['-PpulseTestEulaFile=' + str(args.eula.resolve())]
                     stdout = run(command, output / (key + '.log'), args.timeout)
@@ -76,6 +79,7 @@ def main():
                     if side == 'client':
                         assert case['assetChecks'] == 2 * len(manifest) and case['modelEpochs'] == 2
                         assert stdout.count('PULSE DEMO SCENE PASS') == 2
+                        assert stdout.count('PULSE DEMO CLIENT COMPLETE') == 1
                         assert all(count > 20 for count in case['renders'])
                         if args.animation_regression:
                             assert case['animation']['enabled'] and case['animation']['assertions'] > 6000 and case['animation']['maintenance'] >= 2
@@ -83,10 +87,15 @@ def main():
                                 assert stdout.count(marker) == 2, (key, marker)
                             for marker in ['PULSE TEST L25 WORLD PASS', 'PULSE TEST L25 REMOVAL PASS', 'PULSE ANIMATION COMPLETE']:
                                 assert marker in stdout, (key, marker)
+                        if args.lifecycle_regression:
+                            assert case['lifecycle']['completed'] and case['lifecycle']['hooks'] > 0
+                            for marker in ['PULSE TEST EXPLICIT CLEANUP PASS', 'PULSE TEST NATURAL RESOURCES PASS', 'PULSE TEST NATURAL DISCONNECT PASS']:
+                                assert stdout.count(marker) == 1, (key, marker)
+                            assert stdout.count('PULSE TEST LIFECYCLE WORKLOAD PASS') == 2
                     else:
                         assert 'PULSE DEMO CONTENT PASS' in stdout
                         trace = (directory / 'classloading.log').read_text()
-                        for prefix in ['net.minecraft.client.', 'com.mojang.blaze3d.', 'com.arcanc.pulselib.test.ClientTestPlugin ', 'com.arcanc.pulselib.test.DemoProbe ', 'com.arcanc.pulselib.test.DemoClient ', 'com.arcanc.pulselib.test.AnimationSamplingHarness ', 'com.arcanc.pulselib.test.AnimationLifecycleHarness ', 'com.arcanc.pulselib.test.mixin.AnimationMaintenanceMixin ']:
+                        for prefix in ['net.minecraft.client.', 'com.mojang.blaze3d.', 'com.arcanc.pulselib.test.ClientTestPlugin ', 'com.arcanc.pulselib.test.DemoProbe ', 'com.arcanc.pulselib.test.DemoClient ', 'com.arcanc.pulselib.test.AnimationSamplingHarness ', 'com.arcanc.pulselib.test.AnimationLifecycleHarness ', 'com.arcanc.pulselib.test.mixin.AnimationMaintenanceMixin ', 'com.arcanc.pulselib.test.SmokeLifecycleHarness ', 'com.arcanc.pulselib.test.SmokeLifecycleWorkload ', 'com.arcanc.pulselib.test.SmokeResources ', 'com.arcanc.pulselib.test.RegressionResources ', 'com.arcanc.pulselib.test.mixin.SmokeLifecycleMixin ']:
                             assert '] ' + prefix not in trace, (key, prefix)
                     result['cases'][key] = {'exitCode': 0, 'runDirectory': str(directory.relative_to(ROOT)), 'result': case}
                     save()

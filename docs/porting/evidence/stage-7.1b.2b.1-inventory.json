@@ -1,0 +1,48 @@
+{
+  "pin": "7ce6f024b307bb821ce543344d3896c8e1fcf26b",
+  "checkpoint": "7.1b.2b.1",
+  "scope": "Only SmokeResources and explicit/natural disconnect orchestration. Full Smoke/identity/player/render/performance bundle remains incomplete.",
+  "sourceSha256": {
+    "tests/testmod/src/main/java/com/arcanc/pulselib/test/SmokeResources.java": "3d80420d1caf9d69113bec62265746be95e6f140eff4fd8fdad949cdb867f582",
+    "tests/testmod/src/main/java/com/arcanc/pulselib/test/SmokeHarness.java": "fb5ace41f5b2b77675817973513b0c9ebe7d711dd37942b109a64a512c4bcdf8",
+    "tests/testmod/src/main/java/com/arcanc/pulselib/test/mixin/SmokeLifecycleMixin.java": "9e8dfbf782d4be8f7e83e0a624785964e18b21296936c4697f5bc52fe5762681"
+  },
+  "resourceAssertionProof": {
+    "canonicalCheckSites": 11,
+    "preservedSites": 11,
+    "additionalCheckSites": 2,
+    "exactArgumentTreesAfterDeclaredAdaptation": true
+  },
+  "naturalHookAssertionProof": {
+    "canonicalCheckSites": 1,
+    "preservedSites": 1,
+    "exactArgumentTrees": true
+  },
+  "adaptations": [
+    "geometryResources -> meshResources: native PGlResourceRegistry field; same emptiness guard/message.",
+    "Single legacy OIT owner/stream texture IDs -> all native OIT owners, buffers, views, FBOs, VAOs, UBO rings and fences; captured GL names must be live.",
+    "Native Minecraft.disconnect(TitleScreen, false); natural deletion guards execute inside PulseRuntime.disconnected TAIL before GL names can be reused. Suppressed-hook control executes the same guards on the next tick.",
+    "AnimationSamplingHarness waits for actual maintenance callbacks in addition to the existing 21s/two-boundary prerequisites; all assertions and the 90s deadline remain unchanged.",
+    "Smoke graphics draw is not claimed as migrated; a dedicated workload populates CPU/GPU deformation and explicit ORDINARY/OIT on the existing material type. Native generated-primitives query proves draw execution."
+  ],
+  "helperProvenance": {
+    "source": "tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage42cResources.java",
+    "creationCommit": "60a81599436ea544b0f42257551a7d497cd5d66e",
+    "preservedDate": "25.10.2026"
+  },
+  "completed": [
+    "SmokeResources: all canonical guards",
+    "SmokeHarness.runExplicitCleanup/seedManagers/Dummy lifecycle slice",
+    "SmokeHarness natural disconnect guard/observation slice",
+    "SmokeLifecycleMixin disconnect HEAD observation and negative cancellation; added immediate TAIL verification"
+  ],
+  "remaining": [
+    "Smoke plugin/camera/graphics/world orchestration",
+    "ItemStackIdentity full suite",
+    "PlayerMotion full suite",
+    "RenderRegression/World/H14 native injections",
+    "GPU timing/allocation hooks",
+    "Full canonical source/JAR flags",
+    "7.2 final API/GPU/performance report"
+  ]
+}
