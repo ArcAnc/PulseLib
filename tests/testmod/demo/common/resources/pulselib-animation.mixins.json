@@ -4,7 +4,12 @@
   "compatibilityLevel": "JAVA_25",
   "client": [
     "AnimationMaintenanceMixin",
-    "SmokeLifecycleMixin"
+    "SmokeLifecycleMixin",
+    "SmokeRenderMixin",
+    "SmokeStagesMixin",
+    "SmokeWorldEndMixin",
+    "SmokeLayerMixin",
+    "GlDebugMixin"
   ],
   "injectors": {
     "defaultRequire": 1

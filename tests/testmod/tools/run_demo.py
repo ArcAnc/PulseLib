@@ -24,8 +24,12 @@ def main():
     parser.add_argument('--modes', nargs='+', choices=['jar', 'source'], default=['jar', 'source'])
     parser.add_argument('--animation-regression', action='store_true')
     parser.add_argument('--lifecycle-regression', action='store_true')
+    parser.add_argument('--smoke-regression', action='store_true')
+    parser.add_argument('--smoke-first-person', action='store_true', help='Intentional first-person negative control; the run must fail an original world-scene prerequisite (Fabric armor / NeoForge block).')
     parser.add_argument('--timeout', type=int, default=900)
     args = parser.parse_args()
+    if args.smoke_first_person and not args.smoke_regression:
+        parser.error('--smoke-first-person requires --smoke-regression')
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
     assert args.eula.is_file() and 'eula=true' in args.eula.read_text().splitlines()
@@ -65,6 +69,10 @@ def main():
                         command += ['-PpulseAnimationRegression']
                     if args.lifecycle_regression:
                         command += ['-PpulseLifecycleRegression']
+                    if args.smoke_regression:
+                        command += ['-PpulseSmokeRegression']
+                        if args.smoke_first_person:
+                            command += ['-PpulseSmokeFirstPerson']
                     if side == 'server':
                         command += ['-PpulseTestEulaFile=' + str(args.eula.resolve())]
                     stdout = run(command, output / (key + '.log'), args.timeout)
@@ -92,10 +100,19 @@ def main():
                             for marker in ['PULSE TEST EXPLICIT CLEANUP PASS', 'PULSE TEST NATURAL RESOURCES PASS', 'PULSE TEST NATURAL DISCONNECT PASS']:
                                 assert stdout.count(marker) == 1, (key, marker)
                             assert stdout.count('PULSE TEST LIFECYCLE WORKLOAD PASS') == 2
+                        if args.smoke_regression:
+                            smoke = case['smoke']
+                            assert smoke['enabled'] and smoke['completed'] and smoke['stages'] > 0 and smoke['layers'] > 0
+                            assert smoke['camera'] == ('FIRST_PERSON' if args.smoke_first_person else 'THIRD_PERSON_BACK')
+                            assert len(smoke['draws']) == 2
+                            assert all(draw['colored'] > 0 for draw in smoke['draws'])
+                            assert smoke['draws'][1]['translucent'] and smoke['draws'][1]['partialAlpha'] > 0
+                            for marker in ['PULSE TEST WORLD PASS', 'PULSE TEST SMOKE COMPLETE', 'PULSE TEST solid:', 'PULSE TEST OIT:']:
+                                assert stdout.count(marker) == 1, (key, marker)
                     else:
                         assert 'PULSE DEMO CONTENT PASS' in stdout
                         trace = (directory / 'classloading.log').read_text()
-                        for prefix in ['net.minecraft.client.', 'com.mojang.blaze3d.', 'com.arcanc.pulselib.test.ClientTestPlugin ', 'com.arcanc.pulselib.test.DemoProbe ', 'com.arcanc.pulselib.test.DemoClient ', 'com.arcanc.pulselib.test.AnimationSamplingHarness ', 'com.arcanc.pulselib.test.AnimationLifecycleHarness ', 'com.arcanc.pulselib.test.mixin.AnimationMaintenanceMixin ', 'com.arcanc.pulselib.test.SmokeLifecycleHarness ', 'com.arcanc.pulselib.test.SmokeLifecycleWorkload ', 'com.arcanc.pulselib.test.SmokeResources ', 'com.arcanc.pulselib.test.RegressionResources ', 'com.arcanc.pulselib.test.mixin.SmokeLifecycleMixin ']:
+                        for prefix in ['net.minecraft.client.', 'com.mojang.blaze3d.', 'com.arcanc.pulselib.test.ClientTestPlugin ', 'com.arcanc.pulselib.test.DemoProbe ', 'com.arcanc.pulselib.test.DemoClient ', 'com.arcanc.pulselib.test.AnimationSamplingHarness ', 'com.arcanc.pulselib.test.AnimationLifecycleHarness ', 'com.arcanc.pulselib.test.mixin.AnimationMaintenanceMixin ', 'com.arcanc.pulselib.test.SmokeLifecycleHarness ', 'com.arcanc.pulselib.test.SmokeLifecycleWorkload ', 'com.arcanc.pulselib.test.SmokeResources ', 'com.arcanc.pulselib.test.RegressionResources ', 'com.arcanc.pulselib.test.mixin.SmokeLifecycleMixin ', 'com.arcanc.pulselib.test.SmokeHarness ', 'com.arcanc.pulselib.test.SmokeStages ', 'com.arcanc.pulselib.test.GlErrors ', 'com.arcanc.pulselib.test.mixin.SmokeRenderMixin ', 'com.arcanc.pulselib.test.mixin.SmokeStagesMixin ', 'com.arcanc.pulselib.test.mixin.SmokeWorldEndMixin ', 'com.arcanc.pulselib.test.mixin.SmokeLayerMixin ', 'com.arcanc.pulselib.test.mixin.GlDebugMixin ']:
                             assert '] ' + prefix not in trace, (key, prefix)
                     result['cases'][key] = {'exitCode': 0, 'runDirectory': str(directory.relative_to(ROOT)), 'result': case}
                     save()

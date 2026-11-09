@@ -17,6 +17,8 @@ import com.arcanc.pulselib.content.model.animation.PAnimationEvaluationContext;
 import com.arcanc.pulselib.content.model.animation.PInterpolationType;
 import com.arcanc.pulselib.content.registration.block.block_entity.TestBlockEntity;
 import com.arcanc.pulselib.content.registration.entity.TestEntity;
+import com.arcanc.pulselib.content.registration.entity.renderer.TestEntityRender;
+import com.arcanc.pulselib.content.registration.block.block_entity.ber.TestBlockEntityRenderer;
 import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import com.arcanc.pulselib.data.gecko.MolangParser;
 import com.arcanc.pulselib.data.gecko.PGeckoModelLoader;
@@ -119,6 +121,17 @@ public final class AnimationSamplingHarness
 		Map<?, ?> registry = (Map<?, ?>)field(InstanceAnimationManager.class, "MANAGERS", null);
 		for (var entry : WATCHED.entrySet())
 		{
+			if (!registry.containsKey(entry.getKey()))
+			{
+				var owner = entry.getKey().getAnimatable();
+				PLibDatabase.LOGGER.error("L25 active owner diagnostic: type={}, owner={}, player={}, scene={}, entityRenders={}, blockRenders={}",
+						owner.getClass().getName(), owner, mc.player.position(), DemoProbe.sceneBlockPosition(),
+						TestEntityRender.renders, TestBlockEntityRenderer.renders);
+				if (owner instanceof net.minecraft.world.entity.Entity entity)
+					PLibDatabase.LOGGER.error("L25 entity diagnostic: position={}, removed={}, mapped={}", entity.position(), entity.isRemoved(), mc.level.getEntity(entity.getId()) == entity);
+				if (owner instanceof TestBlockEntity block)
+					PLibDatabase.LOGGER.error("L25 block diagnostic: position={}, removed={}, mapped={}", block.getBlockPos(), block.isRemoved(), mc.level.getBlockEntity(block.getBlockPos()) == block);
+			}
 			check(registry.containsKey(entry.getKey()), "L25 active renderer-owned manager expired");
 			check(entry.getKey().getControllers().containsValue(entry.getValue()), "L25 recreated a controller");
 			check(MolangParser.evaluate("v.l25_probe", entry.getValue().persistentMolangContext()) == 42, "L25 reset persistent controller state");
@@ -162,6 +175,7 @@ public final class AnimationSamplingHarness
 
 	private static <T extends PAnimatable<T>> void watch(T owner)
 	{
+		PLibDatabase.LOGGER.info("PULSE L25 WATCH: owner={}", owner);
 		var manager = PLibHelper.getManager(owner);
 		var controller = manager.getControllers().values().iterator().next();
 		controller.persistentMolangContext().variable("l25_probe", 42);

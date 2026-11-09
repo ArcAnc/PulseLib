@@ -60,6 +60,15 @@ public final class DemoProbe
 		if (completed)
 			return;
 		DemoChecks.runDirectory();
+		if (phase == 5)
+		{
+			if (SmokeHarness.completed())
+			{
+				createScene(mc);
+				phase = 3;
+			}
+			return;
+		}
 		if (phase == 4)
 		{
 			if (SmokeLifecycleHarness.frame())
@@ -83,11 +92,21 @@ public final class DemoProbe
 		{
 			DemoChecks.world(mc.getSingleplayerServer(), true);
 			PLibDatabase.LOGGER.info("PULSE DEMO WORLD PASS: {}", mc.getSingleplayerServer().getWorldPath(LevelResource.ROOT));
-			createScene(mc);
-			phase = 3;
+			if (SmokeHarness.enabled())
+			{
+				phase = 5;
+				SmokeHarness.begin();
+			}
+			else
+			{
+				createScene(mc);
+				phase = 3;
+			}
 		}
 		else if (phase == 3 && scene && ++frames >= 80)
 		{
+			if (SmokeHarness.enabled() && !SmokeHarness.sceneReleased(mc))
+				return;
 			if (Boolean.getBoolean("pulselib.test.animationRegression") && epochs == 0 && !AnimationSamplingHarness.frameWorld())
 				return;
 			verifyScene();
@@ -98,20 +117,7 @@ public final class DemoProbe
 				phase = 2;
 			}
 			else
-			{
-				if (Boolean.getBoolean("pulselib.test.animationRegression"))
-				{
-					AnimationSamplingHarness.verifyRemovalHooks();
-					PLibDatabase.LOGGER.info("PULSE ANIMATION COMPLETE: assertions={}, maintenance={}", RegressionChecks.assertions, RegressionChecks.maintenancePasses);
-				}
-				if (Boolean.getBoolean("pulselib.test.lifecycleRegression"))
-				{
-					phase = 4;
-					SmokeLifecycleHarness.begin();
-				}
-				else
-					complete(mc);
-			}
+				finishSuites(mc);
 		}
 		else if (phase == 2 && reload != null && reload.isDone())
 		{
@@ -126,14 +132,48 @@ public final class DemoProbe
 		}
 	}
 
+	/** Keeps the independent content epochs deterministic after Smoke releases its world scene. */
+	public static void lockSceneCamera()
+	{
+		Minecraft mc = Minecraft.getInstance();
+		if (!SmokeHarness.enabled() || !scene || phase >= 4 || mc.player == null)
+			return;
+		net.minecraft.client.KeyMapping.releaseAll();
+		mc.player.setYRot(0);
+		mc.player.yRotO = 0;
+		mc.player.yBodyRot = 0;
+		mc.player.yBodyRotO = 0;
+		mc.player.setXRot(8);
+		mc.player.xRotO = 8;
+	}
+
+	private static void finishSuites(Minecraft mc)
+	{
+		if (Boolean.getBoolean("pulselib.test.animationRegression"))
+		{
+			AnimationSamplingHarness.verifyRemovalHooks();
+			PLibDatabase.LOGGER.info("PULSE ANIMATION COMPLETE: assertions={}, maintenance={}", RegressionChecks.assertions, RegressionChecks.maintenancePasses);
+		}
+		if (Boolean.getBoolean("pulselib.test.lifecycleRegression"))
+		{
+			phase = 4;
+			SmokeLifecycleHarness.begin();
+		}
+		else
+			complete(mc);
+	}
+
 	private static void complete(Minecraft mc)
 	{
 		completed = true;
-		DemoChecks.writeResult(Map.of("status", "PASS", "side", "client", "candidates", 3, "loaded", 2,
+		var result = new java.util.LinkedHashMap<String, Object>();
+		result.putAll(Map.of("status", "PASS", "side", "client", "candidates", 3, "loaded", 2,
 				"origin", DemoChecks.jar(ClientTestPlugin.class), "assetChecks", assets, "modelEpochs", epochs,
 				"animation", Map.of("enabled", Boolean.getBoolean("pulselib.test.animationRegression"), "assertions", RegressionChecks.assertions, "maintenance", RegressionChecks.maintenancePasses),
 				"lifecycle", Boolean.getBoolean("pulselib.test.lifecycleRegression") ? SmokeLifecycleHarness.result() : Map.of("enabled", false),
 				"renders", java.util.List.of(TestEntityRender.renders, TestBlockEntityRenderer.renders, TestBlockItemRenderer.renders)));
+		result.put("smoke", SmokeHarness.result());
+		DemoChecks.writeResult(result);
 		PLibDatabase.LOGGER.info("PULSE DEMO CLIENT COMPLETE: assets={}, epochs={}, player demos=2", assets, epochs);
 		mc.stop();
 	}
@@ -161,7 +201,15 @@ public final class DemoProbe
 			entity.setPos(pos.getX() + 2, pos.getY(), pos.getZ());
 			entity.setNoAi(true);
 			entity.showArmor = true;
+			if (SmokeHarness.enabled())
+			{
+				PLibDatabase.LOGGER.info("PULSE DEMO COLLISION BEFORE RELEASE: free={}, box={}", level.noCollision(entity), entity.getBoundingBox());
+				SmokeHarness.releaseScene(level);
+				DemoChecks.check(level.noCollision(entity), "Independent demo actor must spawn without block collision");
+				PLibDatabase.LOGGER.info("PULSE DEMO COLLISION AFTER RELEASE: free={}", level.noCollision(entity));
+			}
 			level.addFreshEntity(entity);
+			PLibDatabase.LOGGER.info("PULSE DEMO SPAWN: id={}, entity={}", entity.getId(), entity);
 			player.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(DemoContent.blockItem.get()));
 			player.setItemSlot(EquipmentSlot.OFFHAND, new ItemStack(DemoContent.tail.get()));
 			player.setItemSlot(EquipmentSlot.HEAD, new ItemStack(DemoContent.helmet.get()));
@@ -188,6 +236,15 @@ public final class DemoProbe
 
 	private static void verifyScene()
 	{
+		Minecraft mc = Minecraft.getInstance();
+		var positions = new java.util.ArrayList<net.minecraft.world.phys.Vec3>();
+		for (var entity : mc.level.entitiesForRendering())
+			if (entity instanceof com.arcanc.pulselib.content.registration.entity.TestEntity)
+				positions.add(entity.position());
+		PLibDatabase.LOGGER.info("PULSE DEMO SCENE PROBE: epoch={}, deltas={}/{}/{}, camera={}, eye={}, yaw={}, pitch={}, player={}, entities={}",
+				epochs + 1, TestEntityRender.renders - entityBefore, TestBlockEntityRenderer.renders - blockBefore,
+				TestBlockItemRenderer.renders - itemBefore, mc.options.getCameraType(), mc.gameRenderer.getMainCamera().position(),
+				mc.player.getYRot(), mc.player.getXRot(), mc.player.position(), positions);
 		DemoChecks.check(TestEntityRender.renders > entityBefore + 20,
 				"Canonical entity meshes submit in each resource epoch");
 		DemoChecks.check(TestBlockEntityRenderer.renders > blockBefore + 20,

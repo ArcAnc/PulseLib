@@ -30,6 +30,8 @@ public abstract class AnimationMaintenanceMixin
 	@Inject(method = "removeManager(Ljava/lang/Object;)V", at = @At("HEAD"), cancellable = true, require = 1)
 	private static void removing(Object owner, CallbackInfo ci)
 	{
+		if (com.arcanc.pulselib.test.SmokeHarness.enabled() && owner instanceof com.arcanc.pulselib.content.registration.entity.TestEntity)
+			com.arcanc.pulselib.util.PLibDatabase.LOGGER.info("PULSE NATIVE ENTITY REMOVAL: {}", owner, new Throwable("Native removal observer"));
 		if (Boolean.getBoolean("pulselib.test.animationRegression") && Boolean.getBoolean("pulselib.test.skipAnimationRemoval"))
 			ci.cancel();
 	}

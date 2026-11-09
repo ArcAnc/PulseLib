@@ -64,6 +64,11 @@ def demoMode = demoSource || demoPackaged
 def animationRegression = providers.gradleProperty('pulseAnimationRegression').isPresent()
 def skipAnimationRemoval = providers.gradleProperty('pulseAnimationSkipRemoval').isPresent()
 def lifecycleRegression = providers.gradleProperty('pulseLifecycleRegression').isPresent()
+def smokeRegression = providers.gradleProperty('pulseSmokeRegression').isPresent()
+def smokeFirstPerson = providers.gradleProperty('pulseSmokeFirstPerson').isPresent()
+def smokeSkipDraw = providers.gradleProperty('pulseSmokeSkipDraw').isPresent()
+if ((smokeRegression && !demoMode) || ((smokeFirstPerson || smokeSkipDraw) && !smokeRegression))
+    throw new GradleException('Smoke regression requires a demo source/JAR profile; first-person and skip-draw controls require Smoke regression.')
 def skipDisconnectHook = providers.gradleProperty('pulseLifecycleSkipHook').isPresent()
 if ((lifecycleRegression && !demoMode) || (skipDisconnectHook && !lifecycleRegression))
     throw new GradleException('Lifecycle regression requires a demo source/JAR profile; skip-hook is an explicit negative control requiring lifecycle regression.')
@@ -155,6 +160,13 @@ if (providers.gradleProperty('pulseTestJarBootstrap').isPresent() || demoMode) {
                     if (skipAnimationRemoval)
                         run.vmArg '-Dpulselib.test.skipAnimationRemoval=true'
                 }
+                if (smokeRegression) {
+                    run.vmArg '-Dpulselib.test.smokeRegression=true'
+                    if (smokeFirstPerson)
+                        run.vmArg '-Dpulselib.test.smokeFirstPerson=true'
+                    if (smokeSkipDraw)
+                        run.vmArg '-Dpulselib.test.smokeSkipDraw=true'
+                }
                 if (lifecycleRegression) {
                     run.vmArg '-Dpulselib.test.lifecycleRegression=true'
                     if (skipDisconnectHook)
@@ -183,6 +195,13 @@ if (providers.gradleProperty('pulseTestJarBootstrap').isPresent() || demoMode) {
                     run.systemProperty 'pulselib.test.animationRegression', 'true'
                     if (skipAnimationRemoval)
                         run.systemProperty 'pulselib.test.skipAnimationRemoval', 'true'
+                }
+                if (smokeRegression) {
+                    run.systemProperty 'pulselib.test.smokeRegression', 'true'
+                    if (smokeFirstPerson)
+                        run.systemProperty 'pulselib.test.smokeFirstPerson', 'true'
+                    if (smokeSkipDraw)
+                        run.systemProperty 'pulselib.test.smokeSkipDraw', 'true'
                 }
                 if (lifecycleRegression) {
                     run.systemProperty 'pulselib.test.lifecycleRegression', 'true'

@@ -1,0 +1,57 @@
+{
+  "pin": "7ce6f024b307bb821ce543344d3896c8e1fcf26b",
+  "checkpoint": "7.1b.2b.2a",
+  "sourceSha256": {
+    "tests/testmod/src/main/java/com/arcanc/pulselib/test/SmokeHarness.java": "fb5ace41f5b2b77675817973513b0c9ebe7d711dd37942b109a64a512c4bcdf8",
+    "tests/testmod/src/main/java/com/arcanc/pulselib/test/mixin/SmokeStagesMixin.java": "53451ada2e3619973b7cdbf02712d356eaa7225c78c33c6d64e6b07e000e1157",
+    "tests/testmod/src/main/java/com/arcanc/pulselib/test/mixin/SmokeRenderMixin.java": "990e6e34752c75426e86393b8ce0c7ca114af6b5667ca72207a8f111d06eea0b",
+    "tests/testmod/src/main/java/com/arcanc/pulselib/test/mixin/SmokeLayerMixin.java": "d643e290a170950379ea82019fa3a61436c9bac895ec7b4e2db6fea8afc9c4f4",
+    "tests/testmod/src/main/java/com/arcanc/pulselib/test/mixin/GlDebugMixin.java": "ca83d1c3c014aa6451c7ee517604d87c0da1a44067b2c650b3851c8c3770d954",
+    "tests/testmod/src/main/java/com/arcanc/pulselib/test/GlErrors.java": "f7145567a81444243ae38931388f904a0204a0a08e0e3fb62e33709344d338f0",
+    "tests/testmod/src/main/java/com/arcanc/pulselib/test/DisposableTestWorlds.java": "f9d12fdd7e442ef7068a49010fb7aa478d12812cb73b1ff50085e48eb71e1524"
+  },
+  "scope": "Smoke own plugin/world/camera/animation-controller/solid+OIT pixel checks and native stage/layer/render/GL-error observers. No full RenderRegression/World/H14/identity/player/performance claim.",
+  "assertionProof": {
+    "canonicalCheckSites": 28,
+    "preservedSites": 28,
+    "additionalCheckSites": 2,
+    "exactArgumentTreesAfterDeclaredAdaptations": true
+  },
+  "stageThrowProof": {
+    "canonical": 3,
+    "preserved": 3,
+    "exactExpressionTrees": true
+  },
+  "guardAdaptations": {
+    "!gecko.bones().isEmpty()": "gecko.boneCount() > 0",
+    "submission.enabled()": "submission.operationCount() > 0",
+    "mc.getBlockEntityRenderDispatcher().getRenderer(block) instanceof TestBlockEntityRenderer": "(Object)mc.getBlockEntityRenderDispatcher().getRenderer(block) instanceof TestBlockEntityRenderer"
+  },
+  "excludedFromThisAstProof": {
+    "Natural disconnect did not invoke a loader lifecycle hook": "Exact argument-tree parity is covered by inventory_lifecycle.py.",
+    "Geometry arena must allocate GPU buffers": "Legacy captureGeometryBuffers helper is replaced by RegressionResources.all/page live GL-handle checks and SmokeResources nonempty-resource prerequisites (section 66); not claimed as exact argument-tree parity."
+  },
+  "nativeAdaptations": [
+    "Optional Gecko-entity mode stays guarded. Its geometry check argument tree is retained, but the scoped default profile selects the glTF entity; no Gecko-entity GPU-mode coverage is claimed. Loaded Gecko player rig still exercises the real Gecko parser/controller.",
+    "Run only inside the existing opt-in marked demo world; no legacy flags enabled. Original 30-tick world wait, fixed platform/equipment, FIRST_PERSON yaw=180 and THIRD_PERSON_BACK yaw=0 retained.",
+    "Smoke-only automated window is hidden with GLFW while preserving its GL context, adapting canonical DisposableTestWorlds.prepareAutomationWindow measurement isolation; demo epochs lock yaw=0/pitch=8 before extraction. Manual/default demo profile is unchanged.",
+    "Smoke transient block is removed and actor discarded by the server; native noCollision must pass for the next demo actor, and client removal is awaited before L25 selects all TestEntity owners. Smoke world/draw checks run before demo/retention owners are created in the same area; no teleport/world replacement between retention and removal. Destructive AnimationSamplingHarness.verifyRemovalHooks stays after graphics, restoring canonical ordering. All guards remain unchanged.",
+    "GameRenderer.update HEAD locks the camera before extraction; render TAIL drives the GPU slice. PLivingAttachmentLayer.render -> submit. Block counter observes the original live owner in resolveBoneRender.",
+    "afterBlockEntities / afterParticles phase guards unchanged. Final guard observes PRenderQueue.endWorldFrame after native weather/composition, including the Fabulous path that bypasses afterWeather.",
+    "TextureTarget/ProjectionMatrixBuffer/GlTexture and explicit output views replace legacy bindWrite/projection/frameBufferId; native GL read framebuffer and pixel-pack state restored.",
+    "Indexed PBakedModel.bone list replaces recursive roots-only traversal without duplicate children.",
+    "Existing trianglesEmissiveTranslucent uses explicit OIT; solid uses ORDINARY. Eight instances, original bend and 64x64 target, visible/partial-alpha thresholds and indexed GL state equality retained.",
+    "Native camera yaw is checked at the real Camera after 30 ticks (0/180 degrees, tolerance 0.001). First-person native yaw=180 yields BER callbacks on Fabric but not NeoForge, so the new scoped control expects original world-armor (Fabric) / block-renderer (NeoForge) guards; legacy pulseSmokeReproduce equivalence stays deferred.",
+    "GlDebug moved to opengl; enableDebugCallback now returns GlDebug and accepts extension set, printDebugLog is an instance method. Error recording remains synchronous and throws outside native callback.",
+    "Canonical animation and cleanup suites stay in their existing harnesses. This slice adds the original single Gecko controller start/evaluate/remove check; it does not duplicate full suites."
+  ],
+  "remaining": [
+    "Canonical pulseSmokeReproduce block-visibility negative control: Fabric MC26 BER callbacks still occur at native yaw=180 (NeoForge callback count is zero); it requires a native GPU/frustum oracle, not callback-count equivalence. The new first-person control checks existing world prerequisites (Fabric armor / NeoForge block).",
+    "7.1b.2b.2b: full RenderRegressionHarness/WorldRenderRegressionHarness/H14Harness and their native queue/stage injections",
+    "ItemStackIdentity world/reentry/drop/pickup/GC",
+    "PlayerMotion",
+    "GPU timing/allocation hooks",
+    "Full canonical source/JAR flags and Gecko entity option",
+    "7.2 final API/GPU/residual/performance report"
+  ]
+}

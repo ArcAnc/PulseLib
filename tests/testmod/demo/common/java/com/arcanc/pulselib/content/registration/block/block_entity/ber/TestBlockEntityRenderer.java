@@ -56,6 +56,7 @@ public class TestBlockEntityRenderer extends PBlockRenderer<TestBlockEntity, PBl
 	                                               float partialTick)
 	{
 		renders++;
+		com.arcanc.pulselib.test.SmokeHarness.recordBlockRender(animatable);
 		return bone.parent() == null ? inherited.withAlphaMode(PAlphaMode.AUTO) : inherited;
 	}
 	@Override

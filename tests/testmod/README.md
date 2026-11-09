@@ -190,3 +190,67 @@ sets this flag. Profile prerequisites reject invalid flags before game startup.
 
 See journal section 66, [assertion proof](../../docs/porting/evidence/stage-7.1b.2b.1-inventory.json)
 and [recorded evidence](../../docs/porting/evidence/stage-7.1b.2b.1.json).
+
+
+## Smoke world/graphics orchestration (7.1b.2b.2a)
+
+`--smoke-regression` adds `-PpulseSmokeRegression` to the existing demo
+source/JAR profiles. Clients run the canonical Smoke plugin/model/atlas guards,
+prepare the original marked-world platform and equipment, lock the camera,
+wait 30 player ticks and check block/entity/item/armor/layer/animated callbacks.
+A loaded Gecko controller must start and evaluate its clip. The original item
+pyramid draws eight GPU bend instances into each 64x64 solid/OIT target.
+Visible pixels, partial OIT alpha and indexed blend/depth/scissor restoration
+retain the original thresholds and use the existing Common backend/pipelines.
+
+```bash
+python3 tests/testmod/tools/run_demo.py --smoke-regression --animation-regression --lifecycle-regression --eula /path/to/your/accepted/eula.txt --output build/reports/smoke-UNIQUE
+python3 tests/testmod/tools/inventory_smoke.py
+```
+
+After Smoke finishes, its transient block and actor are removed through native
+server operations. Client actor removal is observed before L25 selects owners;
+the next demo actor must pass native `noCollision` before spawning. Independent
+demo/retention owners then complete the two normal resource epochs in that same
+area. There is no teleport/world replacement between retention and removal.
+Animation/lifecycle options are independent and optional.
+
+The Smoke automation window is hidden while preserving its GL context and
+framebuffer; the standard demo profile stays visible. The native stage observer
+checks block → particles → final world composition, including the Fabulous
+route through `endWorldFrame`. Fixed cameras run before extraction, graphics at
+render TAIL. After Smoke, content epochs lock yaw/pitch to 0/8 degrees. Native
+Camera yaw is checked after the original 30-tick Smoke wait (0/180 degrees,
+tolerance 0.001). Destructive animation removal checks follow graphics. Native
+GL debug errors are retained synchronously and checked outside the callback.
+
+The inventory proves all 28 original Smoke guard argument trees after three
+explicit adaptations, plus all three stage-order throw expressions. Extra
+Smoke guards cover its deadline and actual native yaw; the demo adds a
+collision-free spawn prerequisite. The earlier lifecycle proof stays separate.
+Full RenderRegression/World/H14, identity/player/performance suites and
+canonical full flags remain open.
+
+Two intentionally failing controls require a Smoke profile and a new run ID.
+Invoke either loader's `runClient` with `-PpulseDemoJar -PpulseSmokeRegression`
+and one of:
+
+- `-PpulseSmokeSkipDraw`: skip only the eight test submissions. The original
+  `Original demo geometry must produce visible pixels` guard must fail.
+- `-PpulseSmokeFirstPerson`: FIRST_PERSON/yaw 180 must fail an unchanged world
+  prerequisite: Fabric `Loader custom armor adapter must be invoked`, NeoForge
+  `Original block entity renderer must run`.
+
+Require Java 255 / Gradle 1, without SMOKE or CLIENT COMPLETE. The runner's
+`--smoke-first-person` invokes the same deliberately failing control; it writes
+FAIL and raises. The positive runner sets neither control. Missing profile
+prerequisites are rejected before a game directory is created.
+
+At native yaw 180, Fabric still executes BER callbacks while NeoForge does not.
+A portable callback count therefore cannot serve as a block-visibility oracle.
+The canonical `pulseSmokeReproduce` flag remains guarded pending native
+GPU/frustum visibility evidence. This scoped first-person control does not
+claim that equivalence or first-person rendering correctness.
+
+See journal section 67, [assertion proof](../../docs/porting/evidence/stage-7.1b.2b.2a-inventory.json)
+and [recorded evidence](../../docs/porting/evidence/stage-7.1b.2b.2a.json).

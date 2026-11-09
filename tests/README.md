@@ -752,3 +752,14 @@ cleanup in the external demo. Use `run_demo.py --lifecycle-regression` (optional
 with `--animation-regression`) and check the separate lifecycle assertion proof.
 Full Smoke/native graphics, identity/player/performance suites and canonical flags
 remain open. See journal section 66 and [fixture instructions](testmod/README.md).
+
+
+Stage 7.1b.2b.2a consolidates the canonical Smoke plugin/world/camera/graphics
+checks in the external demo source/JAR profiles on both loaders. Use
+`run_demo.py --smoke-regression`, optionally with the existing animation and
+lifecycle regression options. This adds actual solid/OIT pixels and strict
+native stage-order/layer/GL-error observers. Camera-away and missing-draw
+controls must fail the unchanged original guards; they are excluded from PASS.
+Full RenderRegression/World/H14, identity/player/performance consolidation and
+canonical full flags remain open. See [testmod instructions](testmod/README.md)
+and migration journal section 67.
