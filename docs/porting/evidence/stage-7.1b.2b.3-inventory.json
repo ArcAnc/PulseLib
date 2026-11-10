@@ -1,0 +1,49 @@
+{
+  "checkpoint": "7.1b.2b.3",
+  "pin": "7ce6f024b307bb821ce543344d3896c8e1fcf26b",
+  "source": "tests/testmod/src/main/java/com/arcanc/pulselib/test/ItemStackIdentityHarness.java",
+  "sourceSha256": "1116ad35519ab868416bd3cd989fb15eab9fbffa95dc16d220517a7d135bebd8",
+  "guardProof": {
+    "canonicalSites": 66,
+    "preservedSites": 66,
+    "additionalSites": 2,
+    "exactArgumentTreesIncludingMessagesAndThresholds": true
+  },
+  "coreBodyProof": {
+    "animated": "8d0171e0ac8817a1d982494f79be28af709e5433ff760328ba811fabad00bf95",
+    "concurrentAccess": "b0eb8cd59005327780031db7e62446259e95254c67afac318fd14d29b0639a9a",
+    "data": "ca29da349a9b48c1666d469d91f12494fce8f95af08a99b3127dc1c6abcdfb90",
+    "id": "5751e42df0dac99ada6d23fbbb742e5d92f28aab5cfaac41f69c752ffd865259",
+    "managers": "fc8ee708dc62f7ebac29269337c0c49303eefa018b364da0782df07fb8fd424c",
+    "pass": "3c793f2006261aff8eb1af2d34093c51225fd12ad0e5665c28631a190b607d9b",
+    "regressions": "01097256f5976e4e63becc9cb9584b3b92caabb08a8215a442011655a4cfae17",
+    "serialization": "beed6c6322d98317585efec12ee84cb7a90c58908f5ffbfc8b460f7fa95e4d31",
+    "totalAnimated": "a8612526ebecdb3ddb9482a2a1fc312127e3b92d9ad5c78a018bb0f47b9c37b4",
+    "verifyManagers": "608ba3c1b7db8ba927a0e6522738e15e1ca2b9efbdcb8385013828144d86eaea"
+  },
+  "bodyPolicy": "Javac structural fingerprints retain nesting, node kinds, identifiers, members, variables and literals. Only redundant single-statement blocks are unwrapped. Ten entire core/helper bodies match after the sole declared NBT parse API adaptation.",
+  "provenance": {
+    "author": "ArcAnc",
+    "preservedCreationDate": "14.10.2026",
+    "lastCanonicalCommit": "5ae02648f36cae466c52486c97aa6890e5630f78"
+  },
+  "adapters": [
+    "ClickType -> ContainerInput; handleInventoryMouseClick -> handleContainerInput: same native prediction and ordinary server packet.",
+    "MultiPlayerGameMode.hasInfiniteItems -> Player.hasInfiniteMaterials; selected -> setSelectedSlot; serverLevel -> level; teleportTo adds empty relative set and reset-camera argument.",
+    "Registry-aware ItemStack.CODEC.parse replaces removed ItemStack.parse, same NBT data and fresh runtime ID guards.",
+    "Minecraft.disconnect(TitleScreen,false) replaces old level.disconnect + disconnect; no explicit Pulse cleanup call. Existing runtime mixin observes the real loader hook.",
+    "Standalone tick driver opens one fresh marked world, waits for native readiness, then runs the original phases with original tick waits/deadlines. Reentry requires this JVM to have created that exact marked save.",
+    "Full pulseItemIdentityTest -> pulselib.test.itemIdentity mapping retained within exclusive demo source/JAR; integrated server exercises real hurtAndBreak. No dedicated server required.",
+    "Test-only pulseIdentitySkipHook cancels the actual PulseRuntime.disconnected callback; same unchanged natural cleanup assertion must fail."
+  ],
+  "completed": [
+    "16 core regressions including 100000 copies, eight concurrent workers, server hurtAndBreak, NBT/network, independent managers/controllers/phases",
+    "Inventory pickup/hotbar/reopen/split/merge/offhand/chest quick move, authoritative sync, drop/pickup and 18-count recovery",
+    "Natural disconnect cleanup, retained survivor ID, weak-reference collection, saved-world reentry and new deserialized IDs, controller restart, final disconnect"
+  ],
+  "remaining": [
+    "PlayerMotion full canonical orchestration",
+    "GPU timing/allocation and remaining canonical full flags/Gecko",
+    "7.2 semantic/compiled API and GPU/performance report"
+  ]
+}

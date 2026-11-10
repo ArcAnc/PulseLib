@@ -57,6 +57,11 @@ public final class DemoProbe
 
 	public static void tick(Minecraft mc)
 	{
+		if (ItemStackIdentityHarness.enabled())
+		{
+			ItemStackIdentityHarness.tick();
+			return;
+		}
 		if (VisibilityHarness.enabled())
 		{
 			VisibilityHarness.tick();
@@ -322,6 +327,11 @@ public final class DemoProbe
 
 	public static void stopped()
 	{
+		if (ItemStackIdentityHarness.enabled())
+		{
+			ItemStackIdentityHarness.stopped();
+			return;
+		}
 		if (VisibilityHarness.enabled())
 		{
 			VisibilityHarness.stopped();

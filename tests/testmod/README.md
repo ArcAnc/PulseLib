@@ -409,3 +409,43 @@ separate world-prerequisite control. Visibility uses a declared input change
 from callback count to actual GPU samples, retaining the original >0, message,
 throw body and property mapping. See journal section 71 and
 [recorded evidence](../../docs/porting/evidence/stage-7.1b.2b.2c.json).
+
+### Full ItemStackIdentityHarness (7.1b.2b.3)
+
+`-PpulseItemIdentityTest` now requires an exclusive `pulseDemoContent` or
+`pulseDemoJar` client profile. It creates a fresh marked integrated world,
+runs the complete canonical identity/menu state machine, disconnects naturally,
+collects manager/controller weak references and reopens only the save created
+by this JVM. Integrated server `hurtAndBreak` requires no dedicated EULA.
+Old saves are never adopted; `runServer` and mixed regression profiles fail
+before launch. The original `pulselib.test.itemIdentity=true` property is retained;
+the standalone guarded driver provides the old world-bootstrap prerequisite.
+
+```bash
+python3 tests/testmod/tools/run_identity.py --output build/reports/identity-UNIQUE
+python3 tests/testmod/tools/run_identity.py --negative-control --output build/reports/identity-negative-UNIQUE
+python3 tests/testmod/tools/inventory_identity.py
+```
+
+Default cases are Fabric JAR and NeoForge sources; `--cases` selects one and
+`--gradle-init` accepts the documented HEAD projection. The runner checks all
+12 state-machine phases, 16 core PASS markers, both natural cleanup cycles,
+weak-reference collection, 18-item saved-world reentry, real item callbacks,
+source/JAR origins, markers/level.dat and packaged canonical asset SHA.
+All 66 canonical guards retain their arguments/messages/thresholds; ten full
+core/helper bodies match after the declared registry-aware NBT parse adaptation.
+The 100000-copy check retains its original CPU timeout and is not GPU profiling.
+
+`--negative-control` passes test-only `-PpulseIdentitySkipHook`, suppressing the
+actual loader cleanup callback. Both loaders must complete core/world operations
+and then fail with the unchanged `Natural disconnect must clear item managers`
+message, Java 255 / Gradle 1 and no final result. No assertions are suppressed.
+Skip-hook without the identity profile fails before launch. This does not
+rerun the closed Smoke/render/visibility/animation/lifecycle suites.
+
+Two of the 13 inventoried canonical flags now have scoped support: identity
+and visibility reproduction. The other 11, including full `pulseTestMod` and
+`pulseTestJar`, retain their guards pending the remaining harnesses. This
+supersedes the earlier statement that all flags except reproduction are guarded.
+Full PlayerMotion is next. See journal section 72 and
+[recorded evidence](../../docs/porting/evidence/stage-7.1b.2b.3.json).

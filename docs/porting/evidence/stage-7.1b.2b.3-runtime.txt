@@ -1,0 +1,170 @@
+Stage 7.1b.2b.3: accepted runtime excerpts. Full logs/results under fabric/build/stage71b2b3-20261110.
+Positive runs: Java/Gradle exit 0. Negative runs: expected Java 255 / Gradle 1.
+
+=== positive fabric-jar ===
+[12:41:56] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 1 PASS: independent identical stacks
+[12:41:56] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 2 PASS: repeated reads
+[12:41:56] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 3 PASS: ordinary copy before/after first identity access
+[12:41:56] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 4 PASS: 100-copy chain
+[12:41:56] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 5 PASS: copyWithCount
+[12:41:56] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 6 PASS: partial split, including an unassigned source
+[12:41:56] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 7 PASS: full split and source refill
+[12:41:56] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 8 PASS: count mutation
+[12:41:56] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 9 PASS: component mutation/removal
+[12:41:56] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 10 PASS: tool durability mutation
+[12:41:56] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 11 PASS: EMPTY
+[12:41:56] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 12 PASS: ordinary items, no managers from identity assignment
+[12:41:56] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY COPY BENCHMARK: 100000 vanilla copies, 18.165007 ms, manager delta 0
+[12:41:56] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 13 PASS: 100000 copies
+[12:41:56] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 14 PASS: eight concurrent readers/copy callers
+[12:41:56] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 15 PASS: NBT and network round trips
+[12:41:56] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 16 PASS: vanilla component equality and merging
+[12:41:56] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY PHASE PROBE: IDs 1 / 2, controller times 8.0 / 28.0, copy reuses manager
+[12:41:56] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSIONS PASS: 16 cases, copy-sharing limitation, independent controllers and phases
+[12:41:56] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY PHASE 1
+[12:41:56] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY PHASE PROBE: IDs 18 / 19, controller times 8.0 / 28.0, copy reuses manager
+[12:41:56] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY PHASE 2
+[12:41:56] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY MENU BEFORE SPLIT: expected 18, source 18 count 8, carried 0 count 0
+[12:41:56] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY MENU AFTER SPLIT: source 18 count 4, carried 21 count 4
+[12:41:56] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY PHASE 3
+[12:41:57] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY PHASE 4
+[12:41:57] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY PHASE 5
+[12:41:57] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY PHASE 6
+[12:41:58] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY PHASE 7
+[12:41:58] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY WORLD OPERATIONS PASS: slots, hotbar, chest, both hands, count, split, merge, drop/pickup, inventory reopen
+[12:42:01] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY PHASE 10
+[12:42:01] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY DISCONNECT HOOK: phase 10, thread Render thread
+[12:42:01] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY GC PASS: manager and controller collected; surviving stack ID 28
+[12:42:01] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY PHASE 11
+[12:42:03] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REENTRY PASS: natural cleanup, collected controllers, new deserialized identities
+[12:42:04] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY PHASE 13
+[12:42:04] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY DISCONNECT HOOK: phase 13, thread Render thread
+[12:42:04] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY PHASE 12
+[12:42:04] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY CLIENT PASS
+[12:42:04] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY DISCONNECT HOOK: phase 12, thread Render thread
+[12:42:04] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY SHUTDOWN PASS
+PULSE BOOTSTRAP VERIFIED: /mnt/MainDrive/Programs/MC mods/ArcsLib/fabric/build/pulselib-tests/identity-30d09372c9db44259a68d2ffa7b702a0/client
+BUILD SUCCESSFUL in 32s
+
+=== positive neoforge-source ===
+[12:42:28] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 1 PASS: independent identical stacks
+[12:42:28] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 2 PASS: repeated reads
+[12:42:28] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 3 PASS: ordinary copy before/after first identity access
+[12:42:28] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 4 PASS: 100-copy chain
+[12:42:28] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 5 PASS: copyWithCount
+[12:42:28] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 6 PASS: partial split, including an unassigned source
+[12:42:28] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 7 PASS: full split and source refill
+[12:42:28] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 8 PASS: count mutation
+[12:42:28] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 9 PASS: component mutation/removal
+[12:42:28] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 10 PASS: tool durability mutation
+[12:42:28] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 11 PASS: EMPTY
+[12:42:28] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 12 PASS: ordinary items, no managers from identity assignment
+[12:42:28] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY COPY BENCHMARK: 100000 vanilla copies, 18.66873 ms, manager delta 0
+[12:42:28] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 13 PASS: 100000 copies
+[12:42:28] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 14 PASS: eight concurrent readers/copy callers
+[12:42:28] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 15 PASS: NBT and network round trips
+[12:42:28] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 16 PASS: vanilla component equality and merging
+[12:42:28] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY PHASE PROBE: IDs 1 / 2, controller times 8.0 / 28.0, copy reuses manager
+[12:42:28] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSIONS PASS: 16 cases, copy-sharing limitation, independent controllers and phases
+[12:42:28] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY PHASE 1
+[12:42:28] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY PHASE PROBE: IDs 18 / 19, controller times 8.0 / 28.0, copy reuses manager
+[12:42:28] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY PHASE 2
+[12:42:29] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY MENU BEFORE SPLIT: expected 18, source 18 count 8, carried 0 count 0
+[12:42:29] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY MENU AFTER SPLIT: source 18 count 4, carried 21 count 4
+[12:42:29] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY PHASE 3
+[12:42:29] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY PHASE 4
+[12:42:29] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY PHASE 5
+[12:42:29] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY PHASE 6
+[12:42:30] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY PHASE 7
+[12:42:30] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY WORLD OPERATIONS PASS: slots, hotbar, chest, both hands, count, split, merge, drop/pickup, inventory reopen
+[12:42:30] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY DISCONNECT HOOK: phase 7, thread Render thread
+[12:42:33] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY PHASE 10
+[12:42:33] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY GC PASS: manager and controller collected; surviving stack ID 27
+[12:42:33] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY PHASE 11
+[12:42:35] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REENTRY PASS: natural cleanup, collected controllers, new deserialized identities
+[12:42:35] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY DISCONNECT HOOK: phase 11, thread Render thread
+[12:42:37] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY PHASE 13
+[12:42:37] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY PHASE 12
+[12:42:37] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY CLIENT PASS
+[12:42:37] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY DISCONNECT HOOK: phase 12, thread Render thread
+[12:42:37] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY SHUTDOWN PASS
+PULSE BOOTSTRAP VERIFIED: /mnt/MainDrive/Programs/MC mods/ArcsLib/neoforge/build/pulselib-tests/identity-30d09372c9db44259a68d2ffa7b702a0/client
+BUILD SUCCESSFUL in 32s
+
+=== negative fabric-jar ===
+[12:43:32] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 1 PASS: independent identical stacks
+[12:43:32] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 2 PASS: repeated reads
+[12:43:32] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 3 PASS: ordinary copy before/after first identity access
+[12:43:32] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 4 PASS: 100-copy chain
+[12:43:32] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 5 PASS: copyWithCount
+[12:43:32] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 6 PASS: partial split, including an unassigned source
+[12:43:32] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 7 PASS: full split and source refill
+[12:43:32] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 8 PASS: count mutation
+[12:43:32] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 9 PASS: component mutation/removal
+[12:43:32] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 10 PASS: tool durability mutation
+[12:43:32] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 11 PASS: EMPTY
+[12:43:32] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 12 PASS: ordinary items, no managers from identity assignment
+[12:43:32] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY COPY BENCHMARK: 100000 vanilla copies, 16.270398 ms, manager delta 0
+[12:43:32] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 13 PASS: 100000 copies
+[12:43:32] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 14 PASS: eight concurrent readers/copy callers
+[12:43:32] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 15 PASS: NBT and network round trips
+[12:43:32] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSION 16 PASS: vanilla component equality and merging
+[12:43:32] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY PHASE PROBE: IDs 1 / 2, controller times 8.0 / 28.0, copy reuses manager
+[12:43:32] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY REGRESSIONS PASS: 16 cases, copy-sharing limitation, independent controllers and phases
+[12:43:32] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY PHASE 1
+[12:43:32] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY PHASE PROBE: IDs 18 / 19, controller times 8.0 / 28.0, copy reuses manager
+[12:43:32] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY PHASE 2
+[12:43:32] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY MENU BEFORE SPLIT: expected 18, source 18 count 8, carried 0 count 0
+[12:43:32] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY MENU AFTER SPLIT: source 18 count 4, carried 21 count 4
+[12:43:32] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY PHASE 3
+[12:43:33] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY PHASE 4
+[12:43:33] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY PHASE 5
+[12:43:33] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY PHASE 6
+[12:43:34] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY PHASE 7
+[12:43:34] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY WORLD OPERATIONS PASS: slots, hotbar, chest, both hands, count, split, merge, drop/pickup, inventory reopen
+[12:43:37] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY PHASE 10
+[12:43:37] [Render thread/INFO] (Pulse Lib) ITEM IDENTITY DISCONNECT HOOK: phase 10, thread Render thread
+java.lang.AssertionError: PulseLib smoke test: Natural disconnect must clear item managers
+java.lang.AssertionError: PulseLib smoke test: Natural disconnect must clear item managers
+> Process 'command '/usr/lib/jvm/java-25-openjdk/bin/java'' finished with non-zero exit value 255
+BUILD FAILED in 28s
+
+=== negative neoforge-source ===
+[12:44:05] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 1 PASS: independent identical stacks
+[12:44:05] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 2 PASS: repeated reads
+[12:44:05] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 3 PASS: ordinary copy before/after first identity access
+[12:44:05] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 4 PASS: 100-copy chain
+[12:44:05] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 5 PASS: copyWithCount
+[12:44:05] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 6 PASS: partial split, including an unassigned source
+[12:44:05] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 7 PASS: full split and source refill
+[12:44:05] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 8 PASS: count mutation
+[12:44:05] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 9 PASS: component mutation/removal
+[12:44:05] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 10 PASS: tool durability mutation
+[12:44:05] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 11 PASS: EMPTY
+[12:44:05] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 12 PASS: ordinary items, no managers from identity assignment
+[12:44:05] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY COPY BENCHMARK: 100000 vanilla copies, 15.186488 ms, manager delta 0
+[12:44:05] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 13 PASS: 100000 copies
+[12:44:05] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 14 PASS: eight concurrent readers/copy callers
+[12:44:05] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 15 PASS: NBT and network round trips
+[12:44:05] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSION 16 PASS: vanilla component equality and merging
+[12:44:05] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY PHASE PROBE: IDs 1 / 2, controller times 8.0 / 28.0, copy reuses manager
+[12:44:05] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY REGRESSIONS PASS: 16 cases, copy-sharing limitation, independent controllers and phases
+[12:44:05] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY PHASE 1
+[12:44:05] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY PHASE PROBE: IDs 18 / 19, controller times 8.0 / 28.0, copy reuses manager
+[12:44:05] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY PHASE 2
+[12:44:05] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY MENU BEFORE SPLIT: expected 18, source 18 count 8, carried 0 count 0
+[12:44:05] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY MENU AFTER SPLIT: source 18 count 4, carried 21 count 4
+[12:44:05] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY PHASE 3
+[12:44:06] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY PHASE 4
+[12:44:06] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY PHASE 5
+[12:44:06] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY PHASE 6
+[12:44:06] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY PHASE 7
+[12:44:07] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY WORLD OPERATIONS PASS: slots, hotbar, chest, both hands, count, split, merge, drop/pickup, inventory reopen
+[12:44:07] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY DISCONNECT HOOK: phase 7, thread Render thread
+[12:44:10] [Render thread/INFO] [Pulse Lib/]: ITEM IDENTITY PHASE 10
+[12:44:10] [Render thread/ERROR] [ne.ne.bu.EventBus/EVENTBUS]: Exception caught during firing event: PulseLib smoke test: Natural disconnect must clear item managers
+java.lang.AssertionError: PulseLib smoke test: Natural disconnect must clear item managers
+java.lang.AssertionError: PulseLib smoke test: Natural disconnect must clear item managers
+java.lang.AssertionError: PulseLib smoke test: Natural disconnect must clear item managers
+> Process 'command '/usr/lib/jvm/java-25-openjdk/bin/java'' finished with non-zero exit value 255
+BUILD FAILED in 32s

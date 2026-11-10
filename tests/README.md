@@ -805,3 +805,15 @@ The canonical reproduction flag is now supported only with the exclusive
 `pulseVisibilityRegression` demo profile; other full flags remain guarded.
 See journal section 71. Full ItemStackIdentity world/reentry/drop/pickup/GC and
 server/menu scenarios are next.
+
+
+Stage **7.1b.2b.3** completes the full canonical ItemStackIdentityHarness:
+16 core scenarios, real server hurtAndBreak, vanilla menus/drop/pickup,
+natural cleanup, weak-reference GC, saved-world reentry and controller restart.
+All 66 canonical guard sites and ten complete core/helper bodies are preserved
+with the declared MC26 NBT parsing adaptation. Fabric JAR and NeoForge sources
+pass; skipping the real cleanup hook fails the unchanged cleanup assertion.
+Run `python3 tests/testmod/tools/run_identity.py --output build/reports/identity-UNIQUE`.
+`pulseItemIdentityTest` now has scoped support with an exclusive demo source/JAR
+profile; the remaining 11 full canonical flags retain their guards.
+See journal section 72. Full PlayerMotion is next (7.1b.2b.4).

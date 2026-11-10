@@ -25,6 +25,8 @@ import java.nio.file.StandardOpenOption;
 
 public final class DisposableDemoWorlds
 {
+	private static boolean created;
+
 	private DisposableDemoWorlds()
 	{
 	}
@@ -45,10 +47,31 @@ public final class DisposableDemoWorlds
 		{
 			throw new IllegalStateException(exception);
 		}
+		created = true;
 		mc.options.pauseOnLostFocus = false;
 		mc.createWorldOpenFlows().createFreshLevel(DemoChecks.WORLD,
 				new LevelSettings("PulseLib disposable bootstrap", GameType.CREATIVE,
 						new LevelSettings.DifficultySettings(Difficulty.PEACEFUL, false, true), true, WorldDataConfiguration.DEFAULT),
 				new WorldOptions(0x50554C5345L, false, false), WorldPresets::createFlatWorldDimensions, mc.screen);
+	}
+	/** Opens only the save created by this JVM inside its unique marked run root. */
+	public static void reopen()
+	{
+		Path saves = DemoChecks.runDirectory().resolve("saves"), world = saves.resolve(DemoChecks.WORLD);
+		try
+		{
+			DemoChecks.check(created && !Files.isSymbolicLink(saves) && !Files.isSymbolicLink(world) &&
+					!Files.isSymbolicLink(world.resolve(".pulselib-disposable")) &&
+					Files.readString(world.resolve(".pulselib-disposable")).equals(DemoChecks.WORLD_MARKER) &&
+					Files.isRegularFile(world.resolve("level.dat")), "Refuse reentry into any world not created by this run");
+		}
+		catch (IOException exception)
+		{
+			throw new IllegalStateException("Disposable reentry marker is missing", exception);
+		}
+		Minecraft.getInstance().createWorldOpenFlows().openWorld(DemoChecks.WORLD, () ->
+		{
+			throw new IllegalStateException("Cannot reopen the disposable test world");
+		});
 	}
 }
