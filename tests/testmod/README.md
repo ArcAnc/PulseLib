@@ -449,3 +449,52 @@ and visibility reproduction. The other 11, including full `pulseTestMod` and
 supersedes the earlier statement that all flags except reproduction are guarded.
 Full PlayerMotion is next. See journal section 72 and
 [recorded evidence](../../docs/porting/evidence/stage-7.1b.2b.3.json).
+
+### Full PlayerMotionHarness (7.1b.2b.4)
+
+`-PpulsePlayerMotionTest` now requires an exclusive `pulseDemoContent` or
+`pulseDemoJar` client profile. Its standalone driver opens only a fresh marked
+integrated world, then runs the original harness at native render TAIL.
+Registration, matrices, weighted ROOT, independent camera/basis/quaternion and
+physics oracles retain all 23 canonical guard sites and 17 full method bodies
+with declared MC26 API renames. No production backend or API change is involved.
+
+```bash
+python3 tests/testmod/tools/run_motion.py --output build/reports/motion-UNIQUE
+python3 tests/testmod/tools/run_motion.py --phase mp2 --cases fabric-jar --output build/reports/motion-mp2-UNIQUE
+python3 tests/testmod/tools/run_motion.py --negative-control --output build/reports/motion-negative-UNIQUE
+python3 tests/testmod/tools/inventory_motion.py
+```
+
+Default cases are Fabric JAR / NeoForge sources; `--gradle-init` supports the
+journal's HEAD projection. Full mode has 420 main scenarios: two formats, five
+blend modes, seven clips, three weights and two resource epochs, plus policies,
+multiple definitions, VANILLA camera, crossfade ticks, two native rendered
+observers, real server extraction isolation and respawn. Callback/matrix counts
+are correctness witnesses, not pixel parity, GPU coverage or profiling.
+`--phase` retains the canonical `pulseMotionPhase` property: only `mp2` disables
+camera and F/G/H/VANILLA cases, reducing main scenarios to 240; default is `all`.
+Other values retain the original full path. The old world-bootstrap prerequisite
+is supplied by the guarded standalone driver. Dedicated `runServer` is rejected;
+integrated server extraction and respawn require no EULA.
+
+The test-only native camera adapter captures baseline at `alignWithEntity` before
+the production TAIL hook. The camera mode comes from current Options: native
+Camera.detached is stale at this early boundary during view changes. Canonical
+camera math and tolerances are unchanged. Queue probes observe real three-argument
+submissions in an existing local OFFSCREEN scope and discard only their own work
+in finally, preserving the native world compiler after end-of-frame.
+
+`--negative-control` passes `pulseMotionSkipSubmission`: the actual third-person
+queue call is bypassed only during the direct probe. Both loaders must fail the
+original `real third-person mesh submission` guard, Java 255 / Gradle 1, without
+M-P2/M-P3 PASS or result JSON. Native world geometry and assertions stay active.
+Mixed suites and phase/skip controls without their profile fail before launch.
+
+Four of the 13 inventoried canonical flags now have scoped support: visibility
+reproduction, identity, playerMotion and motionPhase. The other nine, including
+full pulseTestMod/pulseTestJar, remain guarded. This supersedes the previous
+two-supported/eleven-guarded boundary. Native GPU timing/allocation wiring is
+next; final semantic/compiled API and GPU/performance conclusions remain 7.2.
+See journal section 73 and
+[recorded evidence](../../docs/porting/evidence/stage-7.1b.2b.4.json).

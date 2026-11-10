@@ -10,6 +10,7 @@
 package com.arcanc.pulselib.test.mixin;
 
 import com.arcanc.pulselib.test.DemoProbe;
+import com.arcanc.pulselib.test.PlayerMotionRun;
 import com.arcanc.pulselib.test.GlErrors;
 import com.arcanc.pulselib.test.H14OffscreenHarness;
 import com.arcanc.pulselib.test.SmokeHarness;
@@ -38,6 +39,7 @@ public abstract class SmokeRenderMixin
 	@Inject(method = "render", at = @At("TAIL"))
 	private void pulselibtest$graphics(CallbackInfo callback)
 	{
+		PlayerMotionRun.frame();
 		if (VisibilityHarness.enabled())
 		{
 			GlErrors.check();

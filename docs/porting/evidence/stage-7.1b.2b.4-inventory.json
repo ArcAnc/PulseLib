@@ -1,0 +1,63 @@
+{
+  "checkpoint": "7.1b.2b.4",
+  "pin": "7ce6f024b307bb821ce543344d3896c8e1fcf26b",
+  "source": "tests/testmod/src/main/java/com/arcanc/pulselib/test/PlayerMotionHarness.java",
+  "sourceSha256": "d29bbc5c2d3c094abd140e224a22723ec44a5332161c12a2884ab2c38f06aa12",
+  "guardProof": {
+    "canonicalSites": 23,
+    "preservedSites": 23,
+    "additionalSites": 1,
+    "exactArgumentsMessagesTolerancesAfterApiRenames": true
+  },
+  "oracleBodyProof": {
+    "beforeCamera": "1d837ab5fc3a35d60ea69fef1daf410257a8f4437a9234dcab9bfd0b8f00a3ba",
+    "cameraBaseline": "5b9c6110d0ec4ad3714f6bf9649c3d09c7e3a2d24633ef18df3a0c739fa85e29",
+    "check": "3ccdc846a43cd8a18147fbfa162fcbc54f763775806fc1ffbddef14b44f02b7c",
+    "createObservers": "e2a9b2b68e4d6644d0c46d202ec9f6eff89dccaa226bf28e618a975651ec664e",
+    "matrix": "620199ab16039a9d0b672cf8744284fe390124b56f7b52bf653dfa1dd736c06a",
+    "registerAnimations": "acb75c21393e693db6b9797978f755c9f2d1e0f64415bc1cf8b32ffb335e2ca1",
+    "registerAttachments": "7d21facc1b0b915a03b8faf1d9583b4475b768b0a601c5420057747c5905988e",
+    "registerModels": "b33b88d3771139191fdf2fc4079de3599d42722c8e6448150609ec9bd99974e4",
+    "rotation": "bd7f7d8c87266fcda2e25fc9f3fc8e3f2291d31d07b7929726503d5ce6920b70",
+    "sequential": "0eaa3da93797564d0097c537f155f1392879df448579169bd9cdb4d850bb6bae",
+    "sequentialRotation": "06721dfc7bd6f9ead18a6af01330a24b68604e528fdb01d95b4b854e87b07328",
+    "stopFixtures": "2ba499580e3ea9586262c2d6efd9dd81064850f02caab831f91def86aa6cde6e",
+    "submitted": "2f5940eac4ad91919c04398051083e8902402da0d19a686c1d36d46b03e4b9af",
+    "verifyMultipleDefinitions": "912c00b26f14d9468077a7964dbbdbff306961568212db2a639dcd75c0e219ac",
+    "verifyNativeCamera": "1e2bcd8b0b26947f58101e0af834ea701dcfd39ae1b2684a9e87fbfb73cd2707",
+    "verifyTransition": "e8eaf08ede0924400b756548584e5fcca275bac57a2005f821ef2c4f946912ff",
+    "verifyWeightedRoot": "4b263cd5fb663f277779878bcacb24186974ce150b6cfd1888fa873f23a1f896"
+  },
+  "bodyPolicy": "Seventeen complete registration/oracle/helper bodies match after declared API renames; javac structural fingerprints only unwrap redundant single-statement blocks.",
+  "provenance": {
+    "author": "ArcAnc",
+    "preservedCreationDate": "13.10.2026",
+    "lastCanonicalCommit": "5b5961705240de348f1d31926dc24311dc44dbf2"
+  },
+  "nativeAdapters": [
+    "ResourceLocation -> Identifier, Camera.getPosition -> position, JetBrains Nullable -> JSpecify Nullable; shared RegressionChecks preserves canonical check/field helpers.",
+    "Camera.setup -> actual Camera.alignWithEntity. Wrap calls original once; native setPosition(DDD) AFTER captures baseline before production TAIL animation integration; detached argument comes from current Options camera mode because native Camera.detached is stale at that boundary.",
+    "RenderType package moved; original three-argument submitEntityMesh/submitFirstPersonMesh HEAD observes unchanged PInstanceHeader.transform.",
+    "Attachment callback buffer argument -> SubmitNodeStorage, matching native deferred submit API.",
+    "Direct matrix probes use an existing OFFSCREEN local compiler, observe real submissions and discard only their local work in finally; do not append post-frame work to the native world queue.",
+    "Standalone fresh-world driver replaces old Smoke world prerequisites; frame driver runs at actual GameRenderer.render TAIL. Full original phases/weights/waits/reload/server isolation/respawn retained.",
+    "Canonical playerMotion and motionPhase properties retained; only mp2 disables camera/F/G/H/VANILLA, exactly as in source. Other values retain full CAMERA path.",
+    "Test-only skip-submission bypasses actual third-person queue call during direct probe, preserving every oracle and native world render."
+  ],
+  "expectedMainCases": {
+    "all": 420,
+    "mp2": 240,
+    "formats": 2,
+    "blendModes": 5,
+    "weights": [
+      0.25,
+      0.6,
+      1
+    ],
+    "epochs": 2
+  },
+  "remaining": [
+    "Native GPU timing/allocation hooks and remaining full canonical flags/Gecko",
+    "7.2 final semantic/compiled API and GPU/performance report"
+  ]
+}

@@ -13,7 +13,10 @@
     "WorldStagesMixin",
     "H14QueueMixin",
     "VisibilityWorldMixin",
-    "VisibilityStagesMixin"
+    "VisibilityStagesMixin",
+    "PlayerMotionCameraMixin",
+    "PlayerMotionQueueMixin",
+    "PlayerMotionSubmissionControlMixin"
   ],
   "injectors": {
     "defaultRequire": 1

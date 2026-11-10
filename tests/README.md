@@ -817,3 +817,15 @@ Run `python3 tests/testmod/tools/run_identity.py --output build/reports/identity
 `pulseItemIdentityTest` now has scoped support with an exclusive demo source/JAR
 profile; the remaining 11 full canonical flags retain their guards.
 See journal section 72. Full PlayerMotion is next (7.1b.2b.4).
+
+
+Stage **7.1b.2b.4** completes full PlayerMotionHarness: 420 main scenarios per
+loader across Gecko/glTF, five blend modes, three weights and resource reload;
+original matrix/physics/camera oracles, real respawn and two rendered observers.
+All 23 canonical guard sites and 17 full registration/oracle/helper bodies are
+preserved after declared native API adapters. Fabric JAR / NeoForge sources
+pass; Fabric mp2 covers the 240-case camera-disabled branch. Negative controls
+bypass real probe submission and fail the original guard. Run
+`python3 tests/testmod/tools/run_motion.py --output build/reports/motion-UNIQUE`.
+PlayerMotion/motionPhase now have scoped support; nine full flags remain guarded.
+See journal section 73. Native GPU timing/allocation wiring is next (7.1b.2b.5).

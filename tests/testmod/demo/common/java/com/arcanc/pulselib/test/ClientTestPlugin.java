@@ -81,6 +81,7 @@ public class ClientTestPlugin implements IPulseClientPlugin
 	public void registerModels(PModelRegistrar registrar)
 	{
 		models++;
+		PlayerMotionHarness.registerModels(registrar);
 		if (Boolean.getBoolean("pulselib.test.animationRegression"))
 			registrar.model(AnimationSamplingHarness.MODEL_DATA).texture("0", TestEntityRender.ZERO);
 
@@ -127,6 +128,7 @@ public class ClientTestPlugin implements IPulseClientPlugin
 		if (++playerAnimations != 1)
 			throw new AssertionError("Player animation phase repeated");
 
+		PlayerMotionHarness.registerAnimations(registrar);
 		PPlayerBallDemo.registerAnimation(registrar);
 		PPlayerAcrobaticDemo.registerAnimation(registrar);
 	}
@@ -137,6 +139,7 @@ public class ClientTestPlugin implements IPulseClientPlugin
 		if (++animatedRegistrations != 1)
 			throw new AssertionError("Animated attachment phase repeated");
 
+		PlayerMotionHarness.registerAttachments(registrar);
 		// Observe the existing ball demo's hand socket; its ball mesh is rendered by the definition.
 		registrar.register(new PPlayerAnimatedAttachmentRenderer()
 		{

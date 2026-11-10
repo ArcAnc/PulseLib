@@ -70,6 +70,15 @@ def visibilityRegression = providers.gradleProperty('pulseVisibilityRegression')
 def reproduceCamera = providers.gradleProperty('pulseSmokeReproduce').isPresent()
 def itemIdentity = providers.gradleProperty('pulseItemIdentityTest').isPresent()
 def identitySkipHook = providers.gradleProperty('pulseIdentitySkipHook').isPresent()
+def playerMotion = providers.gradleProperty('pulsePlayerMotionTest').isPresent()
+def motionSkipSubmission = providers.gradleProperty('pulseMotionSkipSubmission').isPresent()
+if (motionSkipSubmission && !playerMotion)
+    throw new GradleException('Motion skip-submission requires player motion.')
+def motionPhase = providers.gradleProperty('pulseMotionPhase').getOrElse('all')
+if ((playerMotion && (!demoMode || itemIdentity || animationRegression || lifecycleRegression || smokeRegression || visibilityRegression || ['pulseRenderRegression', 'pulseWorldRegression', 'pulseH14Offscreen'].any { providers.gradleProperty(it).isPresent() })) || (providers.gradleProperty('pulseMotionPhase').isPresent() && !playerMotion))
+    throw new GradleException('Player motion requires an exclusive demo source/JAR profile; motion-phase requires player motion.')
+if (playerMotion && gradle.startParameter.taskNames.any { it.tokenize(':').last() == 'runServer' })
+    throw new GradleException('Player motion uses an integrated server and is client-only.')
 if ((itemIdentity && (!demoMode || animationRegression || lifecycleRegression || smokeRegression || visibilityRegression || ['pulseRenderRegression', 'pulseWorldRegression', 'pulseH14Offscreen'].any { providers.gradleProperty(it).isPresent() })) || (identitySkipHook && !itemIdentity))
     throw new GradleException('Item identity requires an exclusive demo source/JAR profile; skip-hook requires item identity.')
 if (itemIdentity && gradle.startParameter.taskNames.any { it.tokenize(':').last() == 'runServer' })
@@ -108,7 +117,7 @@ if ((demoSource && demoPackaged) || (demoMode && providers.gradleProperty('pulse
     throw new GradleException('Select exactly one bootstrap/demo source/demo JAR profile.')
 
 def unsupported = ['pulseTestMod', 'pulseTestJar', 'pulseSmokeAuto', 'pulseSmokeWorld', 'pulseOitTest', 'pulseOitPerf', 'pulsePlayerMotionTest', 'pulseItemIdentityTest', 'pulseGeckoDemo', 'pulseMotionPhase', 'pulseOitBaseline', 'pulseSmokeReproduce', 'pulseSmokeSkipHook']
-if (unsupported.any { providers.gradleProperty(it).isPresent() && !(it == 'pulseSmokeReproduce' && visibilityRegression) && !(it == 'pulseItemIdentityTest' && itemIdentity) })
+if (unsupported.any { providers.gradleProperty(it).isPresent() && !(it == 'pulseSmokeReproduce' && visibilityRegression) && !(it == 'pulseItemIdentityTest' && itemIdentity) && !(it in ['pulsePlayerMotionTest', 'pulseMotionPhase'] && playerMotion) })
     throw new GradleException('The complete canonical regression harnesses remain stage 7.1b.2. Packaged bootstrap uses only -PpulseTestJarBootstrap; it cannot open existing demo worlds.')
 
 if (providers.gradleProperty('pulseTestJarBootstrap').isPresent() || demoMode) {
@@ -190,6 +199,12 @@ if (providers.gradleProperty('pulseTestJarBootstrap').isPresent() || demoMode) {
                     if (skipAnimationRemoval)
                         run.vmArg '-Dpulselib.test.skipAnimationRemoval=true'
                 }
+                if (playerMotion) {
+                    run.vmArg '-Dpulselib.test.playerMotion=true'
+                    run.vmArg "-Dpulselib.test.motionPhase=${motionPhase}"
+                    if (motionSkipSubmission)
+                        run.vmArg '-Dpulselib.test.motionSkipSubmission=true'
+                }
                 if (itemIdentity) {
                     run.vmArg '-Dpulselib.test.itemIdentity=true'
                     if (identitySkipHook)
@@ -250,6 +265,12 @@ if (providers.gradleProperty('pulseTestJarBootstrap').isPresent() || demoMode) {
                     run.systemProperty 'pulselib.test.animationRegression', 'true'
                     if (skipAnimationRemoval)
                         run.systemProperty 'pulselib.test.skipAnimationRemoval', 'true'
+                }
+                if (playerMotion) {
+                    run.systemProperty 'pulselib.test.playerMotion', 'true'
+                    run.systemProperty 'pulselib.test.motionPhase', motionPhase
+                    if (motionSkipSubmission)
+                        run.systemProperty 'pulselib.test.motionSkipSubmission', 'true'
                 }
                 if (itemIdentity) {
                     run.systemProperty 'pulselib.test.itemIdentity', 'true'

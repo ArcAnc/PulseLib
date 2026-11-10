@@ -57,6 +57,11 @@ public final class DemoProbe
 
 	public static void tick(Minecraft mc)
 	{
+		if (PlayerMotionHarness.enabled())
+		{
+			PlayerMotionRun.tick();
+			return;
+		}
 		if (ItemStackIdentityHarness.enabled())
 		{
 			ItemStackIdentityHarness.tick();
@@ -327,6 +332,11 @@ public final class DemoProbe
 
 	public static void stopped()
 	{
+		if (PlayerMotionHarness.enabled())
+		{
+			PlayerMotionHarness.stopped();
+			return;
+		}
 		if (ItemStackIdentityHarness.enabled())
 		{
 			ItemStackIdentityHarness.stopped();
