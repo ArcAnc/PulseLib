@@ -1,0 +1,263 @@
+{
+  "checkpoint": "7.1b.2b.2b.3",
+  "date": "2026-11-10",
+  "parent": "0f57dcbd6a3a7e05f11ca4c0d5a843e623c38cc4",
+  "status": "PASS",
+  "scope": "Complete RenderRegression (41 cases plus manager access) and exact legacy H14 baseline. Native visibility and remaining identity/player/performance/full flags stay open.",
+  "sourceRefs": {
+    "26.1": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1",
+    "1.21.1-multiloader": "7ce6f024b307bb821ce543344d3896c8e1fcf26b"
+  },
+  "inputs": "HEAD production Java via source projection; testmod checkpoint only; user WIP preserved outside commit.",
+  "guardProofs": {
+    "RenderRegressionHarness": {
+      "canonicalCheckSites": 31,
+      "preservedSites": 31,
+      "exactArgumentTreesAfterDeclaredAdaptations": true
+    },
+    "H14Harness": {
+      "canonicalCheckSites": 1,
+      "preservedSites": 1,
+      "exactArgumentTreesAfterDeclaredAdaptations": true
+    }
+  },
+  "oracleBodyProof": {
+    "rgb": "566b42c815eece603b62d01ff20c7795f6da9db89f995393578cd611b80549d3",
+    "baseline": "fcd4944ef1b4f29718aa39b867e7b5874b2dff20990554ab9ca1c379fbb50d37"
+  },
+  "guardAdaptations": [
+    "Shared H14 helper qualifier becomes H14OffscreenHarness; helper guard/geometry/readback semantics preserved.",
+    "Removed ShaderInstance global getter -> linked native GL_CURRENT_PROGRAM identity; same equality predicate/message.",
+    "Removed streams().deformers().values() -> 26.1 PGpuDeformerBuffers.values(); same active deformation-values emptiness predicate/message."
+  ],
+  "nativeAdapters": [
+    "Legacy GraphicsStatus -> existing test WorldGraphics; Fast/Fancy share Improved Transparency=false, Fabulous=true.",
+    "Legacy raw targets/projection -> native attachment views/ProjectionMatrixBuffer; reuse exact white atlas quad and GL readback/state helpers.",
+    "Ad-hoc sorted-alpha RenderType -> existing emissive translucent material plus explicit ORDINARY policy, preserving source stages and shared sorting.",
+    "Dispatcher.render -> extractEntity/submit/renderAllFeatures inside an explicit local execution boundary, required by MC26 deferred submission.",
+    "InventoryScreen.renderEntityInInventory -> actual InventoryScreen extraction and native GuiEntityRenderer.prepare; GPU-copy actual native PiP output to independent 64x64 target.",
+    "Partial-submission failure uses the real native PiP caller; additionally require every alpha byte of its internal target to remain zero.",
+    "Legacy H14 baseline composites OIT into weather before the real native transparency chain, retaining the exact original discriminating oracle."
+  ],
+  "acceptedMatrix": {
+    "status": "PASS",
+    "runId": "render-2357485c99944080beab38ec67c37f53",
+    "negativeControl": false,
+    "cases": {
+      "fabric-jar": {
+        "exitCode": 0,
+        "runDirectory": "fabric/build/pulselib-tests/render-2357485c99944080beab38ec67c37f53/client",
+        "result": {
+          "fixture": "render-regression",
+          "origin": "file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/fabric/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-fabric.jar",
+          "baseline": true,
+          "status": "PASS",
+          "cases": 41
+        },
+        "screenshots": 2
+      },
+      "neoforge-source": {
+        "exitCode": 0,
+        "runDirectory": "neoforge/build/pulselib-tests/render-2357485c99944080beab38ec67c37f53/client",
+        "result": {
+          "fixture": "render-regression",
+          "origin": "file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/neoforge/build/classes/java/demo/",
+          "baseline": true,
+          "status": "PASS",
+          "cases": 41
+        },
+        "screenshots": 2
+      }
+    },
+    "jars": {
+      "fabric": {
+        "path": "fabric/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-fabric.jar",
+        "sha256": "f3bfdceb2ab21491e78f037134d8d80838aae8c6f9e5c2190f2b339413710539"
+      },
+      "neoforge": {
+        "path": "neoforge/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-neoforge.jar",
+        "sha256": "ceb4c224d01711ffc6ea1503593a8592e1700e415833cd470210ad135b793af2"
+      }
+    }
+  },
+  "totals": {
+    "clients": 2,
+    "renderCases": 82,
+    "baselineComparisons": 2,
+    "baselineImages": 4,
+    "distinctNativeGraphicsRoutes": 2
+  },
+  "baselineWitness": {
+    "bothLoaders": true,
+    "fancyOpaqueRed": 0.6,
+    "legacyFabulousOpaqueRed": 0.2,
+    "legacyFabulousSkyRed": 0.54901963,
+    "originalPredicate": "fancy[0] > 0.55f && fabulous[0] < 0.25f && fabulous[4] > 0.5f",
+    "route": "Composite Pulse OIT into native weather before actual vanilla transparency chain; opaque depth occludes the legacy-routed layer.",
+    "productionRoutingUnchanged": true
+  },
+  "negativeControl": {
+    "status": "PASS",
+    "runId": "render-95a9700a075443dbbd4387351ef56195",
+    "negativeControl": true,
+    "cases": {
+      "fabric-jar": {
+        "expectedFailure": "original early opaque entity pixel",
+        "gradleExit": 1,
+        "javaExit": 255,
+        "runDirectory": "fabric/build/pulselib-tests/render-95a9700a075443dbbd4387351ef56195/client"
+      }
+    },
+    "jars": {
+      "fabric": {
+        "path": "fabric/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-fabric.jar",
+        "sha256": "f3bfdceb2ab21491e78f037134d8d80838aae8c6f9e5c2190f2b339413710539"
+      },
+      "neoforge": {
+        "path": "neoforge/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-neoforge.jar",
+        "sha256": "ceb4c224d01711ffc6ea1503593a8592e1700e415833cd470210ad135b793af2"
+      }
+    }
+  },
+  "configurationControls": {
+    "status": "PASS",
+    "cases": [
+      {
+        "name": "missing-demo",
+        "exit": 1,
+        "runNotCreated": true
+      },
+      {
+        "name": "missing-profile",
+        "exit": 1,
+        "runNotCreated": true
+      },
+      {
+        "name": "mixed-world",
+        "exit": 1,
+        "runNotCreated": true
+      },
+      {
+        "name": "mixed-offscreen",
+        "exit": 1,
+        "runNotCreated": true
+      },
+      {
+        "name": "client-only",
+        "exit": 1,
+        "runNotCreated": true
+      }
+    ]
+  },
+  "production": {
+    "status": "PASS",
+    "production": {
+      "common": {
+        "classCount": 592,
+        "allClassesByteIdentical": true,
+        "gpuClassesByteIdentical": 26,
+        "jar": "common/build/libs/pulselib-26.1.2-common-1.1.5.3.jar",
+        "jarPayloadByteIdentical": true,
+        "beforeJarSha256": "3df0a86a18f0ab8be4eeca8ec10f9f28c2461b3100f5d9ceb68b2dbeebe7e9a3",
+        "afterJarSha256": "3df0a86a18f0ab8be4eeca8ec10f9f28c2461b3100f5d9ceb68b2dbeebe7e9a3"
+      },
+      "fabric": {
+        "classCount": 600,
+        "allClassesByteIdentical": true,
+        "gpuClassesByteIdentical": 26,
+        "jar": "fabric/build/libs/pulselib-26.1.2-fabric-1.1.5.3.jar",
+        "jarPayloadByteIdentical": true,
+        "beforeJarSha256": "069ea78a7783b1f45880708651525d337ded5b31a951f55988809f9646d7f07b",
+        "afterJarSha256": "f48e9e1fe1aa5cd4b9acff27e679c102ac3be86b7454dfb62d6227bfe1efbd2f"
+      },
+      "neoforge": {
+        "classCount": 605,
+        "allClassesByteIdentical": true,
+        "gpuClassesByteIdentical": 26,
+        "jar": "neoforge/build/libs/pulselib-26.1.2-neoforge-1.1.5.3.jar",
+        "jarPayloadByteIdentical": true,
+        "beforeJarSha256": "c5482e9a17b807767a60b54680e13e53d256eaa91fd176637dfdc8b5c559b8b9",
+        "afterJarSha256": "c5482e9a17b807767a60b54680e13e53d256eaa91fd176637dfdc8b5c559b8b9"
+      }
+    },
+    "junit": {
+      "common": {
+        "tests": 240,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "fabric": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "neoforge": {
+        "tests": 0,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "canonicalApi": "All production source bytes and compiled classes unchanged; final whole-library semantic report remains 7.2.",
+    "graphicsGpuUnchanged": true
+  },
+  "verification": {
+    "status": "PASS",
+    "originalDirtyFilesPreserved": 67,
+    "protectedFilesPreserved": 189,
+    "sourceRefs": {
+      "26.1": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1",
+      "1.21.1-multiloader": "7ce6f024b307bb821ce543344d3896c8e1fcf26b"
+    },
+    "dualTransformsVerified": [
+      "journal",
+      "tests/README.md"
+    ],
+    "canonicalFullFlagsStillGuarded": 13,
+    "fixtureJarsMatchAcceptedAndNegativeInputs": true,
+    "noProductionSourceChanges": true,
+    "baselineCommonGlErrorGuard": "Manual flow review + simple structural check: no early return in legacy branch; shared GL_NO_ERROR check follows both branches."
+  },
+  "staticChecks": [
+    "All 31 RenderRegression + 1 baseline guard argument trees retained after explicit MC26 adaptations; full rgb/baseline bodies match",
+    "Earlier H14 offscreen/world/Smoke/lifecycle/animation and full pinned harness inventories PASS",
+    "Pinned source/API inventory PASS",
+    "New Java control-body AST style, headers and existing NullMarked packages PASS; Python parse PASS"
+  ],
+  "preliminaryWork": [
+    "Fixture compiler adaptation: removed streams() replaced with active PGpuDeformerBuffers.values(), retaining the original emptiness predicate.",
+    "Both preliminary clients passed full render/baseline suite.",
+    "Final review placed legacy baseline in an if/else branch before shared GL_NO_ERROR/save/readback, retaining the original common guard; final positive and negative inputs rebuilt and tested.",
+    "No production defect/fix or debugger evidence claimed."
+  ],
+  "artifactDirectory": "fabric/build/stage71b2b2b3-20261110",
+  "logSha256": {
+    "package.log": "d6dd3facc3b03a0825966e439d8e4a15b4d8a1ee66f89272acceb343698a7e08",
+    "package-fixed.log": "c97a45f852a9c9f3adcb32473ef1775c1baa3eb9eac2c90b48d5c4ef9605ff6c",
+    "fabric.log": "937beeb8f3a3974ce524f5f9926aed207ae3d28b5dcadb52743b0c90cc2abe06",
+    "neoforge.log": "08c3e64674ca545b66602a8ecc66c9241c4b6fc5d997c39a10768e52ac883f3b",
+    "accepted-final/fabric-jar.log": "8e074a4d678715f36c8d6aad43973ad7f6bfe4d756a50c43d37ea8ea3371176b",
+    "accepted-final/neoforge-source.log": "b7457ebdde80a311e7fd8e633f5bfc44ae363af33aa368b2d16eb4287fc8875c",
+    "negative-final/fabric-jar.log": "ef71908959df3dc12adbdba606544550c93457535c2099c315ff10e3da535a47",
+    "build.log": "fd4e7fad60c8b6c6010c32e2330a41580f478530438d0668c9fb582b173a127a",
+    "guard-missing-demo.log": "2b440bf67dddda588cf6a960932e450b15fe9d0dfb94aba4877db76b4eba8862",
+    "guard-missing-profile.log": "3fe3c141df847143a4c7b6666f0d5fc7f9eda31d1709193519017f84d27de3dc",
+    "guard-mixed-world.log": "2b440bf67dddda588cf6a960932e450b15fe9d0dfb94aba4877db76b4eba8862",
+    "guard-mixed-offscreen.log": "2b6304772ae9409baf7ee7d3a82577eca769ba48410bafb801af37f4cb797a96",
+    "guard-client-only.log": "7054d467331511983fcc66f9801ad59b97c53bac880c4efb979400a668e180d0"
+  },
+  "remaining": [
+    "Canonical pulseSmokeReproduce visibility oracle",
+    "Full ItemStackIdentity, PlayerMotion, GPU timing/allocation and full canonical flags",
+    "7.2 full semantic/compiled API and GPU/performance report"
+  ],
+  "limits": [
+    "Legacy Fast/Fancy labels share Improved Transparency=false; Fabulous=true.",
+    "Direct dispatcher adapter owns explicit local execution scope around MC26 extraction/submission/features; unscoped native submit is not claimed to be an immediate draw.",
+    "Actual InventoryScreen extraction/native GuiEntityRenderer output is GPU-copied into the independent target for the old pixel oracle; failure uses native PiP production discard and full internal-alpha readback.",
+    "Complete canonical full flags and visibility oracle are still guarded/open.",
+    "No performance result claimed; whole-library compiled/semantic API report remains 7.2."
+  ]
+}

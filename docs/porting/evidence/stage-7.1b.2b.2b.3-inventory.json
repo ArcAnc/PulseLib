@@ -1,0 +1,43 @@
+{
+  "checkpoint": "7.1b.2b.2b.3",
+  "pin": "7ce6f024b307bb821ce543344d3896c8e1fcf26b",
+  "sources": {
+    "tests/testmod/src/main/java/com/arcanc/pulselib/test/RenderRegressionHarness.java": "264d208b00bbaca8f02ec878a29b96799c39654ee24758b856867b7794b528b9",
+    "tests/testmod/src/main/java/com/arcanc/pulselib/test/H14Harness.java": "05c53517c727b870c45378b5acc9f2ed95686ce42d65192c8880ff37c6206453"
+  },
+  "guardProofs": {
+    "RenderRegressionHarness": {
+      "canonicalCheckSites": 31,
+      "preservedSites": 31,
+      "exactArgumentTreesAfterDeclaredAdaptations": true
+    },
+    "H14Harness": {
+      "canonicalCheckSites": 1,
+      "preservedSites": 1,
+      "exactArgumentTreesAfterDeclaredAdaptations": true
+    }
+  },
+  "oracleBodyProof": {
+    "rgb": "566b42c815eece603b62d01ff20c7795f6da9db89f995393578cd611b80549d3",
+    "baseline": "fcd4944ef1b4f29718aa39b867e7b5874b2dff20990554ab9ca1c379fbb50d37"
+  },
+  "guardAdaptations": [
+    "Shared H14 helper qualifier becomes H14OffscreenHarness; helper guard/geometry/readback semantics preserved.",
+    "Removed ShaderInstance global getter -> linked native GL_CURRENT_PROGRAM identity; same equality predicate/message.",
+    "Removed streams().deformers().values() -> 26.1 PGpuDeformerBuffers.values(); same active deformation-values emptiness predicate/message."
+  ],
+  "nativeAdapters": [
+    "Legacy GraphicsStatus -> existing test WorldGraphics; Fast/Fancy share Improved Transparency=false, Fabulous=true.",
+    "Legacy raw targets/projection -> native attachment views/ProjectionMatrixBuffer; reuse exact white atlas quad and GL readback/state helpers.",
+    "Ad-hoc sorted-alpha RenderType -> existing emissive translucent material plus explicit ORDINARY policy, preserving source stages and shared sorting.",
+    "Dispatcher.render -> extractEntity/submit/renderAllFeatures inside an explicit local execution boundary, required by MC26 deferred submission.",
+    "InventoryScreen.renderEntityInInventory -> actual InventoryScreen extraction and native GuiEntityRenderer.prepare; GPU-copy actual native PiP output to independent 64x64 target.",
+    "Partial-submission failure uses the real native PiP caller; additionally require every alpha byte of its internal target to remain zero.",
+    "Legacy H14 baseline composites OIT into weather before the real native transparency chain, retaining the exact original discriminating oracle."
+  ],
+  "remaining": [
+    "Canonical pulseSmokeReproduce visibility oracle",
+    "Full ItemStackIdentity, PlayerMotion, GPU timing/allocation and full canonical flags",
+    "7.2 full semantic/compiled API and GPU/performance report"
+  ]
+}

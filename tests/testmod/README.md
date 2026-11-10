@@ -328,3 +328,45 @@ Native world H13/H14 is complete in these bounds; RenderRegression local,
 entity/manager consumers, legacy baseline and full canonical flags remain open.
 See journal section 69 and
 [recorded evidence](../../docs/porting/evidence/stage-7.1b.2b.2b.2.json).
+
+## RenderRegression and legacy H14 baseline (7.1b.2b.2b.3)
+
+`-PpulseRenderRegression` requires an exclusive demo JAR/source profile. It
+creates a fresh marked integrated world, waits for the 30-tick spectator and
+closed loading-screen prerequisite, then runs all 41 canonical RenderRegression
+cases and the exact two-capture legacy H14 baseline. Earlier world/offscreen,
+Smoke, animation and lifecycle suites do not run. No dedicated server/EULA file
+is required.
+
+```bash
+python3 tests/testmod/tools/run_render.py --output build/reports/render-UNIQUE
+python3 tests/testmod/tools/inventory_render.py
+python3 tests/testmod/tools/run_render.py --negative-control --output build/reports/render-negative-UNIQUE
+```
+
+Default cases are Fabric JAR + NeoForge sources. `--cases` selects one;
+`--gradle-init` supports the documented HEAD projection for a dirty workspace.
+The runner requires all 41 cases, H18 manager/identity and H15 entity markers,
+original baseline reproduction, saved world and normal shutdown. Two baseline
+PNGs (64x32) use the shared `h14-offscreen/` output directory. Legacy Fast/Fancy
+share Improved Transparency=false; Fabulous uses true.
+
+The actual dispatcher uses MC26 extract/submit/deferred feature execution
+within an explicit local boundary. InventoryScreen extracts the real entity
+PiP; the native GuiEntityRenderer prepares it, and its actual output is copied
+to the independent target for the original colored-pixel oracle. Failure goes
+through the native PiP/dispatcher boundary, including production scope discard;
+all alpha bytes of the internal target must remain zero after partial submit.
+The adapter does not claim that unscoped native submit is an immediate draw.
+
+`--negative-control` sets only `-PpulseRenderSkipMesh` on Fabric, requiring the
+unchanged early opaque pixel guard to fail with Java 255 / Gradle 1 and no
+render/baseline/shutdown PASS or result JSON. Its report says PASS only for
+that expected failure. The ordinary baseline intentionally reproduces old
+weather-before-native-chain occlusion; it does not change production routing.
+
+All 31 RenderRegression and one baseline check sites retain exact argument
+trees after the declared MC26 adaptations; complete RGB/baseline bodies match.
+Full canonical flags remain guarded pending the remaining visibility,
+identity/player/performance consolidation. See journal section 70 and
+[recorded evidence](../../docs/porting/evidence/stage-7.1b.2b.2b.3.json).

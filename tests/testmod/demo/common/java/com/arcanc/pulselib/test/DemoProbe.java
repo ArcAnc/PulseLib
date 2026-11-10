@@ -57,6 +57,11 @@ public final class DemoProbe
 
 	public static void tick(Minecraft mc)
 	{
+		if (RenderRegressionRun.enabled())
+		{
+			RenderRegressionRun.tick();
+			return;
+		}
 		if (WorldRegressionRun.enabled())
 		{
 			WorldRegressionRun.tick();
@@ -312,6 +317,11 @@ public final class DemoProbe
 
 	public static void stopped()
 	{
+		if (RenderRegressionRun.enabled())
+		{
+			RenderRegressionRun.stopped();
+			return;
+		}
 		if (WorldRegressionRun.enabled())
 		{
 			WorldRegressionRun.stopped();

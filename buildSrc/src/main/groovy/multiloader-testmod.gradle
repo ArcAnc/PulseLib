@@ -66,6 +66,12 @@ def skipAnimationRemoval = providers.gradleProperty('pulseAnimationSkipRemoval')
 def lifecycleRegression = providers.gradleProperty('pulseLifecycleRegression').isPresent()
 def smokeRegression = providers.gradleProperty('pulseSmokeRegression').isPresent()
 def smokeFirstPerson = providers.gradleProperty('pulseSmokeFirstPerson').isPresent()
+def renderRegression = providers.gradleProperty('pulseRenderRegression').isPresent()
+def renderSkipMesh = providers.gradleProperty('pulseRenderSkipMesh').isPresent()
+if ((renderRegression && (!demoMode || animationRegression || lifecycleRegression || smokeRegression || providers.gradleProperty('pulseWorldRegression').isPresent() || providers.gradleProperty('pulseH14Offscreen').isPresent())) || (renderSkipMesh && !renderRegression))
+    throw new GradleException('Render regression requires an exclusive demo profile; skip-mesh requires render regression.')
+if (renderRegression && gradle.startParameter.taskNames.any { it.tokenize(':').last() == 'runServer' })
+    throw new GradleException('Render regression is client-only.')
 def worldRegression = providers.gradleProperty('pulseWorldRegression').isPresent()
 def worldSkipOpaque = providers.gradleProperty('pulseWorldSkipOpaque').isPresent()
 if ((worldRegression && (!demoMode || animationRegression || lifecycleRegression || smokeRegression)) || (worldSkipOpaque && !worldRegression))
@@ -172,6 +178,11 @@ if (providers.gradleProperty('pulseTestJarBootstrap').isPresent() || demoMode) {
                     if (skipAnimationRemoval)
                         run.vmArg '-Dpulselib.test.skipAnimationRemoval=true'
                 }
+                if (renderRegression) {
+                    run.vmArg '-Dpulselib.test.renderRegression=true'
+                    if (renderSkipMesh)
+                        run.vmArg '-Dpulselib.test.renderSkipMesh=true'
+                }
                 if (worldRegression) {
                     run.vmArg '-Dpulselib.test.worldRegression=true'
                     if (worldSkipOpaque)
@@ -217,6 +228,11 @@ if (providers.gradleProperty('pulseTestJarBootstrap').isPresent() || demoMode) {
                     run.systemProperty 'pulselib.test.animationRegression', 'true'
                     if (skipAnimationRemoval)
                         run.systemProperty 'pulselib.test.skipAnimationRemoval', 'true'
+                }
+                if (renderRegression) {
+                    run.systemProperty 'pulselib.test.renderRegression', 'true'
+                    if (renderSkipMesh)
+                        run.systemProperty 'pulselib.test.renderSkipMesh', 'true'
                 }
                 if (worldRegression) {
                     run.systemProperty 'pulselib.test.worldRegression', 'true'

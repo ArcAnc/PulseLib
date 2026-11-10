@@ -784,3 +784,13 @@ This uses a fresh marked integrated world on Fabric JAR and NeoForge sources;
 no dedicated server/EULA file is required. See journal section 69. Full
 RenderRegression local/entity/manager consumers and legacy H14 baseline are
 next; native world and offscreen suites need no repeated migration.
+
+
+Stage **7.1b.2b.2b.3** completes all **41 RenderRegression cases** and the exact
+legacy H14 routing baseline on both loaders: typed manager/stack access,
+world/local queue isolation, sorting/instancing, native dispatcher/PiP entity
+pixels and partial-failure restoration/discard. Run
+`python3 tests/testmod/tools/run_render.py --output build/reports/render-UNIQUE`.
+See journal section 70 and [testmod instructions](testmod/README.md). Native
+pulseSmokeReproduce visibility is next; RenderRegression/World/H14 bundles
+need no repeated migration. Full identity/player/performance/flags remain open.

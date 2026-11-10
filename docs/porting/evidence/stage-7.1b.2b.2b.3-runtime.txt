@@ -1,0 +1,83 @@
+### fabric/build/stage71b2b2b3-20261110/package.log
+/mnt/MainDrive/Programs/MC mods/ArcsLib/tests/testmod/demo/common/java/com/arcanc/pulselib/test/RenderRegressionHarness.java:338: error: cannot find symbol
+/mnt/MainDrive/Programs/MC mods/ArcsLib/tests/testmod/demo/common/java/com/arcanc/pulselib/test/RenderRegressionHarness.java:338: error: cannot find symbol
+  /mnt/MainDrive/Programs/MC mods/ArcsLib/tests/testmod/demo/common/java/com/arcanc/pulselib/test/RenderRegressionHarness.java:338: error: cannot find symbol
+  /mnt/MainDrive/Programs/MC mods/ArcsLib/tests/testmod/demo/common/java/com/arcanc/pulselib/test/RenderRegressionHarness.java:338: error: cannot find symbol
+BUILD FAILED in 15s
+
+### fabric/build/stage71b2b2b3-20261110/package-fixed.log
+BUILD SUCCESSFUL in 8s
+
+### fabric/build/stage71b2b2b3-20261110/fabric.log
+[09:31:42] [Render thread/INFO] (Pulse Lib) RENDER READY: screen=null, spectator, ticks=30
+[09:31:42] [Render thread/INFO] (Pulse Lib) H18 GAME PASS: Entity/BlockEntity field initializers and typed access, ItemStack identities/controllers
+[09:31:42] [Render thread/INFO] (Pulse Lib) H15 ENTITY PIXEL PASS: actual EntityRenderDispatcher and InventoryScreen, opaque/translucent, independent framebuffer and GL restoration
+[09:31:42] [Render thread/INFO] (Pulse Lib) H13/H15 PIXEL PASS: 41 cases; stage depth, alpha sorting, instancing, isolated queues, nested targets and exception GL state
+[09:31:42] [Render thread/INFO] (Pulse Lib) H14 BASELINE REPRODUCED: Fancy opaque 0.6,0.09803922,0.09803922; Fabulous opaque 0.2,0.2,0.2; Fabulous sky 0.54901963,0.1254902,0.24705882
+[09:31:42] [Render thread/INFO] (Pulse Lib) RENDER REGRESSION PASS: 41 canonical cases, native entity/GUI, H14 legacy routing baseline
+[09:31:42] [Render thread/INFO] (Pulse Lib) RENDER SHUTDOWN PASS
+PULSE BOOTSTRAP VERIFIED: /mnt/MainDrive/Programs/MC mods/ArcsLib/fabric/build/pulselib-tests/stage71b2b2b3-fabric-20261110/client
+BUILD SUCCESSFUL in 25s
+
+### fabric/build/stage71b2b2b3-20261110/neoforge.log
+[09:34:16] [Render thread/INFO] [Pulse Lib/]: RENDER READY: screen=null, spectator, ticks=30
+[09:34:16] [Render thread/INFO] [Pulse Lib/]: H18 GAME PASS: Entity/BlockEntity field initializers and typed access, ItemStack identities/controllers
+[09:34:16] [Render thread/INFO] [Pulse Lib/]: H15 ENTITY PIXEL PASS: actual EntityRenderDispatcher and InventoryScreen, opaque/translucent, independent framebuffer and GL restoration
+[09:34:16] [Render thread/INFO] [Pulse Lib/]: H13/H15 PIXEL PASS: 41 cases; stage depth, alpha sorting, instancing, isolated queues, nested targets and exception GL state
+[09:34:16] [Render thread/INFO] [Pulse Lib/]: H14 BASELINE REPRODUCED: Fancy opaque 0.6,0.09803922,0.09803922; Fabulous opaque 0.2,0.2,0.2; Fabulous sky 0.54901963,0.1254902,0.24705882
+[09:34:16] [Render thread/INFO] [Pulse Lib/]: RENDER REGRESSION PASS: 41 canonical cases, native entity/GUI, H14 legacy routing baseline
+[09:34:16] [Render thread/INFO] [Pulse Lib/]: RENDER SHUTDOWN PASS
+PULSE BOOTSTRAP VERIFIED: /mnt/MainDrive/Programs/MC mods/ArcsLib/neoforge/build/pulselib-tests/stage71b2b2b3-neo-20261110/client
+BUILD SUCCESSFUL in 26s
+
+### fabric/build/stage71b2b2b3-20261110/accepted-final/fabric-jar.log
+[09:40:43] [Render thread/INFO] (Pulse Lib) RENDER READY: screen=null, spectator, ticks=30
+[09:40:43] [Render thread/INFO] (Pulse Lib) H18 GAME PASS: Entity/BlockEntity field initializers and typed access, ItemStack identities/controllers
+[09:40:43] [Render thread/INFO] (Pulse Lib) H15 ENTITY PIXEL PASS: actual EntityRenderDispatcher and InventoryScreen, opaque/translucent, independent framebuffer and GL restoration
+[09:40:43] [Render thread/INFO] (Pulse Lib) H13/H15 PIXEL PASS: 41 cases; stage depth, alpha sorting, instancing, isolated queues, nested targets and exception GL state
+[09:40:43] [Render thread/INFO] (Pulse Lib) H14 BASELINE REPRODUCED: Fancy opaque 0.6,0.09803922,0.09803922; Fabulous opaque 0.2,0.2,0.2; Fabulous sky 0.54901963,0.1254902,0.24705882
+[09:40:43] [Render thread/INFO] (Pulse Lib) RENDER REGRESSION PASS: 41 canonical cases, native entity/GUI, H14 legacy routing baseline
+[09:40:43] [Render thread/INFO] (Pulse Lib) RENDER SHUTDOWN PASS
+PULSE BOOTSTRAP VERIFIED: /mnt/MainDrive/Programs/MC mods/ArcsLib/fabric/build/pulselib-tests/render-2357485c99944080beab38ec67c37f53/client
+BUILD SUCCESSFUL in 31s
+
+### fabric/build/stage71b2b2b3-20261110/accepted-final/neoforge-source.log
+[09:41:10] [Render thread/INFO] [Pulse Lib/]: RENDER READY: screen=null, spectator, ticks=30
+[09:41:10] [Render thread/INFO] [Pulse Lib/]: H18 GAME PASS: Entity/BlockEntity field initializers and typed access, ItemStack identities/controllers
+[09:41:10] [Render thread/INFO] [Pulse Lib/]: H15 ENTITY PIXEL PASS: actual EntityRenderDispatcher and InventoryScreen, opaque/translucent, independent framebuffer and GL restoration
+[09:41:10] [Render thread/INFO] [Pulse Lib/]: H13/H15 PIXEL PASS: 41 cases; stage depth, alpha sorting, instancing, isolated queues, nested targets and exception GL state
+[09:41:10] [Render thread/INFO] [Pulse Lib/]: H14 BASELINE REPRODUCED: Fancy opaque 0.6,0.09803922,0.09803922; Fabulous opaque 0.2,0.2,0.2; Fabulous sky 0.54901963,0.1254902,0.24705882
+[09:41:10] [Render thread/INFO] [Pulse Lib/]: RENDER REGRESSION PASS: 41 canonical cases, native entity/GUI, H14 legacy routing baseline
+[09:41:10] [Render thread/INFO] [Pulse Lib/]: RENDER SHUTDOWN PASS
+PULSE BOOTSTRAP VERIFIED: /mnt/MainDrive/Programs/MC mods/ArcsLib/neoforge/build/pulselib-tests/render-2357485c99944080beab38ec67c37f53/client
+BUILD SUCCESSFUL in 26s
+
+### fabric/build/stage71b2b2b3-20261110/negative-final/fabric-jar.log
+[09:41:42] [Render thread/INFO] (Pulse Lib) RENDER READY: screen=null, spectator, ticks=30
+java.lang.AssertionError: H13/H15/H18: FAST early opaque entity pixel
+java.lang.AssertionError: H13/H15/H18: FAST early opaque entity pixel
+BUILD FAILED in 25s
+
+### fabric/build/stage71b2b2b3-20261110/build.log
+STAGE 2 SERVICE PROVIDERS / LEGACY REMOVAL / COMMON BOUNDARY PASS: /mnt/MainDrive/Programs/MC mods/ArcsLib/build/reports/porting/stage-2-build.json
+BUILD SUCCESSFUL in 15s
+
+### fabric/build/stage71b2b2b3-20261110/guard-missing-demo.log
+   > org.gradle.api.GradleException: Render regression requires an exclusive demo profile; skip-mesh requires render regression.
+BUILD FAILED in 5s
+
+### fabric/build/stage71b2b2b3-20261110/guard-missing-profile.log
+   > org.gradle.api.GradleException: Render regression requires an exclusive demo profile; skip-mesh requires render regression.
+BUILD FAILED in 7s
+
+### fabric/build/stage71b2b2b3-20261110/guard-mixed-world.log
+   > org.gradle.api.GradleException: Render regression requires an exclusive demo profile; skip-mesh requires render regression.
+BUILD FAILED in 5s
+
+### fabric/build/stage71b2b2b3-20261110/guard-mixed-offscreen.log
+   > org.gradle.api.GradleException: Render regression requires an exclusive demo profile; skip-mesh requires render regression.
+BUILD FAILED in 6s
+
+### fabric/build/stage71b2b2b3-20261110/guard-client-only.log
+   > org.gradle.api.GradleException: Render regression is client-only.
+BUILD FAILED in 5s

@@ -100,7 +100,7 @@ def build():
         guards = lambda records, name: [r for r in records if Path(r['path']).name == name and r['kind'] == 'guard' and r['callee'] == 'check']
         scoped = {'scene', 'verify', 'exceptionState', 'assertRgb'}
         expected = [r for r in guards(before, 'H14Harness.java') if r['method'].split('(')[0] in scoped or r['arguments'][-1] == '"Actual window framebuffer must resize"']
-        current = guards(after, 'H14OffscreenHarness.java')
+        current = [r for r in guards(after, 'H14OffscreenHarness.java') if r['method'].split('(')[0] != 'baseline']
         key = lambda r: json.dumps(r['arguments'], ensure_ascii=False).replace('RenderSystem.getShader()', 'GL11.glGetInteger(GL20.GL_CURRENT_PROGRAM)')
         wanted, actual = Counter(map(key, expected)), Counter(map(key, current))
         assert not wanted - actual, ('Canonical H14 guard changed/lost', wanted - actual)

@@ -146,6 +146,16 @@ public final class H14OffscreenHarness
 		PLibDatabase.LOGGER.info("H14 SHUTDOWN PASS: {} cases", cases);
 	}
 
+	static void baseline() throws IOException
+	{
+		List<Surface> surfaces = List.of(new Surface(0.4f, 0x80FF0000, true));
+		float[] fancy = scene(false, false, 64, 32, "fancy-before", surfaces, List.of());
+		float[] fabulous = scene(true, true, 64, 32, "fabulous-before", surfaces, List.of());
+		check(fancy[0] > 0.55f && fabulous[0] < 0.25f && fabulous[4] > 0.5f, "Original weather routing must reproduce H14");
+		PLibDatabase.LOGGER.info("H14 BASELINE REPRODUCED: Fancy opaque {},{},{}; Fabulous opaque {},{},{}; Fabulous sky {},{},{}",
+				fancy[0], fancy[1], fancy[2], fabulous[0], fabulous[1], fabulous[2], fabulous[4], fabulous[5], fabulous[6]);
+	}
+
 	private static void suite(int width, int height, String prefix) throws IOException
 	{
 		verify(width, height, prefix + "-front", List.of(new Surface(0.4f, 0x80FF0000, true)), List.of());
@@ -238,60 +248,68 @@ public final class H14OffscreenHarness
 						surface.color(), 0xF000F0, OverlayTexture.NO_OVERLAY), PTransparencyMode.OIT);
 			}
 			PRenderQueue.flush(STAGE, main);
-			if (fabulous)
-				vanilla(main, targets);
-			float leftDepth = depth(main, width / 4);
-			float rightDepth = depth(main, width * 3 / 4);
-			try (var binding = new H14GpuTargets.Binding(caller, true))
+			if (fabulous && baseline)
 			{
-				GlStateManager._viewport(2, 3, 5, 7);
-				GlStateManager._enableDepthTest();
-				GlStateManager._depthFunc(GL11.GL_GREATER);
-				GlStateManager._depthMask(true);
-				GlStateManager._enableScissorTest();
-				GlStateManager._scissorBox(0, 0, width, height);
-				GlStateManager._enableBlend();
-				GlStateManager._blendFuncSeparate(GL11.GL_ONE, GL11.GL_ZERO, GL11.GL_ZERO, GL11.GL_ONE);
-				GL30.glBindVertexArray(callerVao);
-				GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, callerVertexBuffer);
-				GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, callerIndexBuffer);
-				if (GL.getCapabilities().OpenGL40)
-				{
-					GL30.glDisablei(GL11.GL_BLEND, 1);
-					GL40.glBlendFuncSeparatei(1, GL11.GL_DST_COLOR, GL11.GL_SRC_COLOR, GL11.GL_ONE, GL11.GL_ZERO);
-					GL40.glBlendEquationSeparatei(1, GL14.GL_FUNC_REVERSE_SUBTRACT, GL14.GL_FUNC_SUBTRACT);
-				}
-				var program = (GlRenderPipeline)RenderSystem.getDevice().precompilePipeline(RenderPipelines.GUI);
-				check(program.isValid(), "Native caller shader program must be valid");
-				GlStateManager._glUseProgram(program.program().getProgramId());
-				int white = ((GlTexture)mc.getTextureManager().getTexture(WHITE).getTexture()).glId();
-				for (int unit = 0; unit < 12; unit++)
-				{
-					GlStateManager._activeTexture(GL13.GL_TEXTURE0 + unit);
-					GlStateManager._bindTexture(white);
-				}
+				PRenderQueue.compositeTranslucency(targets.get(3));
+				vanilla(main, targets);
+			}
+			else
+			{
 				if (fabulous)
+					vanilla(main, targets);
+				float leftDepth = depth(main, width / 4);
+				float rightDepth = depth(main, width * 3 / 4);
+				try (var binding = new H14GpuTargets.Binding(caller, true))
 				{
-					GlStateManager._activeTexture(GL13.GL_TEXTURE0 + 15);
-					GL11.glBindTexture(GL11.GL_TEXTURE_2D, white);
-				}
-				int activeShader = GL11.glGetInteger(GL20.GL_CURRENT_PROGRAM);
-				int[] before = glState();
-				if (fabulous)
-				{
-					if (!Boolean.getBoolean("pulselib.test.h14SkipResolve"))
-						PRenderQueue.compositeFabulousTranslucency(main, targets);
-				}
-				else
-					PRenderQueue.compositeTranslucency(main);
-				check(Arrays.equals(before, glState()), name + " composite must restore GL state");
-				check(GL11.glGetInteger(GL20.GL_CURRENT_PROGRAM) == activeShader, name + " RenderSystem shader must remain unchanged");
-				check(leftDepth == depth(main, width / 4) && rightDepth == depth(main, width * 3 / 4), name + " must not write depth");
-				for (RenderTarget target : targets)
-				{
-					float expectedDepth = layers.stream().filter(layer -> target == targets.get(Arrays.asList(TARGETS).indexOf(layer.target()))).
-							map(VanillaLayer::depth).findFirst().orElse(1f);
-					check(Math.abs(depth(target, width / 4) - expectedDepth) < 0.00001f, name + " native target depth changed");
+					GlStateManager._viewport(2, 3, 5, 7);
+					GlStateManager._enableDepthTest();
+					GlStateManager._depthFunc(GL11.GL_GREATER);
+					GlStateManager._depthMask(true);
+					GlStateManager._enableScissorTest();
+					GlStateManager._scissorBox(0, 0, width, height);
+					GlStateManager._enableBlend();
+					GlStateManager._blendFuncSeparate(GL11.GL_ONE, GL11.GL_ZERO, GL11.GL_ZERO, GL11.GL_ONE);
+					GL30.glBindVertexArray(callerVao);
+					GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, callerVertexBuffer);
+					GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, callerIndexBuffer);
+					if (GL.getCapabilities().OpenGL40)
+					{
+						GL30.glDisablei(GL11.GL_BLEND, 1);
+						GL40.glBlendFuncSeparatei(1, GL11.GL_DST_COLOR, GL11.GL_SRC_COLOR, GL11.GL_ONE, GL11.GL_ZERO);
+						GL40.glBlendEquationSeparatei(1, GL14.GL_FUNC_REVERSE_SUBTRACT, GL14.GL_FUNC_SUBTRACT);
+					}
+					var program = (GlRenderPipeline)RenderSystem.getDevice().precompilePipeline(RenderPipelines.GUI);
+					check(program.isValid(), "Native caller shader program must be valid");
+					GlStateManager._glUseProgram(program.program().getProgramId());
+					int white = ((GlTexture)mc.getTextureManager().getTexture(WHITE).getTexture()).glId();
+					for (int unit = 0; unit < 12; unit++)
+					{
+						GlStateManager._activeTexture(GL13.GL_TEXTURE0 + unit);
+						GlStateManager._bindTexture(white);
+					}
+					if (fabulous)
+					{
+						GlStateManager._activeTexture(GL13.GL_TEXTURE0 + 15);
+						GL11.glBindTexture(GL11.GL_TEXTURE_2D, white);
+					}
+					int activeShader = GL11.glGetInteger(GL20.GL_CURRENT_PROGRAM);
+					int[] before = glState();
+					if (fabulous)
+					{
+						if (!Boolean.getBoolean("pulselib.test.h14SkipResolve"))
+							PRenderQueue.compositeFabulousTranslucency(main, targets);
+					}
+					else
+						PRenderQueue.compositeTranslucency(main);
+					check(Arrays.equals(before, glState()), name + " composite must restore GL state");
+					check(GL11.glGetInteger(GL20.GL_CURRENT_PROGRAM) == activeShader, name + " RenderSystem shader must remain unchanged");
+					check(leftDepth == depth(main, width / 4) && rightDepth == depth(main, width * 3 / 4), name + " must not write depth");
+					for (RenderTarget target : targets)
+					{
+						float expectedDepth = layers.stream().filter(layer -> target == targets.get(Arrays.asList(TARGETS).indexOf(layer.target()))).
+								map(VanillaLayer::depth).findFirst().orElse(1f);
+						check(Math.abs(depth(target, width / 4) - expectedDepth) < 0.00001f, name + " native target depth changed");
+					}
 				}
 			}
 			check(GL11.glGetError() == GL11.GL_NO_ERROR, name + " OpenGL error");
