@@ -1,0 +1,42 @@
+{
+  "checkpoint": "7.1b.2b.2b.2",
+  "pin": "7ce6f024b307bb821ce543344d3896c8e1fcf26b",
+  "sources": {
+    "tests/testmod/src/main/java/com/arcanc/pulselib/test/WorldRenderRegressionHarness.java": "ed494f2181f5629b9ce5d00ce1d6c5254d4df6bfe89be4f889812e9f4acddc37",
+    "tests/testmod/src/main/java/com/arcanc/pulselib/test/H14Harness.java": "05c53517c727b870c45378b5acc9f2ed95686ce42d65192c8880ff37c6206453"
+  },
+  "guardProofs": {
+    "WorldRenderRegressionHarness": {
+      "canonicalCheckSites": 5,
+      "preservedSites": 5,
+      "exactGuardTreesAfterDeclaredAdaptation": true
+    },
+    "H14Harness": {
+      "canonicalCheckSites": 9,
+      "preservedSites": 9,
+      "exactGuardTreesAfterDeclaredAdaptation": true
+    }
+  },
+  "oracleBodyProof": {
+    "fabulousWorldComposite": "d9fa96a8e648565f5ab96e544cde3e3a926b45ea9e7843ce1926eb999660fcdd",
+    "fancyWorldComposite": "ece9df9bb62e386ba7069cd8dbb7818f5fb45807e42b410efcbb42a6960135b7"
+  },
+  "guardAdaptations": [
+    "Only the world filename literal pulselib-smoke becomes DemoChecks.WORLD (pulselib-bootstrap), retaining the same normalized run-owned save check and original message."
+  ],
+  "bodyAdaptations": [
+    "OIT system-property gate becomes the scoped active H14 world phase; shared canonical color helper is qualified. Redundant one-statement blocks are unwrapped by the same structural fingerprint as the offscreen proof."
+  ],
+  "nativeAdapters": [
+    "GraphicsStatus Fast/Fancy both map to MC26 Improved Transparency=false; Fabulous maps to true. Twelve H13 scenarios retained, with two distinct native routes.",
+    "ProjectionMatrixBuffer CPU mirror via PGlRenderHost, native camera position(), GlTexture read FBO with pack-state restoration, existing white atlas quad.",
+    "WeatherData replaces ServerLevel weather parameters; native time command replaces removed setDayTime.",
+    "Real Common stage HEAD submit / TAIL early-depth; existing queue HEAD composite observers read live native inputs."
+  ],
+  "remaining": [
+    "RenderRegressionHarness local/entity/manager consumers",
+    "Legacy H14 baseline routing",
+    "Canonical pulseSmokeReproduce visibility oracle",
+    "Full canonical flags, identity/player/performance bundles and final 7.2 report"
+  ]
+}

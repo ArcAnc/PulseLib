@@ -449,7 +449,7 @@ public final class H14OffscreenHarness
 	}
 
 	/** Maps the canonical standalone white texel to the atlas used by the 26.1 backend. */
-	private static PGeometryData atlasQuad()
+	static PGeometryData atlasQuad()
 	{
 		var sprite = PResourceCache.getTextureAtlas().getSprite(PResourceCache.spriteId(WHITE));
 		check(sprite.contents().name().equals(PResourceCache.spriteId(WHITE)), "H14 white atlas sprite must survive resource reload");
@@ -478,7 +478,7 @@ public final class H14OffscreenHarness
 		return new PGeometryData(vertices, indices, 24, 6, PGeometryData.IndexType.UNSIGNED_SHORT);
 	}
 
-	private static float[] color(int color)
+	static float[] color(int color)
 	{
 		return new float[]{((color >> 16) & 255) / 255f, ((color >> 8) & 255) / 255f, (color & 255) / 255f, ((color >>> 24) & 255) / 255f};
 	}
@@ -509,7 +509,7 @@ public final class H14OffscreenHarness
 		}
 	}
 
-	private static void save(RenderTarget target, String name) throws IOException
+	static void save(RenderTarget target, String name) throws IOException
 	{
 		Path output = DemoChecks.runDirectory().resolve("h14-offscreen");
 		Files.createDirectories(output);
@@ -532,7 +532,7 @@ public final class H14OffscreenHarness
 		}
 	}
 
-	private static void assertRgb(float[] actual, float[] expected, String name)
+	static void assertRgb(float[] actual, float[] expected, String name)
 	{
 		for (int side = 0; side < 2; side++)
 			for (int component = 0; component < 3; component++)

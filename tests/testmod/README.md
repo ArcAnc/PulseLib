@@ -291,3 +291,40 @@ pipeline/shader/render type is introduced. Full native world/weather/terrain,
 baseline and RenderRegression/World bundles remain open, as do the canonical
 full flags. See journal section 68 and
 [recorded evidence](../../docs/porting/evidence/stage-7.1b.2b.2b.1.json).
+
+## Native H13/H14 world suites (7.1b.2b.2b.2)
+
+`-PpulseWorldRegression` requires an exclusive demo JAR/source profile. It
+creates one fresh marked integrated world, waits for the loading screen to
+close and the client spectator/30-tick prerequisite, then runs all 12 canonical
+WorldRenderRegression cases and 15 H14 world captures. Real water/glass,
+early opaque RGB/depth, stone/sky occlusion, live rain, the native five-target
+transparency chain, reload and actual framebuffer resize use the existing
+Common backend. The completed offscreen/Smoke/animation suites do not run.
+
+```bash
+python3 tests/testmod/tools/run_world.py --output build/reports/world-UNIQUE
+python3 tests/testmod/tools/inventory_world.py
+python3 tests/testmod/tools/run_world.py --negative-control --output build/reports/world-negative-UNIQUE
+```
+
+Default cases are Fabric JAR and NeoForge sources. `--cases fabric-jar` or
+`--cases neoforge-source` selects one; `--gradle-init` accepts the documented
+HEAD projection for a dirty workspace. The 240-second timeout applies to each
+Gradle process. No dedicated server/EULA file is needed. All existing run/world
+markers and refusal of old paths remain enforced. Fifteen world-* PNGs per
+client use the shared `h14-offscreen/` output directory (960x640, then 992x656).
+
+The separate Fabric negative control sets `-PpulseWorldSkipOpaque`. It skips
+only the test opaque submission and must fail the unchanged early H13 RGB
+guard with Java 255 / Gradle 1, no WORLD/SHUTDOWN PASS and no result JSON.
+Its report says PASS only when that expected failure is observed.
+
+All five H13 and nine H14 world guard sites are preserved. The two complete
+same-frame ordered-alpha oracle methods match by javac structural fingerprint.
+MC26 merges legacy Fast/Fancy into Improved Transparency=false; Fabulous uses
+true. All 12 canonical H13 scenarios remain, across two distinct native routes.
+Native world H13/H14 is complete in these bounds; RenderRegression local,
+entity/manager consumers, legacy baseline and full canonical flags remain open.
+See journal section 69 and
+[recorded evidence](../../docs/porting/evidence/stage-7.1b.2b.2b.2.json).

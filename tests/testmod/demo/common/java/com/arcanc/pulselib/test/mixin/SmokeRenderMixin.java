@@ -13,6 +13,7 @@ import com.arcanc.pulselib.test.DemoProbe;
 import com.arcanc.pulselib.test.GlErrors;
 import com.arcanc.pulselib.test.H14OffscreenHarness;
 import com.arcanc.pulselib.test.SmokeHarness;
+import com.arcanc.pulselib.test.WorldRegressionRun;
 import net.minecraft.client.renderer.GameRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,11 +29,17 @@ public abstract class SmokeRenderMixin
 		SmokeHarness.prepareAutomationWindow();
 		DemoProbe.lockSceneCamera();
 		SmokeHarness.lockWorldCamera();
+		WorldRegressionRun.lockCamera();
 	}
 
 	@Inject(method = "render", at = @At("TAIL"))
 	private void pulselibtest$graphics(CallbackInfo callback)
 	{
+		if (WorldRegressionRun.enabled())
+		{
+			GlErrors.check();
+			WorldRegressionRun.frame();
+		}
 		if (H14OffscreenHarness.enabled())
 		{
 			GlErrors.check();

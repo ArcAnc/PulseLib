@@ -57,6 +57,11 @@ public final class DemoProbe
 
 	public static void tick(Minecraft mc)
 	{
+		if (WorldRegressionRun.enabled())
+		{
+			WorldRegressionRun.tick();
+			return;
+		}
 		if (H14OffscreenHarness.enabled() || completed)
 			return;
 		DemoChecks.runDirectory();
@@ -307,6 +312,11 @@ public final class DemoProbe
 
 	public static void stopped()
 	{
+		if (WorldRegressionRun.enabled())
+		{
+			WorldRegressionRun.stopped();
+			return;
+		}
 		if (H14OffscreenHarness.enabled())
 		{
 			H14OffscreenHarness.stopped();

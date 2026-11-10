@@ -9,7 +9,9 @@
     "SmokeStagesMixin",
     "SmokeWorldEndMixin",
     "SmokeLayerMixin",
-    "GlDebugMixin"
+    "GlDebugMixin",
+    "WorldStagesMixin",
+    "H14QueueMixin"
   ],
   "injectors": {
     "defaultRequire": 1

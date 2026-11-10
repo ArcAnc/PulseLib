@@ -66,9 +66,15 @@ def skipAnimationRemoval = providers.gradleProperty('pulseAnimationSkipRemoval')
 def lifecycleRegression = providers.gradleProperty('pulseLifecycleRegression').isPresent()
 def smokeRegression = providers.gradleProperty('pulseSmokeRegression').isPresent()
 def smokeFirstPerson = providers.gradleProperty('pulseSmokeFirstPerson').isPresent()
+def worldRegression = providers.gradleProperty('pulseWorldRegression').isPresent()
+def worldSkipOpaque = providers.gradleProperty('pulseWorldSkipOpaque').isPresent()
+if ((worldRegression && (!demoMode || animationRegression || lifecycleRegression || smokeRegression)) || (worldSkipOpaque && !worldRegression))
+    throw new GradleException('Native world requires an exclusive demo profile; skip-opaque requires native world.')
+if (worldRegression && gradle.startParameter.taskNames.any { it.tokenize(':').last() == 'runServer' })
+    throw new GradleException('Native world regression is client-only.')
 def h14Offscreen = providers.gradleProperty('pulseH14Offscreen').isPresent()
 def h14SkipResolve = providers.gradleProperty('pulseH14SkipResolve').isPresent()
-if ((h14Offscreen && (!demoMode || animationRegression || lifecycleRegression || smokeRegression)) || (h14SkipResolve && !h14Offscreen))
+if ((h14Offscreen && (!demoMode || animationRegression || lifecycleRegression || smokeRegression || worldRegression)) || (h14SkipResolve && !h14Offscreen))
     throw new GradleException('H14 offscreen requires an exclusive demo source/JAR profile; skip-resolve requires H14 offscreen.')
 if (h14Offscreen && gradle.startParameter.taskNames.any { it.tokenize(':').last() == 'runServer' })
     throw new GradleException('H14 offscreen is a client-only pixel fixture.')
@@ -166,6 +172,11 @@ if (providers.gradleProperty('pulseTestJarBootstrap').isPresent() || demoMode) {
                     if (skipAnimationRemoval)
                         run.vmArg '-Dpulselib.test.skipAnimationRemoval=true'
                 }
+                if (worldRegression) {
+                    run.vmArg '-Dpulselib.test.worldRegression=true'
+                    if (worldSkipOpaque)
+                        run.vmArg '-Dpulselib.test.worldSkipOpaque=true'
+                }
                 if (h14Offscreen) {
                     run.vmArg '-Dpulselib.test.h14Offscreen=true'
                     if (h14SkipResolve)
@@ -206,6 +217,11 @@ if (providers.gradleProperty('pulseTestJarBootstrap').isPresent() || demoMode) {
                     run.systemProperty 'pulselib.test.animationRegression', 'true'
                     if (skipAnimationRemoval)
                         run.systemProperty 'pulselib.test.skipAnimationRemoval', 'true'
+                }
+                if (worldRegression) {
+                    run.systemProperty 'pulselib.test.worldRegression', 'true'
+                    if (worldSkipOpaque)
+                        run.systemProperty 'pulselib.test.worldSkipOpaque', 'true'
                 }
                 if (h14Offscreen) {
                     run.systemProperty 'pulselib.test.h14Offscreen', 'true'

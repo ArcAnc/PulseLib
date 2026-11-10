@@ -774,3 +774,13 @@ This runs Fabric JAR and NeoForge sources without a world/server. See journal
 section 68 and [testmod instructions](testmod/README.md). Native H14 world and
 RenderRegression/World bundles, full flags and final API/performance report
 remain open.
+
+
+Stage **7.1b.2b.2b.2** completes canonical **WorldRenderRegression (H13)** and
+**H14 native world/weather/reload**: 12 + 15 cases per loader, actual water/glass,
+early RGB/depth, stone/sky, live rain, native transparency inputs and framebuffer
+resize. Run `python3 tests/testmod/tools/run_world.py --output build/reports/world-UNIQUE`.
+This uses a fresh marked integrated world on Fabric JAR and NeoForge sources;
+no dedicated server/EULA file is required. See journal section 69. Full
+RenderRegression local/entity/manager consumers and legacy H14 baseline are
+next; native world and offscreen suites need no repeated migration.

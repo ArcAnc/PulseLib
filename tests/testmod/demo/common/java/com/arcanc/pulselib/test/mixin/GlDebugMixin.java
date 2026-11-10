@@ -26,14 +26,14 @@ public abstract class GlDebugMixin
 	@WrapMethod (method = "enableDebugCallback")
 	private static @Nullable GlDebug pulselibtest$synchronous(int verbosity, boolean synchronous, java.util.Set<String> extensions, Operation<@Nullable GlDebug> original)
 	{
-		return original.call(verbosity, synchronous || (Boolean.getBoolean("pulselib.test.smokeRegression") || Boolean.getBoolean("pulselib.test.h14Offscreen")), extensions);
+		return original.call(verbosity, synchronous || (Boolean.getBoolean("pulselib.test.smokeRegression") || (Boolean.getBoolean("pulselib.test.h14Offscreen") || Boolean.getBoolean("pulselib.test.worldRegression"))), extensions);
 	}
 
 	@Inject (method = "printDebugLog", at = @At ("HEAD"))
 	private void pulselibtest$glError(int source, int type, int id, int severity, int length,
 	                                       long message, long user, CallbackInfo callback)
 	{
-		if (type == GL43.GL_DEBUG_TYPE_ERROR && (Boolean.getBoolean("pulselib.test.smokeRegression") || Boolean.getBoolean("pulselib.test.h14Offscreen")))
+		if (type == GL43.GL_DEBUG_TYPE_ERROR && (Boolean.getBoolean("pulselib.test.smokeRegression") || (Boolean.getBoolean("pulselib.test.h14Offscreen") || Boolean.getBoolean("pulselib.test.worldRegression"))))
 			GlErrors.record(id);
 	}
 }
