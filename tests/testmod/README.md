@@ -498,3 +498,51 @@ two-supported/eleven-guarded boundary. Native GPU timing/allocation wiring is
 next; final semantic/compiled API and GPU/performance conclusions remain 7.2.
 See journal section 73 and
 [recorded evidence](../../docs/porting/evidence/stage-7.1b.2b.4.json).
+
+### Native GPU performance wiring (7.1b.2b.5)
+
+Exclusive `pulseDemoContent` / `pulseDemoJar` + canonical `pulseOitPerf` runs
+real timestamp-pair profiling. Add test-only `pulsePerfWorld` for a fresh marked
+integrated world; offscreen runs require no loaded world. Native render, OIT
+policy/backend and production API are unchanged. No CPU-timer replacement,
+glFinish or pixel readback occurs in measured intervals.
+
+```bash
+python3 tests/testmod/tools/run_perf.py --output build/reports/perf-offscreen-UNIQUE
+python3 tests/testmod/tools/run_perf.py --kind world --output build/reports/perf-world-UNIQUE
+python3 tests/testmod/tools/run_perf.py --negative-control --output build/reports/perf-negative-UNIQUE
+python3 tests/testmod/tools/inventory_perf.py
+```
+
+Default cases: Fabric JAR / NeoForge sources. `--gradle-init` accepts the journal's
+HEAD projection. Offscreen: 24 configurations, 1080p/1440p/4K, two native routes,
+0/1/16/128 quads, 32 warmup + 80 samples. World: six actual 1080p configurations,
+64 warmup + 80 samples. The disposable world window is undecorated, with a bounded
+10s framebuffer prerequisite; the original actual-1920x1080 guard is retained.
+Driver calibration performs genuine fallback uploads and physical GPU deformer
+ring creation. Query names must all retire and be deleted; steady OIT texture
+allocations and resource identity checks retain the canonical guards.
+
+Depth/accumulation intervals cover actual native passes; compositor/metadata
+intervals cover real RenderPass.draw calls. Offscreen transparency uses persistent
+native inputs and pooled internal framegraph targets. World wraps actual
+GameRenderer.render; row writes/query draining follow the interval. Neither scope
+includes the whole Minecraft tick/update/presentation. CSV Fancy/Fabulous labels
+mean Improved Transparency false/true. `vanilla_framegraph_passes` counts actual
+native framegraph passes, replacing the old hard-coded fullscreen estimate.
+The compatibility column `buffer_data_calls` now includes fallback storage
+replacement and physical deformer-ring creation, not ordinary mapped writes.
+
+Negative control skips the real offscreen composite and must fail the unchanged
+`Unexpected OIT fullscreen draw count` guard, Java 255 / Gradle 1, with no final
+result. World+skip, mixed suites, controls without their profile and dedicated
+runServer are rejected before launch. Five of 13 canonical flags now have scoped
+support; the other eight, including full pulseTestMod/pulseTestJar, remain guarded.
+
+Accepted offscreen inputs precede a world-only PerfRun bootstrap fix: archive
+and source proofs establish that timer/backend/oracle entries and the offscreen
+path are unchanged, so that matrix was retained without replay. See journal §74,
+[proof/results](../../docs/porting/evidence/stage-7.1b.2b.5.json) and its four raw
+CSV links. Samples are wiring evidence from one GPU, not performance acceptance
+or cross-loader speed conclusions. Remaining full flags/Gecko are next; final
+semantic/compiled API and GPU/performance report remain 7.2.

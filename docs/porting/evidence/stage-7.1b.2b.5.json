@@ -1,0 +1,528 @@
+{
+  "checkpoint": "7.1b.2b.5",
+  "status": "PASS",
+  "continuedFrom": "4e539934875488a576fc304b9c8f9a544113230e",
+  "canonicalSource": "7ce6f024b307bb821ce543344d3896c8e1fcf26b",
+  "graphicsSource": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1",
+  "scope": "Native GPU timer/allocation probes and full offscreen/world performance harness wiring. Samples are wiring evidence, not a final performance verdict.",
+  "canonicalProof": {
+    "checkpoint": "7.1b.2b.5",
+    "pin": "7ce6f024b307bb821ce543344d3896c8e1fcf26b",
+    "sourceSha256": {
+      "tests/testmod/src/main/java/com/arcanc/pulselib/test/GpuTiming.java": "6e9b578d8896d98a8b6e401002b69d115faeacf4b4a536627f56b99f85d39e5d",
+      "tests/testmod/src/main/java/com/arcanc/pulselib/test/OitPerformanceHarness.java": "d9b7a18bd789c652b38efa4a80da0081b0410b28b4ddd024b4b47cff6d08fabe",
+      "tests/testmod/src/main/java/com/arcanc/pulselib/test/WorldOitPerformanceHarness.java": "a2e01ca363f57e70eff96a869739c5dbc701bd025e985aac894c81351a8d9481"
+    },
+    "guardProof": {
+      "GpuTiming.java": {
+        "canonicalSites": 3,
+        "preservedSites": 3,
+        "additionalSites": 1,
+        "exactArgumentsMessagesAndThresholds": true
+      },
+      "OitPerformanceHarness.java": {
+        "canonicalSites": 10,
+        "preservedSites": 10,
+        "additionalSites": 0,
+        "exactArgumentsMessagesAndThresholds": true
+      },
+      "WorldOitPerformanceHarness.java": {
+        "canonicalSites": 5,
+        "preservedSites": 5,
+        "additionalSites": 0,
+        "exactArgumentsMessagesAndThresholds": true
+      }
+    },
+    "bodyProof": {
+      "GpuTiming.java": {
+        "allocation": "d33af8fe9abe02be618edd9c2ebbbe97196a16642dd5ef38bc19a7dee866711b",
+        "begin": "542315165acaeb0737d1b5634e80bf9f997e075af0d2c9ea523b58aa9353b3cb",
+        "bufferReallocation": "5ff866f943690992594d562438809bdf8bd07c6c1f290b34990cd99be0cb7b0d",
+        "drain": "bcd5df8cac80b5732e80894fb0b56d782d0fee8765a1c3260c4de6b185944271",
+        "end": "bb891279ef8e374ecd0fa7bd0a4f88dd86db1b7c9c740493afea0ccb180c783f",
+        "finish": "be0b51242270e8b6be11a17564266d5584688c49c0cefab548a9148985588326",
+        "fullscreen": "a33ea5f10ef3b25a68950db1f12b780263f40447d2c89a006c16176e614e9363",
+        "start": "37102d0682bb89ad20447d876096dd0870e1cc54954d12554d7e977c6915ec18"
+      },
+      "OitPerformanceHarness.java": {
+        "availableVram": "5618cbb8ea20ed08fdc0bce315e6174f6fd4d1f4a6e9091e48626e4d3cd7f4c2",
+        "fabulous": "cff43af8dd7fc6ae1bc7ab30d0286b2a9672b566c81145928aabb96b154b78be",
+        "mean": "eafd90f766dfbecb995b70f11be1d1e8149fa84b4ad88142aa6cd8155eb48541",
+        "quads": "a2c6984866440a9b8e306c6f8ce8314d05bd13fc30450396b881e442620ae340",
+        "textureBytes": "cee3d8feaf7503d4ec08538cbd7ba4f52f79de4a34ca5f8386eceea8709eafb4"
+      },
+      "WorldOitPerformanceHarness.java": {
+        "beginFrame": "45657fbee52256223976f2c243175bc522f7a97f6c191fafdd830e10fc80403e",
+        "endFrame": "c019477eec96f99bfebf27406291076ed884a6c163fc28a0f45cf49d590f97db",
+        "mean": "eafd90f766dfbecb995b70f11be1d1e8149fa84b4ad88142aa6cd8155eb48541",
+        "quads": "8217dca58718a22c05e0ead53bf18c041a940f9446189cfc9bf5a9ba2386c695"
+      }
+    },
+    "bodyPolicy": "Seventeen full timer/statistics/world interval bodies match. Only redundant single-statement blocks, shared helper owner name, and four lifetime-counter statements are normalized.",
+    "sampling": {
+      "offscreen": {
+        "configurations": 24,
+        "warmup": 32,
+        "samples": 80,
+        "resolutions": [
+          [
+            1920,
+            1080
+          ],
+          [
+            2560,
+            1440
+          ],
+          [
+            3840,
+            2160
+          ]
+        ],
+        "quads": [
+          0,
+          1,
+          16,
+          128
+        ]
+      },
+      "world": {
+        "configurations": 6,
+        "warmup": 64,
+        "samples": 80,
+        "resolution": [
+          1920,
+          1080
+        ],
+        "quads": [
+          0,
+          1,
+          0,
+          1,
+          16,
+          128
+        ]
+      }
+    },
+    "nativeAdapters": [
+      "Legacy GlWeightedBlendedOit -> native per-target PGlWeightedBlendedOit owners; real RenderPass.draw calls supply compositor/metadata spans and fullscreen counts. Depth/accumulation spans retain actual native pass boundaries.",
+      "Instance/indirect fallback glBufferData calls use current stream uploadHeaders/upload return-value callbacks; deformer stream counts physical buffers from actual MappableRingBuffer construction. Ring storage events are not per-write counts.",
+      "Removed PostChain constructor/temp-targets/process -> actual ShaderManager transparency + FrameGraphBuilder with persistent five inputs and pooled internal targets. Native vanilla_framegraph_passes replaces legacy hard-coded vanilla_fullscreen_draws; no draw-count equivalence claimed.",
+      "Typed native GlTexture owners and real byte queries replace legacy int texture arrays; resource stability covers native owner maps/geometry/streams/rings, excludes intentionally rotating sync fences.",
+      "Original quad positions/colors/depth distribution retained; existing atlasQuad supplies white atlas UVs. Explicit OIT on existing type, no new pipeline/backend/shader.",
+      "GraphicsStatus -> two Improved Transparency routes; original Fancy/Fabulous CSV labels remain aliases. WeatherData/time command/teleport/window handles use native APIs.",
+      "Standalone exclusive pulseOitPerf demo profile; test-only pulsePerfWorld supplies existing world property and creates a fresh marked integrated save. Whole GameRenderer interval wraps original call exactly once; row writes/drain occur after interval.",
+      "Calibration uses genuine fallback uploads and physical GPU deformer ring construction; real warmup OIT texture allocations must be observed. Query lifetime counters prove all names retired/deleted.",
+      "Offscreen skip-composite control bypasses actual compositor, retaining original draw-count oracle."
+    ],
+    "remaining": [
+      "Remaining full canonical flags/Gecko and combined orchestration",
+      "7.2 final semantic/compiled API and GPU/performance report; these samples do not establish performance acceptance"
+    ]
+  },
+  "gitCreationProvenance": {
+    "tests/testmod/src/main/java/com/arcanc/pulselib/test/GpuTiming.java": "4b22a67bcf3e1091de92dc5f8e2c94de9ac48eaf 2026-10-13 20:31:46 +0300",
+    "tests/testmod/src/main/java/com/arcanc/pulselib/test/OitPerformanceHarness.java": "4b22a67bcf3e1091de92dc5f8e2c94de9ac48eaf 2026-10-13 20:31:46 +0300",
+    "tests/testmod/src/main/java/com/arcanc/pulselib/test/WorldOitPerformanceHarness.java": "4b22a67bcf3e1091de92dc5f8e2c94de9ac48eaf 2026-10-13 20:31:46 +0300",
+    "tests/testmod/src/main/java/com/arcanc/pulselib/test/mixin/OitTimingMixin.java": "4b22a67bcf3e1091de92dc5f8e2c94de9ac48eaf 2026-10-13 20:31:46 +0300",
+    "tests/testmod/src/main/java/com/arcanc/pulselib/test/mixin/InstanceAllocationMixin.java": "4b22a67bcf3e1091de92dc5f8e2c94de9ac48eaf 2026-10-13 20:31:46 +0300",
+    "tests/testmod/src/main/java/com/arcanc/pulselib/test/mixin/IndirectAllocationMixin.java": "4b22a67bcf3e1091de92dc5f8e2c94de9ac48eaf 2026-10-13 20:31:46 +0300",
+    "tests/testmod/src/main/java/com/arcanc/pulselib/test/mixin/StreamAllocationMixin.java": "4b22a67bcf3e1091de92dc5f8e2c94de9ac48eaf 2026-10-13 20:31:46 +0300"
+  },
+  "accepted": {
+    "offscreen": {
+      "status": "PASS",
+      "runId": "gpu-perf-cfd6a795e2e743d9a38d885a21c48626",
+      "negativeControl": false,
+      "jars": {
+        "fabric": {
+          "path": "fabric/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-fabric.jar",
+          "sha256": "20d14d36362af9fe0e888eeb0a4e07fb956de3bb4125b126acca8e1b0a3956df"
+        },
+        "neoforge": {
+          "path": "neoforge/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-neoforge.jar",
+          "sha256": "885686924293ba0779007009066d5b55b3c000e6b9d86a3d0769e82c08f74f87"
+        }
+      },
+      "cases": {
+        "fabric-jar": {
+          "exitCode": 0,
+          "runDirectory": "fabric/build/pulselib-tests/gpu-perf-cfd6a795e2e743d9a38d885a21c48626/client",
+          "result": {
+            "fixture": "gpu-performance",
+            "origin": "file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/fabric/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-fabric.jar",
+            "samples": 80,
+            "configurations": 24,
+            "queries": {
+              "textureAllocations": 341,
+              "deleted": 64568,
+              "created": 64568,
+              "bufferStorageEvents": 116
+            },
+            "kind": "offscreen",
+            "status": "PASS",
+            "warmup": 32,
+            "calibrationStorageEvents": 8
+          }
+        },
+        "neoforge-source": {
+          "exitCode": 0,
+          "runDirectory": "neoforge/build/pulselib-tests/gpu-perf-cfd6a795e2e743d9a38d885a21c48626/client",
+          "result": {
+            "calibrationStorageEvents": 8,
+            "fixture": "gpu-performance",
+            "origin": "file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/neoforge/build/classes/java/demo/",
+            "samples": 80,
+            "configurations": 24,
+            "queries": {
+              "textureAllocations": 341,
+              "deleted": 64568,
+              "created": 64568,
+              "bufferStorageEvents": 116
+            },
+            "kind": "offscreen",
+            "status": "PASS",
+            "warmup": 32
+          }
+        }
+      }
+    },
+    "world": {
+      "status": "PASS",
+      "runId": "gpu-perf-78c580fc7ce74b8580766aaaac411e9d",
+      "negativeControl": false,
+      "jars": {
+        "fabric": {
+          "path": "fabric/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-fabric.jar",
+          "sha256": "61326f8f18de856e5ca5e1d272c2e96c8a04f0906e8c7ff0f1ccab7e0808d1d6"
+        },
+        "neoforge": {
+          "path": "neoforge/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-neoforge.jar",
+          "sha256": "1d8632287b47baf4d2967c5c59deb2d8ed50506927e60475ba5a4a0ac9978c44"
+        }
+      },
+      "cases": {
+        "fabric-jar": {
+          "exitCode": 0,
+          "runDirectory": "fabric/build/pulselib-tests/gpu-perf-78c580fc7ce74b8580766aaaac411e9d/client",
+          "result": {
+            "warmup": 64,
+            "calibrationStorageEvents": 8,
+            "fixture": "gpu-performance",
+            "origin": "file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/fabric/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-fabric.jar",
+            "samples": 80,
+            "configurations": 6,
+            "queries": {
+              "bufferStorageEvents": 14,
+              "textureAllocations": 27,
+              "deleted": 19010,
+              "created": 19010
+            },
+            "kind": "world",
+            "status": "PASS"
+          }
+        },
+        "neoforge-source": {
+          "exitCode": 0,
+          "runDirectory": "neoforge/build/pulselib-tests/gpu-perf-78c580fc7ce74b8580766aaaac411e9d/client",
+          "result": {
+            "status": "PASS",
+            "warmup": 64,
+            "calibrationStorageEvents": 8,
+            "fixture": "gpu-performance",
+            "origin": "file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/neoforge/build/classes/java/demo/",
+            "samples": 80,
+            "configurations": 6,
+            "queries": {
+              "bufferStorageEvents": 14,
+              "textureAllocations": 27,
+              "deleted": 19010,
+              "created": 19010
+            },
+            "kind": "world"
+          }
+        }
+      }
+    }
+  },
+  "rawCsvs": {
+    "fabric/offscreen": {
+      "path": "docs/porting/evidence/stage-7.1b.2b.5-fabric-offscreen.csv",
+      "sha256": "39e1c0d8661c86b38780ceb36bbc762c0b18893139f60a9b022d89a4e745010e",
+      "source": "fabric/build/pulselib-tests/gpu-perf-cfd6a795e2e743d9a38d885a21c48626/client/h14-results/gpu-performance.csv",
+      "rows": 24
+    },
+    "neoforge/offscreen": {
+      "path": "docs/porting/evidence/stage-7.1b.2b.5-neoforge-offscreen.csv",
+      "sha256": "700c1549122a213cb8d842df3a2051bce8b4a3aec5736970eaab5c5ff15b2dae",
+      "source": "neoforge/build/pulselib-tests/gpu-perf-cfd6a795e2e743d9a38d885a21c48626/client/h14-results/gpu-performance.csv",
+      "rows": 24
+    },
+    "fabric/world": {
+      "path": "docs/porting/evidence/stage-7.1b.2b.5-fabric-world.csv",
+      "sha256": "12a18c2e0736e560aaa00245366f784b62e672475b7d9e20435aa3573b9fb205",
+      "source": "fabric/build/pulselib-tests/gpu-perf-78c580fc7ce74b8580766aaaac411e9d/client/h14-results/world-gpu-performance.csv",
+      "rows": 6
+    },
+    "neoforge/world": {
+      "path": "docs/porting/evidence/stage-7.1b.2b.5-neoforge-world.csv",
+      "sha256": "a7a791c684f442f950c79e40075a8417ab7da915c85daf7b9c14676382b80f11",
+      "source": "neoforge/build/pulselib-tests/gpu-perf-78c580fc7ce74b8580766aaaac411e9d/client/h14-results/world-gpu-performance.csv",
+      "rows": 6
+    }
+  },
+  "negative": {
+    "status": "PASS",
+    "runId": "gpu-perf-91158a08602d4e65944381e3c0fc77fc",
+    "negativeControl": true,
+    "cases": {
+      "fabric-jar": {
+        "expectedFailure": "Unexpected OIT fullscreen draw count",
+        "javaExit": 255,
+        "gradleExit": 1,
+        "runDirectory": "fabric/build/pulselib-tests/gpu-perf-91158a08602d4e65944381e3c0fc77fc/client"
+      },
+      "neoforge-source": {
+        "expectedFailure": "Unexpected OIT fullscreen draw count",
+        "javaExit": 255,
+        "gradleExit": 1,
+        "runDirectory": "neoforge/build/pulselib-tests/gpu-perf-91158a08602d4e65944381e3c0fc77fc/client"
+      }
+    },
+    "jars": {
+      "fabric": {
+        "path": "fabric/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-fabric.jar",
+        "sha256": "61326f8f18de856e5ca5e1d272c2e96c8a04f0906e8c7ff0f1ccab7e0808d1d6"
+      },
+      "neoforge": {
+        "path": "neoforge/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-neoforge.jar",
+        "sha256": "1d8632287b47baf4d2967c5c59deb2d8ed50506927e60475ba5a4a0ac9978c44"
+      }
+    }
+  },
+  "configurationControls": {
+    "status": "PASS",
+    "cases": [
+      {
+        "name": "missing-demo",
+        "exit": 1,
+        "runNotCreated": true
+      },
+      {
+        "name": "world-outside-profile",
+        "exit": 1,
+        "runNotCreated": true
+      },
+      {
+        "name": "skip-outside-profile",
+        "exit": 1,
+        "runNotCreated": true
+      },
+      {
+        "name": "world-skip",
+        "exit": 1,
+        "runNotCreated": true
+      },
+      {
+        "name": "mixed-motion",
+        "exit": 1,
+        "runNotCreated": true
+      },
+      {
+        "name": "other-full-flag",
+        "exit": 1,
+        "runNotCreated": true
+      },
+      {
+        "name": "client-only",
+        "exit": 1,
+        "runNotCreated": true
+      }
+    ]
+  },
+  "buildAndProduction": {
+    "status": "PASS",
+    "production": {
+      "common": {
+        "classCount": 592,
+        "allClassesByteIdentical": true,
+        "gpuClassesByteIdentical": 26,
+        "jar": "common/build/libs/pulselib-26.1.2-common-1.1.5.3.jar",
+        "jarPayloadByteIdentical": true,
+        "beforeJarSha256": "3df0a86a18f0ab8be4eeca8ec10f9f28c2461b3100f5d9ceb68b2dbeebe7e9a3",
+        "afterJarSha256": "3df0a86a18f0ab8be4eeca8ec10f9f28c2461b3100f5d9ceb68b2dbeebe7e9a3"
+      },
+      "fabric": {
+        "classCount": 600,
+        "allClassesByteIdentical": true,
+        "gpuClassesByteIdentical": 26,
+        "jar": "fabric/build/libs/pulselib-26.1.2-fabric-1.1.5.3.jar",
+        "jarPayloadByteIdentical": true,
+        "beforeJarSha256": "26aced9029f62f034f3d73c084f4c8c8441ee85867cd06bf37d72a4d66e3f8fc",
+        "afterJarSha256": "a546cec2eb3964c074dacc1d326aac825fd8ffdfc911d9e701f5b55a7252486e"
+      },
+      "neoforge": {
+        "classCount": 605,
+        "allClassesByteIdentical": true,
+        "gpuClassesByteIdentical": 26,
+        "jar": "neoforge/build/libs/pulselib-26.1.2-neoforge-1.1.5.3.jar",
+        "jarPayloadByteIdentical": true,
+        "beforeJarSha256": "c5482e9a17b807767a60b54680e13e53d256eaa91fd176637dfdc8b5c559b8b9",
+        "afterJarSha256": "c5482e9a17b807767a60b54680e13e53d256eaa91fd176637dfdc8b5c559b8b9"
+      }
+    },
+    "junit": {
+      "common": {
+        "tests": 240,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "fabric": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "neoforge": {
+        "tests": 0,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "canonicalApi": "All production source bytes and compiled classes unchanged; final whole-library semantic report remains 7.2.",
+    "graphicsGpuUnchanged": true
+  },
+  "staticInventories": {
+    "status": "PASS",
+    "exitCodes": {
+      "inventory_perf": 0,
+      "inventory_motion": 0,
+      "inventory_identity": 0,
+      "inventory_visibility": 0,
+      "inventory_render": 0,
+      "inventory_h14": 0,
+      "inventory_world": 0,
+      "inventory_smoke": 0,
+      "inventory_lifecycle": 0,
+      "inventory_harnesses": 0,
+      "pinned-inventory": 0
+    }
+  },
+  "fixtureDeltaProof": {
+    "status": "PASS",
+    "modules": {
+      "fabric": {
+        "changedEntries": [
+          "com/arcanc/pulselib/test/PerfRun.class"
+        ],
+        "allOtherEntriesByteIdentical": true,
+        "scope": "Only world-gated undecorated window prerequisite and bounded readiness wait in PerfRun; no timer, metric, offscreen, model or Mixin byte changes."
+      },
+      "neoforge": {
+        "changedEntries": [
+          "com/arcanc/pulselib/test/PerfRun.class"
+        ],
+        "allOtherEntriesByteIdentical": true,
+        "scope": "Only world-gated undecorated window prerequisite and bounded readiness wait in PerfRun; no timer, metric, offscreen, model or Mixin byte changes."
+      }
+    },
+    "offscreenSourceProof": {
+      "originalSourceSha256": "b3043f2edc4e412e678f3d230a7ded2f2fc9bac9c6a36be09d2fb81ddb302be4",
+      "currentSourceSha256": "fd23ff78518cc0e6fd51061495e3f652337dad71ce6f6a7010b28efc54090ff3",
+      "sourceByteIdenticalAfterRemovingTwoWorldOnlyBlocksAndUnusedField": true,
+      "newCodeExecutesOnlyWhenWorldPropertyIsTrue": true
+    }
+  },
+  "preservationAndStatistics": {
+    "status": "PASS",
+    "statistics": {
+      "offscreen/fabric-jar": {
+        "rows": 24,
+        "measuredSamples": 1920,
+        "queries": {
+          "textureAllocations": 341,
+          "deleted": 64568,
+          "created": 64568,
+          "bufferStorageEvents": 116
+        },
+        "calibrationStorageEvents": 8
+      },
+      "offscreen/neoforge-source": {
+        "rows": 24,
+        "measuredSamples": 1920,
+        "queries": {
+          "textureAllocations": 341,
+          "deleted": 64568,
+          "created": 64568,
+          "bufferStorageEvents": 116
+        },
+        "calibrationStorageEvents": 8
+      },
+      "world/fabric-jar": {
+        "rows": 6,
+        "measuredSamples": 480,
+        "queries": {
+          "bufferStorageEvents": 14,
+          "textureAllocations": 27,
+          "deleted": 19010,
+          "created": 19010
+        },
+        "calibrationStorageEvents": 8
+      },
+      "world/neoforge-source": {
+        "rows": 6,
+        "measuredSamples": 480,
+        "queries": {
+          "bufferStorageEvents": 14,
+          "textureAllocations": 27,
+          "deleted": 19010,
+          "created": 19010
+        },
+        "calibrationStorageEvents": 8
+      }
+    },
+    "totalRows": 60,
+    "mainMeasuredSamples": 4800,
+    "retiredDeletedQueryNames": 167156,
+    "originalDirtyFilesPreserved": 67,
+    "protectedFilesPreserved": 189,
+    "sourceRefs": {
+      "26.1": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1",
+      "1.21.1-multiloader": "7ce6f024b307bb821ce543344d3896c8e1fcf26b"
+    },
+    "dualTransformsVerified": [
+      "journal",
+      "tests/README.md"
+    ],
+    "canonicalFlags": {
+      "inventoried": 13,
+      "scopedSupported": 5,
+      "otherFullFlagsGuarded": 8
+    },
+    "noProductionSourceChanges": true,
+    "offscreenAcceptedInputsPreservedWithWorldOnlyDriverDeltaProof": true
+  },
+  "diagnostics": [
+    "Initial compile corrected native AutoCloseable/package access/WeatherData adapters.",
+    "First startup failed before scenarios: stream upload return type requires CallbackInfoReturnable.",
+    "Second startup failed before scenarios: overloaded native deformer-ring constructor selector needed an exact descriptor.",
+    "World first used default demo 960x640; explicit 1080p decorated launch was clamped to 1920x1044, shown in crash reports.",
+    "World-only undecorated window and bounded 10-second framebuffer prerequisite now establish real 1920x1080 before creating the disposable world; original guard retained. No debugger needed for the explicit descriptor/window-size evidence.",
+    "Accepted offscreen matrix was retained after world fix: only PerfRun.class changed and its offscreen source path remains byte-equivalent after removing two world-only blocks/unused field. Original accepted fixture JARs backed up; full fixture-JAR identity across matrices is not claimed."
+  ],
+  "limitations": [
+    "One NVIDIA GeForce GTX 1660 Ti / NVIDIA 615.78.08 / OpenGL 3.3 host. No cross-loader speed conclusion or memory-budget acceptance.",
+    "GPU timestamp pairs are real; CPU nanoTime is used only for deadlines. Measured spans exclude glFinish, pixel readback and row writes.",
+    "Offscreen frame excludes title GUI/presentation; world frame covers GameRenderer.render, not all Minecraft tick/update/presentation.",
+    "Compositor/metadata spans cover actual native draw calls, not CPU binding setup.",
+    "Vanilla_framegraph_passes is actual native pass count, not the old hard-coded fullscreen-draw estimate.",
+    "Legacy buffer_data_calls CSV column includes actual fallback storage replacement and physical deformer-ring creations; ordinary mapped writes are not counted.",
+    "Query-name totals include warmup, calibration and empty-after-OIT controls; 4800 samples count only the primary accepted matrix rows.",
+    "Canonical Fancy/Fabulous labels alias Improved Transparency false/true.",
+    "Whole-library semantic/compiled API and GPU/performance acceptance remain stage 7.2."
+  ],
+  "rawArtifacts": "fabric/build/stage71b2b5-20261110",
+  "nextCheckpoint": "7.1b.2b.6: remaining full canonical flags/Gecko and combined source/JAR orchestration; then 7.2.",
+  "localCommitMessage": "test: migrate native GPU performance harnesses (stage 7.1b.2b.5)"
+}

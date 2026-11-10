@@ -71,6 +71,13 @@ def reproduceCamera = providers.gradleProperty('pulseSmokeReproduce').isPresent(
 def itemIdentity = providers.gradleProperty('pulseItemIdentityTest').isPresent()
 def identitySkipHook = providers.gradleProperty('pulseIdentitySkipHook').isPresent()
 def playerMotion = providers.gradleProperty('pulsePlayerMotionTest').isPresent()
+def oitPerf = providers.gradleProperty('pulseOitPerf').isPresent()
+def perfWorld = providers.gradleProperty('pulsePerfWorld').isPresent()
+def perfSkipComposite = providers.gradleProperty('pulsePerfSkipComposite').isPresent()
+if ((oitPerf && (!demoMode || itemIdentity || playerMotion || animationRegression || lifecycleRegression || smokeRegression || visibilityRegression || ['pulseRenderRegression', 'pulseWorldRegression', 'pulseH14Offscreen'].any { providers.gradleProperty(it).isPresent() })) || ((perfWorld || perfSkipComposite) && !oitPerf) || (perfWorld && perfSkipComposite))
+    throw new GradleException('GPU performance requires an exclusive demo profile; world/skip controls require it; skip-composite is offscreen-only.')
+if (oitPerf && gradle.startParameter.taskNames.any { it.tokenize(':').last() == 'runServer' })
+    throw new GradleException('GPU performance requires a client GPU and is client-only.')
 def motionSkipSubmission = providers.gradleProperty('pulseMotionSkipSubmission').isPresent()
 if (motionSkipSubmission && !playerMotion)
     throw new GradleException('Motion skip-submission requires player motion.')
@@ -117,7 +124,7 @@ if ((demoSource && demoPackaged) || (demoMode && providers.gradleProperty('pulse
     throw new GradleException('Select exactly one bootstrap/demo source/demo JAR profile.')
 
 def unsupported = ['pulseTestMod', 'pulseTestJar', 'pulseSmokeAuto', 'pulseSmokeWorld', 'pulseOitTest', 'pulseOitPerf', 'pulsePlayerMotionTest', 'pulseItemIdentityTest', 'pulseGeckoDemo', 'pulseMotionPhase', 'pulseOitBaseline', 'pulseSmokeReproduce', 'pulseSmokeSkipHook']
-if (unsupported.any { providers.gradleProperty(it).isPresent() && !(it == 'pulseSmokeReproduce' && visibilityRegression) && !(it == 'pulseItemIdentityTest' && itemIdentity) && !(it in ['pulsePlayerMotionTest', 'pulseMotionPhase'] && playerMotion) })
+if (unsupported.any { providers.gradleProperty(it).isPresent() && !(it == 'pulseSmokeReproduce' && visibilityRegression) && !(it == 'pulseItemIdentityTest' && itemIdentity) && !(it in ['pulsePlayerMotionTest', 'pulseMotionPhase'] && playerMotion) && !(it == 'pulseOitPerf' && oitPerf) })
     throw new GradleException('The complete canonical regression harnesses remain stage 7.1b.2. Packaged bootstrap uses only -PpulseTestJarBootstrap; it cannot open existing demo worlds.')
 
 if (providers.gradleProperty('pulseTestJarBootstrap').isPresent() || demoMode) {
@@ -199,6 +206,13 @@ if (providers.gradleProperty('pulseTestJarBootstrap').isPresent() || demoMode) {
                     if (skipAnimationRemoval)
                         run.vmArg '-Dpulselib.test.skipAnimationRemoval=true'
                 }
+                if (oitPerf) {
+                    run.vmArg '-Dpulselib.test.oitPerf=true'
+                    if (perfWorld)
+                        run.vmArg '-Dpulselib.test.world=true'
+                    if (perfSkipComposite)
+                        run.vmArg '-Dpulselib.test.perfSkipComposite=true'
+                }
                 if (playerMotion) {
                     run.vmArg '-Dpulselib.test.playerMotion=true'
                     run.vmArg "-Dpulselib.test.motionPhase=${motionPhase}"
@@ -243,7 +257,7 @@ if (providers.gradleProperty('pulseTestJarBootstrap').isPresent() || demoMode) {
                         run.vmArg '-Dpulselib.test.skipDisconnectHook=true'
                 }
                 if (run.name == 'client')
-                    run.programArgs '--width', '960', '--height', '640'
+                    run.programArgs '--width', (oitPerf && perfWorld ? '1920' : '960'), '--height', (oitPerf && perfWorld ? '1080' : '640')
             }
         }
     } else {
@@ -265,6 +279,13 @@ if (providers.gradleProperty('pulseTestJarBootstrap').isPresent() || demoMode) {
                     run.systemProperty 'pulselib.test.animationRegression', 'true'
                     if (skipAnimationRemoval)
                         run.systemProperty 'pulselib.test.skipAnimationRemoval', 'true'
+                }
+                if (oitPerf) {
+                    run.systemProperty 'pulselib.test.oitPerf', 'true'
+                    if (perfWorld)
+                        run.systemProperty 'pulselib.test.world', 'true'
+                    if (perfSkipComposite)
+                        run.systemProperty 'pulselib.test.perfSkipComposite', 'true'
                 }
                 if (playerMotion) {
                     run.systemProperty 'pulselib.test.playerMotion', 'true'
@@ -310,7 +331,7 @@ if (providers.gradleProperty('pulseTestJarBootstrap').isPresent() || demoMode) {
                         run.systemProperty 'pulselib.test.skipDisconnectHook', 'true'
                 }
                 if (run.name == 'client')
-                    run.programArguments.addAll '--width', '960', '--height', '640'
+                    run.programArguments.addAll '--width', (oitPerf && perfWorld ? '1920' : '960'), '--height', (oitPerf && perfWorld ? '1080' : '640')
             }
         }
     }

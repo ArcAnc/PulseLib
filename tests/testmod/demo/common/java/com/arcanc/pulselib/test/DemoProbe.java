@@ -57,6 +57,11 @@ public final class DemoProbe
 
 	public static void tick(Minecraft mc)
 	{
+		if (PerfRun.enabled())
+		{
+			PerfRun.tick();
+			return;
+		}
 		if (PlayerMotionHarness.enabled())
 		{
 			PlayerMotionRun.tick();
@@ -332,6 +337,11 @@ public final class DemoProbe
 
 	public static void stopped()
 	{
+		if (PerfRun.enabled())
+		{
+			PerfRun.stopped();
+			return;
+		}
 		if (PlayerMotionHarness.enabled())
 		{
 			PlayerMotionHarness.stopped();

@@ -16,7 +16,12 @@
     "VisibilityStagesMixin",
     "PlayerMotionCameraMixin",
     "PlayerMotionQueueMixin",
-    "PlayerMotionSubmissionControlMixin"
+    "PlayerMotionSubmissionControlMixin",
+    "OitTimingMixin",
+    "InstanceAllocationMixin",
+    "IndirectAllocationMixin",
+    "StreamAllocationMixin",
+    "PerfRenderMixin"
   ],
   "injectors": {
     "defaultRequire": 1

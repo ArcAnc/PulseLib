@@ -829,3 +829,15 @@ bypass real probe submission and fail the original guard. Run
 `python3 tests/testmod/tools/run_motion.py --output build/reports/motion-UNIQUE`.
 PlayerMotion/motionPhase now have scoped support; nine full flags remain guarded.
 See journal section 73. Native GPU timing/allocation wiring is next (7.1b.2b.5).
+
+
+Stage **7.1b.2b.5** completes native GPU timestamps/allocation probes and both
+canonical performance harnesses. Fabric JAR / NeoForge sources pass offscreen
+24-case and world 6-case matrices: 60 rows / 4800 measured samples total.
+All 18 canonical guards and 17 timer/statistics/world-interval bodies remain;
+real fallback/ring calibration, query retirement/deletion and negative composite
+controls pass. This is wiring evidence; final performance acceptance remains 7.2.
+Run `python3 tests/testmod/tools/run_perf.py --output build/reports/perf-UNIQUE`
+and add `--kind world` for the native GameRenderer interval. Five canonical flags
+now have scoped support; eight full flags remain guarded. See journal section 74.
+Remaining full flags/Gecko and combined orchestration are next (7.1b.2b.6).

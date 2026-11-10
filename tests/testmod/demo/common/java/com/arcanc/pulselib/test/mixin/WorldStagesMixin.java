@@ -11,6 +11,8 @@ package com.arcanc.pulselib.test.mixin;
 
 import com.arcanc.pulselib.content.renderer.PRenderStagesHandler;
 import com.arcanc.pulselib.test.H14WorldHarness;
+import com.arcanc.pulselib.test.PerfRun;
+import com.arcanc.pulselib.test.WorldOitPerformanceHarness;
 import com.arcanc.pulselib.test.WorldRegressionRun;
 import com.arcanc.pulselib.test.WorldRenderRegressionHarness;
 import com.mojang.blaze3d.pipeline.RenderTarget;
@@ -25,6 +27,8 @@ public abstract class WorldStagesMixin
 	@Inject(method = "afterBlockEntities", at = @At("HEAD"))
 	private static void pulselibtest$submit(CallbackInfo callback)
 	{
+		if (PerfRun.world())
+			WorldOitPerformanceHarness.queue();
 		if (WorldRegressionRun.h13Active())
 			WorldRenderRegressionHarness.submit();
 		if (WorldRegressionRun.h14Active())

@@ -96,7 +96,7 @@ public class ClientTestPlugin implements IPulseClientPlugin
 				texture("pyramid_texture", TestBlockEntityRenderer.PYRAMID);
 		var blockItem = registrar.model(TestBlockItemRenderer.MODEL_DATA).texture("pyramid", TestBlockItemRenderer.PYRAMID).
 				texture("circle", TestBlockItemRenderer.CIRCLE);
-		if (H14OffscreenHarness.enabled() || WorldRegressionRun.enabled() || RenderRegressionRun.enabled())
+		if (PerfRun.enabled() || H14OffscreenHarness.enabled() || WorldRegressionRun.enabled() || RenderRegressionRun.enabled())
 			blockItem.texture("h14_white", H14OffscreenHarness.WHITE);
 		registrar.model(TestArmor.MODEL_DATA).texture("0", TestArmor.TEXTURE);
 		registrar.model(TestTailItem.MODEL_DATA).texture("0", TestTailItem.TEXTURE);
