@@ -1,0 +1,378 @@
+{
+  "checkpoint": "7.1b.2b.2b.1",
+  "date": "2026-11-10",
+  "parent": "bcb0730a77cbadab621959f79b3bcd8452a36b03",
+  "status": "PASS",
+  "scope": "Complete 38 canonical H14 offscreen cases; parent render/native-world bundle remains partial.",
+  "sourceRefs": {
+    "26.1": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1",
+    "1.21.1-multiloader": "7ce6f024b307bb821ce543344d3896c8e1fcf26b"
+  },
+  "inputs": "HEAD Java plus checkpoint via source projection; user WIP is excluded from compilation and preserved in the working tree.",
+  "assertionProof": {
+    "canonicalSites": 9,
+    "preservedSites": 9,
+    "additionalSites": 7,
+    "exactArgumentTreesAfterDeclaredAdaptation": true
+  },
+  "oracleBodyProof": {
+    "assertRgb": "5baafb7023a040ff45d89413bcace08b5ea792dfa037426c102cb58400ed3a7b",
+    "color": "e718b864c7f8dff84f59e56901050d9719c30b32768b780ef85641ef87e74050",
+    "expected": "bdf6a4b9ce3928ae092ae9fe82b89fe73544fcea5a0c3774185acecd148c95eb",
+    "quad": "5000615612ecd1f73a9c20a434d72bf57a5834ecaf8a55ac6fd341751af2e93a",
+    "suite": "56e6dbd61515fce64d73c9117aac7aa3d633387272bf44e8a44df0a9c0066689"
+  },
+  "acceptedClients": {
+    "fabric-jar": {
+      "exitCode": 0,
+      "runDirectory": "fabric/build/pulselib-tests/stage71b2b2b1-atlas-20261110/client",
+      "result": {
+        "origin": "file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/fabric/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-fabric.jar",
+        "epochs": 2,
+        "status": "PASS",
+        "cases": 38,
+        "framebufferResized": true,
+        "fixture": "h14-offscreen",
+        "nativeChains": 36
+      },
+      "screenshots": 48
+    },
+    "neoforge-source": {
+      "exitCode": 0,
+      "runDirectory": "neoforge/build/pulselib-tests/h14-348690001e9945b98e374d13fb3f6b3a/client",
+      "result": {
+        "framebufferResized": true,
+        "cases": 38,
+        "status": "PASS",
+        "epochs": 2,
+        "origin": "file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/neoforge/build/classes/java/demo/",
+        "nativeChains": 36,
+        "fixture": "h14-offscreen"
+      },
+      "screenshots": 48
+    }
+  },
+  "totals": {
+    "clients": 2,
+    "cases": 76,
+    "nativePostchains": 72,
+    "screenshots": 96,
+    "worlds": 0
+  },
+  "negativeControl": {
+    "status": "PASS",
+    "runId": "h14-18f8e5884a23483691e70f7280d34da9",
+    "negativeControl": true,
+    "cases": {
+      "fabric-jar": {
+        "expectedFailure": "original Fancy/Fabulous parity",
+        "gradleExit": 1,
+        "javaExit": 255,
+        "runDirectory": "fabric/build/pulselib-tests/h14-18f8e5884a23483691e70f7280d34da9/client"
+      }
+    },
+    "jars": {
+      "fabric": {
+        "path": "fabric/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-fabric.jar",
+        "sha256": "c52fabb5300a07a56b50497aa94ca37f41f3d6e3e626ad23fb80cca160aa3fd1"
+      },
+      "neoforge": {
+        "path": "neoforge/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-neoforge.jar",
+        "sha256": "568650a744c50ff66ac01f054c59b77f620a44e39a728c48fd1e3b35e84f4941"
+      }
+    }
+  },
+  "configurationControls": {
+    "status": "PASS",
+    "cases": [
+      {
+        "name": "missing-demo",
+        "exit": 1,
+        "runNotCreated": true
+      },
+      {
+        "name": "missing-profile",
+        "exit": 1,
+        "runNotCreated": true
+      },
+      {
+        "name": "mixed-profile",
+        "exit": 1,
+        "runNotCreated": true
+      },
+      {
+        "name": "client-only",
+        "exit": 1,
+        "runNotCreated": true
+      }
+    ]
+  },
+  "production": {
+    "status": "PASS",
+    "production": {
+      "common": {
+        "classCount": 592,
+        "byteIdenticalClasses": 586,
+        "changedClasses": [
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$BlendState.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$ExternalGlTexture.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$ExternalGlTextureView.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$GlStateSnapshot.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$Pass.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.class"
+        ],
+        "jarPayloadDelta": [
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$BlendState.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$ExternalGlTexture.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$ExternalGlTextureView.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$GlStateSnapshot.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$Pass.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.class"
+        ],
+        "debugOnly": {
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$BlendState.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$ExternalGlTexture.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$ExternalGlTextureView.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$GlStateSnapshot.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$Pass.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.class": false
+        },
+        "publicProtectedDescriptorsUnchanged": {
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$BlendState.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$ExternalGlTexture.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$ExternalGlTextureView.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$GlStateSnapshot.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$Pass.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.class": true
+        },
+        "jarSha256": "3df0a86a18f0ab8be4eeca8ec10f9f28c2461b3100f5d9ceb68b2dbeebe7e9a3"
+      },
+      "fabric": {
+        "classCount": 600,
+        "byteIdenticalClasses": 594,
+        "changedClasses": [
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$BlendState.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$ExternalGlTexture.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$ExternalGlTextureView.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$GlStateSnapshot.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$Pass.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.class"
+        ],
+        "jarPayloadDelta": [
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$BlendState.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$ExternalGlTexture.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$ExternalGlTextureView.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$GlStateSnapshot.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$Pass.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.class"
+        ],
+        "debugOnly": {
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$BlendState.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$ExternalGlTexture.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$ExternalGlTextureView.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$GlStateSnapshot.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$Pass.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.class": false
+        },
+        "publicProtectedDescriptorsUnchanged": {
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$BlendState.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$ExternalGlTexture.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$ExternalGlTextureView.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$GlStateSnapshot.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$Pass.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.class": true
+        },
+        "jarSha256": "7cf1aa44278ba9eeaaba726ba44976c603adc668210aef6cfd846d2489bc239c"
+      },
+      "neoforge": {
+        "classCount": 605,
+        "byteIdenticalClasses": 599,
+        "changedClasses": [
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$BlendState.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$ExternalGlTexture.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$ExternalGlTextureView.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$GlStateSnapshot.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$Pass.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.class"
+        ],
+        "jarPayloadDelta": [
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$BlendState.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$ExternalGlTexture.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$ExternalGlTextureView.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$GlStateSnapshot.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$Pass.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.class"
+        ],
+        "debugOnly": {
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$BlendState.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$ExternalGlTexture.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$ExternalGlTextureView.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$GlStateSnapshot.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$Pass.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.class": false
+        },
+        "publicProtectedDescriptorsUnchanged": {
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$BlendState.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$ExternalGlTexture.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$ExternalGlTextureView.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$GlStateSnapshot.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit$Pass.class": true,
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.class": true
+        },
+        "jarSha256": "c5482e9a17b807767a60b54680e13e53d256eaa91fd176637dfdc8b5c559b8b9"
+      }
+    },
+    "junit": {
+      "common": {
+        "tests": 240,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "fabric": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "neoforge": {
+        "tests": 0,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "semanticDelta": "Only PGlWeightedBlendedOit outer class in each loader copy; nested class deltas are debug metadata only. All other classes and all shader/pipeline/render-type resources unchanged.",
+    "api": "All changed class public/protected JVM descriptors unchanged; all other class bytes unchanged. Whole-library canonical semantic report remains 7.2."
+  },
+  "fixtureFormattingProof": {
+    "fabric": {
+      "acceptedJarSha256": "c52fabb5300a07a56b50497aa94ca37f41f3d6e3e626ad23fb80cca160aa3fd1",
+      "finalJarSha256": "4535718de85358a2dac607cdb7e336fbd5ac71068ff9379c3adb5e3f5a538c8d",
+      "debugOnlyDelta": [
+        "com/arcanc/pulselib/test/H14OffscreenHarness$ReferenceLayer.class",
+        "com/arcanc/pulselib/test/H14OffscreenHarness$Surface.class",
+        "com/arcanc/pulselib/test/H14OffscreenHarness$VanillaLayer.class",
+        "com/arcanc/pulselib/test/H14OffscreenHarness.class"
+      ],
+      "semanticEquality": true
+    },
+    "neoforge": {
+      "acceptedJarSha256": "568650a744c50ff66ac01f054c59b77f620a44e39a728c48fd1e3b35e84f4941",
+      "finalJarSha256": "958651d7047c1009bcbfd7938b16bc3d0d1d22eb5d6cef4b2cb7bfd18ae4756b",
+      "debugOnlyDelta": [
+        "com/arcanc/pulselib/test/H14OffscreenHarness$ReferenceLayer.class",
+        "com/arcanc/pulselib/test/H14OffscreenHarness$Surface.class",
+        "com/arcanc/pulselib/test/H14OffscreenHarness$VanillaLayer.class",
+        "com/arcanc/pulselib/test/H14OffscreenHarness.class"
+      ],
+      "semanticEquality": true
+    }
+  },
+  "rootCauses": [
+    {
+      "defect": "createTexture indexes twelve-slot MC cache at caller unit 15",
+      "failure": "ArrayIndexOutOfBoundsException: Index 15 out of bounds for length 12",
+      "debuggerValues": {
+        "activeTexture": 33999,
+        "previousTexture": 746,
+        "allocatedTexture": 773,
+        "width": 64,
+        "height": 32,
+        "label": "PulseLib Fabulous metadata"
+      },
+      "fix": "Raw temporary GL_TEXTURE_2D bind/restore, preserving native cache and active unit."
+    },
+    {
+      "defect": "composite restores only limited state; caller program/VAO/buffers/textures leak",
+      "unchangedGuard": "initial-front-fabulous composite must restore GL state",
+      "debuggerBeforeAfter": {
+        "program": [
+          84,
+          187
+        ],
+        "vertexArray": [
+          6,
+          3
+        ],
+        "elementBuffer": [
+          81,
+          0
+        ],
+        "activeTexture": [
+          33999,
+          33988
+        ],
+        "textureBindings0to11": "white texture 746 replaced by OIT inputs"
+      },
+      "fix": "Both composite paths reuse existing legacy.GlRenderState; no shaders/algorithms changed."
+    }
+  ],
+  "fixtureAdapterFailure": {
+    "failure": "Analytic first red pixel expected 0.60156864, got 0.2",
+    "debuggerEvidence": "Actual OIT DEPTH, identity frame, native atlas width=512; Sampler0 uses atlas, not standalone WHITE",
+    "fix": "Register 1x1 white atlas sprite on existing model in H14 profile; map only copied quad UVs. Original geometry/oracle bodies remain exact."
+  },
+  "debugger": {
+    "skill": "ij-debugger",
+    "jdwp": "127.0.0.1:5031",
+    "temporaryConfiguration": "Pulse H14 Fixture (temporary)",
+    "suspensionReason": "Read live state arrays and preserve tracepoint stack before immediate assertion crash.",
+    "readOnlyValues": true,
+    "initialUnboundBreakpoint": "Physical WIP line not executable; projection location then worked.",
+    "cleanup": "No active sessions or agent breakpoints; temporary configuration removed; two original disabled user exception breakpoints unchanged.",
+    "rawArtifacts": {
+      "debug-evidence.json": "4dbf79f5eccaf19dca4d1ff31b57820abad161be10d886fd5faf13a0697f6b86",
+      "state-debug-evidence.json": "2e2cbdb8d542824caffe892552be6ee50a97eed15b75292c03353f19aed4e4db",
+      "atlas-debug-evidence.json": "6a3cd7725df6eeb965cdd5507005d111604359de1be7a1f1ea4010d163dcabf0"
+    }
+  },
+  "preservation": {
+    "originalDirtyFilesPreserved": 67,
+    "protectedFilesPreserved": 189,
+    "dualTransformsVerified": [
+      "PGlWeightedBlendedOit.java",
+      "journal",
+      "tests/README.md"
+    ],
+    "canonicalFullFlagsStillGuarded": 13
+  },
+  "staticChecks": [
+    "Canonical H14 9 preserved guards + 7 prerequisites/completion guards; five exact suite/oracle bodies",
+    "Canonical Smoke, lifecycle, animation and full 62-file pinned harness inventories PASS",
+    "Pinned source/API inventory verifier PASS",
+    "New Java headers/packages and AST control-body style PASS; Python parse PASS"
+  ],
+  "logSha256": {
+    "fabric-probe.log": "c81b7dd836cacd47b0cb7a13071b32393dd8896269890b50528afe108057ac7b",
+    "debug.log": "0d6be7f6c76d3e358c18e83a93c1ad5e7b6c5a7b4b0321d9190b7fa34b4e3cc6",
+    "fabric-fixed.log": "0ddb9bba028272a999a104f63e05b854fff1c519fbd6a620db458ca3af27bc37",
+    "state-debug.log": "d30a99be9652f6ec2e415fba135ba1dfd85913e3ebe16310ca8403e85e8cf5ec",
+    "state-fixed.log": "bca124cc97986fe658bfea913887d870509fa15ec664060b9a71da6b18f30414",
+    "atlas-debug.log": "449d8e3e6cabd32aed003fe2108b4a936c048e7ae14a66bb357c12416a541151",
+    "atlas.log": "9676ba50f17fbad657681eafc1ee583106f69cdd5d8fd79ee50e163ad1744a3c",
+    "accepted-neoforge/neoforge-source.log": "4c666b56eaeafb48d9a3b5174a03d9278d2308f1d31b0c5772f73d0ebbfb6c87",
+    "negative-resolve/fabric-jar.log": "16a3e4ff1ffd65f64ff25e7b5952ee58acc2c645d9c3b3b835d5415e8ea2d49f",
+    "build.log": "31c6fa446d215f673993646e53e0534087c49b90f574b39ce3b3690b709d3090",
+    "format-package.log": "25fccb23541ef072b146a3e42b9d68ceb1ab2f4ac46ee75efe5f1450986e1724",
+    "guard-missing-demo.log": "f28d1195f3c8960740c71104e4cbfd49e6f5185568a360c90015a577d0a75b84",
+    "guard-missing-profile.log": "f28d1195f3c8960740c71104e4cbfd49e6f5185568a360c90015a577d0a75b84",
+    "guard-mixed-profile.log": "f28d1195f3c8960740c71104e4cbfd49e6f5185568a360c90015a577d0a75b84",
+    "guard-client-only.log": "f76f8dc411c2908f914f3620bc2edaa533f5c8dae8a8d79673cb72b50f298a9f"
+  },
+  "artifactDirectory": "fabric/build/stage71b2b2b1-20261110",
+  "remaining": [
+    "Native H14 world terrain/cloud/rain pixels and queue/stage injections",
+    "RenderRegressionHarness and WorldRenderRegressionHarness",
+    "Legacy baseline routing and canonical pulseSmokeReproduce visibility oracle",
+    "Full canonical flags/Gecko option, identity/player/performance consolidation",
+    "7.2 full API/GPU/performance report"
+  ],
+  "limits": [
+    "Synthetic offscreen inputs with native postchain are not native world/weather/terrain evidence.",
+    "No baseline/full canonical flags or native queue/stage injections claimed complete.",
+    "Whole-library canonical semantic/compiled API report and profiling remain 7.2.",
+    "Broader caller-state capture has a cost; no performance result is claimed.",
+    "Game tests were not repeated after formatting; ASM SKIP_DEBUG proves final fixture semantic equality."
+  ]
+}

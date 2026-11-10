@@ -1,0 +1,141 @@
+### fabric/build/stage71b2b2b1-20261110/fabric-probe.log
+java.lang.ArrayIndexOutOfBoundsException: Index 15 out of bounds for length 12
+java.lang.ArrayIndexOutOfBoundsException: Index 15 out of bounds for length 12
+BUILD FAILED in 20s
+
+### fabric/build/stage71b2b2b1-20261110/debug.log
+java.lang.ArrayIndexOutOfBoundsException: Index 15 out of bounds for length 12
+java.lang.ArrayIndexOutOfBoundsException: Index 15 out of bounds for length 12
+BUILD FAILED in 3m 36s
+
+### fabric/build/stage71b2b2b1-20261110/fabric-fixed.log
+java.lang.AssertionError: H14: initial-front-fabulous composite must restore GL state
+java.lang.AssertionError: H14: initial-front-fabulous composite must restore GL state
+BUILD FAILED in 21s
+
+### fabric/build/stage71b2b2b1-20261110/state-debug.log
+java.lang.AssertionError: H14: initial-front-fabulous composite must restore GL state
+java.lang.AssertionError: H14: initial-front-fabulous composite must restore GL state
+BUILD FAILED in 2m 15s
+
+### fabric/build/stage71b2b2b1-20261110/state-fixed.log
+java.lang.AssertionError: H14: initial-front analytic ordered-alpha reference: pixel 0 component 0 expected 0.60156864, got 0.2
+java.lang.AssertionError: H14: initial-front analytic ordered-alpha reference: pixel 0 component 0 expected 0.60156864, got 0.2
+BUILD FAILED in 21s
+
+### fabric/build/stage71b2b2b1-20261110/atlas-debug.log
+java.lang.AssertionError: H14: initial-front analytic ordered-alpha reference: pixel 0 component 0 expected 0.60156864, got 0.2
+java.lang.AssertionError: H14: initial-front analytic ordered-alpha reference: pixel 0 component 0 expected 0.60156864, got 0.2
+BUILD FAILED in 58s
+
+### fabric/build/stage71b2b2b1-20261110/atlas.log
+[07:06:15] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-front: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.54901963,0.1254902,0.24705882
+[07:06:15] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-behind: opaque RGB 0.2,0.2,0.2; sky RGB 0.54901963,0.1254902,0.24705882
+[07:06:15] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-crossing: opaque RGB 0.54901963,0.29803923,0.047058824; sky RGB 0.27450982,0.5647059,0.12156863
+[07:06:16] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-four-layers: opaque RGB 0.41960785,0.35686275,0.20392157; sky RGB 0.38431373,0.37254903,0.29803923
+[07:06:16] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-emissive: opaque RGB 0.2901961,0.47843137,0.6; sky RGB 0.23921569,0.5019608,0.7490196
+[07:06:16] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-lit: opaque RGB 0.35686275,0.09803922,0.09803922; sky RGB 0.30588236,0.1254902,0.24705882
+[07:06:16] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-translucent-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[07:06:16] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-translucent-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[07:06:16] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-itemEntity-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[07:06:16] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-itemEntity-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[07:06:16] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-particles-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[07:06:16] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-particles-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[07:06:16] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-weather-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[07:06:16] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-weather-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[07:06:16] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-clouds-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[07:06:16] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-clouds-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[07:06:16] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-interleaved: opaque RGB 0.7294118,0.38039216,0.02745098; sky RGB 0.72156864,0.41568628,0.13333334
+[07:06:16] [Render thread/INFO] (Pulse Lib) H14 CASE PASS initial-opaque-particle: opaque RGB 0.0,0.0,1.0; sky RGB 0.0,0.0,1.0
+[07:06:19] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-front: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.54901963,0.1254902,0.24705882
+[07:06:19] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-behind: opaque RGB 0.2,0.2,0.2; sky RGB 0.54901963,0.1254902,0.24705882
+[07:06:19] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-crossing: opaque RGB 0.54901963,0.29803923,0.047058824; sky RGB 0.27450982,0.5647059,0.12156863
+[07:06:19] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-four-layers: opaque RGB 0.41960785,0.35686275,0.20392157; sky RGB 0.38431373,0.37254903,0.29803923
+[07:06:19] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-emissive: opaque RGB 0.2901961,0.47843137,0.6; sky RGB 0.23921569,0.5019608,0.7490196
+[07:06:19] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-lit: opaque RGB 0.35686275,0.09803922,0.09803922; sky RGB 0.30588236,0.1254902,0.24705882
+[07:06:19] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-translucent-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[07:06:19] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-translucent-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[07:06:19] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-itemEntity-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[07:06:19] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-itemEntity-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[07:06:19] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-particles-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[07:06:19] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-particles-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[07:06:19] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-weather-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[07:06:19] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-weather-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[07:06:19] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-clouds-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[07:06:19] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-clouds-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[07:06:19] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-interleaved: opaque RGB 0.7294118,0.38039216,0.02745098; sky RGB 0.72156864,0.41568628,0.13333334
+[07:06:19] [Render thread/INFO] (Pulse Lib) H14 CASE PASS reloaded-resized-opaque-particle: opaque RGB 0.0,0.0,1.0; sky RGB 0.0,0.0,1.0
+[07:06:19] [Render thread/INFO] (Pulse Lib) H14 PIXEL PASS: 38 cases, native postchain, direct reference, GL state, resource reload and window resize
+[07:06:19] [Render thread/INFO] (Pulse Lib) H14 SHUTDOWN PASS: 38 cases
+PULSE BOOTSTRAP VERIFIED: /mnt/MainDrive/Programs/MC mods/ArcsLib/fabric/build/pulselib-tests/stage71b2b2b1-atlas-20261110/client
+BUILD SUCCESSFUL in 26s
+
+### fabric/build/stage71b2b2b1-20261110/accepted-neoforge/neoforge-source.log
+[07:07:57] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-front: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.54901963,0.1254902,0.24705882
+[07:07:57] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-behind: opaque RGB 0.2,0.2,0.2; sky RGB 0.54901963,0.1254902,0.24705882
+[07:07:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-crossing: opaque RGB 0.54901963,0.29803923,0.047058824; sky RGB 0.27450982,0.5647059,0.12156863
+[07:07:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-four-layers: opaque RGB 0.41960785,0.35686275,0.20392157; sky RGB 0.38431373,0.37254903,0.29803923
+[07:07:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-emissive: opaque RGB 0.2901961,0.47843137,0.6; sky RGB 0.23921569,0.5019608,0.7490196
+[07:07:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-lit: opaque RGB 0.35686275,0.09803922,0.09803922; sky RGB 0.30588236,0.1254902,0.24705882
+[07:07:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-translucent-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[07:07:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-translucent-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[07:07:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-itemEntity-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[07:07:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-itemEntity-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[07:07:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-particles-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[07:07:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-particles-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[07:07:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-weather-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[07:07:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-weather-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[07:07:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-clouds-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[07:07:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-clouds-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[07:07:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-interleaved: opaque RGB 0.7294118,0.38039216,0.02745098; sky RGB 0.72156864,0.41568628,0.13333334
+[07:07:58] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS initial-opaque-particle: opaque RGB 0.0,0.0,1.0; sky RGB 0.0,0.0,1.0
+[07:08:01] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-front: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.54901963,0.1254902,0.24705882
+[07:08:01] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-behind: opaque RGB 0.2,0.2,0.2; sky RGB 0.54901963,0.1254902,0.24705882
+[07:08:01] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-crossing: opaque RGB 0.54901963,0.29803923,0.047058824; sky RGB 0.27450982,0.5647059,0.12156863
+[07:08:01] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-four-layers: opaque RGB 0.41960785,0.35686275,0.20392157; sky RGB 0.38431373,0.37254903,0.29803923
+[07:08:01] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-emissive: opaque RGB 0.2901961,0.47843137,0.6; sky RGB 0.23921569,0.5019608,0.7490196
+[07:08:01] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-lit: opaque RGB 0.35686275,0.09803922,0.09803922; sky RGB 0.30588236,0.1254902,0.24705882
+[07:08:01] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-translucent-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[07:08:01] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-translucent-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[07:08:01] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-itemEntity-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[07:08:01] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-itemEntity-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[07:08:01] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-particles-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[07:08:01] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-particles-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[07:08:01] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-weather-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[07:08:01] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-weather-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[07:08:01] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-clouds-front: opaque RGB 0.36078432,0.05882353,0.45882353; sky RGB 0.32941177,0.07450981,0.54901963
+[07:08:01] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-clouds-behind: opaque RGB 0.6,0.09803922,0.09803922; sky RGB 0.5294118,0.07450981,0.34901962
+[07:08:01] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-interleaved: opaque RGB 0.7294118,0.38039216,0.02745098; sky RGB 0.72156864,0.41568628,0.13333334
+[07:08:01] [Render thread/INFO] [Pulse Lib/]: H14 CASE PASS reloaded-resized-opaque-particle: opaque RGB 0.0,0.0,1.0; sky RGB 0.0,0.0,1.0
+[07:08:01] [Render thread/INFO] [Pulse Lib/]: H14 PIXEL PASS: 38 cases, native postchain, direct reference, GL state, resource reload and window resize
+[07:08:01] [Render thread/INFO] [Pulse Lib/]: H14 SHUTDOWN PASS: 38 cases
+PULSE BOOTSTRAP VERIFIED: /mnt/MainDrive/Programs/MC mods/ArcsLib/neoforge/build/pulselib-tests/h14-348690001e9945b98e374d13fb3f6b3a/client
+BUILD SUCCESSFUL in 28s
+
+### fabric/build/stage71b2b2b1-20261110/negative-resolve/fabric-jar.log
+java.lang.AssertionError: H14: initial-front Fancy/Fabulous parity: pixel 0 component 0 expected 0.6, got 0.2
+java.lang.AssertionError: H14: initial-front Fancy/Fabulous parity: pixel 0 component 0 expected 0.6, got 0.2
+BUILD FAILED in 20s
+
+### fabric/build/stage71b2b2b1-20261110/build.log
+STAGE 2 SERVICE PROVIDERS / LEGACY REMOVAL / COMMON BOUNDARY PASS: /mnt/MainDrive/Programs/MC mods/ArcsLib/build/reports/porting/stage-2-build.json
+BUILD SUCCESSFUL in 41s
+
+### fabric/build/stage71b2b2b1-20261110/format-package.log
+BUILD SUCCESSFUL in 11s
+
+### fabric/build/stage71b2b2b1-20261110/guard-missing-demo.log
+   > org.gradle.api.GradleException: H14 offscreen requires an exclusive demo source/JAR profile; skip-resolve requires H14 offscreen.
+BUILD FAILED in 5s
+
+### fabric/build/stage71b2b2b1-20261110/guard-missing-profile.log
+   > org.gradle.api.GradleException: H14 offscreen requires an exclusive demo source/JAR profile; skip-resolve requires H14 offscreen.
+BUILD FAILED in 5s
+
+### fabric/build/stage71b2b2b1-20261110/guard-mixed-profile.log
+   > org.gradle.api.GradleException: H14 offscreen requires an exclusive demo source/JAR profile; skip-resolve requires H14 offscreen.
+BUILD FAILED in 5s
+
+### fabric/build/stage71b2b2b1-20261110/guard-client-only.log
+   > org.gradle.api.GradleException: H14 offscreen is a client-only pixel fixture.
+BUILD FAILED in 6s

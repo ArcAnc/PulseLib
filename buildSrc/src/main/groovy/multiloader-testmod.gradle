@@ -66,6 +66,12 @@ def skipAnimationRemoval = providers.gradleProperty('pulseAnimationSkipRemoval')
 def lifecycleRegression = providers.gradleProperty('pulseLifecycleRegression').isPresent()
 def smokeRegression = providers.gradleProperty('pulseSmokeRegression').isPresent()
 def smokeFirstPerson = providers.gradleProperty('pulseSmokeFirstPerson').isPresent()
+def h14Offscreen = providers.gradleProperty('pulseH14Offscreen').isPresent()
+def h14SkipResolve = providers.gradleProperty('pulseH14SkipResolve').isPresent()
+if ((h14Offscreen && (!demoMode || animationRegression || lifecycleRegression || smokeRegression)) || (h14SkipResolve && !h14Offscreen))
+    throw new GradleException('H14 offscreen requires an exclusive demo source/JAR profile; skip-resolve requires H14 offscreen.')
+if (h14Offscreen && gradle.startParameter.taskNames.any { it.tokenize(':').last() == 'runServer' })
+    throw new GradleException('H14 offscreen is a client-only pixel fixture.')
 def smokeSkipDraw = providers.gradleProperty('pulseSmokeSkipDraw').isPresent()
 if ((smokeRegression && !demoMode) || ((smokeFirstPerson || smokeSkipDraw) && !smokeRegression))
     throw new GradleException('Smoke regression requires a demo source/JAR profile; first-person and skip-draw controls require Smoke regression.')
@@ -160,6 +166,11 @@ if (providers.gradleProperty('pulseTestJarBootstrap').isPresent() || demoMode) {
                     if (skipAnimationRemoval)
                         run.vmArg '-Dpulselib.test.skipAnimationRemoval=true'
                 }
+                if (h14Offscreen) {
+                    run.vmArg '-Dpulselib.test.h14Offscreen=true'
+                    if (h14SkipResolve)
+                        run.vmArg '-Dpulselib.test.h14SkipResolve=true'
+                }
                 if (smokeRegression) {
                     run.vmArg '-Dpulselib.test.smokeRegression=true'
                     if (smokeFirstPerson)
@@ -195,6 +206,11 @@ if (providers.gradleProperty('pulseTestJarBootstrap').isPresent() || demoMode) {
                     run.systemProperty 'pulselib.test.animationRegression', 'true'
                     if (skipAnimationRemoval)
                         run.systemProperty 'pulselib.test.skipAnimationRemoval', 'true'
+                }
+                if (h14Offscreen) {
+                    run.systemProperty 'pulselib.test.h14Offscreen', 'true'
+                    if (h14SkipResolve)
+                        run.systemProperty 'pulselib.test.h14SkipResolve', 'true'
                 }
                 if (smokeRegression) {
                     run.systemProperty 'pulselib.test.smokeRegression', 'true'

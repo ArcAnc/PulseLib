@@ -763,3 +763,14 @@ controls must fail the unchanged original guards; they are excluded from PASS.
 Full RenderRegression/World/H14, identity/player/performance consolidation and
 canonical full flags remain open. See [testmod instructions](testmod/README.md)
 and migration journal section 67.
+
+
+Stage **7.1b.2b.2b.1** migrates all **38 canonical H14 offscreen cases** with the
+native five-target transparency postchain, unchanged color/state/depth oracle,
+resource reload and real framebuffer resize. It fixes OIT allocation on caller
+texture unit 15 and caller GL-state restoration. Use
+`python3 tests/testmod/tools/run_h14.py --output build/reports/h14-UNIQUE`.
+This runs Fabric JAR and NeoForge sources without a world/server. See journal
+section 68 and [testmod instructions](testmod/README.md). Native H14 world and
+RenderRegression/World bundles, full flags and final API/performance report
+remain open.

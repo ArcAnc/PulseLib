@@ -9,6 +9,7 @@
 
 package com.arcanc.pulselib.content.renderer.gl;
 
+import com.arcanc.pulselib.content.renderer.legacy.GlRenderState;
 import com.arcanc.pulselib.platform.PClientRenderHooks;
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.arcanc.pulselib.util.PRenderTypes;
@@ -309,7 +310,7 @@ final class PGlWeightedBlendedOit
 		if (this.pass != Pass.NONE)
 			throw new IllegalStateException("Cannot composite weighted blended OIT while a pass is active");
 		validateDestination(colorAttachment);
-		GlStateSnapshot state = GlStateSnapshot.capture();
+		GlRenderState state = new GlRenderState();
 		try (RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
 				() -> "PulseLib weighted OIT composite", colorAttachment, OptionalInt.empty()))
 		{
@@ -328,7 +329,7 @@ final class PGlWeightedBlendedOit
 		}
 		finally
 		{
-			state.restore();
+			state.close();
 			this.finishFrame();
 		}
 	}
@@ -358,7 +359,7 @@ final class PGlWeightedBlendedOit
 			return;
 		if (this.pass != Pass.NONE)
 			throw new IllegalStateException("Cannot composite weighted blended OIT while a pass is active");
-		GlStateSnapshot state = GlStateSnapshot.capture();
+		GlRenderState state = new GlRenderState();
 		try
 		{
 			if (this.fabulousMetadataView == null)
@@ -400,7 +401,7 @@ final class PGlWeightedBlendedOit
 		}
 		finally
 		{
-			state.restore();
+			state.close();
 			this.finishFrame();
 		}
 	}
@@ -753,7 +754,7 @@ final class PGlWeightedBlendedOit
 	}
 
 	/**
-	 * Creates the texture.
+	 * Allocates on any caller unit without changing Minecraft's twelve-slot texture cache.
 	 * @param label the label to use.
 	 * @param declaredFormat the declared format to use.
 	 * @param internalFormat the internal format to use.
@@ -770,7 +771,7 @@ final class PGlWeightedBlendedOit
 		int texture = GL11.glGenTextures();
 		try
 		{
-			GlStateManager._bindTexture(texture);
+			GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture);
 			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
 			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
 			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
@@ -780,7 +781,7 @@ final class PGlWeightedBlendedOit
 		}
 		finally
 		{
-			GlStateManager._bindTexture(previousTexture);
+			GL11.glBindTexture(GL11.GL_TEXTURE_2D, previousTexture);
 			GlStateManager._activeTexture(activeTexture);
 		}
 	}

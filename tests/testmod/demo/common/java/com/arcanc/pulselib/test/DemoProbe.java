@@ -57,7 +57,7 @@ public final class DemoProbe
 
 	public static void tick(Minecraft mc)
 	{
-		if (completed)
+		if (H14OffscreenHarness.enabled() || completed)
 			return;
 		DemoChecks.runDirectory();
 		if (phase == 5)
@@ -307,6 +307,11 @@ public final class DemoProbe
 
 	public static void stopped()
 	{
+		if (H14OffscreenHarness.enabled())
+		{
+			H14OffscreenHarness.stopped();
+			return;
+		}
 		DemoChecks.check(completed && assets == 100, "Two canonical demo asset epochs completed before client shutdown");
 		PLibDatabase.LOGGER.info("PULSE DEMO CLIENT SHUTDOWN PASS");
 	}

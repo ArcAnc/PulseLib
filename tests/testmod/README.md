@@ -254,3 +254,40 @@ claim that equivalence or first-person rendering correctness.
 
 See journal section 67, [assertion proof](../../docs/porting/evidence/stage-7.1b.2b.2a-inventory.json)
 and [recorded evidence](../../docs/porting/evidence/stage-7.1b.2b.2a.json).
+
+## Canonical H14 offscreen suite (7.1b.2b.2b.1)
+
+`-PpulseH14Offscreen` requires `-PpulseDemoJar` or `-PpulseDemoContent` and
+excludes animation/Smoke/lifecycle orchestration. It runs all 38 canonical
+H14 offscreen cases on the title screen, with no world/server or EULA file.
+The hidden window retains its GL context and actually resizes across a native
+resource reload. Each client writes 48 PNGs and a result JSON into its fresh
+marked run directory. No existing run directory is accepted.
+
+```bash
+python3 tests/testmod/tools/run_h14.py --output build/reports/h14-UNIQUE
+python3 tests/testmod/tools/inventory_h14.py
+python3 tests/testmod/tools/run_h14.py --negative-control --output build/reports/h14-negative-UNIQUE
+```
+
+The positive runner packages both testmods and runs Fabric JAR + NeoForge
+sources. `--cases fabric-jar` or `--cases neoforge-source` selects one case;
+`--gradle-init` supports the documented HEAD projection of a dirty workspace.
+Default timeout is 240 seconds per Gradle process. It requires 38 cases,
+36 native transparency chains, two epochs, actual framebuffer resize, normal
+shutdown, all 48 PNG dimensions and no `level.dat`.
+
+The separate negative control sets `-PpulseH14SkipResolve` on Fabric only.
+It expects the unchanged first Fancy/Fabulous parity guard to fail with
+Java 255 / Gradle 1, no result JSON and no PIXEL/SHUTDOWN PASS. Its report says
+PASS only when that expected failure is observed. Neither control changes the
+pixel oracle or production files.
+
+The canonical suite, ordered-alpha reference, quad, color conversion and RGB
+assertion have matching javac structural fingerprints. Only the quad copy's
+UVs map the original white texel into the 26.1 atlas; the white sprite is added
+to an existing demo model exclusively in this profile. No new production
+pipeline/shader/render type is introduced. Full native world/weather/terrain,
+baseline and RenderRegression/World bundles remain open, as do the canonical
+full flags. See journal section 68 and
+[recorded evidence](../../docs/porting/evidence/stage-7.1b.2b.2b.1.json).

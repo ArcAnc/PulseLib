@@ -9,8 +9,9 @@
 
 package com.arcanc.pulselib.test.mixin;
 
-import com.arcanc.pulselib.test.GlErrors;
 import com.arcanc.pulselib.test.DemoProbe;
+import com.arcanc.pulselib.test.GlErrors;
+import com.arcanc.pulselib.test.H14OffscreenHarness;
 import com.arcanc.pulselib.test.SmokeHarness;
 import net.minecraft.client.renderer.GameRenderer;
 import org.spongepowered.asm.mixin.Mixin;
@@ -32,6 +33,11 @@ public abstract class SmokeRenderMixin
 	@Inject(method = "render", at = @At("TAIL"))
 	private void pulselibtest$graphics(CallbackInfo callback)
 	{
+		if (H14OffscreenHarness.enabled())
+		{
+			GlErrors.check();
+			H14OffscreenHarness.frame();
+		}
 		if (SmokeHarness.enabled())
 		{
 			GlErrors.check();

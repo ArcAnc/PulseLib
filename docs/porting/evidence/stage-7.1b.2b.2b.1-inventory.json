@@ -1,0 +1,41 @@
+{
+  "pin": "7ce6f024b307bb821ce543344d3896c8e1fcf26b",
+  "checkpoint": "7.1b.2b.2b.1",
+  "source": "tests/testmod/src/main/java/com/arcanc/pulselib/test/H14Harness.java",
+  "sourceSha256": "05c53517c727b870c45378b5acc9f2ed95686ce42d65192c8880ff37c6206453",
+  "scope": "All 38 canonical H14 offscreen cases, native five-target postchain, state/depth/exception/reload/resize. Native world/weather/baseline and RenderRegression/World bundles remain open.",
+  "guardProof": {
+    "canonicalSites": 9,
+    "preservedSites": 9,
+    "additionalSites": 7,
+    "exactArgumentTreesAfterDeclaredAdaptation": true
+  },
+  "oracleBodyProof": {
+    "assertRgb": "5baafb7023a040ff45d89413bcace08b5ea792dfa037426c102cb58400ed3a7b",
+    "color": "e718b864c7f8dff84f59e56901050d9719c30b32768b780ef85641ef87e74050",
+    "expected": "bdf6a4b9ce3928ae092ae9fe82b89fe73544fcea5a0c3774185acecd148c95eb",
+    "quad": "5000615612ecd1f73a9c20a434d72bf57a5834ecaf8a55ac6fd341751af2e93a",
+    "suite": "56e6dbd61515fce64d73c9117aac7aa3d633387272bf44e8a44df0a9c0066689"
+  },
+  "oracleBodyPolicy": "Javac structural fingerprints retain node kinds, tree nesting, variable/member/identifier names and literals; only redundant single-statement BlockTree nodes are unwrapped. All five full method bodies match.",
+  "guardAdaptations": {
+    "RenderSystem.getShader()": "GL11.glGetInteger(GL20.GL_CURRENT_PROGRAM): MC26 removed ShaderInstance global pointer; native linked program identity is retained. Caller program is the already registered vanilla GUI pipeline."
+  },
+  "nativeAdapters": [
+    "ResourceLocation -> Identifier; GlStateManager cache-aware GL wrappers.",
+    "PostChain constructor/process/getTempTarget -> ShaderManager transparency + FrameGraphBuilder/LevelTargetBundle; same five independent live inputs.",
+    "Legacy framebuffer ids -> temporary native GlTexture framebuffer attachments; preserve read/write framebuffer, views and pixel-pack state.",
+    "Original screenshot ABGR -> NativeImage.setPixelABGR; output restricted to the generated marked run root.",
+    "Explicit OIT on the existing material types and independent test stage; no new backend/pipeline/shader.",
+    "Canonical quad body remains exact; atlasQuad changes only its eight UV floats from standalone white texel to the registered white atlas sprite center. New test-only 1x1 RGBA white PNG; model count unchanged.",
+    "Production private createTexture raw bind/restore supports caller texture unit 15 without indexing the twelve-slot Minecraft cache.",
+    "Both production composite paths use the existing GlRenderState scope to restore caller program, VAO/buffers, active texture and bindings in addition to framebuffer/depth/blend state."
+  ],
+  "remaining": [
+    "Native H14 world terrain/cloud/rain pixels and queue/stage injections",
+    "RenderRegressionHarness and WorldRenderRegressionHarness",
+    "Legacy baseline routing and canonical pulseSmokeReproduce visibility oracle",
+    "Full canonical flags/Gecko option, identity/player/performance consolidation",
+    "7.2 full API/GPU/performance report"
+  ]
+}
