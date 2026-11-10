@@ -370,3 +370,42 @@ trees after the declared MC26 adaptations; complete RGB/baseline bodies match.
 Full canonical flags remain guarded pending the remaining visibility,
 identity/player/performance consolidation. See journal section 70 and
 [recorded evidence](../../docs/porting/evidence/stage-7.1b.2b.2b.3.json).
+
+## Native camera visibility and scoped reproduction (7.1b.2b.2c)
+
+`-PpulseVisibilityRegression` requires an exclusive demo source/JAR profile.
+It creates a fresh marked integrated world with the original test block at
+(11,140,14), player at (10.5,140,10.5), and FIRST_PERSON yaw 0/180, pitch 0.
+Each phase waits 30 player ticks, then measures four actual world frames.
+Front-away-front repeats after a real resource reload with Improved
+Transparency true instead of false. Other regression suites do not run.
+
+```bash
+python3 tests/testmod/tools/run_visibility.py --output build/reports/visibility-UNIQUE
+python3 tests/testmod/tools/run_visibility.py --negative-control --output build/reports/visibility-negative-UNIQUE
+python3 tests/testmod/tools/inventory_visibility.py
+```
+
+Default cases are Fabric JAR and NeoForge sources; `--cases` selects one and
+`--gradle-init` accepts the documented HEAD projection. The runner requires
+24 native yaw/frustum/GPU observations, 48 query scopes, six 960x640 PNGs,
+normal shutdown and a saved world per client. Query scopes cover only actual
+Pulse mesh flushes; native terrain and fullscreen resolves are excluded. No
+foreign samples query may be active. Renderer callbacks are diagnostics.
+GPU samples include overdraw/OIT passes and are not unique pixels or timing.
+
+`--negative-control` passes the actual canonical `-PpulseSmokeReproduce` flag
+on both loaders. It must observe yaw=180, native frustum=false and GPU=0 in
+the first expected-visible phase, then fail with the original
+`Original block entity renderer must run` message, Java 255 / Gradle 1 and no
+visibility/shutdown PASS or result JSON. Its report says PASS only when this
+expected failure occurs. No geometry/guard suppression is used.
+
+The canonical flag is supported only with this visibility profile plus a demo
+source/JAR profile. Outside it, the flag still fails before launch. Other full
+canonical flags retain their guards. This supersedes the deferred visibility
+boundary of the earlier Smoke section; `pulseSmokeFirstPerson` remains a
+separate world-prerequisite control. Visibility uses a declared input change
+from callback count to actual GPU samples, retaining the original >0, message,
+throw body and property mapping. See journal section 71 and
+[recorded evidence](../../docs/porting/evidence/stage-7.1b.2b.2c.json).

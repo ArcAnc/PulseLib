@@ -11,6 +11,7 @@ package com.arcanc.pulselib.test.mixin;
 
 import com.arcanc.pulselib.content.renderer.PRenderQueue;
 import com.arcanc.pulselib.test.SmokeStages;
+import com.arcanc.pulselib.test.VisibilityHarness;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -23,5 +24,10 @@ public abstract class SmokeWorldEndMixin
 	private static void pulselibtest$endFrame(CallbackInfo callback)
 	{
 		SmokeStages.endFrame();
+	}
+	@Inject(method = "endWorldFrame", at = @At("TAIL"))
+	private static void pulselibtest$visibilityEnd(CallbackInfo callback)
+	{
+		VisibilityHarness.endWorld();
 	}
 }

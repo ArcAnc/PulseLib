@@ -57,6 +57,11 @@ public final class DemoProbe
 
 	public static void tick(Minecraft mc)
 	{
+		if (VisibilityHarness.enabled())
+		{
+			VisibilityHarness.tick();
+			return;
+		}
 		if (RenderRegressionRun.enabled())
 		{
 			RenderRegressionRun.tick();
@@ -317,6 +322,11 @@ public final class DemoProbe
 
 	public static void stopped()
 	{
+		if (VisibilityHarness.enabled())
+		{
+			VisibilityHarness.stopped();
+			return;
+		}
 		if (RenderRegressionRun.enabled())
 		{
 			RenderRegressionRun.stopped();

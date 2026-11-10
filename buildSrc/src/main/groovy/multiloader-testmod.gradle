@@ -66,6 +66,12 @@ def skipAnimationRemoval = providers.gradleProperty('pulseAnimationSkipRemoval')
 def lifecycleRegression = providers.gradleProperty('pulseLifecycleRegression').isPresent()
 def smokeRegression = providers.gradleProperty('pulseSmokeRegression').isPresent()
 def smokeFirstPerson = providers.gradleProperty('pulseSmokeFirstPerson').isPresent()
+def visibilityRegression = providers.gradleProperty('pulseVisibilityRegression').isPresent()
+def reproduceCamera = providers.gradleProperty('pulseSmokeReproduce').isPresent()
+if (visibilityRegression && (!demoMode || animationRegression || lifecycleRegression || smokeRegression || providers.gradleProperty('pulseRenderRegression').isPresent() || providers.gradleProperty('pulseWorldRegression').isPresent() || providers.gradleProperty('pulseH14Offscreen').isPresent()))
+    throw new GradleException('Visibility regression requires an exclusive demo source/JAR profile.')
+if (visibilityRegression && gradle.startParameter.taskNames.any { it.tokenize(':').last() == 'runServer' })
+    throw new GradleException('Visibility regression is client-only.')
 def renderRegression = providers.gradleProperty('pulseRenderRegression').isPresent()
 def renderSkipMesh = providers.gradleProperty('pulseRenderSkipMesh').isPresent()
 if ((renderRegression && (!demoMode || animationRegression || lifecycleRegression || smokeRegression || providers.gradleProperty('pulseWorldRegression').isPresent() || providers.gradleProperty('pulseH14Offscreen').isPresent())) || (renderSkipMesh && !renderRegression))
@@ -96,7 +102,7 @@ if ((demoSource && demoPackaged) || (demoMode && providers.gradleProperty('pulse
     throw new GradleException('Select exactly one bootstrap/demo source/demo JAR profile.')
 
 def unsupported = ['pulseTestMod', 'pulseTestJar', 'pulseSmokeAuto', 'pulseSmokeWorld', 'pulseOitTest', 'pulseOitPerf', 'pulsePlayerMotionTest', 'pulseItemIdentityTest', 'pulseGeckoDemo', 'pulseMotionPhase', 'pulseOitBaseline', 'pulseSmokeReproduce', 'pulseSmokeSkipHook']
-if (unsupported.any { providers.gradleProperty(it).isPresent() })
+if (unsupported.any { providers.gradleProperty(it).isPresent() && !(it == 'pulseSmokeReproduce' && visibilityRegression) })
     throw new GradleException('The complete canonical regression harnesses remain stage 7.1b.2. Packaged bootstrap uses only -PpulseTestJarBootstrap; it cannot open existing demo worlds.')
 
 if (providers.gradleProperty('pulseTestJarBootstrap').isPresent() || demoMode) {
@@ -178,6 +184,11 @@ if (providers.gradleProperty('pulseTestJarBootstrap').isPresent() || demoMode) {
                     if (skipAnimationRemoval)
                         run.vmArg '-Dpulselib.test.skipAnimationRemoval=true'
                 }
+                if (visibilityRegression) {
+                    run.vmArg '-Dpulselib.test.visibilityRegression=true'
+                    if (reproduceCamera)
+                        run.vmArg '-Dpulselib.test.reproduceCamera=true'
+                }
                 if (renderRegression) {
                     run.vmArg '-Dpulselib.test.renderRegression=true'
                     if (renderSkipMesh)
@@ -228,6 +239,11 @@ if (providers.gradleProperty('pulseTestJarBootstrap').isPresent() || demoMode) {
                     run.systemProperty 'pulselib.test.animationRegression', 'true'
                     if (skipAnimationRemoval)
                         run.systemProperty 'pulselib.test.skipAnimationRemoval', 'true'
+                }
+                if (visibilityRegression) {
+                    run.systemProperty 'pulselib.test.visibilityRegression', 'true'
+                    if (reproduceCamera)
+                        run.systemProperty 'pulselib.test.reproduceCamera', 'true'
                 }
                 if (renderRegression) {
                     run.systemProperty 'pulselib.test.renderRegression', 'true'

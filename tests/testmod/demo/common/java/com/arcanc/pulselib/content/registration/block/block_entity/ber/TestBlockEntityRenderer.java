@@ -57,6 +57,7 @@ public class TestBlockEntityRenderer extends PBlockRenderer<TestBlockEntity, PBl
 	{
 		renders++;
 		com.arcanc.pulselib.test.SmokeHarness.recordBlockRender(animatable);
+		com.arcanc.pulselib.test.VisibilityHarness.recordBlock(animatable);
 		return bone.parent() == null ? inherited.withAlphaMode(PAlphaMode.AUTO) : inherited;
 	}
 	@Override

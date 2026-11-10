@@ -11,7 +11,9 @@
     "SmokeLayerMixin",
     "GlDebugMixin",
     "WorldStagesMixin",
-    "H14QueueMixin"
+    "H14QueueMixin",
+    "VisibilityWorldMixin",
+    "VisibilityStagesMixin"
   ],
   "injectors": {
     "defaultRequire": 1

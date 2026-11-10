@@ -794,3 +794,14 @@ pixels and partial-failure restoration/discard. Run
 See journal section 70 and [testmod instructions](testmod/README.md). Native
 pulseSmokeReproduce visibility is next; RenderRegression/World/H14 bundles
 need no repeated migration. Full identity/player/performance/flags remain open.
+
+
+Stage **7.1b.2b.2c** completes native block visibility and scoped canonical
+`pulseSmokeReproduce`: front-away-front before/after reload on both loaders,
+actual camera frustum and GPU samples from real Pulse mesh flushes. Callbacks
+remain diagnostic (Fabric still calls the renderer behind the camera).
+Run `python3 tests/testmod/tools/run_visibility.py --output build/reports/visibility-UNIQUE`.
+The canonical reproduction flag is now supported only with the exclusive
+`pulseVisibilityRegression` demo profile; other full flags remain guarded.
+See journal section 71. Full ItemStackIdentity world/reentry/drop/pickup/GC and
+server/menu scenarios are next.
