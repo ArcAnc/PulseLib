@@ -76,6 +76,12 @@ public final class SmokeLifecycleHarness
 		return true;
 	}
 
+	static void explicitOnly()
+	{
+		SmokeLifecycleWorkload.draw();
+		runExplicitCleanup(ClientTestPlugin.GECKO.getModel());
+	}
+
 	private static void runExplicitCleanup(PBakedModel model)
 	{
 		seedManagers(model);

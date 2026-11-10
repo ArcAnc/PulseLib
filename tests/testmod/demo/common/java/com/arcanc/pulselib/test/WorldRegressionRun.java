@@ -28,6 +28,7 @@ import java.util.concurrent.CompletableFuture;
 public final class WorldRegressionRun
 {
 	private static int phase;
+	private static int initialModelEpochs;
 	private static boolean complete;
 	private static boolean improved;
 	private static long deadline;
@@ -39,6 +40,16 @@ public final class WorldRegressionRun
 
 	private WorldRegressionRun()
 	{
+	}
+
+	static void beginExistingWorld(CompletableFuture<Void> preparation)
+	{
+		initialModelEpochs = ClientTestPlugin.models;
+		improved = Minecraft.getInstance().options.improvedTransparency().get();
+		setup = preparation;
+		phase = -1;
+		deadline = System.nanoTime() + 150_000_000_000L;
+		System.setProperty("pulselib.test.worldRegression", "true");
 	}
 
 	public static boolean enabled()
@@ -68,6 +79,7 @@ public final class WorldRegressionRun
 			return;
 		if (phase == 0)
 		{
+			initialModelEpochs = ClientTestPlugin.models;
 			DemoChecks.plugins(true);
 			improved = mc.options.improvedTransparency().get();
 			GLFW.glfwHideWindow(mc.getWindow().handle());
@@ -88,7 +100,8 @@ public final class WorldRegressionRun
 				}, server);
 			}
 			if (setup.isDone() && mc.screen == null && mc.player.tickCount >= 30 &&
-					mc.gameMode.getPlayerMode() == net.minecraft.world.level.GameType.SPECTATOR)
+					mc.gameMode.getPlayerMode() == net.minecraft.world.level.GameType.SPECTATOR &&
+					(!CanonicalProfile.smokeWorld() || mc.level.hasChunk(DemoProbe.sceneBlockPosition().getX() >> 4, DemoProbe.sceneBlockPosition().getZ() >> 4)))
 			{
 				setup.join();
 				PLibDatabase.LOGGER.info("NATIVE WORLD READY: screen=null, spectator, ticks={}", mc.player.tickCount);
@@ -144,14 +157,17 @@ public final class WorldRegressionRun
 			}
 			DemoChecks.check(mc.getMainRenderTarget().width != framebufferWidth, "Actual native world framebuffer must resize");
 			DemoChecks.check(WorldRenderRegressionHarness.cases() == 12 && H14WorldHarness.cases() == 15, "All native H13/H14 cases must finish");
-			DemoChecks.check(ClientTestPlugin.models == 2 && H14WorldHarness.hooks() > 0, "World reload and actual Fabulous hook complete");
+			DemoChecks.check(ClientTestPlugin.models == initialModelEpochs + 1 && H14WorldHarness.hooks() > 0, "World reload and actual Fabulous hook complete");
 			mc.options.improvedTransparency().set(improved);
 			GLFW.glfwSetWindowSize(mc.getWindow().handle(), width, height);
 			complete = true;
 			DemoChecks.writeResult(Map.of("status", "PASS", "fixture", "native-world", "h13Cases", WorldRenderRegressionHarness.cases(), "h14Cases", H14WorldHarness.cases(),
 					"fabulousHooks", H14WorldHarness.hooks(), "modelEpochs", ClientTestPlugin.models, "resized", true, "origin", DemoChecks.jar(WorldRegressionRun.class)));
 			PLibDatabase.LOGGER.info("NATIVE WORLD PASS: H13=12 H14=15 actual terrain/rain/reload/resize");
-			mc.stop();
+			if (CanonicalProfile.smokeWorld() || CanonicalProfile.oitWorld())
+				CanonicalRun.worldComplete();
+			else
+				mc.stop();
 		}
 		catch (IOException exception)
 		{

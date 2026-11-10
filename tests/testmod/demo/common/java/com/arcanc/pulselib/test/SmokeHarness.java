@@ -143,7 +143,7 @@ public final class SmokeHarness
 			return;
 		check(System.nanoTime() < deadline, "Smoke world/graphics deadline");
 		Minecraft mc = Minecraft.getInstance();
-		if (mc.player == null || mc.level == null)
+		if (!CanonicalRun.noWorldSmoke() && (mc.player == null || mc.level == null))
 			return;
 		if (mc.getOverlay() != null || PModelCache.getModels() == null)
 			return;
@@ -162,7 +162,7 @@ public final class SmokeHarness
 		TextureAtlasSprite sprite = PResourceCache.getTextureAtlas().
 				getSprite(PResourceCache.resolve(ClientTestPlugin.GLTF.getModelId(), "circle"));
 		check(!sprite.contents().name().getPath().equals("missingno"), "Test texture must be stitched");
-		if (!worldVerified)
+		if (!worldVerified && !CanonicalRun.noWorldSmoke())
 		{
 			if (worldSetup == null)
 			{

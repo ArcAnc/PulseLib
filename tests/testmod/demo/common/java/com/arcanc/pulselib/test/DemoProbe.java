@@ -57,6 +57,16 @@ public final class DemoProbe
 
 	public static void tick(Minecraft mc)
 	{
+		if (CanonicalProfile.route("manual"))
+		{
+			CanonicalRun.manualTick();
+			return;
+		}
+		if (CanonicalRun.noWorldSmoke() || CanonicalRun.baselineOnly())
+		{
+			CanonicalRun.tick();
+			return;
+		}
 		if (PerfRun.enabled())
 		{
 			PerfRun.tick();
@@ -184,6 +194,18 @@ public final class DemoProbe
 			AnimationSamplingHarness.verifyRemovalHooks();
 			PLibDatabase.LOGGER.info("PULSE ANIMATION COMPLETE: assertions={}, maintenance={}", RegressionChecks.assertions, RegressionChecks.maintenancePasses);
 		}
+		if (CanonicalProfile.smokeWorld())
+		{
+			phase = 6;
+			CanonicalRun.beginWorldSuites();
+			return;
+		}
+		regressionsComplete();
+	}
+
+	static void regressionsComplete()
+	{
+		Minecraft mc = Minecraft.getInstance();
 		if (Boolean.getBoolean("pulselib.test.lifecycleRegression"))
 		{
 			phase = 4;
@@ -203,8 +225,13 @@ public final class DemoProbe
 				"lifecycle", Boolean.getBoolean("pulselib.test.lifecycleRegression") ? SmokeLifecycleHarness.result() : Map.of("enabled", false),
 				"renders", java.util.List.of(TestEntityRender.renders, TestBlockEntityRenderer.renders, TestBlockItemRenderer.renders)));
 		result.put("smoke", SmokeHarness.result());
+		if (CanonicalProfile.smokeWorld())
+			result.put("combined", Map.of("renderCases", RenderRegressionHarness.cases(), "h13Cases", WorldRenderRegressionHarness.cases(),
+					"h14Cases", H14WorldHarness.cases(), "modelRegistrations", ClientTestPlugin.models, "format", CanonicalRun.format()));
 		DemoChecks.writeResult(result);
 		PLibDatabase.LOGGER.info("PULSE DEMO CLIENT COMPLETE: assets={}, epochs={}, player demos=2", assets, epochs);
+		if (CanonicalProfile.smokeWorld())
+			PLibDatabase.LOGGER.info("PULSE TEST CLIENT PASS");
 		mc.stop();
 	}
 
@@ -290,7 +317,7 @@ public final class DemoProbe
 				TestBlockItemRenderer.renders - itemBefore);
 	}
 
-	private static void models(Minecraft mc)
+	static void models(Minecraft mc)
 	{
 		if (Boolean.getBoolean("pulselib.test.animationRegression"))
 		{
@@ -337,6 +364,16 @@ public final class DemoProbe
 
 	public static void stopped()
 	{
+		if (CanonicalProfile.route("manual"))
+		{
+			DemoChecks.writeResult(Map.of("status", "PASS", "side", "client", "manual", true, "origin", DemoChecks.jar(CommonTestPlugin.class)));
+			return;
+		}
+		if (CanonicalRun.noWorldSmoke() || CanonicalRun.baselineOnly() || CanonicalProfile.oitWorld())
+		{
+			CanonicalRun.stopped();
+			return;
+		}
 		if (PerfRun.enabled())
 		{
 			PerfRun.stopped();

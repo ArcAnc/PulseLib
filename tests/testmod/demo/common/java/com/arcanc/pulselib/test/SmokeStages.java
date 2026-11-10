@@ -22,7 +22,7 @@ public final class SmokeStages
 
 	public static void blocks()
 	{
-		if (!SmokeHarness.enabled())
+		if (!SmokeHarness.enabled() || CanonicalRun.renderProbeActive())
 			return;
 		if (phase != 0)
 			throw new AssertionError("Block-entity stage out of order: " + phase);
@@ -31,7 +31,7 @@ public final class SmokeStages
 
 	public static void particles()
 	{
-		if (!SmokeHarness.enabled())
+		if (!SmokeHarness.enabled() || CanonicalRun.renderProbeActive())
 			return;
 		if (phase != 1)
 			throw new AssertionError("Particle stage out of order: " + phase);
@@ -40,7 +40,7 @@ public final class SmokeStages
 
 	public static void endFrame()
 	{
-		if (!SmokeHarness.enabled())
+		if (!SmokeHarness.enabled() || CanonicalRun.renderProbeActive())
 			return;
 		if (phase != 2)
 			throw new AssertionError("Weather stage out of order: " + phase);

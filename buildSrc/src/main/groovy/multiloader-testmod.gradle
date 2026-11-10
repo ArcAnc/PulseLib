@@ -11,7 +11,7 @@ import groovy.json.JsonSlurper
 import java.nio.file.Files
 import java.nio.file.StandardOpenOption
 
-// Bootstrap remains independent of canonical demo content; full harness migration continues in 7.1b.2.
+// Bootstrap and canonical demo have separate external source sets.
 sourceSets {
     testmod {
         java.srcDirs rootProject.file('tests/testmod/bootstrap/common/java'), rootProject.file("tests/testmod/bootstrap/${project.name}/java")
@@ -36,7 +36,7 @@ def testmodJar = tasks.register('testmodJar', Jar) {
     manifest.attributes 'PulseLib-Test-Stage': '7.1a', 'PulseLib-Canonical-Source': '7ce6f024b307bb821ce543344d3896c8e1fcf26b'
 }
 
-// Canonical demo content profile; complete regression harness flags remain guarded.
+// Canonical content and regression profiles share the external demo source set.
 sourceSets {
     demo {
         java.srcDirs rootProject.file('tests/testmod/demo/common/java'), rootProject.file("tests/testmod/demo/${project.name}/java")
@@ -47,7 +47,7 @@ sourceSets {
 }
 def demoJar = tasks.register('demoJar', Jar) {
     group = 'verification'
-    description = 'Packages canonical demo content; full regression harnesses remain stage 7.1b.2.'
+    description = 'Packages the external canonical 26.1.2 testmod.'
     from sourceSets.demo.output
     from rootProject.file('LICENSE.txt')
     archiveBaseName = 'pulselib-testmod-demo'
@@ -58,21 +58,55 @@ def demoJar = tasks.register('demoJar', Jar) {
     duplicatesStrategy = DuplicatesStrategy.FAIL
     manifest.attributes 'PulseLib-Test-Stage': '7.1b.1', 'PulseLib-Canonical-Source': '7ce6f024b307bb821ce543344d3896c8e1fcf26b'
 }
-def demoSource = providers.gradleProperty('pulseDemoContent').isPresent()
-def demoPackaged = providers.gradleProperty('pulseDemoJar').isPresent()
+// Preserve the original packaging task while making its canonical launch artifact available.
+testmodJar.configure { dependsOn demoJar }
+if (project.name == 'fabric' && tasks.findByName('remapTestmodJar') == null) {
+    tasks.register('remapTestmodJar') {
+        group = 'verification'
+        description = 'Builds the canonical testmod in the official Minecraft 26.1.2 namespace.'
+        dependsOn demoJar
+    }
+}
+
+def canonicalSource = providers.gradleProperty('pulseTestMod').isPresent()
+def canonicalPackaged = providers.gradleProperty('pulseTestJar').isPresent()
+def canonicalMode = canonicalSource || canonicalPackaged
+def canonicalAuto = providers.gradleProperty('pulseSmokeAuto').isPresent()
+def canonicalWorld = providers.gradleProperty('pulseSmokeWorld').isPresent()
+def canonicalOit = providers.gradleProperty('pulseOitTest').isPresent()
+def canonicalBaseline = providers.gradleProperty('pulseOitBaseline').isPresent()
+def geckoDemo = providers.gradleProperty('pulseGeckoDemo').isPresent()
+def canonicalRoute = 'scoped'
+if (canonicalMode) {
+    canonicalRoute = 'manual'
+    if (providers.gradleProperty('pulseItemIdentityTest').isPresent())
+        canonicalRoute = 'identity'
+    else if (providers.gradleProperty('pulsePlayerMotionTest').isPresent())
+        canonicalRoute = 'motion'
+    else if (providers.gradleProperty('pulseOitPerf').isPresent())
+        canonicalRoute = 'perf'
+    else if (canonicalOit)
+        canonicalRoute = canonicalBaseline ? 'baseline' : 'oit'
+    else if (canonicalAuto)
+        canonicalRoute = providers.gradleProperty('pulseSmokeReproduce').isPresent() && canonicalWorld ? 'visibility' : 'smoke'
+}
+def canonicalSmoke = canonicalRoute == 'smoke'
+def canonicalVisibility = canonicalRoute == 'visibility'
+def demoSource = providers.gradleProperty('pulseDemoContent').isPresent() || canonicalSource
+def demoPackaged = providers.gradleProperty('pulseDemoJar').isPresent() || canonicalPackaged
 def demoMode = demoSource || demoPackaged
-def animationRegression = providers.gradleProperty('pulseAnimationRegression').isPresent()
+def animationRegression = providers.gradleProperty('pulseAnimationRegression').isPresent() || canonicalSmoke
 def skipAnimationRemoval = providers.gradleProperty('pulseAnimationSkipRemoval').isPresent()
-def lifecycleRegression = providers.gradleProperty('pulseLifecycleRegression').isPresent()
-def smokeRegression = providers.gradleProperty('pulseSmokeRegression').isPresent()
+def lifecycleRegression = providers.gradleProperty('pulseLifecycleRegression').isPresent() || canonicalSmoke
+def smokeRegression = providers.gradleProperty('pulseSmokeRegression').isPresent() || canonicalSmoke
 def smokeFirstPerson = providers.gradleProperty('pulseSmokeFirstPerson').isPresent()
-def visibilityRegression = providers.gradleProperty('pulseVisibilityRegression').isPresent()
+def visibilityRegression = providers.gradleProperty('pulseVisibilityRegression').isPresent() || canonicalVisibility
 def reproduceCamera = providers.gradleProperty('pulseSmokeReproduce').isPresent()
-def itemIdentity = providers.gradleProperty('pulseItemIdentityTest').isPresent()
+def itemIdentity = providers.gradleProperty('pulseItemIdentityTest').isPresent() && (!canonicalMode || canonicalRoute == 'identity')
 def identitySkipHook = providers.gradleProperty('pulseIdentitySkipHook').isPresent()
-def playerMotion = providers.gradleProperty('pulsePlayerMotionTest').isPresent()
-def oitPerf = providers.gradleProperty('pulseOitPerf').isPresent()
-def perfWorld = providers.gradleProperty('pulsePerfWorld').isPresent()
+def playerMotion = providers.gradleProperty('pulsePlayerMotionTest').isPresent() && (!canonicalMode || canonicalRoute == 'motion')
+def oitPerf = providers.gradleProperty('pulseOitPerf').isPresent() && (!canonicalMode || canonicalRoute == 'perf')
+def perfWorld = providers.gradleProperty('pulsePerfWorld').isPresent() || (canonicalRoute == 'perf' && canonicalWorld)
 def perfSkipComposite = providers.gradleProperty('pulsePerfSkipComposite').isPresent()
 if ((oitPerf && (!demoMode || itemIdentity || playerMotion || animationRegression || lifecycleRegression || smokeRegression || visibilityRegression || ['pulseRenderRegression', 'pulseWorldRegression', 'pulseH14Offscreen'].any { providers.gradleProperty(it).isPresent() })) || ((perfWorld || perfSkipComposite) && !oitPerf) || (perfWorld && perfSkipComposite))
     throw new GradleException('GPU performance requires an exclusive demo profile; world/skip controls require it; skip-composite is offscreen-only.')
@@ -82,7 +116,7 @@ def motionSkipSubmission = providers.gradleProperty('pulseMotionSkipSubmission')
 if (motionSkipSubmission && !playerMotion)
     throw new GradleException('Motion skip-submission requires player motion.')
 def motionPhase = providers.gradleProperty('pulseMotionPhase').getOrElse('all')
-if ((playerMotion && (!demoMode || itemIdentity || animationRegression || lifecycleRegression || smokeRegression || visibilityRegression || ['pulseRenderRegression', 'pulseWorldRegression', 'pulseH14Offscreen'].any { providers.gradleProperty(it).isPresent() })) || (providers.gradleProperty('pulseMotionPhase').isPresent() && !playerMotion))
+if ((playerMotion && (!demoMode || itemIdentity || animationRegression || lifecycleRegression || smokeRegression || visibilityRegression || ['pulseRenderRegression', 'pulseWorldRegression', 'pulseH14Offscreen'].any { providers.gradleProperty(it).isPresent() })) || (providers.gradleProperty('pulseMotionPhase').isPresent() && !playerMotion && !canonicalMode))
     throw new GradleException('Player motion requires an exclusive demo source/JAR profile; motion-phase requires player motion.')
 if (playerMotion && gradle.startParameter.taskNames.any { it.tokenize(':').last() == 'runServer' })
     throw new GradleException('Player motion uses an integrated server and is client-only.')
@@ -100,13 +134,13 @@ if ((renderRegression && (!demoMode || animationRegression || lifecycleRegressio
     throw new GradleException('Render regression requires an exclusive demo profile; skip-mesh requires render regression.')
 if (renderRegression && gradle.startParameter.taskNames.any { it.tokenize(':').last() == 'runServer' })
     throw new GradleException('Render regression is client-only.')
-def worldRegression = providers.gradleProperty('pulseWorldRegression').isPresent()
+def worldRegression = providers.gradleProperty('pulseWorldRegression').isPresent() || (canonicalRoute == 'baseline' && canonicalWorld)
 def worldSkipOpaque = providers.gradleProperty('pulseWorldSkipOpaque').isPresent()
 if ((worldRegression && (!demoMode || animationRegression || lifecycleRegression || smokeRegression)) || (worldSkipOpaque && !worldRegression))
     throw new GradleException('Native world requires an exclusive demo profile; skip-opaque requires native world.')
 if (worldRegression && gradle.startParameter.taskNames.any { it.tokenize(':').last() == 'runServer' })
     throw new GradleException('Native world regression is client-only.')
-def h14Offscreen = providers.gradleProperty('pulseH14Offscreen').isPresent()
+def h14Offscreen = providers.gradleProperty('pulseH14Offscreen').isPresent() || canonicalRoute == 'oit'
 def h14SkipResolve = providers.gradleProperty('pulseH14SkipResolve').isPresent()
 if ((h14Offscreen && (!demoMode || animationRegression || lifecycleRegression || smokeRegression || worldRegression)) || (h14SkipResolve && !h14Offscreen))
     throw new GradleException('H14 offscreen requires an exclusive demo source/JAR profile; skip-resolve requires H14 offscreen.')
@@ -115,8 +149,8 @@ if (h14Offscreen && gradle.startParameter.taskNames.any { it.tokenize(':').last(
 def smokeSkipDraw = providers.gradleProperty('pulseSmokeSkipDraw').isPresent()
 if ((smokeRegression && !demoMode) || ((smokeFirstPerson || smokeSkipDraw) && !smokeRegression))
     throw new GradleException('Smoke regression requires a demo source/JAR profile; first-person and skip-draw controls require Smoke regression.')
-def skipDisconnectHook = providers.gradleProperty('pulseLifecycleSkipHook').isPresent()
-if ((lifecycleRegression && !demoMode) || (skipDisconnectHook && !lifecycleRegression))
+def skipDisconnectHook = providers.gradleProperty('pulseLifecycleSkipHook').isPresent() || (canonicalMode && providers.gradleProperty('pulseSmokeSkipHook').isPresent())
+if ((lifecycleRegression && !demoMode) || (skipDisconnectHook && !lifecycleRegression && !canonicalMode))
     throw new GradleException('Lifecycle regression requires a demo source/JAR profile; skip-hook is an explicit negative control requiring lifecycle regression.')
 if ((animationRegression && !demoMode) || (skipAnimationRemoval && !animationRegression))
     throw new GradleException('Animation regression requires a demo source/JAR profile; skip-removal is an explicit negative control requiring animation regression.')
@@ -124,8 +158,8 @@ if ((demoSource && demoPackaged) || (demoMode && providers.gradleProperty('pulse
     throw new GradleException('Select exactly one bootstrap/demo source/demo JAR profile.')
 
 def unsupported = ['pulseTestMod', 'pulseTestJar', 'pulseSmokeAuto', 'pulseSmokeWorld', 'pulseOitTest', 'pulseOitPerf', 'pulsePlayerMotionTest', 'pulseItemIdentityTest', 'pulseGeckoDemo', 'pulseMotionPhase', 'pulseOitBaseline', 'pulseSmokeReproduce', 'pulseSmokeSkipHook']
-if (unsupported.any { providers.gradleProperty(it).isPresent() && !(it == 'pulseSmokeReproduce' && visibilityRegression) && !(it == 'pulseItemIdentityTest' && itemIdentity) && !(it in ['pulsePlayerMotionTest', 'pulseMotionPhase'] && playerMotion) && !(it == 'pulseOitPerf' && oitPerf) })
-    throw new GradleException('The complete canonical regression harnesses remain stage 7.1b.2. Packaged bootstrap uses only -PpulseTestJarBootstrap; it cannot open existing demo worlds.')
+if (unsupported.any { providers.gradleProperty(it).isPresent() && !canonicalMode && !(it == 'pulseGeckoDemo' && demoMode) && !(it == 'pulseSmokeReproduce' && visibilityRegression) && !(it == 'pulseItemIdentityTest' && itemIdentity) && !(it in ['pulsePlayerMotionTest', 'pulseMotionPhase'] && playerMotion) && !(it == 'pulseOitPerf' && oitPerf) })
+    throw new GradleException('Canonical launch flags require -PpulseTestMod/-PpulseTestJar or the matching scoped demo profile.')
 
 if (providers.gradleProperty('pulseTestJarBootstrap').isPresent() || demoMode) {
     def packaged = providers.gradleProperty('pulseBootstrapJar').map { rootProject.file(it) }.getOrElse((demoMode ? demoJar : testmodJar).get().archiveFile.get().asFile)
@@ -201,6 +235,26 @@ if (providers.gradleProperty('pulseTestJarBootstrap').isPresent() || demoMode) {
                 run.vmArg '-Xlog:class+load=info:file=classloading.log'
                 if (demoMode)
                     run.vmArg "-Dpulselib.test.demoMode=${demoSource ? 'source' : 'jar'}"
+                if (canonicalMode) {
+                    run.vmArg '-Dpulselib.test.canonicalMode=true'
+                    run.vmArg "-Dpulselib.test.canonicalRoute=${canonicalRoute}"
+                    if (canonicalAuto)
+                        run.vmArg '-Dpulselib.test.auto=true'
+                    if ((canonicalWorld && run.name == 'client') || canonicalRoute in ['identity', 'motion'])
+                        run.vmArg '-Dpulselib.test.world=true'
+                    if (canonicalOit || oitPerf)
+                        run.vmArg '-Dpulselib.test.oit=true'
+                    if (providers.gradleProperty('pulseSmokeSkipHook').isPresent())
+                        run.vmArg '-Dpulselib.test.skipDisconnectHook=true'
+                    if (reproduceCamera)
+                        run.vmArg '-Dpulselib.test.reproduceCamera=true'
+                    if (canonicalBaseline)
+                        run.vmArg '-Dpulselib.test.oitBaseline=true'
+                    if (canonicalOit || oitPerf)
+                        run.vmArg "-Dpulselib.test.oitOutput=${root.resolve(run.name).resolve(oitPerf ? 'h14-results' : 'h14-offscreen')}"
+                }
+                if (geckoDemo)
+                    run.vmArg '-Dpulselib.test.geckoEntity=true'
                 if (animationRegression) {
                     run.vmArg '-Dpulselib.test.animationRegression=true'
                     if (skipAnimationRemoval)
@@ -275,6 +329,26 @@ if (providers.gradleProperty('pulseTestJarBootstrap').isPresent() || demoMode) {
                 run.jvmArgument '-Xlog:class+load=info:file=classloading.log'
                 if (demoMode)
                     run.systemProperty 'pulselib.test.demoMode', demoSource ? 'source' : 'jar'
+                if (canonicalMode) {
+                    run.systemProperty 'pulselib.test.canonicalMode', 'true'
+                    run.systemProperty 'pulselib.test.canonicalRoute', canonicalRoute
+                    if (canonicalAuto)
+                        run.systemProperty 'pulselib.test.auto', 'true'
+                    if ((canonicalWorld && run.name == 'client') || canonicalRoute in ['identity', 'motion'])
+                        run.systemProperty 'pulselib.test.world', 'true'
+                    if (canonicalOit || oitPerf)
+                        run.systemProperty 'pulselib.test.oit', 'true'
+                    if (providers.gradleProperty('pulseSmokeSkipHook').isPresent())
+                        run.systemProperty 'pulselib.test.skipDisconnectHook', 'true'
+                    if (reproduceCamera)
+                        run.systemProperty 'pulselib.test.reproduceCamera', 'true'
+                    if (canonicalBaseline)
+                        run.systemProperty 'pulselib.test.oitBaseline', 'true'
+                    if (canonicalOit || oitPerf)
+                        run.systemProperty 'pulselib.test.oitOutput', root.resolve(run.name).resolve(oitPerf ? 'h14-results' : 'h14-offscreen').toString()
+                }
+                if (geckoDemo)
+                    run.systemProperty 'pulselib.test.geckoEntity', 'true'
                 if (animationRegression) {
                     run.systemProperty 'pulselib.test.animationRegression', 'true'
                     if (skipAnimationRemoval)

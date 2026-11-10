@@ -132,7 +132,10 @@ public final class H14OffscreenHarness
 			DemoChecks.writeResult(Map.of("status", "PASS", "fixture", "h14-offscreen", "cases", cases, "epochs", 2,
 					"nativeChains", nativeChains, "origin", DemoChecks.jar(H14OffscreenHarness.class), "framebufferResized", true));
 			PLibDatabase.LOGGER.info("H14 PIXEL PASS: {} cases, native postchain, direct reference, GL state, resource reload and window resize", cases);
-			mc.stop();
+			if (CanonicalProfile.oitWorld())
+				CanonicalRun.offscreenComplete();
+			else
+				mc.stop();
 		}
 		catch (IOException exception)
 		{

@@ -2,15 +2,7 @@ plugins {
     id 'base'
 }
 
-// Remove this guard when the canonical testmod source set is ported in stage 7.1.
-if (providers.gradleProperty('pulseTestMod').isPresent())
-	throw new GradleException(
-			'-PpulseTestMod is not supported on 26.1.2-multiloader yet. ' +
-			'The pulselibtest mod and its block/entity/item registrations have not been ported. ' +
-			'Opening and saving an existing pulselibtest world without them can lose test content.\n' +
-			'Current NeoForge verification uses :neoforge:runServer / :neoforge:runClient ' +
-			'with -PpulseStage1Smoke and a new verification world; this is a separate fixture.\n' +
-			'See tests/README.md and docs/porting/26.1.2-multiloader.md (Fabric: stage 6; full testmod: stage 7.1).')
+// Canonical testmod launch flags are configured by the multiloader-testmod convention.
 
 allprojects {
     group = mod_group_id

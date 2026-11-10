@@ -841,3 +841,25 @@ Run `python3 tests/testmod/tools/run_perf.py --output build/reports/perf-UNIQUE`
 and add `--kind world` for the native GameRenderer interval. Five canonical flags
 now have scoped support; eight full flags remain guarded. See journal section 74.
 Remaining full flags/Gecko and combined orchestration are next (7.1b.2b.6).
+
+
+Stage **7.1b.2b.6** restores all 13 canonical launch flags and completes the
+external testmod consolidation. `pulseTestMod` selects sources and `pulseTestJar`
+selects the packaged demo. Add `pulseSmokeAuto`, `pulseSmokeWorld` and optionally
+`pulseGeckoDemo` for the combined client run. Existing root priority selects
+identity, motion, performance, OIT/baseline, then smoke. Interactive profiles
+reuse the existing content and key bindings.
+
+11 positive cases cover menu, four loader/source/JAR world combinations,
+Gecko, OIT/world, baseline and two physical servers. Combined world runs join
+animation, 41 render cases, 12 H13 + 15 H14 world cases, reload and cleanup.
+Two genuine negative controls verify camera/hook failures and final-result
+publication. Actual flags are checked in 10 configurations. All 241 fresh JUnit
+pass. See journal §75 for fixture delta proof and verification boundaries.
+
+Run `python3 tests/testmod/tools/run_canonical.py --output build/reports/canonical-UNIQUE
+--eula-file fabric/runs/server/eula.txt` with the existing accepted EULA file.
+`testmodJar` also builds the canonical demo JAR. Fabric `remapTestmodJar` builds
+that JAR in the official Minecraft 26.1.2 namespace. Stage 7.1 is complete within
+the documented testmod scope. The next checkpoint is the final semantic/compiled
+API and GPU/performance report, 7.2.

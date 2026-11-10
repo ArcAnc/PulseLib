@@ -139,7 +139,7 @@ public final class DemoChecks
 
 	public static void serverTick(MinecraftServer server)
 	{
-		if (serverPassed && server.getTickCount() >= 20)
+		if (!CanonicalProfile.route("manual") && serverPassed && server.getTickCount() >= 20)
 			server.halt(false);
 	}
 
@@ -151,6 +151,10 @@ public final class DemoChecks
 
 	public static void writeResult(Map<String, ?> result)
 	{
+		if (CanonicalProfile.smokeWorld() && !result.containsKey("combined"))
+			return;
+		if (CanonicalProfile.oitWorld() && !"canonical-oit".equals(result.get("fixture")))
+			return;
 		try
 		{
 			Files.writeString(runDirectory().resolve("demo-results.json"), new GsonBuilder().
