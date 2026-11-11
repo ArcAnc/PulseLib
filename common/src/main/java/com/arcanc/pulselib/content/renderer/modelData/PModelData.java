@@ -30,7 +30,8 @@ import java.util.Objects;
  */
 public class PModelData
 {
-	public static final Identifier DEFAULT_MODEL_LOADER = PGltfModelLoader.INSTANCE.id();
+	public static final Identifier DEFAULT_MODEL_LOADER_ID = PGltfModelLoader.INSTANCE.id();
+	public static final Identifier DEFAULT_MODEL_LOADER = DEFAULT_MODEL_LOADER_ID;
 
 	public static final MapCodec<PModelData> CODEC = RecordCodecBuilder.mapCodec(instance ->
 			instance.group(

@@ -863,3 +863,15 @@ Run `python3 tests/testmod/tools/run_canonical.py --output build/reports/canonic
 that JAR in the official Minecraft 26.1.2 namespace. Stage 7.1 is complete within
 the documented testmod scope. The next checkpoint is the final semantic/compiled
 API and GPU/performance report, 7.2.
+
+
+Stage **7.2a** inventories all 458 canonical / 543 current named source types
+and 1797 release class files. It restores canonical `PModelLoader.loadModel`,
+`modelResourceCandidates`, both built-in loader entry points and
+`PModelData.DEFAULT_MODEL_LOADER_ID`. Native batch reload delegates through the
+canonical contract. Five new regressions, 246 fresh JUnit and targeted Fabric
+JAR / NeoForge source Gecko clients pass. The player API validator now accepts
+exactly the four server-safe policy implementations already approved in §50.
+Full compatibility review remains open. See journal §76 and the generated
+source/compiled inventories. The next checkpoint is 7.2b GPU facade/deformer
+compatibility, followed by the remaining native API and GPU/performance report.

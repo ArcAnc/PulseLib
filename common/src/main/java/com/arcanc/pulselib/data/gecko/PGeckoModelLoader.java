@@ -11,7 +11,6 @@ package com.arcanc.pulselib.data.gecko;
 
 
 import com.arcanc.pulselib.content.model.PModel;
-import com.arcanc.pulselib.content.model.resource.PModelResource;
 import com.arcanc.pulselib.data.PAnimationSidecarParser;
 import com.arcanc.pulselib.data.PLoadedModel;
 import com.arcanc.pulselib.data.PModelLoader;
@@ -22,12 +21,10 @@ import net.minecraft.server.packs.resources.ResourceManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.function.Consumer;
 
 /**
  * Loads gecko model.
@@ -75,45 +72,35 @@ public class PGeckoModelLoader implements PModelLoader
 	
 	/** Resolves a canonical model id to a GeckoLib model resource. */
 	@Override
-	public List<Identifier> physicalResourceCandidates(Identifier modelId)
+	public List<Identifier> modelResourceCandidates(Identifier modelId)
 	{
 		return List.of(modelId.withPrefix(MODEL_ROOT + "/").withSuffix(MODEL_EXTENSION));
 	}
 	
-	/**
-	 * Loads the models.
-	 * @param backgroundExecutor the background executor to use.
-	 * @param resourceManager the resource manager to use.
-	 * @param elementConsumer the element consumer to use.
-	 * @return the value produced by this operation.
-	 */
+	/** {@inheritDoc} */
 	@Override
-	public CompletableFuture<?> loadModels(Executor backgroundExecutor,
-	                                       ResourceManager resourceManager,
-	                                       Collection<PModelResource> models,
-	                                       Consumer<PLoadedModel> elementConsumer)
+	public CompletableFuture<PLoadedModel> loadModel(Executor backgroundExecutor,
+	                                                ResourceManager resourceManager,
+	                                                Identifier modelId)
 	{
-		List<CompletableFuture<PLoadedModel>> tasks = models.stream().map(resource ->
-				CompletableFuture.supplyAsync(() -> loadModel(resourceManager, resource), backgroundExecutor)).toList();
-		return CompletableFuture.allOf(tasks.toArray(CompletableFuture[] :: new)).thenRunAsync(
-				() -> tasks.forEach(task -> elementConsumer.accept(task.join())), backgroundExecutor);
+		return CompletableFuture.supplyAsync(() -> loadModel(resourceManager, modelId), backgroundExecutor);
 	}
 
-	private PLoadedModel loadModel(ResourceManager resourceManager, PModelResource resource)
+	private PLoadedModel loadModel(ResourceManager resourceManager, Identifier modelId)
 	{
-		Identifier source = physicalResourceCandidates(resource.modelId()).stream().
+		Identifier source = modelResourceCandidates(modelId).stream().
 				filter(candidate -> resourceManager.getResource(candidate).isPresent()).findFirst().
-				orElseThrow(() -> new IllegalStateException("Registered GeckoLib model " + resource.modelId() +
-						" has no resource; tried: " + physicalResourceCandidates(resource.modelId())));
+				orElseThrow(() -> new IllegalStateException("Registered GeckoLib model " + modelId +
+						" has no resource; tried: " + modelResourceCandidates(modelId)));
 		try
 		{
 			PModel model = PGeckoModelParser.parseModel(resourceManager.getResourceOrThrow(source).open());
 			loadAnimations(resourceManager, source, model);
-			return new PLoadedModel(resource.modelId(), source, model);
+			return new PLoadedModel(modelId, source, model);
 		}
 		catch (IOException exception)
 		{
-			throw new RuntimeException("Can't load GeckoLib model " + resource.modelId() + " from " + source, exception);
+			throw new RuntimeException("Can't load GeckoLib model " + modelId + " from " + source, exception);
 		}
 	}
 	

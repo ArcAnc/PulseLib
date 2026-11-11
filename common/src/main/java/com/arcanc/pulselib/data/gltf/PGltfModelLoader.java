@@ -11,7 +11,6 @@ package com.arcanc.pulselib.data.gltf;
 
 
 import com.arcanc.pulselib.content.model.PModel;
-import com.arcanc.pulselib.content.model.resource.PModelResource;
 import com.arcanc.pulselib.data.PLoadedModel;
 import com.arcanc.pulselib.data.PModelLoader;
 import com.arcanc.pulselib.util.PLibDatabase;
@@ -20,12 +19,10 @@ import net.minecraft.server.packs.resources.ResourceManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.function.Consumer;
 
 /**
  * Loads gltf model.
@@ -66,46 +63,36 @@ public class PGltfModelLoader implements PModelLoader
 	 * @return the GLB and glTF resource candidates.
 	 */
 	@Override
-	public List<Identifier> physicalResourceCandidates(Identifier modelId)
+	public List<Identifier> modelResourceCandidates(Identifier modelId)
 	{
 		Identifier base = modelId.withPrefix(ROOT + "/");
 		return List.of(base.withSuffix(GLB_EXTENSION), base.withSuffix(GLTF_EXTENSION));
 	}
 	
-	/**
-	 * Loads the models.
-	 * @param backgroundExecutor the background executor to use.
-	 * @param resourceManager the resource manager to use.
-	 * @param elementConsumer the element consumer to use.
-	 * @return the value produced by this operation.
-	 */
+	/** {@inheritDoc} */
 	@Override
-	public CompletableFuture<?> loadModels(Executor backgroundExecutor,
-	                                       ResourceManager resourceManager,
-	                                       Collection<PModelResource> models,
-	                                       Consumer<PLoadedModel> elementConsumer)
+	public CompletableFuture<PLoadedModel> loadModel(Executor backgroundExecutor,
+	                                                ResourceManager resourceManager,
+	                                                Identifier modelId)
 	{
-		List<CompletableFuture<PLoadedModel>> tasks = models.stream().map(resource ->
-				CompletableFuture.supplyAsync(() -> loadModel(resourceManager, resource), backgroundExecutor)).toList();
-		return CompletableFuture.allOf(tasks.toArray(CompletableFuture[] :: new)).thenRunAsync(
-				() -> tasks.forEach(task -> elementConsumer.accept(task.join())), backgroundExecutor);
+		return CompletableFuture.supplyAsync(() -> loadModel(resourceManager, modelId), backgroundExecutor);
 	}
 
-	private PLoadedModel loadModel(ResourceManager resourceManager, PModelResource resource)
+	private PLoadedModel loadModel(ResourceManager resourceManager, Identifier modelId)
 	{
-		Identifier source = physicalResourceCandidates(resource.modelId()).stream().
+		Identifier source = modelResourceCandidates(modelId).stream().
 				filter(candidate -> resourceManager.getResource(candidate).isPresent()).findFirst().
-				orElseThrow(() -> new IllegalStateException("Registered glTF model " + resource.modelId() +
-						" has no resource; tried: " + physicalResourceCandidates(resource.modelId())));
+				orElseThrow(() -> new IllegalStateException("Registered glTF model " + modelId +
+						" has no resource; tried: " + modelResourceCandidates(modelId)));
 		try
 		{
 			PModel model = PGltfModelParser.parse(resourceManager.getResourceOrThrow(source).open());
 			loadAnimationEvents(resourceManager, source, model);
-			return new PLoadedModel(resource.modelId(), source, model);
+			return new PLoadedModel(modelId, source, model);
 		}
 		catch (IOException exception)
 		{
-			throw new RuntimeException("Can't load GLTF model " + resource.modelId() + " from " + source, exception);
+			throw new RuntimeException("Can't load GLTF model " + modelId + " from " + source, exception);
 		}
 	}
 	

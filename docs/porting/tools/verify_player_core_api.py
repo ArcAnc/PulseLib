@@ -15,6 +15,24 @@ HEADERS = ['kind', 'modifiers', 'annotations', 'type_parameters', 'extends', 'im
 
 
 def normalize(value):
+    # Section 50 isolates client descriptors using four constant-return policies.
+    policies = {
+        'final public static ItemRenderPolicy RENDER': (
+            'new ItemRenderPolicy(){ @Override public boolean hide(LocalPlayer player, InteractionHand hand, ItemStack stack) { return false; } }',
+            '(player,hand,stack)->false'),
+        'final public static ItemRenderPolicy HIDE': (
+            'new ItemRenderPolicy(){ @Override public boolean hide(LocalPlayer player, InteractionHand hand, ItemStack stack) { return true; } }',
+            '(player,hand,stack)->true'),
+        'final public static ItemVisibilityPolicy VISIBLE': (
+            'new ItemVisibilityPolicy(){ @Override public ItemVisibility visibility(LocalPlayer player, InteractionHand hand, float animationTime, ItemStack stack) { return ItemVisibility.VISIBLE; } }',
+            '(player,hand,animationTime,stack)->ItemVisibility.VISIBLE'),
+        'final public static ItemVisibilityPolicy HIDDEN': (
+            'new ItemVisibilityPolicy(){ @Override public ItemVisibility visibility(LocalPlayer player, InteractionHand hand, float animationTime, ItemStack stack) { return ItemVisibility.HIDDEN; } }',
+            '(player,hand,animationTime,stack)->ItemVisibility.HIDDEN'),
+    }
+    policy = policies.get(value.get('signature'))
+    if policy and ''.join(value.get('initializer', '').split()) == ''.join(policy[0].split()):
+        value = dict(value, initializer=policy[1])
     return json.dumps(value, sort_keys=True).replace('ResourceLocation', 'Identifier').replace('PlayerModel<?>', 'PlayerModel')
 
 
@@ -55,7 +73,7 @@ def main():
     assert 'public static List<PPlayerAnimationMeshAttachmentPose> automaticMeshAttachmentPoses(Player, float)' in declarations
     assert 'public static PFirstPersonRenderPresentation firstPersonPresentation(Player, float)' in declarations
     report = {'status': 'PASS', 'baselineCommit': '7ce6f024b307bb821ce543344d3896c8e1fcf26b', 'types': results,
-              'minecraftAdaptations': ['ResourceLocation -> Identifier', 'PlayerModel<?> -> non-generic net.minecraft.client.model.player.PlayerModel', 'PPlayerPart.resolve uses the native main ModelParts; 26.1 overlay parts are children, not separately sampled parts'],
+              'minecraftAdaptations': ['ResourceLocation -> Identifier', 'PlayerModel<?> -> non-generic net.minecraft.client.model.player.PlayerModel', 'PPlayerPart.resolve uses the native main ModelParts; 26.1 overlay parts are children, not separately sampled parts', 'Four ItemRenderPolicy/ItemVisibilityPolicy constants use exact constant-return anonymous implementations for server descriptor isolation, section 50'],
               'retainedNativeAdapters': ['automaticMeshAttachmentPoses(Player, float)', 'firstPersonPresentation(Player, float)'],
               'limits': 'Source declaration audit for player core/camera math. Native player/attachment rendering signatures and runtime motion remain stage 5.2; compiled full API audit remains stage 7.'}
     if args.report:

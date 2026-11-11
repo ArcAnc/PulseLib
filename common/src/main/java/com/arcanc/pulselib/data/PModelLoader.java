@@ -50,19 +50,44 @@ public interface PModelLoader
 	 * @param modelId the registered canonical model id.
 	 * @return physical resource candidates.
 	 */
-	List<Identifier> physicalResourceCandidates(Identifier modelId);
+	List<Identifier> modelResourceCandidates(Identifier modelId);
 	
 	/**
-	 * Loads the models.
-	 * @param backgroundExecutor the background executor to use.
-	 * @param resourceManager the resource manager to use.
-	 * @param models registered logical models owned by this loader.
-	 * @param elementConsumer receives a canonical id, selected physical source,
-	 *                        and parsed model.
-	 * @return the value produced by this operation.
+	 * Loads one canonical model and records its selected physical source.
+	 *
+	 * @param backgroundExecutor the executor used to prepare model resources.
+	 * @param resourceManager the source resource manager.
+	 * @param modelId the canonical model identifier.
+	 * @return the canonical id, selected physical source and parsed model.
 	 */
-	CompletableFuture<?> loadModels(Executor backgroundExecutor,
-	                                ResourceManager resourceManager,
-	                                Collection<PModelResource> models,
-	                                Consumer<PLoadedModel> elementConsumer);
+	CompletableFuture<PLoadedModel> loadModel(Executor backgroundExecutor,
+	                                         ResourceManager resourceManager,
+	                                         Identifier modelId);
+
+	/** Native reload alias for the canonical resource candidate contract. */
+	default List<Identifier> physicalResourceCandidates(Identifier modelId)
+	{
+		return modelResourceCandidates(modelId);
+	}
+
+	/**
+	 * Loads a registered batch through the canonical single-model contract.
+	 * Results are delivered in registration order after the whole batch succeeds.
+	 *
+	 * @param backgroundExecutor the executor used to prepare model resources.
+	 * @param resourceManager the source resource manager.
+	 * @param models registered logical models owned by this loader.
+	 * @param elementConsumer receives each loaded model in registration order.
+	 * @return completion of the batch and its result delivery.
+	 */
+	default CompletableFuture<?> loadModels(Executor backgroundExecutor,
+	                                        ResourceManager resourceManager,
+	                                        Collection<PModelResource> models,
+	                                        Consumer<PLoadedModel> elementConsumer)
+	{
+		List<CompletableFuture<PLoadedModel>> tasks = models.stream().
+				map(resource -> loadModel(backgroundExecutor, resourceManager, resource.modelId())).toList();
+		return CompletableFuture.allOf(tasks.toArray(CompletableFuture[] :: new)).
+				thenRunAsync(() -> tasks.forEach(task -> elementConsumer.accept(task.join())), backgroundExecutor);
+	}
 }

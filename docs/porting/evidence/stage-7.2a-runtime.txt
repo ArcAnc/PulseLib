@@ -1,0 +1,19 @@
+Stage 7.2a targeted changed-resource API runs
+Raw artifacts under fabric/build/stage72-20261111
+Positive Java/Gradle exit 0
+
+fabric-jar-menu
+[02:20:20] [Render thread/INFO] (Pulse Lib) PULSE TEST L1/L4 PASS: 11 bones, loaded clips [walk, idle], forward/reverse/paused overlay and pose snapshot
+[02:20:20] [Render thread/INFO] (Pulse Lib) PULSE TEST EXPLICIT CLEANUP PASS: buffers=15, textures=24, fbos=2, vaos=2, fences=11
+[02:20:20] [Render thread/INFO] (Pulse Lib) PULSE TEST CLIENT PASS
+[02:20:20] [Render thread/INFO] (Pulse Lib) CANONICAL SHUTDOWN PASS
+PULSE BOOTSTRAP VERIFIED: /mnt/MainDrive/Programs/MC mods/ArcsLib/fabric/build/pulselib-tests/canonical-f86314e169344b07864eb7fe2543108f-fabric-jar-menu/client
+BUILD SUCCESSFUL in 21s
+
+neoforge-source-menu-gecko
+[02:20:41] [Render thread/INFO] [Pulse Lib/]: PULSE TEST L1/L4 PASS: 11 bones, loaded clips [curve, turn720, clock, turn360, walk, sampling_demo, idle], forward/reverse/paused overlay and pose snapshot
+[02:20:41] [Render thread/INFO] [Pulse Lib/]: PULSE TEST EXPLICIT CLEANUP PASS: buffers=15, textures=24, fbos=2, vaos=2, fences=11
+[02:20:41] [Render thread/INFO] [Pulse Lib/]: PULSE TEST CLIENT PASS
+[02:20:41] [Render thread/INFO] [Pulse Lib/]: CANONICAL SHUTDOWN PASS
+PULSE BOOTSTRAP VERIFIED: /mnt/MainDrive/Programs/MC mods/ArcsLib/neoforge/build/pulselib-tests/canonical-f86314e169344b07864eb7fe2543108f-neoforge-source-menu-gecko/client
+BUILD SUCCESSFUL in 20s
