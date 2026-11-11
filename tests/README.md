@@ -936,3 +936,10 @@ The proof inventories 49 selected class copies and 22 targeted member checks.
 GPU/shader/resources and 1852 previous class copies remain byte-identical. See
 journal §80 and stage-7.2e evidence. Next is 7.2f whole-library inherited/compiler-
 resolved API acceptance, followed by the consolidated GPU/performance report.
+
+
+### Residual legacy attachment clips (5.2b.4d.1)
+
+`python3 tests/testmod/tools/run_legacy_clips.py --output build/reports/legacy-clips-UNIQUE` runs only the new isolated native legacy layer pixel fixture, default Fabric JAR / NeoForge sources. Add `--negative-control` for the two expected failures with the controller provider disabled. The runner includes `tests/testmod/tools/legacy-clips.gradle`; direct Gradle launches require that init script, `-PpulseLegacyClips` and exactly one `-PpulseDemoJar` / `-PpulseDemoContent`. It rejects mixed regression profiles, missing demo, orphan skip-control and dedicated tasks before game-directory creation.
+
+Each accepted client checks 48 cases: own Gecko/glTF root-translation and child rotation/nonuniform-scale clips, global/item sources, reverse paused seeks, post-submit controller mutation and genuine reload. Independent dense 128×128 RGBA/depth footprints and 16 raw PNGs/client verify actual extraction/layer/queue/GPU output. Assets reproduce with `python3 tests/testmod/tools/make_legacy_clips.py --check`. First-person held-item/map pixels remain 5.2b.4d.2; closed world/armor/environment/motion suites are not replayed. On the current dirty workspace use `--gradle-init fabric/build/stage524d1-20261111/projection.gradle` to compile/run committed production Java with the new fixture.

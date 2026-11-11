@@ -81,6 +81,7 @@ public class ClientTestPlugin implements IPulseClientPlugin
 	public void registerModels(PModelRegistrar registrar)
 	{
 		models++;
+		LegacyClipHarness.registerModels(registrar);
 		PlayerMotionHarness.registerModels(registrar);
 		if (Boolean.getBoolean("pulselib.test.animationRegression"))
 			registrar.model(AnimationSamplingHarness.MODEL_DATA).texture("0", TestEntityRender.ZERO);
@@ -113,6 +114,7 @@ public class ClientTestPlugin implements IPulseClientPlugin
 	{
 		if (++attachments != 1)
 			throw new AssertionError("Attachment phase repeated");
+		LegacyClipHarness.registerAttachments(registrar);
 		registrar.registerLiving(DemoContent.helmet.get(), new PLivingAttachmentDefinition(TestArmor.MODEL_DATA,
 			PLivingAttachmentSources.equipmentSlot(EquipmentSlot.HEAD), List.of(PHumanoidBindings.head("head")), TestArmor :: resolveArmorRender, true));
 		registrar.registerLiving(DemoContent.chestplate.get(), new PLivingAttachmentDefinition(TestArmor.MODEL_DATA,

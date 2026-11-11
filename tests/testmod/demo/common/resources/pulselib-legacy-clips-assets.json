@@ -1,0 +1,11 @@
+{
+  "author": "ArcAnc",
+  "created": "2026-11-11",
+  "copyright": 2026,
+  "license": "Arc's License of Common Sense",
+  "files": {
+    "assets/pulselibtest/geckolib/models/regression/legacy_clips.geo.json": "8a65551d2d73405725ab9f64069a20ffa00d346488308a79e25bd1c79c8ecb51",
+    "assets/pulselibtest/geckolib/animations/regression/legacy_clips.animation.json": "c57d29db49c108ad6a6ed7cb330ba0a9df560ae703f78f0653fa1aed048a5f3a",
+    "assets/pulselibtest/glmodels/regression/legacy_clips_gltf.gltf": "04fe80148fbc234ebf17bb8d2810f77917a0bc8ee2e9b1a5a37381da9ee4bab9"
+  }
+}

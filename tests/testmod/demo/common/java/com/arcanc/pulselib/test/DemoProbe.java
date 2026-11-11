@@ -57,6 +57,11 @@ public final class DemoProbe
 
 	public static void tick(Minecraft mc)
 	{
+		if (LegacyClipHarness.enabled())
+		{
+			LegacyClipHarness.tick();
+			return;
+		}
 		if (CanonicalProfile.route("manual"))
 		{
 			CanonicalRun.manualTick();
@@ -364,6 +369,11 @@ public final class DemoProbe
 
 	public static void stopped()
 	{
+		if (LegacyClipHarness.enabled())
+		{
+			LegacyClipHarness.stopped();
+			return;
+		}
 		if (CanonicalProfile.route("manual"))
 		{
 			DemoChecks.writeResult(Map.of("status", "PASS", "side", "client", "manual", true, "origin", DemoChecks.jar(CommonTestPlugin.class)));

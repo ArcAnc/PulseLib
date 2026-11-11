@@ -1,0 +1,25 @@
+/* ArcAnc, created 11.11.2026, copyright 2026.
+ * Arc's License of Common Sense. See LICENSE.txt at repository root.
+ * The profile lives with the test driver; production Gradle conventions stay unchanged.
+ */
+gradle.projectsEvaluated {
+	def root = gradle.rootProject
+	if (root.findProject(':fabric') == null)
+		return
+	def active = root.providers.gradleProperty('pulseLegacyClips').isPresent()
+	def skip = root.providers.gradleProperty('pulseLegacySkipControllers').isPresent()
+	def modes = ['pulseDemoJar', 'pulseDemoContent'].count { root.providers.gradleProperty(it).isPresent() }
+	def mixed = ['pulseTestMod', 'pulseTestJar', 'pulseSmokeAuto', 'pulseSmokeWorld', 'pulseOitTest', 'pulseOitPerf', 'pulsePlayerMotionTest', 'pulseItemIdentityTest', 'pulseAnimationRegression', 'pulseLifecycleRegression', 'pulseSmokeRegression', 'pulseVisibilityRegression', 'pulseRenderRegression', 'pulseWorldRegression', 'pulseH14Offscreen'].any { root.providers.gradleProperty(it).isPresent() }
+	if ((active && (modes != 1 || mixed)) || (skip && !active))
+		throw new GradleException('Legacy clips require an exclusive demo source/JAR profile; skip-controllers requires legacy clips.')
+	if (active && gradle.startParameter.taskNames.any { it.tokenize(':').last() == 'runServer' })
+		throw new GradleException('Legacy clips are a client GPU fixture with a disposable integrated world.')
+	if (active)
+		root.subprojects.findAll { it.name in ['fabric', 'neoforge'] }.each { p ->
+			p.tasks.named('runClient').configure {
+				jvmArgs '-Dpulselib.test.legacyClips=true'
+				if (skip)
+					jvmArgs '-Dpulselib.test.legacySkipControllers=true'
+			}
+		}
+}

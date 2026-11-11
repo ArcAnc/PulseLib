@@ -10,6 +10,7 @@
 package com.arcanc.pulselib.test.mixin;
 
 import com.arcanc.pulselib.test.DemoProbe;
+import com.arcanc.pulselib.test.LegacyClipHarness;
 import com.arcanc.pulselib.test.CanonicalRun;
 import com.arcanc.pulselib.test.GpuFacadeProbe;
 import com.arcanc.pulselib.test.MaterialApiProbe;
@@ -42,6 +43,8 @@ public abstract class SmokeRenderMixin
 	@Inject(method = "render", at = @At("TAIL"))
 	private void pulselibtest$graphics(CallbackInfo callback)
 	{
+		if (LegacyClipHarness.enabled())
+			LegacyClipHarness.frame();
 		PlayerMotionRun.frame();
 		if (VisibilityHarness.enabled())
 		{

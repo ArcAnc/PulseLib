@@ -1,0 +1,20 @@
+fabric/build/stage524d1-20261111/accepted/fabric-jar.log
+[15:28:29] [Render thread/INFO] (Pulse Lib) LEGACY CLIPS PASS: 48 cases, own Gecko/glTF clips, global/item sources, real layer pixels, reverse seeks and post-submit mutation, two epochs
+[15:28:29] [Render thread/INFO] (Pulse Lib) LEGACY CLIPS SHUTDOWN PASS
+PULSE BOOTSTRAP VERIFIED: /mnt/MainDrive/Programs/MC mods/ArcsLib/fabric/build/pulselib-tests/legacy-clips-dd49df6bd8dc4c7f87c06cc3bdc5c624/client
+BUILD SUCCESSFUL in 29s
+fabric/build/stage524d1-20261111/accepted/neoforge-source.log
+[15:28:59] [Render thread/INFO] [Pulse Lib/]: LEGACY CLIPS PASS: 48 cases, own Gecko/glTF clips, global/item sources, real layer pixels, reverse seeks and post-submit mutation, two epochs
+[15:28:59] [Render thread/INFO] [Pulse Lib/]: LEGACY CLIPS SHUTDOWN PASS
+PULSE BOOTSTRAP VERIFIED: /mnt/MainDrive/Programs/MC mods/ArcsLib/neoforge/build/pulselib-tests/legacy-clips-dd49df6bd8dc4c7f87c06cc3bdc5c624/client
+BUILD SUCCESSFUL in 29s
+fabric/build/stage524d1-20261111/negative-complete/fabric-jar.log
+java.lang.AssertionError: PULSE DEMO: No unrequested/static/late-mutated mesh pixels outside the authored footprint
+java.lang.AssertionError: PULSE DEMO: No unrequested/static/late-mutated mesh pixels outside the authored footprint
+> Process 'command '/usr/lib/jvm/java-25-openjdk/bin/java'' finished with non-zero exit value 255
+BUILD FAILED in 26s
+fabric/build/stage524d1-20261111/negative-complete/neoforge-source.log
+java.lang.AssertionError: PULSE DEMO: No unrequested/static/late-mutated mesh pixels outside the authored footprint
+java.lang.AssertionError: PULSE DEMO: No unrequested/static/late-mutated mesh pixels outside the authored footprint
+> Process 'command '/usr/lib/jvm/java-25-openjdk/bin/java'' finished with non-zero exit value 255
+BUILD FAILED in 26s
