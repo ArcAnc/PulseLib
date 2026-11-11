@@ -71,6 +71,10 @@ import java.util.function.Function;
 public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS extends EntityRenderState & PEntityRenderState<T>> extends EntityRenderer<T, RS>
 	implements PRenderer<T, RS>
 {
+	/** Canonical EntityRenderer constants, no longer exposed by the native superclass. */
+	public static final int LEASH_RENDER_STEPS = 24;
+	protected static final float NAMETAG_SCALE = 0.025F;
+
 	private final PModelData modelData;
 	private final PRenderStateScope<RS> submission = new PRenderStateScope<>();
 	private final Function<Identifier, RenderType> renderType;

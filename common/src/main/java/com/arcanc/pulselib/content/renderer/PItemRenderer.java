@@ -88,6 +88,15 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 	protected abstract RS createRenderState();
 	
 	/**
+	 * Preserves the canonical reload listener name without restoring BEWLR ownership.
+	 * @return the simple name of this renderer's runtime class.
+	 */
+	public String getName()
+	{
+		return this.getClass().getSimpleName();
+	}
+
+	/**
 	 * Performs the submit operation.
 	 * @param renderState the render state to use.
 	 * @param poseStack the pose stack to use.

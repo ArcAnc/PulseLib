@@ -199,6 +199,15 @@ public class PArmorClientExtensions implements IClientItemExtensions
 		this.base.renderFirstPersonOverlay(stack, EquipmentSlot.HEAD, player, graphics, delta);
 	}
 
+	/**
+	 * Retains the empty default inherited from canonical IClientItemExtensions.
+	 * @deprecated Native overlays receive extracted GUI state through renderFirstPersonOverlay.
+	 */
+	@Deprecated(forRemoval = true)
+	public void renderHelmetOverlay(ItemStack stack, Player player, int width, int height, float partialTick)
+	{
+	}
+
 	/** Retains canonical entity-aware attachment eligibility for explicit tint queries. */
 	public int getArmorLayerTintColor(ItemStack stack, LivingEntity entity, EquipmentClientInfo.Layer layer, int layerIdx, int fallbackColor)
 	{

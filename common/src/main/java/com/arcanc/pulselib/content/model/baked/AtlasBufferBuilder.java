@@ -35,6 +35,16 @@ public class AtlasBufferBuilder extends BufferBuilder
 		super(buffer, mode, format);
 		this.sprite = sprite;
 	}
+
+	/**
+	 * Preserves the canonical VertexConsumer helper after its removal from Minecraft.
+	 * @param alpha the alpha component, packed with the same low eight bits as before.
+	 * @return this consumer after setting white with the supplied alpha.
+	 */
+	public VertexConsumer setWhiteAlpha(int alpha)
+	{
+		return this.setColor(alpha << 24 | 0xFFFFFF);
+	}
 	
 	/**
 	 * Sets the uv.
