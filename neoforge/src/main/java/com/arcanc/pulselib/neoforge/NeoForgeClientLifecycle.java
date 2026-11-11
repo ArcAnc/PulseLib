@@ -50,7 +50,7 @@ import net.neoforged.neoforge.event.tick.LevelTickEvent;
 /** NeoForge event wiring for shared Minecraft 26.1 client operations. */
 public final class NeoForgeClientLifecycle
 {
-	private NeoForgeClientLifecycle()
+	public NeoForgeClientLifecycle()
 	{
 	}
 

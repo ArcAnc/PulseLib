@@ -904,3 +904,19 @@ selections, 17 shader pipeline identities and actual dual sprite metadata, toget
 with their existing smoke/render/GPU lifetime guards. Shaders and GPU backend are
 preserved. See journal §78 and stage-7.2c evidence. The next checkpoint is 7.2d
 native Mixin hooks and loader lifecycle API; whole-library acceptance remains open.
+
+
+Stage **7.2d** reviews 17 hook/lifecycle types and 24 declarations. Eight types /
+nine members are restored, with four native signature adapters and 17 compiled
+member checks. Nine implementation/dependency types have explicit native
+relocations; their old constructors, generic shadow field and VertexBuffer
+methods are not claimed source/binary compatible. Individual block removal now
+releases its animation manager. Fabric ClientLevel replacement now clears the
+old runtime without disconnect; same-level calls retain it. Actual accessors use
+RenderSetup/RenderPipeline, SubmitNodeCollector and the native sprite ID mapper.
+The packaged bootstrap verifies four block cases and two render states before
+and after reload on both loaders, plus invoker application and loader access.
+Fabric additionally checks actual transient ClientLevel replacement. Both
+clients and dedicated servers exit 0, and all 254 fresh JUnit pass. GPU/shader
+payload is unchanged. See journal §79 and stage-7.2d evidence. The next checkpoint
+is 7.2e remaining renderer/player/GUI/reload API; whole-library acceptance remains open.

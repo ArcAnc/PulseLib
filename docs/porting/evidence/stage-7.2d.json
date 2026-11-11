@@ -1,0 +1,764 @@
+{
+  "checkpoint": "7.2d",
+  "date": "2026-11-11",
+  "status": "COMPLETE_WITH_ENUMERATED_NATIVE_IMPLEMENTATION_ADAPTATIONS",
+  "parent": "6fd45746c72794a3bb992d4f60c2dc638e8c9e54",
+  "branch": "26.1.2-multiloader",
+  "sourceRefs": {
+    "26.1": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1",
+    "1.21.1-multiloader": "7ce6f024b307bb821ce543344d3896c8e1fcf26b"
+  },
+  "commitMessage": "fix: restore native lifecycle hooks and classify Mixin contracts (stage 7.2d)",
+  "scope": {
+    "reviewTypes": 17,
+    "canonicalDeclarations": 24,
+    "restoredTypes": 8,
+    "restoredCanonicalDeclarations": 9,
+    "nativeSignatureAdapters": 4,
+    "compiledMemberChecks": 17,
+    "classifiedRelocationTypes": 9,
+    "nativeFieldAndMethodChecks": 9,
+    "newClientOnlyMixins": 6
+  },
+  "fixes": [
+    "BlockEntity.setRemoved releases only the removed client owner animation manager, with canonical null/client guards.",
+    "Fabric Minecraft.setLevel clears the previous runtime only when a nonnull old ClientLevel is replaced. Disconnect stays owned by existing loader events.",
+    "Real native render setup/pipeline, hand-render invoker and Fabric sprite registry accessors restore feasible canonical entry points.",
+    "NeoForgeClientLifecycle regains its public empty no-arg constructor; event registration remains unchanged."
+  ],
+  "compatibility": {
+    "restoredTypes": [
+      {
+        "type": "com.arcanc.pulselib.content.mixin.BlockEntityMixin",
+        "canonicalMembers": 1,
+        "verifiedNativeSignatures": [
+          "public <init>()"
+        ],
+        "canonicalConstants": {},
+        "nativeAdapters": []
+      },
+      {
+        "type": "com.arcanc.pulselib.content.mixin.ItemInHandRendererAccessor",
+        "canonicalMembers": 1,
+        "verifiedNativeSignatures": [
+          "abstract public void pulselib$renderPlayerArm(PoseStack, SubmitNodeCollector, int, float, float, HumanoidArm)"
+        ],
+        "canonicalConstants": {},
+        "nativeAdapters": [
+          {
+            "canonical": "abstract public void pulselib$renderPlayerArm(PoseStack, MultiBufferSource, int, float, float, HumanoidArm)",
+            "native": "abstract public void pulselib$renderPlayerArm(PoseStack, SubmitNodeCollector, int, float, float, HumanoidArm)"
+          }
+        ]
+      },
+      {
+        "type": "com.arcanc.pulselib.content.mixin.RenderTypeAccessor",
+        "canonicalMembers": 0,
+        "verifiedNativeSignatures": [],
+        "canonicalConstants": {},
+        "nativeAdapters": []
+      },
+      {
+        "type": "com.arcanc.pulselib.content.mixin.RenderTypeAccessor.CompositeRenderTypeAccessor",
+        "canonicalMembers": 1,
+        "verifiedNativeSignatures": [
+          "abstract public RenderSetup pulselib$getState()"
+        ],
+        "canonicalConstants": {},
+        "nativeAdapters": [
+          {
+            "canonical": "abstract public RenderType.CompositeState pulselib$getState()",
+            "native": "abstract public RenderSetup pulselib$getState()"
+          }
+        ]
+      },
+      {
+        "type": "com.arcanc.pulselib.content.mixin.RenderTypeAccessor.CompositeStateAccessor",
+        "canonicalMembers": 1,
+        "verifiedNativeSignatures": [
+          "abstract public RenderPipeline pulselib$getTransparencyState()"
+        ],
+        "canonicalConstants": {},
+        "nativeAdapters": [
+          {
+            "canonical": "abstract public RenderStateShard.TransparencyStateShard pulselib$getTransparencyState()",
+            "native": "abstract public RenderPipeline pulselib$getTransparencyState()"
+          }
+        ]
+      },
+      {
+        "type": "com.arcanc.pulselib.fabric.mixin.MinecraftMixin",
+        "canonicalMembers": 2,
+        "verifiedNativeSignatures": [
+          "public ClientLevel level",
+          "public <init>()"
+        ],
+        "canonicalConstants": {},
+        "nativeAdapters": []
+      },
+      {
+        "type": "com.arcanc.pulselib.fabric.mixin.SpriteSourcesAccessor",
+        "canonicalMembers": 1,
+        "verifiedNativeSignatures": [
+          "public static ExtraCodecs.LateBoundIdMapper<Identifier, MapCodec<? extends SpriteSource>> pulselib$getTypes()"
+        ],
+        "canonicalConstants": {},
+        "nativeAdapters": [
+          {
+            "canonical": "public static BiMap<ResourceLocation, SpriteSourceType> pulselib$getTypes()",
+            "native": "public static ExtraCodecs.LateBoundIdMapper<Identifier, MapCodec<? extends SpriteSource>> pulselib$getTypes()"
+          }
+        ]
+      },
+      {
+        "type": "com.arcanc.pulselib.neoforge.NeoForgeClientLifecycle",
+        "canonicalMembers": 2,
+        "verifiedNativeSignatures": [
+          "public static void register(IEventBus)",
+          "public <init>()"
+        ],
+        "canonicalConstants": {},
+        "nativeAdapters": []
+      }
+    ],
+    "nativeRelocations": [
+      {
+        "type": "com.arcanc.pulselib.content.mixin.EntityRenderDispatcherMixin",
+        "status": "NATIVE_IMPLEMENTATION_RELOCATION",
+        "canonicalDeclarations": [
+          "public <init>()"
+        ],
+        "reason": "PiP submission now occurs after native target/projection selection. The old immediate dispatcher wrapper and its abstract constructor are replaced by scoped native PiP execution and failure discard.",
+        "nativeSources": [
+          "common/src/main/java/com/arcanc/pulselib/content/mixin/PictureInPictureRendererMixin.java",
+          "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java"
+        ],
+        "priorJournalSections": [
+          58,
+          70
+        ]
+      },
+      {
+        "type": "com.arcanc.pulselib.content.mixin.InventoryScreenMixin",
+        "status": "NATIVE_IMPLEMENTATION_RELOCATION",
+        "canonicalDeclarations": [
+          "public <init>()"
+        ],
+        "reason": "Inventory previews use native PictureInPictureRenderer.prepare/renderToTexture and the same GUI scope. The old immediate inventory injection and abstract constructor are replaced.",
+        "nativeSources": [
+          "common/src/main/java/com/arcanc/pulselib/content/mixin/PictureInPictureRendererMixin.java"
+        ],
+        "priorJournalSections": [
+          58,
+          70
+        ]
+      },
+      {
+        "type": "com.arcanc.pulselib.content.mixin.LevelRendererContextMixin",
+        "status": "NATIVE_IMPLEMENTATION_RELOCATION",
+        "canonicalDeclarations": [
+          "public <init>()"
+        ],
+        "reason": "WORLD enters at native GameRenderer.renderLevel. The native framegraph pass guarantees endWorldFrame in finally after the transparency inputs are consumed.",
+        "nativeSources": [
+          "common/src/main/java/com/arcanc/pulselib/content/mixin/GameRendererMixin.java",
+          "common/src/main/java/com/arcanc/pulselib/content/renderer/PWorldRenderPass.java"
+        ],
+        "priorJournalSections": [
+          39,
+          56,
+          57
+        ]
+      },
+      {
+        "type": "com.arcanc.pulselib.content.mixin.LevelRendererTransparencyMixin",
+        "status": "NATIVE_IMPLEMENTATION_RELOCATION",
+        "canonicalDeclarations": [
+          "public <init>()"
+        ],
+        "reason": "PostChain.process(float) is replaced by native framegraph transparency declarations. LevelRenderer retains five targets and PWorldRenderPass composites before their retirement.",
+        "nativeSources": [
+          "common/src/main/java/com/arcanc/pulselib/content/mixin/LevelRendererMixin.java",
+          "common/src/main/java/com/arcanc/pulselib/content/renderer/PWorldRenderPass.java"
+        ],
+        "priorJournalSections": [
+          39,
+          57
+        ]
+      },
+      {
+        "type": "com.arcanc.pulselib.content.mixin.LivingEntityRendererMixin",
+        "status": "NATIVE_IMPLEMENTATION_RELOCATION",
+        "canonicalDeclarations": [
+          "protected M model",
+          "public <init>()"
+        ],
+        "reason": "The existing name now targets PlayerModel.setupAnim(AvatarRenderState). Its old protected EntityModel<T> shadow and two type parameters cannot describe the extracted-state model. Native LivingEntityRenderer.getModel remains the real renderer model accessor; extraction, rig setup and deferred submit own the old apply/restore work.",
+        "nativeSources": [
+          "common/src/main/java/com/arcanc/pulselib/content/mixin/LivingEntityRendererMixin.java",
+          "common/src/main/java/com/arcanc/pulselib/content/mixin/EntityRendererExtractionMixin.java",
+          "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerRigSubmitMixin.java",
+          "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerRootTransformMixin.java"
+        ],
+        "priorJournalSections": [
+          34,
+          35,
+          36,
+          41
+        ]
+      },
+      {
+        "type": "com.arcanc.pulselib.content.mixin.VertexBufferAccessor",
+        "status": "REMOVED_MC_DEPENDENCY",
+        "canonicalDeclarations": [
+          "abstract public void pulselib$setIndexCount(int)",
+          "abstract public int pulselib$getIndexCount()",
+          "abstract public void pulselib$setIndexType(VertexFormat.IndexType)",
+          "abstract public VertexFormat.IndexType pulselib$getIndexType()",
+          "abstract public RenderSystem.AutoStorageIndexBuffer pulselib$UploadIndexBuffer(MeshData.DrawState, ByteBuffer)",
+          "abstract public VertexFormat.Mode pulselib$getMode()"
+        ],
+        "reason": "VertexBuffer and its six mutable index/upload accessors were removed. Native geometry is replaced atomically with PGlDynamicGeometry.update(PGeometryData), and native arena pages/rings own GPU storage. No independently mutable fake index fields are introduced.",
+        "nativeSources": [
+          "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlDynamicGeometry.java",
+          "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlGeometryArena.java",
+          "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlDynamicGeometry.java"
+        ],
+        "priorJournalSections": [
+          23,
+          77
+        ]
+      },
+      {
+        "type": "com.arcanc.pulselib.fabric.mixin.HumanoidArmorLayerMixin",
+        "status": "NATIVE_IMPLEMENTATION_RELOCATION",
+        "canonicalDeclarations": [
+          "public <init>()"
+        ],
+        "reason": "Shared extraction/feature/submit hooks own armor provider selection, visibility, animation and frozen geometry on both loaders; the old immediate Fabric-only injection and abstract constructor are replaced.",
+        "nativeSources": [
+          "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderStateMixin.java",
+          "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderLayerMixin.java",
+          "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderSubmitMixin.java",
+          "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java"
+        ],
+        "priorJournalSections": [
+          61,
+          62
+        ]
+      },
+      {
+        "type": "com.arcanc.pulselib.fabric.mixin.LevelRendererMixin",
+        "status": "NATIVE_IMPLEMENTATION_RELOCATION",
+        "canonicalDeclarations": [
+          "public <init>()"
+        ],
+        "reason": "Fabric LevelRenderEvents route opaque/translucent/particle boundaries; shared framegraph integration resolves the actual weather/Fabulous targets. The old immediate stage injection and abstract constructor are replaced.",
+        "nativeSources": [
+          "fabric/src/main/java/com/arcanc/pulselib/fabric/PulseLibFabricClient.java",
+          "common/src/main/java/com/arcanc/pulselib/content/renderer/PWorldRenderPass.java"
+        ],
+        "priorJournalSections": [
+          56,
+          57
+        ]
+      },
+      {
+        "type": "com.arcanc.pulselib.fabric.mixin.ModelManagerMixin",
+        "status": "NATIVE_IMPLEMENTATION_RELOCATION",
+        "canonicalDeclarations": [
+          "public <init>()"
+        ],
+        "reason": "AtlasRegistry.register(AtlasConfig) replaces mutation of the removed AtlasSet constructor mapping. Both typed metadata records are registered with the native atlas.",
+        "nativeSources": [
+          "fabric/src/main/java/com/arcanc/pulselib/fabric/PulseLibFabricClient.java"
+        ],
+        "priorJournalSections": [
+          54,
+          78
+        ]
+      }
+    ],
+    "limitations": [
+      "Nine implementation/dependency types have enumerated source/binary incompatibilities. Their old FQCNs, abstract constructors, generic shadow field or VertexBuffer setters are not claimed restored.",
+      "The hand invoker is checked for native target resolution/application. Existing native hand consumers and accepted arm/armor pixels remain prior behavioral evidence.",
+      "Fabric world replacement is checked on a fresh transient native ClientLevel in a disposable integrated world. This is not a new network dimension-transfer acceptance."
+    ],
+    "remainingReviewTypes": [
+      {
+        "type": "com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimatedAttachmentContext",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/content/player/animation/attachment/PPlayerAnimatedAttachmentContext.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimatedAttachmentLayer",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/content/player/animation/attachment/PPlayerAnimatedAttachmentLayer.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimatedAttachments",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/content/player/animation/attachment/PPlayerAnimatedAttachments.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonRenderer",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PPlayerFirstPersonRenderer.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.content.renderer.PBlockRenderer",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/content/renderer/PBlockRenderer.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.content.renderer.PEntityRenderLayer",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderLayer.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.content.renderer.PEntityRenderer",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.content.renderer.PItemRenderer",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.content.renderer.PRenderer",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderer.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.util.PModelCache",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/util/PModelCache.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.util.attachments.PAttachmentAnchorResolvers",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentAnchorResolvers.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.util.attachments.PAttachmentAnchorResolvers.AnchorResolver",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentAnchorResolvers.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.util.attachments.PLivingAttachmentLayer",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentLayer.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.util.attachments.humanoid.PHumanoidAttachmentLayer",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidAttachmentLayer.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.util.attachments.humanoid.armor.PArmorClientExtensions",
+        "priorStatus": "changed-review",
+        "source": "neoforge/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PArmorClientExtensions.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.util.attachments.humanoid.armor.PLibArmorHandler",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PLibArmorHandler.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.util.helpers.PLibHelper",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/util/helpers/PLibHelper.java"
+      }
+    ],
+    "wholeLibraryAcceptanceComplete": false
+  },
+  "sourceHashes": {
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/BlockEntityMixin.java": "041483d76c0911d6d7751eecea3117649ff118c220fbf25c6b4f674093409f1b",
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemInHandRendererAccessor.java": "5f24311131ff1a27c7a55826793d85ca1a6289a855bd33d1119c098a404cd9d6",
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/RenderTypeAccessor.java": "0ae3e41ae62076dd070e3ee334024cf79c57ee2a6123ece16f1a004d6082b6b4",
+    "fabric/src/main/java/com/arcanc/pulselib/fabric/mixin/SpriteSourcesAccessor.java": "989e91b32c5bf1e366aa335d188fab266606b2904c2fec4022c76ce492e8486e",
+    "neoforge/src/main/java/com/arcanc/pulselib/neoforge/NeoForgeClientLifecycle.java": "39a640f6a452a1104ace65dd3a045776ead4ac691e3548953833bbca3b97047a",
+    "common/src/main/resources/pulselib.mixins.json": "a27b141a76f3ab16f734b49f69ee4cefdedbc78f5687b489a5b958cd676b1ced",
+    "fabric/src/main/resources/pulselib-fabric.mixins.json": "3848f52e62b532f719726dfbf67d3e173afd61d1548ea942dbd6e588c621d2e8",
+    "fabric/src/main/java/com/arcanc/pulselib/fabric/mixin/MinecraftMixin.java": "bfa4aca403a8982f981d6d2348028154fc6e04f0f6445ef53db2232805cb6961",
+    "tests/testmod/bootstrap/common/java/com/arcanc/pulselib/test/bootstrap/BootstrapClient.java": "579e65a3805d7c53e1956bdd57198cd459e74b90e6ea8be9f5d134ebea6112e5",
+    "tests/testmod/bootstrap/common/java/com/arcanc/pulselib/test/bootstrap/NativeHookProbe.java": "9437e75b764f733529dba0a4b8b62bbba28fa60d4b2437b1ac7b097cf2188af9",
+    "docs/porting/tools/verify_hook_api.py": "92a47bea7fa05cd5334dfa007e0992870af045a2a2ba040186e1d7c4cdc7e279"
+  },
+  "canonicalProvenance": {
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/BlockEntityMixin.java": {
+      "canonicalBlob": "dfcd5aa2c49f82b17eacd453f3f10a7d7b6a895c",
+      "lastCanonicalChange": "5b5961705240de348f1d31926dc24311dc44dbf2"
+    },
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemInHandRendererAccessor.java": {
+      "canonicalBlob": "1aefa11b438453403e33ea39567b54a193e5ae65",
+      "lastCanonicalChange": "5b5961705240de348f1d31926dc24311dc44dbf2"
+    },
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/RenderTypeAccessor.java": {
+      "canonicalBlob": "04fa729e70263e0d1aafb2207b8ae6b53ada2c8d",
+      "lastCanonicalChange": "5b5961705240de348f1d31926dc24311dc44dbf2"
+    },
+    "fabric/src/main/java/com/arcanc/pulselib/fabric/mixin/SpriteSourcesAccessor.java": {
+      "canonicalBlob": "48f361b3a1a8f7e12c6cd27932098810d00b56fc",
+      "lastCanonicalChange": "5b5961705240de348f1d31926dc24311dc44dbf2"
+    },
+    "fabric/src/main/java/com/arcanc/pulselib/fabric/mixin/MinecraftMixin.java": {
+      "canonicalBlob": "122563b653f9cc6938af7b901fcc7a5917a00cb8",
+      "lastCanonicalChange": "5b5961705240de348f1d31926dc24311dc44dbf2"
+    }
+  },
+  "checks": {
+    "build": {
+      "status": "PASS",
+      "log": "fabric/build/stage72d-20261111/build-final.log",
+      "tasks": [
+        "build",
+        "stage2Evidence",
+        ":fabric:testmodJar",
+        ":neoforge:testmodJar"
+      ],
+      "freshJUnit": 254,
+      "headProjection": "fabric/build/stage72d-20261111/projection.gradle"
+    },
+    "scopedProof": "stage-7.2d-hooks.json",
+    "subsystemApi": {
+      "verify_animation_api": 0,
+      "verify_baked_api": 0,
+      "verify_gui_helper_api": 0,
+      "verify_manager_api": 0,
+      "verify_player_attachment_api": 0,
+      "verify_player_core_api": 0,
+      "verify_player_deformer_api": 0,
+      "verify_plugin_api": 0,
+      "verify_render_context_api": 0,
+      "verify_render_plan_api": 0,
+      "verify_renderer_api": 0
+    },
+    "testmodInventories": {
+      "inventory_harnesses": 0,
+      "inventory_lifecycle": 0,
+      "inventory_smoke": 0,
+      "inventory_h14": 0,
+      "inventory_world": 0,
+      "inventory_render": 0,
+      "inventory_visibility": 0,
+      "inventory_identity": 0,
+      "inventory_motion": 0,
+      "inventory_perf": 0,
+      "inventory_canonical": 0
+    },
+    "style": {
+      "status": "PASS",
+      "log": "fabric/build/stage72d-20261111/style.log"
+    }
+  },
+  "runtime": {
+    "status": "PASS",
+    "accepted": {
+      "status": "PASS",
+      "runId": "bootstrap-0a55854acd964886895fefcd86e46184",
+      "cases": {
+        "fabric-server": {
+          "exitCode": 0,
+          "seconds": 76.95,
+          "runDirectory": "fabric/build/pulselib-tests/bootstrap-0a55854acd964886895fefcd86e46184/server",
+          "result": {
+            "loaded": 2,
+            "world": "/mnt/MainDrive/Programs/MC mods/ArcsLib/fabric/build/pulselib-tests/bootstrap-0a55854acd964886895fefcd86e46184/server/pulselib-bootstrap",
+            "side": "server",
+            "status": "PASS",
+            "candidates": 3,
+            "origin": "file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/fabric/build/libs/pulselib-testmod-bootstrap-26.1.2-1.1.5.3-fabric.jar"
+          }
+        },
+        "neoforge-server": {
+          "exitCode": 0,
+          "seconds": 87.44,
+          "runDirectory": "neoforge/build/pulselib-tests/bootstrap-0a55854acd964886895fefcd86e46184/server",
+          "result": {
+            "loaded": 2,
+            "origin": "file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/neoforge/build/libs/pulselib-testmod-bootstrap-26.1.2-1.1.5.3-neoforge.jar",
+            "candidates": 3,
+            "status": "PASS",
+            "side": "server",
+            "world": "/mnt/MainDrive/Programs/MC mods/ArcsLib/neoforge/build/pulselib-tests/bootstrap-0a55854acd964886895fefcd86e46184/server/pulselib-bootstrap"
+          }
+        },
+        "fabric-client": {
+          "exitCode": 0,
+          "seconds": 31.65,
+          "runDirectory": "fabric/build/pulselib-tests/bootstrap-0a55854acd964886895fefcd86e46184/client",
+          "result": {
+            "status": "PASS",
+            "side": "client",
+            "candidates": 3,
+            "modelEpochs": 2,
+            "gltfBones": 3,
+            "assetChecks": 12,
+            "geckoAnimations": 1,
+            "loaded": 2,
+            "origin": "file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/fabric/build/libs/pulselib-testmod-bootstrap-26.1.2-1.1.5.3-fabric.jar",
+            "geckoBones": 7
+          }
+        },
+        "neoforge-client": {
+          "exitCode": 0,
+          "seconds": 30.65,
+          "runDirectory": "neoforge/build/pulselib-tests/bootstrap-0a55854acd964886895fefcd86e46184/client",
+          "result": {
+            "geckoAnimations": 1,
+            "loaded": 2,
+            "origin": "file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/neoforge/build/libs/pulselib-testmod-bootstrap-26.1.2-1.1.5.3-neoforge.jar",
+            "geckoBones": 7,
+            "status": "PASS",
+            "side": "client",
+            "candidates": 3,
+            "modelEpochs": 2,
+            "gltfBones": 3,
+            "assetChecks": 12
+          }
+        }
+      },
+      "jars": {
+        "fabric": {
+          "path": "fabric/build/libs/pulselib-testmod-bootstrap-26.1.2-1.1.5.3-fabric.jar",
+          "sha256": "ab93e6451df552c3e365aef6b689b5cde2e34719c6bf46bb920c61a676e86dd5",
+          "classes": 12,
+          "canonicalAssets": 6
+        },
+        "neoforge": {
+          "path": "neoforge/build/libs/pulselib-testmod-bootstrap-26.1.2-1.1.5.3-neoforge.jar",
+          "sha256": "e743253a59705a96af8654f5202d950a359448d24443ef14a82822ed31ca8ff3",
+          "classes": 12,
+          "canonicalAssets": 6
+        }
+      }
+    },
+    "results": "fabric/build/stage72d-20261111/accepted/results.json",
+    "perClient": {
+      "resourceEpochs": 2,
+      "blockCasesPerEpoch": 4,
+      "renderSetupStatesPerEpoch": 2,
+      "actualInvokerApplied": true
+    },
+    "fabricWorldReplacement": {
+      "status": "PASS",
+      "epochs": 2,
+      "method": "Actual Minecraft.setLevel called with same ClientLevel, fresh transient native ClientLevel, and original level restored in finally.",
+      "scope": "Direct native replacement in a disposable integrated world; no new network dimension-transfer claim."
+    },
+    "dedicatedServerClientClassLoading": false,
+    "diagnostics": [
+      "Initial preflight rejected a derived default accessor method targeting the RenderSetup class. It was replaced by a pure native field accessor before final acceptance.",
+      "The runtime/ attempt predates the final Fabric world-change fix and contains the rejected preflight. Accepted evidence is exclusively accepted/."
+    ]
+  },
+  "production": {
+    "status": "PASS",
+    "production": {
+      "common": {
+        "jar": "common/build/libs/pulselib-26.1.2-common-1.1.5.3.jar",
+        "beforeJarSha256": "783e32923fab6662d5e8fa0a5901a03a932828082ce1587a7483836a9ee78da3",
+        "finalJarSha256": "3c3fce244ac01000879c19cbb4d75b08f25e2fcb75cac8975cacb5fe5a8683e7",
+        "classCopies": 611,
+        "addedClasses": [
+          "com/arcanc/pulselib/content/mixin/BlockEntityMixin.class",
+          "com/arcanc/pulselib/content/mixin/ItemInHandRendererAccessor.class",
+          "com/arcanc/pulselib/content/mixin/RenderTypeAccessor$CompositeRenderTypeAccessor.class",
+          "com/arcanc/pulselib/content/mixin/RenderTypeAccessor$CompositeStateAccessor.class",
+          "com/arcanc/pulselib/content/mixin/RenderTypeAccessor.class"
+        ],
+        "changedPayload": [
+          "pulselib.mixins.json"
+        ],
+        "unchangedClassCopies": 606,
+        "allGpuAndShaderPayloadByteIdentical": true
+      },
+      "fabric": {
+        "jar": "fabric/build/libs/pulselib-26.1.2-fabric-1.1.5.3.jar",
+        "beforeJarSha256": "6cb549abcd095615e0563800a15e7bb59ec6fa3bdf6cfa6e5e55154db8b80643",
+        "finalJarSha256": "6a000e24f953c41105bc7a81d0651d8859b4c73a91a68c8f8a0ff08bcbde55d1",
+        "classCopies": 621,
+        "addedClasses": [
+          "com/arcanc/pulselib/content/mixin/BlockEntityMixin.class",
+          "com/arcanc/pulselib/content/mixin/ItemInHandRendererAccessor.class",
+          "com/arcanc/pulselib/content/mixin/RenderTypeAccessor$CompositeRenderTypeAccessor.class",
+          "com/arcanc/pulselib/content/mixin/RenderTypeAccessor$CompositeStateAccessor.class",
+          "com/arcanc/pulselib/content/mixin/RenderTypeAccessor.class",
+          "com/arcanc/pulselib/fabric/mixin/MinecraftMixin.class",
+          "com/arcanc/pulselib/fabric/mixin/SpriteSourcesAccessor.class"
+        ],
+        "changedPayload": [
+          "pulselib-fabric.mixins.json",
+          "pulselib.mixins.json"
+        ],
+        "unchangedClassCopies": 614,
+        "allGpuAndShaderPayloadByteIdentical": true
+      },
+      "neoforge": {
+        "jar": "neoforge/build/libs/pulselib-26.1.2-neoforge-1.1.5.3.jar",
+        "beforeJarSha256": "6701d5d170ffcc75f074f901c5ab9ca30201cbbf55e3baadb49b1098f3494aed",
+        "finalJarSha256": "d195bd4ab5995b16208c2652000e0665ab6c030795555d4baf2623cb5f165cb0",
+        "classCopies": 624,
+        "addedClasses": [
+          "com/arcanc/pulselib/content/mixin/BlockEntityMixin.class",
+          "com/arcanc/pulselib/content/mixin/ItemInHandRendererAccessor.class",
+          "com/arcanc/pulselib/content/mixin/RenderTypeAccessor$CompositeRenderTypeAccessor.class",
+          "com/arcanc/pulselib/content/mixin/RenderTypeAccessor$CompositeStateAccessor.class",
+          "com/arcanc/pulselib/content/mixin/RenderTypeAccessor.class"
+        ],
+        "changedPayload": [
+          "com/arcanc/pulselib/neoforge/NeoForgeClientLifecycle.class",
+          "pulselib.mixins.json"
+        ],
+        "unchangedClassCopies": 618,
+        "allGpuAndShaderPayloadByteIdentical": true
+      }
+    },
+    "junit": {
+      "common": {
+        "tests": 253,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "fabric": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "neoforge": {
+        "tests": 0,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "totalClassCopies": 1856,
+    "addedClassCopies": 17,
+    "changedClassCopies": 1,
+    "unchangedClassCopies": 1838,
+    "changedResourceCopies": 4
+  },
+  "preservation": {
+    "status": "PASS",
+    "parent": "6fd45746c72794a3bb992d4f60c2dc638e8c9e54",
+    "sourceRefs": {
+      "26.1": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1",
+      "1.21.1-multiloader": "7ce6f024b307bb821ce543344d3896c8e1fcf26b"
+    },
+    "ownedPaths": 16,
+    "originalDirtyPaths": 68,
+    "originalDirtyFilesByteIdentical": 65,
+    "constructorAndDocumentationTransformsReversible": true,
+    "protectedFiles": 189,
+    "reviewTypes": 17,
+    "restoredTypes": 8,
+    "nativeRelocationTypes": 9,
+    "restoredMembers": 9,
+    "compiledMemberChecks": 17,
+    "nativeTargets": 9,
+    "freshJUnit": 254,
+    "acceptedClients": 2,
+    "acceptedDedicatedServers": 2,
+    "remainingReviewTypes": 17
+  },
+  "nextCheckpoint": {
+    "id": "7.2e",
+    "scope": "17 remaining renderer/player/GUI/reload review types",
+    "types": [
+      {
+        "type": "com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimatedAttachmentContext",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/content/player/animation/attachment/PPlayerAnimatedAttachmentContext.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimatedAttachmentLayer",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/content/player/animation/attachment/PPlayerAnimatedAttachmentLayer.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimatedAttachments",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/content/player/animation/attachment/PPlayerAnimatedAttachments.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonRenderer",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/content/player/animation/firstPerson/PPlayerFirstPersonRenderer.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.content.renderer.PBlockRenderer",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/content/renderer/PBlockRenderer.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.content.renderer.PEntityRenderLayer",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderLayer.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.content.renderer.PEntityRenderer",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.content.renderer.PItemRenderer",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.content.renderer.PRenderer",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderer.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.util.PModelCache",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/util/PModelCache.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.util.attachments.PAttachmentAnchorResolvers",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentAnchorResolvers.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.util.attachments.PAttachmentAnchorResolvers.AnchorResolver",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentAnchorResolvers.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.util.attachments.PLivingAttachmentLayer",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentLayer.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.util.attachments.humanoid.PHumanoidAttachmentLayer",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidAttachmentLayer.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.util.attachments.humanoid.armor.PArmorClientExtensions",
+        "priorStatus": "changed-review",
+        "source": "neoforge/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PArmorClientExtensions.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.util.attachments.humanoid.armor.PLibArmorHandler",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PLibArmorHandler.java"
+      },
+      {
+        "type": "com.arcanc.pulselib.util.helpers.PLibHelper",
+        "priorStatus": "changed-review",
+        "source": "common/src/main/java/com/arcanc/pulselib/util/helpers/PLibHelper.java"
+      }
+    ]
+  },
+  "later": [
+    "Whole-library inherited/compiler-resolved API acceptance, including all enumerated native adaptations",
+    "Consolidated GPU/runtime/performance report using prior accepted evidence and measurement limits"
+  ],
+  "rawArtifacts": "fabric/build/stage72d-20261111"
+}

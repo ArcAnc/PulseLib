@@ -11,6 +11,10 @@
   },
   "client": [
     "ItemStackMixin",
+    "BlockEntityMixin",
+    "ItemInHandRendererAccessor",
+    "RenderTypeAccessor$CompositeStateAccessor",
+    "RenderTypeAccessor$CompositeRenderTypeAccessor",
     "BlockEntityRenderStateAccessor",
     "CameraMixin",
     "CubeDefinitionMixin",

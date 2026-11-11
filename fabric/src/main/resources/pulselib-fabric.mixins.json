@@ -3,7 +3,9 @@
   "package": "com.arcanc.pulselib.fabric.mixin",
   "compatibilityLevel": "JAVA_25",
   "client": [
-    "LivingAttachmentExtractionMixin"
+    "LivingAttachmentExtractionMixin",
+    "SpriteSourcesAccessor",
+    "MinecraftMixin"
   ],
   "injectors": {
     "defaultRequire": 1

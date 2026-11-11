@@ -57,6 +57,7 @@ public final class BootstrapClient
 		else if (phase == 1 && mc.level != null && mc.player != null && mc.getSingleplayerServer() != null)
 		{
 			BootstrapChecks.world(mc.getSingleplayerServer(), true);
+			NativeHookProbe.run(mc);
 			PLibDatabase.LOGGER.info("PULSE BOOTSTRAP WORLD PASS: {}", mc.getSingleplayerServer().getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT));
 			reload = mc.reloadResourcePacks();
 			phase = 2;
@@ -67,6 +68,7 @@ public final class BootstrapClient
 			BootstrapChecks.check(ClientTestPlugin.models == 2 && ClientTestPlugin.GLTF.getModel() != previous, "Resource reload replaces baked models from packaged assets");
 			models(mc);
 			BootstrapChecks.world(mc.getSingleplayerServer(), true);
+			NativeHookProbe.run(mc);
 			completed = true;
 			BootstrapChecks.writeResult(Map.of("status", "PASS", "side", "client", "candidates", 3, "loaded", 2,
 					"origin", BootstrapChecks.jar(ClientTestPlugin.class), "assetChecks", assets, "modelEpochs", 2,
