@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * Streams deformer.
  */
-final class PDeformerStream
+public final class PDeformerStream
 {
 	private final Map<PDeformerStack, @Nullable PGpuDeformerStack> stacks = new IdentityHashMap<>();
 	private final Map<PGpuDeformerStack, Integer> operationOffsets = new IdentityHashMap<>();

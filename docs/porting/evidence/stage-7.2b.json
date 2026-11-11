@@ -1,0 +1,534 @@
+{
+  "checkpoint": "7.2b",
+  "status": "PASS_WITH_ENUMERATED_NATIVE_ADAPTERS",
+  "continuedFrom": "f11b5436291044ab5cda9fd13510c383cd2e50bc",
+  "sourceRefs": {
+    "26.1": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1",
+    "1.21.1-multiloader": "7ce6f024b307bb821ce543344d3896c8e1fcf26b"
+  },
+  "scope": "Resolve all 16 GPU facade/deformer review types over the existing native backend. Material/atlas/native hooks and final whole-library acceptance remain the next work.",
+  "apiProof": {
+    "path": "docs/porting/evidence/stage-7.2b-gpu-api.json",
+    "sha256": "8abec2ff5cd968263a32d986e118d5d69cd8646ec23354b6f1369a8c793c7220",
+    "types": 16,
+    "canonicalMembers": 111,
+    "compiledChecks": 333,
+    "constantValues": 10,
+    "preservedNativeBodies": 148,
+    "enumeratedBodyChanges": 6
+  },
+  "implementationSha256": {
+    "common/src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PDeformerStream.java": "459651d5b919c1ebc3e8862915a3501115134facf30a6d2245b85ac3663cec53",
+    "common/src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PFrameStreams.java": "d38b5e9e708c963b8c55afca4618d27ac929f594113b3085db915975f0bec603",
+    "common/src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers.java": "649b63b5b99e46becf26fb3878be0d3ef9f659a3d3ba4fac7f21f753eab88b53",
+    "common/src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerStack.java": "19978a271ec455374370c43be59e3c910abf0b0d404e326f532c45005917d652",
+    "common/src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PPoseStream.java": "0b725468ffd50c80537bc191c878752e02c7d050138cdd1131c4de86a1d84da4",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlFrameArena.java": "ef81e294db1a3db08578d1261ce0cfb2454010a8a2eb73ce8267f53479d2ce4e",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlCapabilityProbe.java": "12cad31ea3b4cf27dd1fd291306cee2e26e19c15252d520328ff1c88d3661c17",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlDrawExecutor.java": "e8484f90028f309c35c20b8b97088b01467a89f6d671659c9a0ed19ff32c5202",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlFrameArena.java": "ac8253bc92c326be4b1ccdcc0f23a98572bdba12ea73d1d3731433078521549b",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlGeometryArena.java": "dd775e51237308bad289c24e550f16af616c619551897f6290b7703f7e768f0b",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlResourceRegistry.java": "4490ce2b9deff804ff60430220063cc648ed5479d3535b3301671b474dea5b38",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlStreamStorage.java": "6cd5ed57db9373266ca3b04e7dd5043739c9438375ad6968a012a48912bceec5",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlWeightedBlendedOit.java": "8e1ba1ba846488fb074f7d79c991dd5a60832116623b1654dfb3f021308bfe53",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/McLegacyGlHostBridge.java": "ba07cf70549660a625d5d7a0f5069ecf79e2d96d8beebe79caeaee54f257124a",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlGeometryArena.java": "d8e495688caadc2a2d83cfd354cdf8d8da88a93a0c148f23462939569512e10b",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java": "a25c54a2f1eebbcef92c08345bf53aabeb5fa71ebb7f30dd3b0a4fc898e34db1",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlResourceRegistry.java": "84702472b4c1badce430f6c39a44f226c008f0110dc11f808455247470b3bb48",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java": "12a01825b578380ad1ba47a408c746286ec61d83811ba909d22b6619e4b80dde",
+    "common/src/test/java/com/arcanc/pulselib/content/model/deformer/gpu/PFrameStreamsTest.java": "1f3fe071c653033209f10139099dad44a3af600f6cf9a060acb4f1a1bcdce6a1",
+    "tests/testmod/demo/common/java/com/arcanc/pulselib/test/GpuFacadeProbe.java": "1e7f49301eaf15c53a5daa0594ae9774f0bceb503d1d5478569b8ce5c6ef9003",
+    "tests/testmod/demo/common/java/com/arcanc/pulselib/test/mixin/SmokeRenderMixin.java": "b379dbe0117c2e5aa525ad41c4ed34c7f20320af5110064ab59291a2401e8f11",
+    "docs/porting/tools/verify_gpu_facade_api.py": "70558dd68572d20cce4c485a0d6a3028da45d54916e5f9711f08acaabd65f091"
+  },
+  "creationProvenance": {
+    "common/src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PFrameStreams.java": "e591523b9f8dfdd0fbe17402616d700e57cf14cd",
+    "common/src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PPoseStream.java": "e591523b9f8dfdd0fbe17402616d700e57cf14cd",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlCapabilityProbe.java": "e591523b9f8dfdd0fbe17402616d700e57cf14cd",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/McLegacyGlHostBridge.java": "e591523b9f8dfdd0fbe17402616d700e57cf14cd",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlFrameArena.java": "e591523b9f8dfdd0fbe17402616d700e57cf14cd",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlGeometryArena.java": "e591523b9f8dfdd0fbe17402616d700e57cf14cd",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlResourceRegistry.java": "e591523b9f8dfdd0fbe17402616d700e57cf14cd",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlDrawExecutor.java": "e591523b9f8dfdd0fbe17402616d700e57cf14cd",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlWeightedBlendedOit.java": "e591523b9f8dfdd0fbe17402616d700e57cf14cd",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlStreamStorage.java": "e591523b9f8dfdd0fbe17402616d700e57cf14cd"
+  },
+  "acceptedRuntime": {
+    "status": "PASS",
+    "runId": "canonical-38ee8d769dbc4f4d8f3736d0225df238",
+    "cases": {
+      "fabric-jar-menu": {
+        "exitCode": 0,
+        "runDirectory": "fabric/build/pulselib-tests/canonical-38ee8d769dbc4f4d8f3736d0225df238-fabric-jar-menu/client",
+        "result": {
+          "modelEpochs": 1,
+          "status": "PASS",
+          "smoke": {
+            "camera": "FIRST_PERSON",
+            "stages": 0,
+            "draws": [
+              {
+                "colored": 504,
+                "translucent": false,
+                "partialAlpha": 0
+              },
+              {
+                "colored": 504,
+                "translucent": true,
+                "partialAlpha": 504
+              }
+            ],
+            "layers": 0,
+            "enabled": true,
+            "completed": true
+          },
+          "renderCases": 36,
+          "fixture": "canonical-smoke-menu",
+          "format": "pulselib:gltf",
+          "side": "client",
+          "origin": "file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/fabric/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-fabric.jar"
+        }
+      },
+      "neoforge-source-menu-gecko": {
+        "exitCode": 0,
+        "runDirectory": "neoforge/build/pulselib-tests/canonical-38ee8d769dbc4f4d8f3736d0225df238-neoforge-source-menu-gecko/client",
+        "result": {
+          "renderCases": 36,
+          "fixture": "canonical-smoke-menu",
+          "format": "pulselib:gecko",
+          "side": "client",
+          "origin": "file:/mnt/MainDrive/Programs/MC%20mods/ArcsLib/neoforge/build/classes/java/demo/",
+          "modelEpochs": 1,
+          "status": "PASS",
+          "smoke": {
+            "layers": 0,
+            "enabled": true,
+            "completed": true,
+            "camera": "FIRST_PERSON",
+            "stages": 0,
+            "draws": [
+              {
+                "partialAlpha": 0,
+                "colored": 504,
+                "translucent": false
+              },
+              {
+                "partialAlpha": 504,
+                "colored": 504,
+                "translucent": true
+              }
+            ]
+          }
+        }
+      }
+    },
+    "jars": {
+      "fabric": {
+        "path": "fabric/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-fabric.jar",
+        "sha256": "872ef4d1fa26c45abb0c510701167dbd6c742b43d653eecc9a155ce1a2f622c2"
+      },
+      "neoforge": {
+        "path": "neoforge/build/libs/pulselib-testmod-demo-26.1.2-1.1.5.3-neoforge.jar",
+        "sha256": "a1f02b4a46a60968e3c13534906312b6a1045825ed8ae2efdb6a1711d6352bf6"
+      }
+    }
+  },
+  "gpuResults": {
+    "fabric-jar-menu": {
+      "status": "PASS",
+      "fenceChecks": 5,
+      "nativeDeletion": true,
+      "nativeStreams": true,
+      "pixelCases": 6
+    },
+    "neoforge-source-menu-gecko": {
+      "fenceChecks": 5,
+      "nativeDeletion": true,
+      "nativeStreams": true,
+      "pixelCases": 6,
+      "status": "PASS"
+    }
+  },
+  "productionAndBuild": {
+    "status": "PASS",
+    "production": {
+      "common": {
+        "classes": 603,
+        "addedClasses": [
+          "com/arcanc/pulselib/content/model/deformer/gpu/PFrameStreams.class",
+          "com/arcanc/pulselib/content/model/deformer/gpu/PPoseStream.class",
+          "com/arcanc/pulselib/content/renderer/legacy/GlCapabilityProbe.class",
+          "com/arcanc/pulselib/content/renderer/legacy/GlDrawExecutor.class",
+          "com/arcanc/pulselib/content/renderer/legacy/GlFrameArena.class",
+          "com/arcanc/pulselib/content/renderer/legacy/GlGeometryArena$Slice.class",
+          "com/arcanc/pulselib/content/renderer/legacy/GlGeometryArena.class",
+          "com/arcanc/pulselib/content/renderer/legacy/GlResourceRegistry.class",
+          "com/arcanc/pulselib/content/renderer/legacy/GlStreamStorage.class",
+          "com/arcanc/pulselib/content/renderer/legacy/GlWeightedBlendedOit.class",
+          "com/arcanc/pulselib/content/renderer/legacy/McLegacyGlHostBridge.class"
+        ],
+        "changedClasses": [
+          "com/arcanc/pulselib/content/model/deformer/gpu/PDeformerStream.class",
+          "com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers$Bindings.class",
+          "com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers$Submission.class",
+          "com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers$UploadBuffers.class",
+          "com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers.class",
+          "com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerStack.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlFrameArena.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlGeometryArena$Page.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor$ArenaKey.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor$Draw.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor$OitPass.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor$RenderTargetAttachments.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlResourceRegistry.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.class"
+        ],
+        "otherClassesByteIdentical": 577,
+        "jar": "common/build/libs/pulselib-26.1.2-common-1.1.5.3.jar",
+        "beforeJarSha256": "f0c769e1bdc7235145ff1dfb91e05b2a23463fb83f39819cd430ceac662be978",
+        "finalJarSha256": "dbe80dd12861df3490cd7dd587126511c80f048418007c259c776053f1e83f12",
+        "nonClassPayloadByteIdentical": true
+      },
+      "fabric": {
+        "classes": 611,
+        "addedClasses": [
+          "com/arcanc/pulselib/content/model/deformer/gpu/PFrameStreams.class",
+          "com/arcanc/pulselib/content/model/deformer/gpu/PPoseStream.class",
+          "com/arcanc/pulselib/content/renderer/legacy/GlCapabilityProbe.class",
+          "com/arcanc/pulselib/content/renderer/legacy/GlDrawExecutor.class",
+          "com/arcanc/pulselib/content/renderer/legacy/GlFrameArena.class",
+          "com/arcanc/pulselib/content/renderer/legacy/GlGeometryArena$Slice.class",
+          "com/arcanc/pulselib/content/renderer/legacy/GlGeometryArena.class",
+          "com/arcanc/pulselib/content/renderer/legacy/GlResourceRegistry.class",
+          "com/arcanc/pulselib/content/renderer/legacy/GlStreamStorage.class",
+          "com/arcanc/pulselib/content/renderer/legacy/GlWeightedBlendedOit.class",
+          "com/arcanc/pulselib/content/renderer/legacy/McLegacyGlHostBridge.class"
+        ],
+        "changedClasses": [
+          "com/arcanc/pulselib/content/model/deformer/gpu/PDeformerStream.class",
+          "com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers$Bindings.class",
+          "com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers$Submission.class",
+          "com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers$UploadBuffers.class",
+          "com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers.class",
+          "com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerStack.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlFrameArena.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlGeometryArena$Page.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor$ArenaKey.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor$Draw.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor$OitPass.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor$RenderTargetAttachments.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlResourceRegistry.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.class"
+        ],
+        "otherClassesByteIdentical": 585,
+        "jar": "fabric/build/libs/pulselib-26.1.2-fabric-1.1.5.3.jar",
+        "beforeJarSha256": "fff8bd2275b258b79157b75c28da5b9b1df322b4d62b000814e0243f7ea524d5",
+        "finalJarSha256": "82aded6c3c041eef52686b5b7c3363e149c3fa519c15a1be4562ac2d4105b9ea",
+        "nonClassPayloadByteIdentical": true
+      },
+      "neoforge": {
+        "classes": 616,
+        "addedClasses": [
+          "com/arcanc/pulselib/content/model/deformer/gpu/PFrameStreams.class",
+          "com/arcanc/pulselib/content/model/deformer/gpu/PPoseStream.class",
+          "com/arcanc/pulselib/content/renderer/legacy/GlCapabilityProbe.class",
+          "com/arcanc/pulselib/content/renderer/legacy/GlDrawExecutor.class",
+          "com/arcanc/pulselib/content/renderer/legacy/GlFrameArena.class",
+          "com/arcanc/pulselib/content/renderer/legacy/GlGeometryArena$Slice.class",
+          "com/arcanc/pulselib/content/renderer/legacy/GlGeometryArena.class",
+          "com/arcanc/pulselib/content/renderer/legacy/GlResourceRegistry.class",
+          "com/arcanc/pulselib/content/renderer/legacy/GlStreamStorage.class",
+          "com/arcanc/pulselib/content/renderer/legacy/GlWeightedBlendedOit.class",
+          "com/arcanc/pulselib/content/renderer/legacy/McLegacyGlHostBridge.class"
+        ],
+        "changedClasses": [
+          "com/arcanc/pulselib/content/model/deformer/gpu/PDeformerStream.class",
+          "com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers$Bindings.class",
+          "com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers$Submission.class",
+          "com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers$UploadBuffers.class",
+          "com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers.class",
+          "com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerStack.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlFrameArena.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlGeometryArena$Page.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor$ArenaKey.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor$Draw.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor$OitPass.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor$RenderTargetAttachments.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlResourceRegistry.class",
+          "com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.class"
+        ],
+        "otherClassesByteIdentical": 590,
+        "jar": "neoforge/build/libs/pulselib-26.1.2-neoforge-1.1.5.3.jar",
+        "beforeJarSha256": "4f2eb01c754ce54c791a60f2452949ff8b41c7c143152f0cfbe4d5ea9f2d3cd6",
+        "finalJarSha256": "7c386fb285ccf6c775db50d702712356d220e31061621222f9d08d741037813d",
+        "nonClassPayloadByteIdentical": true
+      }
+    },
+    "junit": {
+      "common": {
+        "tests": 248,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "fabric": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "neoforge": {
+        "tests": 0,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "totalClasses": 1830,
+    "newClassCopies": 33,
+    "changedClassCopies": 45,
+    "otherClassCopiesByteIdentical": 1752,
+    "shadersAndNonClassResourcesByteIdentical": true
+  },
+  "subsystemApiChecks": {
+    "verify_animation_api": 0,
+    "verify_baked_api": 0,
+    "verify_gui_helper_api": 0,
+    "verify_manager_api": 0,
+    "verify_player_attachment_api": 0,
+    "verify_player_core_api": 0,
+    "verify_player_deformer_api": 0,
+    "verify_plugin_api": 0,
+    "verify_render_context_api": 0,
+    "verify_render_plan_api": 0,
+    "verify_renderer_api": 0
+  },
+  "testmodStaticInventories": {
+    "inventory_harnesses": 0,
+    "inventory_lifecycle": 0,
+    "inventory_smoke": 0,
+    "inventory_h14": 0,
+    "inventory_world": 0,
+    "inventory_render": 0,
+    "inventory_visibility": 0,
+    "inventory_identity": 0,
+    "inventory_motion": 0,
+    "inventory_perf": 0,
+    "inventory_canonical": 0
+  },
+  "preservation": {
+    "status": "PASS",
+    "parent": "f11b5436291044ab5cda9fd13510c383cd2e50bc",
+    "sourceRefs": {
+      "26.1": "67bea7ccc6bd1d4d15f417179ef82d5a7b8aacb1",
+      "1.21.1-multiloader": "7ce6f024b307bb821ce543344d3896c8e1fcf26b"
+    },
+    "ownedPaths": 27,
+    "originalDirtyPaths": 67,
+    "originalDirtyFilesByteIdentical": 61,
+    "fourWipFilesRoundTripVerified": true,
+    "documentationDualTransforms": true,
+    "protectedFiles": 189,
+    "typesVerified": 16,
+    "canonicalMembers": 111,
+    "compiledMemberChecks": 333,
+    "freshJunitTests": 249,
+    "acceptedClients": 2,
+    "pixelCasesPerClient": 6,
+    "fenceChecksPerClient": 5,
+    "newProductionClassCopies": 33,
+    "changedProductionClassCopies": 45,
+    "otherProductionClassCopiesByteIdentical": 1752,
+    "remainingCanonicalReviewTypes": 40,
+    "temporaryDebuggerStateCleaned": true
+  },
+  "wipMerges": {
+    "status": "PASS",
+    "files": {
+      "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlGeometryArena.java": {
+        "originalSha256": "cda0a2069511ff60611c60c36cdff30d10d3ced33cb30ae0d0178263dac09d41",
+        "mergedSha256": "0a373773eabd0aecf72a2ce7d76fc806b4eb23998039877ee9042d197c3243c3",
+        "threeWayMergeClean": true,
+        "reverseRestoresExactOriginalBytes": true
+      },
+      "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java": {
+        "originalSha256": "c5e3b6094d93b92f369b2121ae219213c0d9090bc3abbaea3d6c644cf4ce8290",
+        "mergedSha256": "6b656e39d8dd81c34d964497250e87aa95f0e2a0f0e84154c4b3a539a0af221e",
+        "threeWayMergeClean": true,
+        "reverseRestoresExactOriginalBytes": true
+      },
+      "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlResourceRegistry.java": {
+        "originalSha256": "9b53998df8f43012b094aa4f2bec5ed1e78c8c01e9e14b503662c029995bad2c",
+        "mergedSha256": "c1c42653aabeb82db1f1a971d53e7d0791980fea6d934db6d6187dead8fbcccc",
+        "threeWayMergeClean": true,
+        "reverseRestoresExactOriginalBytes": true
+      },
+      "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java": {
+        "originalSha256": "e98cf54bcbd79fcd0c33041c8c9ea9433cb7e6370d070cd6f6817465d02dfd23",
+        "mergedSha256": "201f294dfef07b2ea7a287e494ee9eebcda135feb0ef9293278a5edfb7e6556a",
+        "threeWayMergeClean": true,
+        "reverseRestoresExactOriginalBytes": true
+      }
+    }
+  },
+  "debugger": {
+    "status": "ROOT_CAUSE_CONFIRMED",
+    "location": "GpuFacadeProbe.java:157",
+    "cause": "The new probe widened native-endian 16-bit index bytes through a default BIG_ENDIAN read-only view. Its first nonzero 32-bit indices became 256 and 512.",
+    "stack": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"frames\":[{\"presentation\":\"geometry:157, GpuFacadeProbe (com.arcanc.pulselib.test)\",\"index\":0,\"file\":\"file:///mnt/MainDrive/Programs/MC mods/ArcsLib/tests/testmod/demo/common/java/com/arcanc/pulselib/test/GpuFacadeProbe.java\",\"line\":157,\"isCurrent\":true},{\"presentation\":\"run:80, GpuFacadeProbe (com.arcanc.pulselib.test)\",\"index\":1,\"file\":\"file:///mnt/MainDrive/Programs/MC mods/ArcsLib/tests/testmod/demo/common/java/com/arcanc/pulselib/test/GpuFacadeProbe.java\",\"line\":80,\"isCurrent\":false},{\"presentation\":\"18 hidden frames\",\"index\":2,\"isCurrent\":false}],\"threadId\":\"\\\"Render thread\\\"@1 in group \\\"main\\\": RUNNING\",\"totalFrames\":3}"
+        }
+      ],
+      "isError": false
+    },
+    "values": [
+      {
+        "content": [
+          {
+            "type": "text",
+            "text": "((java.nio.ByteBuffer)indices).getInt(4) = 256"
+          }
+        ],
+        "isError": false
+      },
+      {
+        "content": [
+          {
+            "type": "text",
+            "text": "((java.nio.ByteBuffer)indices).getInt(8) = 512"
+          }
+        ],
+        "isError": false
+      },
+      {
+        "content": [
+          {
+            "type": "text",
+            "text": "((com.arcanc.pulselib.content.renderer.plan.PGeometryData)source).indices().order().toString() = \"BIG_ENDIAN\"\n  ├─ + value = [66, 73, 71, 95, 69, 78, 68, 73, 65, 78] {byte[10]@30321}\n  │  ├─ 0 = 66\n  │  ├─ 1 = 73\n  │  ├─ 2 = 71\n  │  ├─ 3 = 95\n  │  ├─ 4 = 69\n  │  ├─ 5 = 78\n  │  ├─ 6 = 68\n  │  ├─ 7 = 73\n  │  ├─ 8 = 65\n  │  └─ 9 = 78\n  ├─ coder = 0\n  ├─ hash = 763351002\n  └─ hashIsZero = false"
+          }
+        ],
+        "isError": false
+      }
+    ],
+    "logpointError": "IDE could not infer the type of the var local in the log expression. Suspended evaluation with explicit ByteBuffer casts succeeded.",
+    "ideProjection": "A temporary init script limited to this project and the IDE delegated application task supplied the existing HEAD projection."
+  },
+  "debuggerCleanup": {
+    "agentBreakpointsRemoved": true,
+    "userExceptionBreakpointsDisabled": 2,
+    "sessionStopped": true,
+    "temporaryInitRemoved": true
+  },
+  "diagnostics": [
+    "Initial Javadoc used physical WIP. Projection now applies to both JavaCompile and Javadoc.",
+    "The new probe first used an unavailable GL_TEXTURE_BUFFER_BINDING constant. It now uses the existing project GL_TEXTURE_BUFFER query.",
+    "The first 32-bit probe widened native bytes through a BIG_ENDIAN read-only view. Debugger confirmed 256/512 and BIG_ENDIAN. Explicit native byte order corrected the probe.",
+    "A one-phase native stream adapter attempted mapping inside an active RenderPass. The real CommandEncoder guard required prepare before pass creation and binding of prepared uniforms inside the pass.",
+    "Canonical cleanup review restored registry-owned geometry retention, draw-after-cleanup and mandatory local-slot waiting. Empty plans return before target binding or waiting. All accepted cases follow these corrections.",
+    "A whole-file style scan found a preexisting unmodified native control block. Final style scope covers all new/changed complete classes and the modified/added native methods. Existing native bodies are protected by exact fingerprints."
+  ],
+  "verificationBoundaries": [
+    "Actual CPU pose records and deformer state share the native uploader. Native bone poses retain their existing CPU evaluation.",
+    "VertexBuffer return types use PGlDynamicGeometry. ShaderInstance binding uses RenderPass plus explicit pre-pass prepare.",
+    "Geometry uses the native POSITION_TEX_NORMAL layout. Canonical absolute page commands are normalized before native execution.",
+    "Six pixel cases per client include one black control, 16/32-bit geometry, dynamic geometry, OIT resolve and draw after executor cleanup. Five fence checks per client and actual stream bytes/resource deletion also pass.",
+    "The low-level OIT facade checks four real layer owners and deletion. Full Fabulous/world pixel matrices are inherited from the previous accepted suites with the protected native bodies.",
+    "Four initial WIP files receive clean three-way task additions. Reverse merge restores the exact original bytes. Committed source proofs use HEAD plus the intended checkpoint, independently of the remaining user WIP."
+  ],
+  "remainingReviewTypes": [
+    "com.arcanc.pulselib.content.mixin.BlockEntityMixin",
+    "com.arcanc.pulselib.content.mixin.EntityRenderDispatcherMixin",
+    "com.arcanc.pulselib.content.mixin.InventoryScreenMixin",
+    "com.arcanc.pulselib.content.mixin.ItemInHandRendererAccessor",
+    "com.arcanc.pulselib.content.mixin.LevelRendererContextMixin",
+    "com.arcanc.pulselib.content.mixin.LevelRendererTransparencyMixin",
+    "com.arcanc.pulselib.content.mixin.LivingEntityRendererMixin",
+    "com.arcanc.pulselib.content.mixin.RenderTypeAccessor",
+    "com.arcanc.pulselib.content.mixin.RenderTypeAccessor.CompositeRenderTypeAccessor",
+    "com.arcanc.pulselib.content.mixin.RenderTypeAccessor.CompositeStateAccessor",
+    "com.arcanc.pulselib.content.mixin.VertexBufferAccessor",
+    "com.arcanc.pulselib.content.model.textures.atlas.PLibMetadata",
+    "com.arcanc.pulselib.content.model.textures.atlas.RuntimeLoader",
+    "com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimatedAttachmentContext",
+    "com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimatedAttachmentLayer",
+    "com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimatedAttachments",
+    "com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonRenderer",
+    "com.arcanc.pulselib.content.renderer.PBlockRenderer",
+    "com.arcanc.pulselib.content.renderer.PEntityRenderLayer",
+    "com.arcanc.pulselib.content.renderer.PEntityRenderer",
+    "com.arcanc.pulselib.content.renderer.PItemRenderer",
+    "com.arcanc.pulselib.content.renderer.PRenderer",
+    "com.arcanc.pulselib.fabric.mixin.HumanoidArmorLayerMixin",
+    "com.arcanc.pulselib.fabric.mixin.LevelRendererMixin",
+    "com.arcanc.pulselib.fabric.mixin.MinecraftMixin",
+    "com.arcanc.pulselib.fabric.mixin.ModelManagerMixin",
+    "com.arcanc.pulselib.fabric.mixin.SpriteSourcesAccessor",
+    "com.arcanc.pulselib.neoforge.NeoForgeClientLifecycle",
+    "com.arcanc.pulselib.util.PModelCache",
+    "com.arcanc.pulselib.util.PRenderTypes",
+    "com.arcanc.pulselib.util.PRenderTypes.RenderTypeProvider",
+    "com.arcanc.pulselib.util.PRenderTypes.ShaderRegistrar",
+    "com.arcanc.pulselib.util.PRenderTypes.ShadersProvider",
+    "com.arcanc.pulselib.util.attachments.PAttachmentAnchorResolvers",
+    "com.arcanc.pulselib.util.attachments.PAttachmentAnchorResolvers.AnchorResolver",
+    "com.arcanc.pulselib.util.attachments.PLivingAttachmentLayer",
+    "com.arcanc.pulselib.util.attachments.humanoid.PHumanoidAttachmentLayer",
+    "com.arcanc.pulselib.util.attachments.humanoid.armor.PArmorClientExtensions",
+    "com.arcanc.pulselib.util.attachments.humanoid.armor.PLibArmorHandler",
+    "com.arcanc.pulselib.util.helpers.PLibHelper"
+  ],
+  "rawAuditReviewTypes": [
+    "com.arcanc.pulselib.content.mixin.BlockEntityMixin",
+    "com.arcanc.pulselib.content.mixin.EntityRenderDispatcherMixin",
+    "com.arcanc.pulselib.content.mixin.InventoryScreenMixin",
+    "com.arcanc.pulselib.content.mixin.ItemInHandRendererAccessor",
+    "com.arcanc.pulselib.content.mixin.LevelRendererContextMixin",
+    "com.arcanc.pulselib.content.mixin.LevelRendererTransparencyMixin",
+    "com.arcanc.pulselib.content.mixin.LivingEntityRendererMixin",
+    "com.arcanc.pulselib.content.mixin.RenderTypeAccessor",
+    "com.arcanc.pulselib.content.mixin.RenderTypeAccessor.CompositeRenderTypeAccessor",
+    "com.arcanc.pulselib.content.mixin.RenderTypeAccessor.CompositeStateAccessor",
+    "com.arcanc.pulselib.content.mixin.VertexBufferAccessor",
+    "com.arcanc.pulselib.content.model.textures.atlas.PLibMetadata",
+    "com.arcanc.pulselib.content.model.textures.atlas.RuntimeLoader",
+    "com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimatedAttachmentContext",
+    "com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimatedAttachmentLayer",
+    "com.arcanc.pulselib.content.player.animation.attachment.PPlayerAnimatedAttachments",
+    "com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonRenderer",
+    "com.arcanc.pulselib.content.renderer.PBlockRenderer",
+    "com.arcanc.pulselib.content.renderer.PEntityRenderLayer",
+    "com.arcanc.pulselib.content.renderer.PEntityRenderer",
+    "com.arcanc.pulselib.content.renderer.PItemRenderer",
+    "com.arcanc.pulselib.content.renderer.PRenderer",
+    "com.arcanc.pulselib.content.renderer.legacy.GlDynamicGeometry",
+    "com.arcanc.pulselib.content.renderer.legacy.GlResourceRegistry",
+    "com.arcanc.pulselib.content.renderer.legacy.GlStreamStorage",
+    "com.arcanc.pulselib.fabric.mixin.HumanoidArmorLayerMixin",
+    "com.arcanc.pulselib.fabric.mixin.LevelRendererMixin",
+    "com.arcanc.pulselib.fabric.mixin.MinecraftMixin",
+    "com.arcanc.pulselib.fabric.mixin.ModelManagerMixin",
+    "com.arcanc.pulselib.fabric.mixin.SpriteSourcesAccessor",
+    "com.arcanc.pulselib.neoforge.NeoForgeClientLifecycle",
+    "com.arcanc.pulselib.util.PModelCache",
+    "com.arcanc.pulselib.util.PRenderTypes",
+    "com.arcanc.pulselib.util.PRenderTypes.RenderTypeProvider",
+    "com.arcanc.pulselib.util.PRenderTypes.ShaderRegistrar",
+    "com.arcanc.pulselib.util.PRenderTypes.ShadersProvider",
+    "com.arcanc.pulselib.util.attachments.PAttachmentAnchorResolvers",
+    "com.arcanc.pulselib.util.attachments.PAttachmentAnchorResolvers.AnchorResolver",
+    "com.arcanc.pulselib.util.attachments.PLivingAttachmentLayer",
+    "com.arcanc.pulselib.util.attachments.humanoid.PHumanoidAttachmentLayer",
+    "com.arcanc.pulselib.util.attachments.humanoid.armor.PArmorClientExtensions",
+    "com.arcanc.pulselib.util.attachments.humanoid.armor.PLibArmorHandler",
+    "com.arcanc.pulselib.util.helpers.PLibHelper"
+  ],
+  "nextCheckpoint": "7.2c material/atlas API compatibility for PLibMetadata, RuntimeLoader, PRenderTypes, RenderTypeProvider, ShaderRegistrar, ShadersProvider.",
+  "rawArtifacts": "fabric/build/stage72b-20261111",
+  "localCommitMessage": "fix: restore canonical GPU facades over native owners (stage 7.2b)"
+}

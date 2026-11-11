@@ -14,7 +14,7 @@ import org.lwjgl.opengl.GL32;
 /**
  * Manages gl frame allocations.
  */
-final class PGlFrameArena
+public final class PGlFrameArena
 {
 	private static final long MAX_REUSE_WAIT_NANOS = 1_000_000L;
 	private final long[] fences;
@@ -24,8 +24,10 @@ final class PGlFrameArena
 	 * Creates an instance of the enclosing type.
 	 * @param slots the slots to use.
 	 */
-	PGlFrameArena(int slots)
+	public PGlFrameArena(int slots)
 	{
+		if (slots < 1)
+			throw new IllegalArgumentException("Frame arena requires at least one slot");
 		this.fences = new long[slots];
 	}
 
@@ -33,7 +35,7 @@ final class PGlFrameArena
 	 * Performs the begin operation.
 	 * @return the value produced by this operation.
 	 */
-	int begin()
+	public int begin()
 	{
 		for (int attempt = 0; attempt < this.fences.length; attempt++)
 		{
@@ -44,19 +46,50 @@ final class PGlFrameArena
 		return -1;
 	}
 
+	/** Selects an ordinary rotating slot or a fence-guarded persistent slot. */
+	public int begin(boolean persistent)
+	{
+		return persistent ? begin() : (int)(this.submissionIndex++ % this.fences.length);
+	}
+
+	/** Acquires the next slot, waiting for its outstanding GPU work when required. */
+	public int beginWaiting(boolean persistent)
+	{
+		int slot = (int)(this.submissionIndex++ % this.fences.length);
+		if (persistent)
+			await(slot);
+		return slot;
+	}
+
+	/** Records a persistent submission through the same native fence owner. */
+	public void finish(int slot, boolean persistent)
+	{
+		if (persistent)
+			finish(slot);
+	}
+
+	/** Retires all fences before resetting the rotating slot index. */
+	public void reset()
+	{
+		awaitAll();
+		this.submissionIndex = 0;
+	}
+
 	/**
 	 * Performs the finish operation.
 	 * @param slot the slot to use.
 	 */
-	void finish(int slot)
+	public void finish(int slot)
 	{
+		if (this.fences[slot] != 0L)
+			throw new IllegalStateException("PulseLib frame-arena slot was submitted twice without waiting");
 		this.fences[slot] = GL32.glFenceSync(GL32.GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 	}
 
 	/**
 	 * Performs the await all operation.
 	 */
-	void awaitAll()
+	public void awaitAll()
 	{
 		for (int slot = 0; slot < this.fences.length; slot++)
 			this.await(slot);
@@ -86,7 +119,7 @@ final class PGlFrameArena
 	 * Performs the await operation.
 	 * @param slot the slot to use.
 	 */
-	private void await(int slot)
+	public void await(int slot)
 	{
 		long fence = this.fences[slot];
 		if (fence == 0L)
@@ -97,4 +130,10 @@ final class PGlFrameArena
 		GL32.glDeleteSync(fence);
 		this.fences[slot] = 0L;
 	}
+	/** Retires the next rotating slot before a mandatory local draw. */
+	public void awaitNext()
+	{
+		await((int)(this.submissionIndex % this.fences.length));
+	}
+
 }

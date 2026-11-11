@@ -875,3 +875,17 @@ exactly the four server-safe policy implementations already approved in §50.
 Full compatibility review remains open. See journal §76 and the generated
 source/compiled inventories. The next checkpoint is 7.2b GPU facade/deformer
 compatibility, followed by the remaining native API and GPU/performance report.
+
+
+Stage **7.2b** restores canonical GPU/deformer facades through the existing native
+owners. All 16 selected types / 111 canonical members are checked, including
+333 class-file member checks across the release JARs. Minecraft-specific
+VertexBuffer and ShaderInstance replacements are enumerated in journal §77.
+GlStreamStorage.prepare uploads before a RenderPass opens, and bind uses those
+prepared buffers inside the pass. Executor cleanup retains registry-owned
+geometry for reuse, registry.clear releases it, and local previews await their
+next frame slot. Two targeted clients pass six pixel cases each, real GPU fence,
+stream readback and deletion checks, plus the existing render regressions.
+All 249 fresh JUnit and subsystem/static API checks pass. The next checkpoint
+is 7.2c material/atlas compatibility. See journal §77 for source/compiled proofs,
+raw runtime artifacts, debugger evidence and WIP round-trip preservation.

@@ -24,7 +24,8 @@ import java.util.List;
 public final class PGpuDeformerBuffers
 {
 	public static final Submission NONE = new Submission(-1, -1, 0);
-	private static final PDeformerStream STREAM = new PDeformerStream();
+	private static final PFrameStreams STREAMS = new PFrameStreams();
+	private static final PDeformerStream STREAM = STREAMS.deformers();
 
 	/**
 	 * Creates an instance of the enclosing type.
@@ -100,7 +101,7 @@ public final class PGpuDeformerBuffers
 	 */
 	public static void finishFrame()
 	{
-		STREAM.finishFrame();
+		STREAMS.finishFrame();
 	}
 
 	/**
@@ -118,7 +119,25 @@ public final class PGpuDeformerBuffers
 	public static void cleanup()
 	{
 		UPLOAD_BUFFERS.close();
-		STREAM.clearDefinitions();
+		STREAMS.clearDefinitions();
+	}
+
+	/** Invalidates shared pose and deformer definitions through the canonical streams. */
+	public static void clearDefinitions()
+	{
+		STREAMS.clearDefinitions();
+	}
+
+	/** Returns the same streams consumed by native deformer uploads. */
+	public static PFrameStreams streams()
+	{
+		return STREAMS;
+	}
+
+	/** Releases native uploads while retaining the packed stream definitions. */
+	public static void releaseUploads()
+	{
+		UPLOAD_BUFFERS.close();
 	}
 
 /**
@@ -126,6 +145,11 @@ public final class PGpuDeformerBuffers
  */
 	public record Submission(int operationOffset, int valueOffset, int operationCount)
 	{
+		/** Returns whether this submission contains GPU deformation operations. */
+		public boolean enabled()
+		{
+			return this.operationCount > 0;
+		}
 	}
 
 /**
@@ -135,14 +159,22 @@ public final class PGpuDeformerBuffers
 	{
 	}
 
-	private static final UploadBuffers UPLOAD_BUFFERS = new UploadBuffers();
+	private static final UploadBuffers UPLOAD_BUFFERS = new UploadBuffers(STREAMS);
 
 /**
  * Provides support for upload buffers.
  */
-	private static final class UploadBuffers
+	public static final class UploadBuffers implements AutoCloseable
 	{
 		private static final int MINIMUM_SIZE = Float.BYTES * 4;
+		private final PDeformerStream stream;
+
+		/** Creates a native upload owner for the supplied canonical streams. */
+		public UploadBuffers(PFrameStreams streams)
+		{
+			this.stream = streams.deformers();
+		}
+
 
 		private @Nullable MappableRingBuffer operations;
 		private @Nullable MappableRingBuffer values;
@@ -151,19 +183,20 @@ public final class PGpuDeformerBuffers
 		 * Performs the upload operation.
 		 * @return the value produced by this operation.
 		 */
-		private Bindings upload()
+		public Bindings upload()
 		{
-			this.operations = upload(this.operations, PGpuDeformerBuffers.operations(), PGpuDeformerBuffers.operationsDirty(), "deformer_operations");
-			this.values = upload(this.values, PGpuDeformerBuffers.values(), PGpuDeformerBuffers.valuesDirty(), "deformer_values");
-			PGpuDeformerBuffers.markOperationsUploaded();
-			PGpuDeformerBuffers.markValuesUploaded();
+			this.operations = upload(this.operations, this.stream.operations(), this.stream.operationsDirty(), "deformer_operations");
+			this.values = upload(this.values, this.stream.values(), this.stream.valuesDirty(), "deformer_values");
+			this.stream.markOperationsUploaded();
+			this.stream.markValuesUploaded();
 			return new Bindings(this.operations.currentBuffer(), this.values.currentBuffer());
 		}
 
 		/**
 		 * Performs the close operation.
 		 */
-		private void close()
+		@Override
+		public void close()
 		{
 			if (this.operations != null)
 			{

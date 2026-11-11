@@ -1,0 +1,19 @@
+Stage 7.2b accepted native facade runs
+Raw artifacts under fabric/build/stage72b-20261111
+Java/Gradle exit 0 for both accepted clients.
+
+fabric-jar-menu
+[07:48:29] [Render thread/INFO] (Pulse Lib) GPU FACADE PASS: pixels=6, fences=5, native stream readback/deletion
+[07:48:29] [Render thread/INFO] (Pulse Lib) H13/H15 PIXEL PASS: 36 cases; stage depth, alpha sorting, instancing, isolated queues, nested targets and exception GL state
+[07:48:29] [Render thread/INFO] (Pulse Lib) PULSE TEST EXPLICIT CLEANUP PASS: buffers=15, textures=24, fbos=2, vaos=2, fences=11
+[07:48:29] [Render thread/INFO] (Pulse Lib) CANONICAL SHUTDOWN PASS
+PULSE BOOTSTRAP VERIFIED: /mnt/MainDrive/Programs/MC mods/ArcsLib/fabric/build/pulselib-tests/canonical-38ee8d769dbc4f4d8f3736d0225df238-fabric-jar-menu/client
+BUILD SUCCESSFUL in 21s
+
+neoforge-source-menu-gecko
+[07:48:49] [Render thread/INFO] [Pulse Lib/]: GPU FACADE PASS: pixels=6, fences=5, native stream readback/deletion
+[07:48:50] [Render thread/INFO] [Pulse Lib/]: H13/H15 PIXEL PASS: 36 cases; stage depth, alpha sorting, instancing, isolated queues, nested targets and exception GL state
+[07:48:50] [Render thread/INFO] [Pulse Lib/]: PULSE TEST EXPLICIT CLEANUP PASS: buffers=15, textures=24, fbos=2, vaos=2, fences=11
+[07:48:50] [Render thread/INFO] [Pulse Lib/]: CANONICAL SHUTDOWN PASS
+PULSE BOOTSTRAP VERIFIED: /mnt/MainDrive/Programs/MC mods/ArcsLib/neoforge/build/pulselib-tests/canonical-38ee8d769dbc4f4d8f3736d0225df238-neoforge-source-menu-gecko/client
+BUILD SUCCESSFUL in 20s

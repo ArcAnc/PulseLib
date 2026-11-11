@@ -141,6 +141,28 @@ public final class PGlResourceRegistry
 		};
 	}
 
+	/** Resolves the native dynamic source behind a canonical facade handle. */
+	public PGlDynamicGeometry dynamicSource(PMeshHandle handle)
+	{
+		if (resource(handle) instanceof PGlDynamicGeometry source)
+			return source;
+		throw new IllegalArgumentException("Handle does not refer to dynamic geometry");
+	}
+
+	/** Resolves immutable source data without allocating another arena. */
+	public PGeometryData geometryData(PMeshHandle handle)
+	{
+		if (resource(handle) instanceof PGeometryData data)
+			return data;
+		throw new IllegalArgumentException("Handle does not refer to immutable geometry");
+	}
+
+	/** Tests the immutable geometry kind without accepting foreign handles. */
+	public boolean isGeometry(PMeshHandle handle)
+	{
+		return this.meshResources.get(handle) instanceof PGeometryData;
+	}
+
 	PGlGeometryArena.Slice resolve(PMeshHandle handle, PGlGeometryArena arena, int frameSlot)
 	{
 		return switch (resource(handle))

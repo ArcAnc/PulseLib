@@ -22,13 +22,13 @@ public final class PGpuDeformerStack
 	public static final int MAX_OPERATIONS = 8;
 	public static final int VEC4S_PER_OPERATION = 4;
 
-	private static final int STRETCH = 1;
-	private static final int SQUASH = 2;
-	private static final int TAPER = 3;
-	private static final int TWIST = 4;
-	private static final int BEND = 5;
-	private static final int WAVE = 6;
-	private static final int HINGE = 7;
+	public static final int STRETCH = 1;
+	public static final int SQUASH = 2;
+	public static final int TAPER = 3;
+	public static final int TWIST = 4;
+	public static final int BEND = 5;
+	public static final int WAVE = 6;
+	public static final int HINGE = 7;
 	private static final float EPSILON = 1.0e-5f;
 
 	private final float[] operationData;

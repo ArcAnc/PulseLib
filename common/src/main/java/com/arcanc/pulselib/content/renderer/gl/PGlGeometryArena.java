@@ -172,6 +172,12 @@ public final class PGlGeometryArena
 			GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
 
+		/** Returns the existing native vertex-array name. */
+		public int vertexArray()
+		{
+			return this.vertexArray;
+		}
+
 		/**
 		 * Performs the bind operation.
 		 * @param instanceBuffer the instance buffer to use.

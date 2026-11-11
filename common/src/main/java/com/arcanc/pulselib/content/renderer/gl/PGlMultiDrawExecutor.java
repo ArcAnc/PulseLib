@@ -60,7 +60,7 @@ import java.util.OptionalInt;
 public final class PGlMultiDrawExecutor implements PRenderExecutor
 {
 	private final PGlResourceRegistry resources;
-	private final PGlGeometryArena geometry = new PGlGeometryArena();
+	private final PGlGeometryArena geometry;
 	private final PGlInstanceStream instances = new PGlInstanceStream();
 	private final PGlIndirectStream indirect = new PGlIndirectStream();
 	private final PGlFrameArena frameArena = new PGlFrameArena(9);
@@ -81,7 +81,14 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 	/** Uses resource handles owned by the submitting queue. */
 	public PGlMultiDrawExecutor(PGlResourceRegistry resources)
 	{
+		this(resources, new PGlGeometryArena());
+	}
+
+	/** Shares the canonical registry's existing arena with its native executor. */
+	public PGlMultiDrawExecutor(PGlResourceRegistry resources, PGlGeometryArena geometry)
+	{
 		this.resources = resources;
+		this.geometry = geometry;
 	}
 
 	/** Reports the actual 26.1 backend strategies, without selecting another renderer. */
@@ -306,8 +313,15 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 	@Override
 	public void cleanup()
 	{
+		cleanup(true);
+	}
+
+	/** Releases execution state, optionally retaining caller-owned geometry and handles. */
+	public void cleanup(boolean clearGeometry)
+	{
 		this.frameArena.awaitAll();
-		this.geometry.clear();
+		if (clearGeometry)
+			this.geometry.clear();
 		this.instances.close();
 		this.indirect.close();
 		this.weightedBlendedOits.values().forEach(PGlWeightedBlendedOit :: close);
@@ -327,7 +341,10 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 			this.stateIndices.close();
 		this.stateVertices = null;
 		this.stateIndices = null;
-		this.resources.clear();
+		if (clearGeometry)
+			this.resources.clear();
+		else
+			this.frameArena.reset();
 	}
 
 	/**
@@ -612,4 +629,13 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 	private record RenderTargetAttachments(GpuTextureView color, GpuTextureView depth)
 	{
 	}
+	/** Completes canonical local previews after waiting for their next native slot. */
+	public void executeImmediateWaiting(PRenderPlan plan, PRenderFrame frame)
+	{
+		if (plan.isEmpty())
+			return;
+		this.frameArena.awaitNext();
+		executeImmediate(plan, frame);
+	}
+
 }

@@ -41,9 +41,9 @@ import java.util.List;
 /**
  * Provides support for gl weighted blended oit.
  */
-final class PGlWeightedBlendedOit
+public final class PGlWeightedBlendedOit
 {
-	static final int LAYER_COUNT = 4;
+	public static final int LAYER_COUNT = 4;
 	private static final float[] CLEAR_ACCUMULATION = {0.0F, 0.0F, 0.0F, 0.0F};
 	private static final float[] CLEAR_DEPTH = {1.0F, 1.0F, 1.0F, 1.0F};
 
@@ -448,7 +448,7 @@ final class PGlWeightedBlendedOit
 	 * Determines whether supported.
 	 * @return the value produced by this operation.
 	 */
-	private static boolean isSupported()
+	public static boolean isSupported()
 	{
 		return GL.getCapabilities().OpenGL40 || GL.getCapabilities().GL_ARB_draw_buffers_blend;
 	}
