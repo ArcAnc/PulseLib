@@ -33,6 +33,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.profiling.ProfilerFiller;
 import org.jetbrains.annotations.ApiStatus;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -369,5 +370,28 @@ public class PModelCache
 			chain = chain.thenCompose(empty -> MODEL_LOADERS.get(entry.getKey()).
 					loadModels(backgroundExecutor, resourceManager, entry.getValue(), elementConsumer));
 		return chain;
+	}
+
+	/**
+	 * Prepares source models asynchronously, waits for the reload barrier and publishes baked models on the
+	 * game executor.
+	 *
+	 * @param stage the stage
+	 * @param resourceManager the resource manager used to locate source assets
+	 * @param preparationsProfiler the profiler for background reload preparation
+	 * @param reloadProfiler the profiler for applying the resource reload
+	 * @param backgroundExecutor the executor used to read and prepare model resources
+	 * @param gameExecutor the executor used to publish game-thread reload results
+	 * @return a future completing when prepared models have been published
+	 */
+	@ApiStatus.Internal
+	public static CompletableFuture<Void> reload(PreparableReloadListener.PreparationBarrier stage,
+	                                             ResourceManager resourceManager,
+	                                             ProfilerFiller preparationsProfiler,
+	                                             ProfilerFiller reloadProfiler,
+	                                             Executor backgroundExecutor,
+	                                             Executor gameExecutor)
+	{
+		return reload(new PreparableReloadListener.SharedState(resourceManager), backgroundExecutor, stage, gameExecutor);
 	}
 }

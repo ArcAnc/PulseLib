@@ -25,7 +25,15 @@ public final class TestModNeoForgeClient
 	public static void register()
 	{
 		BootstrapChecks.jar(TestModNeoForgeClient.class);
-		NeoForge.EVENT_BUS.addListener((ClientTickEvent.Post event) -> BootstrapClient.tick(Minecraft.getInstance()));
-		NeoForge.EVENT_BUS.addListener((GameShuttingDownEvent event) -> BootstrapClient.stopped());
+		NeoForge.EVENT_BUS.addListener((ClientTickEvent.Post event) ->
+		{
+			ArmorExtensionProbe.tick(Minecraft.getInstance());
+			BootstrapClient.tick(Minecraft.getInstance());
+		});
+		NeoForge.EVENT_BUS.addListener((GameShuttingDownEvent event) ->
+		{
+			ArmorExtensionProbe.stopped();
+			BootstrapClient.stopped();
+		});
 	}
 }

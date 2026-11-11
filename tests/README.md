@@ -920,3 +920,19 @@ Fabric additionally checks actual transient ClientLevel replacement. Both
 clients and dedicated servers exit 0, and all 254 fresh JUnit pass. GPU/shader
 payload is unchanged. See journal §79 and stage-7.2d evidence. The next checkpoint
 is 7.2e remaining renderer/player/GUI/reload API; whole-library acceptance remains open.
+
+
+Stage **7.2e** reviews the last 17 declared-API types: 144 canonical declarations,
+143 mapped native entry points and the retired BEWLR getCustomRenderer dependency.
+PModelCache regains its six-argument reload adapter with the native barrier and
+executors unchanged. NeoForge PArmorClientExtensions regains base composition,
+all 13 native callback delegates and explicit canonical entity/slot/helmet/tint
+helpers. Hidden armor and native default tint retain precedence. Two new CPU tests
+verify reload publication/barrier/executor and failure behavior; all 256 JUnit pass.
+The NeoForge bootstrap verifies 13 delegates, three factory cases and five explicit
+canonical calls before/after reload. Its final run uses native ModelPart visibility;
+the successful Fabric case is adopted with the same artifact and unchanged sources.
+The proof inventories 49 selected class copies and 22 targeted member checks.
+GPU/shader/resources and 1852 previous class copies remain byte-identical. See
+journal §80 and stage-7.2e evidence. Next is 7.2f whole-library inherited/compiler-
+resolved API acceptance, followed by the consolidated GPU/performance report.
