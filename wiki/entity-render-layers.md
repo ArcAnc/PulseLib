@@ -1,39 +1,50 @@
 # Entity Render Layers
 
-[`PEntityRenderLayer`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderLayer.java) renders an additional PulseLib model on top of a [`PEntityRenderer`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java).
+[`PEntityRenderLayer`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderLayer.java) renders an additional PulseLib model on top of a [`PEntityRenderer`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java).
 
-Layers are useful for armor pieces, equipment, accessories, conditional attachments, or model variants.
+Layers are useful for armor pieces, equipment, accessories, conditional attachments, or model variants. The layer and its parent renderer must use the same native render-state type. Owner-based hooks remain available; state overloads let a custom state provide captured appearance data. Resolve inputs before creating deferred collector callbacks.
 
 ## Layer class
 
 ```java
-public class RobotChestLayer extends PEntityRenderLayer<RobotEntity, PEntityRenderState.LivingImpl<RobotEntity>> {
-    public RobotChestLayer() {
-        super(PModelData.entityLayer(
-                        MyEntities.ROBOT.getId(),
-                        Identifier.fromNamespaceAndPath("examplemod", "armor")),
-                PRenderTypes.RenderTypeProvider::trianglesSolid);
-    }
+public class RobotChestLayer extends PEntityRenderLayer<RobotEntity, PEntityRenderState.LivingImpl<RobotEntity>>
+{
+	public RobotChestLayer()
+	{
+		super(PModelData.entityLayer(
+						MyEntities.ROBOT.getId(),
+						Identifier.fromNamespaceAndPath("examplemod", "armor")),
+				PRenderTypes.RenderTypeProvider::trianglesSolid);
+	}
 
-    @Override
-    public boolean shouldRender(PEntityRenderState.LivingImpl<RobotEntity> renderState) {
-        return renderState.getAnimatable().hasChestPlate();
-    }
+	@Override
+	public boolean shouldRender(PEntityRenderState.LivingImpl<RobotEntity> renderState)
+	{
+		return renderState.getAnimatable().hasChestPlate();
+	}
 }
 ```
 
 ## Add layer to renderer
 
 ```java
-public class RobotRenderer extends PEntityRenderer<RobotEntity, PEntityRenderState.LivingImpl<RobotEntity>> {
-    public RobotRenderer(EntityRendererProvider.Context context) {
-        super(context, ROBOT_MODEL_DATA, PRenderTypes.RenderTypeProvider::trianglesSolid);
+public class RobotRenderer extends PEntityRenderer<RobotEntity, PEntityRenderState.LivingImpl<RobotEntity>>
+{
+	public RobotRenderer(EntityRendererProvider.Context context)
+	{
+		super(context, ROBOT_MODEL_DATA, PRenderTypes.RenderTypeProvider::trianglesSolid);
 
-        addRenderLayer("body",
-                new RobotChestLayer()
-                        .bindBone("armor_body", "body")
-                        .bindBone("armor_head", "head"));
-    }
+		addRenderLayer("body",
+				new RobotChestLayer().
+						bindBone("armor_body", "body").
+						bindBone("armor_head", "head"));
+	}
+
+	@Override
+	public PEntityRenderState.LivingImpl<RobotEntity> createRenderState()
+	{
+		return PLibHelper.livingRenderState();
+	}
 }
 ```
 
@@ -44,10 +55,10 @@ public class RobotRenderer extends PEntityRenderer<RobotEntity, PEntityRenderSta
 Layer bone bindings copy base entity bone poses into layer bones:
 
 ```java
-new RobotChestLayer()
-        .bindBone("layer_right_arm", "right_arm")
-        .bindMatchingBone("head")
-        .bindMatchingBones("left_leg", "right_leg");
+new RobotChestLayer().
+		bindBone("layer_right_arm", "right_arm").
+		bindMatchingBone("head").
+		bindMatchingBones("left_leg", "right_leg");
 ```
 
 Use this when the layer model should follow animated limbs from the base model.
@@ -61,18 +72,20 @@ layer.setRotation(new Quaternionf().rotationXYZ(0, 0, 0));
 layer.setScale(new Vector3f(1.05f, 1.05f, 1.05f));
 ```
 
-Override appearance hooks:
+Override appearance hooks (`LightCoordsUtil` is in `net.minecraft.util`):
 
 ```java
 @Override
 public int getColor(PEntityRenderState.LivingImpl<RobotEntity> renderState,
-                    PBakedBone bone, PBakedMesh mesh, int packedColor) {
-    return renderState.getAnimatable().isPowered() ? 0xFF80FFFF : packedColor;
+					PBakedBone bone, PBakedMesh mesh, int packedColor)
+					{
+	return renderState.getAnimatable().isPowered() ? 0xFF80FFFF : packedColor;
 }
 
 @Override
-public int getPackedLight(PEntityRenderState.LivingImpl<RobotEntity> renderState, int packedLight) {
-    return renderState.getAnimatable().isPowered() ? LightCoordsUtil.FULL_BRIGHT : packedLight;
+public int getPackedLight(PEntityRenderState.LivingImpl<RobotEntity> renderState, int packedLight)
+{
+	return renderState.getAnimatable().isPowered() ? LightCoordsUtil.FULL_BRIGHT : packedLight;
 }
 ```
 
@@ -80,7 +93,7 @@ The default layer resolver applies these hooks through `PMeshRenderContext.withC
 
 Classes used:
 
-* [`PEntityRenderLayer`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderLayer.java)
+* [`PEntityRenderLayer`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderLayer.java)
 * [`PModelData.entityLayer(...)`](modeldata.md)
-* [`PBakedBone`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java)
-* [`PBakedMesh`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedMesh.java)
+* [`PBakedBone`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java)
+* [`PBakedMesh`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedMesh.java)

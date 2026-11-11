@@ -11,12 +11,15 @@
 - [Discord][discord]
 
 ## TechStack
+
+- Java 25 / Minecraft 26.1.2
+- [Fabric](https://github.com/FabricMC/fabric) (loader and modding API)
 - [NeoForge](https://github.com/neoforged/NeoForge) (modding API for Minecraft)
 - [SpongePowered Mixin](https://github.com/SpongePowered/Mixin) (mixin and bytecode weaving framework)
 
 ## License
 
-All code and artwork is licensed under the [Arc's License of Common Sense](/LICENSE.txt)
+All code and artwork is licensed under the [Arc's License of Common Sense](LICENSE.txt)
 
 ## Development
 
@@ -24,7 +27,7 @@ Welcome to our [Wiki][wiki]
 
 ### Maven
 
-You can find Maven setup details in the [installation guide](https://arcanc.github.io/PulseLib/26.1/installation/).
+You can find Maven setup details in the [installation guide](wiki/installation.md).
 
 ### Contributing
 
@@ -35,4 +38,4 @@ If you need help feel free to [join our Discord][discord]
 
 [download]: https://www.curseforge.com/minecraft/mc-mods/pulselib
 [discord]: https://discord.gg/cwydhvYb2M
-[wiki]: https://arcanc.github.io/PulseLib/26.1/
+[wiki]: wiki/index.md

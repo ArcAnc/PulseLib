@@ -1,34 +1,36 @@
 # GUI Rendering
 
-PulseLib 26.1 renders animated item models in a GUI through [`PItemRenderer`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java). The renderer detects `ItemDisplayContext.GUI`, submits the mesh to `PRenderQueue.RenderStage.GUI`, and registers custom geometry that flushes that stage in the current GUI render pass.
+Minecraft 26.1.2 separates GUI extraction from drawing. PulseLib supports both special item models and arbitrary animated models inside a screen; both use isolated render scopes around actual drawing.
 
-There is no public `PLibHelper.renderModelInGui(...)` helper in this branch. For an item, implement a `PItemRenderer` and let Minecraft invoke its special-model renderer:
+## Animated items
+
+Implement [`PItemRenderer`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java), register its special-model codec for your loader, and reference it from `assets/<modid>/items/<item>.json`. Minecraft invokes the special renderer for inventory and screen items. See [PulseLib Items](pulselib-items.md) for the complete setup.
+
+Use queued `trianglesSolid`, `trianglesCutout`, or `trianglesTranslucent` in the renderer constructor, including for `ItemDisplayContext.GUI`. `trianglesGui` uses the instant layout and belongs to the helper below. GUI item execution uses a local compiler and flushes it when the scope closes; it does not drain pending world geometry or OIT.
+
+## A model inside a screen
+
+Use [`PLibHelper.renderModelInGui(...)`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/util/helpers/PLibHelper.java) during GUI extraction:
 
 ```java
-public final class WandRenderer extends PItemRenderer<WandItem, WandRenderState> {
-    public WandRenderer(PModelData data) {
-        super(data, PRenderTypes.RenderTypeProvider::trianglesSolid);
-    }
-
-    @Override
-    protected WandRenderState createRenderState() {
-        return new WandRenderState();
-    }
-}
-
-public final class WandRenderState extends PItemRenderState.Impl<WandItem> {
-}
+PLibHelper.renderModelInGui(
+		graphics, // GuiGraphicsExtractor supplied by the screen
+		MODEL_DATA,
+		manager.getControllers().values(),
+		PRenderTypes.RenderTypeProvider::trianglesGui,
+		x, y,
+		new Vector3f(32.0f, 32.0f, 32.0f),
+		0xFFFFFFFF, packedLight, packedOverlay, partialTick);
 ```
 
-For custom GUI-only geometry, submit a [`PBakedMesh`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedMesh.java) to `PRenderQueue` and flush it from a `SubmitNodeCollector` custom-geometry callback. Keep that code inside a renderer or special-model renderer: it needs the active pose stack, collector, and packed light/overlay values supplied by Minecraft.
+`MODEL_DATA` must have a matching [model-resource registration](resources.md#register-model-resources). Supply controllers in composition order, tick them through their normal manager lifecycle, and select an instant render type (`trianglesGui` / `trianglesInstantTranslucent`, or an appropriate instant solid/cutout variant).
 
-`PItemRenderer` always uses the queued, instanced rendering path, including in a GUI. Supply `trianglesSolid`, `trianglesCutout`, or `trianglesTranslucent` according to the material. The `GUI` stage controls when the queue is flushed; it does not require a different shader.
+The helper evaluates and captures the model pose, GUI pose, position, scale, tint, light, overlay and scissor for that invocation. It adds a native picture-in-picture render state rather than issuing GPU work during extraction. Later controller, pose-stack or scale-vector changes do not alter the captured pose and transform. A model that has not loaded, or a model whose projected bounds are fully clipped, adds no GUI state. Keep a supplied render-type function stable until execution.
 
-`trianglesGui` is a compatibility alias for `trianglesInstantTranslucent`. It belongs to direct `PBakedBone.instantDraw(...)` rendering and must not be supplied to `PItemRenderer`, because the queued and instant pipelines receive per-draw data through different inputs. A renderer shared by several item display contexts may still select a queued alpha mode per mesh in `resolveMeshRender(...)`.
+PulseLib registers its picture-in-picture renderer on both loaders. The helper uses native GUI bounds and clipping, including nested screen calls. Do not manually flush the world queue from a screen callback.
 
-Classes used:
+## Custom offscreen rendering
 
-* [`PItemRenderer`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java)
-* [`PItemRenderState`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/base/PItemRenderState.java)
-* [`PRenderQueue`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java)
-* [`PRenderTypes`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java)
+Advanced callers can use [`PRenderContexts`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderContexts.java) for local GUI/offscreen queue ownership. Bind the intended output attachments before entering the scope and keep them alive until it closes. Enter around actual render execution: a `SubmitNodeCollector` callback may execute after its extraction method has returned.
+
+Use normal item rendering or the helper for standard screens; they already establish the required lifetime and state restoration.

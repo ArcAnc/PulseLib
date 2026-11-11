@@ -8,38 +8,39 @@ The API is client-only. Register definitions through [`IPulseClientPlugin.regist
 @PulsePlugin
 public final class ExamplePlayerAnimations implements IPulseClientPlugin
 {
-    @Override
-    public Identifier getPluginId()
-    {
-        return Identifier.fromNamespaceAndPath(ExampleMod.MOD_ID, "player_animations");
-    }
+	@Override
+	public Identifier getPluginId()
+	{
+		return Identifier.fromNamespaceAndPath(ExampleMod.MOD_ID, "player_animations");
+	}
 
-    private static final PModelData COMBAT_MODEL = PModelData.direct(
-            Identifier.fromNamespaceAndPath(ExampleMod.MOD_ID, "player/combat"),
-            PGeckoModelLoader.INSTANCE.id());
+	private static final PModelData COMBAT_MODEL = PModelData.direct(
+			Identifier.fromNamespaceAndPath(ExampleMod.MOD_ID, "player/combat"),
+			PGeckoModelLoader.INSTANCE.id());
 
-    private static final PRawAnimation IDLE = PRawAnimation.begin()
-            .thenLoop("animation.combat.idle")
-            .build();
+	private static final PRawAnimation IDLE = PRawAnimation.begin().
+			thenLoop("animation.combat.idle").
+			build();
 
-    @Override
-    public void registerPlayerAnimations(PPlayerAnimationRegistrar registrar)
-    {
-        registrar.register(
-                Identifier.fromNamespaceAndPath(ExampleMod.MOD_ID, "combat_pose"),
-                PPlayerAnimationDefinition.builder(COMBAT_MODEL)
-                        .when(player -> player.getMainHandItem().is(MyItems.KATANA.get()))
-                        .bind(PPlayerPart.BODY, "body")
-                        .bind(PPlayerPart.RIGHT_ARM, "right_arm")
-                        .mask(PPlayerPart.BODY, PPlayerPart.RIGHT_ARM)
-                        .blendMode(PPlayerAnimationBlendMode.ADDITIVE_LOCAL)
-                        .weight(0.75f)
-                        .controllers(registrar -> registrar.add("combat", () -> state -> {
-                            state.controller().play(IDLE);
-                            return ControllerState.PLAY;
-                        }))
-                        .build());
-    }
+	@Override
+	public void registerPlayerAnimations(PPlayerAnimationRegistrar registrar)
+	{
+		registrar.register(
+				Identifier.fromNamespaceAndPath(ExampleMod.MOD_ID, "combat_pose"),
+				PPlayerAnimationDefinition.builder(COMBAT_MODEL).
+						when(player -> player.getMainHandItem().is(MyItems.KATANA.get())).
+						bind(PPlayerPart.BODY, "body").
+						bind(PPlayerPart.RIGHT_ARM, "right_arm").
+						mask(PPlayerPart.BODY, PPlayerPart.RIGHT_ARM).
+						blendMode(PPlayerAnimationBlendMode.ADDITIVE_LOCAL).
+						weight(0.75f).
+						controllers(controllers -> controllers.add("combat", () -> state ->
+						{
+							state.controller().play(IDLE);
+							return ControllerState.PLAY;
+						})).
+						build());
+	}
 }
 ```
 
@@ -54,7 +55,7 @@ For a client packet handler or another explicit client action, use a runtime han
 ```java
 PPlayerAnimationHandle animation = PPlayerAnimations.getHandle(player, COMBAT_POSE_ID);
 if (animation != null)
-    animation.play("combat", ATTACK);
+	animation.play("combat", ATTACK);
 ```
 
 `play`, `stop`, `pause`, `resume`, `stopAll`, and state checks address a named controller. `controller(name)` is available for advanced controller-specific operations without exposing an `AnimManagerKey`. Game-state synchronization itself remains the owning mod's responsibility.
@@ -71,7 +72,7 @@ Each semantic part applies to both the base part and the matching outer skin lay
 
 ```java
 .mask((player, part, partialTick) ->
-        part != PPlayerPart.HEAD || !player.isUsingItem())
+		part != PPlayerPart.HEAD || !player.isUsingItem())
 ```
 
 ## Blending and weights
@@ -102,10 +103,10 @@ For a dynamic blend, provide a function evaluated every render pass:
 `partWeight(...)` multiplies that definition weight only for the selected part. It accepts either a constant or the same dynamic weight function:
 
 ```java
-.weight(0.8f)
-.partWeight(PPlayerPart.HEAD, 0.25f)
-.partWeight(PPlayerPart.RIGHT_ARM,
-        (player, partialTick) -> player.isUsingItem() ? 1.0f : 0.0f)
+.weight(0.8f).
+partWeight(PPlayerPart.HEAD, 0.25f).
+partWeight(PPlayerPart.RIGHT_ARM,
+		(player, partialTick) -> player.isUsingItem() ? 1.0f : 0.0f)
 ```
 
 Layer several definitions with different masks, priorities, modes, definition weights, and part weights to combine independent actions.
@@ -134,17 +135,18 @@ Attach a `PDeformerStack` directly to a definition with `deform(part, stack, val
 
 ```java
 private static final PChannelReference<Float> KNEE_BEND =
-        new PChannelReference<>("knee_bend", 0.0f);
+		new PChannelReference<>("knee_bend", 0.0f);
 
 // `BENT_LEG` is a compiled PDeformerStack, for example one PBendDeformer.
-PPlayerAnimationDefinition.builder(MODEL)
-        .bind(PPlayerPart.RIGHT_LEG, "right_leg")
-        .deform(PPlayerPart.RIGHT_LEG, BENT_LEG, (context, reference) -> {
-            if (!reference.name().equals(KNEE_BEND.name()))
-                return reference.defaultValue();
-            return sampleKnee(context.controllerSeconds("combat"));
-        })
-        .build();
+PPlayerAnimationDefinition.builder(MODEL).
+		bind(PPlayerPart.RIGHT_LEG, "right_leg").
+		deform(PPlayerPart.RIGHT_LEG, BENT_LEG, (context, reference) ->
+		{
+			if (!reference.name().equals(KNEE_BEND.name()))
+				return reference.defaultValue();
+			return sampleKnee(context.controllerSeconds("combat"));
+		}).
+		build();
 ```
 
 The callback receives `PPlayerAnimationDeformerContext`: `player()`, `definition()`, `partialTick()`, `weight()`, `isPlaying(name)`, `controllerTicks(name)`, and `controllerSeconds(name)`. More than one deformer may target the same part; they run in declaration order. The lower-level global `PPlayerMeshDeformers.register(...)` remains available for a deformation that is not part of an animation definition.
@@ -155,7 +157,7 @@ See [Mesh deformers](mesh-deformers.md) for built-in operations, subdivision, no
 
 The model only needs a skeleton and animations; mesh data is optional. Bone positions from Gecko animations are converted from blocks to vanilla model pixels automatically. Rotation, position, and scale channels are supported. Standard glTF assets keep their normal right-handed Y-up coordinates: the player pipeline converts their position and quaternion axes to Minecraft's mirrored player render space. Do not pre-flip an exported glTF player animation. The skeleton resolver evaluates bind pose and parent transforms; a bound child therefore inherits transforms of intermediate animation bones. A bound `ROOT` is applied once to the render stack and is excluded from child deltas.
 
-The API affects the whole player model in third person. It restores position, rotation, and scale immediately after every draw, preventing a pose from leaking into a different player or another render layer.
+The API affects the whole player model in third person. Native extraction captures rig, root and geometry inputs in render states; submit hooks apply them in scoped model/pose contexts and restore the host afterwards. GPU execution uses captured matrices and deformation values rather than re-reading a player's later animation state. The native player model is `net.minecraft.client.model.player.PlayerModel` (without a player type parameter).
 
 ## First-person hands, items, and camera space
 
@@ -167,21 +169,21 @@ The first-person transform has two coordinate boundaries. PulseLib first express
 
 ### PulseLib Player Action Rig
 
-Use [`player_model_template.gltf`](../src/main/resources/assets/pulselib/template/player/player_model_template.gltf) or [`player_model_template.bbmodel`](../src/main/resources/assets/pulselib/template/player/player_model_template.bbmodel) as the starting skeleton for player actions. It contains `body`, `head`, `right_arm`, `left_arm`, and `fp_camera`, plus `right_hand` and `left_hand` item anchors. The file is intentionally skeleton-only: add preview meshes in Blockbench if they help authoring, but keep the named bone origins unchanged.
+Use [`player_model_template.gltf`](../common/src/main/resources/assets/pulselib/template/player/player_model_template.gltf) or [`player_model_template.bbmodel`](../common/src/main/resources/assets/pulselib/template/player/player_model_template.bbmodel) as the starting skeleton for player actions. It contains `body`, `head`, `right_arm`, `left_arm`, and `fp_camera`, plus `right_hand` and `left_hand` item anchors. The file is intentionally skeleton-only: add preview meshes in Blockbench if they help authoring, but keep the named bone origins unchanged.
 
 `right_arm` and `left_arm` have a fixed rig contract. Each bone origin must equal the local origin of the geometry-only vanilla `ModelPart` used by the first-person renderer. In particular, it is the arm pivot, not the player-model root, the center of the cuboid, or the hand grip. The template matches the normal 4×12×4 vanilla arms exactly after glTF conversion. PulseLib applies no per-arm correction matrix; a rig that moves either origin will move the rendered vanilla arm and its persistent attachments by the same offset.
 
 ```java
-PPlayerAnimationDefinition.builder(MODEL)
-        .bind(PPlayerPart.HEAD, "head")       // optional: drives the camera
-        .bind(PPlayerPart.RIGHT_ARM, "right_arm")
-        .bind(PPlayerPart.LEFT_ARM, "left_arm")
-        .anchor(PPlayerAnimationAnchors.FIRST_PERSON_CAMERA, "fp_camera")
-        .anchor(PPlayerAnimationAnchors.RIGHT_ITEM, "right_hand")
-        .anchor(PPlayerAnimationAnchors.LEFT_ITEM, "left_hand")
-        .firstPerson(PPlayerFirstPersonSettings.ENABLED)
-        // controller setup
-        .build();
+PPlayerAnimationDefinition.builder(MODEL).
+		bind(PPlayerPart.HEAD, "head"). // optional: drives the camera
+		bind(PPlayerPart.RIGHT_ARM, "right_arm").
+		bind(PPlayerPart.LEFT_ARM, "left_arm").
+		anchor(PPlayerAnimationAnchors.FIRST_PERSON_CAMERA, "fp_camera").
+		anchor(PPlayerAnimationAnchors.RIGHT_ITEM, "right_hand").
+		anchor(PPlayerAnimationAnchors.LEFT_ITEM, "left_hand").
+		firstPerson(PPlayerFirstPersonSettings.ENABLED)
+		// controller setup
+		.build();
 ```
 
 `RIGHT_ARM` and `LEFT_ARM` supply the physical arms to draw; `RIGHT_ITEM` and `LEFT_ITEM` supply the physical first-person item-renderer origins. Minecraft maps its logical main/off hand to these physical left/right channels according to the player's main-arm setting.
@@ -194,12 +196,12 @@ Keep `firstPerson` disabled for ordinary third-person animations. Even while it 
 
 ## Hiding first-person held items
 
-`itemRenderPolicy(...)` supplies a predicate for each first-person item channel. It is evaluated immediately before drawing each non-empty item and receives the local player, its logical hand, and current `ItemStack`:
+`itemRenderPolicy(...)` supplies a predicate for each first-person item channel. It is evaluated while preparing each non-empty item channel and receives the local player, its logical hand, and current `ItemStack`:
 
 ```java
-.firstPerson(PPlayerFirstPersonSettings.ENABLED)
-.itemRenderPolicy((player, hand, stack) ->
-        hand == InteractionHand.MAIN_HAND && stack.is(MyItems.KATANA.get()))
+.firstPerson(PPlayerFirstPersonSettings.ENABLED).
+itemRenderPolicy((player, hand, stack) ->
+		hand == InteractionHand.MAIN_HAND && stack.is(MyItems.KATANA.get()))
 ```
 
 Return `true` to suppress that item's local first-person draw. `ItemRenderPolicy.HIDE` hides an item and `ItemRenderPolicy.RENDER` keeps it visible; rendering is the default. The policy is attached to each physical left/right item channel only when that definition contributes the matching item anchor. Definitions are processed by ascending `priority` and identifier, so the highest ordered contributor for each channel owns its discrete policy while its transform is blended normally. The inventory and third-person renderer are unaffected.
@@ -208,9 +210,9 @@ For a moment that belongs to an animation sequence, use `itemVisibility(controll
 
 ```java
 .itemVisibility("bandage", (player, hand, animationTime, stack) ->
-        animationTime > 0.2f
-                ? PPlayerAnimationDefinition.ItemVisibility.HIDDEN
-                : PPlayerAnimationDefinition.ItemVisibility.VISIBLE)
+		animationTime > 0.2f
+				? PPlayerAnimationDefinition.ItemVisibility.HIDDEN
+				: PPlayerAnimationDefinition.ItemVisibility.VISIBLE)
 ```
 
 This phase policy supplements `itemRenderPolicy(...)`: either policy may hide the item. If several definitions contribute the same physical item channel, the last definition by priority and identifier owns both policies, just as it does for the item transform.
@@ -222,8 +224,8 @@ This phase policy supplements `itemRenderPolicy(...)`: either policy may hide th
 The player-animation model may also contain mesh branches that are not bound to a vanilla player part. By default, PulseLib automatically renders a mesh branch when it contains an active animated bone, both in third person and through the enabled first-person integration. To render only known branches, declare their roots with `meshAttachment(boneName)`:
 
 ```java
-.meshAttachment("ball")
-.meshAttachment("backpack")
+.meshAttachment("ball").
+meshAttachment("backpack")
 ```
 
 Once at least one root is declared, PulseLib does not discover other free mesh branches. A selected root renders its complete descendant tree, so a prop can contain child bones and meshes without listing each one. Automatic and explicit attachments render only while the definition has an active animation, are blended from identity by its activation weight, and use the translucent render type. Skeleton-only models remain valid.
@@ -232,7 +234,7 @@ Once at least one root is declared, PulseLib does not discover other free mesh b
 
 ```java
 .populateMolangContext((player, instance, controller, context, partialTick) ->
-        context.query("is_sneaking", player.isCrouching() ? 1.0f : 0.0f))
+		context.query("is_sneaking", player.isCrouching() ? 1.0f : 0.0f))
 ```
 
 As with other client-side animation state, multiplayer gameplay events are the owning mod's responsibility to synchronize. The animation definition observes only state available on that client.

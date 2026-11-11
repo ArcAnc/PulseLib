@@ -4,32 +4,44 @@ An animatable is any object that can provide animation state to a PulseLib rende
 
 Animation state is built around:
 
-* [`PAnimatable`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/animatable/PAnimatable.java)
-* [`PAnimationManager`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/animatable/PAnimationManager.java)
-* [`PAnimationController`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/animatable/PAnimationController.java)
-* [`PRawAnimation`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/model/animation/PRawAnimation.java)
+* [`PAnimatable`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimatable.java)
+* [`PAnimationManager`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimationManager.java)
+* [`PAnimationController`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimationController.java)
+* [`PRawAnimation`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/animation/PRawAnimation.java)
 
 ## PAnimatable
 
 An animatable has two responsibilities. It returns a manager for the current object or stack, and it registers controller factories. The factories matter because items and other singleton-style objects may need separate controller instances for separate keys.
 
 ```java
-public class ExampleEntity extends PathfinderMob implements PAnimatable<ExampleEntity> {
-    private final PAnimationManager<ExampleEntity> manager = PLibHelper.createManager(this);
+public class ExampleEntity extends PathfinderMob implements PAnimatable<ExampleEntity>
+{
+	private static final PRawAnimation WALK = PRawAnimation.begin().thenLoop("walk").build();
+	private static final PRawAnimation IDLE = PRawAnimation.begin().thenLoop("idle").build();
 
-    @Override
-    public PAnimationManager<ExampleEntity> getAnimationManager(AnimManagerKey key) {
-        return this.manager;
-    }
+	private final PAnimationManager<ExampleEntity> manager = PLibHelper.createManager(this);
 
-    @Override
-    public void registerAnimationControllers(PAnimationManager.PAnimationRegistrar<ExampleEntity> registrar) {
-        registrar.add("movement", () -> state -> {
-            ExampleEntity entity = state.animatable();
-            state.controller().play(entity.walkAnimation.isMoving() ? WALK : IDLE);
-            return ControllerState.PLAY;
-        });
-    }
+	public ExampleEntity(EntityType<? extends PathfinderMob> type, Level level)
+	{
+		super(type, level);
+	}
+
+	@Override
+	public PAnimationManager<ExampleEntity> getAnimationManager(AnimManagerKey key)
+	{
+		return this.manager;
+	}
+
+	@Override
+	public void registerAnimationControllers(PAnimationManager.PAnimationRegistrar<ExampleEntity> registrar)
+	{
+		registrar.add("movement", () -> state ->
+		{
+			ExampleEntity entity = state.animatable();
+			state.controller().play(entity.walkAnimation.isMoving() ? WALK : IDLE);
+			return ControllerState.PLAY;
+		});
+	}
 }
 ```
 
@@ -37,18 +49,19 @@ public class ExampleEntity extends PathfinderMob implements PAnimatable<ExampleE
 
 Entities and block entities are real world instances, so they can usually keep one manager field. Items are different: there is one `Item` object for many `ItemStack`s, so PulseLib uses keys to separate stack animation state.
 
-[`PLibHelper.createManager`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/util/helpers/PLibHelper.java) chooses instance managers for entities and block entities, and singleton managers for other animatables.
+[`PLibHelper.createManager`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/util/helpers/PLibHelper.java) chooses instance managers for entities and block entities, and singleton managers for other animatables.
 
-For items, use [`SingletonAnimationManager.getManager`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/animatable/singleton/SingletonAnimationManager.java) with the key passed by the renderer:
+For items, use [`SingletonAnimationManager.getManager`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/singleton/SingletonAnimationManager.java) with the key passed by the renderer:
 
 ```java
 @Override
-public PAnimationManager<ExampleItem> getAnimationManager(AnimManagerKey key) {
-    return SingletonAnimationManager.getManager(key, this);
+public PAnimationManager<ExampleItem> getAnimationManager(AnimManagerKey key)
+{
+	return SingletonAnimationManager.getManager(key, this);
 }
 ```
 
-[`AnimManagerKey`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/animatable/AnimManagerKey.java) can derive keys from `ItemStack`, `Entity`, `BlockEntity`, or an arbitrary object.
+[`AnimManagerKey`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/AnimManagerKey.java) can derive keys from `ItemStack`, `Entity`, `BlockEntity`, or an arbitrary object.
 
 ## PRawAnimation
 
@@ -57,11 +70,11 @@ public PAnimationManager<ExampleItem> getAnimationManager(AnimManagerKey key) {
 Stage names must match animation names inside the loaded model.
 
 ```java
-private static final PRawAnimation SEQUENCE = PRawAnimation.begin()
-        .thenPlay("deploy")
-        .thenWait(10)
-        .thenLoop("idle")
-        .build();
+private static final PRawAnimation SEQUENCE = PRawAnimation.begin().
+		thenPlay("deploy").
+		thenWait(10).
+		thenLoop("idle").
+		build();
 ```
 
 Stage helpers:
@@ -81,14 +94,14 @@ clip is always played as `PAnimationType.PLAY_ONCE`; this is separate from `then
 clip forever.
 
 ```java
-private static final PRawAnimation IDLE = PRawAnimation.begin()
-        .thenRandomLoop(random -> random
-                .add("idle_breath", 6)
-                .add("idle_look_left", 2)
-                .add("idle_look_right", 2)
-                .add("idle_scratch", 1)
-                .preventImmediateRepeat())
-        .build();
+private static final PRawAnimation IDLE = PRawAnimation.begin().
+		thenRandomLoop(random -> random.
+				add("idle_breath", 6).
+				add("idle_look_left", 2).
+				add("idle_look_right", 2).
+				add("idle_scratch", 1).
+				preventImmediateRepeat()).
+		build();
 ```
 
 The random selection is runtime state owned by each controller playback. `preventImmediateRepeat()` removes the
@@ -97,29 +110,31 @@ previously selected animation from the next draw when the pool contains more tha
 Example with speed and interpolation:
 
 ```java
-private static final PRawAnimation FAST_OPEN = PRawAnimation.begin()
-        .thenPlay("open")
-        .withSpeed(2.0f)
-        .withInterpolation(PInterpolationType.BEZIER)
-        .thenHold("open")
-        .build();
+private static final PRawAnimation FAST_OPEN = PRawAnimation.begin().
+		thenPlay("open").
+		withSpeed(2.0f).
+		withInterpolation(PInterpolationType.BEZIER).
+		thenHold("open").
+		build();
 ```
 
-Built-in interpolation types are defined in [`PInterpolationType`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/model/animation/PInterpolationType.java): `LINEAR`, `CATMULLROM`, `BEZIER`, `STEP`.
+Built-in interpolation types are defined in [`PInterpolationType`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/animation/PInterpolationType.java): `LINEAR`, `CATMULLROM`, `BEZIER`, `STEP`.
 
 ## Controller state handler
 
-A controller owns one active `PRawAnimation` at a time. Think of the state handler as the current animation rule. It is called while ticking, checks the animatable's current state, and returns [`ControllerState`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/animatable/ControllerState.java).
+A controller owns one active `PRawAnimation` at a time. Think of the state handler as the current animation rule. It is called while ticking, checks the animatable's current state, and returns [`ControllerState`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/ControllerState.java).
 
 ```java
-registrar.add("attack", () -> state -> {
-    if (!state.animatable().swinging) {
-        state.controller().stop();
-        return ControllerState.STOP;
-    }
+registrar.add("attack", () -> state ->
+{
+	if (!state.animatable().swinging)
+	{
+		state.controller().stop();
+		return ControllerState.STOP;
+	}
 
-    state.controller().play(ATTACK);
-    return ControllerState.PLAY;
+	state.controller().play(ATTACK);
+	return ControllerState.PLAY;
 });
 ```
 
@@ -148,23 +163,24 @@ For expressions embedded in Gecko animation vectors, see [Molang animations](mol
 
 ```java
 private static final PAnimationGraph MOVEMENT = new PAnimationGraph(
-        List.of(
-                new PAnimationState.BlendSpace1D("locomotion", "speed", List.of(
-                        new PAnimationState.BlendSpace1D.Point(0.0f, "idle"),
-                        new PAnimationState.BlendSpace1D.Point(0.1f, "walk"),
-                        new PAnimationState.BlendSpace1D.Point(0.3f, "run"))),
-                new PAnimationState.Clip("jump", "jump", PAnimationType.PLAY_ONCE,
-                        PInterpolationType.LINEAR, 1.0f, false),
-                new PAnimationState.OneShotOverlay("attack", "attack", "attack")),
-        List.of(
-                new PAnimationTransition(0, 1, PCondition.parameter("jump"), 0.08f, 10,
-                        PInterruptionPolicy.FROM_CURRENT),
-                new PAnimationTransition(1, 0, PCondition.ALWAYS, 1.0f, 0.1f, 0,
-                        PInterruptionPolicy.FROM_CURRENT)));
+		List.of(
+				new PAnimationState.BlendSpace1D("locomotion", "speed", List.of(
+						new PAnimationState.BlendSpace1D.Point(0.0f, "idle"),
+						new PAnimationState.BlendSpace1D.Point(0.1f, "walk"),
+						new PAnimationState.BlendSpace1D.Point(0.3f, "run"))),
+				new PAnimationState.Clip("jump", "jump", PAnimationType.PLAY_ONCE,
+						PInterpolationType.LINEAR, 1.0f, false),
+				new PAnimationState.OneShotOverlay("attack", "attack", "attack")),
+		List.of(
+				new PAnimationTransition(0, 1, PCondition.parameter("jump"), 0.08f, 10,
+						PInterruptionPolicy.FROM_CURRENT),
+				new PAnimationTransition(1, 0, PCondition.ALWAYS, 1.0f, 0.1f, 0,
+						PInterruptionPolicy.FROM_CURRENT)));
 
 @Override
-public void registerAnimationControllers(PAnimationManager.PAnimationRegistrar<ExampleEntity> registrar) {
-    registrar.addGraph("movement", MOVEMENT);
+public void registerAnimationControllers(PAnimationManager.PAnimationRegistrar<ExampleEntity> registrar)
+{
+	registrar.addGraph("movement", MOVEMENT);
 }
 ```
 

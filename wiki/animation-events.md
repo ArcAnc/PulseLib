@@ -2,7 +2,7 @@
 
 Animation events are timestamped typed payloads stored in `PAnimation`. Time is expressed in ticks internally; glTF sidecars and Gecko JSON use seconds and are converted with `seconds * 20`.
 
-The public API is `PAnimationEvent<T>` and `PAnimationEventType<T>`. Event types supply a `Identifier`, a `MapCodec<T>`, a side policy, and the execution function. Built-in type instances are registered in the `pulselib:animation_event_type` registry, so an add-on can register its own typed event type in the same registry.
+The public API is `PAnimationEvent<T>` and `PAnimationEventType<T>`. Event types supply an `Identifier`, a `MapCodec<T>`, a side policy, and the execution function. Built-in type instances are registered in the `pulselib:animation_event_type` registry, so an add-on can register its own typed event type through `IPulseCommonPlugin.registerAnimationEvents(PTypeRegistrar)` and `registrar.registerAnimationEvent(type)`.
 
 ## Built-in types
 

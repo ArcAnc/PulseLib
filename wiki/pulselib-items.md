@@ -2,11 +2,11 @@
 
 Items need a slightly different setup from entities and block entities. Minecraft creates one `Item` object for the item type, but the player can hold many `ItemStack`s of that type. If animation state lived directly on the item object, every stack would share the same animation.
 
-PulseLib handles this by using [`AnimManagerKey`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/animatable/AnimManagerKey.java) and [`SingletonAnimationManager`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/animatable/singleton/SingletonAnimationManager.java). The item implements [`PAnimatable`](../common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimatable.java), while its manager is resolved per key.
+PulseLib handles this by using [`AnimManagerKey`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/AnimManagerKey.java) and [`SingletonAnimationManager`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/singleton/SingletonAnimationManager.java). The item implements [`PAnimatable`](../common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimatable.java), while its manager is resolved per key.
 
 ## Item model definition
 
-The old `models/item/<item>.json` file with `"parent": "builtin/entity"` does not select a PulseLib renderer on 26.1. Register a `SpecialModelRenderer.Unbaked` codec, then reference that registered special-model type from the item's 26.1 model definition. The wrapper below is the PulseLib side of that setup.
+The old `models/item/<item>.json` file with `"parent": "builtin/entity"` does not select a PulseLib renderer on 26.1.2. Register a `SpecialModelRenderer.Unbaked` codec, then reference that registered special-model type from the item's 26.1.2 model definition. The wrapper below is the PulseLib side of that setup.
 
 ## Item class
 
@@ -44,52 +44,70 @@ public class WandItem extends Item implements PAnimatable<WandItem>
 
 ## Renderer
 
-The 26.1 renderer is a `SpecialModelRenderer`, not a `BlockEntityWithoutLevelRenderer`. It points at model data, selects a PulseLib render type, and creates a render state for every item render.
+The 26.1.2 renderer is a `SpecialModelRenderer`, not a `BlockEntityWithoutLevelRenderer`. It points at model data, selects a PulseLib render type, and creates a render state for every item render.
 
 ```java
-public class WandRenderer extends PItemRenderer<WandItem, WandRenderState> {
-    public WandRenderer(PModelData data) {
-        super(data, PRenderTypes.RenderTypeProvider::trianglesSolid);
-    }
+public class WandRenderer extends PItemRenderer<WandItem, WandRenderState>
+{
+	public WandRenderer(PModelData data)
+	{
+		super(data, PRenderTypes.RenderTypeProvider::trianglesSolid);
+	}
 
-    @Override
-    protected WandRenderState createRenderState() {
-        return new WandRenderState();
-    }
+	@Override
+	protected WandRenderState createRenderState()
+	{
+		return new WandRenderState();
+	}
 }
 
-public class WandRenderState extends PItemRenderState.Impl<WandItem> {}
+public class WandRenderState extends PItemRenderState.Impl<WandItem>
+{
+}
 ```
 
 Provide an `Unbaked` special-model wrapper that bakes this renderer:
 
 ```java
 public record Unbaked(PModelData data)
-        implements SpecialModelRenderer.Unbaked<WandRenderState> {
-    public static final MapCodec<Unbaked> MAP_CODEC = PModelData.CODEC.xmap(Unbaked::new, Unbaked::data);
+		implements SpecialModelRenderer.Unbaked<WandRenderState>
+		{
+	public static final MapCodec<Unbaked> MAP_CODEC = PModelData.CODEC.xmap(Unbaked::new, Unbaked::data);
 
-    @Override
-    public WandRenderer bake(BakingContext context) {
-        return new WandRenderer(data);
-    }
+	@Override
+	public WandRenderer bake(SpecialModelRenderer.BakingContext context)
+	{
+		return new WandRenderer(data);
+	}
 
-    @Override
-    public MapCodec<Unbaked> type() {
-        return MAP_CODEC;
-    }
+	@Override
+	public MapCodec<Unbaked> type()
+	{
+		return MAP_CODEC;
+	}
 }
 ```
 
-Register that codec with NeoForge's special-model renderer event:
+Register that codec during client initialization. NeoForge uses this mod-bus event:
 
 ```java
 @SubscribeEvent
-public static void registerSpecialModels(RegisterSpecialModelRendererEvent event) {
-    event.register(Identifier.fromNamespaceAndPath("examplemod", "wand"), Unbaked.MAP_CODEC);
+public static void registerSpecialModels(RegisterSpecialModelRendererEvent event)
+{
+	event.register(Identifier.fromNamespaceAndPath("examplemod", "wand"), Unbaked.MAP_CODEC);
 }
 ```
 
-Reference it from `assets/examplemod/items/wand.json`:
+Fabric needs the same codec in Minecraft's `SpecialModelRenderers.ID_MAPPER` before item JSON baking. In this port's pinned Fabric API, the [demo accessor](../tests/testmod/demo/common/java/com/arcanc/pulselib/test/mixin/SpecialTypesAccessor.java) and [client initializer](../tests/testmod/demo/fabric/java/com/arcanc/pulselib/test/fabric/TestModFabricClient.java) show the registration:
+
+```java
+SpecialTypesAccessor.types().put(
+		Identifier.fromNamespaceAndPath("examplemod", "wand"), Unbaked.MAP_CODEC);
+```
+
+`SpecialTypesAccessor` is a mod-owned Mixin accessor, not a PulseLib API. If you use that approach, include your accessor in your mod's client mixin configuration. The PulseLib plugin registrar declares model resources; it does not register Minecraft special-model codecs for you.
+
+Reference the registered type from `assets/examplemod/items/wand.json`:
 
 ```json
 {
@@ -108,10 +126,10 @@ The `base` model is the normal `assets/examplemod/models/item/wand.json` file th
 
 ```java
 public static final PModelData WAND_RESOURCE =
-        PModelData.item(Identifier.fromNamespaceAndPath("examplemod", "wand"));
+		PModelData.item(Identifier.fromNamespaceAndPath("examplemod", "wand"));
 
-registrar.model(WAND_RESOURCE)
-        .texture("body", Identifier.fromNamespaceAndPath("examplemod", "item/wand/body"));
+registrar.model(WAND_RESOURCE).
+		texture("body", Identifier.fromNamespaceAndPath("examplemod", "item/wand/body"));
 ```
 
 The decoded `PModelData` is a separate object, but `getModel()` looks up its canonical ID in `PModelCache`; it therefore receives the model loaded by `WAND_RESOURCE`. If `model_loader` is present in JSON, use the same loader ID in the registration. PulseLib does not convert a legacy `builtin/entity` JSON into this renderer automatically.
@@ -128,6 +146,6 @@ The item animation contract is `PAnimatable`; renderer registration is independe
 
 Classes used:
 
-* [`PItemRenderer`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java)
-* [`SingletonAnimationManager`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/animatable/singleton/SingletonAnimationManager.java)
+* [`PItemRenderer`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java)
+* [`SingletonAnimationManager`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/singleton/SingletonAnimationManager.java)
 * [`PModelData.item(...)`](modeldata.md)

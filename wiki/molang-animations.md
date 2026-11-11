@@ -34,11 +34,12 @@ Override `populateMolangContext` in the renderer for the animatable type. The ho
 ```java
 @Override
 protected void populateMolangContext(RobotEntity robot,
-                                     PAnimationController<RobotEntity> controller,
-                                     MolangParser.Context context,
-                                     float partialTick) {
-    context.query("ground_speed", (float) robot.getDeltaMovement().horizontalDistance());
-    context.query("is_active", robot.isActive() ? 1f : 0f);
+									 PAnimationController<RobotEntity> controller,
+									 MolangParser.Context context,
+									 float partialTick)
+									 {
+	context.query("ground_speed", (float) robot.getDeltaMovement().horizontalDistance());
+	context.query("is_active", robot.isActive() ? 1f : 0f);
 }
 ```
 

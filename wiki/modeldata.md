@@ -1,6 +1,6 @@
 # Model Data
 
-[`PModelData`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/modelData/PModelData.java) tells a renderer which canonical model to obtain. It never contains a loader root or filename extension. [`PModelResource`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/model/resource/PModelResource.java) holds the matching registration and texture mappings.
+[`PModelData`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/modelData/PModelData.java) tells a renderer which canonical model to obtain. It never contains a loader root or filename extension. [`PModelResource`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/resource/PModelResource.java) holds the matching registration and texture mappings.
 
 Use the factories for the conventional canonical IDs:
 
@@ -9,8 +9,8 @@ PModelData block = PModelData.block(Identifier.fromNamespaceAndPath("examplemod"
 PModelData item = PModelData.item(Identifier.fromNamespaceAndPath("examplemod", "wand"));
 PModelData entity = PModelData.entity(Identifier.fromNamespaceAndPath("examplemod", "robot"));
 PModelData armor = PModelData.entityLayer(
-        Identifier.fromNamespaceAndPath("examplemod", "robot"),
-        Identifier.fromNamespaceAndPath("examplemod", "armor"));
+		Identifier.fromNamespaceAndPath("examplemod", "robot"),
+		Identifier.fromNamespaceAndPath("examplemod", "armor"));
 PModelData gui = PModelData.direct(Identifier.fromNamespaceAndPath("examplemod", "gui/gene_screen"));
 ```
 
@@ -18,8 +18,8 @@ The first three create `block/crusher`, `item/wand`, and `entity/robot`; `entity
 
 ```java
 PModelData geckoRobot = PModelData.entity(
-        Identifier.fromNamespaceAndPath("examplemod", "robot"),
-        PGeckoModelLoader.INSTANCE.id());
+		Identifier.fromNamespaceAndPath("examplemod", "robot"),
+		PGeckoModelLoader.INSTANCE.id());
 ```
 
 For the default glTF loader, `examplemod:entity/robot` is resolved internally to `assets/examplemod/glmodels/entity/robot.glb`, then to `.gltf` when the GLB is absent. The cache and renderer keep using `examplemod:entity/robot` in both cases.
@@ -28,10 +28,10 @@ For renderers constructed in code, register the same object used by the renderer
 
 ```java
 public static final PModelData ROBOT_MODEL =
-        PModelData.entity(Identifier.fromNamespaceAndPath("examplemod", "robot"));
+		PModelData.entity(Identifier.fromNamespaceAndPath("examplemod", "robot"));
 
-event.model(ROBOT_MODEL)
-        .texture("textures/body", Identifier.fromNamespaceAndPath("examplemod", "entity/robot/body"));
+registrar.model(ROBOT_MODEL).
+		texture("textures/body", Identifier.fromNamespaceAndPath("examplemod", "entity/robot/body"));
 ```
 
 `PModelData` instances are not compared with each other. The resource and baked-model caches are keyed by canonical `Identifier`, so separate instances select the same baked model when their `model_id` values are equal.
@@ -40,10 +40,10 @@ Item special renderers are data-driven: their renderer `PModelData` is decoded f
 
 ```java
 public static final PModelData WAND_RESOURCE =
-        PModelData.item(Identifier.fromNamespaceAndPath("examplemod", "wand"));
+		PModelData.item(Identifier.fromNamespaceAndPath("examplemod", "wand"));
 
-event.model(WAND_RESOURCE)
-        .texture("body", Identifier.fromNamespaceAndPath("examplemod", "item/wand/body"));
+registrar.model(WAND_RESOURCE).
+		texture("body", Identifier.fromNamespaceAndPath("examplemod", "item/wand/body"));
 ```
 
 ```json

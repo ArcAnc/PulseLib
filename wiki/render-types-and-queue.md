@@ -1,117 +1,97 @@
 # Render Types and Queue
 
-Most mods can use PulseLib's renderers without touching the render queue directly. This page exists for the cases where you need to understand why PulseLib does not use vanilla `RenderType` values and where custom rendering should be inserted.
+PulseLib models are triangle meshes. [`PRenderTypes`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java) supplies their native render pipelines and material states; [`PRenderQueue`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java) compiles captured submissions and executes them through the shared GPU backend.
 
-PulseLib models are triangle meshes loaded from glTF/GLB or another model loader. Vanilla baked block models are mostly quad-based, so PulseLib provides its own triangle render types, shaders, vertex format, and instanced queue. That is why examples use [`PRenderTypes`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java) instead of `RenderType.entityCutout` or block render types.
+## Choosing a render type
 
-## Which render type should I choose?
+| Material | Queued renderer | Direct `PBakedBone.instantDraw(...)` / GUI helper |
+| --- | --- | --- |
+| Opaque | `trianglesSolid` | `trianglesInstantSolid` |
+| Hard alpha cutout | `trianglesCutout` | `trianglesInstantCutout` |
+| Blended alpha | `trianglesTranslucent` | `trianglesInstantTranslucent` / `trianglesGui` |
+| Emissive | `trianglesEmissiveSolid`, `trianglesEmissiveCutout`, `trianglesEmissiveTranslucent` | matching `trianglesInstantEmissive...` variant |
 
-Use the simplest type that matches the visual result:
-
-* `trianglesSolid` for opaque models.
-* `trianglesCutout` for hard alpha cutouts, like holes or masked pixels.
-* `trianglesTranslucent` for glass-like transparency and weighted blended order-independent transparency (OIT).
-
-Use those queued variants in `PBlockRenderer`, `PEntityRenderer`, and `PItemRenderer`, including GUI item rendering. `trianglesGui` is a compatibility alias for the translucent instant pipeline used by direct `PBakedBone.instantDraw(...)` calls; it is not a queued item-renderer type.
-
-`trianglesSolid` forces an opaque output alpha. Cutout and translucent variants discard fragments below their alpha threshold. Built-in queued translucent variants use weighted blended order-independent transparency when the target has a depth attachment and the OpenGL driver supports independent per-target blending. The OIT pass keeps several depth layers, so overlapping transparent PulseLib meshes are resolved correctly without relying on submission order. If that path is unavailable, PulseLib falls back to the queue's back-to-front alpha blending.
-
-For emissive meshes the built-in renderers select the matching solid, cutout, or translucent emissive variant automatically from the base type.
-
-In a renderer constructor this usually looks like:
+All factories above belong to `PRenderTypes.RenderTypeProvider` and take the atlas `Identifier`. `PBlockRenderer`, `PEntityRenderer`, and `PItemRenderer` use queued variants, including GUI items:
 
 ```java
 super(modelData, PRenderTypes.RenderTypeProvider::trianglesSolid);
 ```
 
-If a texture is marked as emissive, the default renderers automatically switch the mesh to the matching emissive variant. You normally do not need to select an emissive type yourself.
+Solid forces output alpha to one. Cutout discards low-alpha fragments; translucent blends surviving fragments. Default mesh resolvers choose a matching emissive variant for emissive sprites. [Resources](resources.md#alpha-modes) explains alpha metadata and explicit per-mesh overrides.
 
-Alpha-mode and emissive texture metadata is described on [Resources](resources.md).
+Canonical factory aliases are also retained: `trianglesImmediate` uses instant cutout; `trianglesSolidEmissive`, `trianglesCutoutEmissive`, and `trianglesTranslucentEmissive` select queued emissive variants; `trianglesGuiEmissive` and `trianglesImmediateEmissive` select instant emissive translucent and cutout respectively. `emissiveVariant(...)` preserves the layout/alpha mode of known types and leaves an unknown custom type unchanged.
 
-## Why vanilla RenderType is not enough
+## Material transparency and OIT
 
-PulseLib's baked meshes use [`PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java). The queued triangle pipeline receives `DynamicTransforms` and `Lighting` through the normal 26.1 uniforms, but per-instance transform, colour, light, overlay, and deformer offsets arrive as instanced vertex attributes. The instant pipeline instead receives one mesh's colour, light, overlay, and deformer offsets through `ColorOverlay`.
+A blended material and an OIT submission are separate choices. `PTransparencyMode.ORDINARY` sorts transparent instances back-to-front and alpha-blends them. `PTransparencyMode.OIT` requests PulseLib's order-independent path for a supported built-in queued translucent type. Explicit queue overloads accept that policy without changing the native `RenderType` identity.
 
-A vanilla render type may compile and still render incorrectly because its shader and vertex format do not match this contract.
+Overloads without a policy default to OIT for the two supported queued translucent pipelines and to ordinary rendering for other types. Living attachments and player effects may explicitly use ordinary alpha even with a translucent material. Custom transparent types are not automatically OIT-enabled; explicitly requesting OIT for an unsupported type is rejected.
 
-If you create a custom render type, keep these requirements:
+OIT also needs a suitable depth target and driver support. Unsupported execution uses ordinary sorted alpha. The current implementation keeps four depth layers and composites them into the appropriate native targets. The native `Improved Transparency` option changes the target layout and composition route; it does not change which material a renderer requests.
 
-* `VertexFormat.Mode.TRIANGLES`
-* `PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL`
-* a shader that understands PulseLib's uniforms and instance attributes
-* a transparency state that matches how the queue should sort the mesh
+## Pipeline contract
 
-For most mods, it is safer to start from PulseLib's existing render types and only add a new one when you need a genuinely different shader state.
+Minecraft's native type is `net.minecraft.client.renderer.rendertype.RenderType`. A compatible custom type needs:
 
-## What the queue does
+* `VertexFormat.Mode.TRIANGLES` and `PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL`.
+* A shader that reads the queued instance attributes or the instant per-draw inputs appropriate to the caller.
+* A native `RenderSetup` / `RenderPipeline` with the intended blend, depth and target state.
 
-[`PRenderQueue`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java) batches identical meshes together and renders many instances with one instanced draw call. That is important for animated block entities and entities: every object can have its own transform and animation pose, but the GPU can still draw repeated mesh buffers efficiently.
+Vanilla block/entity pipelines usually use different mesh layouts and cannot consume PulseLib instances correctly. `RenderPipeline.getColorTargetState().blendFunction()` exposes the native `Optional<BlendFunction>`. The internal `PRenderTypes.getTransparencyState(...)` / `isTransparent(...)` helpers use that same material state. Neither alone determines OIT policy. See [Shaders](shaders.md) for the vertex and per-draw inputs.
 
-The queue has a few stages:
+## Queue stages and scopes
 
-* `SOLID_BLOCKS` for solid block entity meshes.
-* `TRANSLUCENT_BLOCKS` for transparent block/entity-adjacent meshes.
-* `ENTITIES` for entity and hand-held item rendering.
-* `FIRST_PERSON` for items rendered in either first-person hand.
-* `GUI` for GUI rendering.
+| Stage | Typical owner |
+| --- | --- |
+| `SOLID_BLOCKS` | Block-entity geometry |
+| `TRANSLUCENT_BLOCKS` | Block-entity transparency |
+| `ENTITIES` | World entities and items outside first person |
+| `FIRST_PERSON` | Physical left/right first-person item and attachment rendering |
+| `GUI` | Item display context inside an isolated GUI scope |
 
-Normal renderers submit into these stages for you. [`PRenderStagesHandler`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java) flushes the level stages, while PulseLib flushes `FIRST_PERSON` immediately after the hand pass. An enabled player first-person animation adjusts arm and item submissions inside Minecraft's normal hands-and-items renderer; `PItemRenderer` selects `FIRST_PERSON` automatically for `FIRST_PERSON_LEFT_HAND` and `FIRST_PERSON_RIGHT_HAND`, so no special renderer code is needed.
+World hooks flush opaque entity/block geometry after collection, capture native opaque depth, then compile world transparency together after particles. Deferred OIT composition follows the active native transparency/weather route. [`PRenderStagesHandler`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java) contains shared operations; loader adapters and native hooks own their timing. Mods should not install a second set of world flush callbacks.
 
-## When to submit manually
+First-person geometry is flushed after the hand pass. GUI and offscreen [`PRenderContexts`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderContexts.java) own local compilers and restore captured output state on close. They never consume the world compiler's pending geometry or OIT. Establish local scopes around execution, after selecting output attachments; collector extraction alone does not establish an execution lifetime.
 
-Manual queue submission is an advanced escape hatch. Use it when you already have a baked PulseLib mesh and want to draw it in the same pipeline.
+## Manual submission
+
+For a baked mesh, the facade accepts a copied instance transform and an optional deformation:
 
 ```java
 PRenderQueue.submit(
-        PRenderQueue.RenderStage.ENTITIES,
-        renderType,
-        bakedMesh,
-        null, // no mesh deformation
-        new PRenderQueue.InstanceData(matrix, 0xFFFFFFFF, packedLight, packedOverlay));
+		PRenderQueue.RenderStage.ENTITIES,
+		renderType,
+		bakedMesh,
+		null,
+		new PRenderQueue.InstanceData(matrix, 0xFFFFFFFF, packedLight, packedOverlay),
+		PTransparencyMode.ORDINARY);
 ```
 
-`PBakedMesh` owns the GPU vertex and index buffers. Do not pass a vanilla `VertexBuffer`: the queue needs PulseLib's mesh data and its triangle vertex format.
+Portable submissions use `PGeometryData` or `PDynamicGeometry` with a `PInstanceHeader`. Geometry uses the same triangle layout, with unsigned 16-bit or 32-bit indices. Reuse immutable geometry objects so the registry can reuse their arena allocation.
 
-For opaque submissions, identical `(RenderType, PBakedMesh)` pairs are grouped. Transparent submissions that cannot use OIT are ordered back-to-front and only adjacent equal pairs are joined. Built-in translucent types are accumulated into OIT targets per Minecraft output target, then composited after `ENTITIES` and `TRANSLUCENT_BLOCKS` are flushed together from `RenderLevelStageEvent.AfterTranslucentFeatures`. First-person OIT is instead composited immediately after the hand pass. Each OIT target records transparent depth layers, allowing Minecraft's transparency post-chain to place the result correctly relative to translucent blocks. This makes supported PulseLib translucency independent of its own submission order; custom transparent types, targets without depth, and unsupported OpenGL contexts retain sorted alpha blending. Static mesh data is packed into OpenGL geometry pages; the queue streams per-instance records and indirect commands through fence-protected ring buffers, using multi-draw indirect where the current OpenGL driver supports it. These are implementation details: callers only submit meshes and must not retain or manipulate the queue's buffers.
+For changing geometry, reuse one `PGlDynamicGeometry` and call `update(PGeometryData)` on the render thread. Queued work resolves that source at execution time; flush before changing its index count or layout. Close caller-owned dynamic sources when finished. Do not pass a retired vanilla `VertexBuffer` to the queue.
 
-## Compiled render plans in the 26.1.2 MultiLoader port
+## Compiled plans and resource ownership
 
-The queue now feeds the canonical `PFrameCompiler<S>`. It produces a `PRenderPlan` with `PPipelineHandle` / `PMeshHandle`, indexed `PDrawCommand` values and a packed `PInstanceHeader` stream. Geometry offsets remain mesh-local until the backend resolves them against the existing GPU arena; instance offsets refer to the plan's packed stream. Combined compilation sorts ordinary transparency across the requested stages and keeps OIT batches separate. `compileOpaque` consumes only opaque submissions, leaving transparency queued.
+`PFrameCompiler<S>` produces a `PRenderPlan` containing `PPipelineHandle` / `PMeshHandle`, indexed `PDrawCommand` values and packed `PInstanceHeader` data. Combined compilation sorts ordinary transparency across the requested stages and keeps OIT groups separate. `compileOpaque(...)` consumes only opaque submissions.
 
-`PGlMultiDrawExecutor` implements `PRenderExecutor` using the existing 26.1 instancing, indirect streams and OIT implementation. Its `execute(plan, frame)` consumes captured model-view and projection matrices; it restores the host projection afterward. Minecraft 26.1 exposes the current projection as a GPU buffer, so the host adapter mirrors actual CPU projection uploads instead of reading back GPU memory. Custom hosts that bind their own projection buffers can provide an explicit `PRenderFrame`.
+`PGlMultiDrawExecutor` executes plans using the 26.1 geometry arena, instance streams, indirect submission and OIT implementation. Canonical `legacy.Gl*` classes delegate to this same backend. They do not create another renderer. `PRenderFrame` captures model-view/projection state; an external host can supply its own frame. `PRenderCapabilities` reports pose storage, upload and draw modes independently; CPU pose evaluation can coexist with GPU mesh deformation.
 
-`PRenderCapabilities.storageMode()` describes pose storage. The current backend reports CPU pose evaluation and retains GPU deformation through the existing UBO stream. Draw submission and upload modes independently report multi-draw indirect and persistent ring storage where supported.
-
-Checkpoint **4.1b.1** adds canonical queue overloads accepting `PGeometryData` or `PDynamicGeometry` with `PInstanceHeader`. Portable geometry uses the same `POSITION_TEX_NORMAL` layout and triangle indices as baked meshes. Both unsigned 16-bit and 32-bit indices are supported. Immutable data is uploaded once per resource identity into the existing arena pages.
-
-For mutable geometry, reuse one `PGlDynamicGeometry` source and call `update(PGeometryData)` on the render thread. Submit it through the `PDynamicGeometry` overloads. Pending submissions see the latest data, so flush before changing the index count or vertex layout. The executor reuses allocations associated with its reclaimed frame slots; repeated updates do not add a new static arena allocation each frame. Queue reload/disconnect/shutdown owns GPU cleanup.
-
-The baked-mesh queue overloads above remain a temporary facade into the single canonical compiler. Modern baked/model/renderer API adaptation is the next checkpoint, **4.1b.2**. World stage timing, target-specific OIT composition and GUI/offscreen scopes still require their remaining stage 4 checks. Canonical item submissions with `ItemDisplayContext.GUI` do not enter the world queue; full local GUI rendering is adapted in 4.3. See the [migration journal](../docs/porting/26.1.2-multiloader.md).
+Executor cleanup releases its execution resources. A separately owned `PGlResourceRegistry` retains registered geometry until its own `clear()` or source close; custom hosts must manage both lifetimes. The normal loader reload/disconnect/shutdown integration already owns the library's cleanup.
 
 ## Renderer hooks
 
-Every PulseLib renderer has the same three-stage flow:
-
-* `preSubmit(PoseStack, renderState, CameraRenderState, SubmitNodeCollector)` runs before the model is submitted.
-* `trueSubmit(...)` is the normal PulseLib model submission.
-* `postSubmit(...)` runs after the model is submitted.
-
-A typical customization is small:
+The built-in renderers retain owner-based customization and add native render-state overloads. Their native submit lifecycle is `preSubmit(...)`, `trueSubmit(...)`, then `postSubmit(...)`:
 
 ```java
 @Override
 public void postSubmit(PoseStack poseStack,
-                       RobotRenderState renderState,
-                       CameraRenderState cameraRenderState,
-                       SubmitNodeCollector submitNodeCollector) {
-    // Submit additional PulseLib meshes or collector nodes here.
+					   RobotRenderState renderState,
+					   CameraRenderState cameraRenderState,
+					   SubmitNodeCollector submitNodeCollector)
+{
+	// Submit extra PulseLib meshes or native collector nodes here.
 }
 ```
 
-Classes used:
-
-* [`PRenderTypes`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java)
-* [`PRenderQueue`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java)
-* [`PRenderStagesHandler`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java)
-
-For shader paths, vertex/instance inputs, GPU deformers, and the OIT implementation, see [Shaders](shaders.md).
+Use the supplied render state and invocation inputs when preparing submissions. Capture any values needed by deferred collector callbacks before queuing them. See [Renderers](renderers.md) and the [API reference](api-reference.md).

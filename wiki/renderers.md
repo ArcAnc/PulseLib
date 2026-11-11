@@ -1,8 +1,10 @@
 # Renderers
 
+Examples on this page use `Identifier` from `net.minecraft.resources`, `RenderType` from `net.minecraft.client.renderer.rendertype`, and the state interfaces in `com.arcanc.pulselib.content.renderer.base`.
+
 A PulseLib renderer is the bridge between Minecraft's render call and PulseLib's baked animated model. It gets the current animatable, asks for model data, binds the animation manager to the baked model, and submits every posed bone to the render queue.
 
-All built-in renderers implement [`PRenderer`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/PRenderer.java) and use the same submit lifecycle:
+All built-in renderers implement [`PRenderer`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderer.java) and use the same submit lifecycle:
 
 * `preSubmit(...)` - hook before PulseLib submits model meshes.
 * `trueSubmit(...)` - default PulseLib model submission.
@@ -12,78 +14,100 @@ Most custom renderers need a model-data constructor and a render-state implement
 
 ## Molang context
 
-The built-in entity, block entity, and item renderers prepare a Molang context once per controller and render pass, then reuse it for all mixed bones. Override `populateMolangContext(...)` to add renderer-specific `query.*` values. The full API and the current `variable.*` lifetime limitation are documented in [Molang animations](molang-animations.md).
+The built-in entity, block entity, and item renderers prepare a Molang context once per controller and render pass, then reuse it for all mixed bones. Override `populateMolangContext(...)` to add renderer-specific `query.*` values. Custom queries and persistent per-controller `variable.*` state are documented in [Molang animations](molang-animations.md).
 
 ## Block renderer
 
-Use [`PBlockRenderer`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/PBlockRenderer.java) for block entities. The block itself should hide vanilla rendering; the block entity renderer becomes the visible model.
+Use [`PBlockRenderer`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PBlockRenderer.java) for block entities. The block itself should hide vanilla rendering; the block entity renderer becomes the visible model.
 
 ```java
-public class CrusherRenderer extends PBlockRenderer<CrusherBlockEntity, CrusherRenderState> {
-    public CrusherRenderer(BlockEntityRendererProvider.Context context) {
-        super(PModelData.block(
-                        Identifier.fromNamespaceAndPath("examplemod", "crusher")),
-                PRenderTypes.RenderTypeProvider::trianglesCutout);
-    }
+public class CrusherRenderer extends PBlockRenderer<CrusherBlockEntity, CrusherRenderState>
+{
+	public CrusherRenderer(BlockEntityRendererProvider.Context context)
+	{
+		super(PModelData.block(
+						Identifier.fromNamespaceAndPath("examplemod", "crusher")),
+				PRenderTypes.RenderTypeProvider::trianglesCutout);
+	}
 
-    @Override
-    public CrusherRenderState createRenderState() {
-        return new CrusherRenderState();
-    }
+	@Override
+	public CrusherRenderState createRenderState()
+	{
+		return new CrusherRenderState();
+	}
 }
 
-public class CrusherRenderState extends PBlockRenderState.Impl<CrusherBlockEntity> {}
+public class CrusherRenderState extends PBlockRenderState.Impl<CrusherBlockEntity>
+{
+}
 ```
 
-Register it through NeoForge:
+Register it in your loader's client setup. NeoForge uses the mod-bus event below:
 
 ```java
 @SubscribeEvent
-public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
-    event.registerBlockEntityRenderer(MyBlockEntities.CRUSHER.get(), CrusherRenderer::new);
+public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event)
+{
+	event.registerBlockEntityRenderer(MyBlockEntities.CRUSHER.get(), CrusherRenderer::new);
 }
 ```
 
-## Item renderer
-
-Use [`PItemRenderer`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java) when the item model needs real animation instead of a static baked item JSON. The item must implement [`PAnimatable`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/animatable/PAnimatable.java).
+Fabric uses the same renderer class:
 
 ```java
-public class WandRenderer extends PItemRenderer<WandItem, WandRenderState> {
-    public WandRenderer(PModelData modelData) {
-        super(modelData,
-                PRenderTypes.RenderTypeProvider::trianglesSolid);
-    }
+BlockEntityRendererRegistry.register(MyBlockEntities.CRUSHER.get(), CrusherRenderer::new);
+```
 
-    @Override
-    protected WandRenderState createRenderState() {
-        return new WandRenderState();
-    }
+`BlockEntityRendererRegistry` is in Fabric API's `net.fabricmc.fabric.api.client.rendering.v1` package. The registry holders shown here are placeholders for your mod's block-entity type references.
+
+## Item renderer
+
+Use [`PItemRenderer`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java) when the item model needs real animation instead of a static baked item JSON. The item must implement [`PAnimatable`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimatable.java).
+
+```java
+public class WandRenderer extends PItemRenderer<WandItem, WandRenderState>
+{
+	public WandRenderer(PModelData modelData)
+	{
+		super(modelData,
+				PRenderTypes.RenderTypeProvider::trianglesSolid);
+	}
+
+	@Override
+	protected WandRenderState createRenderState()
+	{
+		return new WandRenderState();
+	}
 }
 
-public class WandRenderState extends PItemRenderState.Impl<WandItem> {}
+public class WandRenderState extends PItemRenderState.Impl<WandItem>
+{
+}
 ```
 
 For standard special item models, `modelData` is decoded from the item JSON. See [PulseLib Items](pulselib-items.md) for the matching resource registration.
 
-In GUI context, `PItemRenderer` submits to the `GUI` queue and immediately flushes that stage through the collector. In `FIRST_PERSON_LEFT_HAND` and `FIRST_PERSON_RIGHT_HAND` contexts, it submits to the dedicated `FIRST_PERSON` stage, which PulseLib flushes and composites immediately after the current hand pass. An enabled player first-person animation adjusts the arm or item pose inside that normal vanilla pass; it does not replace the pass. The renderer preserves the render type supplied to its constructor; use a render type compatible with the contexts in which the item is displayed.
+In GUI context, `PItemRenderer` executes in an isolated local scope and flushes that local compiler when the scope closes. It does not drain world submissions. In `FIRST_PERSON_LEFT_HAND` and `FIRST_PERSON_RIGHT_HAND` contexts, it submits to the dedicated `FIRST_PERSON` stage, which PulseLib flushes and composites immediately after the current hand pass. An enabled player first-person animation adjusts the arm or item pose inside that normal vanilla pass; it does not replace the pass. The renderer preserves the render type supplied to its constructor; use a render type compatible with the contexts in which the item is displayed.
 
 ## Entity renderer
 
-Use [`PEntityRenderer`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java) when the entire entity model is a PulseLib model.
+Use [`PEntityRenderer`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java) when the entire entity model is a PulseLib model.
 
 ```java
-public class RobotRenderer extends PEntityRenderer<RobotEntity, PEntityRenderState.Impl<RobotEntity>> {
-    public RobotRenderer(EntityRendererProvider.Context context) {
-        super(context,
-                PModelData.entity(Identifier.fromNamespaceAndPath("examplemod", "robot")),
-                PRenderTypes.RenderTypeProvider::trianglesSolid);
-    }
+public class RobotRenderer extends PEntityRenderer<RobotEntity, PEntityRenderState.LivingImpl<RobotEntity>>
+{
+	public RobotRenderer(EntityRendererProvider.Context context)
+	{
+		super(context,
+				PModelData.entity(Identifier.fromNamespaceAndPath("examplemod", "robot")),
+				PRenderTypes.RenderTypeProvider::trianglesSolid);
+	}
 
-    @Override
-    public PEntityRenderState.Impl<RobotEntity> createRenderState() {
-        return PLibHelper.entityRenderState();
-    }
+	@Override
+	public PEntityRenderState.LivingImpl<RobotEntity> createRenderState()
+	{
+		return PLibHelper.livingRenderState();
+	}
 }
 ```
 
@@ -91,7 +115,7 @@ For `LivingEntity` subclasses, `PEntityRenderer` applies vanilla body rotation, 
 
 ## Render type requirement
 
-PulseLib models are triangle meshes. Use [`PRenderTypes.RenderTypeProvider`](https://github.com/ArcAnc/PulseLib/blob/26.1/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java):
+PulseLib models are triangle meshes. Use [`PRenderTypes.RenderTypeProvider`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java):
 
 ```java
 PRenderTypes.RenderTypeProvider::trianglesSolid
@@ -101,4 +125,4 @@ PRenderTypes.RenderTypeProvider::trianglesTranslucent
 
 These are the queued variants used by all three renderer classes, including `PItemRenderer` in GUI display context. `trianglesGui` is an instant-rendering compatibility alias and is not compatible with the instanced queue. Do not pass vanilla entity/block `RenderType` values unless they use a compatible triangle vertex format and shader setup.
 
-The renderer APIs use 26.1 render states and `SubmitNodeCollector`; the old `MultiBufferSource`/`BlockEntityWithoutLevelRenderer` examples do not apply to this branch.
+The renderer APIs use 26.1.2 render states and `SubmitNodeCollector`; the old `MultiBufferSource`/`BlockEntityWithoutLevelRenderer` examples do not apply to this branch.
