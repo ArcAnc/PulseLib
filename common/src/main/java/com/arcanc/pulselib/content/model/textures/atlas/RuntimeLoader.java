@@ -28,6 +28,8 @@ import java.util.stream.Collectors;
 public class RuntimeLoader implements SpriteSource
 {
 	public static final MapCodec<RuntimeLoader> CODEC = MapCodec.unit(RuntimeLoader ::new);
+	/** Native sprite-source type, shared with the registered codec. */
+	public static final MapCodec<RuntimeLoader> TYPE = CODEC;
 	
 	/**
 	 * Performs the run operation.
@@ -53,6 +55,12 @@ public class RuntimeLoader implements SpriteSource
 		});
 	}
 	
+	/** Returns the native codec representing this sprite-source type. */
+	public MapCodec<RuntimeLoader> type()
+	{
+		return TYPE;
+	}
+
 	/**
 	 * Performs the codec operation.
 	 * @return the value produced by this operation.

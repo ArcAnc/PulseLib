@@ -12,6 +12,7 @@ package com.arcanc.pulselib.fabric;
 import com.arcanc.pulselib.content.event.PulseRuntime;
 import com.arcanc.pulselib.content.animatable.PLibAnimationTicker;
 import com.arcanc.pulselib.content.animatable.instance.InstanceAnimationManager;
+import com.arcanc.pulselib.content.model.textures.atlas.PLibMetadata;
 import com.arcanc.pulselib.content.model.textures.atlas.PLibSpriteMetadata;
 import com.arcanc.pulselib.content.model.textures.atlas.RuntimeLoader;
 import com.arcanc.pulselib.content.renderer.PRenderStagesHandler;
@@ -61,7 +62,7 @@ public final class PulseLibFabricClient implements ClientModInitializer
 		PulsePluginManager.get().registerClient();
 		SpriteSourceRegistry.register(PLibDatabase.rl("runtime_loader"), RuntimeLoader.CODEC);
 		AtlasRegistry.register(new AtlasManager.AtlasConfig(PResourceCache.ATLAS_LOCATION,
-				PResourceCache.ATLAS_FILE_LOCATION, false, Set.of(PLibSpriteMetadata.TYPE)));
+				PResourceCache.ATLAS_FILE_LOCATION, false, Set.of(PLibSpriteMetadata.TYPE, PLibMetadata.TYPE)));
 		ResourceLoader resources = ResourceLoader.get(PackType.CLIENT_RESOURCES);
 		resources.registerReloadListener(PLibDatabase.RELOAD_LISTENER_ID, PModelCache::reload);
 		resources.addListenerOrdering(ResourceReloaderKeys.Client.MODELS, PLibDatabase.RELOAD_LISTENER_ID);

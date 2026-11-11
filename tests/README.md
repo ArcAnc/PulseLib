@@ -889,3 +889,18 @@ stream readback and deletion checks, plus the existing render regressions.
 All 249 fresh JUnit and subsystem/static API checks pass. The next checkpoint
 is 7.2c material/atlas compatibility. See journal §77 for source/compiled proofs,
 raw runtime artifacts, debugger evidence and WIP round-trip preservation.
+
+
+Stage **7.2c** restores material aliases, the PLibMetadata record and native
+ShadersProvider/ShaderRegistrar entry points. The six selected types expose all
+47 canonical members with 18 enumerated native declaration adapters and 141
+compiled member checks. Shader getters return immutable RenderPipeline owners;
+registration shares the native one-shot registry of 19 pipelines. Transparency
+queries use native BlendFunction, and RuntimeLoader type is its registered codec.
+Both loaders decode canonical and native metadata records on the same real sprite.
+The emissiveVariant regression is fixed for GUI/immediate and unknown custom types.
+All 254 fresh JUnit pass. Both targeted clients verify six aliases, seven material
+selections, 17 shader pipeline identities and actual dual sprite metadata, together
+with their existing smoke/render/GPU lifetime guards. Shaders and GPU backend are
+preserved. See journal §78 and stage-7.2c evidence. The next checkpoint is 7.2d
+native Mixin hooks and loader lifecycle API; whole-library acceptance remains open.

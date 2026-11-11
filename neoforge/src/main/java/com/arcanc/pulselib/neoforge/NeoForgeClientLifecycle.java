@@ -12,6 +12,7 @@ package com.arcanc.pulselib.neoforge;
 import com.arcanc.pulselib.content.animatable.PLibAnimationTicker;
 import com.arcanc.pulselib.content.animatable.instance.InstanceAnimationManager;
 import com.arcanc.pulselib.content.event.PulseRuntime;
+import com.arcanc.pulselib.content.model.textures.atlas.PLibMetadata;
 import com.arcanc.pulselib.content.model.textures.atlas.PLibSpriteMetadata;
 import com.arcanc.pulselib.content.renderer.PModelGuiRenderer;
 import com.arcanc.pulselib.content.renderer.PModelGuiRenderState;
@@ -101,6 +102,7 @@ public final class NeoForgeClientLifecycle
 	{
 		event.register(new AtlasManager.AtlasConfig(PResourceCache.ATLAS_LOCATION, PResourceCache.ATLAS_FILE_LOCATION, false));
 		event.addAdditionalMetadata(PResourceCache.ATLAS_FILE_LOCATION, PLibSpriteMetadata.TYPE);
+		event.addAdditionalMetadata(PResourceCache.ATLAS_FILE_LOCATION, PLibMetadata.TYPE);
 	}
 
 	private static void addLayers(EntityRenderersEvent.AddLayers event)

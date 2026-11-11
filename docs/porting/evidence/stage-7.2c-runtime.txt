@@ -1,0 +1,14 @@
+=== fabric-jar-menu ===
+[08:21:45] [Render thread/INFO] (Pulse Lib) GPU FACADE PASS: pixels=6, fences=5, native stream readback/deletion
+[08:21:45] [Render thread/INFO] (Pulse Lib) MATERIAL API PASS: aliases=6, materialVariants=7, pipelineChecks=17, metadataSprites=1
+[08:21:46] [Render thread/INFO] (Pulse Lib) PULSE TEST EXPLICIT CLEANUP PASS: buffers=15, textures=24, fbos=2, vaos=2, fences=11
+[08:21:46] [Render thread/INFO] (Pulse Lib) PULSE TEST CLIENT PASS
+[08:21:46] [Render thread/INFO] (Pulse Lib) CANONICAL SHUTDOWN PASS
+BUILD SUCCESSFUL in 19s
+=== neoforge-source-menu-gecko ===
+[08:22:04] [Render thread/INFO] [Pulse Lib/]: GPU FACADE PASS: pixels=6, fences=5, native stream readback/deletion
+[08:22:04] [Render thread/INFO] [Pulse Lib/]: MATERIAL API PASS: aliases=6, materialVariants=7, pipelineChecks=17, metadataSprites=1
+[08:22:05] [Render thread/INFO] [Pulse Lib/]: PULSE TEST EXPLICIT CLEANUP PASS: buffers=15, textures=24, fbos=2, vaos=2, fences=11
+[08:22:05] [Render thread/INFO] [Pulse Lib/]: PULSE TEST CLIENT PASS
+[08:22:05] [Render thread/INFO] [Pulse Lib/]: CANONICAL SHUTDOWN PASS
+BUILD SUCCESSFUL in 19s

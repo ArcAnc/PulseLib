@@ -12,6 +12,7 @@ package com.arcanc.pulselib.test.mixin;
 import com.arcanc.pulselib.test.DemoProbe;
 import com.arcanc.pulselib.test.CanonicalRun;
 import com.arcanc.pulselib.test.GpuFacadeProbe;
+import com.arcanc.pulselib.test.MaterialApiProbe;
 import com.arcanc.pulselib.test.PlayerMotionRun;
 import com.arcanc.pulselib.test.GlErrors;
 import com.arcanc.pulselib.test.H14OffscreenHarness;
@@ -68,7 +69,10 @@ public abstract class SmokeRenderMixin
 			SmokeHarness.frame();
 		}
 		if (CanonicalRun.noWorldSmoke() && SmokeHarness.completed())
+		{
 			GpuFacadeProbe.run();
+			MaterialApiProbe.run();
+		}
 		CanonicalRun.frame();
 	}
 }
