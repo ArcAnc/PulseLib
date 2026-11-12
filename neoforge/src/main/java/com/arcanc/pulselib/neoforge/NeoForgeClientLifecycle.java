@@ -22,7 +22,7 @@ import com.arcanc.pulselib.util.PRenderTypes;
 import com.arcanc.pulselib.util.PResourceCache;
 import com.arcanc.pulselib.util.attachments.humanoid.armor.PLibArmorHandler;
 import com.google.common.reflect.TypeToken;
-import com.mojang.blaze3d.textures.TextureFormat;
+import com.mojang.blaze3d.GpuFormat;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
@@ -52,7 +52,7 @@ public final class NeoForgeClientLifecycle
 	public static void register(IEventBus bus)
 	{
 		PClientRenderHooks.installArmorModels(NeoForgeClientLifecycle::armorModel);
-		PClientRenderHooks.install(TextureFormat::hasStencilAspect, (renderer, pose, collector, light, skin, sleeve, player, right) ->
+		PClientRenderHooks.install(GpuFormat::hasStencilAspect, (renderer, pose, collector, light, skin, sleeve, player, right) ->
 		{
 			if (right)
 				renderer.renderRightHand(pose, collector, light, skin, sleeve, player);

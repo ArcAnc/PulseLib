@@ -10,6 +10,7 @@
 package com.arcanc.pulselib.content.model.baked;
 
 
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -30,7 +31,7 @@ public class AtlasBufferBuilder extends BufferBuilder
 	 * @param format the format to use.
 	 * @param sprite the sprite to use.
 	 */
-	public AtlasBufferBuilder(ByteBufferBuilder buffer, VertexFormat.Mode mode, VertexFormat format, TextureAtlasSprite sprite)
+	public AtlasBufferBuilder(ByteBufferBuilder buffer, PrimitiveTopology mode, VertexFormat format, TextureAtlasSprite sprite)
 	{
 		super(buffer, mode, format);
 		this.sprite = sprite;

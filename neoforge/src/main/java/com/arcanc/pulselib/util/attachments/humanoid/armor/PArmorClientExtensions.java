@@ -24,7 +24,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Unit;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -219,7 +219,7 @@ public class PArmorClientExtensions implements IClientItemExtensions
 
 	private static EquipmentClientInfo.LayerType layerType(LivingEntity entity, EquipmentSlot slot)
 	{
-		if (entity.isBaby() && entity.getType() != EntityType.ARMOR_STAND)
+		if (entity.isBaby() && entity.getType() != EntityTypes.ARMOR_STAND)
 			return EquipmentClientInfo.LayerType.HUMANOID_BABY;
 		return slot == EquipmentSlot.LEGS ? EquipmentClientInfo.LayerType.HUMANOID_LEGGINGS : EquipmentClientInfo.LayerType.HUMANOID;
 	}

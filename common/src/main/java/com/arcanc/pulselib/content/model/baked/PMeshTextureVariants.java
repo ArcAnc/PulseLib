@@ -16,10 +16,10 @@ import com.arcanc.pulselib.content.renderer.legacy.GlGeometryDataFactory;
 import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.arcanc.pulselib.util.PResourceCache;
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.MeshData;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.ApiStatus;
@@ -82,8 +82,8 @@ public final class PMeshTextureVariants
 		try (ByteBufferBuilder bytes = new ByteBufferBuilder(source.vertexCount() * PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize()))
 		{
 			BufferBuilder builder = sprite.contents().name().getPath().equals("missingno") ?
-					new BufferBuilder(bytes, VertexFormat.Mode.TRIANGLES, PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL) :
-					new AtlasBufferBuilder(bytes, VertexFormat.Mode.TRIANGLES, PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL, sprite);
+					new BufferBuilder(bytes, PrimitiveTopology.TRIANGLES, PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL) :
+					new AtlasBufferBuilder(bytes, PrimitiveTopology.TRIANGLES, PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL, sprite);
 			for (int vertex = 0; vertex < source.vertexCount(); vertex++)
 				builder.addVertex(source.positions().get(vertex * 3), source.positions().get(vertex * 3 + 1), source.positions().get(vertex * 3 + 2)).
 						setUv(source.uvs().get(vertex * 2), source.uvs().get(vertex * 2 + 1)).

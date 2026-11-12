@@ -12,7 +12,7 @@ package com.arcanc.pulselib.platform;
 import com.arcanc.pulselib.content.player.animation.firstPerson.PFirstPersonPassTime;
 import com.arcanc.pulselib.content.player.deformer.PPlayerMeshDeformers;
 import com.arcanc.pulselib.content.renderer.base.PRenderCallbackScope;
-import com.mojang.blaze3d.textures.TextureFormat;
+import com.mojang.blaze3d.GpuFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.Model;
@@ -29,7 +29,7 @@ import java.util.function.Predicate;
 /** Narrow bridges for optional loader extensions to vanilla graphics APIs. */
 public final class PClientRenderHooks
 {
-	private static Predicate<TextureFormat> stencilAspect = format -> false;
+	private static Predicate<GpuFormat> stencilAspect = GpuFormat::hasStencilAspect;
 	private static ArmorModelResolver armorModels = (stack, type, model) -> model;
 	private static ArmRenderer armRenderer = (renderer, pose, collector, light, skin, sleeve, player, right) ->
 	{
@@ -43,13 +43,13 @@ public final class PClientRenderHooks
 	{
 	}
 
-	public static void install(Predicate<TextureFormat> stencilQuery, ArmRenderer arms)
+	public static void install(Predicate<GpuFormat> stencilQuery, ArmRenderer arms)
 	{
 		stencilAspect = Objects.requireNonNull(stencilQuery);
 		armRenderer = Objects.requireNonNull(arms);
 	}
 
-	public static boolean hasStencilAspect(TextureFormat format)
+	public static boolean hasStencilAspect(GpuFormat format)
 	{
 		return stencilAspect.test(format);
 	}

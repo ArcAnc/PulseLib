@@ -12,6 +12,7 @@ package com.arcanc.pulselib.content.mixin;
 import com.arcanc.pulselib.content.animatable.PAnimatable;
 import com.arcanc.pulselib.content.animatable.PItemStackAnimationData;
 import com.arcanc.pulselib.content.animatable.PItemStackAnimationIds;
+import com.arcanc.pulselib.content.animatable.PItemStackAnimationIdentity;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -84,11 +85,7 @@ public abstract class ItemStackMixin implements PItemStackAnimationData
 	{
 		ItemStack result = callback.getReturnValue();
 		if (!result.isEmpty())
-		{
-			long id = pulselib$getOrCreateAnimationId();
-			if (id != 0)
-				((PItemStackAnimationData)(Object)result).pulselib$setAnimationId(id);
-		}
+			PItemStackAnimationIdentity.copy(this, (PItemStackAnimationData)(Object)result);
 	}
 
 	/**
@@ -100,14 +97,7 @@ public abstract class ItemStackMixin implements PItemStackAnimationData
 	private void pulselib$splitAnimationId(CallbackInfoReturnable<ItemStack> callback)
 	{
 		ItemStack result = callback.getReturnValue();
-		if (result.isEmpty())
-			return;
-		PItemStackAnimationData data = (PItemStackAnimationData)(Object)result;
-		if (data.pulselib$getAnimationId() == 0)
-			return;
-		if (((ItemStack)(Object)this).isEmpty())
-			pulselib$setAnimationId(0);
-		else
-			data.pulselib$setAnimationId(PItemStackAnimationIds.nextId());
+		if (!result.isEmpty())
+			PItemStackAnimationIdentity.split(this, (PItemStackAnimationData)(Object)result, ((ItemStack)(Object)this).isEmpty());
 	}
 }

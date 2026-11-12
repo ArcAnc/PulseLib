@@ -1,0 +1,1938 @@
+{
+  "author": "ArcAnc",
+  "created_at": "2026-11-12",
+  "copyright": "Copyright (c) 2026",
+  "license": "Arc's License of Common Sense (LICENSE.txt)",
+  "stage_start_commit": "c633ebefc79383c984522e9f63e98875fd7e235a",
+  "baseline_commit": "5065103d1bccc7880445f9e93bc6ed709cfbb809",
+  "status": "partial",
+  "diagnostic_flags": [
+    "--release 25",
+    "-proc:none",
+    "-implicit:none",
+    "-Xmaxerrs 10000",
+    "-XDshould-stop.ifError=FLOW"
+  ],
+  "compilation": [
+    {
+      "module": "common",
+      "exit_code": 1,
+      "source_count": 393,
+      "error_count": 118,
+      "files": {
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java": 6,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderLayerMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderSubmitMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/HumanoidArmorLayerMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemFeatureRendererMixin.java": 5,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemSubmitMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java": 9,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartSubmitMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java": 6,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelSubmitMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/WeatherEffectRendererMixin.java": 2,
+        "common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java": 2,
+        "common/src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers.java": 2,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java": 7,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java": 2,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java": 8,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlRenderHost.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java": 18,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java": 5,
+        "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java": 38
+      },
+      "errors": [
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java",
+          "line": 21,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java",
+          "line": 22,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java",
+          "line": 40,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java",
+          "line": 41,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java",
+          "line": 41,
+          "message": "package MultiBufferSource does not exist"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java",
+          "line": 64,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 25,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 757,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 793,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemFeatureRendererMixin.java",
+          "line": 15,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemFeatureRendererMixin.java",
+          "line": 16,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemFeatureRendererMixin.java",
+          "line": 32,
+          "message": "package MultiBufferSource does not exist"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemFeatureRendererMixin.java",
+          "line": 32,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemFeatureRendererMixin.java",
+          "line": 33,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "line": 21,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "line": 22,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "line": 24,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "line": 43,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "line": 44,
+          "message": "package MultiBufferSource does not exist"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "line": 44,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "line": 45,
+          "message": "package MultiBufferSource does not exist"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "line": 64,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java",
+          "line": 24,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java",
+          "line": 25,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java",
+          "line": 44,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java",
+          "line": 47,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java",
+          "line": 48,
+          "message": "package MultiBufferSource does not exist"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java",
+          "line": 75,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 17,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 25,
+          "message": "package MultiBufferSource does not exist"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 19,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 20,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 21,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderSubmitMixin.java",
+          "line": 24,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemSubmitMixin.java",
+          "line": 21,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "line": 35,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartSubmitMixin.java",
+          "line": 28,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelSubmitMixin.java",
+          "line": 26,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java",
+          "line": 101,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java",
+          "line": 249,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderLayerMixin.java",
+          "line": 75,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java",
+          "line": 45,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java",
+          "line": 83,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java",
+          "line": 85,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java",
+          "line": 200,
+          "message": "method _enableBlend in class GlStateManager cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java",
+          "line": 202,
+          "message": "method _disableBlend in class GlStateManager cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java",
+          "line": 432,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "line": 109,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "line": 273,
+          "message": "constructor TextureTarget in class TextureTarget cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "line": 287,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "line": 436,
+          "message": "incompatible types: OptionalInt cannot be converted to Optional<Vector4fc>"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "line": 451,
+          "message": "incompatible types: GpuBuffer cannot be converted to GpuBufferSlice"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "line": 452,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "line": 453,
+          "message": "method drawIndexed in class RenderPass cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "line": 528,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 232,
+          "message": "method _enableBlend in class GlStateManager cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 259,
+          "message": "method _enableBlend in class GlStateManager cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 306,
+          "message": "incompatible types: OptionalInt cannot be converted to Optional<Vector4fc>"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 318,
+          "message": "method draw in class RenderPass cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 358,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 369,
+          "message": "incompatible types: OptionalInt cannot be converted to Optional<Vector4fc>"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 375,
+          "message": "method draw in class RenderPass cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 378,
+          "message": "incompatible types: OptionalInt cannot be converted to Optional<Vector4fc>"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 389,
+          "message": "method draw in class RenderPass cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 468,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 471,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 474,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 811,
+          "message": "constructor GlTextureView in class GlTextureView cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 913,
+          "message": "method _enableBlend in class GlStateManager cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 915,
+          "message": "method _disableBlend in class GlStateManager cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/HumanoidArmorLayerMixin.java",
+          "line": 67,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/WeatherEffectRendererMixin.java",
+          "line": 26,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/WeatherEffectRendererMixin.java",
+          "line": 26,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers.java",
+          "line": 240,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers.java",
+          "line": 240,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 23,
+          "message": "PModelGuiRenderer is not abstract and does not override abstract method renderToTexture(PModelGuiRenderState,PoseStack,SubmitNodeCollector) in PictureInPictureRenderer"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 30,
+          "message": "method does not override or implement a method from a supertype"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 36,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 37,
+          "message": "method prepare in class PictureInPictureRenderer<T> cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 45,
+          "message": "method does not override or implement a method from a supertype"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java",
+          "line": 35,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java",
+          "line": 60,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlRenderHost.java",
+          "line": 41,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 64,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 63,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 62,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 56,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 69,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 76,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 83,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 91,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 99,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 107,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 117,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 126,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 136,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 144,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 160,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 160,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 154,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 169,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 169,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 166,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 191,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 191,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 188,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 189,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 189,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 189,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 175,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 206,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 203,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 202,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 194,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 274,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 273,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 272,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 271,
+          "message": "method builder in class VertexFormat cannot be applied to given types;"
+        }
+      ]
+    },
+    {
+      "module": "fabric",
+      "exit_code": 1,
+      "source_count": 403,
+      "error_count": 119,
+      "files": {
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java": 6,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderLayerMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderSubmitMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/HumanoidArmorLayerMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemFeatureRendererMixin.java": 5,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemSubmitMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java": 9,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartSubmitMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java": 6,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelSubmitMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/WeatherEffectRendererMixin.java": 2,
+        "common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java": 2,
+        "common/src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers.java": 2,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java": 7,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java": 2,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java": 8,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlRenderHost.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java": 18,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java": 5,
+        "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java": 38,
+        "fabric/src/main/java/com/arcanc/pulselib/fabric/PulseLibFabricClient.java": 1
+      },
+      "errors": [
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java",
+          "line": 21,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java",
+          "line": 22,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java",
+          "line": 40,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java",
+          "line": 41,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java",
+          "line": 41,
+          "message": "package MultiBufferSource does not exist"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java",
+          "line": 64,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 25,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 757,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 793,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemFeatureRendererMixin.java",
+          "line": 15,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemFeatureRendererMixin.java",
+          "line": 16,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemFeatureRendererMixin.java",
+          "line": 32,
+          "message": "package MultiBufferSource does not exist"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemFeatureRendererMixin.java",
+          "line": 32,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemFeatureRendererMixin.java",
+          "line": 33,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "line": 21,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "line": 22,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "line": 24,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "line": 43,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "line": 44,
+          "message": "package MultiBufferSource does not exist"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "line": 44,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "line": 45,
+          "message": "package MultiBufferSource does not exist"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "line": 64,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java",
+          "line": 24,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java",
+          "line": 25,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java",
+          "line": 44,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java",
+          "line": 47,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java",
+          "line": 48,
+          "message": "package MultiBufferSource does not exist"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java",
+          "line": 75,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 17,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 25,
+          "message": "package MultiBufferSource does not exist"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 19,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 20,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 21,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderSubmitMixin.java",
+          "line": 24,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemSubmitMixin.java",
+          "line": 21,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "line": 35,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartSubmitMixin.java",
+          "line": 28,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelSubmitMixin.java",
+          "line": 26,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java",
+          "line": 101,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java",
+          "line": 249,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderLayerMixin.java",
+          "line": 75,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java",
+          "line": 45,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java",
+          "line": 83,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java",
+          "line": 85,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java",
+          "line": 200,
+          "message": "method _enableBlend in class GlStateManager cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java",
+          "line": 202,
+          "message": "method _disableBlend in class GlStateManager cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java",
+          "line": 432,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "line": 109,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "line": 273,
+          "message": "constructor TextureTarget in class TextureTarget cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "line": 287,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "line": 436,
+          "message": "incompatible types: OptionalInt cannot be converted to Optional<Vector4fc>"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "line": 451,
+          "message": "incompatible types: GpuBuffer cannot be converted to GpuBufferSlice"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "line": 452,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "line": 453,
+          "message": "method drawIndexed in class RenderPass cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "line": 528,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 232,
+          "message": "method _enableBlend in class GlStateManager cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 259,
+          "message": "method _enableBlend in class GlStateManager cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 306,
+          "message": "incompatible types: OptionalInt cannot be converted to Optional<Vector4fc>"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 318,
+          "message": "method draw in class RenderPass cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 358,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 369,
+          "message": "incompatible types: OptionalInt cannot be converted to Optional<Vector4fc>"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 375,
+          "message": "method draw in class RenderPass cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 378,
+          "message": "incompatible types: OptionalInt cannot be converted to Optional<Vector4fc>"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 389,
+          "message": "method draw in class RenderPass cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 468,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 471,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 474,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 811,
+          "message": "constructor GlTextureView in class GlTextureView cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 913,
+          "message": "method _enableBlend in class GlStateManager cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 915,
+          "message": "method _disableBlend in class GlStateManager cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/HumanoidArmorLayerMixin.java",
+          "line": 67,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/WeatherEffectRendererMixin.java",
+          "line": 26,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/WeatherEffectRendererMixin.java",
+          "line": 26,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers.java",
+          "line": 240,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers.java",
+          "line": 240,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 23,
+          "message": "PModelGuiRenderer is not abstract and does not override abstract method renderToTexture(PModelGuiRenderState,PoseStack,SubmitNodeCollector) in PictureInPictureRenderer"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 30,
+          "message": "method does not override or implement a method from a supertype"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 36,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 37,
+          "message": "method prepare in class PictureInPictureRenderer<T> cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 45,
+          "message": "method does not override or implement a method from a supertype"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java",
+          "line": 35,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java",
+          "line": 60,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlRenderHost.java",
+          "line": 41,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 64,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 63,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 62,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 56,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 69,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 76,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 83,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 91,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 99,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 107,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 117,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 126,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 136,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 144,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 160,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 160,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 154,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 169,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 169,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 166,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 191,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 191,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 188,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 189,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 189,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 189,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 175,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 206,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 203,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 202,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 194,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 274,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 273,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 272,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 271,
+          "message": "method builder in class VertexFormat cannot be applied to given types;"
+        },
+        {
+          "path": "fabric/src/main/java/com/arcanc/pulselib/fabric/PulseLibFabricClient.java",
+          "line": 56,
+          "message": "cannot find symbol"
+        }
+      ]
+    },
+    {
+      "module": "neoforge",
+      "exit_code": 1,
+      "source_count": 405,
+      "error_count": 119,
+      "files": {
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java": 6,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderLayerMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderSubmitMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/HumanoidArmorLayerMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemFeatureRendererMixin.java": 5,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemSubmitMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java": 9,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartSubmitMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java": 6,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelSubmitMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/WeatherEffectRendererMixin.java": 2,
+        "common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java": 2,
+        "common/src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers.java": 2,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java": 7,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java": 2,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java": 8,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlRenderHost.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java": 18,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java": 5,
+        "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java": 38,
+        "neoforge/src/main/java/com/arcanc/pulselib/neoforge/NeoForgeClientLifecycle.java": 1
+      },
+      "errors": [
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java",
+          "line": 21,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java",
+          "line": 22,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java",
+          "line": 40,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java",
+          "line": 41,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java",
+          "line": 41,
+          "message": "package MultiBufferSource does not exist"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java",
+          "line": 64,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 25,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 757,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 793,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemFeatureRendererMixin.java",
+          "line": 15,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemFeatureRendererMixin.java",
+          "line": 16,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemFeatureRendererMixin.java",
+          "line": 32,
+          "message": "package MultiBufferSource does not exist"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemFeatureRendererMixin.java",
+          "line": 32,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemFeatureRendererMixin.java",
+          "line": 33,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "line": 21,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "line": 22,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "line": 24,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "line": 43,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "line": 44,
+          "message": "package MultiBufferSource does not exist"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "line": 44,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "line": 45,
+          "message": "package MultiBufferSource does not exist"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "line": 64,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java",
+          "line": 24,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java",
+          "line": 25,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java",
+          "line": 44,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java",
+          "line": 47,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java",
+          "line": 48,
+          "message": "package MultiBufferSource does not exist"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java",
+          "line": 75,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 17,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 25,
+          "message": "package MultiBufferSource does not exist"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 19,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 20,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 21,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderSubmitMixin.java",
+          "line": 24,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemSubmitMixin.java",
+          "line": 21,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "line": 35,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartSubmitMixin.java",
+          "line": 28,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelSubmitMixin.java",
+          "line": 26,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java",
+          "line": 101,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java",
+          "line": 249,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderLayerMixin.java",
+          "line": 75,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java",
+          "line": 45,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java",
+          "line": 83,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java",
+          "line": 85,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java",
+          "line": 200,
+          "message": "method _enableBlend in class GlStateManager cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java",
+          "line": 202,
+          "message": "method _disableBlend in class GlStateManager cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java",
+          "line": 432,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "line": 109,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "line": 273,
+          "message": "no suitable constructor found for TextureTarget(String,int,int,boolean)"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "line": 287,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "line": 436,
+          "message": "incompatible types: OptionalInt cannot be converted to Optional<Vector4fc>"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "line": 451,
+          "message": "incompatible types: GpuBuffer cannot be converted to GpuBufferSlice"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "line": 452,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "line": 453,
+          "message": "method drawIndexed in class RenderPass cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "line": 528,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 232,
+          "message": "method _enableBlend in class GlStateManager cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 259,
+          "message": "method _enableBlend in class GlStateManager cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 306,
+          "message": "incompatible types: OptionalInt cannot be converted to Optional<Vector4fc>"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 318,
+          "message": "method draw in class RenderPass cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 358,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 369,
+          "message": "incompatible types: OptionalInt cannot be converted to Optional<Vector4fc>"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 375,
+          "message": "method draw in class RenderPass cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 378,
+          "message": "incompatible types: OptionalInt cannot be converted to Optional<Vector4fc>"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 389,
+          "message": "method draw in class RenderPass cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 468,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 471,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 474,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 811,
+          "message": "constructor GlTextureView in class GlTextureView cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 913,
+          "message": "method _enableBlend in class GlStateManager cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "line": 915,
+          "message": "method _disableBlend in class GlStateManager cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/HumanoidArmorLayerMixin.java",
+          "line": 67,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/WeatherEffectRendererMixin.java",
+          "line": 26,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/WeatherEffectRendererMixin.java",
+          "line": 26,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers.java",
+          "line": 240,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers.java",
+          "line": 240,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 23,
+          "message": "PModelGuiRenderer is not abstract and does not override abstract method renderToTexture(PModelGuiRenderState,PoseStack,SubmitNodeCollector) in PictureInPictureRenderer"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 30,
+          "message": "method does not override or implement a method from a supertype"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 36,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 37,
+          "message": "method prepare in class PictureInPictureRenderer<T> cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 45,
+          "message": "method does not override or implement a method from a supertype"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java",
+          "line": 35,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java",
+          "line": 60,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlRenderHost.java",
+          "line": 41,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 64,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 63,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 62,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 56,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 69,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 76,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 83,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 91,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 99,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 107,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 117,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 126,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 136,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 144,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 160,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 160,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 154,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 169,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 169,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 166,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 191,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 191,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 188,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 189,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 189,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 189,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 175,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 206,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 203,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 202,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 194,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 274,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 273,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 272,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+          "line": 271,
+          "message": "method builder in class VertexFormat cannot be applied to given types;"
+        },
+        {
+          "path": "neoforge/src/main/java/com/arcanc/pulselib/neoforge/NeoForgeClientLifecycle.java",
+          "line": 64,
+          "message": "incompatible types: invalid constructor reference"
+        }
+      ]
+    }
+  ],
+  "checks": {
+    "common_core_components": "passed: explicit 27 production sources, not complete Common",
+    "vanilla_26_2_bootstrap_with_client_backend_class_rejection": "passed, no world; not PulseLib loader bootstrap",
+    "platform_and_discovery_adapter_abi": "passed for Fabric and NeoForge",
+    "asm_scan_directory_and_jar": "passed",
+    "plugin_phase_state_machine": "passed",
+    "registry_codecs": "passed",
+    "molang_and_catmull_rom": "passed",
+    "item_identity_transfer_rules": "passed; native transformed ItemStack integration not run",
+    "access_widener": "passed",
+    "pulse_plugin_manager_registration_in_running_loaders": "not verified",
+    "dedicated_server_pulselib_bootstrap": "not verified",
+    "minecraft_client_and_gpu": "not run"
+  },
+  "baseline_source_comparison": {
+    "unchanged_count": 405,
+    "changed_existing_files": [
+      "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemStackMixin.java",
+      "common/src/main/java/com/arcanc/pulselib/content/model/baked/AtlasBufferBuilder.java",
+      "common/src/main/java/com/arcanc/pulselib/content/model/baked/PDeformedMeshBuffers.java",
+      "common/src/main/java/com/arcanc/pulselib/content/model/baked/PGpuDeformedMeshBuffers.java",
+      "common/src/main/java/com/arcanc/pulselib/content/model/baked/PMeshTextureVariants.java",
+      "common/src/main/java/com/arcanc/pulselib/platform/PClientRenderHooks.java",
+      "common/src/main/java/com/arcanc/pulselib/util/PModelCache.java",
+      "neoforge/src/main/java/com/arcanc/pulselib/neoforge/NeoForgeClientLifecycle.java",
+      "neoforge/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PArmorClientExtensions.java"
+    ],
+    "added_production_sources": [
+      "common/src/main/java/com/arcanc/pulselib/content/animatable/PItemStackAnimationIdentity.java"
+    ]
+  },
+  "ordinary_common_compile": {
+    "command": "./gradlew :common:compileJava --no-parallel --no-daemon --console=plain",
+    "exit_code": 1,
+    "reported_errors": 38
+  },
+  "api_compatibility": {
+    "changed_existing_declarations": [
+      "AtlasBufferBuilder(ByteBufferBuilder, PrimitiveTopology, VertexFormat, TextureAtlasSprite)",
+      "PClientRenderHooks.install(Predicate<GpuFormat>, ArmRenderer)",
+      "PClientRenderHooks.hasStencilAspect(GpuFormat)"
+    ],
+    "new_internal_type": "PItemStackAnimationIdentity",
+    "baseline_rewritten": false
+  }
+}

@@ -23,10 +23,10 @@ import com.arcanc.pulselib.data.gecko.PGeckoModelLoader;
 import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.MeshData;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -290,7 +290,7 @@ public class PModelCache
 			try (ByteBufferBuilder bytes = ByteBufferBuilder.exactlySized(
 					primitive.vertexCount() * PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize()))
 			{
-				BufferBuilder buffer = new AtlasBufferBuilder(bytes, VertexFormat.Mode.TRIANGLES,
+				BufferBuilder buffer = new AtlasBufferBuilder(bytes, PrimitiveTopology.TRIANGLES,
 						PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL, sprite);
 				for (int vertex = 0; vertex < primitive.vertexCount(); vertex++)
 					buffer.addVertex(primitive.positions().get(vertex * 3), primitive.positions().get(vertex * 3 + 1), primitive.positions().get(vertex * 3 + 2)).
