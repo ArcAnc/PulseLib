@@ -11,7 +11,7 @@ Use the loader-specific artifact. The Common module contains shared code and res
 | Fabric | `com.arcanc.pulselib:pulselib-fabric:26.1.2-1.1.5.3` |
 | NeoForge | `com.arcanc.pulselib:pulselib-neoforge:26.1.2-1.1.5.3` |
 
-These are this branch's publication coordinates, not a claim that both artifacts have been released to the public Maven repository. Fabric Maven publishing is currently disabled in `fabric/build.gradle`; the root release tasks publish NeoForge only.
+Both loader projects support Maven, Modrinth and CurseForge publication. The coordinates above describe this branch; use a version available in the public repository, or build locally until that version is released.
 
 For a published release, add the [ArcAnc Maven repository](https://arcanc.github.io/Maven/) and the dependency matching your loader and Minecraft version:
 
@@ -41,6 +41,20 @@ dependencies {
 ```
 
 Keep shared PulseLib integration in your Common source set and Minecraft renderer registration in each loader's client source set. See [Getting started](getting-started.md).
+
+## Publishing from this checkout
+
+`publish` writes both loader publications to a local Maven repository. The default destination is `build/maven-repository/`; `mavenRepoDir` selects another directory:
+
+```sh
+./gradlew :fabric:publish :neoforge:publish -PmavenRepoDir=/absolute/path/to/maven-repository
+```
+
+The Maven workflow runs both publications and pushes the generated repository to `ArcAnc/Maven` using `MAVEN_REPO_TOKEN`. It runs on a published GitHub release or a manual workflow dispatch.
+
+`publishMods` uploads both loaders to Modrinth and CurseForge. `publishAll` combines those uploads with Maven publication. For a Fabric-only upload, run `:fabric:modrinth` and `:fabric:publishCurseForge`. Each loader has its own version suffix and artifacts; Fabric releases declare Fabric API as a required dependency on both services.
+
+Provide `MODRINTH_TOKEN` and `CURSEFORGE_TOKEN` in the environment, or Gradle properties `modrinthToken` and `curseforgeToken`, before running upload tasks. Keep credentials outside the repository. Use `./gradlew publishAll --dry-run` to inspect the release task graph without uploading files.
 
 ## For players
 

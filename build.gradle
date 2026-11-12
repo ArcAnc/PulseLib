@@ -11,10 +11,11 @@ allprojects {
 
 tasks.register('publishMods') {
     group = 'publishing'
-    dependsOn ':neoforge:modrinth', ':neoforge:publishCurseForge'
+    dependsOn ':fabric:modrinth', ':fabric:publishCurseForge',
+            ':neoforge:modrinth', ':neoforge:publishCurseForge'
 }
 
 tasks.register('publishAll') {
     group = 'publishing'
-    dependsOn ':neoforge:publish', 'publishMods'
+    dependsOn ':fabric:publish', ':neoforge:publish', 'publishMods'
 }

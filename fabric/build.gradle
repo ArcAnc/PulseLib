@@ -1,6 +1,7 @@
 plugins {
     id 'multiloader-loader'
     id 'net.fabricmc.fabric-loom'
+    id 'multiloader-publishing'
 }
 
 dependencies {
@@ -20,9 +21,4 @@ loom {
         client { client(); configName = 'Fabric Client (PulseLib)'; ideConfigGenerated true; runDir 'runs/client' }
         server { server(); configName = 'Fabric Server (PulseLib)'; ideConfigGenerated true; runDir 'runs/server' }
     }
-}
-
-// Fabric Maven publication is disabled; the current release workflow publishes NeoForge only.
-tasks.withType(PublishToMavenRepository).configureEach {
-    enabled = false
 }

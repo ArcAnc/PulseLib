@@ -36,9 +36,9 @@ jobs:
           chmod +x gradlew
           ./gradlew check --no-daemon
 
-      - name: Publish into Pages repository
+      - name: Publish Fabric and NeoForge into Pages repository
         run: |
-          ./gradlew publish --no-daemon \
+          ./gradlew :fabric:publish :neoforge:publish --no-daemon \
             -PmavenRepoDir="$GITHUB_WORKSPACE/maven-repository"
 
       - name: Commit Maven artifacts
