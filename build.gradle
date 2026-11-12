@@ -2,8 +2,6 @@ plugins {
     id 'base'
 }
 
-// Canonical testmod launch flags are configured by the multiloader-testmod convention.
-
 allprojects {
     group = mod_group_id
     version = mod_version

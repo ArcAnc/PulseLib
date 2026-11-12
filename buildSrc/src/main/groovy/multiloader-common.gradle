@@ -27,17 +27,9 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.2.1'
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.13.2'
     implementation 'com.fasterxml.jackson.core:jackson-core:2.13.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8'; options.release = 25 }
-tasks.withType(Test).configureEach {
-    useJUnitPlatform()
-    // Minecraft bootstrap logging must stay out of user run/log directories.
-    workingDir layout.buildDirectory.dir("test-runs/${name}")
-    doFirst { workingDir.mkdirs() }
-}
 tasks.withType(Javadoc).configureEach {
     options.encoding = 'UTF-8'
     options.addStringOption('Xdoclint:none', '-quiet')

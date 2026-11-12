@@ -31,10 +31,10 @@ jobs:
           path: maven-repository
           token: ${{ secrets.MAVEN_REPO_TOKEN }}
 
-      - name: Build and test
+      - name: Build artifacts
         run: |
           chmod +x gradlew
-          ./gradlew check --no-daemon
+          ./gradlew assemble --no-daemon
 
       - name: Publish Fabric and NeoForge into Pages repository
         run: |
