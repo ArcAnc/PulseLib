@@ -16,11 +16,7 @@ import org.lwjgl.opengl.*;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Manages gl geometry allocations.
@@ -122,16 +118,16 @@ public final class PGlGeometryArena
 	}
 
 
-/**
- * Immutable value object representing slice.
- */
+	/**
+	 * Immutable value object representing slice.
+    */
 	public record Slice(Page page, long indexOffset, int baseVertex, int indexCount, int indexType)
 	{
 	}
 
-/**
- * Provides support for page.
- */
+	/**
+	 * Provides support for page.
+    */
 	public static final class Page
 	{
 		private final int vertexBuffer;

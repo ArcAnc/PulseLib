@@ -14,8 +14,8 @@ import com.arcanc.pulselib.content.animatable.AnimManagerKey;
 import com.arcanc.pulselib.content.animatable.PAnimatable;
 import com.arcanc.pulselib.content.animatable.PAnimationManager;
 import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
-import net.minecraft.util.Util;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.util.Util;
 
 import java.util.IdentityHashMap;
 import java.util.Map;

@@ -15,15 +15,12 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.PoseStack;
-
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
-
 import org.joml.Matrix4f;
-import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -67,7 +64,6 @@ public abstract class PlayerRootTransformMixin
 		original.call(poses, x, y, z);
 		if (state instanceof AvatarRenderState && state instanceof PPlayerRootRenderState snapshot)
 		{
-			@Nullable
 			Matrix4f root = snapshot.pulselib$getPlayerRoot();
 			if (root != null)
 				poses.mulPose(root);

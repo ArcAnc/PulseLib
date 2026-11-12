@@ -91,13 +91,9 @@ public class PAnimationChannel
 				case ADDITIVE ->
 				{
 					if (this.multiplicativeBlend)
-					{
 						destination.set(base).mul(new Vector3f(1f).lerp(layer, clampedWeight));
-					}
 					else
-					{
 						destination.set(base).add(new Vector3f(layer).mul(clampedWeight));
-					}
 				}
 			}
 		}
@@ -109,13 +105,9 @@ public class PAnimationChannel
 		public void apply(PPoseWriter pose, int boneIndex, Vector3f value)
 		{
 			if (this.multiplicativeBlend)
-			{
 				pose.scale(boneIndex, value);
-			}
 			else
-			{
 				pose.translation(boneIndex, value);
-			}
 		}
 	}
 

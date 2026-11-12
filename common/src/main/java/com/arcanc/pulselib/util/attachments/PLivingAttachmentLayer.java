@@ -10,28 +10,23 @@
 package com.arcanc.pulselib.util.attachments;
 
 
-import com.arcanc.pulselib.content.renderer.base.PRenderState;
-import com.arcanc.pulselib.content.renderer.base.PRenderCallbackScope;
 import com.arcanc.pulselib.content.animatable.PAnimationController;
 import com.arcanc.pulselib.content.model.animation.PAnimationPoseResolver;
-import com.arcanc.pulselib.content.model.baked.PBakedBone;
-import com.arcanc.pulselib.content.model.baked.PBakedMesh;
-import com.arcanc.pulselib.content.model.baked.PBakedModel;
-import com.arcanc.pulselib.content.model.baked.PMeshRenderContext;
-import com.arcanc.pulselib.content.model.baked.PMeshRenderMaterial;
-import com.arcanc.pulselib.content.model.baked.PMeshRenderResolver;
-import com.arcanc.pulselib.content.renderer.PRenderQueue;
+import com.arcanc.pulselib.content.model.baked.*;
 import com.arcanc.pulselib.content.renderer.PRenderContexts;
-import com.arcanc.pulselib.content.renderer.plan.PTransparencyMode;
+import com.arcanc.pulselib.content.renderer.PRenderQueue;
 import com.arcanc.pulselib.content.renderer.base.PLivingAttachmentRenderState;
+import com.arcanc.pulselib.content.renderer.base.PRenderCallbackScope;
+import com.arcanc.pulselib.content.renderer.base.PRenderState;
+import com.arcanc.pulselib.content.renderer.plan.PTransparencyMode;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.arcanc.pulselib.util.PResourceCache;
+import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
@@ -154,7 +149,7 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 	                                              float partialTick)
 	{
 		ModelPart modelRoot = entity instanceof AbstractClientPlayer player ?
-				Minecraft.getInstance().getEntityRenderDispatcher().getPlayerRenderer(player).getModel().root() : anchorPart;
+				PLibRenderHelper.mc().getEntityRenderDispatcher().getPlayerRenderer(player).getModel().root() : anchorPart;
 		try (var invocation = PRenderCallbackScope.capture(poseStack, modelRoot))
 		{
 			anchorPart.xRot = 0;
@@ -269,7 +264,6 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 
 		PMeshRenderResolver resolver = (bakedBone, mesh, inherited) ->
 		{
-			// Each resolver must finish before traversal continues into another mesh or child bone.
 			try (var callback = PRenderCallbackScope.capture(poseStack, modelRoot))
 			{
 				return definition.renderResolver().resolve(entity, stack, bakedBone, mesh, inherited, partialTick);
@@ -343,10 +337,10 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 		return null;
 	}
 
+	/**
+	 * Defines the contract for attachment part resolver.
+    */
 	@FunctionalInterface
-/**
- * Defines the contract for attachment part resolver.
- */
 	private interface AttachmentPartResolver
 	{
 		/**
@@ -357,9 +351,9 @@ public class PLivingAttachmentLayer<S extends LivingEntityRenderState, M extends
 		@Nullable ModelPart resolve(PAttachmentBinding binding);
 	}
 
-/**
- * Immutable value object representing render entry.
- */
+	/**
+	 * Immutable value object representing render entry.
+    */
 	public record RenderEntry(
 			PLivingAttachmentDefinition definition,
 			LivingEntity entity,

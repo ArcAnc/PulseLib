@@ -11,12 +11,7 @@ package com.arcanc.pulselib.content.model.baked;
 
 import com.arcanc.pulselib.content.animatable.PAnimatable;
 import com.arcanc.pulselib.content.animatable.PAnimationController;
-import com.arcanc.pulselib.content.model.animation.PAnimation;
-import com.arcanc.pulselib.content.model.animation.PAnimationRuntime;
-import com.arcanc.pulselib.content.model.animation.PAnimationPoseResolver;
-import com.arcanc.pulselib.content.model.animation.PBoneAnimation;
-import com.arcanc.pulselib.content.model.animation.PCompiledAnimation;
-import com.arcanc.pulselib.content.model.animation.PPose;
+import com.arcanc.pulselib.content.model.animation.*;
 import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import com.arcanc.pulselib.data.gecko.MolangParser;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -25,13 +20,7 @@ import net.minecraft.resources.Identifier;
 import org.joml.Vector3f;
 import org.jspecify.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 /**

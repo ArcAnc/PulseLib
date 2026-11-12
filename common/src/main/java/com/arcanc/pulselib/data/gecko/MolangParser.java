@@ -38,9 +38,7 @@ public final class MolangParser
 	public static Expression parse(String source)
 	{
 		if (source == null || source.isBlank())
-		{
 			throw new IllegalArgumentException("Molang expression must not be blank");
-		}
 		return new Parser(source).parse();
 	}
 
@@ -89,13 +87,9 @@ public final class MolangParser
 		default float evaluate(Object data)
 		{
 			if (data instanceof Context context)
-			{
 				return evaluate(context);
-			}
 			if (data instanceof Map<?, ?> values)
-			{
 				return evaluate(Context.from(values));
-			}
 			return evaluate(new Context());
 		}
 	}
@@ -126,9 +120,7 @@ public final class MolangParser
 			Context context = new Context();
 			for (Map.Entry<?, ?> entry : values.entrySet())
 				if (entry.getKey() != null && entry.getValue() instanceof Number number)
-				{
 					context.value(String.valueOf(entry.getKey()), number.floatValue());
-				}
 			return context;
 		}
 
@@ -143,21 +135,13 @@ public final class MolangParser
 		{
 			String normalized = normalizeName(name);
 			if (normalized.startsWith("query."))
-			{
 				this.queryValues.put(normalized.substring("query.".length()), value);
-			}
 			else if (normalized.startsWith("variable."))
-			{
 				this.variables.put(normalized.substring("variable.".length()), value);
-			}
 			else if (normalized.startsWith("context."))
-			{
 				this.contextValues.put(normalized.substring("context.".length()), value);
-			}
 			else
-			{
 				this.queryValues.put(normalized, value);
-			}
 			return this;
 		}
 
@@ -301,37 +285,23 @@ public final class MolangParser
 		{
 			name = normalizeName(name);
 			if (name.equals("this"))
-			{
 				return Value.of(this.thisValue);
-			}
 			if (name.equals("true"))
-			{
 				return Value.of(1f);
-			}
 			if (name.equals("false"))
-			{
 				return Value.of(0f);
-			}
 			if (name.equals("math.pi"))
-			{
 				return Value.of((float) Math.PI);
-			}
 
 			if (name.startsWith("math."))
 				return math(name.substring("math.".length()), arguments,
 						this :: random);
 			if (name.startsWith("temp."))
-			{
 				return Value.ofNullable(evaluation.temporary.get(name.substring("temp.".length())));
-			}
 			if (name.startsWith("variable."))
-			{
 				return Value.ofNullable(this.variables.get(name.substring("variable.".length())));
-			}
 			if (name.startsWith("context."))
-			{
 				return Value.ofNullable(this.contextValues.get(name.substring("context.".length())));
-			}
 			if (name.startsWith("query."))
 			{
 				String query = name.substring("query.".length());
@@ -339,9 +309,7 @@ public final class MolangParser
 				{
 					Float result = this.queryResolver.resolve(query, arguments.stream().map(Value :: number).toList(), this);
 					if (result != null)
-					{
 						return Value.of(result);
-					}
 				}
 				return Value.ofNullable(this.queryValues.get(query));
 			}
@@ -384,17 +352,11 @@ public final class MolangParser
 			name = normalizeName(name);
 			float number = value.number();
 			if (name.startsWith("temp."))
-			{
 				evaluation.temporary.put(name.substring("temp.".length()), number);
-			}
 			else if (name.startsWith("variable."))
-			{
 				this.variables.put(name.substring("variable.".length()), number);
-			}
 			else
-			{
 				throw new IllegalArgumentException("Only temp.* and variable.* values are writable: " + name);
-			}
 			return Value.of(number);
 		}
 	}
@@ -543,22 +505,16 @@ public final class MolangParser
 		public float evaluate(@Nullable Context context)
 		{
 			if (this.constantValue != null)
-			{
 				return this.constantValue;
-			}
 			Evaluation evaluation = new Evaluation(context == null ? new Context() : context);
 			Value value = Value.of(0f);
 			for (Node statement : this.statements)
 			{
 				value = statement.evaluate(evaluation);
 				if (evaluation.flow == Flow.RETURN)
-				{
 					return evaluation.result.number();
-				}
 				if (evaluation.flow != Flow.NONE)
-				{
 					throw new IllegalArgumentException("Molang " + evaluation.flow.name().toLowerCase(Locale.ROOT) + " used outside a loop");
-				}
 			}
 			return value.number();
 		}
@@ -609,9 +565,7 @@ public final class MolangParser
 			{
 				values.add(argument.evaluate(evaluation));
 				if (evaluation.flow != Flow.NONE)
-				{
 					return Value.of(0f);
-				}
 			}
 			return evaluation.context.resolve(this.name, values, evaluation);
 		}
@@ -658,17 +612,11 @@ public final class MolangParser
 		{
 			Value a = this.left.evaluate(evaluation);
 			if (this.operator.equals("&&") && !a.truthy())
-			{
 				return Value.of(0f);
-			}
 			if (this.operator.equals("||") && a.truthy())
-			{
 				return Value.of(1f);
-			}
 			if (this.operator.equals("??") && a.value != null)
-			{
 				return a;
-			}
 			Value b = this.right.evaluate(evaluation);
 			return switch (this.operator)
 			{
@@ -755,9 +703,7 @@ public final class MolangParser
 			{
 				value = statement.evaluate(evaluation);
 				if (evaluation.flow != Flow.NONE)
-				{
 					break;
-				}
 			}
 			return value;
 		}
@@ -809,18 +755,14 @@ public final class MolangParser
 			{
 				value = this.body.evaluate(evaluation);
 				if (evaluation.flow == Flow.RETURN)
-				{
 					break;
-				}
 				if (evaluation.flow == Flow.BREAK)
 				{
 					evaluation.flow = Flow.NONE;
 					break;
 				}
 				if (evaluation.flow == Flow.CONTINUE)
-				{
 					evaluation.flow = Flow.NONE;
-				}
 			}
 			return value;
 		}
@@ -852,9 +794,7 @@ public final class MolangParser
 		float b = argument(arguments, 1);
 		float c = argument(arguments, 2);
 		if (name.startsWith("ease_"))
-		{
 			return Value.of(ease(name, a, b, c));
-		}
 		return switch (name)
 		{
 			case "abs" -> Value.of(Math.abs(a));
@@ -943,9 +883,7 @@ public final class MolangParser
 	{
 		float result = 0f;
 		for (int index = 0; index < Math.clamp(count, 0, MAX_LOOP_ITERATIONS); index++)
-		{
 			result += randomProvider.next(index, low, high, integer);
-		}
 		return result;
 	}
 
@@ -1007,9 +945,7 @@ public final class MolangParser
 	{
 		String[] parts = name.split("_");
 		if (parts.length != 3)
-		{
 			throw new IllegalArgumentException("Unknown Molang math function: math." + name);
-		}
 		float t = Math.clamp(time, 0f, 1f);
 		boolean out = parts[1].equals("out");
 		boolean inOut = parts[1].equals("inout");
@@ -1220,9 +1156,7 @@ public final class MolangParser
 		{
 			PExpressionDependency result = PExpressionDependency.CONSTANT;
 			for (Node node : nodes)
-			{
 				result = PExpressionDependency.combine(result, dependency(node));
-			}
 			return result;
 		}
 
@@ -1235,13 +1169,9 @@ public final class MolangParser
 		private static PExpressionDependency dependency(Node node)
 		{
 			if (node instanceof Literal)
-			{
 				return PExpressionDependency.CONSTANT;
-			}
 			if (node instanceof Variable variable)
-			{
 				return variableDependency(variable.name());
-			}
 			if (node instanceof Call call)
 			{
 				PExpressionDependency result = dependency(call.arguments());
@@ -1252,36 +1182,22 @@ public final class MolangParser
 				return PExpressionDependency.combine(result, variableDependency(name));
 			}
 			if (node instanceof Unary unary)
-			{
 				return dependency(unary.value());
-			}
 			if (node instanceof Binary binary)
-			{
 				return PExpressionDependency.combine(dependency(binary.left()), dependency(binary.right()));
-			}
 			if (node instanceof Conditional conditional)
 				return PExpressionDependency.combine(dependency(conditional.condition()),
 						PExpressionDependency.combine(dependency(conditional.yes()), dependency(conditional.no())));
 			if (node instanceof Assignment)
-			{
 				return PExpressionDependency.STATEFUL;
-			}
 			if (node instanceof Block block)
-			{
 				return dependency(block.statements());
-			}
 			if (node instanceof Return returned)
-			{
 				return dependency(returned.value());
-			}
 			if (node instanceof FlowNode)
-			{
 				return PExpressionDependency.STATEFUL;
-			}
 			if (node instanceof Loop loop)
-			{
 				return PExpressionDependency.combine(dependency(loop.count()), dependency(loop.body()));
-			}
 			return PExpressionDependency.STATEFUL;
 		}
 
@@ -1300,17 +1216,11 @@ public final class MolangParser
 				return PExpressionDependency.STATEFUL;
 			}
 			if (name.equals("true") || name.equals("false") || name.equals("math.pi") || name.startsWith("math."))
-			{
 				return PExpressionDependency.CONSTANT;
-			}
 			if (name.equals("query.anim_time"))
-			{
 				return PExpressionDependency.TIME_ONLY;
-			}
 			if (name.startsWith("variable.") || name.startsWith("temp."))
-			{
 				return PExpressionDependency.STATEFUL;
-			}
 			return PExpressionDependency.INSTANCE;
 		}
 
@@ -1328,9 +1238,7 @@ public final class MolangParser
 				nodes.add(statement());
 				if (match(";")) continue;
 				if (this.current.type != terminator && this.current.type != TokenType.END)
-				{
 					error("Expected ';'");
-				}
 			}
 			return nodes;
 		}
@@ -1343,17 +1251,11 @@ public final class MolangParser
 		private Node statement()
 		{
 			if (matchWord("return"))
-			{
 				return new Return(expression());
-			}
 			if (matchWord("break"))
-			{
 				return new FlowNode(Flow.BREAK);
-			}
 			if (matchWord("continue"))
-			{
 				return new FlowNode(Flow.CONTINUE);
-			}
 			return expression();
 		}
 
@@ -1381,9 +1283,7 @@ public final class MolangParser
 				String operator = this.current.text;
 				next();
 				if (!(left instanceof Variable))
-				{
 					error("Assignment target must be a variable");
-				}
 				return new Assignment(operator, (Variable) left, assignment());
 			}
 			return left;
@@ -1398,9 +1298,7 @@ public final class MolangParser
 		{
 			Node condition = coalesce();
 			if (!match("?"))
-			{
 				return condition;
-			}
 			Node yes = expression();
 			Node no = match(":") ? conditional() : new Literal(0f);
 			return new Conditional(condition, yes, no);
@@ -1428,9 +1326,7 @@ public final class MolangParser
 		{
 			Node node = logicalAnd();
 			while (match("||"))
-			{
 				node = new Binary("||", node, logicalAnd());
-			}
 			return node;
 		}
 
@@ -1443,9 +1339,7 @@ public final class MolangParser
 		{
 			Node node = equality();
 			while (match("&&"))
-			{
 				node = new Binary("&&", node, equality());
-			}
 			return node;
 		}
 
@@ -1566,9 +1460,7 @@ public final class MolangParser
 				String name = this.current.text;
 				next();
 				if (!match("("))
-				{
 					return new Variable(name);
-				}
 				List<Node> arguments = new ArrayList<>();
 				if (!match(" )".trim()))
 				{
@@ -1720,9 +1612,7 @@ public final class MolangParser
 					Character.isWhitespace(this.source.charAt(this.position)))
 				this.position++;
 			if (this.position >= this.source.length())
-			{
 				return new Token(TokenType.END, "", this.position);
-			}
 			int start = this.position;
 			char character = this.source.charAt(this.position);
 			if (Character.isDigit(character) ||

@@ -10,12 +10,12 @@
 package com.arcanc.pulselib.content.player.animation.attachment;
 
 import com.arcanc.pulselib.content.model.animation.PTransform;
-import com.arcanc.pulselib.content.player.animation.PPlayerAnimationSpace;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationAnchor;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimationAnchorPose;
+import com.arcanc.pulselib.content.player.animation.PPlayerAnimationSpace;
 import com.arcanc.pulselib.content.player.animation.PPlayerAnimations;
-import com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonAnchorPose;
 import com.arcanc.pulselib.content.player.animation.firstPerson.PFirstPersonRenderPresentation;
+import com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonAnchorPose;
 import com.arcanc.pulselib.content.renderer.base.PRenderCallbackScope;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.player.AbstractClientPlayer;

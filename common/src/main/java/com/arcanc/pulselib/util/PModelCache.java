@@ -12,11 +12,11 @@ package com.arcanc.pulselib.util;
 
 import com.arcanc.pulselib.content.model.*;
 import com.arcanc.pulselib.content.model.baked.*;
-import com.arcanc.pulselib.content.renderer.PRenderQueue;
-import com.arcanc.pulselib.content.renderer.legacy.GlGeometryDataFactory;
 import com.arcanc.pulselib.content.model.resource.PModelResource;
 import com.arcanc.pulselib.content.model.textures.PTextureAlphaClassifier;
 import com.arcanc.pulselib.content.model.textures.atlas.PLibSpriteMetadata;
+import com.arcanc.pulselib.content.renderer.PRenderQueue;
+import com.arcanc.pulselib.content.renderer.legacy.GlGeometryDataFactory;
 import com.arcanc.pulselib.data.PLoadedModel;
 import com.arcanc.pulselib.data.PModelLoader;
 import com.arcanc.pulselib.data.gecko.PGeckoModelLoader;
@@ -61,7 +61,7 @@ public class PModelCache
 						throw new IllegalStateException("Duplicate model loader id: " + oldV.id());
 					},
 					Object2ObjectOpenHashMap :: new));
-	
+
 	/**
 	 * Returns baked models keyed by canonical model id.
 	 * @return the baked model cache.
@@ -70,7 +70,7 @@ public class PModelCache
 	{
 		return MODELS;
 	}
-	
+
 	/**
 	 * Registers the model loader.
 	 * @param modelLoader the model loader to use.
@@ -79,10 +79,10 @@ public class PModelCache
 	{
 		if (MODEL_LOADERS.containsKey(modelLoader.id()))
 			return;
-		
+
 		MODEL_LOADERS.put(modelLoader.id(), modelLoader);
 	}
-	
+
 	/**
 	 * Unregisters the model loader.
 	 * @param loaderId the loader id to use.
@@ -91,7 +91,7 @@ public class PModelCache
 	{
 		MODEL_LOADERS.remove(loaderId);
 	}
-	
+
 	/**
 	 * Returns the model loaders.
 	 * @return the value produced by this operation.
@@ -100,7 +100,7 @@ public class PModelCache
 	{
 		return List.copyOf(MODEL_LOADERS.values());
 	}
-	
+
 	/**
 	 * Returns the model loader.
 	 * @param loaderId the loader id to use.
@@ -110,7 +110,7 @@ public class PModelCache
 	{
 		return Optional.ofNullable(MODEL_LOADERS.get(loaderId));
 	}
-	
+
 	/**
 	 * Performs the reload operation.
 	 * @param sharedState the shared state to use.
@@ -139,13 +139,12 @@ public class PModelCache
 				},
 				gameExecutor);
 	}
-	
+
 	/**
 	 * Clears the caches.
 	 */
 	private static void clearCaches()
 	{
-		// Runs on the reload game executor, before any old baked GPU buffers are closed.
 		PRenderQueue.cleanup();
 		PTextureAlphaClassifier.clear();
 		if (MODELS != null)
@@ -156,7 +155,7 @@ public class PModelCache
 			MODELS = null;
 		}
 	}
-	
+
 	/**
 	 * Clears the bone cache.
 	 * @param bone the bone to use.
@@ -170,7 +169,7 @@ public class PModelCache
 		});
 		bone.children().forEach(PModelCache :: clearBoneCache);
 	}
-	
+
 	/**
 	 * Performs the bake models operation.
 	 * @param rawModels the raw models to use.
@@ -198,7 +197,7 @@ public class PModelCache
 						)
 				);
 				}
-			
+
 				for (Map.Entry<UUID, Pair<UUID, List<UUID>>> bone2MeshesEntry : model.boneMeshes.entrySet())
 				{
 				PBakedBone.PBakedBoneBuilder builder = bakedBoneBuilder.get(bone2MeshesEntry.getKey());
@@ -218,23 +217,23 @@ public class PModelCache
 				PBone parentBone = bone.parent();
 				if (parentBone == null)
 					continue;
-				
+
 				PBakedBone.PBakedBoneBuilder child =
 						bakedBoneBuilder.get(bone.uuid());
-				
+
 				PBakedBone.PBakedBoneBuilder parent =
 						bakedBoneBuilder.get(parentBone.uuid());
-				
+
 				child.parent = parent;
 				parent.children.add(child);
 				}
 
 				List<PBakedBone> rootBones = new ArrayList<>();
-			
+
 				for (PBakedBone.PBakedBoneBuilder builder : bakedBoneBuilder.values())
 					if (builder.parent == null)
 						rootBones.add(bakeBone(builder, null));
-			
+
 				bakedModelMap.put(
 						rawModel.getKey(),
 						new PBakedModel(ImmutableList.copyOf(rootBones),
@@ -246,7 +245,7 @@ public class PModelCache
 				throw new IllegalStateException("Can't bake model " + rawModel.getKey(), exception);
 			}
 		}
-		
+
 		return bakedModelMap;
 	}
 
@@ -312,7 +311,7 @@ public class PModelCache
 			throw new IllegalStateException("Can't bake primitive for model " + modelId + " with texture reference " + textureReference, exception);
 		}
 	}
-	
+
 	/**
 	 * Performs the bake bone operation.
 	 * @param builder the builder to use.
@@ -324,7 +323,7 @@ public class PModelCache
 			@Nullable PBakedBone bakedParent)
 	{
 		List<PBakedBone> bakedChildren = new ArrayList<>();
-		
+
 		PBakedBone bakedBone = new PBakedBone(
 				builder.name,
 				builder.basePosition,
@@ -333,10 +332,10 @@ public class PModelCache
 				bakedParent,
 				ImmutableList.copyOf(builder.meshes)
 		);
-		
+
 		for (PBakedBone.PBakedBoneBuilder child : builder.children)
 			bakedChildren.add(bakeBone(child, bakedBone));
-		
+
 		return new PBakedBone(
 				builder.name,
 				builder.basePosition,
@@ -346,7 +345,7 @@ public class PModelCache
 				ImmutableList.copyOf(builder.meshes)
 		);
 	}
-	
+
 	/**
 	 * Loads the models.
 	 * @param backgroundExecutor the background executor to use.

@@ -15,9 +15,9 @@ package com.arcanc.pulselib.content.player.deformer;
 public final class PDeformableCubeBakeScope
 {
 	/*
-	 * REQUIRE CHANGE: this ThreadLocal transports EntityModelSet.bakeLayer's layer selection to
-	 * CubeDefinition.bake because vanilla does not expose that context there. Replace it with an
-	 * explicit per-CubeDefinition marker once the model-definition tree has a stable accessor path.
+	 * FIXME: this ThreadLocal transports EntityModelSet.bakeLayer's layer selection to
+	 *  CubeDefinition.bake because vanilla does not expose that context there. Replace it with an
+	 *  explicit per-CubeDefinition marker once the model-definition tree has a stable accessor path.
 	 */
 	private static final ThreadLocal<Integer> DEPTH = ThreadLocal.withInitial(() -> 0);
 
@@ -47,9 +47,9 @@ public final class PDeformableCubeBakeScope
 		return DEPTH.get() > 0;
 	}
 
-/**
- * Provides support for scope.
- */
+	/**
+	 * Provides support for scope.
+    */
 	public static final class Scope implements AutoCloseable
 	{
 		/**

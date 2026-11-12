@@ -9,8 +9,8 @@
 
 package com.arcanc.pulselib.content.mixin;
 
-import com.arcanc.pulselib.content.player.deformer.PPlayerModelGeometry.Entry;
 import com.arcanc.pulselib.content.player.deformer.PPlayerModelGeometry;
+import com.arcanc.pulselib.content.player.deformer.PPlayerModelGeometry.Entry;
 import com.arcanc.pulselib.content.player.deformer.PPlayerModelSubmitState;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.renderer.SubmitNodeStorage;

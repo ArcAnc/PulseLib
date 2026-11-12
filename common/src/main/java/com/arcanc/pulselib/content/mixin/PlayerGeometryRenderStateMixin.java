@@ -9,9 +9,9 @@
 
 package com.arcanc.pulselib.content.mixin;
 
-import com.arcanc.pulselib.content.player.deformer.PPlayerModelGeometry.Entry;
 import com.arcanc.pulselib.content.player.deformer.PPlayerGeometryRenderState;
 import com.arcanc.pulselib.content.player.deformer.PPlayerModelGeometry;
+import com.arcanc.pulselib.content.player.deformer.PPlayerModelGeometry.Entry;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;

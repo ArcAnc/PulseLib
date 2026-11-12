@@ -39,14 +39,10 @@ final class PCyclicAnimationEvents
 	static void visit(PAnimation animation, double from, double to, boolean includeReverseStart, Consumer<PAnimationEvent<?>> consumer)
 	{
 		if (!Double.isFinite(from) || !Double.isFinite(to) || !Float.isFinite(animation.length()))
-		{
 			throw new IllegalArgumentException("Cyclic animation times and length must be finite: " + animation.name());
-		}
 		double length = animation.length();
 		if (length <= 0.0 || from == to || animation.events().isEmpty())
-		{
 			return;
-		}
 		boolean forward = to > from;
 		Comparator<PAnimationEvent<?>> order = Comparator.comparingDouble(PAnimationEvent::time);
 		List<PAnimationEvent<?>> events = animation.events().stream().
@@ -54,9 +50,7 @@ final class PCyclicAnimationEvents
 				sorted(forward ? order : order.reversed()).
 				toList();
 		if (events.isEmpty())
-		{
 			return;
-		}
 		Position start = position(animation, from, length);
 		Position end = position(animation, to, length);
 		long first = !forward && start.local() == 0.0 ? start.cycle() - 1L : start.cycle();
@@ -66,37 +60,25 @@ final class PCyclicAnimationEvents
 		double firstFrom = !forward && start.local() == 0.0 ? length : start.local();
 		double lastTo = forward && end.local() == 0.0 ? length : end.local();
 		if (windows < 1L)
-		{
 			throw invalidRange(animation, from, to, "cycle windows do not advance");
-		}
 		long count = count(events, window(firstFrom, windows == 1L ? lastTo : forward ? length : 0.0,
 				length, forward, includeReverseStart));
 		if (windows > 1L)
-		{
 			count += count(events, window(forward ? 0.0 : length, lastTo, length, forward, true));
-		}
 
 		double total = count + Math.max(0L, windows - 2L) * (double)events.size();
 		if (total > MAX_EVENTS_PER_DISPATCH)
-		{
 			throw invalidRange(animation, from, to, "would dispatch " + total +
 					" events; maximum per dispatch is " + MAX_EVENTS_PER_DISPATCH);
-		}
 		for (long cycle = first; ; cycle += step)
 		{
 			Window window = window(cycle == first ? firstFrom : forward ? 0.0 : length,
 					cycle == last ? lastTo : forward ? length : 0.0, length, forward, cycle != first || includeReverseStart);
 			for (PAnimationEvent<?> event : events)
-			{
 				if (window.contains(event.time()))
-				{
 					consumer.accept(event);
-				}
-			}
 			if (cycle == last)
-			{
 				break;
-			}
 		}
 	}
 
@@ -114,9 +96,7 @@ final class PCyclicAnimationEvents
 	{
 		double candidate = Math.floor(time / length);
 		if (!Double.isFinite(candidate) || Math.abs(candidate) > MAX_EXACT_CYCLE)
-		{
 			throw invalidRange(animation, time, time, "cycle index cannot be represented exactly");
-		}
 		long cycle = (long)candidate;
 		double local = Math.fma(-cycle, length, time);
 		if (local < 0.0)
@@ -130,18 +110,14 @@ final class PCyclicAnimationEvents
 			local = Math.fma(-cycle, length, time);
 		}
 		if (Math.abs(cycle) >= MAX_EXACT_CYCLE || !(local >= 0.0 && local < length))
-		{
 			throw invalidRange(animation, time, time, "cycle phase cannot be represented precisely");
-		}
 		return new Position(cycle, local);
 	}
 
 	private static Window window(double from, double to, double length, boolean forward, boolean includeReverseStart)
 	{
 		if (forward ? to <= from : to >= from)
-		{
 			throw new IllegalArgumentException("Cyclic animation window does not advance: from=" + from + ", to=" + to);
-		}
 		return new Window(from, to, length, forward, includeReverseStart);
 	}
 

@@ -9,6 +9,7 @@
 
 package com.arcanc.pulselib.content.mixin;
 
+import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.WeatherEffectRenderer;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,10 +20,9 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(WeatherEffectRenderer.class)
 public abstract class WeatherEffectRendererMixin
 {
-	// NeoForge delegates its two-argument render method to an overload with LevelRenderState.
 	@Redirect(method = "render*", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;useShaderTransparency()Z"))
 	private boolean pulselib$writeSeparatedWeatherDepth()
 	{
-		return Minecraft.useShaderTransparency() || Minecraft.getInstance().levelRenderer.getWeatherTarget() != null;
+		return Minecraft.useShaderTransparency() || PLibRenderHelper.mc().levelRenderer.getWeatherTarget() != null;
 	}
 }

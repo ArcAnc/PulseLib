@@ -20,6 +20,7 @@ import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.model.Model;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
@@ -66,33 +67,38 @@ public abstract class HumanoidArmorLayerMixin implements PPlayerArmorGeometryLay
 			EquipmentClientInfo.LayerType type = state.isBaby && state.entityType != EntityType.ARMOR_STAND ?
 					EquipmentClientInfo.LayerType.HUMANOID_BABY : slot == EquipmentSlot.LEGS ?
 					EquipmentClientInfo.LayerType.HUMANOID_LEGGINGS : EquipmentClientInfo.LayerType.HUMANOID;
-			try (var caller = PModelPartSnapshot.capture(original.root()))
+			try (PModelPartSnapshot caller = PModelPartSnapshot.capture(original.root()))
 			{
 				PPlayerModelGeometry.setup(original, state);
-				var model = PClientRenderHooks.armorModel(stack, type, original);
-				var entry = PPlayerModelGeometry.capture(player, state, partialTick, original, model);
+				Model<?> model = PClientRenderHooks.armorModel(stack, type, original);
+				PPlayerModelGeometry.Entry entry = PPlayerModelGeometry.capture(player, state, partialTick, original, model);
 				PPlayerModelGeometry.putArmor(armor, this.pulselib$geometryKey, slot, entry);
 			}
 		}
 	}
 
 	@WrapMethod(method = "renderArmorPiece")
-	private void pulselib$submitExtractedArmor(PoseStack poses, SubmitNodeCollector collector, ItemStack stack,
-			EquipmentSlot slot, int light, HumanoidRenderState state, Operation<Void> original)
+	private void pulselib$submitExtractedArmor(PoseStack poses,
+	                                           SubmitNodeCollector collector,
+	                                           ItemStack stack,
+	                                           EquipmentSlot slot,
+	                                           int light,
+	                                           HumanoidRenderState state,
+	                                           Operation<Void> original)
 	{
-		var owner = state instanceof PPlayerGeometryRenderState access ? access : null;
-		var geometry = owner == null ? null : owner.pulselib$getPlayerGeometry();
-		var entry = geometry == null ? null : geometry.armor(this.pulselib$geometryKey, slot);
+		PPlayerGeometryRenderState owner = state instanceof PPlayerGeometryRenderState access ? access : null;
+		PPlayerModelGeometry geometry = owner == null ? null : owner.pulselib$getPlayerGeometry();
+		PPlayerModelGeometry.Entry entry = geometry == null ? null : geometry.armor(this.pulselib$geometryKey, slot);
 		if (entry == null)
 		{
 			original.call(poses, collector, stack, slot, light, state);
 			return;
 		}
-		var previous = owner.pulselib$getSubmittingGeometry();
+		PPlayerModelGeometry.Entry previous = owner.pulselib$getSubmittingGeometry();
 		owner.pulselib$setSubmittingGeometry(entry);
 		int depth = ((PoseStackAccessor)poses).pulselib$getDepth();
 		PoseStack.Pose pose = poses.last().copy();
-		try (var caller = PModelPartSnapshot.capture(entry.model().root()))
+		try (PModelPartSnapshot caller = PModelPartSnapshot.capture(entry.model().root()))
 		{
 			original.call(poses, collector, stack, slot, light, state);
 		}

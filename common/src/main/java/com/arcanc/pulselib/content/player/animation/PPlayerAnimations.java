@@ -17,9 +17,9 @@ import com.arcanc.pulselib.content.player.animation.firstPerson.*;
 import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.model.player.PlayerModel;
-import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.Identifier;
@@ -28,10 +28,10 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.ApiStatus;
-import org.jspecify.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
@@ -356,7 +356,7 @@ public final class PPlayerAnimations
 		Map<ModelPart, PPlayerModelPose.PartPose> originals = new IdentityHashMap<>();
 		for (PPlayerRigPose.Contribution contribution : contributions)
 		{
-			@Nullable ModelPart part = switch (contribution.part())
+			ModelPart part = switch (contribution.part())
 			{
 				case HEAD -> model.head;
 				case BODY -> model.body;

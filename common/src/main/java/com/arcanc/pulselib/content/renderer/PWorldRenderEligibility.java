@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 @ApiStatus.Internal
 public final class PWorldRenderEligibility
 {
-	private static final ThreadLocal<Extraction> CURRENT = new ThreadLocal<>();
+	private static final ThreadLocal<@Nullable Extraction> CURRENT = new ThreadLocal<>();
 
 	private PWorldRenderEligibility()
 	{
@@ -28,7 +28,7 @@ public final class PWorldRenderEligibility
 
 	public static <S extends EntityRenderState> S capture(Supplier<S> extract)
 	{
-		@Nullable Extraction parent = CURRENT.get();
+		Extraction parent = CURRENT.get();
 		Extraction extraction = new Extraction();
 		CURRENT.set(extraction);
 		try
@@ -56,7 +56,7 @@ public final class PWorldRenderEligibility
 	/** Marks successfully extracted Pulse geometry, including automatic meshes on native players. */
 	public static void markGeometry()
 	{
-		@Nullable Extraction extraction = CURRENT.get();
+		Extraction extraction = CURRENT.get();
 		if (extraction != null)
 			extraction.item = true;
 	}

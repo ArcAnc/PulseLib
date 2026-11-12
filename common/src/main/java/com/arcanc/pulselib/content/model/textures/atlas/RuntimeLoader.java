@@ -28,9 +28,7 @@ import java.util.stream.Collectors;
 public class RuntimeLoader implements SpriteSource
 {
 	public static final MapCodec<RuntimeLoader> CODEC = MapCodec.unit(RuntimeLoader ::new);
-	/** Native sprite-source type, shared with the registered codec. */
-	public static final MapCodec<RuntimeLoader> TYPE = CODEC;
-	
+
 	/**
 	 * Performs the run operation.
 	 * @param resourceManager the resource manager to use.
@@ -39,8 +37,6 @@ public class RuntimeLoader implements SpriteSource
 	@Override
 	public void run(ResourceManager resourceManager, Output output)
 	{
-		// Resource registrations are immutable for this reload. Do not rebuild
-		// them here: model reload listeners may already be reading the cache.
 		Set<Identifier> textures = PResourceCache.getResourceCache().values().stream().
 				flatMap(resource -> resource.textures().values().stream()).
 				collect(Collectors.toSet());
@@ -53,12 +49,6 @@ public class RuntimeLoader implements SpriteSource
 			else
 				PLibDatabase.LOGGER.warn("Missing sprite: {}", fullResourceId);
 		});
-	}
-	
-	/** Returns the native codec representing this sprite-source type. */
-	public MapCodec<RuntimeLoader> type()
-	{
-		return TYPE;
 	}
 
 	/**

@@ -14,13 +14,9 @@ import com.arcanc.pulselib.content.animatable.PAnimatable;
 import com.arcanc.pulselib.content.animatable.PAnimationController;
 import com.arcanc.pulselib.content.animatable.PAnimationManager;
 import com.arcanc.pulselib.content.animatable.instance.InstanceAnimationManager;
-import com.arcanc.pulselib.content.model.animation.PPose;
 import com.arcanc.pulselib.content.model.animation.PAnimationEvaluationContext;
-import com.arcanc.pulselib.content.model.baked.PBakedBone;
-import com.arcanc.pulselib.content.model.baked.PBakedMesh;
-import com.arcanc.pulselib.content.model.baked.PBakedModel;
-import com.arcanc.pulselib.content.model.baked.PMeshRenderContext;
-import com.arcanc.pulselib.content.model.baked.PMeshRenderMaterial;
+import com.arcanc.pulselib.content.model.animation.PPose;
+import com.arcanc.pulselib.content.model.baked.*;
 import com.arcanc.pulselib.content.renderer.base.PBlockRenderState;
 import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import com.arcanc.pulselib.data.gecko.MolangParser;
@@ -46,7 +42,6 @@ import org.joml.Matrix4f;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -59,7 +54,7 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 	private final PModelData modelData;
 	private final PRenderStateScope<RS> submission = new PRenderStateScope<>();
 	private final Function<Identifier, RenderType> renderType;
-	
+
 	/**
 	 * Creates an instance of the enclosing type.
 	 * @param modelData the model data to use.
@@ -70,7 +65,7 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 		this.modelData = modelData;
 		this.renderType = renderType;
 	}
-	
+
 	/**
 	 * Returns the model data.
 	 * @param renderState the render state to use.
@@ -81,8 +76,7 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 	{
 		return getModelData(renderState.getAnimatable());
 	}
-	
-	/** Selects the canonical model data for an owner during extraction and submission. */
+
 	@Override
 	/**
 	 * {@inheritDoc}
@@ -92,7 +86,6 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 		return this.modelData;
 	}
 
-	/** Returns the baked model selected for the supplied owner, or null before resource load. */
 	@Override
 	/**
 	 * {@inheritDoc}
@@ -112,7 +105,7 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 	{
 		return getModel(renderState.getAnimatable());
 	}
-	
+
 	/**
 	 * Returns the render type.
 	 * @param texture the texture to use.
@@ -123,7 +116,7 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 	{
 		return this.renderType.apply(texture);
 	}
-	
+
 	/**
 	 * Extracts the render state.
 	 * @param blockEntity the block entity to use.
@@ -142,7 +135,7 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 		renderState.extractBlockData(blockEntity, this, breakProgress);
 		renderState.extractFacing(getAnimatableFacing(blockEntity));
 	}
-	
+
 	/**
 	 * Performs the submit operation.
 	 * @param renderState the render state to use.
@@ -170,7 +163,7 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 			poseStack.popPose();
 		}
 	}
-	
+
 	/**
 	 * Performs the pre submit operation.
 	 * @param poseStack the pose stack to use.
@@ -182,7 +175,7 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 	public void preSubmit(PoseStack poseStack, RS renderState, CameraRenderState cameraRenderState, SubmitNodeCollector submitNodeCollector)
 	{
 	}
-	
+
 	/**
 	 * Performs the true submit operation.
 	 * @param poseStack the pose stack to use.
@@ -204,13 +197,13 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 			Map<PAnimationController<T>, MolangParser.Context> molangContexts = prepareMolangContexts(
 					renderState.getAnimatable(), manager, controllers, renderState.partialTick());
 			InstanceAnimationManager.addManager(manager);
-		
+
 			PPose pose = model.evaluate(controllers, molangContexts, renderState.partialTick());
 			model.bones().forEach(bone -> perBoneSubmit(renderState.getAnimatable(), poseStack, bone, pose, controllers,
 					molangContexts, this::getRenderType, -1, renderState.lightCoords, OverlayTexture.NO_OVERLAY, renderState.partialTick()));
 		});
 	}
-	
+
 	/**
 	 * Performs the post submit operation.
 	 * @param poseStack the pose stack to use.
@@ -222,7 +215,7 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 	public void postSubmit(PoseStack poseStack, RS renderState, CameraRenderState cameraRenderState, SubmitNodeCollector submitNodeCollector)
 	{
 	}
-	
+
 	/**
 	 * Submits the selected bone and its descendants using the sampled pose and inherited mesh render context.
 	 *
@@ -336,7 +329,7 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 	                                    float partialTick)
 	{
 	}
-	
+
 	/**
 	 * Submits one bone hierarchy using the supplied model and controller inputs.
 	 *
@@ -413,7 +406,7 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 	{
 		this.submission.run(renderState, () -> submitBone(renderState.getAnimatable(), bone, poseStack, modelData, controllers, renderType, color, packedLight, packedOverlay, renderState.partialTick()));
 	}
-	
+
 	/**
 	 * Resolves render overrides inherited by the selected bone and its meshes.
 	 *
@@ -457,7 +450,7 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 	{
 		return resolveMeshRender(renderState.getAnimatable(), bone, mesh, inherited, renderState.partialTick());
 	}
-	
+
 	/**
 	 * Performs the try rotate to real rotation operation.
 	 * @param poseStack the pose stack to use.
@@ -474,7 +467,7 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 			poseStack.mulPose(Axis.XP.rotationDegrees(90 * facing.getUnitVec3i().getY()));
 		}
 	}
-	
+
 	/**
 	 * Returns the animatable facing.
 	 * @param renderState the render state to use.
@@ -495,13 +488,13 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 	{
 		BlockState blockState = animatable.getBlockState();
 		Direction dir = Direction.NORTH;
-		
+
 		if (blockState.hasProperty(BlockStateProperties.HORIZONTAL_FACING))
 			dir = blockState.getValue(BlockStateProperties.HORIZONTAL_FACING);
-		
+
 		if (blockState.hasProperty(BlockStateProperties.FACING))
 			dir = blockState.getValue(BlockStateProperties.FACING);
-		
+
 		if (dir.getAxis() ==  Direction.Axis.Z)
 			dir = dir.getOpposite();
 		return dir;

@@ -24,16 +24,7 @@ import com.mojang.blaze3d.textures.GpuTexture;
 import com.mojang.blaze3d.textures.GpuTextureView;
 import com.mojang.blaze3d.textures.TextureFormat;
 import org.jspecify.annotations.Nullable;
-import org.lwjgl.opengl.ARBDrawBuffersBlend;
-import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-import org.lwjgl.opengl.GL13;
-import org.lwjgl.opengl.GL14;
-import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL30;
-import org.lwjgl.opengl.GL32;
-import org.lwjgl.opengl.GL40;
+import org.lwjgl.opengl.*;
 
 import java.util.OptionalInt;
 import java.util.List;

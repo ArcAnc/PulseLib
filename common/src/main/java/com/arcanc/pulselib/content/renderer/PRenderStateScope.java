@@ -26,7 +26,7 @@ final class PRenderStateScope<S>
 
 	void run(S state, Runnable action)
 	{
-		@Nullable S previous = this.current;
+		S previous = this.current;
 		this.current = state;
 		try
 		{

@@ -10,14 +10,12 @@
 package com.arcanc.pulselib.util.helpers;
 
 
-import de.javagl.jgltf.model.AccessorData;
-import de.javagl.jgltf.model.AccessorModel;
-import de.javagl.jgltf.model.GltfConstants;
-import de.javagl.jgltf.model.MaterialModel;
-import de.javagl.jgltf.model.TextureModel;
+import de.javagl.jgltf.model.*;
 import de.javagl.jgltf.model.v2.MaterialModelV2;
 
-import java.nio.*;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 
 /**
  * Provides support for lib parser helper.

@@ -11,11 +11,9 @@ package com.arcanc.pulselib.content.player.animation;
 
 import com.arcanc.pulselib.content.model.animation.PTransform;
 import com.arcanc.pulselib.data.gltf.PGltfModelLoader;
-import org.joml.Matrix4f;
-import org.joml.Quaternionf;
-import org.joml.Quaternionfc;
-import org.joml.Vector3f;
-import org.joml.Vector3fc;
+import org.joml.*;
+
+import java.lang.Math;
 
 /**
  * Coordinate conversion between imported player models and vanilla ModelPart space.

@@ -14,13 +14,9 @@ import com.arcanc.pulselib.content.animatable.PAnimatable;
 import com.arcanc.pulselib.content.animatable.PAnimationController;
 import com.arcanc.pulselib.content.animatable.PAnimationManager;
 import com.arcanc.pulselib.content.animatable.instance.InstanceAnimationManager;
-import com.arcanc.pulselib.content.model.animation.PPose;
 import com.arcanc.pulselib.content.model.animation.PAnimationEvaluationContext;
-import com.arcanc.pulselib.content.model.baked.PBakedBone;
-import com.arcanc.pulselib.content.model.baked.PBakedMesh;
-import com.arcanc.pulselib.content.model.baked.PBakedModel;
-import com.arcanc.pulselib.content.model.baked.PMeshRenderContext;
-import com.arcanc.pulselib.content.model.baked.PMeshRenderMaterial;
+import com.arcanc.pulselib.content.model.animation.PPose;
+import com.arcanc.pulselib.content.model.baked.*;
 import com.arcanc.pulselib.content.renderer.base.PEntityRenderState;
 import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import com.arcanc.pulselib.data.gecko.MolangParser;
@@ -60,7 +56,6 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -92,7 +87,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		this.modelData = modelData;
 		this.renderType = renderType;
 	}
-	
+
 	/**
 	 * Returns the model data.
 	 * @param renderState the render state to use.
@@ -103,22 +98,20 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 	{
 		return getModelData(renderState.getAnimatable());
 	}
-	
-	/** Selects the canonical model data for an owner during extraction and submission. */
-	@Override
+
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public PModelData getModelData(T animatable)
 	{
 		return this.modelData;
 	}
 
-	/** Returns the baked model selected for the supplied owner, or null before resource load. */
-	@Override
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public @Nullable PBakedModel getModel(T animatable)
 	{
 		return getModelData(animatable).getModel();
@@ -134,7 +127,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 	{
 		return getModel(renderState.getAnimatable());
 	}
-	
+
 	/**
 	 * Returns the render type.
 	 * @param texture the texture to use.
@@ -145,7 +138,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 	{
 		return this.renderType.apply(texture);
 	}
-	
+
 	/**
 	 * Adds the render layer.
 	 * @param boneName the bone name to use.
@@ -163,7 +156,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 			return listLayers;
 		});
 	}
-	
+
 	/**
 	 * Extracts the render state.
 	 * @param entity the entity to use.
@@ -180,7 +173,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 			extractLivingRenderData(living, livingEntityRenderState, partialTick);
 		}
 	}
-	
+
 	/**
 	 * Performs the submit operation.
 	 * @param renderState the render state to use.
@@ -192,7 +185,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 	public void submit(RS renderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState)
 	{
 		super.submit(renderState, poseStack, submitNodeCollector, cameraRenderState);
-		
+
 		preSubmit(poseStack, renderState, cameraRenderState, submitNodeCollector);
 		poseStack.pushPose();
 		try
@@ -206,7 +199,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		}
 		postSubmit(poseStack, renderState, cameraRenderState, submitNodeCollector);
 	}
-	
+
 	/**
 	 * Performs the pre submit operation.
 	 * @param poseStack the pose stack to use.
@@ -217,9 +210,9 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 	@Override
 	public void preSubmit(PoseStack poseStack, RS renderState, CameraRenderState cameraRenderState, SubmitNodeCollector submitNodeCollector)
 	{
-	
+
 	}
-	
+
 	/**
 	 * Performs the true submit operation.
 	 * @param poseStack the pose stack to use.
@@ -235,18 +228,18 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 			PBakedModel model = renderState.getBakedModel();
 			if (model == null)
 				return;
-		
+
 			PAnimationManager<T> manager = PLibHelper.getManager(renderState.getAnimatable(), renderState.getAnimKey());
 			manager.bindModel(model);
 			InstanceAnimationManager.addManager(manager);
-		
+
 			Collection<PAnimationController<T>> controllers = manager.getControllers().values();
 			Map<PAnimationController<T>, MolangParser.Context> molangContexts = prepareMolangContexts(
 					renderState.getAnimatable(), manager, controllers, renderState.partialTick());
 			PPose pose = model.evaluate(controllers, molangContexts, renderState.partialTick());
 			HeadRotation headRotation = headRotation(renderState);
 			int packedOverlay;
-		
+
 			if (renderState instanceof LivingEntityRenderState livingEntityRenderState)
 			{
 				packedOverlay = LivingEntityRenderer.getOverlayCoords(livingEntityRenderState, 0.0f);
@@ -256,7 +249,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 			{
 				packedOverlay = OverlayTexture.NO_OVERLAY;
 			}
-			
+
 			if (this.renderLayers.isEmpty())
 			{
 				for (PBakedBone bone : model.bones())
@@ -281,7 +274,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 			}
 		});
 	}
-	
+
 	/**
 	 * Performs the post submit operation.
 	 * @param poseStack the pose stack to use.
@@ -292,9 +285,9 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 	@Override
 	public void postSubmit(PoseStack poseStack, RS renderState, CameraRenderState cameraRenderState, SubmitNodeCollector submitNodeCollector)
 	{
-	
+
 	}
-	
+
 	/**
 	 * Submits the selected bone and its descendants using the sampled pose and inherited mesh render context.
 	 *
@@ -493,47 +486,6 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 				data, renderType, packedColor, packedLight, packedOverlay, renderState.partialTick(), headRotation(renderState),
 				renderLayer, entityBonePoses, layerTransform, null, molangContexts));
 	}
-	
-	/**
-	 * Performs the per bone submit operation.
-	 * @param renderState the render state to use.
-	 * @param poseStack the pose stack to use.
-	 * @param bone the bone to use.
-	 * @param controllers the controllers to use.
-	 * @param data the data to use.
-	 * @param renderType the render type to use.
-	 * @param packedColor the packed color to use.
-	 * @param packedLight the packed light to use.
-	 * @param packedOverlay the packed overlay to use.
-	 * @param submitNodeCollector the submit node collector to use.
-	 * @param cameraRenderState the camera render state to use.
-	 * @param renderLayer the render layer to use.
-	 * @param entityBonePoses the entity bone poses to use.
-	 * @param layerTransform the layer transform to use.
-	 * @param molangContexts the molang contexts to use.
-	 */
-
-
-	/**
-	 * Performs the per bone submit operation.
-	 * @param renderState the render state to use.
-	 * @param poseStack the pose stack to use.
-	 * @param bone the bone to use.
-	 * @param controllers the controllers to use.
-	 * @param data the data to use.
-	 * @param renderType the render type to use.
-	 * @param packedColor the packed color to use.
-	 * @param packedLight the packed light to use.
-	 * @param packedOverlay the packed overlay to use.
-	 * @param submitNodeCollector the submit node collector to use.
-	 * @param cameraRenderState the camera render state to use.
-	 * @param renderLayer the render layer to use.
-	 * @param entityBonePoses the entity bone poses to use.
-	 * @param layerTransform the layer transform to use.
-	 * @param deferredLayers the deferred layers to use.
-	 * @param molangContexts the molang contexts to use.
-	 */
-		
 
 	/**
 	 * Performs the submit deferred layer operation.
@@ -671,7 +623,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 			pose.mul(layerTransform);
 		}
 	}
-	
+
 	/**
 	 * Submits one bone hierarchy using the supplied model and controller inputs.
 	 *
@@ -814,21 +766,6 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 	{
 		this.submission.run(renderState, () -> submitBone(renderState.getAnimatable(), bone, poseStack, modelData, controllers, renderType, color, packedLight, packedOverlay, renderState.partialTick(), renderLayer));
 	}
-	
-	/**
-	 * Performs the submit bone operation.
-	 * @param renderState the render state to use.
-	 * @param bone the bone to use.
-	 * @param poseStack the pose stack to use.
-	 * @param modelData the model data to use.
-	 * @param controllers the controllers to use.
-	 * @param renderType the render type to use.
-	 * @param color the color to use.
-	 * @param packedLight the packed light to use.
-	 * @param packedOverlay the packed overlay to use.
-	 * @param renderLayer the render layer to use.
-	 */
-
 
 	/**
 	 * Resolves render overrides inherited by the selected bone and its meshes.
@@ -873,7 +810,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 	{
 		return resolveMeshRender(renderState.getAnimatable(), bone, mesh, inherited, renderState.partialTick());
 	}
-	
+
 	/**
 	 * Performs the setup rotations operation.
 	 * @param renderState the render state to use.
@@ -887,12 +824,12 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		{
 			yBodyRot += (float)(Math.cos(Mth.floor(renderState.ageInTicks) * 3.25F) * Math.PI * 0.4F);
 		}
-		
+
 		if (!renderState.hasPose(Pose.SLEEPING))
 		{
 			poseStack.mulPose(Axis.YN.rotationDegrees(yBodyRot));
 		}
-		
+
 		float deathTime = renderState.deathTime;
 		if (deathTime > 0)
 		{
@@ -902,7 +839,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 			{
 				f = 1.0F;
 			}
-			
+
 			poseStack.mulPose(Axis.ZP.rotationDegrees(f * 90));
 		}
 		else if (renderState.isAutoSpinAttack)
@@ -924,7 +861,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 			poseStack.mulPose(Axis.ZP.rotationDegrees(180.0F));
 		}
 	}
-	
+
 	/**
 	 * Performs the sleep direction to rotation operation.
 	 * @param facing the facing to use.
@@ -940,7 +877,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 			default -> 0.0F;
 		};
 	}
-	
+
 	/**
 	 * Extracts the living render data.
 	 * @param entity the entity to use.
@@ -956,7 +893,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		state.yRot = Mth.wrapDegrees(headYRot - state.bodyRot);
 		state.xRot = entity.getXRot(partialTick);
 		state.isUpsideDown = this.isEntityUpsideDown(entity);
-		
+
 		if (state.isUpsideDown)
 		{
 			state.yRot *= -1f;
@@ -964,39 +901,39 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		}
 
 		state.extractHeadData(state.yRot, headXRot);
-		
+
 		float walkAnimationPos = 0.0f;
 		float walkAnimationSpeed = 0.0f;
-		
+
 		if (!entity.isPassenger() && entity.isAlive())
 		{
 			walkAnimationPos = entity.walkAnimation.position(partialTick);
 			walkAnimationSpeed = entity.walkAnimation.speed(partialTick);
 		}
-		
+
 		state.walkAnimationPos = walkAnimationPos;
 		state.walkAnimationSpeed = walkAnimationSpeed;
-		
+
 		float wornHeadAnimationPos = walkAnimationPos;
-		
+
 		if (entity.getVehicle() instanceof LivingEntity vehicle)
 		{
 			wornHeadAnimationPos = vehicle.walkAnimation.position(partialTick);
 		}
-		
+
 		state.wornHeadAnimationPos = wornHeadAnimationPos;
-		
+
 		state.scale = entity.getScale();
 		state.ageScale = entity.getAgeScale();
 		state.pose = entity.getPose();
-		
+
 		state.bedOrientation = entity.getBedOrientation();
-		
+
 		if (state.bedOrientation != null)
 		{
 			state.eyeHeight = entity.getEyeHeight(Pose.STANDING);
 		}
-		
+
 		state.isFullyFrozen = entity.isFullyFrozen();
 		state.isBaby = entity.isBaby();
 		state.isInWater = entity.isInWater();
@@ -1004,10 +941,10 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		state.ticksSinceKineticHitFeedback = entity.getTicksSinceLastKineticHitFeedback(partialTick);
 		state.hasRedOverlay = entity.hurtTime > 0 || entity.deathTime > 0;
 		ItemStack headItem = entity.getItemBySlot(EquipmentSlot.HEAD);
-		
+
 		SkullBlock.Type wornHeadType = null;
 		ResolvableProfile wornHeadProfile = null;
-		
+
 		if (headItem.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof AbstractSkullBlock skullBlock)
 		{
 			wornHeadType = skullBlock.getType();
@@ -1022,15 +959,15 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 			else*/
 			state.headItem.clear();
 		}
-		
+
 		state.wornHeadType = wornHeadType;
 		state.wornHeadProfile = wornHeadProfile;
-		
+
 		state.deathTime = entity.deathTime > 0 ? entity.deathTime + partialTick : 0.0f;
 		Minecraft minecraft = Minecraft.getInstance();
 		state.isInvisibleToPlayer = state.isInvisible && entity.isInvisibleTo(minecraft.player);
 	}
-	
+
 	/**
 	 * Performs the solve body rot operation.
 	 * @param entity the entity to use.
@@ -1050,7 +987,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 			{
 				bodyRot += headDiff * 0.2F;
 			}
-			
+
 			return bodyRot;
 		}
 		else
@@ -1058,7 +995,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 			return Mth.rotLerp(partialTick, entity.yBodyRotO, entity.yBodyRot);
 		}
 	}
-	
+
 	/**
 	 * Determines whether entity upside down.
 	 * @param mob the mob to use.
@@ -1069,7 +1006,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		Component customName = mob.getCustomName();
 		return customName != null && isUpsideDownName(customName.getString());
 	}
-	
+
 	/**
 	 * Determines whether upside down name.
 	 * @param name the name to use.
@@ -1079,10 +1016,10 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 	{
 		return "Dinnerbone".equals(name) || "Grumm".equals(name);
 	}
-	
-/**
- * Provides support for deferred layer submit.
- */
+
+	/**
+	 * Provides support for deferred layer submit.
+    */
 	protected final class DeferredLayerSubmit
 	{
 		private final PEntityRenderLayer<T, RS> layer;
@@ -1091,7 +1028,7 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 		private final int packedColor;
 		private final int packedLight;
 		private final int packedOverlay;
-		
+
 		/**
 		 * Creates an instance of the enclosing type.
 		 * @param layer the layer to use.

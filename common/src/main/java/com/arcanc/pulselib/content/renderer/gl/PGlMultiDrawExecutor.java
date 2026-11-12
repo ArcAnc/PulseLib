@@ -10,30 +10,23 @@
 package com.arcanc.pulselib.content.renderer.gl;
 
 import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
-import com.arcanc.pulselib.content.renderer.plan.PDrawCommand;
-import com.arcanc.pulselib.content.renderer.plan.PDrawGroup;
-import com.arcanc.pulselib.content.renderer.plan.PRenderCapabilities;
-import com.arcanc.pulselib.content.renderer.plan.PRenderCapabilityMatrix;
-import com.arcanc.pulselib.content.renderer.plan.PRenderExecutor;
-import com.arcanc.pulselib.content.renderer.plan.PRenderFrame;
-import com.arcanc.pulselib.content.renderer.plan.PRenderPlan;
-import com.arcanc.pulselib.content.renderer.plan.PTransparencyMode;
+import com.arcanc.pulselib.content.renderer.plan.*;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.arcanc.pulselib.util.PResourceCache;
 import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
-import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.ProjectionType;
+import com.mojang.blaze3d.buffers.GpuBuffer;
+import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.opengl.GlStateManager;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.systems.ScissorState;
 import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.textures.GpuTextureView;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ProjectionMatrixBuffer;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -45,14 +38,7 @@ import org.joml.Vector4f;
 import org.jspecify.annotations.Nullable;
 import org.lwjgl.opengl.*;
 
-import java.util.Objects;
-import java.util.ArrayList;
-import java.util.IdentityHashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.OptionalDouble;
-import java.util.OptionalInt;
+import java.util.*;
 
 /**
  * Provides support for gl multi draw executor.
@@ -120,7 +106,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 	@Override
 	public void execute(PRenderPlan plan, PRenderFrame frame)
 	{
-		execute(plan, frame, Minecraft.getInstance().getMainRenderTarget());
+		execute(plan, frame, PLibRenderHelper.mc().getMainRenderTarget());
 	}
 
 	/** Uses opaque depth independently of the eventual transparency destination. */
@@ -170,7 +156,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 						this.resources.resolve(group.mesh(), this.geometry, frameSlot), group.command(), group.writeDepth(), this.resources.transparency(group.pipeline())));
 			if (this.stateVertices == null)
 				this.stateVertices = RenderSystem.getDevice().createBuffer(() -> "PulseLib pass state vertices", GpuBuffer.USAGE_VERTEX,
-						(long)PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize());
+						PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize());
 			if (this.stateIndices == null)
 				this.stateIndices = RenderSystem.getDevice().createBuffer(() -> "PulseLib pass state indices", GpuBuffer.USAGE_INDEX, (long)Integer.BYTES);
 			if (this.projectionBuffer == null)
@@ -462,7 +448,6 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 				pass.bindTexture("LayerDepthSampler", oitPass == OitPass.DEPTH_PEEL ?
 						activeOit().previousLayerDepthView() : activeOit().activeLayerDepthView(),
 						RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST));
-			// A zero-index draw applies Minecraft pipeline/uniform state; arena VAOs supply actual geometry.
 			pass.setVertexBuffer(0, this.stateVertices);
 			pass.setIndexBuffer(this.stateIndices, VertexFormat.IndexType.INT);
 			pass.drawIndexed(0, 0, 0, 1);
@@ -517,7 +502,6 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 	 * Resolves the pipeline.
 	 * @param type the type to use.
 	 * @param oitPass the oit pass to use.
-	 * @param frame the captured frame matrices
 	 * @return the value produced by this operation.
 	 */
 	private RenderPipeline resolvePipeline(RenderType type, OitPass oitPass)
@@ -588,24 +572,24 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 			pass.disableScissor();
 	}
 
-/**
- * Immutable value object representing draw.
- */
+	/**
+	 * Immutable value object representing draw.
+    */
 	private record Draw(RenderType type, String label, PGlGeometryArena.Slice slice,
 	                    PDrawCommand command, boolean writeDepth, PTransparencyMode transparency)
 	{
 	}
 
-/**
- * Immutable value object representing arena key.
- */
+	/**
+	 * Immutable value object representing arena key.
+    */
 	private record ArenaKey(PGlGeometryArena.Page page, int indexType)
 	{
 	}
 
-/**
- * Enumerates the available oit pass values.
- */
+	/**
+	 * Enumerates the available oit pass values.
+    */
 	private enum OitPass
 	{
 		NONE,
@@ -623,9 +607,9 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 		}
 	}
 
-/**
- * Immutable value object representing render target attachments.
- */
+	/**
+	 * Immutable value object representing render target attachments.
+    */
 	private record RenderTargetAttachments(GpuTextureView color, GpuTextureView depth)
 	{
 	}

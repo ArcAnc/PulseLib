@@ -9,8 +9,8 @@
 
 package com.arcanc.pulselib.content.player.animation;
 
-import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.ApiStatus;
 

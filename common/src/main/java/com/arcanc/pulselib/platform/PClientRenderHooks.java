@@ -29,7 +29,6 @@ import java.util.function.Predicate;
 /** Narrow bridges for optional loader extensions to vanilla graphics APIs. */
 public final class PClientRenderHooks
 {
-	// Vanilla 26.1.2 exposes DEPTH32 but no stencil-bearing TextureFormat.
 	private static Predicate<TextureFormat> stencilAspect = format -> false;
 	private static ArmorModelResolver armorModels = (stack, type, model) -> model;
 	private static ArmRenderer armRenderer = (renderer, pose, collector, light, skin, sleeve, player, right) ->

@@ -9,13 +9,14 @@
 
 package com.arcanc.pulselib.content.mixin;
 
-import com.arcanc.pulselib.platform.PClientRenderHooks;
+import com.arcanc.pulselib.content.player.animation.firstPerson.*;
 import com.arcanc.pulselib.content.player.deformer.PPlayerMeshDeformers;
 import com.arcanc.pulselib.content.renderer.base.PModelPartSnapshot;
-import com.arcanc.pulselib.content.player.animation.firstPerson.*;
+import com.arcanc.pulselib.platform.PClientRenderHooks;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -32,9 +33,10 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Group;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
@@ -135,7 +137,7 @@ public abstract class ItemInHandRendererMixin
 		{
 			original.call(player, partialTick, xRot, hand, attack, stack, inverseArmHeight, poseStack, submitNodeCollector, packedLight);
 			if (hand == InteractionHand.OFF_HAND && stack.isEmpty())
-				renderHeldArm(player, PFirstPersonRenderContexts.current(), poseStack, submitNodeCollector, packedLight);
+				pulseLib$renderHeldArm(player, PFirstPersonRenderContexts.current(), poseStack, submitNodeCollector, packedLight);
 		}
 		finally
 		{
@@ -156,17 +158,17 @@ public abstract class ItemInHandRendererMixin
 	 */
 	@Group(name = "pulselib$rightHand", min = 1, max = 1)
 	@WrapOperation(require = 0, method = "renderPlayerArm", at = @At(value = "INVOKE", target =
-			"Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderRightHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;ZLnet/minecraft/client/player/AbstractClientPlayer;)V"))
+			"Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderRightHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;Z)V"))
 	private void pulselib$renderRightHand(AvatarRenderer<?> renderer,
-	                                     PoseStack poseStack,
-	                                     SubmitNodeCollector submitNodeCollector,
-	                                     int packedLight,
-	                                     Identifier skin,
-	                                     boolean sleeve,
-	                                     AbstractClientPlayer player,
-	                                     Operation<Void> original)
+	                                      PoseStack poseStack,
+	                                      SubmitNodeCollector submitNodeCollector,
+	                                      int packedLight,
+	                                      Identifier skin,
+	                                      boolean sleeve,
+	                                      Operation<Void> original,
+	                                      @Local (name = "player") AbstractClientPlayer player)
 	{
-		renderArm(renderer, poseStack, submitNodeCollector, packedLight, skin, sleeve, player, original);
+		pulseLib$renderArm(renderer, poseStack, submitNodeCollector, packedLight, skin, sleeve, player, original);
 	}
 
 	/**
@@ -182,17 +184,17 @@ public abstract class ItemInHandRendererMixin
 	 */
 	@Group(name = "pulselib$leftHand", min = 1, max = 1)
 	@WrapOperation(require = 0, method = "renderPlayerArm", at = @At(value = "INVOKE", target =
-			"Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderLeftHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;ZLnet/minecraft/client/player/AbstractClientPlayer;)V"))
+			"Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderLeftHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;Z)V"))
 	private void pulselib$renderLeftHand(AvatarRenderer<?> renderer,
 	                                    PoseStack poseStack,
 	                                    SubmitNodeCollector submitNodeCollector,
 	                                    int packedLight,
 	                                    Identifier skin,
 	                                    boolean sleeve,
-	                                    AbstractClientPlayer player,
-	                                    Operation<Void> original)
+	                                    Operation<Void> original,
+	                                    @Local (name = "player") AbstractClientPlayer player)
 	{
-		renderArm(renderer, poseStack, submitNodeCollector, packedLight, skin, sleeve, player, original);
+		pulseLib$renderArm(renderer, poseStack, submitNodeCollector, packedLight, skin, sleeve, player, original);
 	}
 
 	/** Vanilla has no explicit player argument; exactly one loader signature must match. */
@@ -203,7 +205,7 @@ public abstract class ItemInHandRendererMixin
 	                                              SubmitNodeCollector collector, int light, Identifier skin,
 	                                              boolean sleeve, Operation<Void> original)
 	{
-		renderArm(renderer, poses, collector, light, skin, sleeve, null, original);
+		pulseLib$renderArm(renderer, poses, collector, light, skin, sleeve, null, original);
 	}
 
 	/** Vanilla has no explicit player argument; exactly one loader signature must match. */
@@ -214,7 +216,7 @@ public abstract class ItemInHandRendererMixin
 	                                              SubmitNodeCollector collector, int light, Identifier skin,
 	                                              boolean sleeve, Operation<Void> original)
 	{
-		renderArm(renderer, poses, collector, light, skin, sleeve, null, original);
+		pulseLib$renderArm(renderer, poses, collector, light, skin, sleeve, null, original);
 	}
 
 	/**
@@ -228,19 +230,20 @@ public abstract class ItemInHandRendererMixin
 	 * @param player the player to use.
 	 * @param original the original to use.
 	 */
-	private static void renderArm(AvatarRenderer<?> renderer,
-	                              PoseStack poseStack,
-	                              SubmitNodeCollector submitNodeCollector,
-	                              int packedLight,
-	                              Identifier skin,
-	                              boolean sleeve,
-	                              @Nullable AbstractClientPlayer player,
-	                              Operation<Void> original)
+	@Unique
+	private static void pulseLib$renderArm(AvatarRenderer<?> renderer,
+	                                       PoseStack poseStack,
+	                                       SubmitNodeCollector submitNodeCollector,
+	                                       int packedLight,
+	                                       Identifier skin,
+	                                       boolean sleeve,
+	                                       @Nullable AbstractClientPlayer player,
+	                                       Operation<Void> original)
 	{
 		PFirstPersonRenderContext context = PFirstPersonRenderContexts.current();
 		if (context == null || context.map())
 		{
-			submitArm(renderer, poseStack, submitNodeCollector, packedLight, skin, sleeve, player, original);
+			pulseLib$submitArm(renderer, poseStack, submitNodeCollector, packedLight, skin, sleeve, player, original);
 			return;
 		}
 		PFirstPersonArmPose armPose = context.arm() == HumanoidArm.RIGHT ?
@@ -249,7 +252,7 @@ public abstract class ItemInHandRendererMixin
 			return;
 		if (armPose.mode() == PFirstPersonRenderMode.VANILLA)
 		{
-			submitArm(renderer, poseStack, submitNodeCollector, packedLight, skin, sleeve, player, original);
+			pulseLib$submitArm(renderer, poseStack, submitNodeCollector, packedLight, skin, sleeve, player, original);
 			return;
 		}
 		if (armPose.transform() == null)
@@ -261,7 +264,7 @@ public abstract class ItemInHandRendererMixin
 			 * The matrix came from PFirstPersonPresentation's canonical MODEL pose. */
 			PFirstPersonPoseStack.replaceLocalPose(poseStack, context.basePose(), context.baseNormal(),
 					PVanillaFirstPersonArmResolver.resolveArmOrigin(context.arm(), armPose.transform()));
-			submitArm(renderer, poseStack, submitNodeCollector, packedLight, skin, sleeve, player, original);
+			pulseLib$submitArm(renderer, poseStack, submitNodeCollector, packedLight, skin, sleeve, player, original);
 		}
 		finally
 		{
@@ -270,9 +273,10 @@ public abstract class ItemInHandRendererMixin
 	}
 
 	/** Preserves the native invocation arity without changing shared pose handling. */
-	private static void submitArm(AvatarRenderer<?> renderer, PoseStack poses, SubmitNodeCollector collector,
-	                              int light, Identifier skin, boolean sleeve, @Nullable AbstractClientPlayer player,
-	                              Operation<Void> original)
+	@Unique
+	private static void pulseLib$submitArm(AvatarRenderer<?> renderer, PoseStack poses, SubmitNodeCollector collector,
+	                                       int light, Identifier skin, boolean sleeve, @Nullable AbstractClientPlayer player,
+	                                       Operation<Void> original)
 	{
 		if (player == null)
 			original.call(renderer, poses, collector, light, skin, sleeve);
@@ -310,7 +314,7 @@ public abstract class ItemInHandRendererMixin
 		}
 		PFirstPersonItemPose itemPose = context.arm() == HumanoidArm.RIGHT ?
 				context.presentation().rightItem() : context.presentation().leftItem();
-		renderHeldArm(entity, context, poseStack, submitNodeCollector, packedLight);
+		pulseLib$renderHeldArm(entity, context, poseStack, submitNodeCollector, packedLight);
 		if (itemPose.mode() == PFirstPersonRenderMode.HIDDEN)
 			return;
 		if (itemPose.mode() == PFirstPersonRenderMode.VANILLA)
@@ -339,11 +343,12 @@ public abstract class ItemInHandRendererMixin
 	 * existing vanilla arm renderer immediately before its final item submission,
 	 * so the item pipeline itself remains untouched.
 	 */
-	private static void renderHeldArm(LivingEntity entity,
-	                                  @Nullable PFirstPersonRenderContext context,
-	                                  PoseStack poseStack,
-	                                  SubmitNodeCollector submitNodeCollector,
-	                                  int packedLight)
+	@Unique
+	private static void pulseLib$renderHeldArm(LivingEntity entity,
+	                                           @Nullable PFirstPersonRenderContext context,
+	                                           PoseStack poseStack,
+	                                           SubmitNodeCollector submitNodeCollector,
+	                                           int packedLight)
 	{
 		if (context == null || !(entity instanceof AbstractClientPlayer player) || player.isInvisible())
 			return;

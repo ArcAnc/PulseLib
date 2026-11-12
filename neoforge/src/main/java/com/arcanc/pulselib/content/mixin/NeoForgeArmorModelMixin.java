@@ -28,9 +28,12 @@ public abstract class NeoForgeArmorModelMixin
 {
 	@WrapOperation(method = "renderLayers(Lnet/minecraft/client/resources/model/EquipmentClientInfo$LayerType;Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lnet/minecraft/world/item/ItemStack;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;II)V",
 			at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/client/extensions/common/IClientItemExtensions;getGenericArmorModel(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/client/resources/model/EquipmentClientInfo$LayerType;Lnet/minecraft/client/model/Model;)Lnet/minecraft/client/model/Model;"))
-	private Model<?> pulselib$useExtractedModel(IClientItemExtensions extensions, ItemStack stack,
-			EquipmentClientInfo.LayerType type, Model<?> model, Operation<Model<?>> original,
-			@Local(argsOnly = true) Object state)
+	private Model<?> pulselib$useExtractedModel(IClientItemExtensions extensions,
+	                                            ItemStack stack,
+	                                            EquipmentClientInfo.LayerType type,
+	                                            Model<?> model,
+	                                            Operation<Model<?>> original,
+	                                            @Local (argsOnly = true, name = "state") Object state)
 	{
 		var provider = PArmorModelSnapshots.submitting(state);
 		if (provider != null && provider.model() == model)

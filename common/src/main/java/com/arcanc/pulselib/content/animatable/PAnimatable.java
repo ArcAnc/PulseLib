@@ -21,17 +21,13 @@ package com.arcanc.pulselib.content.animatable;
 public interface PAnimatable<T extends PAnimatable<T>>
 {
 	/**
-	 * Returns the manager for a context after owner construction.
-	 *	 * An owner may store PLibHelper.createManager(this) in a field and return field.getManager(key).
-	 *	 * Custom storage strategies and direct access to instance-owned managers remain supported.
-	 *
 	 * @param key the key
 	 * @return the manager for a context after owner construction.
 	 * An owner may store PLibHelper.createManager(this) in a field and return field.getManager(key).
 	 * Custom storage strategies and direct access to instance-owned managers remain supported
 	 */
 	PAnimationManager<T> getAnimationManager(AnimManagerKey key);
-	
+
 	/**
 	 * Declares the controllers and animation graphs to create for each animation manager.
 	 *

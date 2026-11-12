@@ -43,7 +43,7 @@ public record PModelGuiRenderState(PBakedModel model, PPose animationPose, Matri
 	                                                     Function<Identifier, RenderType> renderType, int x, int y, Vector3f scale,
 	                                                     int color, int light, int overlay, float partialTick)
 	{
-		@Nullable PBakedModel model = modelData.getModel();
+		PBakedModel model = modelData.getModel();
 		if (model == null)
 			return;
 		var access = (GuiGraphicsExtractorAccessor)graphics;

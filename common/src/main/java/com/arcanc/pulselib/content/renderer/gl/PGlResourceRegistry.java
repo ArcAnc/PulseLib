@@ -11,18 +11,14 @@ package com.arcanc.pulselib.content.renderer.gl;
 
 import com.arcanc.pulselib.content.model.baked.PBakedMesh;
 import com.arcanc.pulselib.content.renderer.legacy.GlDynamicGeometry;
-import com.arcanc.pulselib.content.renderer.plan.PMeshHandle;
-import com.arcanc.pulselib.content.renderer.plan.PPipelineHandle;
-import com.arcanc.pulselib.content.renderer.plan.PTransparencyMode;
+import com.arcanc.pulselib.content.renderer.plan.*;
 import com.arcanc.pulselib.util.PRenderTypes;
-import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
-import com.arcanc.pulselib.content.renderer.plan.PDynamicGeometry;
 import net.minecraft.client.renderer.rendertype.RenderType;
 
 import java.util.EnumMap;
 import java.util.IdentityHashMap;
-import java.util.Objects;
 import java.util.Map;
+import java.util.Objects;
 
 /** Maps canonical plan handles to the existing Minecraft 26.1 GPU resources. */
 public final class PGlResourceRegistry

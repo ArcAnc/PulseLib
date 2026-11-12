@@ -21,15 +21,15 @@ import java.util.List;
 @Mixin(SubmitNodeStorage.ItemSubmit.class)
 public abstract class ItemSubmitMixin
 {
-	@ModifyVariable(method = "<init>", at = @At("HEAD"), argsOnly = true)
+	@ModifyVariable (method = "<init>", at = @At ("HEAD"), argsOnly = true, name = "quads")
 	private static List<BakedQuad> pulselib$copyQuads(List<BakedQuad> quads)
 	{
 		return List.copyOf(quads);
 	}
 
-	@ModifyVariable(method = "<init>", at = @At("HEAD"), argsOnly = true)
-	private static int[] pulselib$copyTints(int[] tints)
+	@ModifyVariable (method = "<init>", at = @At ("HEAD"), argsOnly = true, name = "tintLayers")
+	private static int[] pulselib$copyTints(int[] tintLayers)
 	{
-		return tints.clone();
+		return tintLayers.clone();
 	}
 }

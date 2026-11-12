@@ -14,13 +14,9 @@ import com.arcanc.pulselib.content.animatable.PAnimatable;
 import com.arcanc.pulselib.content.animatable.PAnimationController;
 import com.arcanc.pulselib.content.animatable.PAnimationManager;
 import com.arcanc.pulselib.content.mixin.ItemStackRenderStateAccessor;
-import com.arcanc.pulselib.content.model.animation.PPose;
 import com.arcanc.pulselib.content.model.animation.PAnimationEvaluationContext;
-import com.arcanc.pulselib.content.model.baked.PBakedBone;
-import com.arcanc.pulselib.content.model.baked.PBakedMesh;
-import com.arcanc.pulselib.content.model.baked.PBakedModel;
-import com.arcanc.pulselib.content.model.baked.PMeshRenderContext;
-import com.arcanc.pulselib.content.model.baked.PMeshRenderMaterial;
+import com.arcanc.pulselib.content.model.animation.PPose;
+import com.arcanc.pulselib.content.model.baked.*;
 import com.arcanc.pulselib.content.renderer.base.PItemRenderState;
 import com.arcanc.pulselib.content.renderer.modelData.PModelData;
 import com.arcanc.pulselib.data.PModelLoader;
@@ -46,7 +42,6 @@ import org.joml.Vector3fc;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -59,7 +54,7 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 	private final PModelData modelData;
 	private final PRenderStateScope<RS> submission = new PRenderStateScope<>();
 	private final Function<Identifier, RenderType> renderType;
-	
+
 	/**
 	 * Creates an instance of the enclosing type.
 	 * @param modelData the model data to use.
@@ -80,13 +75,13 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 	{
 		this(data, renderType);
 	}
-	
+
 	/**
 	 * Creates the render state.
 	 * @return the value produced by this operation.
 	 */
 	protected abstract RS createRenderState();
-	
+
 	/**
 	 * Preserves the canonical reload listener name without restoring BEWLR ownership.
 	 * @return the simple name of this renderer's runtime class.
@@ -129,7 +124,7 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 					PModelData modelData = getModelData(renderState);
 					PModelLoader modelLoader = PModelCache.getModelLoader(modelData.getModelLoaderId()).orElse(PGltfModelLoader.INSTANCE);
 					modelLoader.applyItemTransform(poseStack);
-		
+
 					CameraRenderState cameraRenderState = new CameraRenderState();
 					preSubmit(poseStack, renderState, cameraRenderState, submitNodeCollector);
 					trueSubmit(poseStack, renderState, cameraRenderState, submitNodeCollector);
@@ -148,7 +143,7 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 			}
 		}
 	}
-	
+
 	/**
 	 * Returns the extents.
 	 * @param output the output to use.
@@ -158,7 +153,7 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 	{
 		output.accept(new Vector3f());
 	}
-	
+
 	/**
 	 * Extracts the argument.
 	 * @param stack the stack to use.
@@ -171,7 +166,7 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 		state.extractStackData(stack, this);
 		return state;
 	}
-	
+
 	/**
 	 * Returns the model data.
 	 * @param renderState the render state to use.
@@ -182,8 +177,7 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 	{
 		return getModelData(renderState.getAnimatable());
 	}
-	
-	/** Selects the canonical model data for an owner during extraction and submission. */
+
 	@Override
 	/**
 	 * {@inheritDoc}
@@ -193,7 +187,6 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 		return this.modelData;
 	}
 
-	/** Returns the baked model selected for the supplied owner, or null before resource load. */
 	@Override
 	/**
 	 * {@inheritDoc}
@@ -213,7 +206,7 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 	{
 		return getModel(renderState.getAnimatable());
 	}
-	
+
 	/**
 	 * Returns the render type.
 	 * @param texture the texture to use.
@@ -224,7 +217,7 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 	{
 		return this.renderType.apply(texture);
 	}
-	
+
 	/**
 	 * Performs the pre submit operation.
 	 * @param poseStack the pose stack to use.
@@ -236,7 +229,7 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 	public void preSubmit(PoseStack poseStack, RS renderState, CameraRenderState cameraRenderState, SubmitNodeCollector submitNodeCollector)
 	{
 	}
-	
+
 	/**
 	 * Performs the true submit operation.
 	 * @param poseStack the pose stack to use.
@@ -252,20 +245,20 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 			PBakedModel model = renderState.getBakedModel();
 			if (model == null)
 				return;
-		
+
 			PAnimationManager<T> manager = PLibHelper.getManager(renderState.getAnimatable(), renderState.getAnimKey());
 			manager.bindModel(model);
-		
+
 			Collection<PAnimationController<T>> controllers = manager.getControllers().values();
 			Map<PAnimationController<T>, MolangParser.Context> molangContexts = prepareMolangContexts(
 					renderState.getAnimatable(), manager, controllers, renderState.partialTick());
-		
+
 			PPose pose = model.evaluate(controllers, molangContexts, renderState.partialTick());
 			ItemDisplayContext context = ((ItemStackRenderStateAccessor)renderState.itemRenderState()).pulselib$getDisplayContext();
 			model.bones().forEach(bone -> perBoneSubmit(renderState.getAnimatable(), renderState.stack(), poseStack, bone, pose, controllers, molangContexts, this::getRenderType, -1, renderState.lightCoords(), renderState.overlayCoords(), renderState.partialTick(), context));
 		});
 	}
-	
+
 	/**
 	 * Performs the post submit operation.
 	 * @param poseStack the pose stack to use.
@@ -277,7 +270,7 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 	public void postSubmit(PoseStack poseStack, RS renderState, CameraRenderState cameraRenderState, SubmitNodeCollector submitNodeCollector)
 	{
 	}
-	
+
 	/**
 	 * Submits the selected bone and its descendants using the sampled pose and inherited mesh render context.
 	 *
@@ -395,7 +388,7 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 	                                    float partialTick)
 	{
 	}
-	
+
 	/**
 	 * Submits one bone hierarchy using the supplied model and controller inputs.
 	 *
@@ -478,7 +471,7 @@ public abstract class PItemRenderer<T extends Item & PAnimatable<T>, RS extends 
 	{
 		this.submission.run(renderState, () -> submitBone(renderState.getAnimatable(), renderState.stack(), bone, poseStack, modelData, controllers, renderType, color, packedLight, packedOverlay, renderState.partialTick(), context));
 	}
-	
+
 	/**
 	 * Resolves render overrides inherited by the selected bone and its meshes.
 	 *

@@ -25,7 +25,7 @@ public final class PModelPartSnapshot implements AutoCloseable
 
 	private PModelPartSnapshot(ModelPart root, boolean freezeGeometry)
 	{
-		this.parts = root.getAllParts().stream().map(SavedPart::new).toList();
+		this.parts = root.getAllParts().stream().map(SavedPart :: new).toList();
 		this.deformers = freezeGeometry ? PPlayerDeformerSnapshot.captureGeometry(root) : PPlayerDeformerSnapshot.capture(root);
 	}
 
@@ -49,7 +49,7 @@ public final class PModelPartSnapshot implements AutoCloseable
 	/** Replays the saved pose without replacing the snapshot with the consumer's current state. */
 	public void restore()
 	{
-		this.parts.forEach(SavedPart::restore);
+		this.parts.forEach(SavedPart :: restore);
 		this.deformers.restore();
 	}
 

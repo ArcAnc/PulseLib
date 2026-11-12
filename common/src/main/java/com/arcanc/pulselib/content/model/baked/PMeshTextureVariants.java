@@ -11,9 +11,9 @@ package com.arcanc.pulselib.content.model.baked;
 
 import com.arcanc.pulselib.content.model.PMeshPrimitive;
 import com.arcanc.pulselib.content.model.textures.PTextureAlphaClassifier;
+import com.arcanc.pulselib.content.model.textures.atlas.PLibSpriteMetadata;
 import com.arcanc.pulselib.content.renderer.legacy.GlGeometryDataFactory;
 import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
-import com.arcanc.pulselib.content.model.textures.atlas.PLibSpriteMetadata;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.arcanc.pulselib.util.PResourceCache;
 import com.mojang.blaze3d.vertex.BufferBuilder;

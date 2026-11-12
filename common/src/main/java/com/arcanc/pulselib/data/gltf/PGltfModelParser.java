@@ -164,22 +164,22 @@ public class PGltfModelParser
 		GltfModel model = new GltfModelReader().readWithoutReferences(stream);
 
 		PModel pModel = new PModel();
-		
+
 		Map<UUID, PBone> uuidToBone = new HashMap<>();
 		Map<UUID, PMesh> uuidToMesh = new HashMap<>();
 		Map<NodeModel, PBone> nodeToBone = parseBones(model, uuidToBone, uuidToMesh);
 		Map<String, PAnimation> animations = parseAnimations(model, nodeToBone);
-		
+
 		pModel.bones.putAll(uuidToBone);
 		pModel.meshes.putAll(uuidToMesh);
 		pModel.boneMeshes.putAll(uuidToBone.values().stream().
 				collect(Collectors.toMap(PBone :: uuid, pBone -> Pair.of(pBone.uuid(), pBone.meshUUIDS().stream().toList()))));
 		pModel.animations.putAll(animations);
-		
+
 		return pModel;
-		
+
 	}
-	
+
 	/**
 	 * Parses the bones.
 	 * @param model the model to use.
@@ -191,11 +191,10 @@ public class PGltfModelParser
 	{
 		List<NodeModel> nodes = model.getNodeModels();
 		final Map<NodeModel, PBone> nodeToBone = new HashMap<>();
-		
+
 		if (nodes == null || nodes.isEmpty())
 			return nodeToBone;
-		
-		// Animated mesh nodes need their own transform; flattening them into an ancestor loses their channels.
+
 		Set<NodeModel> animatedNodes = new HashSet<>();
 		for (AnimationModel animation : model.getAnimationModels())
 			for (AnimationModel.Channel channel : animation.getChannels())
@@ -205,10 +204,10 @@ public class PGltfModelParser
 				filter(node -> isBoneNode(node) || animatedNodes.contains(node) && !isBlockbenchLocatorMarker(node)).
 				toList();
 		Set<String> boneNames = new HashSet<>();
-		
+
 		for (NodeModel node : joints)
 			parseBone(node, nodeToBone, boneNames);
-		
+
 		for (NodeModel node : nodes)
 		{
 			List<MeshModel> meshes = node.getMeshModels();
@@ -228,7 +227,7 @@ public class PGltfModelParser
 				parent.children().add(bone);
 			}
 		}
-		
+
 		for (NodeModel node : nodes)
 		{
 			List<MeshModel> meshes = node.getMeshModels();
@@ -248,10 +247,10 @@ public class PGltfModelParser
 
 		nodeToBone.forEach((nodeModel, pBone) ->
 				uuidToBone.put(pBone.uuid(), pBone));
-		
+
 		return nodeToBone;
 	}
-	
+
 	/**
 	 * Parses the bone.
 	 * @param node the node to use.
@@ -271,13 +270,13 @@ public class PGltfModelParser
 
 		UUID boneUUID = UUID.randomUUID();
 		String name = uniqueBoneName(node.getName(), boneUUID, boneNames);
-		
+
 		PBone bone = new PBone(
 				boneUUID,
 				name,
 				pivot,
 				baseRotation);
-		
+
 		nodeToBone.put(node, bone);
 	}
 
@@ -351,7 +350,7 @@ public class PGltfModelParser
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Determines whether blockbench locator marker.
 	 * @param node the node to use.
@@ -362,23 +361,23 @@ public class PGltfModelParser
 		NodeModel parent = node.getParent();
 		if (parent == null)
 			return false;
-		
+
 		String nodeName = node.getName();
 		if (nodeName == null || !nodeName.equals(parent.getName()))
 			return false;
-		
+
 		List<MeshModel> meshes = node.getMeshModels();
 		if (meshes != null && !meshes.isEmpty())
 			return false;
-		
+
 		List<NodeModel> children = node.getChildren();
 		if (children != null && !children.isEmpty())
 			return false;
-		
+
 		float[] scale = node.getScale();
 		return scale != null && scale.length == 3 && scale[0] < 0.1f && scale[1] < 0.1f && scale[2] < 0.1f;
 	}
-	
+
 	/**
 	 * Parses the mesh.
 	 * @param mesh the mesh to use.
@@ -412,18 +411,18 @@ public class PGltfModelParser
 		AccessorModel positionsAccessor = primitive.getAttributes().get("POSITION");
 		AccessorModel normalsAccessor = primitive.getAttributes().get("NORMAL");
 		AccessorModel uvsAccessor = primitive.getAttributes().get("TEXCOORD_0");
-		
+
 		FloatBuffer positions = transformPositions(PLibParserHelper.getFloatBuffer(positionsAccessor), meshTransform);
 		FloatBuffer normals = transformNormals(PLibParserHelper.getFloatBuffer(normalsAccessor), meshTransform);
 		FloatBuffer uvs = PLibParserHelper.getFloatBuffer(uvsAccessor);
-		
+
 		int vertexCount = positionsAccessor.getCount();
-		
+
 		AccessorModel indicesAccessor = primitive.getIndices();
 		ByteBuffer indices = PLibParserHelper.getByteBuffer(indicesAccessor);
 		int indicesCount = indicesAccessor.getCount();
 		int indicesType = indicesAccessor.getComponentType();
-		
+
 		MaterialModel material = primitive.getMaterialModel();
 		return new PMeshPrimitive(
 				vertexCount,
@@ -497,7 +496,7 @@ public class PGltfModelParser
 			transform.scale(scale[0], scale[1], scale[2]);
 		return transform;
 	}
-	
+
 	/**
 	 * Parses the animations.
 	 * @param model the model to use.
@@ -507,36 +506,36 @@ public class PGltfModelParser
 	private static Map<String, PAnimation> parseAnimations(GltfModel model, Map<NodeModel, PBone> nodeToBone)
 	{
 		Map<String, PAnimation> animations = new HashMap<>();
-		
+
 		for (int q = 0; q < model.getAnimationModels().size(); q++)
 		{
 			AnimationModel animationModel = model.getAnimationModels().get(q);
-			
+
 			String animationName = animationModel.getName() != null ? animationModel.getName() : "anim_" + q;
 			Map<String, PBoneAnimation> boneAnimations = new HashMap<>();
 			float maxTime = 0f;
-			
+
 			for (AnimationModel.Channel channel : animationModel.getChannels())
 			{
 				NodeModel node = channel.getNodeModel();
-				
+
 				if (node == null)
 					continue;
-				
+
 				PBone bone = nodeToBone.get(node);
 				if (bone == null)
 					continue;
-				
+
 				UUID boneUuid = bone.uuid();
-				
+
 				PGltfChannelDecoder<?> decoder = decoder(channel.getPath());
 				if (decoder == null)
 					continue;
-				
+
 				AnimationModel.Sampler sampler = channel.getSampler();
 				if (sampler == null)
 					continue;
-				
+
 				FloatBuffer inputTimes = PLibParserHelper.getFloatBuffer(sampler.getInput());
 				maxTime = Math.max(maxTime, inputTimes.limit() > 0 ? inputTimes.get(inputTimes.limit() - 1) : 0L);
 				AccessorModel outputAccessor = sampler.getOutput();
@@ -549,10 +548,10 @@ public class PGltfModelParser
 			}
 			animations.put(animationName, new PAnimation(animationName, maxTime * 20, boneAnimations));
 		}
-		
+
 		return animations;
 	}
-	
+
 	/**
 	 * Performs the decoder operation.
 	 * @param path the path to use.

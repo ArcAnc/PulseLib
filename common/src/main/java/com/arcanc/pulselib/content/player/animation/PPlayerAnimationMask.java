@@ -16,10 +16,10 @@ import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
-@FunctionalInterface
 /**
  * Defines the contract for player animation mask.
  */
+@FunctionalInterface
 public interface PPlayerAnimationMask
 {
 	/**

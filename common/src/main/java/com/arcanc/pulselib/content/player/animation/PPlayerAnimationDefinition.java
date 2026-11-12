@@ -11,27 +11,20 @@ package com.arcanc.pulselib.content.player.animation;
 
 import com.arcanc.pulselib.content.animatable.PAnimationController;
 import com.arcanc.pulselib.content.animatable.PAnimationManager;
+import com.arcanc.pulselib.content.model.animation.PPoseEasing;
+import com.arcanc.pulselib.content.model.animation.PTransitionInterruptionPolicy;
 import com.arcanc.pulselib.content.model.deformer.PDeformerStack;
 import com.arcanc.pulselib.content.player.animation.firstPerson.PPlayerFirstPersonSettings;
 import com.arcanc.pulselib.content.renderer.modelData.PModelData;
-import com.arcanc.pulselib.content.model.animation.PPoseEasing;
-import com.arcanc.pulselib.content.model.animation.PTransitionInterruptionPolicy;
 import com.arcanc.pulselib.data.gecko.MolangParser;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import org.jspecify.annotations.Nullable;
 import org.joml.Vector3f;
+import org.jspecify.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 
 /**
@@ -438,25 +431,11 @@ public final class PPlayerAnimationDefinition
 		/**
 		 * Keeps vanilla held-item rendering enabled.
 		 */
-		ItemRenderPolicy RENDER = new ItemRenderPolicy()
-		{
-			@Override
-			public boolean hide(LocalPlayer player, InteractionHand hand, ItemStack stack)
-			{
-				return false;
-			}
-		};
+		ItemRenderPolicy RENDER = (player, hand, stack) -> false;
 		/**
 		 * Hides vanilla held-item rendering.
 		 */
-		ItemRenderPolicy HIDE = new ItemRenderPolicy()
-		{
-			@Override
-			public boolean hide(LocalPlayer player, InteractionHand hand, ItemStack stack)
-			{
-				return true;
-			}
-		};
+		ItemRenderPolicy HIDE = (player, hand, stack) -> true;
 
 		/**
 		 * Returns whether vanilla rendering should hide the item in the supplied hand.
@@ -493,25 +472,11 @@ public final class PPlayerAnimationDefinition
 		/**
 		 * Always includes the held item.
 		 */
-		ItemVisibilityPolicy VISIBLE = new ItemVisibilityPolicy()
-		{
-			@Override
-			public ItemVisibility visibility(LocalPlayer player, InteractionHand hand, float animationTime, ItemStack stack)
-			{
-				return ItemVisibility.VISIBLE;
-			}
-		};
+		ItemVisibilityPolicy VISIBLE = (player, hand, animationTime, stack) -> ItemVisibility.VISIBLE;
 		/**
 		 * Always hides the held item.
 		 */
-		ItemVisibilityPolicy HIDDEN = new ItemVisibilityPolicy()
-		{
-			@Override
-			public ItemVisibility visibility(LocalPlayer player, InteractionHand hand, float animationTime, ItemStack stack)
-			{
-				return ItemVisibility.HIDDEN;
-			}
-		};
+		ItemVisibilityPolicy HIDDEN = (player, hand, animationTime, stack) -> ItemVisibility.HIDDEN;
 
 		/**
 		 * Selects held-item visibility at the supplied animation playback time.
@@ -533,7 +498,6 @@ public final class PPlayerAnimationDefinition
 		private final PModelData modelData;
 		private Predicate<Player> predicate = player -> true;
 		private final Map<PPlayerPart, String> bindings = new LinkedHashMap<>();
-		// EnumSet reflects all enum methods, including client-only model signatures.
 		private final Set<PPlayerPart> mask = new LinkedHashSet<>();
 		private PPlayerAnimationMask partMask;
 		private PPlayerAnimationBlendMode blendMode = PPlayerAnimationBlendMode.ADDITIVE_LOCAL;

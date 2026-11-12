@@ -62,18 +62,14 @@ public abstract class ItemStackMixin implements PItemStackAnimationData
 	{
 		long id = this.pulselib$animationId;
 		if (id != 0)
-		{
 			return id;
-		}
 		ItemStack stack = (ItemStack)(Object)this;
 		if (stack.isEmpty() || !(stack.getItem() instanceof PAnimatable<?>))
 			return 0;
 		synchronized (this)
 		{
 			if (this.pulselib$animationId == 0)
-			{
 				this.pulselib$animationId = PItemStackAnimationIds.nextId();
-			}
 			return this.pulselib$animationId;
 		}
 	}
@@ -91,9 +87,7 @@ public abstract class ItemStackMixin implements PItemStackAnimationData
 		{
 			long id = pulselib$getOrCreateAnimationId();
 			if (id != 0)
-			{
 				((PItemStackAnimationData)(Object)result).pulselib$setAnimationId(id);
-			}
 		}
 	}
 
@@ -107,18 +101,12 @@ public abstract class ItemStackMixin implements PItemStackAnimationData
 	{
 		ItemStack result = callback.getReturnValue();
 		if (result.isEmpty())
-		{
 			return;
-		}
 		PItemStackAnimationData data = (PItemStackAnimationData)(Object)result;
 		if (data.pulselib$getAnimationId() == 0)
-		{
 			return;
-		}
 		if (((ItemStack)(Object)this).isEmpty())
-		{
 			pulselib$setAnimationId(0);
-		}
 		else
 			data.pulselib$setAnimationId(PItemStackAnimationIds.nextId());
 	}

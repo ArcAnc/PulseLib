@@ -52,7 +52,6 @@ public abstract class CameraMixin
 	private void pulselib$followAnimatedHead(float partialTick, CallbackInfo ci)
 	{
 		Camera camera = (Camera)(Object)this;
-		@Nullable
 		Entity entity = camera.entity();
 		if (camera.isDetached() || entity != Minecraft.getInstance().player || !(entity instanceof LocalPlayer player))
 			return;

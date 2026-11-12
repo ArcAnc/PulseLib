@@ -15,11 +15,7 @@ import com.arcanc.pulselib.content.model.animation.PAnimationPoseResolver;
 import com.arcanc.pulselib.content.model.baked.PBakedModel;
 import com.arcanc.pulselib.data.gecko.MolangParser;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /** Shares one evaluated pose across a submission's bone traversal and attached models. */
 final class PRenderPoseContexts<T extends PAnimatable<T>> extends IdentityHashMap<PAnimationController<T>, MolangParser.Context>
@@ -37,12 +33,8 @@ final class PRenderPoseContexts<T extends PAnimatable<T>> extends IdentityHashMa
 		{
 			PRenderPoseContexts<T> typed = (PRenderPoseContexts<T>)cache;
 			for (Sample<T> sample : typed.poses)
-			{
 				if (sample.model() == model && sample.controllers() == controllers && sample.partialTick() == partialTick)
-				{
 					return sample.resolver();
-				}
-			}
 			PAnimationPoseResolver<T> resolver = evaluate(model, controllers, contexts, partialTick);
 			typed.poses.add(new Sample<>(model, controllers, partialTick, resolver));
 			return resolver;

@@ -11,33 +11,24 @@ package com.arcanc.pulselib.content.renderer;
 
 
 import com.arcanc.pulselib.content.model.baked.PBakedMesh;
+import com.arcanc.pulselib.content.model.baked.PDeformedMeshBuffers;
 import com.arcanc.pulselib.content.model.baked.PGpuDeformedMeshBuffers;
 import com.arcanc.pulselib.content.model.deformer.PMeshDeformation;
 import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
 import com.arcanc.pulselib.content.renderer.gl.PGlMultiDrawExecutor;
 import com.arcanc.pulselib.content.renderer.gl.PGlRenderHost;
 import com.arcanc.pulselib.content.renderer.gl.PGlResourceRegistry;
-import com.arcanc.pulselib.content.renderer.plan.PFrameCompiler;
-import com.arcanc.pulselib.content.renderer.plan.PInstanceHeader;
-import com.arcanc.pulselib.content.renderer.plan.PDrawCommand;
-import com.arcanc.pulselib.content.renderer.plan.PDrawGroup;
-import com.arcanc.pulselib.content.renderer.plan.PRenderPlan;
-import com.arcanc.pulselib.content.renderer.plan.PRenderFrame;
-import com.arcanc.pulselib.content.model.baked.PDeformedMeshBuffers;
-import com.arcanc.pulselib.content.renderer.plan.PPipelineHandle;
-import com.arcanc.pulselib.content.renderer.plan.PTransparencyMode;
-import com.arcanc.pulselib.content.renderer.plan.PMeshHandle;
-import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
-import com.arcanc.pulselib.content.renderer.plan.PDynamicGeometry;
+import com.arcanc.pulselib.content.renderer.plan.*;
 import com.arcanc.pulselib.util.PRenderTypes;
+import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
 import com.mojang.blaze3d.pipeline.RenderTarget;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.world.item.ItemDisplayContext;
 import org.joml.Matrix4f;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Provides support for render queue.
@@ -216,7 +207,7 @@ public final class PRenderQueue
 	private static PFrameCompiler<RenderStage> compiler()
 	{
 		PRenderContexts.Scope local = PRenderContexts.localScope();
-		return local == null ? COMPILER : java.util.Objects.requireNonNull(local.compiler);
+		return local == null ? COMPILER : Objects.requireNonNull(local.compiler);
 	}
 
 	/** Executes all local stages through the shared backend, using sorted alpha without world OIT. */
@@ -256,7 +247,7 @@ public final class PRenderQueue
 		EXECUTOR.endWorldFrame();
 	}
 
-	
+
 	/**
 	 * Performs the submit block entity mesh operation.
 	 * @param renderType the render type to use.
@@ -272,7 +263,7 @@ public final class PRenderQueue
 		submit(RenderStage.SOLID_BLOCKS,
 				renderType, mesh, deformation, data);
 	}
-	
+
 	/**
 	 * Performs the submit block entity translucent mesh operation.
 	 * @param renderType the render type to use.
@@ -287,7 +278,7 @@ public final class PRenderQueue
 	{
 		submit(RenderStage.TRANSLUCENT_BLOCKS, renderType, mesh, deformation, data, true);
 	}
-	
+
 	/**
 	 * Performs the submit item operation.
 	 * @param context the context to use.
@@ -311,7 +302,7 @@ public final class PRenderQueue
 		};
 		submit(stage, renderType, mesh, deformation, data, PRenderTypes.isTransparent(renderType));
 	}
-	
+
 	/**
 	 * Performs the submit entity mesh operation.
 	 * @param renderType the render type to use.
@@ -326,7 +317,7 @@ public final class PRenderQueue
 	{
 		submit(PRenderContexts.entityStage(), renderType, mesh, deformation, data, PRenderTypes.isTransparent(renderType));
 	}
-	
+
 	/**
 	 * Performs the submit operation.
 	 * @param stage the stage to use.
@@ -424,7 +415,7 @@ public final class PRenderQueue
 			PMeshHandle handle = RESOURCES.dynamic(PDeformedMeshBuffers.resolve(mesh, deformation));
 			return new PreparedMesh(handle, RESOURCES.indexCount(handle), header);
 		}
-		var geometry = PGpuDeformedMeshBuffers.resolve(mesh, deformation == null ? 0 : deformation.subdivisionLevel());
+		PGeometryData geometry = PGpuDeformedMeshBuffers.resolve(mesh, deformation == null ? 0 : deformation.subdivisionLevel());
 		return new PreparedMesh(RESOURCES.geometry(geometry), geometry.indexCount(), header);
 	}
 
@@ -438,7 +429,7 @@ public final class PRenderQueue
 	 */
 	public static void flush(RenderStage stage)
 	{
-		flush(stage, Minecraft.getInstance().getMainRenderTarget());
+		flush(stage, PLibRenderHelper.mc().getMainRenderTarget());
 	}
 
 	/**
@@ -534,10 +525,10 @@ public final class PRenderQueue
 	{
 		cleanUp();
 	}
-	
-/**
- * Provides support for render stage.
- */
+
+	/**
+	 * Provides support for render stage.
+	 */
 	public static final class RenderStage
 	{
 		public static final RenderStage SOLID_BLOCKS = new RenderStage("solid_blocks");
@@ -545,9 +536,9 @@ public final class PRenderQueue
 		public static final RenderStage ENTITIES = new RenderStage("entities");
 		public static final RenderStage FIRST_PERSON = new RenderStage("first_person");
 		public static final RenderStage GUI = new RenderStage("gui");
-		
+
 		private final String name;
-		
+
 		/**
 		 * Creates an instance of the enclosing type.
 		 * @param name the name to use.
@@ -556,7 +547,7 @@ public final class PRenderQueue
 		{
 			this.name = name;
 		}
-		
+
 		/**
 		 * Performs the hash code operation.
 		 * @return the value produced by this operation.
@@ -566,10 +557,10 @@ public final class PRenderQueue
 		{
 			return this.name.hashCode();
 		}
-		
+
 		/**
 		 * Performs the equals operation.
-		 * @param obj the obj to use.
+		 * @param object the obj to use.
 		 * @return the value produced by this operation.
 		 */
 		@Override
@@ -578,10 +569,10 @@ public final class PRenderQueue
 			return object instanceof RenderStage other && this.name.equals(other.name);
 		}
 	}
-	
-/**
- * Immutable value object representing instance data.
- */
+
+	/**
+	 * Immutable value object representing instance data.
+    */
 	public record InstanceData(
 			Matrix4f posMatrix,
 			int packedColor,
@@ -628,5 +619,5 @@ public final class PRenderQueue
 					this.deformerOperationOffset, this.deformerValueOffset, this.deformerOperationCount);
 		}
 	}
-	
+
 }

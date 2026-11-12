@@ -58,9 +58,9 @@ public final class PAnimationEventCallbacks
 	}
 
 	@FunctionalInterface
-/**
- * Defines the contract for locator callback.
- */
+	/**
+	 * Defines the contract for locator callback.
+     */
 	public interface LocatorCallback
 	{
 		/**

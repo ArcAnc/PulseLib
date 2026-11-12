@@ -78,7 +78,6 @@ public final class PPlayerModelGeometry
 	{
 		try (var caller = PModelPartSnapshot.capture(model.root()))
 		{
-			// Model's erased setup contract is the same AvatarRenderState used by the native node.
 			setup(model, state);
 			if (model instanceof PlayerModel playerModel)
 				PPlayerMeshDeformers.apply(player, playerModel, partialTick);

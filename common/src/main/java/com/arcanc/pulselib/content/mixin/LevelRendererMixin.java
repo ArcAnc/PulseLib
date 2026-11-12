@@ -10,9 +10,9 @@
 package com.arcanc.pulselib.content.mixin;
 
 import com.arcanc.pulselib.content.renderer.PWorldRenderPass;
+import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LevelTargetBundle;
 import net.minecraft.client.renderer.PostChain;
@@ -51,7 +51,7 @@ public abstract class LevelRendererMixin
 	{
 		if (callback.getReturnValue() != null || !PWorldRenderPass.requiresSeparateTargets(this.levelRenderState))
 			return;
-		callback.setReturnValue(Minecraft.getInstance().getShaderManager().getPostChain(
+		callback.setReturnValue(PLibRenderHelper.mc().getShaderManager().getPostChain(
 				TRANSPARENCY_POST_CHAIN_ID, LevelTargetBundle.SORTING_TARGETS));
 	}
 
