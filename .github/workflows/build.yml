@@ -26,5 +26,10 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
 
-      - name: Build with Gradle
-        run: ./gradlew assemble
+      - name: Prepare Minecraft dependencies
+        run: >-
+          ./gradlew :common:createMinecraftArtifacts :neoforge:createMinecraftArtifacts
+          :fabric:configureLaunch --no-parallel --no-daemon
+
+      - name: Build and check both loaders
+        run: ./gradlew build --no-daemon

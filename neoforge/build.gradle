@@ -22,7 +22,7 @@ neoForge {
                     file('src/generated/resources/').absolutePath, '--existing', file('src/main/resources/').absolutePath
         }
         configureEach {
-            ideName = "NeoForge ${it.name.capitalize()} (PulseLib)"
+            ideName = "NeoForge ${it.name.capitalize()} (PulseLib ${minecraft_version})"
             systemProperty 'forge.logging.markers', 'REGISTRIES'
             logLevel = org.slf4j.event.Level.DEBUG
         }

@@ -1,0 +1,196 @@
+{
+  "author": "ArcAnc",
+  "created_at": "2026-11-12",
+  "copyright": "Copyright (c) 2026",
+  "license": "Arc's License of Common Sense (LICENSE.txt)",
+  "baseline_commit": "5065103d1bccc7880445f9e93bc6ed709cfbb809",
+  "stage_start_commit": "9a91021f61e25bd22c9bf9c871da91dcc3ba649f",
+  "checked_at_utc": "2026-11-12",
+  "selected": {
+    "minecraft": "26.2",
+    "java": 25,
+    "neoforge": "26.2.0.57",
+    "neoform": "26.2-2",
+    "moddev_gradle": "2.0.143",
+    "fabric_loader": "0.20.1",
+    "fabric_api": "0.161.0+26.2",
+    "fabric_loom": "1.17.21",
+    "gradle": "9.6.1",
+    "mod_version": "1.1.5.3"
+  },
+  "constraints": {
+    "loom_minimum_gradle_plugin_api": "9.5.0",
+    "fabric_loader_selected_stable": true,
+    "fabric_api": {
+      "fabricloader": ">=0.18.4",
+      "java": ">=25",
+      "minecraft": "~26.2-"
+    },
+    "neoform": {
+      "spec": 6,
+      "minecraft": "26.2",
+      "java_target": 25
+    },
+    "neoforge_userdev_neoform": "net.neoforged:neoform:26.2-2@zip",
+    "gradle_distribution_sha256": "9c0f7faeeb306cb14e4279a3e084ca6b596894089a0638e68a07c945a32c9e14"
+  },
+  "sources": [
+    {
+      "title": "Fabric 26.2 development guidance",
+      "url": "https://www.fabricmc.net/2026/06/15/262.html"
+    },
+    {
+      "title": "Loader versions for 26.2",
+      "url": "https://meta.fabricmc.net/v2/versions/loader/26.2",
+      "download_sha256": "9f623132c55c6637ad609ccc5f3341acfc8266c3d586bd28058438ae78cbda0b"
+    },
+    {
+      "title": "Fabric API releases",
+      "url": "https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-api/maven-metadata.xml",
+      "download_sha256": "42d84cd7a581c5ea5d87dcfa485c78aca3c34eef08e22182a6b1b5088c5c1e7b"
+    },
+    {
+      "title": "Fabric API runtime constraints",
+      "url": "https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-api/0.161.0+26.2/fabric-api-0.161.0+26.2.jar",
+      "download_sha256": "e5b858ceb13290c274e31cb888ff5a1a40cb91067e7ffab0b5b775aec51e216a"
+    },
+    {
+      "title": "Loom releases",
+      "url": "https://maven.fabricmc.net/net/fabricmc/fabric-loom/maven-metadata.xml",
+      "download_sha256": "79d7fde81ec13e785cdb5c9d1af90a11ecabd7a40fa70ccd91384ed520bcb9eb"
+    },
+    {
+      "title": "Loom Gradle constraints",
+      "url": "https://maven.fabricmc.net/net/fabricmc/fabric-loom/1.17.21/fabric-loom-1.17.21.module",
+      "download_sha256": "b4b57c34129fe2b113c9db754d7deca89c527eeffbb08612af3c64760e9006b3"
+    },
+    {
+      "title": "NeoForge POM",
+      "url": "https://maven.neoforged.net/releases/net/neoforged/neoforge/26.2.0.57/neoforge-26.2.0.57.pom",
+      "download_sha256": "d98f92ab1900a533c670de5f047c2b53a627d9d4374b872adafa0641717aba86"
+    },
+    {
+      "title": "NeoForge userdev configuration",
+      "url": "https://maven.neoforged.net/releases/net/neoforged/neoforge/26.2.0.57/neoforge-26.2.0.57-userdev.jar",
+      "download_sha256": "ca43982d52abf87050aed1530264c7f74e1ca3b4332e82faf0737e39f5e33593"
+    },
+    {
+      "title": "NeoForm Minecraft/Java requirements",
+      "url": "https://maven.neoforged.net/releases/net/neoforged/neoform/26.2-2/neoform-26.2-2.zip",
+      "download_sha256": "09fd01e2371a94c78bc4d0d28645ab88206fcef395795182cee841765ebd5a63"
+    },
+    {
+      "title": "ModDevGradle module",
+      "url": "https://maven.neoforged.net/releases/net/neoforged/moddev-gradle/2.0.143/moddev-gradle-2.0.143.module",
+      "download_sha256": "93140ce51a19bba82e96adb5f2e087603e6c2e6dfdc65bc33bdd2f5943e1b40a"
+    },
+    {
+      "title": "Gradle distribution checksum",
+      "url": "https://services.gradle.org/distributions/gradle-9.6.1-bin.zip.sha256",
+      "download_sha256": "896bed90c4c17e0a4c779683aeba2a63f3df10cedc31244e391850feee597925"
+    },
+    {
+      "title": "Loom run configuration APIs",
+      "url": "https://maven.fabricmc.net/net/fabricmc/fabric-loom/1.17.21/fabric-loom-1.17.21-sources.jar",
+      "download_sha256": "d94244f3859fab634b285924b88e72d641b33370365aee693c06e4c13ed71d9e"
+    },
+    {
+      "title": "ModDevGradle IntelliJ integration",
+      "url": "https://maven.neoforged.net/releases/net/neoforged/moddev-gradle/2.0.143/moddev-gradle-2.0.143-sources.jar",
+      "download_sha256": "b68b6550852fd7ab0da62e61bf9cbfe5e3e378cde3f632ec5b6579d2a72bdead"
+    }
+  ],
+  "resolved_external_artifacts": {
+    "common:compileClasspath": 71,
+    "common:runtimeClasspath": 83,
+    "fabric:compileClasspath": 122,
+    "fabric:runtimeClasspath": 134,
+    "neoforge:compileClasspath": 90,
+    "neoforge:runtimeClasspath": 105
+  },
+  "checks": {
+    "gradle_projects_tasks": "passed",
+    "minecraft_common_and_neoforge_artifacts": "passed",
+    "compile_and_runtime_external_resolution": "passed",
+    "fabric_ide_files_and_neoforge_ide_model": "passed",
+    "expanded_mod_metadata_and_maven_poms": "passed",
+    "java_compilation": "failed: 43 expected pre-port Minecraft API errors, see stage journal",
+    "minecraft_runtime": "not run",
+    "opengl_vulkan": "not run"
+  },
+  "neoforge_ide_run_model": [
+    {
+      "defaults": false,
+      "type": "application",
+      "name": "NeoForge Client (PulseLib 26.2)",
+      "moduleName": "PulseLib.neoforge.main",
+      "envs": {},
+      "workingDirectory": "<repo>/neoforge/run",
+      "beforeRun": [],
+      "jvmArgs": "\"@<repo>/neoforge/build/moddev/clientRunVmArgs.txt\" \"-Dfml.modFolders=pulselib%%<repo>/neoforge/build/classes/java/main:pulselib%%<repo>/neoforge/build/resources/main\"",
+      "programParameters": "\"@<repo>/neoforge/build/moddev/clientRunProgramArgs.txt\"",
+      "mainClass": "net.neoforged.devlaunch.Main",
+      "shortenCommandLine": null,
+      "includeProvidedDependencies": false
+    },
+    {
+      "defaults": false,
+      "type": "application",
+      "name": "NeoForge Data (PulseLib 26.2)",
+      "moduleName": "PulseLib.neoforge.main",
+      "envs": {},
+      "workingDirectory": "<repo>/neoforge/run-data",
+      "beforeRun": [],
+      "jvmArgs": "\"@<repo>/neoforge/build/moddev/dataRunVmArgs.txt\" \"-Dfml.modFolders=pulselib%%<repo>/neoforge/build/classes/java/main:pulselib%%<repo>/neoforge/build/resources/main\"",
+      "programParameters": "\"@<repo>/neoforge/build/moddev/dataRunProgramArgs.txt\"",
+      "mainClass": "net.neoforged.devlaunch.Main",
+      "shortenCommandLine": null,
+      "includeProvidedDependencies": false
+    },
+    {
+      "defaults": false,
+      "type": "application",
+      "name": "NeoForge Server (PulseLib 26.2)",
+      "moduleName": "PulseLib.neoforge.main",
+      "envs": {},
+      "workingDirectory": "<repo>/neoforge/run",
+      "beforeRun": [],
+      "jvmArgs": "\"@<repo>/neoforge/build/moddev/serverRunVmArgs.txt\" \"-Dfml.modFolders=pulselib%%<repo>/neoforge/build/classes/java/main:pulselib%%<repo>/neoforge/build/resources/main\"",
+      "programParameters": "\"@<repo>/neoforge/build/moddev/serverRunProgramArgs.txt\"",
+      "mainClass": "net.neoforged.devlaunch.Main",
+      "shortenCommandLine": null,
+      "includeProvidedDependencies": false
+    }
+  ],
+  "fabric_ide_configuration": {
+    "display_names": [
+      "Fabric Client (PulseLib 26.2) (:fabric)",
+      "Fabric Server (PulseLib 26.2) (:fabric)"
+    ],
+    "launch_config": "<repo>/.gradle/loom-cache/projects/fabric/launch.cfg",
+    "asset_index": "26.2-32",
+    "run_directories": [
+      "<repo>/fabric/runs/client",
+      "<repo>/fabric/runs/server"
+    ],
+    "server_arguments": [
+      "nogui"
+    ]
+  },
+  "expanded_mod_metadata": {
+    "fabric": {
+      "minecraft": "26.2",
+      "fabricloader": ">=0.20.1",
+      "java": ">=25"
+    },
+    "neoforge": {
+      "minecraft": "[26.2]",
+      "neoforge": "[26.2.0.57,)"
+    },
+    "mod_version": "1.1.5.3"
+  },
+  "maven_publications": {
+    "fabric": "com.arcanc.pulselib:pulselib-fabric:26.2-1.1.5.3",
+    "neoforge": "com.arcanc.pulselib:pulselib-neoforge:26.2-1.1.5.3"
+  }
+}
