@@ -1,5 +1,7 @@
 # Удаление отдельного item animation interface — 28.10.2026
 
+> Архив миграции. При очистке проекта 12.11.2026 удалены временные smoke/harness fixtures, скрипты сверок, raw evidence и API-inventory dumps. Этот документ сохраняет историю и архитектурные решения; старые команды запусков больше не являются текущими инструкциями. Удалённые файлы доступны в истории Git до очистки: `git show bf0a24f:<путь>`.
+
 **Статус: выполнено; отдельная API-контрольная точка перед завершением depth fix.** Источник: `26.1.2-multiloader`, начальный HEAD `4195074dd9d42a7b7ae66d642b821214d7de748d`. Пользователь явно потребовал полностью удалить `PItemAnimatable`, перенести проверку `ItemStackMixin` на `PAnimatable`, затем закончить исправление глубины. Это осознанное исключение из исходного требования сохранять все публичные типы MultiLoader.
 
 ## API и реализация
@@ -29,4 +31,4 @@ Full build / stage2Evidence: Common, NeoForge, Fabric — PASS. **230 JUnit: Com
 
 Backup/initial patch/hashes, isolated API projection, exact artifact metadata и accepted logs: **`/tmp/pulselib-item-api-2oeze_yt`**. На старте **52 tracked edits / 3 untracked depth evidence**, из них 49 прежних пользовательских правок и незавершённый depth candidate. Compile inputs спроецированы из HEAD + только item API changes; три файла незакоммиченного depth candidate для этого checkpoint взяты из HEAD. Исходные пользовательские изменения и depth candidate сохранены в worktree. Protected `common/logs` / `fabric/runs` и source refs не менялись; push/publish не выполнялись.
 
-**Следующее действие:** закончить depth fix и H14 (main migration journal, pending section 39). Эта API-контрольная точка не означает завершения этапов 4–5. Local commit: `refactor: remove redundant item animatable contract`; SHA в Git history/отчёте. [Evidence](evidence/item-api-removal.json).
+**Следующее действие:** закончить depth fix и H14 (main migration journal, pending section 39). Эта API-контрольная точка не означает завершения этапов 4–5. Local commit: `refactor: remove redundant item animatable contract`; SHA в Git history/отчёте. Evidence (`docs/porting/evidence/item-api-removal.json`, архив Git).

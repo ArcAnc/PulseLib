@@ -22,8 +22,6 @@ Keep client plugins and renderer classes out of dedicated-server initialization.
 
 Blockbench can author skeletons and animation clips for PulseLib. Start with the [model authoring guide](basic.md); the bundled [player rig](player-animations.md#pulselib-player-action-rig) is available for player actions.
 
-The [demo test mod](../tests/testmod/README.md) contains Common examples with separate Fabric and NeoForge client registration. Demo content is excluded from release JARs.
-
 ## Marking your project
 
 You can use this image on your CurseForge or Modrinth project page to indicate a PulseLib dependency:

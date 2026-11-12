@@ -1,6 +1,6 @@
 # Automatic PulseLib plugins
 
-The Minecraft 26.1.2 MultiLoader branch uses the public plugin API from `1.21.1-multiloader`. Both Fabric and NeoForge discover plugins and route their lifecycle through shared Common services. Client and dedicated-server bootstrap, reload and renderer integrations have verification evidence on both loaders; the [migration journal](../docs/porting/26.1.2-multiloader.md) records the exact coverage and remaining work.
+The Minecraft 26.1.2 MultiLoader branch uses the public plugin API from `1.21.1-multiloader`. Both Fabric and NeoForge discover plugins and route their lifecycle through shared Common services. Client and dedicated-server bootstrap, reload and renderer integrations have verification evidence on both loaders; the [archived migration journal](../docs/porting/26.1.2-multiloader.md) records the historical coverage and remaining limitations.
 
 A public annotated class with a public no-argument constructor is discovered automatically among installed mods. Register ordinary Minecraft blocks, items and entities with the loader; declare PulseLib extensions through plugin callbacks.
 
@@ -75,4 +75,4 @@ External plugin failures are logged with class, owning mod and phase. A failed o
 
 Remove the old mod-bus listeners when moving registration bodies into plugins. `PulseLibEvents` and `PResourceCache.postEvent()` are removed. Internal `PLibRegistration` registries remain the runtime backing stores. The migration preserves library version `1.1.5.3`; it does not represent a finished MultiLoader release yet.
 
-[Migration journal](../docs/porting/26.1.2-multiloader.md) · [External plugin/rendering fixture](../tests/stage1/neoforge/java/com/arcanc/pulselib/test/stage1/Stage1Client.java)
+[Migration journal](../docs/porting/26.1.2-multiloader.md)
