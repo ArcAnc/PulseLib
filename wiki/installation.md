@@ -26,10 +26,10 @@ dependencies {
 }
 ```
 
-For the current unpublished port, build from this checkout with JDK 25:
+To build from this checkout, use JDK 25:
 
 ```sh
-./gradlew :fabric:build :neoforge:build
+./gradlew :fabric:assemble :neoforge:assemble
 ```
 
 The loader JARs are written to `fabric/build/libs/` and `neoforge/build/libs/`. Add the matching JAR as a local dependency in your loader project; Fabric also needs Fabric API. For example, with the JAR in the consumer's `libs/` directory:
@@ -43,6 +43,8 @@ dependencies {
 Keep shared PulseLib integration in your Common source set and Minecraft renderer registration in each loader's client source set. See [Getting started](getting-started.md).
 
 ## Publishing from this checkout
+
+The shared release configuration is implemented by [`MultiloaderPublishingPlugin.groovy`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/buildSrc/src/main/groovy/MultiloaderPublishingPlugin.groovy). Its `multiloader-publishing` ID is registered in [`buildSrc/build.gradle`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/buildSrc/build.gradle) and applied by both loader projects.
 
 `publish` writes both loader publications to a local Maven repository. The default destination is `build/maven-repository/`; `mavenRepoDir` selects another directory:
 

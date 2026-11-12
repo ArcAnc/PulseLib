@@ -25,6 +25,8 @@ All code and artwork is licensed under the [Arc's License of Common Sense](LICEN
 
 Welcome to our [Wiki][wiki]
 
+Release changes are listed in the [changelog](changelog.md).
+
 ### Maven
 
 You can find Maven setup details in the [installation guide](wiki/installation.md).

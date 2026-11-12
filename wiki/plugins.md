@@ -73,4 +73,4 @@ External plugin failures are logged with class, owning mod and phase. A failed o
 | `PlayerAnimationRegistrationEvent` | `registerPlayerAnimations(PPlayerAnimationRegistrar)` |
 | `PlayerAnimatedAttachmentRegistrationEvent` | `registerAnimatedAttachments(PAnimatedAttachmentRegistrar)` |
 
-Remove the old mod-bus listeners when moving registration bodies into plugins. `PulseLibEvents` and `PResourceCache.postEvent()` are removed. Internal `PLibRegistration` registries remain the runtime backing stores. The migration preserves library version `1.1.5.3`; it does not represent a finished MultiLoader release yet.
+Remove the old mod-bus listeners when moving registration bodies into plugins. `PulseLibEvents` and `PResourceCache.postEvent()` are removed. Internal `PLibRegistration` registries remain the runtime backing stores for both loaders.

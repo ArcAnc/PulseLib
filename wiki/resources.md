@@ -179,7 +179,7 @@ registrar.model(Identifier.fromNamespaceAndPath("examplemod", "entity/robot"),
 
 The atlas is registered by PulseLib itself. Your mod contributes model-resource texture mappings.
 
-Both loaders decode the same `pulselib` metadata section. `PLibMetadata` supplies the canonical emissive/alpha values; the native `PLibSpriteMetadata` adapter carries them into the atlas. With no metadata, emissive is `false` and alpha mode is `AUTO`. `RuntimeLoader.CODEC` / `codec()` provide the native atlas-source codec.
+Both loaders decode the same `pulselib` metadata section. `PLibMetadata` supplies the canonical emissive/alpha values; the native `PLibSpriteMetadata` adapter carries them into the atlas. With no metadata, emissive is `false` and alpha mode is `AUTO`. `RuntimeLoader.CODEC` / `codec()` provide the native atlas-source codec. The obsolete `RuntimeLoader.TYPE` and `type()` aliases have been removed.
 
 Runtime atlas classes:
 
