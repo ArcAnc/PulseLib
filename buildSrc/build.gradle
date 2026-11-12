@@ -14,3 +14,12 @@ dependencies {
     implementation 'com.modrinth.minotaur:Minotaur:2.10.0'
     implementation 'net.darkhax.curseforgegradle:CurseForgeGradle:1.2.30'
 }
+
+gradlePlugin {
+    plugins {
+        multiloaderPublishing {
+            id = 'multiloader-publishing'
+            implementationClass = 'MultiloaderPublishingPlugin'
+        }
+    }
+}
