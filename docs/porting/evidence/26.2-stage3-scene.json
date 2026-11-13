@@ -114,5 +114,12 @@
       "index": "100644 2e8e943b56e750abaea5e630b91a1cd7b2a7651d 0\tneoforge/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/package-info.java\n"
     }
   },
-  "next_stage": "Stage 4: consistent pipeline/shader instance UBO layouts, all shader families and deformers; address native Vulkan catalog failure. Do not downgrade four-layer OIT or modern render plans."
+  "next_stage": "Stage 4: consistent pipeline/shader instance UBO layouts, all shader families and deformers; address native Vulkan catalog failure. Do not downgrade four-layer OIT or modern render plans.",
+  "implementation_commit": "0a8ba601f51fcc8078e1ecf539b974b7c05b8965",
+  "committed_clean_build": {
+    "exit_code": 0,
+    "commit": "0a8ba601f51fcc8078e1ecf539b974b7c05b8965",
+    "worktree_status": "clean",
+    "command": "./gradlew :common:compileJava :neoforge:build :fabric:build --no-parallel --no-daemon --console=plain"
+  }
 }
