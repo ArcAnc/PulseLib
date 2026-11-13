@@ -16,7 +16,6 @@ import com.arcanc.pulselib.platform.PClientRenderHooks;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -55,7 +54,7 @@ public abstract class ItemInHandRendererMixin
 	 * @param packedLight the packed light to use.
 	 * @param original the original to use.
 	 */
-	@WrapMethod(method = "renderHandsWithItems")
+	@WrapMethod(method = "submitHandsWithItems")
 	private void pulselib$renderHandsWithItems(float partialTick,
 	                                            PoseStack poseStack,
 	                                            SubmitNodeCollector submitNodeCollector,
@@ -88,10 +87,7 @@ public abstract class ItemInHandRendererMixin
 	 * @param packedLight the packed light to use.
 	 * @param ci the ci to use.
 	 */
-	@Inject(method = "renderHandsWithItems", at = @At(
-			value = "INVOKE",
-			target = "Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher;renderAllFeatures()V",
-			shift = At.Shift.BEFORE))
+	@Inject(method = "submitHandsWithItems", at = @At("RETURN"))
 	private void pulselib$renderExtraFirstPersonGeometry(float partialTick,
 	                                                     PoseStack poseStack,
 	                                                     SubmitNodeCollector submitNodeCollector,
@@ -118,7 +114,7 @@ public abstract class ItemInHandRendererMixin
 	 * @param packedLight the packed light to use.
 	 * @param original the original to use.
 	 */
-	@WrapMethod(method = "renderArmWithItem")
+	@WrapMethod(method = "submitArmWithItem")
 	private void pulselib$renderArmWithItem(AbstractClientPlayer player,
 	                                        float partialTick,
 	                                        float xRot,
@@ -158,15 +154,15 @@ public abstract class ItemInHandRendererMixin
 	 */
 	@Group(name = "pulselib$rightHand", min = 1, max = 1)
 	@WrapOperation(require = 0, method = "renderPlayerArm", at = @At(value = "INVOKE", target =
-			"Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderRightHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;Z)V"))
+			"Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderRightHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;ZLnet/minecraft/client/player/AbstractClientPlayer;)V"))
 	private void pulselib$renderRightHand(AvatarRenderer<?> renderer,
 	                                      PoseStack poseStack,
 	                                      SubmitNodeCollector submitNodeCollector,
 	                                      int packedLight,
 	                                      Identifier skin,
 	                                      boolean sleeve,
-	                                      Operation<Void> original,
-	                                      @Local (name = "player") AbstractClientPlayer player)
+	                                      AbstractClientPlayer player,
+	                                      Operation<Void> original)
 	{
 		pulseLib$renderArm(renderer, poseStack, submitNodeCollector, packedLight, skin, sleeve, player, original);
 	}
@@ -184,15 +180,15 @@ public abstract class ItemInHandRendererMixin
 	 */
 	@Group(name = "pulselib$leftHand", min = 1, max = 1)
 	@WrapOperation(require = 0, method = "renderPlayerArm", at = @At(value = "INVOKE", target =
-			"Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderLeftHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;Z)V"))
+			"Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderLeftHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;ZLnet/minecraft/client/player/AbstractClientPlayer;)V"))
 	private void pulselib$renderLeftHand(AvatarRenderer<?> renderer,
 	                                    PoseStack poseStack,
 	                                    SubmitNodeCollector submitNodeCollector,
 	                                    int packedLight,
 	                                    Identifier skin,
 	                                    boolean sleeve,
-	                                    Operation<Void> original,
-	                                    @Local (name = "player") AbstractClientPlayer player)
+	                                    AbstractClientPlayer player,
+	                                    Operation<Void> original)
 	{
 		pulseLib$renderArm(renderer, poseStack, submitNodeCollector, packedLight, skin, sleeve, player, original);
 	}
@@ -295,7 +291,7 @@ public abstract class ItemInHandRendererMixin
 	 * @param packedLight the packed light to use.
 	 * @param original the original to use.
 	 */
-	@WrapOperation(method = "renderArmWithItem", at = @At(value = "INVOKE", target =
+	@WrapOperation(method = "submitArmWithItem", at = @At(value = "INVOKE", target =
 			"Lnet/minecraft/client/renderer/ItemInHandRenderer;renderItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;I)V"))
 	private void pulselib$renderItem(ItemInHandRenderer renderer,
 	                                 LivingEntity entity,

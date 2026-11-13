@@ -11,27 +11,24 @@ package com.arcanc.pulselib.content.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 
 /** A failed deferred batch must be cleared just as a successful renderAllFeatures batch is. */
 @Mixin(FeatureRenderDispatcher.class)
 public abstract class FeatureRenderDispatcherMixin
 {
-	@Shadow
-	public abstract void clearSubmitNodes();
-
-	@WrapMethod(method = "renderAllFeatures")
-	private void pulselib$discardFailedFeatures(Operation<Void> original)
+	@WrapMethod(method = "renderAllFeatures(Lnet/minecraft/client/renderer/SubmitNodeStorage;)V")
+	private void pulselib$discardFailedFeatures(SubmitNodeStorage storage, Operation<Void> original)
 	{
 		try
 		{
-			original.call();
+			original.call(storage);
 		}
 		catch (RuntimeException | Error failure)
 		{
-			clearSubmitNodes();
+			storage.getSubmitsPerOrder().clear();
 			throw failure;
 		}
 	}

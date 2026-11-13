@@ -14,7 +14,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import net.minecraft.client.renderer.state.gui.GuiRenderState;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -22,19 +23,24 @@ import org.jetbrains.annotations.ApiStatus;
 @ApiStatus.Internal
 public final class PModelGuiRenderer extends PictureInPictureRenderer<PModelGuiRenderState>
 {
-	public PModelGuiRenderer(MultiBufferSource.BufferSource buffers)
+	public PModelGuiRenderer()
 	{
-		super(buffers);
+	}
+
+	/** Compatibility overload using the client's native dispatcher. */
+	public void prepare(PModelGuiRenderState state, GuiRenderState gui, int guiScale)
+	{
+		prepare(state, gui, Minecraft.getInstance().gameRenderer.featureRenderDispatcher(), guiScale);
 	}
 
 	@Override
-	public void prepare(PModelGuiRenderState state, GuiRenderState gui, int guiScale)
+	public void prepare(PModelGuiRenderState state, GuiRenderState gui, FeatureRenderDispatcher dispatcher, int guiScale)
 	{
 		var lights = RenderSystem.getShaderLights();
 		try
 		{
-			Minecraft.getInstance().gameRenderer.getLighting().setupFor(Lighting.Entry.ITEMS_3D);
-			super.prepare(state, gui, guiScale);
+			Minecraft.getInstance().gameRenderer.lighting().setupFor(Lighting.Entry.ITEMS_3D);
+			super.prepare(state, gui, dispatcher, guiScale);
 		}
 		finally
 		{
@@ -43,6 +49,12 @@ public final class PModelGuiRenderer extends PictureInPictureRenderer<PModelGuiR
 	}
 
 	@Override
+	protected void renderToTexture(PModelGuiRenderState state, PoseStack poses, SubmitNodeCollector collector)
+	{
+		renderToTexture(state, poses);
+	}
+
+	/** Retains the canonical model traversal independently of native feature collection. */
 	protected void renderToTexture(PModelGuiRenderState state, PoseStack poses)
 	{
 		// Cancel the native PIP anchor/Z reflection; the snapshot already contains GUI pose, origin and scale.

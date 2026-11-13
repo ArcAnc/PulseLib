@@ -55,7 +55,7 @@ public abstract class GameRendererMixin
 	 */
 	@Inject(method = "renderItemInHand", at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;renderHandsWithItems(FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/player/LocalPlayer;I)V",
+			target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;submitHandsWithItems(FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/player/LocalPlayer;I)V",
 			shift = At.Shift.AFTER))
 	private void pulselib$flushFirstPersonItems(CameraRenderState cameraState,
 	                                            float deltaPartialTick,

@@ -50,7 +50,7 @@ public final class PWorldRenderPass
 		return false;
 	}
 
-	/** Called after the native transparency chain has declared its passes, before late debug rendering. */
+	/** Called after the native transparency chain has declared its passes, before always-on-top rendering. */
 	public static void addToFrame(FrameGraphBuilder frame, LevelTargetBundle targets)
 	{
 		var pass = frame.addPass("pulselib_transparency");

@@ -54,7 +54,7 @@ public final class PulseLibFabricClient implements ClientModInitializer
 	{
 		PRenderTypes.register(RenderPipelines::register);
 		FabricRhiPipelines.register();
-		PictureInPictureRendererRegistry.register(context -> new PModelGuiRenderer(context.bufferSource()));
+		PictureInPictureRendererRegistry.register(context -> new PModelGuiRenderer());
 		LevelRenderEvents.AFTER_SOLID_FEATURES.register(context -> PRenderStagesHandler.afterOpaqueFeatures());
 		LevelRenderEvents.AFTER_TRANSLUCENT_FEATURES.register(context -> PRenderStagesHandler.afterNativeFeatures());
 		LevelRenderEvents.END_MAIN.register(context -> PRenderStagesHandler.afterParticles());

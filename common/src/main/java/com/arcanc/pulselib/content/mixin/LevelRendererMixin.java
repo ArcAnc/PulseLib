@@ -16,10 +16,9 @@ import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LevelTargetBundle;
 import net.minecraft.client.renderer.PostChain;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import net.minecraft.client.renderer.state.level.LevelRenderState;
 import net.minecraft.resources.Identifier;
-import org.joml.Matrix4fc;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -55,9 +54,9 @@ public abstract class LevelRendererMixin
 				TRANSPARENCY_POST_CHAIN_ID, LevelTargetBundle.SORTING_TARGETS));
 	}
 
-	@Inject(method = "addLateDebugPass", at = @At("HEAD"))
-	private void pulselib$addTransparencyPass(FrameGraphBuilder frame, CameraRenderState camera, GpuBufferSlice fog,
-	                                          Matrix4fc modelView, CallbackInfo callback)
+	@Inject(method = "addAlwaysOnTopPass(Lcom/mojang/blaze3d/framegraph/FrameGraphBuilder;Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher$PreparedFrame;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V", at = @At("HEAD"))
+	private void pulselib$addTransparencyPass(FrameGraphBuilder frame, FeatureRenderDispatcher.PreparedFrame features,
+	                                          GpuBufferSlice fog, CallbackInfo callback)
 	{
 		PWorldRenderPass.addToFrame(frame, this.targets);
 	}

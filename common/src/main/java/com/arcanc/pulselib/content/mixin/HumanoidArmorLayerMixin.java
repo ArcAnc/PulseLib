@@ -26,7 +26,7 @@ import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.resources.model.EquipmentClientInfo;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -64,7 +64,7 @@ public abstract class HumanoidArmorLayerMixin implements PPlayerArmorGeometryLay
 			if (!HumanoidArmorLayer.shouldRender(stack, slot) || PLivingAttachments.hidesVanillaArmor(stack) || stack.getItem() instanceof PArmorModelProvider)
 				continue;
 			HumanoidModel<?> original = this.getArmorModel(state, slot);
-			EquipmentClientInfo.LayerType type = state.isBaby && state.entityType != EntityType.ARMOR_STAND ?
+			EquipmentClientInfo.LayerType type = state.isBaby && state.entityType != EntityTypes.ARMOR_STAND ?
 					EquipmentClientInfo.LayerType.HUMANOID_BABY : slot == EquipmentSlot.LEGS ?
 					EquipmentClientInfo.LayerType.HUMANOID_LEGGINGS : EquipmentClientInfo.LayerType.HUMANOID;
 			try (PModelPartSnapshot caller = PModelPartSnapshot.capture(original.root()))

@@ -9,9 +9,9 @@
 
 package com.arcanc.pulselib.content.mixin;
 
-import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.WeatherEffectRenderer;
+import net.minecraft.client.renderer.state.GameRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -20,9 +20,9 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(WeatherEffectRenderer.class)
 public abstract class WeatherEffectRendererMixin
 {
-	@Redirect(method = "render*", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;useShaderTransparency()Z"))
-	private boolean pulselib$writeSeparatedWeatherDepth()
+	@Redirect(method = "render(Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/client/renderer/state/level/WeatherRenderState;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/state/GameRenderState;useShaderTransparency()Z"))
+	private boolean pulselib$writeSeparatedWeatherDepth(GameRenderState state)
 	{
-		return Minecraft.useShaderTransparency() || PLibRenderHelper.mc().levelRenderer.getWeatherTarget() != null;
+		return state.useShaderTransparency() || Minecraft.getInstance().levelRenderer.weatherTarget() != null;
 	}
 }

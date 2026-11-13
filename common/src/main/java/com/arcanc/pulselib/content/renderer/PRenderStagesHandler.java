@@ -32,7 +32,7 @@ public class PRenderStagesHandler
 	/** Captures native depth writers after their batches finish, before terrain and particles. */
 	public static void afterNativeFeatures()
 	{
-		PRenderQueue.captureWorldDepth(Minecraft.getInstance().getMainRenderTarget());
+		PRenderQueue.captureWorldDepth(Minecraft.getInstance().gameRenderer.mainRenderTarget());
 	}
 
 	/**
@@ -57,7 +57,7 @@ public class PRenderStagesHandler
 	 */
 	public static void afterWeather(RenderTarget destination)
 	{
-		if (destination == Minecraft.getInstance().levelRenderer.getWeatherTarget())
+		if (destination == Minecraft.getInstance().levelRenderer.weatherTarget())
 			return;
 		PRenderQueue.compositeTranslucency(destination);
 	}

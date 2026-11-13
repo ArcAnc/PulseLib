@@ -7,6 +7,20 @@ This code is licensed under "Arc's License of Common Sense" (LICENSE.txt).
 
 # Minecraft 26.2 component checks
 
+Full production Fabric client bootstrap can also be checked explicitly:
+
+```bash
+./gradlew --init-script tests/porting/client-check.gradle :fabric:runClient -PportingClientBackend=opengl --no-parallel --no-daemon --console=plain
+./gradlew --init-script tests/porting/client-check.gradle :fabric:runClient -PportingClientBackend=vulkan --no-parallel --no-daemon --console=plain
+```
+
+Each invocation creates a fresh directory under `fabric/build/porting-client`, uses all production
+sources/resources/Mixins and opens no existing save. Quit the test client normally within three minutes;
+a timeout is a failed run. This launches the actual game, without a fixture mod or relaxed injections.
+Verify the actual backend in the log (Minecraft may fall back), the visible screen and resource-loading
+errors. Exit code zero alone is insufficient: native shader loading can fail before a normal shutdown.
+Reaching the title screen does not validate world models, player animation, GUI previews or OIT.
+
 These fixtures compile explicit, current production components against the actual Minecraft/loader
 dependencies. They never replace `compileJava`, change the main source sets, package a production mod, remove
 renderer classes or use old PulseLib classfiles to satisfy missing types. Outputs live under each
