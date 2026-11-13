@@ -117,3 +117,40 @@ method as before; its resource descriptor is mandatory and uses the existing str
 contract. The server fixture intentionally does not package the client implementation, so a server
 attempt to resolve it would fail. Production source sets still include it. Actual client execution
 of the provider remains part of client/render integration validation.
+
+## Opt-in RHI checks (stage 3)
+
+```bash
+./gradlew --init-script tests/porting/rhi-check.gradle :common:checkPortingRhiLayout --no-parallel --no-daemon --console=plain
+./gradlew --init-script tests/porting/rhi-check.gradle :neoforge:checkPortingRhiOpenGL :neoforge:checkPortingRhiVulkan --no-parallel --no-daemon --console=plain
+```
+
+These tasks compile the unmodified canonical render-plan sources, the new Common RHI package and
+test-only fixtures against real 26.2 dependencies, without stale production class outputs. They do
+not alter production compilation or join the normal CI/build/publishing task graph. The GPU fixture
+uses a real FML client content loader and a hidden GLFW window; it never constructs a Minecraft
+instance, loads a world or accesses user saves. Each invocation gets a new directory under
+`neoforge/build/porting-rhi` and a two-minute process timeout.
+
+The CPU check covers std140 bytes, light/overlay/deformer fields, full-block padding, zero and
+511/512/513/1025 boundaries, independent packed ranges, multiple-group order and 64/256 alignment.
+GPU checks execute both explicit packed plans and actual `PFrameCompiler` output, read back 1025
+unique pixels, and verify nonzero `firstInstance`/`firstIndex`, negative valid `baseVertex`, frame
+matrices, three-slot upload reuse, cutout textures/samplers, ushort/uint indices, dynamic updates,
+static caching and resource ownership. Invalid ranges and unsupported OIT fail explicitly.
+
+The default block holds 128 records of 112 bytes (14336 bytes), below the portable 16 KiB uniform
+block limit. OpenGL's fixture queries its actual block limit and tests 512 records. Native 26.2
+`GpuDevice` exposes uniform offset alignment, but not the maximum uniform buffer range. Vulkan's
+fixture therefore defaults to the portable limit/capacity. On hardware whose range has been
+independently verified (for example with `vulkaninfo`), also run:
+
+```bash
+./gradlew --init-script tests/porting/rhi-check.gradle :neoforge:checkPortingRhiVulkan -PportingRhiVulkanCapacity=512 -PportingRhiVulkanUniformLimit=65536 --no-parallel --no-daemon --console=plain
+```
+
+LWJGL is confined to fixture device/window bootstrap and the OpenGL limit query. The production RHI
+package uses native Blaze3D abstractions only. Both backends were tested on one GTX 1660 Ti; this
+is not a claim of full Minecraft/PulseLib Vulkan support. Production shaders, world/GUI integration,
+deformers, four-layer OIT/Fabulous and Fabric runtime remain pending. Vulkan validation layers and
+long-running GPU memory profiling were not enabled. See the migration journal and stage 3 evidence.

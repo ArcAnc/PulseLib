@@ -1,0 +1,82 @@
+/**
+ * @author ArcAnc
+ * Created at: 13.11.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
+import org.gradle.api.artifacts.component.ProjectComponentIdentifier
+
+gradle.projectsEvaluated
+{
+	def common = gradle.rootProject.findProject(':common')
+	if (common == null)
+		return
+	def root = gradle.rootProject
+	def output = common.layout.buildDirectory.dir('porting-rhi/classes')
+	def neo = root.project(':neoforge')
+	def external = neo.configurations.compileClasspath.incoming.artifactView
+	{
+		componentFilter { !(it instanceof ProjectComponentIdentifier) }
+	}.files
+	def compile = common.tasks.register('compilePortingRhiChecks', JavaCompile)
+	{
+		dependsOn common.tasks.named('createMinecraftArtifacts')
+		source common.fileTree('src/main/java')
+		{
+			include 'com/arcanc/pulselib/content/renderer/plan/*.java'
+			include 'com/arcanc/pulselib/content/renderer/rhi/*.java'
+		}
+		source root.file('tests/porting/src/rhi/java')
+		classpath = common.files(common.configurations.compileClasspath, external)
+		javaCompiler = common.javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(25) }
+		options.release = 25
+		options.encoding = 'UTF-8'
+		options.compilerArgs.add('-proc:none')
+		options.sourcepath = common.files()
+		destinationDirectory = output
+	}
+	def runtime = neo.configurations.runtimeClasspath.incoming.artifactView
+	{
+		componentFilter { !(it instanceof ProjectComponentIdentifier) }
+	}.files
+	common.tasks.register('checkPortingRhiLayout', JavaExec)
+	{
+		dependsOn compile
+		group = 'verification'
+		classpath = common.files(output, common.configurations.runtimeClasspath)
+		mainClass = 'com.arcanc.pulselib.content.renderer.rhi.RhiLayoutChecks'
+	}
+	def jar = neo.tasks.register('portingRhiFixtureJar', Jar)
+	{
+		dependsOn compile
+		archiveFileName = 'pulselib-rhi-fixture.jar'
+		destinationDirectory = neo.layout.buildDirectory.dir('porting-rhi')
+		from output
+		from root.file('tests/porting/src/rhi/resources')
+	}
+	['OpenGL', 'Vulkan'].each
+	{ backend ->
+		neo.tasks.register('checkPortingRhi' + backend, JavaExec)
+		{
+			dependsOn jar, neo.tasks.named('createMinecraftArtifacts')
+			group = 'verification'
+			description = 'Real offscreen Blaze3D GPU readback fixture; not a production game client.'
+			classpath = neo.files(jar.flatMap { it.archiveFile }, runtime)
+			mainClass = 'com.arcanc.pulselib.content.renderer.rhi.RhiFixtureLauncher'
+			args backend, (backend == 'Vulkan' ? root.providers.gradleProperty('portingRhiVulkanCapacity').getOrElse('128') : '512'),
+					root.providers.gradleProperty('portingRhiVulkanUniformLimit').getOrElse('16384')
+			jvmArgs '--enable-native-access=ALL-UNNAMED', '--sun-misc-unsafe-memory-access=allow',
+					'--add-opens=java.base/java.lang.invoke=ALL-UNNAMED', '--add-exports=jdk.naming.dns/com.sun.jndi.dns=java.naming'
+			timeout = java.time.Duration.ofMinutes(2)
+			doFirst
+			{
+				def parent = neo.layout.buildDirectory.dir('porting-rhi').get().asFile
+				parent.mkdirs()
+				workingDir = java.nio.file.Files.createTempDirectory(parent.toPath(), backend + '-').toFile()
+			}
+		}
+	}
+}
