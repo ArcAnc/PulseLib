@@ -11,15 +11,15 @@ package com.arcanc.pulselib.content.renderer.rhi;
 
 import com.arcanc.pulselib.content.model.baked.PBakedMesh;
 import com.arcanc.pulselib.content.renderer.gl.PGlDynamicGeometry;
+import com.arcanc.pulselib.content.renderer.gl.PGlResourceRegistry;
 import com.arcanc.pulselib.content.renderer.plan.PDrawCommand;
 import com.arcanc.pulselib.content.renderer.plan.PDrawGroup;
 import com.arcanc.pulselib.content.renderer.plan.PFrameCompiler;
 import com.arcanc.pulselib.content.renderer.plan.PInstanceHeader;
-import com.arcanc.pulselib.content.renderer.plan.PMeshHandle;
-import com.arcanc.pulselib.content.renderer.plan.PPipelineHandle;
 import com.arcanc.pulselib.content.renderer.plan.PRenderFrame;
 import com.arcanc.pulselib.content.renderer.plan.PRenderPlan;
 import com.arcanc.pulselib.content.renderer.plan.PTransparencyMode;
+import com.arcanc.pulselib.util.PRenderTypes;
 import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
@@ -32,11 +32,9 @@ import org.joml.Matrix4f;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -48,16 +46,14 @@ final class RhiOpaqueChecks
 			PRenderFrame frame, PBakedMesh baked, boolean cutout, boolean emissive, Consumer<Boolean> clear, Supplier<ByteBuffer> pixels)
 	{
 		RenderType source = source(cutout, emissive);
-		var pipeline = new PPipelineHandle(41);
-		var mesh = new PMeshHandle(42);
-		var geometry = new HashMap<PMeshHandle, Object>();
-		geometry.put(mesh, baked);
-		var policy = new AtomicReference<>(PTransparencyMode.ORDINARY);
+		RhiLayoutChecks.assertTrue(source == source(cutout, emissive) && source.outline().isPresent(), "Production factory cache and outline metadata");
+		var registry = new PGlResourceRegistry();
+		var pipeline = registry.pipeline(source);
+		var mesh = registry.mesh(baked);
 		var deviceLookups = new AtomicInteger();
 		var preparations = new AtomicInteger();
-		var activeSource = new AtomicReference<>(source);
 		var wrongPreparation = new AtomicBoolean();
-		var renderer = new PRhiOpaqueRenderer(ignored -> activeSource.get(), ignored -> policy.get(), geometry::get, () ->
+		var renderer = new PRhiOpaqueRenderer(registry::pipeline, registry::transparency, registry::geometryResource, () ->
 		{
 			deviceLookups.incrementAndGet();
 			return device;
@@ -86,21 +82,22 @@ final class RhiOpaqueChecks
 					withFragmentShader(Identifier.fromNamespaceAndPath("pulselib", "core/oit_composite")).
 					withPrimitiveTopology(PrimitiveTopology.TRIANGLES).withCull(false).
 					withDepthStencilState(DepthStencilState.DEFAULT).build();
-			activeSource.set(RenderType.create("unknown_queue_type", RenderSetup.builder(unknown).createRenderSetup()));
-			RhiLayoutChecks.assertTrue(!renderer.canExecute(plan), "Unrecognized native pipeline remains with caller");
-			activeSource.set(source);
-			policy.set(PTransparencyMode.OIT);
-			RhiLayoutChecks.assertTrue(!renderer.canExecute(plan), "Explicit OIT policy stays on caller's existing path");
+			var unknownHandle = registry.pipeline(RenderType.create("unknown_queue_type", RenderSetup.builder(unknown).createRenderSetup()), PTransparencyMode.ORDINARY);
+			var unknownPlan = new PRenderPlan(List.of(new PDrawGroup(unknownHandle, mesh, command, true, group.instances())), packed);
+			RhiLayoutChecks.assertTrue(!renderer.canExecute(unknownPlan), "Unrecognized native pipeline remains with caller");
+			var translucent = PRenderTypes.RenderTypeProvider.trianglesTranslucent(Identifier.fromNamespaceAndPath("pulselib", "profile_fixture"));
+			var oitHandle = registry.pipeline(translucent, PTransparencyMode.OIT);
+			var oitPlan = new PRenderPlan(List.of(new PDrawGroup(oitHandle, mesh, command, true, group.instances())), packed);
+			RhiLayoutChecks.assertTrue(!renderer.canExecute(oitPlan), "Explicit OIT policy stays on caller's existing path");
 			try
 			{
-				renderer.execute(plan, frame);
+				renderer.execute(oitPlan, frame);
 				throw new AssertionError("Opaque adapter accepted OIT");
 			}
 			catch (UnsupportedOperationException expected)
 			{
 				RhiLayoutChecks.assertTrue(deviceLookups.get() == 0 && preparations.get() == 0, "Unsupported plan rejected before any GPU side effects");
 			}
-			policy.set(PTransparencyMode.ORDINARY);
 			var deformed = new PInstanceHeader(new Matrix4f(), -1, 0, 0, 0, 0, 1);
 			var unsupported = new PDrawGroup(pipeline, mesh, new PDrawCommand(3, 1, 0, 0, 0), true, List.of(deformed));
 			RhiLayoutChecks.assertTrue(!renderer.canExecute(new PRenderPlan(List.of(group, unsupported))), "Mixed supported/GPU-deformed plan is not split");
@@ -129,15 +126,17 @@ final class RhiOpaqueChecks
 			RhiProfileChecks.checkPixels(pixels.get(), true);
 			try (var dynamic = new PGlDynamicGeometry(baked.geometry()))
 			{
-				geometry.put(mesh, dynamic);
+				var dynamicHandle = registry.dynamic(dynamic);
 				dynamic.update(RhiProfileChecks.geometry(-1, true));
 				clear.accept(true);
-				renderer.execute(plan, frame);
+				renderer.execute(new PRenderPlan(List.of(new PDrawGroup(pipeline, dynamicHandle, command, true, group.instances())), packed), frame);
 				RhiProfileChecks.checkPixel(pixels.get(), 0, emissive ? RhiProfileChecks.color(0) : RhiProfileChecks.shade(RhiProfileChecks.color(0)));
 			}
-			geometry.put(mesh, baked);
 			renderer.cleanup();
 			renderer.cleanup();
+			registry.clear();
+			pipeline = registry.pipeline(source);
+			mesh = registry.mesh(baked);
 			RhiLayoutChecks.assertTrue(!target.color().isClosed(), "Cleanup does not own host output resources");
 			clear.accept(true);
 			var compiler = new PFrameCompiler<String>();
@@ -148,24 +147,21 @@ final class RhiOpaqueChecks
 			RhiLayoutChecks.assertTrue(compiler.isEmpty(), "Canonical compiler consumed its opaque stage");
 			RhiLayoutChecks.assertTrue(deviceLookups.get() == 2, "Cleanup followed by lazy resource recreation");
 			System.out.println("PASS opaque queue adapter " + (emissive ? "emissive " : "lit ") + (cutout ? "cutout" : "solid") +
-					": canonical compiler/pipeline mapping, 1025 pixels, packed firstInstance=9, atomic selection, native prepare/cache and dynamic/cleanup/recreate");
+					": production factories/registry/compiler, 1025 pixels, packed firstInstance=9, native prepare/cache and dynamic/cleanup/recreate");
 		}
 		finally
 		{
 			renderer.cleanup();
+			registry.clear();
 		}
 	}
 
-	/** Native metadata matching canonical IDs/shader references; only the adapted RHI profile is submitted to GPU. */
+	/** Uses the actual MultiLoader public factories, including their native setup and cache. */
 	private static RenderType source(boolean cutout, boolean emissive)
 	{
-		String path = "pipeline/triangles_" + (emissive ? "emissive_" : "") + (cutout ? "cutout" : "solid") + "_no_cull";
-		var pipeline = RenderPipeline.builder().withLocation(Identifier.fromNamespaceAndPath("pulselib", path)).
-				withVertexShader(Identifier.fromNamespaceAndPath("pulselib", "core/triangles")).
-				withFragmentShader(Identifier.fromNamespaceAndPath("pulselib", "core/triangles")).
-				withVertexBinding(0, PRhiPipelines.POSITION_TEX_NORMAL).
-				withPrimitiveTopology(PrimitiveTopology.TRIANGLES).withCull(false).
-				withDepthStencilState(DepthStencilState.DEFAULT).build();
-		return RenderType.create("canonical_opaque_queue_source", RenderSetup.builder(pipeline).createRenderSetup());
+		var texture = Identifier.fromNamespaceAndPath("pulselib", "profile_fixture");
+		if (emissive)
+			return cutout ? PRenderTypes.RenderTypeProvider.trianglesEmissiveCutout(texture) : PRenderTypes.RenderTypeProvider.trianglesEmissiveSolid(texture);
+		return cutout ? PRenderTypes.RenderTypeProvider.trianglesCutout(texture) : PRenderTypes.RenderTypeProvider.trianglesSolid(texture);
 	}
 }

@@ -10,10 +10,12 @@
 package com.arcanc.pulselib.content.renderer.rhi;
 
 import com.arcanc.pulselib.fabric.FabricRhiPipelines;
+import com.arcanc.pulselib.util.PRenderTypes;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.resources.Identifier;
 
 import java.util.HashSet;
 
@@ -42,6 +44,16 @@ public final class FabricPipelineChecks
 			if (before.contains(pipeline) || !after.contains(pipeline))
 				throw new AssertionError("Native registry did not receive Common profile identity");
 		});
-		System.out.println("PULSELIB_FABRIC_RHI_REGISTRATION_PASSED four shared profiles; actual Knot CLIENT/access widener/native registry; no Minecraft instance");
+		if (PRenderTypes.class.getClassLoader() != game || RhiCatalogChecks.class.getClassLoader() != game)
+			throw new AssertionError("Production catalog must share Knot's native class loader");
+		RhiCatalogChecks.register(RenderPipelines::register);
+		if (RenderPipelines.getStaticPipelines().size() != before.size() + 23)
+			throw new AssertionError("Expected 19 canonical and four RHI entries in the real registry");
+		var texture = Identifier.fromNamespaceAndPath("pulselib", "profile_fixture");
+		var solid = PRenderTypes.RenderTypeProvider.trianglesSolid(texture);
+		if (solid != PRenderTypes.RenderTypeProvider.trianglesSolid(texture) || solid.hasBlending() || !solid.outline().isPresent() ||
+				solid.pipeline() != PRenderTypes.RenderPipelinesProvider.TRIANGLES_SOLID)
+			throw new AssertionError("Production factory identity/setup lost in Fabric");
+		System.out.println("PULSELIB_FABRIC_RHI_REGISTRATION_PASSED 19 production + 4 shared profiles and real factory; actual Knot CLIENT/access widener/native registry; no Minecraft instance");
 	}
 }

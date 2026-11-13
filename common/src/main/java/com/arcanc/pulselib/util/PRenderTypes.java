@@ -11,17 +11,18 @@ package com.arcanc.pulselib.util;
 
 
 import com.arcanc.pulselib.content.model.textures.PAlphaMode;
+import com.arcanc.pulselib.content.renderer.rhi.PRhiPipelines;
 import com.mojang.blaze3d.GpuFormat;
+import com.mojang.blaze3d.PrimitiveTopology;
+import com.mojang.blaze3d.pipeline.BindGroupLayout;
 import com.mojang.blaze3d.pipeline.BlendFunction;
 import com.mojang.blaze3d.pipeline.ColorTargetState;
 import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.BlendFactor;
 import com.mojang.blaze3d.shaders.UniformType;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import com.mojang.blaze3d.vertex.VertexFormatElement;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.BindGroupLayouts;
 import net.minecraft.client.renderer.rendertype.OutputTarget;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -52,35 +53,45 @@ public final class PRenderTypes
 	{
 		private static final Set<RenderPipeline> PIPELINES = new HashSet<>();
 		
-		private static final RenderPipeline.Snippet TRIANGLES_SNIPPET = RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET).
+		private static final RenderPipeline.Snippet TRIANGLES_SNIPPET = RenderPipeline.builder().
+				withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION).
 				withVertexShader(PLibDatabase.rl("core/triangles")).
 				withFragmentShader(PLibDatabase.rl("core/triangles")).
-				withSampler("Sampler0").
-				withSampler("Sampler2").
-				withUniform("Lighting", UniformType.UNIFORM_BUFFER).
-				withUniform("DeformerOperations", UniformType.TEXEL_BUFFER, GpuFormat.R8_SINT).
-				withUniform("DeformerValues", UniformType.TEXEL_BUFFER, GpuFormat.R8_SINT).
-				withVertexFormat(VertexFormatProvider.POSITION_TEX_NORMAL, VertexFormat.Mode.TRIANGLES).
+				withBindGroupLayout(BindGroupLayout.builder().
+					withSampler("Sampler0").
+					withSampler("Sampler2").
+					withUniform("Lighting", UniformType.UNIFORM_BUFFER).
+					withUniform("DeformerOperations", UniformType.TEXEL_BUFFER, GpuFormat.RGBA32_FLOAT).
+					withUniform("DeformerValues", UniformType.TEXEL_BUFFER, GpuFormat.RGBA32_FLOAT).
+					build()).
+				withVertexBinding(0, VertexFormatProvider.POSITION_TEX_NORMAL).
+				withPrimitiveTopology(PrimitiveTopology.TRIANGLES).
 				withDepthStencilState(DepthStencilState.DEFAULT).
 				buildSnippet();
 		
 		public static final RenderPipeline TRIANGLES_SOLID = registerPipeline(RenderPipeline.builder(TRIANGLES_SNIPPET).
 				withLocation(PLibDatabase.rl("pipeline/triangles_solid_no_cull")).
-				withSampler("Sampler1").
+				withBindGroupLayout(BindGroupLayout.builder().
+					withSampler("Sampler1").
+					build()).
 				withShaderDefine("FORCE_OPAQUE").
 				withCull(false).
 				build());
 		
 		public static final RenderPipeline TRIANGLES_CUTOUT = registerPipeline(RenderPipeline.builder(TRIANGLES_SNIPPET).
 				withLocation(PLibDatabase.rl("pipeline/triangles_cutout_no_cull")).
-				withSampler("Sampler1").
+				withBindGroupLayout(BindGroupLayout.builder().
+					withSampler("Sampler1").
+					build()).
 				withShaderDefine("ALPHA_CUTOUT", 0.1F).
 				withCull(false).
 				build());
 		
 		public static final RenderPipeline TRIANGLES_TRANSLUCENT = registerPipeline(RenderPipeline.builder(TRIANGLES_SNIPPET).
 				withLocation(PLibDatabase.rl("pipeline/triangles_translucent_no_cull")).
-				withSampler("Sampler1").
+				withBindGroupLayout(BindGroupLayout.builder().
+					withSampler("Sampler1").
+					build()).
 				withShaderDefine("ALPHA_CUTOUT", 0.1F).
 				withCull(false).
 				withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT)).
@@ -88,7 +99,9 @@ public final class PRenderTypes
 
 		public static final RenderPipeline TRIANGLES_EMISSIVE_SOLID = registerPipeline(RenderPipeline.builder(TRIANGLES_SNIPPET).
 				withLocation(PLibDatabase.rl("pipeline/triangles_emissive_solid_no_cull")).
-				withSampler("Sampler1").
+				withBindGroupLayout(BindGroupLayout.builder().
+					withSampler("Sampler1").
+					build()).
 				withShaderDefine("EMISSIVE").
 				withShaderDefine("FORCE_OPAQUE").
 				withCull(false).
@@ -96,7 +109,9 @@ public final class PRenderTypes
 
 		public static final RenderPipeline TRIANGLES_EMISSIVE_CUTOUT = registerPipeline(RenderPipeline.builder(TRIANGLES_SNIPPET).
 				withLocation(PLibDatabase.rl("pipeline/triangles_emissive_cutout_no_cull")).
-				withSampler("Sampler1").
+				withBindGroupLayout(BindGroupLayout.builder().
+					withSampler("Sampler1").
+					build()).
 				withShaderDefine("EMISSIVE").
 				withShaderDefine("ALPHA_CUTOUT", 0.1F).
 				withCull(false).
@@ -104,7 +119,9 @@ public final class PRenderTypes
 
 		public static final RenderPipeline TRIANGLES_EMISSIVE_TRANSLUCENT = registerPipeline(RenderPipeline.builder(TRIANGLES_SNIPPET).
 				withLocation(PLibDatabase.rl("pipeline/triangles_emissive_translucent_no_cull")).
-				withSampler("Sampler1").
+				withBindGroupLayout(BindGroupLayout.builder().
+					withSampler("Sampler1").
+					build()).
 				withShaderDefine("EMISSIVE").
 				withShaderDefine("ALPHA_CUTOUT", 0.1F).
 				withCull(false).
@@ -114,8 +131,10 @@ public final class PRenderTypes
 		public static final RenderPipeline TRIANGLES_OIT = registerPipeline(RenderPipeline.builder(TRIANGLES_SNIPPET).
 				withLocation(PLibDatabase.rl("pipeline/triangles_oit_no_cull")).
 				withFragmentShader(PLibDatabase.rl("core/triangles_oit")).
-				withSampler("Sampler1").
-				withSampler("LayerDepthSampler").
+				withBindGroupLayout(BindGroupLayout.builder().
+					withSampler("Sampler1").
+					withSampler("LayerDepthSampler").
+					build()).
 				withShaderDefine("ALPHA_CUTOUT", 0.1F).
 				withCull(false).
 				build());
@@ -123,8 +142,10 @@ public final class PRenderTypes
 		public static final RenderPipeline TRIANGLES_OIT_EMISSIVE = registerPipeline(RenderPipeline.builder(TRIANGLES_SNIPPET).
 				withLocation(PLibDatabase.rl("pipeline/triangles_oit_emissive_no_cull")).
 				withFragmentShader(PLibDatabase.rl("core/triangles_oit")).
-				withSampler("Sampler1").
-				withSampler("LayerDepthSampler").
+				withBindGroupLayout(BindGroupLayout.builder().
+					withSampler("Sampler1").
+					withSampler("LayerDepthSampler").
+					build()).
 				withShaderDefine("EMISSIVE").
 				withShaderDefine("ALPHA_CUTOUT", 0.1F).
 				withCull(false).
@@ -133,7 +154,9 @@ public final class PRenderTypes
 		public static final RenderPipeline TRIANGLES_OIT_DEPTH = registerPipeline(RenderPipeline.builder(TRIANGLES_SNIPPET).
 				withLocation(PLibDatabase.rl("pipeline/triangles_oit_depth_no_cull")).
 				withFragmentShader(PLibDatabase.rl("core/triangles_oit_depth")).
-				withSampler("Sampler1").
+				withBindGroupLayout(BindGroupLayout.builder().
+					withSampler("Sampler1").
+					build()).
 				withShaderDefine("ALPHA_CUTOUT", 0.1F).
 				withCull(false).
 				build());
@@ -141,8 +164,10 @@ public final class PRenderTypes
 		public static final RenderPipeline TRIANGLES_OIT_DEPTH_PEEL = registerPipeline(RenderPipeline.builder(TRIANGLES_SNIPPET).
 				withLocation(PLibDatabase.rl("pipeline/triangles_oit_depth_peel_no_cull")).
 				withFragmentShader(PLibDatabase.rl("core/triangles_oit_depth_peel")).
-				withSampler("Sampler1").
-				withSampler("LayerDepthSampler").
+				withBindGroupLayout(BindGroupLayout.builder().
+					withSampler("Sampler1").
+					withSampler("LayerDepthSampler").
+					build()).
 				withShaderDefine("ALPHA_CUTOUT", 0.1F).
 				withCull(false).
 				build());
@@ -151,58 +176,68 @@ public final class PRenderTypes
 				withLocation(PLibDatabase.rl("pipeline/oit_composite")).
 				withVertexShader(PLibDatabase.rl("core/oit_composite")).
 				withFragmentShader(PLibDatabase.rl("core/oit_composite")).
-				withSampler("AccumSampler").
-				withSampler("RevealSampler").
-				withSampler("DepthSampler").
+				withBindGroupLayout(BindGroupLayout.builder().
+					withSampler("AccumSampler").
+					withSampler("RevealSampler").
+					withSampler("DepthSampler").
+					build()).
 				withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT)).
 				withCull(false).
-				withVertexFormat(DefaultVertexFormat.EMPTY, VertexFormat.Mode.TRIANGLES).
+				withPrimitiveTopology(PrimitiveTopology.TRIANGLES).
 				build());
 		
 		public static final RenderPipeline OIT_FABULOUS_METADATA = registerPipeline(RenderPipeline.builder().
 				withLocation(PLibDatabase.rl("pipeline/oit_fabulous_metadata")).
 				withVertexShader(PLibDatabase.rl("core/oit_composite")).
 				withFragmentShader(PLibDatabase.rl("core/oit_fabulous_metadata")).
-				withSampler("RevealSampler").withSampler("DepthSampler").
+				withBindGroupLayout(BindGroupLayout.builder().
+					withSampler("RevealSampler").withSampler("DepthSampler").
+					build()).
 				withCull(false).
-				withVertexFormat(DefaultVertexFormat.EMPTY, VertexFormat.Mode.TRIANGLES).
+				withPrimitiveTopology(PrimitiveTopology.TRIANGLES).
 				build());
 
 		public static final RenderPipeline OIT_FABULOUS_COMPOSITE = registerPipeline(RenderPipeline.builder().
 				withLocation(PLibDatabase.rl("pipeline/oit_fabulous_composite")).
 				withVertexShader(PLibDatabase.rl("core/oit_composite")).
 				withFragmentShader(PLibDatabase.rl("core/oit_fabulous_composite")).
-				withSampler("AccumSampler").
-				withSampler("OitMetadataSampler").
-				withSampler("TranslucentSampler").
-				withSampler("TranslucentDepthSampler").
-				withSampler("ItemEntitySampler").
-				withSampler("ItemEntityDepthSampler").
-				withSampler("ParticlesSampler").
-				withSampler("ParticlesDepthSampler").
-				withSampler("WeatherSampler").
-				withSampler("WeatherDepthSampler").
-				withSampler("CloudsSampler").
-				withSampler("CloudsDepthSampler").
+				withBindGroupLayout(BindGroupLayout.builder().
+					withSampler("AccumSampler").
+					withSampler("OitMetadataSampler").
+					withSampler("TranslucentSampler").
+					withSampler("TranslucentDepthSampler").
+					withSampler("ItemEntitySampler").
+					withSampler("ItemEntityDepthSampler").
+					withSampler("ParticlesSampler").
+					withSampler("ParticlesDepthSampler").
+					withSampler("WeatherSampler").
+					withSampler("WeatherDepthSampler").
+					withSampler("CloudsSampler").
+					withSampler("CloudsDepthSampler").
+					build()).
 				withColorTargetState(new ColorTargetState(new BlendFunction(BlendFactor.SRC_ALPHA,
 						BlendFactor.ONE_MINUS_SRC_ALPHA, BlendFactor.ZERO, BlendFactor.ONE))).
 				withCull(false).
-				withVertexFormat(DefaultVertexFormat.EMPTY, VertexFormat.Mode.TRIANGLES).
+				withPrimitiveTopology(PrimitiveTopology.TRIANGLES).
 				build());
 
-		private static final RenderPipeline.Snippet TRIANGLES_INSTANT_SNIPPET = RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET).
+		private static final RenderPipeline.Snippet TRIANGLES_INSTANT_SNIPPET = RenderPipeline.builder().
+				withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION).
 				withVertexShader(PLibDatabase.rl("core/triangles_instant")).
 				withFragmentShader(PLibDatabase.rl("core/triangles_instant")).
-				withSampler("Sampler0").
-				withSampler("Sampler1").
-				withSampler("Sampler2").
-				withUniform("Lighting", UniformType.UNIFORM_BUFFER).
-				withUniform("ColorOverlay", UniformType.UNIFORM_BUFFER).
-				withUniform("DeformerOperations", UniformType.TEXEL_BUFFER, GpuFormat.R8_SINT).
-				withUniform("DeformerValues", UniformType.TEXEL_BUFFER, GpuFormat.R8_SINT).
+				withBindGroupLayout(BindGroupLayout.builder().
+					withSampler("Sampler0").
+					withSampler("Sampler1").
+					withSampler("Sampler2").
+					withUniform("Lighting", UniformType.UNIFORM_BUFFER).
+					withUniform("ColorOverlay", UniformType.UNIFORM_BUFFER).
+					withUniform("DeformerOperations", UniformType.TEXEL_BUFFER, GpuFormat.RGBA32_FLOAT).
+					withUniform("DeformerValues", UniformType.TEXEL_BUFFER, GpuFormat.RGBA32_FLOAT).
+					build()).
 				withCull(false).
 				withDepthStencilState(DepthStencilState.DEFAULT).
-				withVertexFormat(VertexFormatProvider.POSITION_TEX_NORMAL, VertexFormat.Mode.TRIANGLES).
+				withVertexBinding(0, VertexFormatProvider.POSITION_TEX_NORMAL).
+				withPrimitiveTopology(PrimitiveTopology.TRIANGLES).
 				buildSnippet();
 
 		public static final RenderPipeline TRIANGLES_INSTANT_SOLID = registerPipeline(RenderPipeline.builder(TRIANGLES_INSTANT_SNIPPET).
@@ -267,12 +302,7 @@ public final class PRenderTypes
  */
 	public static class VertexFormatProvider
 	{
-		public static final VertexFormat POSITION_TEX_NORMAL = VertexFormat.builder().
-				add("Position", VertexFormatElement.POSITION).
-				add("UV0", VertexFormatElement.UV0).
-				add("Normal", VertexFormatElement.NORMAL).
-				padding(1).
-				build();
+		public static final VertexFormat POSITION_TEX_NORMAL = PRhiPipelines.POSITION_TEX_NORMAL;
 	}
 	
 /**

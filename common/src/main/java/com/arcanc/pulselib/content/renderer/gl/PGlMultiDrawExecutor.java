@@ -153,7 +153,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 			List<Draw> draws = new ArrayList<>();
 			for (PDrawGroup group : groups)
 				draws.add(new Draw(this.resources.pipeline(group.pipeline()), "PulseLib mesh " + group.mesh().value(),
-						this.resources.resolve(group.mesh(), this.geometry, frameSlot), group.command(), group.writeDepth(), this.resources.transparency(group.pipeline())));
+						this.geometry.resolve(this.resources.geometryResource(group.mesh()), frameSlot), group.command(), group.writeDepth(), this.resources.transparency(group.pipeline())));
 			if (this.stateVertices == null)
 				this.stateVertices = RenderSystem.getDevice().createBuffer(() -> "PulseLib pass state vertices", GpuBuffer.USAGE_VERTEX,
 						PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize());

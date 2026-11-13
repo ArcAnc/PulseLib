@@ -47,6 +47,10 @@ gradle.projectsEvaluated
 		from(shared)
 		{
 			include 'com/arcanc/pulselib/content/renderer/rhi/PRhiPipelines*.class'
+			include 'com/arcanc/pulselib/content/renderer/rhi/RhiCatalogChecks.class'
+			include 'com/arcanc/pulselib/content/model/textures/PAlphaMode.class'
+			include 'com/arcanc/pulselib/util/PRenderTypes*.class'
+			include 'com/arcanc/pulselib/util/PLibDatabase.class'
 			include 'com/arcanc/pulselib/content/renderer/rhi/package-info.class'
 			include 'com/arcanc/pulselib/content/renderer/rhi/FieldsAreNonnullByDefault.class'
 			include 'com/arcanc/pulselib/content/renderer/rhi/MethodsReturnNonnullByDefault.class'

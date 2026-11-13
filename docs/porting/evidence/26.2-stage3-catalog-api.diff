@@ -1,0 +1,5 @@
+# @author ArcAnc; Created at: 13.11.2026; Copyright (c) 2026; Arc's License of Common Sense (LICENSE.txt)
+# Parse-only public/protected declarations, imports/package metadata excluded.
+# Eight unrelated pre-existing user paths excluded; ported PRenderTypes included.
+# No public/protected declaration additions, removals or changes relative to 96010b0.
+# Package-private resolve dispatch moved from PGlResourceRegistry to PGlGeometryArena; see journal.

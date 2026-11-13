@@ -26,16 +26,17 @@ final class RhiRegistrationChecks
 	{
 		var bus = BusBuilder.builder().markerType(IModBusEvent.class).checkTypesOnDispatch().build();
 		bus.addListener(NeoForgeRhiPipelines::register);
+		bus.addListener((RegisterRenderPipelinesEvent event) -> RhiCatalogChecks.register(event::registerPipeline));
 		Map<Identifier, RenderPipeline> registered = new HashMap<>();
 		bus.post(new RegisterRenderPipelinesEvent(pipeline ->
 		{
 			if (registered.putIfAbsent(pipeline.getLocation(), pipeline) != null)
 				throw new AssertionError("Duplicate RHI pipeline registration");
 		}));
-		RhiLayoutChecks.assertTrue(registered.size() == 4, "Four RHI profiles through actual mod event bus");
+		RhiLayoutChecks.assertTrue(registered.size() == 23, "Nineteen canonical and four RHI profiles through actual mod event bus");
 		var portable = PRhiPipelines.portable();
 		RhiLayoutChecks.assertTrue(portable == PRhiPipelines.portable() && portable.instanceCapacity() == 128, "Stable portable Common definitions");
 		portable.register(pipeline -> RhiLayoutChecks.assertTrue(registered.get(pipeline.getLocation()) == pipeline, "Registered definitions shared with material consumers"));
-		System.out.println("PASS NeoForge native mod-bus RHI registration, four shared portable profiles, capacity 128");
+		System.out.println("PASS NeoForge native mod-bus production/RHI registration: 19 canonical + 4 shared portable profiles, capacity 128");
 	}
 }

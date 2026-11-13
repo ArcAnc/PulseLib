@@ -160,17 +160,6 @@ public final class PGlResourceRegistry
 		return this.meshResources.get(handle) instanceof PGeometryData;
 	}
 
-	PGlGeometryArena.Slice resolve(PMeshHandle handle, PGlGeometryArena arena, int frameSlot)
-	{
-		return switch (resource(handle))
-		{
-			case PBakedMesh mesh -> arena.resolve(mesh);
-			case PGeometryData data -> arena.resolve(data);
-			case PGlDynamicGeometry source -> arena.resolve(source, frameSlot);
-			default -> throw new IllegalStateException("Unknown geometry resource");
-		};
-	}
-
 	private PMeshHandle register(Object resource)
 	{
 		PMeshHandle handle = new PMeshHandle(this.nextHandle++);

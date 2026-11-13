@@ -30,6 +30,18 @@ public final class PGlGeometryArena
 	private final Map<PGeometryData, Slice> geometrySlices = new IdentityHashMap<>();
 	private final Map<PGlDynamicGeometry, Map<Integer, DynamicAllocation>> dynamicPages = new IdentityHashMap<>();
 
+	/** Resolves borrowed queue metadata inside its GPU owner, keeping the registry independent of this arena. */
+	Slice resolve(Object resource, int frameSlot)
+	{
+		return switch (resource)
+		{
+			case PBakedMesh mesh -> resolve(mesh);
+			case PGeometryData data -> resolve(data);
+			case PGlDynamicGeometry source -> resolve(source, frameSlot);
+			default -> throw new IllegalStateException("Unknown geometry resource");
+		};
+	}
+
 	/**
 	 * Performs the resolve operation.
 	 * @param mesh the mesh to use.
