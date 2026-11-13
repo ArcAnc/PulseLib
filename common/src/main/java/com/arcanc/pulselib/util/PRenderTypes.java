@@ -11,14 +11,13 @@ package com.arcanc.pulselib.util;
 
 
 import com.arcanc.pulselib.content.model.textures.PAlphaMode;
+import com.mojang.blaze3d.GpuFormat;
 import com.mojang.blaze3d.pipeline.BlendFunction;
 import com.mojang.blaze3d.pipeline.ColorTargetState;
 import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.platform.BlendFactor;
 import com.mojang.blaze3d.shaders.UniformType;
-import com.mojang.blaze3d.platform.SourceFactor;
-import com.mojang.blaze3d.platform.DestFactor;
-import com.mojang.blaze3d.textures.TextureFormat;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
@@ -59,8 +58,8 @@ public final class PRenderTypes
 				withSampler("Sampler0").
 				withSampler("Sampler2").
 				withUniform("Lighting", UniformType.UNIFORM_BUFFER).
-				withUniform("DeformerOperations", UniformType.TEXEL_BUFFER, TextureFormat.RED8I).
-				withUniform("DeformerValues", UniformType.TEXEL_BUFFER, TextureFormat.RED8I).
+				withUniform("DeformerOperations", UniformType.TEXEL_BUFFER, GpuFormat.R8_SINT).
+				withUniform("DeformerValues", UniformType.TEXEL_BUFFER, GpuFormat.R8_SINT).
 				withVertexFormat(VertexFormatProvider.POSITION_TEX_NORMAL, VertexFormat.Mode.TRIANGLES).
 				withDepthStencilState(DepthStencilState.DEFAULT).
 				buildSnippet();
@@ -185,8 +184,8 @@ public final class PRenderTypes
 				withSampler("WeatherDepthSampler").
 				withSampler("CloudsSampler").
 				withSampler("CloudsDepthSampler").
-				withColorTargetState(new ColorTargetState(new BlendFunction(SourceFactor.SRC_ALPHA,
-						DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ZERO, DestFactor.ONE))).
+				withColorTargetState(new ColorTargetState(new BlendFunction(BlendFactor.SRC_ALPHA,
+						BlendFactor.ONE_MINUS_SRC_ALPHA, BlendFactor.ZERO, BlendFactor.ONE))).
 				withCull(false).
 				withVertexFormat(DefaultVertexFormat.EMPTY, VertexFormat.Mode.TRIANGLES).
 				build());
@@ -199,8 +198,8 @@ public final class PRenderTypes
 				withSampler("Sampler2").
 				withUniform("Lighting", UniformType.UNIFORM_BUFFER).
 				withUniform("ColorOverlay", UniformType.UNIFORM_BUFFER).
-				withUniform("DeformerOperations", UniformType.TEXEL_BUFFER, TextureFormat.RED8I).
-				withUniform("DeformerValues", UniformType.TEXEL_BUFFER, TextureFormat.RED8I).
+				withUniform("DeformerOperations", UniformType.TEXEL_BUFFER, GpuFormat.R8_SINT).
+				withUniform("DeformerValues", UniformType.TEXEL_BUFFER, GpuFormat.R8_SINT).
 				withCull(false).
 				withDepthStencilState(DepthStencilState.DEFAULT).
 				withVertexFormat(VertexFormatProvider.POSITION_TEX_NORMAL, VertexFormat.Mode.TRIANGLES).

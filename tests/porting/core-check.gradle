@@ -69,6 +69,53 @@ gradle.projectsEvaluated
 		maxHeapSize = '1G'
 		doFirst { workingDir.mkdirs() }
 	}
+	// Compile real core implementations, resolving signatures from the unchanged source tree.
+	// Implicit dependencies are not emitted; no output from a failed compilation is used.
+	def integrationSources = common.fileTree(base)
+	{
+		include 'api/**/*.java', 'plugin/*.java', 'platform/IPulsePlatform.java', 'platform/PulseServices.java'
+		include 'content/animatable/**/*.java', 'content/model/animation/*.java', 'content/model/deformer/*.java'
+		include 'content/model/*.java', 'content/model/resource/*.java', 'content/registration/*.java'
+		include 'content/model/baked/PBakedModel.java'
+		include 'data/**/*.java', 'util/PLibDatabase.java', 'util/helpers/PLibCodecs.java', 'util/helpers/PLibParserHelper.java'
+	}
+	def integrationOutput = common.layout.buildDirectory.dir('porting-core/integration')
+	def integration = common.tasks.register('compilePortingIntegrationChecks', Exec)
+	{
+		dependsOn common.tasks.named('createMinecraftArtifacts')
+		def selected = common.files(sources, packageInfo, integrationSources,
+				common.fileTree(new File(fixture, 'src/main/java')) { include '**/*.java' },
+				common.fileTree(new File(fixture, 'src/integration/java')) { include '**/*.java' })
+		inputs.files(common.fileTree('src/main/java'), selected, common.configurations.compileClasspath)
+		outputs.dir(integrationOutput)
+		doFirst
+		{
+			def destination = integrationOutput.get().asFile
+			common.delete(destination)
+			destination.mkdirs()
+			def compiler = common.javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(25) }.get()
+			def arguments = ['--release', '25', '-encoding', 'UTF-8', '-proc:none', '-implicit:none',
+					'-classpath', common.configurations.compileClasspath.asPath,
+					'-sourcepath', common.file('src/main/java').absolutePath, '-d', destination.absolutePath]
+			arguments.addAll(selected.files.collect { it.absolutePath }.unique().sort())
+			def argfile = new File(destination.parentFile, 'integration-javac.args')
+			argfile.text = arguments.collect { '"' + it.replace('\\', '\\\\').replace('"', '\\"') + '"' }.join('\n') + '\n'
+			logger.lifecycle("Integration javac: {} explicit sources, {}", selected.files.size(), compiler.executablePath)
+			commandLine compiler.executablePath.asFile.absolutePath, '@' + argfile.absolutePath
+		}
+	}
+	common.tasks.register('checkPortingIntegration', JavaExec)
+	{
+		group = 'verification'
+		description = 'Runs actual plugin manager/common registrars without client classes; not a complete loader bootstrap.'
+		dependsOn integration
+		classpath = common.files(integrationOutput, new File(fixture, 'src/main/resources'), runtime)
+		mainClass = 'com.arcanc.pulselib.porting.CoreCheckLauncher'
+		args 'integration'
+		workingDir = common.layout.buildDirectory.dir('porting-core/integration-run').get().asFile
+		maxHeapSize = '1G'
+		doFirst { workingDir.mkdirs() }
+	}
 	['fabric': 'Fabric', 'neoforge': 'NeoForge'].each
 	{ name, prefix ->
 		def module = gradle.rootProject.project(':' + name)

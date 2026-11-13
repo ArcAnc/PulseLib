@@ -41,7 +41,12 @@ public final class CoreCheckLauncher
 			Thread.currentThread().setContextClassLoader(loader);
 			try
 			{
-				String suite = args.length > 0 && args[0].equals("discovery") ? "DiscoveryChecks" : "CoreChecks";
+				String suite = args.length == 0 ? "CoreChecks" : switch (args[0])
+				{
+					case "discovery" -> "DiscoveryChecks";
+					case "integration" -> "IntegrationChecks";
+					default -> throw new IllegalArgumentException("Unknown check suite: " + args[0]);
+				};
 				Class.forName("com.arcanc.pulselib.porting." + suite, true, loader).
 						getMethod("main", String[].class).invoke(null, (Object)args);
 			}

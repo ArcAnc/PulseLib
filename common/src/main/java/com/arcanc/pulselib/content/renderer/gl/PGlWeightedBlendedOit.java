@@ -13,6 +13,7 @@ import com.arcanc.pulselib.content.renderer.legacy.GlRenderState;
 import com.arcanc.pulselib.platform.PClientRenderHooks;
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.arcanc.pulselib.util.PRenderTypes;
+import com.mojang.blaze3d.GpuFormat;
 import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.opengl.GlTexture;
 import com.mojang.blaze3d.opengl.GlTextureView;
@@ -22,7 +23,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.textures.GpuTexture;
 import com.mojang.blaze3d.textures.GpuTextureView;
-import com.mojang.blaze3d.textures.TextureFormat;
 import org.jspecify.annotations.Nullable;
 import org.lwjgl.opengl.*;
 
@@ -355,7 +355,7 @@ public final class PGlWeightedBlendedOit
 		{
 			if (this.fabulousMetadataView == null)
 			{
-				this.fabulousMetadataTexture = createTexture("PulseLib Fabulous metadata", TextureFormat.RGBA8,
+				this.fabulousMetadataTexture = createTexture("PulseLib Fabulous metadata", GpuFormat.RGBA8_UNORM,
 						GL30.GL_RG32F, GL30.GL_RG, this.width, this.height);
 				this.fabulousMetadataView = new ExternalGlTextureView(this.fabulousMetadataTexture);
 			}
@@ -465,13 +465,13 @@ public final class PGlWeightedBlendedOit
 		this.depthStencil = targetDepthStencil;
 		for (int layer = 0; layer < LAYER_COUNT; layer++)
 		{
-			this.accumulationTextures[layer] = createTexture("PulseLib OIT accumulation " + layer, TextureFormat.RGBA8,
+			this.accumulationTextures[layer] = createTexture("PulseLib OIT accumulation " + layer, GpuFormat.RGBA8_UNORM,
 					GL30.GL_RGBA16F, GL11.GL_RGBA, targetWidth, targetHeight);
 			this.accumulationViews[layer] = new ExternalGlTextureView(this.accumulationTextures[layer]);
-			this.revealageTextures[layer] = createTexture("PulseLib OIT revealage " + layer, TextureFormat.RED8,
+			this.revealageTextures[layer] = createTexture("PulseLib OIT revealage " + layer, GpuFormat.R8_UNORM,
 					GL30.GL_R16F, GL11.GL_RED, targetWidth, targetHeight);
 			this.revealageViews[layer] = new ExternalGlTextureView(this.revealageTextures[layer]);
-			this.layerDepthTextures[layer] = createTexture("PulseLib OIT depth layer " + layer, TextureFormat.RED8,
+			this.layerDepthTextures[layer] = createTexture("PulseLib OIT depth layer " + layer, GpuFormat.R8_UNORM,
 					GL30.GL_R32F, GL11.GL_RED, targetWidth, targetHeight);
 			this.layerDepthViews[layer] = new ExternalGlTextureView(this.layerDepthTextures[layer]);
 		}
@@ -754,7 +754,7 @@ public final class PGlWeightedBlendedOit
 	 * @param height the height to use.
 	 * @return the value produced by this operation.
 	 */
-	private static ExternalGlTexture createTexture(String label, TextureFormat declaredFormat,
+	private static ExternalGlTexture createTexture(String label, GpuFormat declaredFormat,
 	                                               int internalFormat, int format, int width, int height)
 	{
 		int activeTexture = GL11.glGetInteger(GL13.GL_ACTIVE_TEXTURE);
@@ -790,7 +790,7 @@ public final class PGlWeightedBlendedOit
 		 * @param height the height to use.
 		 * @param id the id to use.
 		 */
-		private ExternalGlTexture(String label, TextureFormat format, int width, int height, int id)
+		private ExternalGlTexture(String label, GpuFormat format, int width, int height, int id)
 		{
 			super(GpuTexture.USAGE_TEXTURE_BINDING | GpuTexture.USAGE_RENDER_ATTACHMENT,
 					label, format, width, height, 1, 1, id);

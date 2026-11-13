@@ -8,7 +8,7 @@ This code is licensed under "Arc's License of Common Sense" (LICENSE.txt).
 # Minecraft 26.2 component checks
 
 These fixtures compile explicit, current production components against the actual Minecraft/loader
-dependencies. They never replace `compileJava`, change the main source sets, package a mod, remove
+dependencies. They never replace `compileJava`, change the main source sets, package a production mod, remove
 renderer classes or use old PulseLib classfiles to satisfy missing types. Outputs live under each
 module's ignored `build/porting-core` directory. No world or Minecraft save is opened.
 
@@ -16,6 +16,8 @@ module's ignored `build/porting-core` directory. No world or Minecraft save is o
 ./gradlew --init-script tests/porting/core-check.gradle :common:checkPortingCore --no-parallel --no-daemon
 ./gradlew --init-script tests/porting/core-check.gradle :fabric:checkPortingDiscovery :neoforge:checkPortingDiscovery --no-parallel --no-daemon
 ./gradlew :fabric:validateAccessWidener --no-parallel --no-daemon
+./gradlew --init-script tests/porting/core-check.gradle :common:checkPortingIntegration --no-parallel --no-daemon
+./gradlew --init-script tests/porting/core-check.gradle --init-script tests/porting/fabric-native-check.gradle :fabric:checkPortingNativeItemStack --no-parallel --no-daemon
 python3 tests/porting/diagnose.py
 ```
 
@@ -51,6 +53,38 @@ The two test-package nullability annotations use JSR-305 `@Nonnull`/`@TypeQualif
 Minecraft 26.2 removed its former annotations with those names. They are test metadata, have no
 Minecraft namespace, and are never included in production.
 
-Do not treat a successful component check as a successful mod build or loader bootstrap. Native
-ItemStack Mixin integration, full plugin discovery/registration, manager/controller/Animation Graph
-integration, dedicated servers and renderer validation remain separate required checks.
+The integration suite compiles selected real API, plugin, animation, deformer and parser sources
+with ordinary Java 25 `javac --release 25 -proc:none -implicit:none`. Source dependencies are resolved
+from the current production source tree; only explicitly selected sources are emitted. The task
+clears its own fixture output first. It does not use any classfiles from failed compilation, old
+PulseLib artifacts or stand-in APIs. A command-line compiler is intentional: in this environment
+Gradle's JavaCompile path attributes additional implicit graphics bodies, whereas standalone javac
+on the same inputs succeeds. Failures of either invocation are recorded in the migration journal;
+production `compileJava` is unchanged. Argument/source lists are under `build/porting-core`.
+
+Integration checks initialize the actual built-in registries and exercise `PulsePluginManager` with
+test candidates: side filtering before class loading, deterministic ordering, deduplication, common
+phase order, applied registrations, closed/wrong-phase scopes, duplicate failure retention and client
+registration rejection. They also test actual manager/controller lazy initialization and owner isolation
+without a bound model. The fresh classloader still rejects Minecraft client and Blaze3D classes.
+
+The native Fabric fixture is an **opt-in separate test mod**, not PulseLib's distributable artifact.
+Its JAR contains selected core implementations, the unchanged ItemStackMixin, actual Fabric entrypoint,
+platform and finder sources, and test-only item/plugin content. It runs KnotServer with the real
+Minecraft 26.2 / Fabric Loader / Fabric API dependencies in a fresh directory under `fabric/build`.
+The actual Fabric finder scans loaded mod roots; the actual manager performs common registration.
+The production SERVER_STARTING callback is not dispatched: the fixture calls `registerCommon()`
+explicitly and exits before a server/world is created. A strict success marker and absence of world
+state are checked; an exception or silent server exit cannot pass the task.
+
+A fixture-only Mixin config applies the **unchanged** ItemStackMixin on the server for this test.
+Production configs keep it client-only. Real Minecraft ItemStacks test copy identity, partial/full
+splits, nonanimated and EMPTY behavior. Animated fixture items throw if manager/controller creation
+is attempted. Minecraft 26.2 binds item prototype components later during resource loading; the test
+explicitly binds components only for its own two items so datapack/world startup is unnecessary.
+Vanilla item prototypes and user saves are not modified. The fixture has no publishing task and is
+never added to production source sets, standard build, CI, jarJar or include.
+
+Successful fixtures do not establish a complete production mod build, full dedicated server startup,
+NeoForge FML integration, client-only Mixin loading, Animation Graph playback against baked models,
+resource loading, or graphics correctness. Those remain separate required checks.

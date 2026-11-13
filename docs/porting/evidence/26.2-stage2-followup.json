@@ -1,0 +1,162 @@
+{
+  "author": "ArcAnc",
+  "created_at": "2026-11-13",
+  "copyright": "Copyright (c) 2026",
+  "license": "Arc's License of Common Sense (LICENSE.txt)",
+  "start_commit": "8813d3bb66c3f44a0580cdfb9e58e6efae16a9e9",
+  "status": "partial",
+  "integration_compilation": {
+    "explicit_java_sources": 169,
+    "production_sources": 162,
+    "fixture_sources": 7,
+    "compiler_flags": [
+      "--release 25",
+      "-encoding UTF-8",
+      "-proc:none",
+      "-implicit:none"
+    ],
+    "compiler_api": "standalone Java 25 javac",
+    "successful": true,
+    "production_outputs_used": false
+  },
+  "checks": {
+    "core_components": "PASS",
+    "real_common_registration": "PASS",
+    "real_plugin_manager": "PASS",
+    "manager_controller_lazy_initialization": "PASS (without a bound model)",
+    "fabric_mod_list_discovery": "PASS (separate fixture mod)",
+    "native_ItemStackMixin": "PASS (fixture-only server Mixin config)",
+    "fabric_access_widener": "PASS",
+    "neoforge_adapter_abi": "PASS",
+    "neoforge_fml_bootstrap": "NOT TESTED",
+    "full_production_mod_build": "FAIL",
+    "full_dedicated_server_startup": "NOT TESTED",
+    "production_SERVER_STARTING_callback": "NOT TESTED",
+    "client_rendering_OpenGL_Vulkan": "NOT TESTED"
+  },
+  "ordinary_common_compile": {
+    "exit_code": 1,
+    "error_count": 32
+  },
+  "expanded_diagnostics": [
+    {
+      "module": "common",
+      "exit_code": 1,
+      "source_count": 393,
+      "error_count": 101,
+      "files": {
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java": 6,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderLayerMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderSubmitMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/HumanoidArmorLayerMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemFeatureRendererMixin.java": 5,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemSubmitMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java": 9,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartSubmitMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java": 6,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelSubmitMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/WeatherEffectRendererMixin.java": 2,
+        "common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java": 2,
+        "common/src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers.java": 2,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java": 7,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java": 2,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java": 8,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlRenderHost.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java": 12,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java": 5,
+        "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java": 27
+      }
+    },
+    {
+      "module": "fabric",
+      "exit_code": 1,
+      "source_count": 403,
+      "error_count": 102,
+      "files": {
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java": 6,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderLayerMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderSubmitMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/HumanoidArmorLayerMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemFeatureRendererMixin.java": 5,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemSubmitMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java": 9,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartSubmitMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java": 6,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelSubmitMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/WeatherEffectRendererMixin.java": 2,
+        "common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java": 2,
+        "common/src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers.java": 2,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java": 7,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java": 2,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java": 8,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlRenderHost.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java": 12,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java": 5,
+        "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java": 27,
+        "fabric/src/main/java/com/arcanc/pulselib/fabric/PulseLibFabricClient.java": 1
+      },
+      "additional_errors": [
+        {
+          "path": "fabric/src/main/java/com/arcanc/pulselib/fabric/PulseLibFabricClient.java",
+          "line": 56,
+          "message": "cannot find symbol"
+        }
+      ]
+    },
+    {
+      "module": "neoforge",
+      "exit_code": 1,
+      "source_count": 406,
+      "error_count": 103,
+      "files": {
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java": 6,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderLayerMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderSubmitMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/HumanoidArmorLayerMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemFeatureRendererMixin.java": 5,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemSubmitMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java": 9,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartSubmitMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java": 6,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelSubmitMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/WeatherEffectRendererMixin.java": 2,
+        "common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java": 2,
+        "common/src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers.java": 2,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java": 7,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java": 2,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java": 8,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlRenderHost.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java": 12,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java": 5,
+        "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java": 27,
+        "neoforge/src/main/java/com/arcanc/pulselib/neoforge/NeoForgeClientLifecycle.java": 1,
+        "neoforge/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/package-info.java": 1
+      },
+      "additional_errors": [
+        {
+          "path": "neoforge/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/package-info.java",
+          "line": 10,
+          "message": "package com.arcanc.pulselib.util.attachments.humanoid.armor has already been annotated"
+        },
+        {
+          "path": "neoforge/src/main/java/com/arcanc/pulselib/neoforge/NeoForgeClientLifecycle.java",
+          "line": 64,
+          "message": "incompatible types: invalid constructor reference"
+        }
+      ]
+    }
+  ],
+  "uncommitted_user_files": [
+    "neoforge/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PArmorClientExtensions.java",
+    "neoforge/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/package-info.java"
+  ],
+  "notes": [
+    "NeoForge source_count includes the user-added package-info.java; it duplicates the Common package annotation and accounts for one diagnostic error. User worktree and index contents were preserved.",
+    "Full Minecraft lifecycle and resource/datapack loading are not validated. Fixture item components are bound explicitly only on fixture items.",
+    "Production ItemStackMixin and its client-only configs are unchanged; only the separate fixture applies it to a server.",
+    "No new public/protected declarations changed since the previous stage 2 commit."
+  ]
+}
