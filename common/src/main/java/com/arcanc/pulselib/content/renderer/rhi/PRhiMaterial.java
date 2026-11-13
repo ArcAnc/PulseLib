@@ -38,6 +38,9 @@ public record PRhiMaterial(RenderPipeline pipeline, Supplier<Attachments> target
 		Objects.requireNonNull(transparency);
 		if (instanceCapacity < 1 || instanceCapacity > 512)
 			throw new IllegalArgumentException("RHI shader instance capacity must be between 1 and 512");
+		String shaderCapacity = pipeline.getShaderDefines().values().get("PULSELIB_INSTANCE_CAPACITY");
+		if (shaderCapacity != null && !shaderCapacity.equals(Integer.toString(instanceCapacity)))
+			throw new IllegalArgumentException("Shader/CPU instance capacities differ");
 		uniforms = Map.copyOf(uniforms);
 		textures = Map.copyOf(textures);
 		Set<String> owned = Set.of("Projection", "DynamicTransforms", "InstanceData");

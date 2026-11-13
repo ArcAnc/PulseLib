@@ -157,6 +157,19 @@ default game preparation/output resolver is compiled but awaits in-game validati
 projection remain owned by `PRenderFrame`; vanilla layering/animated texture transforms are outside
 this PulseLib adapter's contract. No production pipelines/shaders or queue selection are replaced.
 
+The RHI fixture also compiles and executes all four production `PRhiPipelines` profiles (lit/emissive,
+solid/cutout) using actual production shader resources, the native GLSL import preprocessor and real
+`PBakedMesh`/`PMeshPrimitive` records. A 24-byte vertex layout feeds 1025 instances through the canonical
+compiler and renderer. Readback verifies UVs, packed color/light/overlay, FORCE_OPAQUE versus cutoff,
+normal changes, back-facing triangles and uint dynamic geometry. Unsupported nonzero GPU deformer
+counts and shader/CPU capacity mismatches fail explicitly; full deformer/shader families remain pending.
+
+For these tests only, the fixture JAR includes unmodified vanilla shader imports from the resolved
+Minecraft compile artifact: FML class loading does not provide the game's ResourceManager asset view.
+Production and vanilla asset bytes are checked against their sources. The normal loader resource
+tasks package the new production vertex shader and unchanged canonical fragment shader for both
+loaders. These checks do not constitute production pipeline registration or in-game world rendering.
+
 The default block holds 128 records of 112 bytes (14336 bytes), below the portable 16 KiB uniform
 block limit. OpenGL's fixture queries its actual block limit and tests 512 records. Native 26.2
 `GpuDevice` exposes uniform offset alignment, but not the maximum uniform buffer range. Vulkan's
@@ -169,6 +182,6 @@ independently verified (for example with `vulkaninfo`), also run:
 
 LWJGL is confined to fixture device/window bootstrap and the OpenGL limit query. The production RHI
 package uses native Blaze3D abstractions only. Both backends were tested on one GTX 1660 Ti; this
-is not a claim of full Minecraft/PulseLib Vulkan support. Production shaders, world/GUI integration,
+is not a claim of full Minecraft/PulseLib Vulkan support. Remaining shader families, world/GUI integration,
 deformers, four-layer OIT/Fabulous and Fabric runtime remain pending. Vulkan validation layers and
 long-running GPU memory profiling were not enabled. See the migration journal and stage 3 evidence.

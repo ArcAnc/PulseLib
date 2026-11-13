@@ -1,0 +1,21 @@
+# @author ArcAnc; Created at: 13.11.2026; Copyright (c) 2026; Arc's License of Common Sense (LICENSE.txt)
+# Public/protected source declarations; tabs expanded.
+--- parent/common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/PRhiPipelines.java
++++ working/common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/PRhiPipelines.java
+@@ -0,0 +1,6 @@
++TYPE @ApiStatus.Internal public final class PRhiPipelines
++   FIELD public static final VertexFormat POSITION_TEX_NORMAL
++   METHOD public PRhiPipelines(int instanceCapacity)
++   METHOD public int instanceCapacity()
++   METHOD public RenderPipeline pipeline(boolean cutout, boolean emissive)
++   METHOD public void register(Consumer<RenderPipeline> registrar)
+--- parent/common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/PRhiResourceRegistry.java
++++ working/common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/PRhiResourceRegistry.java
+@@ -6,6 +6,7 @@
+    METHOD public PPipelineHandle pipeline(RenderType type, PRhiMaterial material, Supplier<PRhiPassState> prepare)
+    METHOD public PTransparencyMode transparency(PPipelineHandle handle)
+    METHOD public PMeshHandle geometry(PGeometryData data)
++   METHOD public PMeshHandle mesh(PBakedMesh mesh)
+    METHOD public PMeshHandle dynamic(PDynamicGeometry source)
+    METHOD public PMeshHandle dynamic(PDynamicGeometry source, Supplier<PGeometryData> data)
+    METHOD public PRhiMaterial material(PPipelineHandle handle)

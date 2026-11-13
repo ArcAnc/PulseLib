@@ -30,6 +30,11 @@ gradle.projectsEvaluated
 			include 'com/arcanc/pulselib/content/renderer/rhi/*.java'
 			include 'com/arcanc/pulselib/content/renderer/gl/PGlDynamicGeometry.java'
 			include 'com/arcanc/pulselib/content/renderer/legacy/GlDynamicGeometry.java'
+			include 'com/arcanc/pulselib/content/model/baked/PBakedMesh.java'
+			include 'com/arcanc/pulselib/content/model/PMeshPrimitive.java'
+			include 'com/arcanc/pulselib/content/model/PMaterial.java'
+			include 'com/arcanc/pulselib/content/model/PTextureReference.java'
+			include 'com/arcanc/pulselib/content/model/textures/PAlphaMode.java'
 		}
 		source root.file('tests/porting/src/rhi/java')
 		classpath = common.files(common.configurations.compileClasspath, external)
@@ -58,6 +63,21 @@ gradle.projectsEvaluated
 		destinationDirectory = neo.layout.buildDirectory.dir('porting-rhi')
 		from output
 		from root.file('tests/porting/src/rhi/resources')
+		from(root.file('common/src/main/resources'))
+		{
+			include 'assets/pulselib/shaders/**'
+		}
+		// FML's class loader does not expose vanilla assets like the game ResourceManager does.
+		// Include the resolved, unmodified vanilla imports in this unpublished fixture only.
+		from({
+			def vanilla = common.configurations.compileClasspath.files.findAll { it.name.startsWith('vanilla-') && it.name.endsWith('.jar') }
+			if (vanilla.size() != 1)
+				throw new GradleException('Expected one resolved vanilla artifact for production shader imports: ' + vanilla)
+			common.zipTree(vanilla.first())
+		})
+		{
+			include 'assets/minecraft/shaders/include/**'
+		}
 	}
 	['OpenGL', 'Vulkan'].each
 	{ backend ->

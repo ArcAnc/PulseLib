@@ -9,6 +9,7 @@
 
 package com.arcanc.pulselib.content.renderer.rhi;
 
+import com.arcanc.pulselib.content.model.baked.PBakedMesh;
 import com.arcanc.pulselib.content.renderer.plan.PDynamicGeometry;
 import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
 import com.arcanc.pulselib.content.renderer.plan.PGeometrySource;
@@ -136,6 +137,12 @@ public final class PRhiResourceRegistry implements AutoCloseable
 	public PMeshHandle geometry(PGeometryData data)
 	{
 		return register(Objects.requireNonNull(data), () -> data);
+	}
+
+	/** Baked models retain CPU geometry ownership; wrappers sharing that data reuse one allocation. */
+	public PMeshHandle mesh(PBakedMesh mesh)
+	{
+		return geometry(Objects.requireNonNull(mesh).geometry());
 	}
 
 	public PMeshHandle dynamic(PDynamicGeometry source)

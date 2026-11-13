@@ -92,6 +92,8 @@ public final class RhiGpuChecks
 			int capacity = Integer.parseInt(args[1]);
 			ShaderSource shaders = (id, type) ->
 			{
+				if (id.getNamespace().equals("pulselib"))
+					return RhiProductionShaderSource.load(id, type);
 				if (!id.equals(Identifier.fromNamespaceAndPath("porting_fixture", "test")))
 					throw new IllegalArgumentException("Unexpected fixture shader " + id);
 				return type == ShaderType.VERTEX ? vertexShader(capacity) : fragmentShader();
@@ -102,6 +104,7 @@ public final class RhiGpuChecks
 			System.out.println("GPU " + device.getDeviceInfo().name() + " / " + device.getDeviceInfo().backendName() +
 					" alignment=" + device.getDeviceInfo().limits().minUniformOffsetAlignment() + " blockLimit=" + uniformLimit);
 			render(device, capacity, uniformLimit);
+			RhiProfileChecks.run(device, capacity, uniformLimit);
 			System.out.println("PULSELIB_RHI_GPU_PASSED " + args[0] + " (offscreen fixture, not full Minecraft client)");
 		}
 		finally
