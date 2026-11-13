@@ -125,8 +125,9 @@ of the provider remains part of client/render integration validation.
 ./gradlew --init-script tests/porting/rhi-check.gradle :neoforge:checkPortingRhiOpenGL :neoforge:checkPortingRhiVulkan --no-parallel --no-daemon --console=plain
 ```
 
-These tasks compile the unmodified canonical render-plan sources, the new Common RHI package and
-test-only fixtures against real 26.2 dependencies, without stale production class outputs. They do
+These tasks compile the canonical render-plan sources, the Common RHI package, the actual canonical
+`PGlDynamicGeometry`/`GlDynamicGeometry` CPU sources and test-only fixtures against real 26.2
+dependencies, without stale production class outputs. They do
 not alter production compilation or join the normal CI/build/publishing task graph. The GPU fixture
 uses a real FML client content loader and a hidden GLFW window; it never constructs a Minecraft
 instance, loads a world or accesses user saves. Each invocation gets a new directory under
@@ -138,6 +139,14 @@ GPU checks execute both explicit packed plans and actual `PFrameCompiler` output
 unique pixels, and verify nonzero `firstInstance`/`firstIndex`, negative valid `baseVertex`, frame
 matrices, three-slot upload reuse, cutout textures/samplers, ushort/uint indices, dynamic updates,
 static caching and resource ownership. Invalid ranges and unsupported OIT fail explicitly.
+
+The optional `PGeometrySource` contract joins existing CPU deformation sources to RHI without changing
+the `PDynamicGeometry` marker. Canonical facade/native aliases share one GPU allocation; native
+`RenderType` identities retain independent ordinary/OIT policy bindings. Checks cover canonical source
+updates through `PFrameCompiler`, failed close listeners, multiple registries, value-equivalent release
+handles and stale native bindings after cleanup. Listener failures are intentional assertions and must
+not prevent unrelated GPU owners from releasing buffers. These checks still do not execute production
+deformation algorithms, automatically prepare native RenderSetup resources or select RHI in PRenderQueue.
 
 The default block holds 128 records of 112 bytes (14336 bytes), below the portable 16 KiB uniform
 block limit. OpenGL's fixture queries its actual block limit and tests 512 records. Native 26.2

@@ -11,6 +11,7 @@ package com.arcanc.pulselib.content.renderer.gl;
 
 import com.arcanc.pulselib.content.renderer.plan.PDynamicGeometry;
 import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
+import com.arcanc.pulselib.content.renderer.plan.PGeometrySource;
 
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
@@ -18,12 +19,13 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Minecraft 26.1 dynamic geometry source. Reuse the source and replace its immutable data.
+ * Canonical dynamic CPU geometry source, also accepted by the RHI backend.
+ * Reuse the source and replace its immutable data.
  * The queue owns GPU allocations and releases them on reload/disconnect/shutdown.
  * Update and submit on the render thread; pending submissions use the latest uploaded data.
  * Flush pending submissions before changing the index count or layout.
  */
-public final class PGlDynamicGeometry implements PDynamicGeometry, AutoCloseable
+public final class PGlDynamicGeometry implements PDynamicGeometry, PGeometrySource, AutoCloseable
 {
 	private PGeometryData geometry;
 	private final Map<Object, Runnable> closeListeners = new IdentityHashMap<>();
@@ -34,6 +36,7 @@ public final class PGlDynamicGeometry implements PDynamicGeometry, AutoCloseable
 		this.geometry = Objects.requireNonNull(geometry);
 	}
 
+	@Override
 	public PGeometryData geometry()
 	{
 		ensureOpen();
@@ -47,13 +50,15 @@ public final class PGlDynamicGeometry implements PDynamicGeometry, AutoCloseable
 		this.geometry = Objects.requireNonNull(geometry);
 	}
 
-	void onClose(Object owner, Runnable listener)
+	@Override
+	public void onClose(Object owner, Runnable listener)
 	{
 		ensureOpen();
-		this.closeListeners.put(owner, listener);
+		this.closeListeners.put(Objects.requireNonNull(owner), Objects.requireNonNull(listener));
 	}
 
-	void removeCloseListener(Object owner)
+	@Override
+	public void removeCloseListener(Object owner)
 	{
 		this.closeListeners.remove(owner);
 	}
@@ -67,7 +72,21 @@ public final class PGlDynamicGeometry implements PDynamicGeometry, AutoCloseable
 		this.closed = true;
 		var listeners = new ArrayList<>(this.closeListeners.values());
 		this.closeListeners.clear();
-		listeners.forEach(Runnable::run);
+		RuntimeException failure = null;
+		for (Runnable listener : listeners)
+			try
+			{
+				listener.run();
+			}
+			catch (RuntimeException exception)
+			{
+				if (failure == null)
+					failure = exception;
+				else
+					failure.addSuppressed(exception);
+			}
+		if (failure != null)
+			throw failure;
 	}
 
 	private void ensureOpen()

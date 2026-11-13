@@ -9,10 +9,15 @@
 
 package com.arcanc.pulselib.content.renderer.rhi;
 
+import com.arcanc.pulselib.content.renderer.gl.PGlDynamicGeometry;
+import com.arcanc.pulselib.content.renderer.legacy.GlDynamicGeometry;
 import com.arcanc.pulselib.content.renderer.plan.PDrawCommand;
 import com.arcanc.pulselib.content.renderer.plan.PDrawGroup;
 import com.arcanc.pulselib.content.renderer.plan.PFrameCompiler;
 import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
+import com.arcanc.pulselib.content.renderer.plan.PGeometrySource;
+import com.arcanc.pulselib.content.renderer.plan.PMeshHandle;
+import com.arcanc.pulselib.content.renderer.plan.PPipelineHandle;
 import com.arcanc.pulselib.content.renderer.plan.PInstanceHeader;
 import com.arcanc.pulselib.content.renderer.plan.PRenderCapabilities;
 import com.arcanc.pulselib.content.renderer.plan.PRenderFrame;
@@ -39,6 +44,8 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vulkan.VulkanBackend;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.renderer.BindGroupLayouts;
+import net.minecraft.client.renderer.rendertype.RenderSetup;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
@@ -122,7 +129,16 @@ public final class RhiGpuChecks
 					!executor.capabilities().matrix().persistentMapping() && !executor.capabilities().matrix().multiDrawIndirect(), "Honest capabilities");
 			var pipeline = pipeline(false);
 			var target = new PRhiMaterial.Attachments(colorView, depthView);
-			var solid = registry.pipeline(new PRhiMaterial(pipeline, () -> target, capacity));
+			var type = RenderType.create("rhi_fixture_solid", RenderSetup.builder(pipeline).createRenderSetup());
+			var material = new PRhiMaterial(pipeline, () -> target, capacity);
+			var solid = registry.pipeline(type, material);
+			RhiLayoutChecks.assertTrue(solid.equals(registry.pipeline(type, material)) && registry.pipelineType(solid) == type,
+					"Native render-type identity binding/cache");
+			var otherType = RenderType.create("rhi_fixture_other", RenderSetup.builder(pipeline).createRenderSetup());
+			var other = registry.pipeline(otherType, material);
+			RhiLayoutChecks.assertTrue(!solid.equals(other) && registry.pipelineType(other) == otherType, "Separate native type identities");
+			expect(IllegalArgumentException.class, () -> registry.pipeline(type, new PRhiMaterial(pipeline(false), () -> target, capacity)));
+			expect(IllegalStateException.class, () -> registry.pipeline(type, new PRhiMaterial(pipeline, () -> target, capacity)));
 			expect(IllegalArgumentException.class, () -> new PRhiMaterial(pipeline(true), () -> target, capacity));
 			var cutout = registry.pipeline(new PRhiMaterial(pipeline(true), () -> target, capacity, Map.of(),
 					Map.of("Sampler0", () -> new PRhiMaterial.Texture(maskView, sampler)), com.arcanc.pulselib.content.renderer.plan.PTransparencyMode.ORDINARY));
@@ -167,8 +183,11 @@ public final class RhiGpuChecks
 				System.out.println("PASS canonical PFrameCompiler -> PRenderPlan -> RHI, 1025 readback pixels");
 				expect(IllegalArgumentException.class, () -> executor.execute(new PRenderPlan(List.of(new PDrawGroup(solid, mesh,
 						new PDrawCommand(4, 1, 3, -1, 0), true, List.of(packed.get(9))))), frame));
-				var oit = registry.pipeline(new PRhiMaterial(pipeline, () -> target, capacity, Map.of(), Map.of(),
+				var oit = registry.pipeline(type, new PRhiMaterial(pipeline, () -> target, capacity, Map.of(), Map.of(),
 						com.arcanc.pulselib.content.renderer.plan.PTransparencyMode.OIT));
+				RhiLayoutChecks.assertTrue(!solid.equals(oit) && registry.pipelineType(oit) == type &&
+						registry.transparency(oit) == com.arcanc.pulselib.content.renderer.plan.PTransparencyMode.OIT,
+						"One native type preserves independent transparency policies");
 				expect(UnsupportedOperationException.class, () -> executor.execute(new PRenderPlan(List.of(new PDrawGroup(oit, mesh,
 						new PDrawCommand(3, 1, 3, -1, 0), true, List.of(packed.get(9))))), frame));
 				System.out.println("PASS invalid index bounds and unsupported OIT rejected before drawing (no alpha fallback)");
@@ -197,6 +216,7 @@ public final class RhiGpuChecks
 				expect(IllegalStateException.class, () -> registry.geometryData(dynamic));
 				expect(IllegalStateException.class, () -> registry.dynamic(source));
 				System.out.println("PASS real dynamic geometry upload/update/draw/close");
+				checkCanonicalSources(device, registry, executor, solid, frame, data, packed.get(9), color, depth);
 			}
 			finally
 			{
@@ -204,9 +224,69 @@ public final class RhiGpuChecks
 			}
 			RhiLayoutChecks.assertTrue(cached.vertices().isClosed() && cached.indices().isClosed(), "Static GPU cleanup");
 			expect(IllegalStateException.class, () -> registry.geometryData(mesh));
+			expect(IllegalStateException.class, () -> registry.pipelineType(solid));
+			expect(IllegalStateException.class, () -> registry.pipelineType(other));
 			RhiLayoutChecks.assertTrue(!color.isClosed() && !mask.isClosed(), "Borrowed material resources retained");
 			System.out.println("PASS static GPU buffers closed, stale handles rejected; borrowed target resources remain open until fixture cleanup");
 		}
+	}
+
+	private static void checkCanonicalSources(GpuDevice device, PRhiResourceRegistry registry, PRhiDrawExecutor executor,
+			PPipelineHandle pipeline, PRenderFrame frame,
+			PGeometryData data, PInstanceHeader header, GpuTexture color, GpuTexture depth)
+	{
+		var facade = new GlDynamicGeometry();
+		facade.vertexBuffer().update(data);
+		var canonical = new PGlDynamicGeometry(data);
+		for (PGeometrySource source : List.of(canonical, facade))
+		{
+			var mesh = registry.dynamic(source);
+			RhiLayoutChecks.assertTrue(mesh.equals(registry.dynamic(source)) && registry.indexCount(mesh) == data.indexCount(), "Canonical source cached");
+			var before = registry.resolve(mesh, data);
+			PGeometryData updated = geometry(-1, true);
+			if (source == facade)
+				facade.vertexBuffer().update(updated);
+			else
+				canonical.update(updated);
+			device.createCommandEncoder().clearColorAndDepthTextures(color, new Vector4f(0, 0, 0, 0), depth, 0);
+			var compiler = new PFrameCompiler<String>();
+			compiler.submit("canonical", pipeline, mesh, new PDrawCommand(3, 1, 3, -1, 0), header, false);
+			executor.execute(compiler.compileOpaque("canonical"), frame);
+			assertPixel(pixels(device, color), 0, color(0));
+			var after = registry.resolve(mesh, updated);
+			RhiLayoutChecks.assertTrue(before.vertices().isClosed() && before.indices().isClosed(), "Canonical update closes previous allocation");
+			if (source == facade)
+			{
+				var alias = registry.dynamic(facade.vertexBuffer());
+				var aliasBuffers = registry.resolve(alias, updated);
+				RhiLayoutChecks.assertTrue(alias.equals(mesh) && aliasBuffers == after, "Facade/native aliases share one handle and GPU allocation");
+				try (var detached = new PRhiResourceRegistry(device))
+				{
+					var detachedMesh = detached.dynamic(facade);
+					detached.resolve(detachedMesh, updated);
+					// Value-equivalent handles must also detach the original identity listener.
+					detached.release(new PMeshHandle(detachedMesh.value()));
+					detached.dynamic(facade);
+				}
+				RhiLayoutChecks.assertTrue(!after.vertices().isClosed() && facade.geometry() == updated, "Other registry cleanup retains source/allocations");
+				facade.close();
+				RhiLayoutChecks.assertTrue(aliasBuffers.vertices().isClosed() && aliasBuffers.indices().isClosed(), "Facade closes shared allocation");
+				expect(IllegalStateException.class, () -> registry.geometryData(alias));
+			}
+			else
+			{
+				canonical.onClose(new Object(), () ->
+				{
+					throw new IllegalStateException("Expected unrelated owner failure");
+				});
+				expect(IllegalStateException.class, canonical::close);
+			}
+			RhiLayoutChecks.assertTrue(after.vertices().isClosed() && after.indices().isClosed(), "Canonical close releases RHI GPU allocation");
+			expect(IllegalStateException.class, () -> registry.geometryData(mesh));
+			expect(IllegalStateException.class, () -> registry.dynamic(source));
+			source.close();
+		}
+		System.out.println("PASS canonical PGlDynamicGeometry/GlDynamicGeometry -> compiler -> RHI pixels, updates, aliases, cross-registry release and listener-failure cleanup");
 	}
 
 	private static void expect(Class<? extends RuntimeException> type, Runnable action)

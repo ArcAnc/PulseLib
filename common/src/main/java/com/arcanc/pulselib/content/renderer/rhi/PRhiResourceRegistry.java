@@ -11,15 +11,19 @@ package com.arcanc.pulselib.content.renderer.rhi;
 
 import com.arcanc.pulselib.content.renderer.plan.PDynamicGeometry;
 import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
+import com.arcanc.pulselib.content.renderer.plan.PGeometrySource;
 import com.arcanc.pulselib.content.renderer.plan.PMeshHandle;
 import com.arcanc.pulselib.content.renderer.plan.PPipelineHandle;
+import com.arcanc.pulselib.content.renderer.plan.PTransparencyMode;
 import com.mojang.blaze3d.IndexType;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.systems.GpuDevice;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
 
 import java.nio.ByteBuffer;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -36,6 +40,8 @@ public final class PRhiResourceRegistry implements AutoCloseable
 	private final GpuDevice device;
 	private final Map<PRhiMaterial, PPipelineHandle> pipelines = new IdentityHashMap<>();
 	private final Map<PPipelineHandle, PRhiMaterial> materials = new HashMap<>();
+	private final Map<RenderType, Map<PTransparencyMode, PPipelineHandle>> renderTypes = new IdentityHashMap<>();
+	private final Map<PPipelineHandle, RenderType> pipelineTypes = new HashMap<>();
 	private final Map<Object, PMeshHandle> sources = new IdentityHashMap<>();
 	private final Map<PMeshHandle, Geometry> meshes = new HashMap<>();
 
@@ -54,12 +60,55 @@ public final class PRhiResourceRegistry implements AutoCloseable
 	public PPipelineHandle pipeline(PRhiMaterial material)
 	{
 		checkThread();
-		return this.pipelines.computeIfAbsent(Objects.requireNonNull(material), source ->
+		return this.pipelines.computeIfAbsent(Objects.requireNonNull(material), this::registerPipeline);
+	}
+
+	/**
+	 * Binds the queue's native render-type identity and explicit transparency policy to RHI pass resources.
+	 * Reuse one material with target/texture suppliers that resolve the current context. Changing pass
+	 * resources requires cleanup/rebinding; silently retaining a previous target would leak GUI/world state.
+	 */
+	public PPipelineHandle pipeline(RenderType type, PRhiMaterial material)
+	{
+		checkThread();
+		Objects.requireNonNull(type);
+		Objects.requireNonNull(material);
+		if (type.pipeline() != material.pipeline())
+			throw new IllegalArgumentException("RHI material does not belong to this native render type");
+		var bindings = this.renderTypes.computeIfAbsent(type, ignored -> new EnumMap<>(PTransparencyMode.class));
+		PPipelineHandle handle = bindings.get(material.transparency());
+		if (handle != null)
 		{
-			PPipelineHandle handle = new PPipelineHandle(nextId());
-			this.materials.put(handle, source);
+			if (this.materials.get(handle) != material)
+				throw new IllegalStateException("Native render type/policy already has different RHI pass resources");
 			return handle;
-		});
+		}
+		handle = registerPipeline(material);
+		bindings.put(material.transparency(), handle);
+		this.pipelineTypes.put(handle, type);
+		return handle;
+	}
+
+	/** Resolves a native queue binding without encoding its transparency policy in a replacement type. */
+	public RenderType pipelineType(PPipelineHandle handle)
+	{
+		checkThread();
+		RenderType type = this.pipelineTypes.get(handle);
+		if (type == null)
+			throw new IllegalStateException("Unknown/stale native RHI render-type binding");
+		return type;
+	}
+
+	public PTransparencyMode transparency(PPipelineHandle handle)
+	{
+		return material(handle).transparency();
+	}
+
+	private PPipelineHandle registerPipeline(PRhiMaterial material)
+	{
+		PPipelineHandle handle = new PPipelineHandle(nextId());
+		this.materials.put(handle, material);
+		return handle;
 	}
 
 	/** Register PBakedMesh.geometry() here; no GPU ownership is added to PBakedMesh. */
@@ -70,11 +119,14 @@ public final class PRhiResourceRegistry implements AutoCloseable
 
 	public PMeshHandle dynamic(PDynamicGeometry source)
 	{
-		if (!(source instanceof PRhiDynamicGeometry dynamic))
+		if (!(source instanceof PGeometrySource dynamic))
 			throw new IllegalArgumentException("Use an explicit CPU-data adapter for this dynamic geometry type");
-		dynamic.geometry();
-		PMeshHandle handle = register(dynamic, dynamic::geometry);
-		dynamic.onClose(this, () -> release(handle));
+		PGeometrySource canonical = Objects.requireNonNull(dynamic.geometrySource());
+		if (canonical.geometrySource() != canonical)
+			throw new IllegalArgumentException("Dynamic geometry facade must resolve to a non-delegating source");
+		canonical.geometry();
+		PMeshHandle handle = register(canonical, canonical::geometry);
+		canonical.onClose(mesh(handle).closeOwner, () -> release(handle));
 		return handle;
 	}
 
@@ -107,6 +159,11 @@ public final class PRhiResourceRegistry implements AutoCloseable
 	public PGeometryData geometryData(PMeshHandle handle)
 	{
 		return Objects.requireNonNull(mesh(handle).source.get(), "Dynamic source returned null geometry");
+	}
+
+	public int indexCount(PMeshHandle handle)
+	{
+		return geometryData(handle).indexCount();
 	}
 
 	Buffers resolve(PMeshHandle handle, PGeometryData data)
@@ -152,8 +209,8 @@ public final class PRhiResourceRegistry implements AutoCloseable
 		if (mesh == null)
 			throw new IllegalArgumentException("Unknown/stale RHI mesh handle");
 		this.sources.remove(mesh.identity);
-		if (mesh.identity instanceof PRhiDynamicGeometry dynamic)
-			dynamic.removeListener(this);
+		if (mesh.identity instanceof PGeometrySource dynamic)
+			dynamic.removeCloseListener(mesh.closeOwner);
 		if (mesh.buffers != null)
 			mesh.buffers.close();
 	}
@@ -175,8 +232,8 @@ public final class PRhiResourceRegistry implements AutoCloseable
 		RuntimeException failure = null;
 		for (Geometry mesh : this.meshes.values())
 		{
-			if (mesh.identity instanceof PRhiDynamicGeometry dynamic)
-				dynamic.removeListener(this);
+			if (mesh.identity instanceof PGeometrySource dynamic)
+				dynamic.removeCloseListener(mesh.closeOwner);
 			if (mesh.buffers != null)
 				try
 				{
@@ -194,6 +251,8 @@ public final class PRhiResourceRegistry implements AutoCloseable
 		this.sources.clear();
 		this.materials.clear();
 		this.pipelines.clear();
+		this.renderTypes.clear();
+		this.pipelineTypes.clear();
 		if (failure != null)
 			throw failure;
 	}
@@ -211,6 +270,7 @@ public final class PRhiResourceRegistry implements AutoCloseable
 
 	private static final class Geometry
 	{
+		private final Object closeOwner = new Object();
 		private final Object identity;
 		private final Supplier<PGeometryData> source;
 		private @Nullable PGeometryData uploaded;

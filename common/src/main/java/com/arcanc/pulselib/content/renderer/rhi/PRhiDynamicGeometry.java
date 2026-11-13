@@ -11,6 +11,7 @@ package com.arcanc.pulselib.content.renderer.rhi;
 
 import com.arcanc.pulselib.content.renderer.plan.PDynamicGeometry;
 import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
+import com.arcanc.pulselib.content.renderer.plan.PGeometrySource;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ import java.util.Objects;
 
 /** Mutable CPU source; GPU allocation belongs exclusively to its registering RHI registry. */
 @ApiStatus.Internal
-public final class PRhiDynamicGeometry implements PDynamicGeometry, AutoCloseable
+public final class PRhiDynamicGeometry implements PDynamicGeometry, PGeometrySource, AutoCloseable
 {
 	private final Thread owner = Thread.currentThread();
 	private final Map<Object, Runnable> listeners = new IdentityHashMap<>();
@@ -32,6 +33,7 @@ public final class PRhiDynamicGeometry implements PDynamicGeometry, AutoCloseabl
 		this.geometry = Objects.requireNonNull(geometry);
 	}
 
+	@Override
 	public PGeometryData geometry()
 	{
 		ensureOpen();
@@ -45,13 +47,15 @@ public final class PRhiDynamicGeometry implements PDynamicGeometry, AutoCloseabl
 		this.geometry = Objects.requireNonNull(geometry);
 	}
 
-	void onClose(Object owner, Runnable listener)
+	@Override
+	public void onClose(Object owner, Runnable listener)
 	{
 		ensureOpen();
-		this.listeners.put(owner, listener);
+		this.listeners.put(Objects.requireNonNull(owner), Objects.requireNonNull(listener));
 	}
 
-	void removeListener(Object owner)
+	@Override
+	public void removeCloseListener(Object owner)
 	{
 		this.listeners.remove(owner);
 	}

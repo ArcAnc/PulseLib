@@ -9,14 +9,20 @@
 
 package com.arcanc.pulselib.content.renderer.rhi;
 
+import com.arcanc.pulselib.content.renderer.gl.PGlDynamicGeometry;
+import com.arcanc.pulselib.content.renderer.legacy.GlDynamicGeometry;
+import com.arcanc.pulselib.content.renderer.plan.PDynamicGeometry;
 import com.arcanc.pulselib.content.renderer.plan.PDrawCommand;
 import com.arcanc.pulselib.content.renderer.plan.PDrawGroup;
+import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
+import com.arcanc.pulselib.content.renderer.plan.PGeometrySource;
 import com.arcanc.pulselib.content.renderer.plan.PInstanceHeader;
 import com.arcanc.pulselib.content.renderer.plan.PMeshHandle;
 import com.arcanc.pulselib.content.renderer.plan.PPipelineHandle;
 import com.arcanc.pulselib.content.renderer.plan.PRenderPlan;
 import org.joml.Matrix4f;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,11 +35,68 @@ public final class RhiLayoutChecks
 			for (int count : new int[]{0, 1, capacity, capacity + 1, 511, 512, 513, 1025})
 				check(capacity, count);
 		checkGroupOrder();
+		checkGeometrySources();
 		expectFailure(() -> new PRhiInstanceLayout(256, 512, 16384));
 		var header = new PInstanceHeader(new Matrix4f(), -1, 0, 0);
 		var group = new PDrawGroup(new PPipelineHandle(1), new PMeshHandle(1), new PDrawCommand(3, 1, 0, 0, 1), true, List.of(header));
 		expectFailure(() -> new PRhiInstanceLayout(256, 128, 16384).pack(new PRenderPlan(List.of(group), List.of(header))));
 		System.out.println("PASS std140 bytes, zero/511/512/513/1025 instances, multiple-group order, packed firstInstance, alignment 256 and full-block padding");
+	}
+
+	private static void checkGeometrySources()
+	{
+		for (Class<?> type : List.of(PGlDynamicGeometry.class, GlDynamicGeometry.class, PRhiDynamicGeometry.class))
+			assertTrue(List.of(type.getInterfaces()).contains(PDynamicGeometry.class), "Original direct marker interface retained");
+		assertTrue(!AutoCloseable.class.isAssignableFrom(GlDynamicGeometry.class) &&
+				AutoCloseable.class.isAssignableFrom(PGlDynamicGeometry.class) &&
+				AutoCloseable.class.isAssignableFrom(PRhiDynamicGeometry.class), "Canonical AutoCloseable assignability retained");
+		var initial = new PGeometryData(ByteBuffer.allocate(0), ByteBuffer.allocate(0), 24, 0, PGeometryData.IndexType.UNSIGNED_INT);
+		var facade = new GlDynamicGeometry();
+		assertTrue(facade.geometry().vertexStride() == 24 && facade.indexCount() == 0, "Canonical empty facade layout");
+		facade.vertexBuffer().update(initial);
+		for (PGeometrySource source : List.of(new PGlDynamicGeometry(initial), facade, new PRhiDynamicGeometry(initial)))
+		{
+			assertTrue(source.geometrySource().geometrySource() == source.geometrySource(), "Non-delegating canonical identity");
+			assertTrue(source.geometry() == initial, "Original CPU data identity");
+			int[] calls = {0};
+			Object replaced = new Object();
+			Object removed = new Object();
+			source.onClose(replaced, () -> calls[0] += 100);
+			source.onClose(replaced, () -> calls[0]++);
+			source.onClose(removed, () -> calls[0] += 100);
+			source.removeCloseListener(removed);
+			source.onClose(new Object(), () ->
+			{
+				calls[0]++;
+				throw new IllegalStateException("Expected first listener failure");
+			});
+			source.onClose(new Object(), () ->
+			{
+				calls[0]++;
+				throw new IllegalStateException("Expected second listener failure");
+			});
+			try
+			{
+				source.close();
+				throw new AssertionError("Listener failure must propagate");
+			}
+			catch (IllegalStateException expected)
+			{
+				assertTrue(expected.getSuppressed().length == 1, "Both listener failures preserved");
+			}
+			source.close();
+			assertTrue(calls[0] == 3, "Every remaining listener runs exactly once despite failures");
+			try
+			{
+				source.geometry();
+				throw new AssertionError("Closed geometry must be rejected");
+			}
+			catch (IllegalStateException expected)
+			{
+				assertTrue(calls[0] == 3, "Closed access cannot repeat callbacks");
+			}
+		}
+		System.out.println("PASS canonical/RHI CPU geometry sources, facade layout, listener replacement/removal, all-listener failure propagation and idempotent close");
 	}
 
 	private static void checkGroupOrder()
