@@ -146,7 +146,16 @@ the `PDynamicGeometry` marker. Canonical facade/native aliases share one GPU all
 updates through `PFrameCompiler`, failed close listeners, multiple registries, value-equivalent release
 handles and stale native bindings after cleanup. Listener failures are intentional assertions and must
 not prevent unrelated GPU owners from releasing buffers. These checks still do not execute production
-deformation algorithms, automatically prepare native RenderSetup resources or select RHI in PRenderQueue.
+deformation algorithms or select RHI in PRenderQueue.
+
+`PRhiNativeMaterial` now provides a frame-driven native material adapter. The GPU fixture supplies real
+`PreparedRenderType` records and GPU resources to its explicit offscreen preparation/output callbacks;
+it does not call `RenderType.prepare()` in a Minecraft game instance. It verifies one immutable pass
+snapshot per pipeline binding/execution across 1025 instances, Sampler0/1/2, scissor, target/texture
+switches, native Fog/Lighting/Globals buffer changes, and missing/duplicate texture rejection. The
+default game preparation/output resolver is compiled but awaits in-game validation. Model-view and
+projection remain owned by `PRenderFrame`; vanilla layering/animated texture transforms are outside
+this PulseLib adapter's contract. No production pipelines/shaders or queue selection are replaced.
 
 The default block holds 128 records of 112 bytes (14336 bytes), below the portable 16 KiB uniform
 block limit. OpenGL's fixture queries its actual block limit and tests 512 records. Native 26.2

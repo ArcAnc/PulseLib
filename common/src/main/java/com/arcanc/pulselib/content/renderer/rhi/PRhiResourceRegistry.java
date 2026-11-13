@@ -42,6 +42,7 @@ public final class PRhiResourceRegistry implements AutoCloseable
 	private final Map<PPipelineHandle, PRhiMaterial> materials = new HashMap<>();
 	private final Map<RenderType, Map<PTransparencyMode, PPipelineHandle>> renderTypes = new IdentityHashMap<>();
 	private final Map<PPipelineHandle, RenderType> pipelineTypes = new HashMap<>();
+	private final Map<PPipelineHandle, Supplier<PRhiPassState>> preparedPasses = new HashMap<>();
 	private final Map<Object, PMeshHandle> sources = new IdentityHashMap<>();
 	private final Map<PMeshHandle, Geometry> meshes = new HashMap<>();
 
@@ -97,6 +98,26 @@ public final class PRhiResourceRegistry implements AutoCloseable
 		if (type == null)
 			throw new IllegalStateException("Unknown/stale native RHI render-type binding");
 		return type;
+	}
+
+	/** Installs a stable preparation callback; it runs once per used binding in each plan execution. */
+	public PPipelineHandle pipeline(RenderType type, PRhiMaterial material, Supplier<PRhiPassState> prepare)
+	{
+		Objects.requireNonNull(prepare);
+		PPipelineHandle handle = pipeline(type, material);
+		Supplier<PRhiPassState> previous = this.preparedPasses.putIfAbsent(handle, prepare);
+		if (previous != null && previous != prepare)
+			throw new IllegalStateException("Native RHI binding already has a different pass preparation callback");
+		return handle;
+	}
+
+	PRhiPassState prepare(PPipelineHandle handle)
+	{
+		PRhiMaterial material = material(handle);
+		Supplier<PRhiPassState> prepare = this.preparedPasses.get(handle);
+		PRhiPassState state = prepare == null ? PRhiPassState.resolve(material) : Objects.requireNonNull(prepare.get());
+		state.validate(material);
+		return state;
 	}
 
 	public PTransparencyMode transparency(PPipelineHandle handle)
@@ -253,6 +274,7 @@ public final class PRhiResourceRegistry implements AutoCloseable
 		this.pipelines.clear();
 		this.renderTypes.clear();
 		this.pipelineTypes.clear();
+		this.preparedPasses.clear();
 		if (failure != null)
 			throw failure;
 	}

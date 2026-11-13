@@ -22,6 +22,7 @@ import com.arcanc.pulselib.content.renderer.plan.PInstanceHeader;
 import com.arcanc.pulselib.content.renderer.plan.PRenderCapabilities;
 import com.arcanc.pulselib.content.renderer.plan.PRenderFrame;
 import com.arcanc.pulselib.content.renderer.plan.PRenderPlan;
+import com.arcanc.pulselib.content.renderer.plan.PTransparencyMode;
 import com.mojang.blaze3d.GpuFormat;
 import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.buffers.GpuBuffer;
@@ -37,13 +38,18 @@ import com.mojang.blaze3d.shaders.UniformType;
 import com.mojang.blaze3d.systems.GpuBackend;
 import com.mojang.blaze3d.systems.GpuDevice;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.systems.ScissorState;
 import com.mojang.blaze3d.textures.AddressMode;
 import com.mojang.blaze3d.textures.FilterMode;
+import com.mojang.blaze3d.textures.GpuSampler;
 import com.mojang.blaze3d.textures.GpuTexture;
+import com.mojang.blaze3d.textures.GpuTextureView;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vulkan.VulkanBackend;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.renderer.BindGroupLayouts;
+import net.minecraft.client.renderer.rendertype.OutputTarget;
+import net.minecraft.client.renderer.rendertype.PreparedRenderType;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;
@@ -217,6 +223,7 @@ public final class RhiGpuChecks
 				expect(IllegalStateException.class, () -> registry.dynamic(source));
 				System.out.println("PASS real dynamic geometry upload/update/draw/close");
 				checkCanonicalSources(device, registry, executor, solid, frame, data, packed.get(9), color, depth);
+				checkNativeMaterial(device, registry, executor, mesh, frame, packed, target, color, maskView, sampler, capacity);
 			}
 			finally
 			{
@@ -229,6 +236,105 @@ public final class RhiGpuChecks
 			RhiLayoutChecks.assertTrue(!color.isClosed() && !mask.isClosed(), "Borrowed material resources retained");
 			System.out.println("PASS static GPU buffers closed, stale handles rejected; borrowed target resources remain open until fixture cleanup");
 		}
+	}
+
+	private static void checkNativeMaterial(GpuDevice device, PRhiResourceRegistry registry, PRhiDrawExecutor executor,
+			PMeshHandle mesh, PRenderFrame frame, List<PInstanceHeader> packed, PRhiMaterial.Attachments firstTarget,
+			GpuTexture firstColor, GpuTextureView visibleMask, GpuSampler sampler, int capacity)
+	{
+		var oldLights = RenderSystem.getShaderLights();
+		var oldFog = RenderSystem.getShaderFog();
+		var oldGlobals = RenderSystem.getGlobalSettingsUniform();
+		try (var secondColor = device.createTexture("RHI native second target", GpuTexture.USAGE_RENDER_ATTACHMENT | GpuTexture.USAGE_COPY_SRC | GpuTexture.USAGE_COPY_DST,
+				GpuFormat.RGBA8_UNORM, SIZE, SIZE, 1, 1);
+				var secondView = device.createTextureView(secondColor);
+				var hidden = device.createTexture("RHI native hidden mask", GpuTexture.USAGE_RENDER_ATTACHMENT | GpuTexture.USAGE_TEXTURE_BINDING | GpuTexture.USAGE_COPY_DST,
+						GpuFormat.RGBA8_UNORM, 1, 1, 1, 1);
+				var hiddenView = device.createTextureView(hidden);
+				var nativeTransforms = device.createBuffer(() -> "Unused native transforms", GpuBuffer.USAGE_UNIFORM, ByteBuffer.allocateDirect(176));
+				var lighting = uniform(device, 1, 0, 1);
+				var fog = uniform(device, 1, 1, 0);
+				var globals = uniform(device, 0, 1, 1);
+				var white = uniform(device, 1, 1, 1))
+		{
+			RenderSystem.setShaderLights(lighting.slice());
+			RenderSystem.setShaderFog(fog.slice());
+			RenderSystem.setGlobalSettingsUniform(globals);
+			device.createCommandEncoder().clearColorTexture(hidden, new Vector4f(0, 0, 0, 0));
+			var pipeline = pipeline(true, true);
+			var type = RenderType.create("rhi_native_prepared", RenderSetup.builder(pipeline).createRenderSetup());
+			var scissor = new ScissorState();
+			scissor.enable(0, 0, SIZE / 2, SIZE);
+			int[] calls = {0, 0};
+			int[] mode = {0};
+			var secondTarget = new PRhiMaterial.Attachments(secondView, firstTarget.depth());
+			var nativeMaterial = new PRhiNativeMaterial(type, capacity, PTransparencyMode.ORDINARY, Map.of(), () ->
+			{
+				calls[0]++;
+				var texture = new PreparedRenderType.Texture("Sampler0", mode[0] == 1 ? hiddenView : visibleMask, sampler);
+				return new PreparedRenderType(pipeline, OutputTarget.MAIN_TARGET, nativeTransforms.slice(), scissor,
+						mode[0] == 3 ? List.of() : mode[0] == 4 ? List.of(texture, texture) :
+								List.of(texture, new PreparedRenderType.Texture("Sampler1", visibleMask, sampler),
+										new PreparedRenderType.Texture("Sampler2", visibleMask, sampler)));
+			}, prepared ->
+			{
+				calls[1]++;
+				// Mutating the original native object cannot change an already captured scissor.
+				scissor.disable();
+				return mode[0] == 0 ? firstTarget : secondTarget;
+			});
+			var handle = nativeMaterial.register(registry);
+			RhiLayoutChecks.assertTrue(handle.equals(nativeMaterial.register(registry)), "Native factory registration cached");
+			var command = new PDrawCommand(3, 1025, 3, -1, 9);
+			var plan = new PRenderPlan(List.of(new PDrawGroup(handle, mesh, command, true, packed.subList(9, packed.size()))), packed);
+			device.createCommandEncoder().clearColorAndDepthTextures(firstColor, new Vector4f(0, 0, 0, 0), firstTarget.depth().texture(), 0);
+			executor.execute(plan, frame);
+			ByteBuffer firstPixels = pixels(device, firstColor);
+			for (int i = 0; i < 1025; i++)
+				assertPixel(firstPixels, i, i % GRID < GRID / 2 ? 0xFF000000 : 0);
+			RhiLayoutChecks.assertTrue(calls[0] == 1 && calls[1] == 1, "Prepare and output resolution once across all chunks");
+			mode[0] = 1;
+			device.createCommandEncoder().clearColorAndDepthTextures(secondColor, new Vector4f(0, 0, 0, 0), firstTarget.depth().texture(), 0);
+			executor.execute(plan, frame);
+			ByteBuffer hiddenPixels = pixels(device, secondColor);
+			for (int i = 0; i < 1025; i++)
+				assertPixel(hiddenPixels, i, 0);
+			mode[0] = 2;
+			RenderSystem.setShaderLights(white.slice());
+			RenderSystem.setShaderFog(white.slice());
+			RenderSystem.setGlobalSettingsUniform(white);
+			executor.execute(plan, frame);
+			ByteBuffer secondPixels = pixels(device, secondColor);
+			for (int i = 0; i < 1025; i++)
+				assertPixel(secondPixels, i, color(i));
+			ByteBuffer retained = pixels(device, firstColor);
+			for (int i = 0; i < 1025; i++)
+				assertPixel(retained, i, i % GRID < GRID / 2 ? 0xFF000000 : 0);
+			RhiLayoutChecks.assertTrue(calls[0] == 3 && calls[1] == 3, "Fresh native bindings for each execution");
+			mode[0] = 3;
+			expect(NullPointerException.class, () -> executor.execute(plan, frame));
+			RhiLayoutChecks.assertTrue(calls[0] == 4 && calls[1] == 3, "Missing native texture rejected before target resolution/draw");
+			mode[0] = 4;
+			expect(IllegalArgumentException.class, () -> executor.execute(plan, frame));
+			RhiLayoutChecks.assertTrue(calls[0] == 5 && calls[1] == 3, "Duplicate native texture rejected before target resolution/draw");
+			RhiLayoutChecks.assertTrue(RenderSystem.getShaderLights().equals(white.slice()) &&
+					RenderSystem.getShaderFog().equals(white.slice()) && RenderSystem.getGlobalSettingsUniform() == white,
+					"Executor does not replace host uniform bindings");
+			System.out.println("PASS prepared native material: one snapshot per execution, scissor, 1025 pixels, targets, Sampler0/1/2, default uniforms, frame ownership and missing/duplicate binding rejection");
+		}
+		finally
+		{
+			RenderSystem.setShaderLights(oldLights);
+			RenderSystem.setShaderFog(oldFog);
+			RenderSystem.setGlobalSettingsUniform(oldGlobals);
+		}
+	}
+
+	private static GpuBuffer uniform(GpuDevice device, float red, float green, float blue)
+	{
+		var bytes = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
+		bytes.putFloat(red).putFloat(green).putFloat(blue).putFloat(1).flip();
+		return device.createBuffer(() -> "Native uniform fixture", GpuBuffer.USAGE_UNIFORM, bytes);
 	}
 
 	private static void checkCanonicalSources(GpuDevice device, PRhiResourceRegistry registry, PRhiDrawExecutor executor,
@@ -329,6 +435,11 @@ public final class RhiGpuChecks
 
 	private static RenderPipeline pipeline(boolean cutout)
 	{
+		return pipeline(cutout, false);
+	}
+
+	private static RenderPipeline pipeline(boolean cutout, boolean nativeDefaults)
+	{
 		var layout = BindGroupLayout.builder().withUniform("InstanceData", UniformType.UNIFORM_BUFFER);
 		if (cutout)
 			layout.withSampler("Sampler0");
@@ -340,6 +451,11 @@ public final class RhiGpuChecks
 				withPrimitiveTopology(PrimitiveTopology.TRIANGLES).withDepthStencilState(DepthStencilState.DEFAULT).withCull(false);
 		if (cutout)
 			pipeline.withShaderDefine("CUTOUT");
+		if (nativeDefaults)
+			pipeline.withBindGroupLayout(BindGroupLayout.builder().withSampler("Sampler1").withSampler("Sampler2").
+					withUniform("Lighting", UniformType.UNIFORM_BUFFER).
+					withUniform("Fog", UniformType.UNIFORM_BUFFER).withUniform("Globals", UniformType.UNIFORM_BUFFER).build()).
+					withShaderDefine("NATIVE_BINDINGS");
 		return pipeline.build();
 	}
 
@@ -401,11 +517,21 @@ public final class RhiGpuChecks
 				#ifdef CUTOUT
 				uniform sampler2D Sampler0;
 				#endif
+				#ifdef NATIVE_BINDINGS
+				uniform sampler2D Sampler1;
+				uniform sampler2D Sampler2;
+				layout(std140) uniform Lighting { vec4 TestLight; };
+				layout(std140) uniform Fog { vec4 TestFog; };
+				layout(std140) uniform Globals { vec4 TestGlobals; };
+				#endif
 				void main() {
 				#ifdef CUTOUT
 				if (texture(Sampler0, vec2(0.5)).a < 0.5) discard;
 				#endif
 				fragColor = vertexColor;
+				#ifdef NATIVE_BINDINGS
+				fragColor *= TestLight * TestFog * TestGlobals * texture(Sampler1, vec2(0.5)) * texture(Sampler2, vec2(0.5));
+				#endif
 				}
 				""";
 	}

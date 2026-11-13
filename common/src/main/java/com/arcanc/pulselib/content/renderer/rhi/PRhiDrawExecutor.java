@@ -11,6 +11,7 @@ package com.arcanc.pulselib.content.renderer.rhi;
 
 import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
 import com.arcanc.pulselib.content.renderer.plan.PMeshHandle;
+import com.arcanc.pulselib.content.renderer.plan.PPipelineHandle;
 import com.arcanc.pulselib.content.renderer.plan.PRenderCapabilities;
 import com.arcanc.pulselib.content.renderer.plan.PRenderExecutor;
 import com.arcanc.pulselib.content.renderer.plan.PRenderFrame;
@@ -97,6 +98,9 @@ public final class PRhiDrawExecutor implements PRenderExecutor
 						(!material.uniforms().containsKey("DeformerOperations") || !material.uniforms().containsKey("DeformerValues")))
 					throw new IllegalArgumentException("Deformed instances require both deformer streams");
 		}
+		Map<PPipelineHandle, PRhiPassState> passes = new HashMap<>();
+		for (PRhiInstanceLayout.Batch batch : packet.batches())
+			passes.computeIfAbsent(batch.group().pipeline(), this.resources::prepare);
 		Std140Builder.intoBuffer(packet.bytes()).putMat4f(frame.modelView()).putVec4(1, 1, 1, 1).
 				putVec3(0, 0, 0).putMat4f(new Matrix4f());
 		packet.bytes().position(packet.projectionOffset());
@@ -111,20 +115,22 @@ public final class PRhiDrawExecutor implements PRenderExecutor
 				var group = batch.group();
 				var material = this.resources.material(group.pipeline());
 				var buffers = this.resources.resolve(group.mesh(), geometry.get(group.mesh()));
-				var target = material.target().get();
+				var state = passes.get(group.pipeline());
+				var target = state.target();
 				try (var pass = encoder.createRenderPass(() -> "PulseLib RHI " + group.mesh().value(),
 						target.color(), Optional.empty(), target.depth(), OptionalDouble.empty()))
 				{
 					pass.setPipeline(material.pipeline());
+					var scissor = state.scissor();
+					if (scissor.enabled())
+						pass.enableScissor(scissor.x(), scissor.y(), scissor.width(), scissor.height());
+					else
+						pass.disableScissor();
 					pass.setUniform("DynamicTransforms", upload.slice(0, 176));
 					pass.setUniform("Projection", upload.slice(packet.projectionOffset(), 64));
 					pass.setUniform("InstanceData", upload.slice(batch.uniformOffset(), (long)this.layout.capacity() * PRhiInstanceLayout.STRIDE));
-					material.uniforms().forEach((name, value) -> pass.setUniform(name, value.get()));
-					material.textures().forEach((name, value) ->
-					{
-						var texture = value.get();
-						pass.bindTexture(name, texture.view(), texture.sampler());
-					});
+					state.uniforms().forEach(pass::setUniform);
+					state.textures().forEach((name, texture) -> pass.bindTexture(name, texture.view(), texture.sampler()));
 					pass.setVertexBuffer(0, buffers.vertices().slice());
 					pass.setIndexBuffer(buffers.indices(), buffers.indexType());
 					pass.drawIndexed(group.command().indexCount(), batch.instanceCount(),
