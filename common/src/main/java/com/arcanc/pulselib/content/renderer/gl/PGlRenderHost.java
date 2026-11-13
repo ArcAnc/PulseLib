@@ -11,33 +11,24 @@ package com.arcanc.pulselib.content.renderer.gl;
 
 import com.arcanc.pulselib.content.renderer.plan.PRenderFrame;
 import com.arcanc.pulselib.content.renderer.plan.PRenderHost;
+import com.arcanc.pulselib.content.renderer.rhi.PRhiRenderHost;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
-import com.mojang.blaze3d.systems.RenderSystem;
 import org.joml.Matrix4f;
 
-import java.util.Map;
-import java.util.WeakHashMap;
-
-/** Captures CPU frame matrices while Minecraft 26.1 stores the active projection in a UBO. */
+/** Compatibility facade over the shared native frame mirror; no OpenGL state is read. */
 public final class PGlRenderHost implements PRenderHost
 {
-	private static final Map<GpuBufferSlice, Matrix4f> PROJECTIONS = new WeakHashMap<>();
 
 	/** Mirrors an actual projection upload, without reading back GPU memory. */
 	public static void recordProjection(GpuBufferSlice buffer, Matrix4f projection)
 	{
-		RenderSystem.assertOnRenderThread();
-		PROJECTIONS.computeIfAbsent(buffer, ignored -> new Matrix4f()).set(projection);
+		PRhiRenderHost.recordProjection(buffer, projection);
 	}
 
 	/** Captures exactly the projection currently bound by the host. */
 	@Override
 	public PRenderFrame captureFrame()
 	{
-		RenderSystem.assertOnRenderThread();
-		Matrix4f projection = PROJECTIONS.get(RenderSystem.getProjectionMatrixBuffer());
-		if (projection == null)
-			throw new IllegalStateException("Active projection was not uploaded through ProjectionMatrixBuffer; supply an explicit PRenderFrame");
-		return new PRenderFrame(RenderSystem.getModelViewMatrix(), projection);
+		return new PRhiRenderHost().captureFrame();
 	}
 }

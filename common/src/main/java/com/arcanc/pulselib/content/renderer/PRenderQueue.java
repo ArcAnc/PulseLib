@@ -16,9 +16,9 @@ import com.arcanc.pulselib.content.model.baked.PGpuDeformedMeshBuffers;
 import com.arcanc.pulselib.content.model.deformer.PMeshDeformation;
 import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
 import com.arcanc.pulselib.content.renderer.gl.PGlMultiDrawExecutor;
-import com.arcanc.pulselib.content.renderer.gl.PGlRenderHost;
 import com.arcanc.pulselib.content.renderer.gl.PGlResourceRegistry;
 import com.arcanc.pulselib.content.renderer.plan.*;
+import com.arcanc.pulselib.content.renderer.rhi.PRhiRenderHost;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
 import com.mojang.blaze3d.pipeline.RenderTarget;
@@ -441,7 +441,7 @@ public final class PRenderQueue
 	public static void flush(RenderStage stage, RenderTarget depthSource)
 	{
 		EXECUTOR.execute(COMPILER.compile(stage, pipeline -> canBatchWithOit(pipeline) && depthSource.useDepth),
-				new PGlRenderHost().captureFrame(), depthSource);
+				new PRhiRenderHost().captureFrame(), depthSource);
 	}
 
 	/** Consumes opaque geometry while retaining transparent submissions for their later pass. */

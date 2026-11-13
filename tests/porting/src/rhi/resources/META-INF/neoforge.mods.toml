@@ -6,3 +6,5 @@ version="1.0.0"
 displayName="PulseLib offscreen RHI fixture (not a distribution)"
 authors="ArcAnc"
 description="Native Blaze3D geometry, instancing and pixel readback checks. No game instance or world."
+[[mixins]]
+config="pulselib-rhi-host.mixins.json"

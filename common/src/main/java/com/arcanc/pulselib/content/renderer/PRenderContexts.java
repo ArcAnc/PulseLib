@@ -10,9 +10,9 @@
 package com.arcanc.pulselib.content.renderer;
 
 import com.arcanc.pulselib.content.renderer.legacy.GlRenderState;
-import com.arcanc.pulselib.content.renderer.gl.PGlRenderHost;
 import com.arcanc.pulselib.content.renderer.plan.PFrameCompiler;
 import com.arcanc.pulselib.content.renderer.plan.PRenderFrame;
+import com.arcanc.pulselib.content.renderer.rhi.PRhiRenderHost;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.GpuTextureView;
 import org.jspecify.annotations.Nullable;
@@ -108,7 +108,7 @@ public final class PRenderContexts
 			this.context = context;
 			boolean local = context == Context.GUI || context == Context.OFFSCREEN;
 			this.state = local ? new GlRenderState() : null;
-			this.frame = local ? new PGlRenderHost().captureFrame() : null;
+			this.frame = local ? new PRhiRenderHost().captureFrame() : null;
 			this.compiler = local ? new PFrameCompiler<>(instance ->
 			{
 				Vector4f position = new Vector4f(instance.transform().m30(), instance.transform().m31(), instance.transform().m32(), 1);

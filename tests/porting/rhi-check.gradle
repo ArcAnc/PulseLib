@@ -29,6 +29,8 @@ gradle.projectsEvaluated
 			include 'com/arcanc/pulselib/content/renderer/plan/*.java'
 			include 'com/arcanc/pulselib/content/renderer/rhi/*.java'
 			include 'com/arcanc/pulselib/content/renderer/gl/PGlDynamicGeometry.java'
+			include 'com/arcanc/pulselib/content/renderer/gl/PGlRenderHost.java'
+			include 'com/arcanc/pulselib/content/mixin/ProjectionMatrixBufferMixin.java'
 			include 'com/arcanc/pulselib/content/renderer/legacy/GlDynamicGeometry.java'
 			include 'com/arcanc/pulselib/content/model/baked/PBakedMesh.java'
 			include 'com/arcanc/pulselib/content/model/PMeshPrimitive.java'

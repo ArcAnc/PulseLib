@@ -19,10 +19,10 @@ import com.arcanc.pulselib.content.renderer.plan.PFrameCompiler;
 import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
 import com.arcanc.pulselib.content.renderer.plan.PInstanceHeader;
 import com.arcanc.pulselib.content.renderer.plan.PPipelineHandle;
-import com.arcanc.pulselib.content.renderer.plan.PRenderFrame;
 import com.arcanc.pulselib.content.renderer.plan.PRenderPlan;
 import com.arcanc.pulselib.content.renderer.plan.PTransparencyMode;
 import com.mojang.blaze3d.GpuFormat;
+import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.systems.GpuDevice;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -31,6 +31,7 @@ import com.mojang.blaze3d.textures.AddressMode;
 import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.textures.GpuTexture;
 import de.javagl.jgltf.model.GltfConstants;
+import net.minecraft.client.renderer.ProjectionMatrixBuffer;
 import net.minecraft.client.renderer.rendertype.OutputTarget;
 import net.minecraft.client.renderer.rendertype.PreparedRenderType;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
@@ -58,6 +59,9 @@ final class RhiProfileChecks
 	static void run(GpuDevice device, int capacity, int uniformLimit)
 	{
 		var previousLights = RenderSystem.getShaderLights();
+		var previousProjection = RenderSystem.getProjectionMatrixBuffer();
+		var previousType = RenderSystem.getProjectionType();
+		var previousModelView = RenderSystem.getModelViewMatrixCopy();
 		var profiles = capacity == PRhiInstanceLayout.PORTABLE_CAPACITY ? PRhiPipelines.portable() : new PRhiPipelines(capacity);
 		var ids = new HashSet<Identifier>();
 		profiles.register(pipeline -> RhiLayoutChecks.assertTrue(ids.add(pipeline.getLocation()), "Unique production profile IDs"));
@@ -76,9 +80,12 @@ final class RhiProfileChecks
 				var lightmapView = device.createTextureView(lightmap);
 				var sampler = device.createSampler(AddressMode.CLAMP_TO_EDGE, AddressMode.CLAMP_TO_EDGE, FilterMode.NEAREST, FilterMode.NEAREST, 1, OptionalDouble.empty());
 				var nativeTransforms = device.createBuffer(() -> "Unused native transforms", GpuBuffer.USAGE_UNIFORM, ByteBuffer.allocateDirect(176));
-				var lighting = lighting(device))
+				var lighting = lighting(device);
+				var camera = new ProjectionMatrixBuffer("Production profile frame"))
 		{
 			RenderSystem.setShaderLights(lighting.slice());
+			RenderSystem.getModelViewStack().translation(0.25f, 0, 0);
+			RenderSystem.setProjectionMatrix(camera.getBuffer(new Matrix4f().translation(-0.25f, 0, 0)), ProjectionType.ORTHOGRAPHIC);
 			var encoder = device.createCommandEncoder();
 			encoder.writeToTexture(overlay, overlayPixels(), 0, 0, 0, 0, 16, 16);
 			encoder.writeToTexture(lightmap, lightPixels(), 0, 0, 0, 0, 16, 16);
@@ -94,7 +101,7 @@ final class RhiProfileChecks
 			{
 				RhiLayoutChecks.assertTrue(expected.getMessage().contains("capacities differ"), "Capacity checked against shader define");
 			}
-			var frame = new PRenderFrame(new Matrix4f(), new Matrix4f());
+			var frame = new PRhiRenderHost().captureFrame();
 			try
 			{
 				for (boolean emissive : new boolean[]{false, true})
@@ -148,7 +155,7 @@ final class RhiProfileChecks
 							RhiLayoutChecks.assertTrue(expected.getMessage().contains("deformer streams"), "Explicit unsupported-deformation rejection");
 						}
 						System.out.println("PASS production " + (emissive ? "emissive " : "lit ") + (cutout ? "cutout" : "solid") +
-								": 1025 baked-mesh pixels, 24-byte vertices, UV/color/light/overlay, normal/backface update and forced alpha/cutout");
+								": 1025 baked-mesh pixels, native captured frame, 24-byte vertices, UV/color/light/overlay, normal/backface update and forced alpha/cutout");
 					}
 			}
 			finally
@@ -159,6 +166,8 @@ final class RhiProfileChecks
 		finally
 		{
 			RenderSystem.setShaderLights(previousLights);
+			RenderSystem.setProjectionMatrix(previousProjection, previousType);
+			RenderSystem.getModelViewStack().set(previousModelView);
 		}
 	}
 

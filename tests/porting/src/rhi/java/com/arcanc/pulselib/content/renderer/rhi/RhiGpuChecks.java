@@ -101,6 +101,7 @@ public final class RhiGpuChecks
 			};
 			device = backend.createDevice(window, shaders, new GpuDebugOptions(1, true, true, false), () -> {});
 			RenderSystem.initRenderer(device);
+			RhiHostChecks.run(device);
 			int uniformLimit = args[0].equals("Vulkan") ? Integer.parseInt(args[2]) : GL31.glGetInteger(GL31.GL_MAX_UNIFORM_BLOCK_SIZE);
 			System.out.println("GPU " + device.getDeviceInfo().name() + " / " + device.getDeviceInfo().backendName() +
 					" alignment=" + device.getDeviceInfo().limits().minUniformOffsetAlignment() + " blockLimit=" + uniformLimit);
