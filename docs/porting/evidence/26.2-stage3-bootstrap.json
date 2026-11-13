@@ -49,7 +49,7 @@
     "common/src/main/java/com/arcanc/pulselib/content/mixin/FeatureRenderDispatcherMixin.java": "98925d975ebab134889134b160ee7b0d9dc36dbb909da81d46b685d685d5a37d",
     "common/src/main/java/com/arcanc/pulselib/content/mixin/GameRendererMixin.java": "2a3f4153b27cfc18e4a64eec40be67066ef7a8d4bd9f36f99a4ee1396a574dc7",
     "common/src/main/java/com/arcanc/pulselib/content/mixin/HumanoidArmorLayerMixin.java": "5480bebbbebef16bc591683b42f2fa19c7483b387030c84b9a025474f34b3aa0",
-    "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemInHandRendererMixin.java": "b2c8e184caecd3889b655212f0ec0e80f98a560bd08b1a0fa1617782eeb31d01",
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemInHandRendererMixin.java": "126e4bf7aae26ddf30ee69b31b4aebd8da8b458fdf3832a616b94522627de970",
     "common/src/main/java/com/arcanc/pulselib/content/mixin/LevelRendererMixin.java": "0f40ba1c31829c15d7c644ba40c833eb427b686d19924a55b15942c8a03baece",
     "common/src/main/java/com/arcanc/pulselib/content/mixin/PictureInPictureRendererMixin.java": "9254d93d3c74474c09588001127bae5d01767a2df1df3f413285a7e33bb84c2b",
     "common/src/main/java/com/arcanc/pulselib/content/mixin/WeatherEffectRendererMixin.java": "bc4df8fe129d8fc2849bd56147b0e8a40dca8dcbcc390c027cbcb7d391e8712b",
@@ -145,5 +145,19 @@
   ],
   "screenshot": "26.2-stage3-bootstrap-opengl.png: actual fresh test world pause menu, not a Pulse model/rendering assertion",
   "user_saves": "UNTOUCHED: all client work directories under build; one new isolated test world created/saved there",
-  "next": "Continue stage 3: validate committed clean NeoForge tree, actual Pulse model queue/default preparation game checks; resolve required shader attribute layout without disabling pipelines or Vulkan; full GUI/world/player/OIT acceptance stays in later stages"
+  "next": "Continue stage 3: validate committed clean NeoForge tree, actual Pulse model queue/default preparation game checks; resolve required shader attribute layout without disabling pipelines or Vulkan; full GUI/world/player/OIT acceptance stays in later stages",
+  "clean_checkout_build": {
+    "commit": "9b386ae9a13f9e5a2e8b5414af0bbffca90c6ab0",
+    "command": "./gradlew :common:compileJava :neoforge:build :fabric:build --no-parallel --no-daemon --console=plain",
+    "exit_code": 0,
+    "source_exclusions": false,
+    "user_changes_included": false
+  },
+  "NeoForge_hand_erasure": {
+    "source_type": "AvatarlikeEntity extends Avatar & ClientAvatarEntity",
+    "erased_type": "net.minecraft.world.entity.Avatar",
+    "initial_full_bootstrap": "FAIL group expected 1, matched 0: AbstractClientPlayer source argument was not the descriptor",
+    "correction": "actual Avatar descriptor and private handler/helper argument types, no suppression",
+    "runtime_recheck": "pending final audit"
+  }
 }

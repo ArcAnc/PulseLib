@@ -1,0 +1,139 @@
+@author ArcAnc
+Created at: 13.11.2026
+Copyright (c) 2026
+This code is licensed under "Arc's License of Common Sense" (LICENSE.txt).
+
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.6.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build
+> Task :buildSrc:extractPluginRequests FROM-CACHE
+> Task :buildSrc:generatePluginAdapters FROM-CACHE
+> Task :buildSrc:compileJava FROM-CACHE
+> Task :buildSrc:compileGroovy FROM-CACHE
+> Task :buildSrc:compileGroovyPlugins FROM-CACHE
+> Task :buildSrc:pluginDescriptors
+> Task :buildSrc:processResources
+> Task :buildSrc:classes
+> Task :buildSrc:jar
+
+> Configure project :fabric
+Fabric Loom: 1.17.21
+
+> Task :common:createMinecraftArtifacts
+Loaded 111 artifacts from $WORKSPACE/build/porting/clean-bootstrap/common/build/tmp/createMinecraftArtifacts/nfrt_artifact_manifest.properties
+*** Started working on downloadManifest
+  ↓ https://launchermeta.mojang.com/mc/game/version_manifest_v2.json
+ ✓ Completed downloadManifest in 0.36s
+*** Started working on downloadJson
+ ✓ Completed downloadJson in 0.00s
+*** Started working on downloadClient
+*** Started working on downloadServer
+ ✓ Completed downloadClient in 0.03s
+ ✓ Completed downloadServer in 0.03s
+*** Started working on preProcessJar
+ ♻ Used cache of preProcessJar in 0.00s
+*** Started working on decompile
+ ♻ Used cache of decompile in 0.00s
+*** Started working on patch
+ ♻ Used cache of patch in 0.00s
+*** Started working on transformSources
+ ♻ Used cache of transformSources in 0.00s
+*** Started working on recompile
+ ♻ Used cache of recompile in 0.00s
+*** Started working on mergeWithSources
+ ♻ Used cache of mergeWithSources in 0.00s
+ Deleted 42 outdated lock files
+Total runtime: 3.18s
+
+
+> Task :common:compileJava
+$WORKSPACE/build/porting/clean-bootstrap/common/src/main/java/com/arcanc/pulselib/plugin/PulsePluginManager.java:290: warning: [removal] ThreadDeath in java.lang has been deprecated and marked for removal
+        if (cause instanceof ThreadDeath fatal)
+                             ^
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+1 warning
+
+> Task :neoforge:createMinecraftArtifacts
+Loaded 137 artifacts from $WORKSPACE/build/porting/clean-bootstrap/neoforge/build/tmp/createMinecraftArtifacts/nfrt_artifact_manifest.properties
+*** Started working on downloadManifest
+  ↓ https://launchermeta.mojang.com/mc/game/version_manifest_v2.json
+ ✓ Completed downloadManifest in 0.37s
+*** Started working on downloadJson
+ ✓ Completed downloadJson in 0.00s
+*** Started working on downloadServer
+*** Started working on downloadClient
+ ✓ Completed downloadClient in 0.04s
+ ✓ Completed downloadServer in 0.04s
+*** Started working on preProcessJar
+ ♻ Used cache of preProcessJar in 0.00s
+*** Started working on decompile
+ ♻ Used cache of decompile in 0.00s
+*** Started working on patch
+ ♻ Used cache of patch in 0.00s
+*** Started working on applyNeoforgePatches
+ ♻ Used cache of applyNeoforgePatches in 0.00s
+*** Started working on transformSources
+ ♻ Used cache of transformSources in 0.00s
+*** Started working on recompile
+ ♻ Used cache of recompile in 0.00s
+*** Started working on mergeWithSources
+ ♻ Used cache of mergeWithSources in 0.00s
+Total runtime: 2.04s
+
+
+> Task :neoforge:compileJava
+$WORKSPACE/build/porting/clean-bootstrap/common/src/main/java/com/arcanc/pulselib/plugin/PulsePluginManager.java:290: warning: [removal] ThreadDeath in java.lang has been deprecated and marked for removal
+        if (cause instanceof ThreadDeath fatal)
+                             ^
+Note: $WORKSPACE/build/porting/clean-bootstrap/common/src/main/java/com/arcanc/pulselib/platform/PClientRenderHooks.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+1 warning
+
+> Task :neoforge:processResources
+> Task :neoforge:classes
+> Task :neoforge:jarJar
+> Task :neoforge:jar
+> Task :neoforge:javadoc
+> Task :neoforge:javadocJar
+> Task :neoforge:sourcesJar
+> Task :neoforge:assemble
+> Task :neoforge:compileTestJava NO-SOURCE
+> Task :neoforge:processTestResources NO-SOURCE
+> Task :neoforge:testClasses UP-TO-DATE
+> Task :neoforge:test NO-SOURCE
+> Task :neoforge:check UP-TO-DATE
+> Task :neoforge:build
+
+> Task :fabric:compileJava
+$WORKSPACE/build/porting/clean-bootstrap/common/src/main/java/com/arcanc/pulselib/plugin/PulsePluginManager.java:290: warning: [removal] ThreadDeath in java.lang has been deprecated and marked for removal
+        if (cause instanceof ThreadDeath fatal)
+                             ^
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+1 warning
+
+> Task :fabric:processResources
+> Task :fabric:classes
+
+> Task :fabric:processIncludeJars
+(2.13.2.1) is not valid semver for dependency com.fasterxml.jackson.core:jackson-databind:2.13.2.1
+
+> Task :fabric:jar
+> Task :fabric:javadoc
+> Task :fabric:javadocJar
+> Task :fabric:sourcesJar
+> Task :fabric:assemble
+> Task :fabric:compileTestJava NO-SOURCE
+> Task :fabric:processTestResources NO-SOURCE
+> Task :fabric:testClasses UP-TO-DATE
+> Task :fabric:test NO-SOURCE
+> Task :fabric:validateAccessWidener
+> Task :fabric:check
+> Task :fabric:build
+
+[Incubating] Problems report is available at: file:///mnt/MainDrive/Programs/MC%20mods/ArcsLib/build/porting/clean-bootstrap/build/reports/problems/problems-report.html
+
+BUILD SUCCESSFUL in 37s
+26 actionable tasks: 21 executed, 5 from cache

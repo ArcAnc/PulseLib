@@ -25,6 +25,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.PlayerModelPart;
@@ -154,14 +155,14 @@ public abstract class ItemInHandRendererMixin
 	 */
 	@Group(name = "pulselib$rightHand", min = 1, max = 1)
 	@WrapOperation(require = 0, method = "renderPlayerArm", at = @At(value = "INVOKE", target =
-			"Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderRightHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;ZLnet/minecraft/client/player/AbstractClientPlayer;)V"))
+			"Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderRightHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;ZLnet/minecraft/world/entity/Avatar;)V"))
 	private void pulselib$renderRightHand(AvatarRenderer<?> renderer,
 	                                      PoseStack poseStack,
 	                                      SubmitNodeCollector submitNodeCollector,
 	                                      int packedLight,
 	                                      Identifier skin,
 	                                      boolean sleeve,
-	                                      AbstractClientPlayer player,
+	                                      Avatar player,
 	                                      Operation<Void> original)
 	{
 		pulseLib$renderArm(renderer, poseStack, submitNodeCollector, packedLight, skin, sleeve, player, original);
@@ -180,14 +181,14 @@ public abstract class ItemInHandRendererMixin
 	 */
 	@Group(name = "pulselib$leftHand", min = 1, max = 1)
 	@WrapOperation(require = 0, method = "renderPlayerArm", at = @At(value = "INVOKE", target =
-			"Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderLeftHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;ZLnet/minecraft/client/player/AbstractClientPlayer;)V"))
+			"Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;renderLeftHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;ZLnet/minecraft/world/entity/Avatar;)V"))
 	private void pulselib$renderLeftHand(AvatarRenderer<?> renderer,
 	                                    PoseStack poseStack,
 	                                    SubmitNodeCollector submitNodeCollector,
 	                                    int packedLight,
 	                                    Identifier skin,
 	                                    boolean sleeve,
-	                                    AbstractClientPlayer player,
+	                                    Avatar player,
 	                                    Operation<Void> original)
 	{
 		pulseLib$renderArm(renderer, poseStack, submitNodeCollector, packedLight, skin, sleeve, player, original);
@@ -233,7 +234,7 @@ public abstract class ItemInHandRendererMixin
 	                                       int packedLight,
 	                                       Identifier skin,
 	                                       boolean sleeve,
-	                                       @Nullable AbstractClientPlayer player,
+	                                       @Nullable Avatar player,
 	                                       Operation<Void> original)
 	{
 		PFirstPersonRenderContext context = PFirstPersonRenderContexts.current();
@@ -271,7 +272,7 @@ public abstract class ItemInHandRendererMixin
 	/** Preserves the native invocation arity without changing shared pose handling. */
 	@Unique
 	private static void pulseLib$submitArm(AvatarRenderer<?> renderer, PoseStack poses, SubmitNodeCollector collector,
-	                                       int light, Identifier skin, boolean sleeve, @Nullable AbstractClientPlayer player,
+	                                       int light, Identifier skin, boolean sleeve, @Nullable Avatar player,
 	                                       Operation<Void> original)
 	{
 		if (player == null)
