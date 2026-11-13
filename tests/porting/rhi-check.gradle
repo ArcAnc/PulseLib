@@ -37,6 +37,7 @@ gradle.projectsEvaluated
 			include 'com/arcanc/pulselib/content/model/textures/PAlphaMode.java'
 		}
 		source root.file('tests/porting/src/rhi/java')
+		source neo.file('src/main/java/com/arcanc/pulselib/neoforge/NeoForgeRhiPipelines.java')
 		classpath = common.files(common.configurations.compileClasspath, external)
 		javaCompiler = common.javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(25) }
 		options.release = 25
@@ -88,7 +89,8 @@ gradle.projectsEvaluated
 			description = 'Real offscreen Blaze3D GPU readback fixture; not a production game client.'
 			classpath = neo.files(jar.flatMap { it.archiveFile }, runtime)
 			mainClass = 'com.arcanc.pulselib.content.renderer.rhi.RhiFixtureLauncher'
-			args backend, (backend == 'Vulkan' ? root.providers.gradleProperty('portingRhiVulkanCapacity').getOrElse('128') : '512'),
+			args backend, (backend == 'Vulkan' ? root.providers.gradleProperty('portingRhiVulkanCapacity').getOrElse('128') :
+					root.providers.gradleProperty('portingRhiOpenGLCapacity').getOrElse('512')),
 					root.providers.gradleProperty('portingRhiVulkanUniformLimit').getOrElse('16384')
 			jvmArgs '--enable-native-access=ALL-UNNAMED', '--sun-misc-unsafe-memory-access=allow',
 					'--add-opens=java.base/java.lang.invoke=ALL-UNNAMED', '--add-exports=jdk.naming.dns/com.sun.jndi.dns=java.naming'

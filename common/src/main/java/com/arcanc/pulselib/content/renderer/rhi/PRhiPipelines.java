@@ -39,6 +39,12 @@ public final class PRhiPipelines
 	private final int instanceCapacity;
 	private final RenderPipeline[] pipelines = new RenderPipeline[4];
 
+	/** Shared definitions used by loader registration and subsequent material/queue bindings. */
+	public static PRhiPipelines portable()
+	{
+		return Portable.INSTANCE;
+	}
+
 	public PRhiPipelines(int instanceCapacity)
 	{
 		if (instanceCapacity < 1 || instanceCapacity > 512)
@@ -96,5 +102,10 @@ public final class PRhiPipelines
 	private static Identifier id(String path)
 	{
 		return Identifier.fromNamespaceAndPath("pulselib", path);
+	}
+
+	private static final class Portable
+	{
+		private static final PRhiPipelines INSTANCE = new PRhiPipelines(PRhiInstanceLayout.PORTABLE_CAPACITY);
 	}
 }

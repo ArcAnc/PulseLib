@@ -60,6 +60,7 @@ public final class NeoForgeClientLifecycle
 				renderer.renderLeftHand(pose, collector, light, skin, sleeve, player);
 		});
 		bus.addListener((RegisterRenderPipelinesEvent event) -> PRenderTypes.register(event::registerPipeline));
+		bus.addListener(NeoForgeRhiPipelines::register);
 		bus.addListener(NeoForgeClientLifecycle::registerAtlases);
 		bus.addListener((RegisterPictureInPictureRenderersEvent event) -> event.register(PModelGuiRenderState.class, PModelGuiRenderer::new));
 		bus.addListener(NeoForgeClientLifecycle::addLayers);

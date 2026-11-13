@@ -75,6 +75,7 @@ public final class RhiGpuChecks
 	public static void main(String[] args) throws Exception
 	{
 		SharedConstants.tryDetectVersion();
+		RhiRegistrationChecks.run();
 		NativeLibrariesBootstrap.loadLibraries();
 		RenderSystem.initRenderThread();
 		var errors = GLFWErrorCallback.createPrint(System.err).set();

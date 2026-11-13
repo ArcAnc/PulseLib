@@ -168,7 +168,22 @@ For these tests only, the fixture JAR includes unmodified vanilla shader imports
 Minecraft compile artifact: FML class loading does not provide the game's ResourceManager asset view.
 Production and vanilla asset bytes are checked against their sources. The normal loader resource
 tasks package the new production vertex shader and unchanged canonical fragment shader for both
-loaders. These checks do not constitute production pipeline registration or in-game world rendering.
+loaders. These GPU runs do not execute complete production client initialization or in-game world rendering.
+
+The production client lifecycle now registers the shared `PRhiPipelines.portable()` definitions through
+loader-local helpers. To check the Fabric helper in the actual Knot CLIENT game loader, with the
+unmodified production access widener, run:
+
+```bash
+./gradlew --init-script tests/porting/rhi-check.gradle --init-script tests/porting/rhi-loader-check.gradle :fabric:checkPortingRhiRegistration :fabric:validateAccessWidener --no-parallel --no-daemon --console=plain
+```
+
+This isolated fixture checks four new entries in the real native RenderPipelines registry, shared
+object identity, and game-class-loader ownership. It stops after Knot initialization, before launching
+Minecraft. The normal RHI GPU fixture also posts a real NeoForge RegisterRenderPipelinesEvent through
+a native mod event bus to the production helper. Neither fixture executes the complete production
+client entrypoint. Use `-PportingRhiOpenGLCapacity=128` to run OpenGL readback with the same shared
+portable definitions used by registration; Vulkan's default 128 already uses those definitions.
 
 The default block holds 128 records of 112 bytes (14336 bytes), below the portable 16 KiB uniform
 block limit. OpenGL's fixture queries its actual block limit and tests 512 records. Native 26.2

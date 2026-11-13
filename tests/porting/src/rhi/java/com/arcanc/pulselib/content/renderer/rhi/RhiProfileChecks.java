@@ -58,7 +58,7 @@ final class RhiProfileChecks
 	static void run(GpuDevice device, int capacity, int uniformLimit)
 	{
 		var previousLights = RenderSystem.getShaderLights();
-		var profiles = new PRhiPipelines(capacity);
+		var profiles = capacity == PRhiInstanceLayout.PORTABLE_CAPACITY ? PRhiPipelines.portable() : new PRhiPipelines(capacity);
 		var ids = new HashSet<Identifier>();
 		profiles.register(pipeline -> RhiLayoutChecks.assertTrue(ids.add(pipeline.getLocation()), "Unique production profile IDs"));
 		RhiLayoutChecks.assertTrue(ids.size() == 4 && PRhiPipelines.POSITION_TEX_NORMAL.getVertexSize() == 24, "Four profiles, canonical stride 24");
