@@ -1,0 +1,54 @@
+@author ArcAnc
+Created at: 13.11.2026
+Copyright (c) 2026
+This code is licensed under "Arc's License of Common Sense" (LICENSE.txt).
+
+--- parent/common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderSubmitMixin.java
++++ working/common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderSubmitMixin.java
+@@ -1,2 +1,2 @@
+-TYPE @Mixin(SubmitNodeStorage.ModelSubmit.class) public abstract class ArmorProviderSubmitMixin implements PArmorModelSnapshots.Node
++TYPE @Mixin(ModelFeatureRenderer.Submit.class) public abstract class ArmorProviderSubmitMixin implements PArmorModelSnapshots.Node
+    METHOD @Override public PArmorModelSnapshots.@Nullable Entry pulselib$getArmorProvider()
+--- parent/common/src/main/java/com/arcanc/pulselib/content/mixin/CommandEncoderPassMixin.java
++++ working/common/src/main/java/com/arcanc/pulselib/content/mixin/CommandEncoderPassMixin.java
+@@ -0,0 +1 @@
++TYPE @Mixin(CommandEncoder.class) public abstract class CommandEncoderPassMixin
+--- parent/common/src/main/java/com/arcanc/pulselib/content/mixin/GlDeviceFrameBufferAccessor.java
++++ working/common/src/main/java/com/arcanc/pulselib/content/mixin/GlDeviceFrameBufferAccessor.java
+@@ -0,0 +1,2 @@
++TYPE @Mixin(targets = "com.mojang.blaze3d.opengl.GlDevice") public interface GlDeviceFrameBufferAccessor
++   METHOD @Accessor("frameBufferCache") FrameBufferCache pulselib$getFrameBufferCache();
+--- parent/common/src/main/java/com/arcanc/pulselib/content/mixin/GpuDeviceAccessor.java
++++ working/common/src/main/java/com/arcanc/pulselib/content/mixin/GpuDeviceAccessor.java
+@@ -0,0 +1,2 @@
++TYPE @Mixin(GpuDevice.class) public interface GpuDeviceAccessor
++   METHOD @Accessor("backend") GpuDeviceBackend pulselib$getBackend();
+--- parent/common/src/main/java/com/arcanc/pulselib/content/mixin/ItemSubmitMixin.java
++++ working/common/src/main/java/com/arcanc/pulselib/content/mixin/ItemSubmitMixin.java
+@@ -1 +1 @@
+-TYPE @Mixin(SubmitNodeStorage.ItemSubmit.class) public abstract class ItemSubmitMixin
++TYPE @Mixin(ItemFeatureRenderer.Submit.class) public abstract class ItemSubmitMixin
+--- parent/common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java
++++ working/common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java
+@@ -1 +1 @@
+-TYPE @Mixin(ModelPartFeatureRenderer.class) public abstract class ModelPartFeatureRendererMixin
++TYPE @Mixin(ModelFeatureRenderer.class) public abstract class ModelPartFeatureRendererMixin
+--- parent/common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartSubmitMixin.java
++++ working/common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartSubmitMixin.java
+@@ -1,2 +1,2 @@
+-TYPE @Mixin(SubmitNodeStorage.ModelPartSubmit.class) public abstract class ModelPartSubmitMixin implements PModelPartSubmitState
++TYPE @Mixin(ModelFeatureRenderer.Submit.class) public abstract class ModelPartSubmitMixin implements PModelPartSubmitState
+    METHOD @Override public PModelPartSnapshot pulselib$getModelPartPose()
+--- parent/common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelSubmitMixin.java
++++ working/common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelSubmitMixin.java
+@@ -1,2 +1,2 @@
+-TYPE @Mixin(SubmitNodeStorage.ModelSubmit.class) public abstract class PlayerModelSubmitMixin implements PPlayerModelSubmitState
++TYPE @Mixin(ModelFeatureRenderer.Submit.class) public abstract class PlayerModelSubmitMixin implements PPlayerModelSubmitState
+    METHOD @Override public @Nullable Entry pulselib$getModelGeometry()
+--- parent/common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/PRhiRenderPassTracker.java
++++ working/common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/PRhiRenderPassTracker.java
+@@ -0,0 +1,4 @@
++TYPE @ApiStatus.Internal public final class PRhiRenderPassTracker
++   METHOD public static synchronized void opened(CommandEncoder encoder)
++   METHOD public static synchronized void closed(CommandEncoder encoder)
++   METHOD public static synchronized boolean hasActivePass()

@@ -9,11 +9,14 @@
 
 package com.arcanc.pulselib.content.renderer.gl;
 
+import com.arcanc.pulselib.content.mixin.GlDeviceFrameBufferAccessor;
+import com.arcanc.pulselib.content.mixin.GpuDeviceAccessor;
 import com.arcanc.pulselib.content.renderer.legacy.GlRenderState;
 import com.arcanc.pulselib.platform.PClientRenderHooks;
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.mojang.blaze3d.GpuFormat;
+import com.mojang.blaze3d.opengl.FrameBufferCache;
 import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.opengl.GlTexture;
 import com.mojang.blaze3d.opengl.GlTextureView;
@@ -26,8 +29,8 @@ import com.mojang.blaze3d.textures.GpuTextureView;
 import org.jspecify.annotations.Nullable;
 import org.lwjgl.opengl.*;
 
-import java.util.OptionalInt;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Provides support for gl weighted blended oit.
@@ -229,9 +232,9 @@ public final class PGlWeightedBlendedOit
 		attachDepth(this.depthTexture, this.depthStencil);
 		GL20.glDrawBuffers(new int[]{GL30.GL_COLOR_ATTACHMENT0});
 		GlStateManager._disableScissorTest();
-		GlStateManager._enableBlend();
+		GlStateManager._enableBlend(0);
 		configureMinimumBlend(0);
-		GL30.glDisablei(GL11.GL_BLEND, 1);
+		GlStateManager._disableBlend(1);
 		GlStateManager._enableDepthTest();
 		GlStateManager._depthFunc(GL11.GL_LEQUAL);
 		GlStateManager._depthMask(false);
@@ -256,7 +259,8 @@ public final class PGlWeightedBlendedOit
 		attachDepth(this.depthTexture, this.depthStencil);
 		GL20.glDrawBuffers(new int[]{GL30.GL_COLOR_ATTACHMENT0, GL30.GL_COLOR_ATTACHMENT1});
 		GlStateManager._disableScissorTest();
-		GlStateManager._enableBlend();
+		GlStateManager._enableBlend(0);
+		GlStateManager._enableBlend(1);
 		configureAdditiveBlend(0);
 		configureAdditiveBlend(1);
 		GlStateManager._enableDepthTest();
@@ -303,7 +307,7 @@ public final class PGlWeightedBlendedOit
 		validateDestination(colorAttachment);
 		GlRenderState state = new GlRenderState();
 		try (RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-				() -> "PulseLib weighted OIT composite", colorAttachment, OptionalInt.empty()))
+				() -> "PulseLib weighted OIT composite", colorAttachment, Optional.empty()))
 		{
 			pass.setPipeline(PRenderTypes.RenderPipelinesProvider.OIT_COMPOSITE);
 			pass.disableScissor();
@@ -315,7 +319,7 @@ public final class PGlWeightedBlendedOit
 				pass.bindTexture("AccumSampler", accumulationView(layer), sampler);
 				pass.bindTexture("RevealSampler", revealageView(layer), sampler);
 				pass.bindTexture("DepthSampler", layerDepthView(layer), sampler);
-				pass.draw(0, 3);
+				pass.draw(3, 1, 0, 0);
 			}
 		}
 		finally
@@ -366,16 +370,16 @@ public final class PGlWeightedBlendedOit
 					continue;
 				// Pack optical depth and fragment depth: Minecraft still caches only twelve texture units.
 				try (RenderPass metadata = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-						() -> "PulseLib Fabulous metadata", this.fabulousMetadataView, OptionalInt.empty()))
+						() -> "PulseLib Fabulous metadata", this.fabulousMetadataView, Optional.empty()))
 				{
 					metadata.setPipeline(PRenderTypes.RenderPipelinesProvider.OIT_FABULOUS_METADATA);
 					metadata.disableScissor();
 					metadata.bindTexture("RevealSampler", revealageView(layer), sampler);
 					metadata.bindTexture("DepthSampler", layerDepthView(layer), sampler);
-					metadata.draw(0, 3);
+					metadata.draw(3, 1, 0, 0);
 				}
 				try (RenderPass composite = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-						() -> "PulseLib Fabulous composite", destination, OptionalInt.empty()))
+						() -> "PulseLib Fabulous composite", destination, Optional.empty()))
 				{
 					composite.setPipeline(PRenderTypes.RenderPipelinesProvider.OIT_FABULOUS_COMPOSITE);
 					composite.disableScissor();
@@ -386,7 +390,7 @@ public final class PGlWeightedBlendedOit
 						composite.bindTexture(FABULOUS_SAMPLERS[input] + "Sampler", targets.get(input).getColorTextureView(), sampler);
 						composite.bindTexture(FABULOUS_SAMPLERS[input] + "DepthSampler", targets.get(input).getDepthTextureView(), sampler);
 					}
-					composite.draw(0, 3);
+					composite.draw(3, 1, 0, 0);
 				}
 			}
 		}
@@ -684,7 +688,7 @@ public final class PGlWeightedBlendedOit
 	 */
 	private static void configureAdditiveBlend(int target)
 	{
-		GL30.glEnablei(GL11.GL_BLEND, target);
+		GlStateManager._enableBlend(target);
 		if (GL.getCapabilities().OpenGL40)
 		{
 			GL40.glBlendEquationSeparatei(target, GL14.GL_FUNC_ADD, GL14.GL_FUNC_ADD);
@@ -703,7 +707,7 @@ public final class PGlWeightedBlendedOit
 	 */
 	private static void configureMinimumBlend(int target)
 	{
-		GL30.glEnablei(GL11.GL_BLEND, target);
+		GlStateManager._enableBlend(target);
 		if (GL.getCapabilities().OpenGL40)
 		{
 			GL40.glBlendEquationSeparatei(target, GL14.GL_MIN, GL14.GL_MIN);
@@ -777,6 +781,13 @@ public final class PGlWeightedBlendedOit
 		}
 	}
 
+	/** Borrows the device's existing cache; private GL implementation types remain behind accessor interfaces. */
+	private static FrameBufferCache frameBufferCache()
+	{
+		var device = (GpuDeviceAccessor)RenderSystem.getDevice();
+		return ((GlDeviceFrameBufferAccessor)device.pulselib$getBackend()).pulselib$getFrameBufferCache();
+	}
+
 /**
  * Provides support for external gl texture.
  */
@@ -793,7 +804,7 @@ public final class PGlWeightedBlendedOit
 		private ExternalGlTexture(String label, GpuFormat format, int width, int height, int id)
 		{
 			super(GpuTexture.USAGE_TEXTURE_BINDING | GpuTexture.USAGE_RENDER_ATTACHMENT,
-					label, format, width, height, 1, 1, id);
+					label, format, width, height, 1, 1, id, frameBufferCache());
 		}
 	}
 
@@ -808,7 +819,7 @@ public final class PGlWeightedBlendedOit
 		 */
 		private ExternalGlTextureView(ExternalGlTexture texture)
 		{
-			super(texture, 0, 1);
+			super(texture, 0, 1, frameBufferCache());
 		}
 	}
 
@@ -910,9 +921,9 @@ public final class PGlWeightedBlendedOit
 		private void restorePrimary()
 		{
 			if (this.enabled)
-				GlStateManager._enableBlend();
+				GlStateManager._enableBlend(0);
 			else
-				GlStateManager._disableBlend();
+				GlStateManager._disableBlend(0);
 			GL20.glBlendEquationSeparate(this.equationRgb, this.equationAlpha);
 			GlStateManager._blendFuncSeparate(this.sourceRgb, this.destinationRgb, this.sourceAlpha, this.destinationAlpha);
 		}
@@ -924,9 +935,9 @@ public final class PGlWeightedBlendedOit
 		private void restoreIndexed(int target)
 		{
 			if (this.enabled)
-				GL30.glEnablei(GL11.GL_BLEND, target);
+				GlStateManager._enableBlend(target);
 			else
-				GL30.glDisablei(GL11.GL_BLEND, target);
+				GlStateManager._disableBlend(target);
 			restoreEquation(target, this.equationRgb, this.equationAlpha);
 			restoreFunction(target, this.sourceRgb, this.destinationRgb, this.sourceAlpha, this.destinationAlpha);
 		}

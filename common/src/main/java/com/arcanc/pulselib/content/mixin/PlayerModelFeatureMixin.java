@@ -17,16 +17,11 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.player.PlayerModel;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.OutlineBufferSource;
-import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -40,25 +35,20 @@ public abstract class PlayerModelFeatureMixin
 	@Final
 	private PoseStack poseStack;
 
-	@WrapMethod(method = "renderModel")
-	private void pulselib$restoreDeferredPlayer(SubmitNodeStorage.ModelSubmit<?> submit,
-	                                            RenderType type,
-	                                            VertexConsumer buffer,
-	                                            OutlineBufferSource outlines,
-	                                            MultiBufferSource.BufferSource crumbling,
-	                                            Operation<Void> original)
+	@WrapMethod(method = "prepareModel(Lnet/minecraft/client/renderer/feature/ModelFeatureRenderer$Submit;)V")
+	private void pulselib$restoreDeferredPlayer(ModelFeatureRenderer.Submit<?> submit, Operation<Void> original)
 	{
 		var geometry = (Object)submit instanceof PPlayerModelSubmitState access ? access.pulselib$getModelGeometry() : null;
 		if (!(submit.state() instanceof AvatarRenderState) || !(submit.model() instanceof PlayerModel) && geometry == null)
 		{
-			original.call(submit, type, buffer, outlines, crumbling);
+			original.call(submit);
 			return;
 		}
 		int depth = ((PoseStackAccessor)this.poseStack).pulselib$getDepth();
 		PoseStack.Pose entry = this.poseStack.last().copy();
 		try (var snapshot = PModelPartSnapshot.capture(submit.model().root()))
 		{
-			original.call(submit, type, buffer, outlines, crumbling);
+			original.call(submit);
 		}
 		finally
 		{
@@ -68,11 +58,11 @@ public abstract class PlayerModelFeatureMixin
 		}
 	}
 
-	@WrapOperation(method = "renderModel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/Model;setupAnim(Ljava/lang/Object;)V"))
+	@WrapOperation(method = "prepareModel(Lnet/minecraft/client/renderer/feature/ModelFeatureRenderer$Submit;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/Model;setupAnim(Ljava/lang/Object;)V"))
 	private void pulselib$applyNodeGeometry(Model<?> model,
 	                                        Object state,
 	                                        Operation<Void> original,
-	                                        @Local (argsOnly = true, name = "submit") SubmitNodeStorage.ModelSubmit<?> submit)
+	                                        @Local (argsOnly = true, name = "submit") ModelFeatureRenderer.Submit<?> submit)
 	{
 		original.call(model, state);
 		var entry = (Object)submit instanceof PPlayerModelSubmitState access ? access.pulselib$getModelGeometry() : null;

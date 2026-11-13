@@ -9,25 +9,31 @@
 
 package com.arcanc.pulselib.content.renderer.rhi;
 
+import com.arcanc.pulselib.content.mixin.GlDeviceFrameBufferAccessor;
+import com.arcanc.pulselib.content.mixin.GpuDeviceAccessor;
 import com.arcanc.pulselib.content.renderer.gl.PGlRenderHost;
 import com.arcanc.pulselib.content.renderer.plan.PRenderFrame;
+import com.mojang.blaze3d.GpuFormat;
 import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.systems.GpuDevice;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.GpuTexture;
 import net.minecraft.client.renderer.Projection;
 import net.minecraft.client.renderer.ProjectionMatrixBuffer;
 import org.joml.Matrix4f;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Optional;
 
 /** Exercises the production Mixin on real native projection buffers, including the cached upload path. */
 final class RhiHostChecks
 {
 	static void run(GpuDevice device)
 	{
+		passes(device);
 		var previousProjection = RenderSystem.getProjectionMatrixBuffer();
 		var previousType = RenderSystem.getProjectionType();
 		var previousModelView = RenderSystem.getModelViewMatrixCopy();
@@ -99,6 +105,38 @@ final class RhiHostChecks
 			RenderSystem.setProjectionMatrix(previousProjection, previousType);
 			RenderSystem.getModelViewStack().set(previousModelView);
 		}
+	}
+
+	private static void passes(GpuDevice device)
+	{
+		RhiLayoutChecks.assertTrue(!PRhiRenderPassTracker.hasActivePass(), "No native pass before scope");
+		var backend = ((GpuDeviceAccessor)device).pulselib$getBackend();
+		if (backend instanceof GlDeviceFrameBufferAccessor gl)
+			RhiLayoutChecks.assertTrue(gl.pulselib$getFrameBufferCache() != null, "Actual GL device FBO cache available to legacy wrappers");
+		try (var texture = device.createTexture("Native pass tracker", GpuTexture.USAGE_RENDER_ATTACHMENT,
+				GpuFormat.RGBA8_UNORM, 2, 2, 1, 1);
+				var view = device.createTextureView(texture))
+		{
+			var encoder = device.createCommandEncoder();
+			try (var pass = encoder.createRenderPass(() -> "Native tracker pass", view, Optional.empty()))
+			{
+				RhiLayoutChecks.assertTrue(encoder != device.createCommandEncoder(), "26.2 returns fresh frontend encoders");
+				RhiLayoutChecks.assertTrue(PRhiRenderPassTracker.hasActivePass(), "Active pass visible across frontend encoder instances");
+			}
+			RhiLayoutChecks.assertTrue(!PRhiRenderPassTracker.hasActivePass(), "Native close clears tracker");
+			var sentinel = new IllegalStateException("Pass body failure");
+			try (var pass = encoder.createRenderPass(() -> "Native exceptional scope", view, Optional.empty()))
+			{
+				throw sentinel;
+			}
+			catch (IllegalStateException failure)
+			{
+				RhiLayoutChecks.assertTrue(failure == sentinel, "Pass body exception propagated");
+			}
+			RhiLayoutChecks.assertTrue(!PRhiRenderPassTracker.hasActivePass(), "Exception-safe native close clears tracker");
+			encoder.submit();
+		}
+		System.out.println("PASS native pass tracker: fresh encoders, shared active state and normal/exceptional close; backend cache accessor where applicable");
 	}
 
 	private static void assertFrame(PRenderFrame frame, Matrix4f modelView, Matrix4f projection)

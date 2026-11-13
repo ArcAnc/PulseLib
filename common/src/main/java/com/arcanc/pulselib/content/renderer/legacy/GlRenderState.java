@@ -11,14 +11,16 @@ package com.arcanc.pulselib.content.renderer.legacy;
 
 import com.arcanc.pulselib.content.mixin.CommandEncoderAccessor;
 import com.arcanc.pulselib.content.mixin.GlCommandEncoderAccessor;
+import com.arcanc.pulselib.content.renderer.rhi.PRhiRenderPassTracker;
 import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.opengl.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.GpuTextureView;
 import net.minecraft.client.Minecraft;
 import org.joml.Matrix4f;
 import org.jspecify.annotations.Nullable;
-import com.mojang.blaze3d.systems.RenderSystem;
+import org.lwjgl.opengl.ARBDrawBuffersBlend;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL14;
@@ -30,7 +32,6 @@ import org.lwjgl.opengl.GL32;
 import org.lwjgl.opengl.GL33;
 import org.lwjgl.opengl.GL40;
 import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.ARBDrawBuffersBlend;
 
 /** Native state touched by a local render, restored through Minecraft's caches where applicable. */
 public final class GlRenderState implements AutoCloseable
@@ -42,7 +43,7 @@ public final class GlRenderState implements AutoCloseable
 	private final @Nullable GpuTextureView depthAttachment;
 	private final GpuBufferSlice projection = RenderSystem.getProjectionMatrixBuffer();
 	private final ProjectionType projectionType = RenderSystem.getProjectionType();
-	private final Matrix4f modelView = new Matrix4f(RenderSystem.getModelViewMatrix());
+	private final Matrix4f modelView = RenderSystem.getModelViewMatrixCopy();
 	private final boolean renderScissor = RenderSystem.getScissorStateForRenderTypeDraws().enabled();
 	private final int renderScissorX = RenderSystem.getScissorStateForRenderTypeDraws().x();
 	private final int renderScissorY = RenderSystem.getScissorStateForRenderTypeDraws().y();
@@ -80,9 +81,9 @@ public final class GlRenderState implements AutoCloseable
 	public GlRenderState()
 	{
 		RenderSystem.assertOnRenderThread();
-		if (((CommandEncoderAccessor)RenderSystem.getDevice().createCommandEncoder()).pulselib$getBackend().isInRenderPass())
+		if (PRhiRenderPassTracker.hasActivePass())
 			throw new IllegalStateException("Local render scopes cannot enter an active Minecraft RenderPass");
-		var target = Minecraft.getInstance().getMainRenderTarget();
+		var target = Minecraft.getInstance().gameRenderer.mainRenderTarget();
 		this.colorAttachment = java.util.Objects.requireNonNull(this.colorOverride == null ? target.getColorTextureView() : this.colorOverride);
 		this.depthAttachment = this.colorOverride == null && this.depthOverride == null ? target.getDepthTextureView() : this.depthOverride;
 		GL11.glGetIntegerv(GL11.GL_POLYGON_MODE, this.polygonMode);
@@ -197,18 +198,18 @@ public final class GlRenderState implements AutoCloseable
 		GlStateManager._polygonMode(GL11.GL_FRONT_AND_BACK, this.polygonMode[0]);
 		// Global setters alter every draw buffer; restore the primary cache before indexed state.
 		if (this.blends[0][0] != 0)
-			GlStateManager._enableBlend();
+			GlStateManager._enableBlend(0);
 		else
-			GlStateManager._disableBlend();
+			GlStateManager._disableBlend(0);
 		GlStateManager._blendFuncSeparate(this.blends[0][1], this.blends[0][2], this.blends[0][3], this.blends[0][4]);
 		GlStateManager._colorMask(this.blends[0][7]);
 		for (int index = 0; index < this.blends.length; index++)
 		{
 			int[] blend = this.blends[index];
 			if (blend[0] != 0)
-				GL30.glEnablei(GL11.GL_BLEND, index);
+				GlStateManager._enableBlend(index);
 			else
-				GL30.glDisablei(GL11.GL_BLEND, index);
+				GlStateManager._disableBlend(index);
 			if (GL.getCapabilities().OpenGL40)
 			{
 				GL40.glBlendFuncSeparatei(index, blend[1], blend[2], blend[3], blend[4]);

@@ -17,38 +17,34 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.OutlineBufferSource;
-import net.minecraft.client.renderer.SubmitNodeStorage;
-import net.minecraft.client.renderer.feature.ModelPartFeatureRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.model.Model;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
-import java.util.List;
-import java.util.Map;
-
 /** Replays each node's pose for main/outline/crumbling, with invocation-local restoration. */
-@Mixin(ModelPartFeatureRenderer.class)
+@Mixin(ModelFeatureRenderer.class)
 public abstract class ModelPartFeatureRendererMixin
 {
 	@Shadow
 	@Final
 	private PoseStack poseStack;
 
-	@WrapMethod(method = "render")
-	private void pulselib$restoreFeaturePose(Map<RenderType, List<SubmitNodeStorage.ModelPartSubmit>> submits,
-			MultiBufferSource.BufferSource buffers, OutlineBufferSource outlines,
-			MultiBufferSource.BufferSource crumbling, Operation<Void> original)
+	@WrapMethod(method = "prepareModel(Lnet/minecraft/client/renderer/feature/ModelFeatureRenderer$Submit;)V")
+	private void pulselib$restoreFeaturePose(ModelFeatureRenderer.Submit<?> submit, Operation<Void> original)
 	{
+		if (!(submit.model() instanceof Model.Simple))
+		{
+			original.call(submit);
+			return;
+		}
 		int depth = ((PoseStackAccessor)this.poseStack).pulselib$getDepth();
 		PoseStack.Pose entry = this.poseStack.last().copy();
-		try
+		try (var caller = PModelPartSnapshot.capture(submit.model().root()))
 		{
-			original.call(submits, buffers, outlines, crumbling);
+			original.call(submit);
 		}
 		finally
 		{
@@ -58,15 +54,13 @@ public abstract class ModelPartFeatureRendererMixin
 		}
 	}
 
-	@WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/geom/ModelPart;render(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;III)V"))
-	private void pulselib$replayPart(ModelPart part, PoseStack poses, VertexConsumer consumer,
+	@WrapOperation(method = "prepareModel(Lnet/minecraft/client/renderer/feature/ModelFeatureRenderer$Submit;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/Model;renderToBuffer(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;III)V"))
+	private void pulselib$replayPart(Model<?> model, PoseStack poses, VertexConsumer consumer,
 			int light, int overlay, int color, Operation<Void> original,
-			@Local SubmitNodeStorage.ModelPartSubmit submit)
+			@Local(argsOnly = true) ModelFeatureRenderer.Submit<?> submit)
 	{
-		try (var caller = PModelPartSnapshot.capture(part))
-		{
+		if (model instanceof Model.Simple)
 			((PModelPartSubmitState)(Object)submit).pulselib$getModelPartPose().restore();
-			original.call(part, poses, consumer, light, overlay, color);
-		}
+		original.call(model, poses, consumer, light, overlay, color);
 	}
 }

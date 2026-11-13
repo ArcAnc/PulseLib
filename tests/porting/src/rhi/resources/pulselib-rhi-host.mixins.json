@@ -3,7 +3,12 @@
   "package": "com.arcanc.pulselib.content.mixin",
   "compatibilityLevel": "JAVA_25",
   "client": [
-    "ProjectionMatrixBufferMixin"
+    "ProjectionMatrixBufferMixin",
+    "CommandEncoderPassMixin",
+    "CommandEncoderAccessor",
+    "GpuDeviceAccessor",
+    "GlDeviceFrameBufferAccessor",
+    "GlCommandEncoderAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

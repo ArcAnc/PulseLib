@@ -16,13 +16,8 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.Model;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.OutlineBufferSource;
-import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -36,20 +31,19 @@ public abstract class ArmorProviderFeatureMixin
 	@Final
 	private PoseStack poseStack;
 
-	@WrapMethod(method = "renderModel")
-	private void pulselib$restoreProvider(SubmitNodeStorage.ModelSubmit<?> submit, RenderType type,
-			VertexConsumer buffer, OutlineBufferSource outlines, MultiBufferSource.BufferSource crumbling, Operation<Void> original)
+	@WrapMethod(method = "prepareModel(Lnet/minecraft/client/renderer/feature/ModelFeatureRenderer$Submit;)V")
+	private void pulselib$restoreProvider(ModelFeatureRenderer.Submit<?> submit, Operation<Void> original)
 	{
 		if (((PArmorModelSnapshots.Node)(Object)submit).pulselib$getArmorProvider() == null)
 		{
-			original.call(submit, type, buffer, outlines, crumbling);
+			original.call(submit);
 			return;
 		}
 		int depth = ((PoseStackAccessor)this.poseStack).pulselib$getDepth();
 		var pose = this.poseStack.last().copy();
 		try (var caller = PModelPartSnapshot.capture(submit.model().root()))
 		{
-			original.call(submit, type, buffer, outlines, crumbling);
+			original.call(submit);
 		}
 		finally
 		{
@@ -59,9 +53,9 @@ public abstract class ArmorProviderFeatureMixin
 		}
 	}
 
-	@WrapOperation(method = "renderModel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/Model;setupAnim(Ljava/lang/Object;)V"))
+	@WrapOperation(method = "prepareModel(Lnet/minecraft/client/renderer/feature/ModelFeatureRenderer$Submit;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/Model;setupAnim(Ljava/lang/Object;)V"))
 	private void pulselib$replayProvider(Model<?> model, Object state, Operation<Void> original,
-			@Local(argsOnly = true) SubmitNodeStorage.ModelSubmit<?> submit)
+			@Local(argsOnly = true) ModelFeatureRenderer.Submit<?> submit)
 	{
 		original.call(model, state);
 		var entry = ((PArmorModelSnapshots.Node)(Object)submit).pulselib$getArmorProvider();

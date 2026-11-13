@@ -9,7 +9,7 @@
 
 package com.arcanc.pulselib.content.mixin;
 
-import net.minecraft.client.renderer.SubmitNodeStorage;
+import net.minecraft.client.renderer.feature.ItemFeatureRenderer;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import java.util.List;
 
 /** ItemStackRenderState clears and reuses its mutable quad list after submission. */
-@Mixin(SubmitNodeStorage.ItemSubmit.class)
+@Mixin(ItemFeatureRenderer.Submit.class)
 public abstract class ItemSubmitMixin
 {
 	@ModifyVariable (method = "<init>", at = @At ("HEAD"), argsOnly = true, name = "quads")

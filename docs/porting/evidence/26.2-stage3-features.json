@@ -1,0 +1,844 @@
+{
+  "author": "ArcAnc",
+  "created_at": "2026-11-13",
+  "copyright": "Copyright (c) 2026",
+  "license": "Arc's License of Common Sense (LICENSE.txt)",
+  "start_commit": "63dc8fc2af954b811e86a2fcabc07af0fbb94aab",
+  "stage3_status": "PARTIAL: native submit/preparation hooks and legacy native API compile gates adapted; full client compilation and game rendering still pending",
+  "whole_migration_complete": false,
+  "source_refs": {
+    "26.1.2-multiloader": "5065103d1bccc7880445f9e93bc6ed709cfbb809",
+    "master": "e85973a7a71fde0a237da1153a42c12d3578ebae"
+  },
+  "checks": {
+    "native_features": "PASS strict FML CLIENT, 8 production hooks + 5 support Mixins; actual native submit/buildGroup/prepare/setup/render bodies with controlled CPU vertex sink",
+    "items": "PASS copied mutable lists/tints, main then foil batches, per-item light/overlay and per-quad tint fallback, nested calls and all four vertex values restored on exception",
+    "ModelPart": "PASS two snapshots of reused Model.Simple, frozen transforms/visibility/deformation, nested replay, caller bindings/scales/flags, exception-safe pose-stack depth/matrix restoration",
+    "player_geometry": "PASS node-captured entry after state reuse, post-setup snapshot replay, no live owner deformer evaluation and shared caller model restoration",
+    "armor_provider": "PASS node-captured provider entry, post-setup snapshot replay and exception-safe shared model/pose-stack restoration",
+    "native_pass_tracking": "PASS actual passes, fresh frontend encoders, common live-pass detection and normal/exceptional close on OpenGL and Vulkan; actual GL backend FBO cache accessor checked on OpenGL",
+    "rhi_regressions": "PASS native factories/registry/compiler/opaque adapter, four basic profiles with 1025-instance readbacks, offsets/firstInstance, static/dynamic geometry and cleanup/recreate on both backend",
+    "registration": "PASS 19 production + 4 shared profiles through real NeoForge event bus and Fabric Knot CLIENT/native registry; Fabric real factory and access widener validation",
+    "API": "Existing public/protected callable signatures preserved; 5 Mixin native target annotations changed, 4 service types added; internal ModelPart getter valid only on unified nodes wrapping Model.Simple",
+    "legacy_GL_and_OIT": "COMPILES in selected-source type checking/full diagnostics; NOT RUN. Four layers/algorithm/Fabulous inputs preserved, portable OIT and reversed-Z adaptation still pending",
+    "full_client_default_preparation_queue_call_site": "NOT EXECUTED: compilation still fails; no Minecraft instance or world created; CPU vertex/foil outputs and RHI prepared/output callbacks are explicit fixture seams",
+    "full_player_GUI_world_Fabulous_GPU_deformers_Fabric_GPU": "NOT GAME TESTED; selective hook configs do not validate full production Mixin JSON",
+    "full_Vulkan_compatibility": "NOT CONFIRMED; basic RHI scenarios and native pass lifetime only",
+    "production_source_sets_CI": "UNCHANGED; opt-in fixtures only"
+  },
+  "gpu_runs": [
+    {
+      "backend": "OpenGL",
+      "device": "NVIDIA GeForce GTX 1660 Ti",
+      "uniform_alignment": 256,
+      "measured_uniform_block_limit": 65536,
+      "capacity": 128,
+      "exit_code": 0
+    },
+    {
+      "backend": "Vulkan",
+      "device": "NVIDIA GeForce GTX 1660 Ti",
+      "uniform_alignment": 64,
+      "configured_test_uniform_limit": 16384,
+      "hardware_max_uniform_block_limit": "not queried this run",
+      "capacity": 128,
+      "exit_code": 0
+    }
+  ],
+  "ordinary_common_compile": {
+    "exit_code": 1,
+    "declaration_errors": 2,
+    "remaining_declaration_gate": "PModelGuiRenderer: removed MultiBufferSource"
+  },
+  "diagnostics": [
+    {
+      "module": "common",
+      "exit_code": 1,
+      "source_count": 410,
+      "error_count": 13,
+      "files": {
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderLayerMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/HumanoidArmorLayerMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/WeatherEffectRendererMixin.java": 2,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java": 7,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java": 2
+      },
+      "errors": [
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 17,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 25,
+          "message": "package MultiBufferSource does not exist"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderLayerMixin.java",
+          "line": 75,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/HumanoidArmorLayerMixin.java",
+          "line": 67,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/WeatherEffectRendererMixin.java",
+          "line": 26,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/WeatherEffectRendererMixin.java",
+          "line": 26,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 23,
+          "message": "PModelGuiRenderer is not abstract and does not override abstract method renderToTexture(PModelGuiRenderState,PoseStack,SubmitNodeCollector) in PictureInPictureRenderer"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 30,
+          "message": "method does not override or implement a method from a supertype"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 36,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 37,
+          "message": "method prepare in class PictureInPictureRenderer<T> cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 45,
+          "message": "method does not override or implement a method from a supertype"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java",
+          "line": 35,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java",
+          "line": 60,
+          "message": "cannot find symbol"
+        }
+      ],
+      "previous_source_count": 406,
+      "previous_error_count": 72,
+      "removed_errors": [
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java",
+          "message": "cannot find symbol",
+          "count": 5
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java",
+          "message": "package MultiBufferSource does not exist",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderSubmitMixin.java",
+          "message": "cannot find symbol",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemFeatureRendererMixin.java",
+          "message": "cannot find symbol",
+          "count": 4
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemFeatureRendererMixin.java",
+          "message": "package MultiBufferSource does not exist",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemSubmitMixin.java",
+          "message": "cannot find symbol",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "message": "cannot find symbol",
+          "count": 7
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "message": "package MultiBufferSource does not exist",
+          "count": 2
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartSubmitMixin.java",
+          "message": "cannot find symbol",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java",
+          "message": "cannot find symbol",
+          "count": 5
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java",
+          "message": "package MultiBufferSource does not exist",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelSubmitMixin.java",
+          "message": "cannot find symbol",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java",
+          "message": "cannot find symbol",
+          "count": 2
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers.java",
+          "message": "cannot find symbol",
+          "count": 2
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "message": "cannot find symbol",
+          "count": 4
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "message": "constructor TextureTarget in class TextureTarget cannot be applied to given types;",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "message": "incompatible types: GpuBuffer cannot be converted to GpuBufferSlice",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "message": "incompatible types: OptionalInt cannot be converted to Optional<Vector4fc>",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "message": "method drawIndexed in class RenderPass cannot be applied to given types;",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "message": "constructor GlTexture in class GlTexture cannot be applied to given types;",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "message": "constructor GlTextureView in class GlTextureView cannot be applied to given types;",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "message": "incompatible types: OptionalInt cannot be converted to Optional<Vector4fc>",
+          "count": 3
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "message": "method _disableBlend in class GlStateManager cannot be applied to given types;",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "message": "method _enableBlend in class GlStateManager cannot be applied to given types;",
+          "count": 3
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "message": "method draw in class RenderPass cannot be applied to given types;",
+          "count": 3
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java",
+          "message": "cannot find symbol",
+          "count": 3
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java",
+          "message": "method _disableBlend in class GlStateManager cannot be applied to given types;",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java",
+          "message": "method _enableBlend in class GlStateManager cannot be applied to given types;",
+          "count": 1
+        }
+      ],
+      "added_errors": []
+    },
+    {
+      "module": "fabric",
+      "exit_code": 1,
+      "source_count": 421,
+      "error_count": 14,
+      "files": {
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderLayerMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/HumanoidArmorLayerMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/WeatherEffectRendererMixin.java": 2,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java": 7,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java": 2,
+        "fabric/src/main/java/com/arcanc/pulselib/fabric/PulseLibFabricClient.java": 1
+      },
+      "errors": [
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 17,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 25,
+          "message": "package MultiBufferSource does not exist"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderLayerMixin.java",
+          "line": 75,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/HumanoidArmorLayerMixin.java",
+          "line": 67,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/WeatherEffectRendererMixin.java",
+          "line": 26,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/WeatherEffectRendererMixin.java",
+          "line": 26,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 23,
+          "message": "PModelGuiRenderer is not abstract and does not override abstract method renderToTexture(PModelGuiRenderState,PoseStack,SubmitNodeCollector) in PictureInPictureRenderer"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 30,
+          "message": "method does not override or implement a method from a supertype"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 36,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 37,
+          "message": "method prepare in class PictureInPictureRenderer<T> cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 45,
+          "message": "method does not override or implement a method from a supertype"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java",
+          "line": 35,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java",
+          "line": 60,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "fabric/src/main/java/com/arcanc/pulselib/fabric/PulseLibFabricClient.java",
+          "line": 57,
+          "message": "cannot find symbol"
+        }
+      ],
+      "previous_source_count": 417,
+      "previous_error_count": 73,
+      "removed_errors": [
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java",
+          "message": "cannot find symbol",
+          "count": 5
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java",
+          "message": "package MultiBufferSource does not exist",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderSubmitMixin.java",
+          "message": "cannot find symbol",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemFeatureRendererMixin.java",
+          "message": "cannot find symbol",
+          "count": 4
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemFeatureRendererMixin.java",
+          "message": "package MultiBufferSource does not exist",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemSubmitMixin.java",
+          "message": "cannot find symbol",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "message": "cannot find symbol",
+          "count": 7
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "message": "package MultiBufferSource does not exist",
+          "count": 2
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartSubmitMixin.java",
+          "message": "cannot find symbol",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java",
+          "message": "cannot find symbol",
+          "count": 5
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java",
+          "message": "package MultiBufferSource does not exist",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelSubmitMixin.java",
+          "message": "cannot find symbol",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java",
+          "message": "cannot find symbol",
+          "count": 2
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers.java",
+          "message": "cannot find symbol",
+          "count": 2
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "message": "cannot find symbol",
+          "count": 4
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "message": "constructor TextureTarget in class TextureTarget cannot be applied to given types;",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "message": "incompatible types: GpuBuffer cannot be converted to GpuBufferSlice",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "message": "incompatible types: OptionalInt cannot be converted to Optional<Vector4fc>",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "message": "method drawIndexed in class RenderPass cannot be applied to given types;",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "message": "constructor GlTexture in class GlTexture cannot be applied to given types;",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "message": "constructor GlTextureView in class GlTextureView cannot be applied to given types;",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "message": "incompatible types: OptionalInt cannot be converted to Optional<Vector4fc>",
+          "count": 3
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "message": "method _disableBlend in class GlStateManager cannot be applied to given types;",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "message": "method _enableBlend in class GlStateManager cannot be applied to given types;",
+          "count": 3
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "message": "method draw in class RenderPass cannot be applied to given types;",
+          "count": 3
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java",
+          "message": "cannot find symbol",
+          "count": 3
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java",
+          "message": "method _disableBlend in class GlStateManager cannot be applied to given types;",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java",
+          "message": "method _enableBlend in class GlStateManager cannot be applied to given types;",
+          "count": 1
+        }
+      ],
+      "added_errors": []
+    },
+    {
+      "module": "neoforge",
+      "exit_code": 1,
+      "source_count": 426,
+      "error_count": 15,
+      "files": {
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderLayerMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/HumanoidArmorLayerMixin.java": 1,
+        "common/src/main/java/com/arcanc/pulselib/content/mixin/WeatherEffectRendererMixin.java": 2,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java": 7,
+        "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java": 2,
+        "neoforge/src/main/java/com/arcanc/pulselib/neoforge/NeoForgeClientLifecycle.java": 1,
+        "neoforge/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/package-info.java": 1
+      },
+      "errors": [
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 17,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 25,
+          "message": "package MultiBufferSource does not exist"
+        },
+        {
+          "path": "neoforge/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/package-info.java",
+          "line": 10,
+          "message": "package com.arcanc.pulselib.util.attachments.humanoid.armor has already been annotated"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderLayerMixin.java",
+          "line": 75,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/HumanoidArmorLayerMixin.java",
+          "line": 67,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/WeatherEffectRendererMixin.java",
+          "line": 26,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/WeatherEffectRendererMixin.java",
+          "line": 26,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 23,
+          "message": "PModelGuiRenderer is not abstract and does not override abstract method renderToTexture(PModelGuiRenderState,PoseStack,SubmitNodeCollector) in PictureInPictureRenderer"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 30,
+          "message": "method does not override or implement a method from a supertype"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 36,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 37,
+          "message": "method prepare in class PictureInPictureRenderer<T> cannot be applied to given types;"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java",
+          "line": 45,
+          "message": "method does not override or implement a method from a supertype"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java",
+          "line": 35,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java",
+          "line": 60,
+          "message": "cannot find symbol"
+        },
+        {
+          "path": "neoforge/src/main/java/com/arcanc/pulselib/neoforge/NeoForgeClientLifecycle.java",
+          "line": 65,
+          "message": "incompatible types: invalid constructor reference"
+        }
+      ],
+      "previous_source_count": 422,
+      "previous_error_count": 74,
+      "removed_errors": [
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java",
+          "message": "cannot find symbol",
+          "count": 5
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java",
+          "message": "package MultiBufferSource does not exist",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderSubmitMixin.java",
+          "message": "cannot find symbol",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemFeatureRendererMixin.java",
+          "message": "cannot find symbol",
+          "count": 4
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemFeatureRendererMixin.java",
+          "message": "package MultiBufferSource does not exist",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemSubmitMixin.java",
+          "message": "cannot find symbol",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "message": "cannot find symbol",
+          "count": 7
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java",
+          "message": "package MultiBufferSource does not exist",
+          "count": 2
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartSubmitMixin.java",
+          "message": "cannot find symbol",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java",
+          "message": "cannot find symbol",
+          "count": 5
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java",
+          "message": "package MultiBufferSource does not exist",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelSubmitMixin.java",
+          "message": "cannot find symbol",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java",
+          "message": "cannot find symbol",
+          "count": 2
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers.java",
+          "message": "cannot find symbol",
+          "count": 2
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "message": "cannot find symbol",
+          "count": 4
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "message": "incompatible types: GpuBuffer cannot be converted to GpuBufferSlice",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "message": "incompatible types: OptionalInt cannot be converted to Optional<Vector4fc>",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "message": "method drawIndexed in class RenderPass cannot be applied to given types;",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java",
+          "message": "no suitable constructor found for TextureTarget(String,int,int,boolean)",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "message": "constructor GlTexture in class GlTexture cannot be applied to given types;",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "message": "constructor GlTextureView in class GlTextureView cannot be applied to given types;",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "message": "incompatible types: OptionalInt cannot be converted to Optional<Vector4fc>",
+          "count": 3
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "message": "method _disableBlend in class GlStateManager cannot be applied to given types;",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "message": "method _enableBlend in class GlStateManager cannot be applied to given types;",
+          "count": 3
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java",
+          "message": "method draw in class RenderPass cannot be applied to given types;",
+          "count": 3
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java",
+          "message": "cannot find symbol",
+          "count": 3
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java",
+          "message": "method _disableBlend in class GlStateManager cannot be applied to given types;",
+          "count": 1
+        },
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java",
+          "message": "method _enableBlend in class GlStateManager cannot be applied to given types;",
+          "count": 1
+        }
+      ],
+      "added_errors": []
+    }
+  ],
+  "source_hashes": {
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderFeatureMixin.java": "df2b9654396dfba383a6086ae4fbe35c42ef61675c1b60579ef6632571b99b5f",
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/ArmorProviderSubmitMixin.java": "4843f0dffeedb3f15783ecdd874ba7ee5eec1f5ff555eb328c9b06525342398f",
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/CommandEncoderPassMixin.java": "ae8f26a50d32dd9828aefc51593e8828898b5a5f91e39b0a1a0e826c224f5983",
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/GlDeviceFrameBufferAccessor.java": "84e27b7c529ff5f6867167ff6bf2322606b0ed17398ab48caf33e7002e552798",
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/GpuDeviceAccessor.java": "b08723acd876cedb2363d18e99794f475be9a8ba178283f6aefbdc1410e37f2a",
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemFeatureRendererMixin.java": "0810399ea4229427d836b8311f59bd6008bd4d1e50563f7857b31b0cb50e89f2",
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemSubmitMixin.java": "193a30aaa7f5a0663973d891f5f879c0b58b49052e86763bc1f3ba0f4ef46d43",
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartFeatureRendererMixin.java": "07d7410f509e4887924056248a6a47c5e66c69d76ffe35f79de11ac961ae02a9",
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/ModelPartSubmitMixin.java": "ef6cef300c7f3ba78d7dd0abbb79452d3abe6bc69a01f64d13ac4bf3689af2c4",
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelFeatureMixin.java": "4c748f938c8081602fe4e86525a333f6e6fd6f76699944875f110d8c7047ec3c",
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/PlayerModelSubmitMixin.java": "970da5faaa4ecb1734c662a12baf40cfe7ff50a68e85e0f6db8c41c9a7cd5617",
+    "common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java": "9c3ce6050e908c20adbccf257aa9d07a51feac066e3e02555ae677145c0f58e9",
+    "common/src/main/java/com/arcanc/pulselib/content/model/deformer/gpu/PGpuDeformerBuffers.java": "5676af1e4b2eece074fb4cb88cad8472206100844dce3ec980058a285d636628",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/base/PModelPartSubmitState.java": "7d42226c1737ba43da051efbc4de3e86b198385dbff67d3f13a762bca537ce0f",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java": "9628ee5e7f922e2c6da44181b9dba56ed2c368282af16775edb79957a13de932",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java": "877d419d5b065ce46fa71e65aa60749e6b2984fe30c7922143a95c218be848a1",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java": "a62fa8978b94ef3984ea8630b69f3645a3693a666a5b78646752002ef0a80581",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/PRhiRenderPassTracker.java": "fb5e1cbc8c0c5619df97e58ed7a39e11450f55adb7b8c7da9413cc8100d699c0",
+    "common/src/main/resources/pulselib.mixins.json": "514d079bb1ffd9457e43e76be715549753af6dab78b40f275a2fd7afc1b4aedb",
+    "tests/porting/feature-check.gradle": "f47aa54569a431a990995a32268b7edf7b14bad5ff1ed25c90e4fbcba99e3a65",
+    "tests/porting/rhi-check.gradle": "8b192dc1a5377d5ebfe2b6a0896b5882ae6878aeeaec5425dd6c7ebad04190c8",
+    "tests/porting/src/feature/java/com/arcanc/pulselib/content/mixin/FeatureItemOutputMixin.java": "a760fe75ad1d436776c72a32b8f0db464362beb531350d8aa10ead1f99cd9776",
+    "tests/porting/src/feature/java/com/arcanc/pulselib/content/mixin/FeatureVertexOutputMixin.java": "717ab516f2a02bf0016ef380b0af86c6a0e9eed8baa3189d533be93973d87ae8",
+    "tests/porting/src/feature/java/com/arcanc/pulselib/content/player/deformer/FeatureChecks.java": "c680b8bf2c62fb4ebd979b278c6f3c240b44dce611bc2aa1a04ce183cc7d32de",
+    "tests/porting/src/feature/java/com/arcanc/pulselib/content/player/deformer/FeatureFixtureLauncher.java": "2369f0c0e6885f0a780ff4e7460a63378c38a7ff60d4668b4a2a852c0a29a95c",
+    "tests/porting/src/feature/resources/META-INF/neoforge.mods.toml": "f5f547ff2593546fa5157c20dcbaeee3d247dc80e9b76a817ef086d0e4d61df7",
+    "tests/porting/src/feature/resources/pulselib-feature-fixture.mixins.json": "9602e2be65166bd1e41b19a3b79c774e4e404c8965f607307acc5762ccd95e99",
+    "tests/porting/src/rhi/java/com/arcanc/pulselib/content/renderer/rhi/RhiHostChecks.java": "4358e94f559a6103b1dc3e5f339ec27c3fdacf45b1543e9278c2eeeff6049456",
+    "tests/porting/src/rhi/resources/pulselib-rhi-host.mixins.json": "d06069512e910ce454eb3b16eeacd858d438def1cb36931e3de200a7aaa89ea3"
+  },
+  "fixture_byte_identity": [
+    {
+      "fixture": "features",
+      "jar_path": "neoforge/build/porting-feature/pulselib-feature-fixture.jar",
+      "sha256": "1d6574cb1c0f36a53f0d194f3c3edfa6aa7f34bd0b5a2481223a951a17318624",
+      "verified_class_files": 127,
+      "strict_config_byte_identity": true
+    },
+    {
+      "fixture": "rhi",
+      "jar_path": "neoforge/build/porting-rhi/pulselib-rhi-fixture.jar",
+      "sha256": "ba49858613da71f7c4723115c1983aadc1a961410306713a95f89079ec70b4db",
+      "verified_class_files": 81,
+      "strict_config_byte_identity": true
+    }
+  ],
+  "user_paths_preserved": [
+    {
+      "path": "AGENTS.md",
+      "working_sha256": "f36caed236f51dd48ff3c166937be845b7e32a9ddf40ebf5b942a37e9ca7fe82",
+      "index": "100644 c474ce7487bde7e5cdf3548cf0c4950e92acb551 0\tAGENTS.md\n"
+    },
+    {
+      "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderContexts.java",
+      "working_sha256": "fe3bf6e617b90e93b908a8bffadd669ebd4da6192157861a02cca28a0625571f",
+      "index": "100644 9f875d6d798e1d605359f5eb9e46aeaced966917 0\tcommon/src/main/java/com/arcanc/pulselib/content/renderer/PRenderContexts.java\n"
+    },
+    {
+      "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/FieldsAreNonnullByDefault.java",
+      "working_sha256": null,
+      "index": ""
+    },
+    {
+      "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/MethodsReturnNonnullByDefault.java",
+      "working_sha256": null,
+      "index": ""
+    },
+    {
+      "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/PRhiOpaqueRenderer.java",
+      "working_sha256": "07872a5fd5e8671089dd7fa96d117ac899aaf34ef158a84b193b83e881b94a74",
+      "index": "100644 d1a1f3427b9ea0264fdecb4e9d10f7579bf55da0 0\tcommon/src/main/java/com/arcanc/pulselib/content/renderer/rhi/PRhiOpaqueRenderer.java\n"
+    },
+    {
+      "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/package-info.java",
+      "working_sha256": "92d0458ab74f4d0e474b4fd2797bbc1d7bc47607a504a1d649b3dc459cb54622",
+      "index": "100644 ea5e97b0f40ba6fb3ad7be0bceb4d86d3321e2ce 0\tcommon/src/main/java/com/arcanc/pulselib/content/renderer/rhi/package-info.java\n"
+    },
+    {
+      "path": "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+      "working_sha256": "085e21372822673278291204eb63994058b82cc4a490167c4608a9de5d9cf73f",
+      "index": "100644 ce3349e93d77fd34bdc144d47d9c3ce37125b967 0\tcommon/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java\n"
+    },
+    {
+      "path": "neoforge/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PArmorClientExtensions.java",
+      "working_sha256": "2c19cca4379326157256962bd97122118c8c8bc4adf28f9f26fbef88a47a3ac9",
+      "index": "100644 94593125609efda834f750facc00d57e417a4eed 0\tneoforge/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PArmorClientExtensions.java\n"
+    },
+    {
+      "path": "neoforge/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/package-info.java",
+      "working_sha256": "5eab3c404490528351fbc4e1a5fb36f59a828884fec8d6adaf4be9c8c22c3101",
+      "index": "100644 2e8e943b56e750abaea5e630b91a1cd7b2a7651d 0\tneoforge/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/package-info.java\n"
+    }
+  ],
+  "baseline_and_shader_assets": "UNCHANGED",
+  "next_stage": "Continue stage 3: PIP/GUI/armor/world-access compile gates, full strict client bootstrap, default preparation and actual production queue/basic model rendering; do not mark stage 3 complete before game checks"
+}

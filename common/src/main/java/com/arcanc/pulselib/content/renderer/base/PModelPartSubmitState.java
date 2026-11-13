@@ -11,7 +11,7 @@ package com.arcanc.pulselib.content.renderer.base;
 
 import org.jetbrains.annotations.ApiStatus;
 
-/** Pose ownership follows the existing native submit node and its ordinary queue lifetime. */
+/** Frozen pose on a native Model.Simple submission. Other unified model nodes are not ModelPart consumers. */
 @ApiStatus.Internal
 public interface PModelPartSubmitState
 {

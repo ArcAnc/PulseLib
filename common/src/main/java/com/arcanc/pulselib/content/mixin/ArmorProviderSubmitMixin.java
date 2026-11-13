@@ -11,7 +11,7 @@ package com.arcanc.pulselib.content.mixin;
 
 import com.arcanc.pulselib.util.attachments.humanoid.armor.PArmorModelSnapshots;
 import net.minecraft.client.model.Model;
-import net.minecraft.client.renderer.SubmitNodeStorage;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(SubmitNodeStorage.ModelSubmit.class)
+@Mixin(ModelFeatureRenderer.Submit.class)
 public abstract class ArmorProviderSubmitMixin implements PArmorModelSnapshots.Node
 {
 	@Shadow

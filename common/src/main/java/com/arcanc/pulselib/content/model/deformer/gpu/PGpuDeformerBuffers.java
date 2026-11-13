@@ -12,7 +12,6 @@ package com.arcanc.pulselib.content.model.deformer.gpu;
 import com.arcanc.pulselib.content.model.deformer.PMeshDeformation;
 import com.arcanc.pulselib.util.PLibDatabase;
 import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.renderer.MappableRingBuffer;
 import org.jspecify.annotations.Nullable;
 
@@ -237,7 +236,7 @@ public final class PGpuDeformerBuffers
 			else if (dirty)
 				buffer.rotate();
 			if (dirty)
-				try (GpuBuffer.MappedView mapped = RenderSystem.getDevice().createCommandEncoder().mapBuffer(buffer.currentBuffer(), false, true))
+				try (var mapped = buffer.currentBuffer().map(false, true))
 				{
 					var bytes = mapped.data();
 					for (float value : data)

@@ -14,6 +14,8 @@ import com.arcanc.pulselib.content.renderer.plan.*;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.arcanc.pulselib.util.PResourceCache;
 import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
+import com.mojang.blaze3d.GpuFormat;
+import com.mojang.blaze3d.IndexType;
 import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
@@ -106,7 +108,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 	@Override
 	public void execute(PRenderPlan plan, PRenderFrame frame)
 	{
-		execute(plan, frame, PLibRenderHelper.mc().getMainRenderTarget());
+		execute(plan, frame, PLibRenderHelper.mc().gameRenderer.mainRenderTarget());
 	}
 
 	/** Uses opaque depth independently of the eventual transparency destination. */
@@ -270,7 +272,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 					old.close();
 				this.worldOpaqueDepth.destroyBuffers();
 			}
-			this.worldOpaqueDepth = new TextureTarget("PulseLib opaque world depth", source.width, source.height, true);
+			this.worldOpaqueDepth = new TextureTarget("PulseLib opaque world depth", source.width, source.height, true, GpuFormat.RGBA8_UNORM);
 		}
 		PGlWeightedBlendedOit pending = this.weightedBlendedOits.get(this.worldOpaqueDepth);
 		if (pending != null)
@@ -284,7 +286,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 	{
 		if (!plan.isEmpty())
 			execute(plan, new PGlRenderHost().captureFrame(), this.worldDepthValid && this.worldOpaqueDepth != null ?
-					this.worldOpaqueDepth : Minecraft.getInstance().getMainRenderTarget());
+					this.worldOpaqueDepth : Minecraft.getInstance().gameRenderer.mainRenderTarget());
 	}
 
 	/** Invalidates the snapshot when the world's framegraph pass has completed. */
@@ -433,7 +435,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 				Objects.requireNonNull(this.activeOitAttachments, "OIT pass attachments");
 
 		try (RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-				first :: label, attachments.color(), OptionalInt.empty(), attachments.depth(), OptionalDouble.empty()))
+				first :: label, attachments.color(), Optional.empty(), attachments.depth(), OptionalDouble.empty()))
 		{
 			pass.setPipeline(resolvePipeline(type, oitPass));
 			RenderSystem.bindDefaultUniforms(pass);
@@ -448,9 +450,9 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 				pass.bindTexture("LayerDepthSampler", oitPass == OitPass.DEPTH_PEEL ?
 						activeOit().previousLayerDepthView() : activeOit().activeLayerDepthView(),
 						RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST));
-			pass.setVertexBuffer(0, this.stateVertices);
-			pass.setIndexBuffer(this.stateIndices, VertexFormat.IndexType.INT);
-			pass.drawIndexed(0, 0, 0, 1);
+			pass.setVertexBuffer(0, this.stateVertices.slice());
+			pass.setIndexBuffer(this.stateIndices, IndexType.INT);
+			pass.drawIndexed(0, 1, 0, 0, 0);
 			if (oitPass != OitPass.NONE)
 				activeOit().bindForDraw();
 
@@ -525,7 +527,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 		RenderType type = draw.type();
 		// Ordinary world alpha runs after the native item/entity target has completed its pass.
 		RenderTarget target = draw.transparency() == PTransparencyMode.ORDINARY && PRenderTypes.usesOit(type) ?
-				Minecraft.getInstance().getMainRenderTarget() : type.outputTarget().getRenderTarget();
+				Minecraft.getInstance().gameRenderer.mainRenderTarget() : type.outputTarget().getRenderTarget();
 		GpuTextureView color = RenderSystem.outputColorTextureOverride != null ?
 				RenderSystem.outputColorTextureOverride : target.getColorTextureView();
 		GpuTextureView depth = RenderSystem.outputColorTextureOverride != null ? RenderSystem.outputDepthTextureOverride :

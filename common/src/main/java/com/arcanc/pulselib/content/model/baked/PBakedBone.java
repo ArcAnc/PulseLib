@@ -98,7 +98,7 @@ public record PBakedBone(String name,
 			poseStack.translate(pose.translation(boneIndex).x(), pose.translation(boneIndex).y(), pose.translation(boneIndex).z());
 			poseStack.mulPose(pose.rotation(boneIndex));
 			poseStack.scale(pose.scale(boneIndex).x(), pose.scale(boneIndex).y(), pose.scale(boneIndex).z());
-			Matrix4f matrix4fstack = new Matrix4f(RenderSystem.getModelViewMatrix());
+			Matrix4f matrix4fstack = RenderSystem.getModelViewMatrixCopy();
 			matrix4fstack.mul(poseStack.last().pose());
 
 			PMeshRenderContext boneContext = inherited;
@@ -246,7 +246,7 @@ public record PBakedBone(String name,
 			poseStack.translate(frame.translation().x(), frame.translation().y(), frame.translation().z());
 			poseStack.mulPose(frame.rotation());
 			poseStack.scale(frame.scale().x(), frame.scale().y(), frame.scale().z());
-			Matrix4f matrix4fstack = new Matrix4f(RenderSystem.getModelViewMatrix());
+			Matrix4f matrix4fstack = RenderSystem.getModelViewMatrixCopy();
 			matrix4fstack.mul(poseStack.last().pose());
 			this.meshes().forEach(mesh -> drawMesh(mesh, this, resolver, inherited, matrix4fstack));
 			this.children().forEach(child -> child.instantDraw(poseStack, poseResolver, resolver, inherited));
