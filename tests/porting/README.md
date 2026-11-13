@@ -88,3 +88,32 @@ never added to production source sets, standard build, CI, jarJar or include.
 Successful fixtures do not establish a complete production mod build, full dedicated server startup,
 NeoForge FML integration, client-only Mixin loading, Animation Graph playback against baked models,
 resource loading, or graphics correctness. Those remain separate required checks.
+
+NeoForge dedicated bootstrap (requires the core init script first):
+
+```bash
+./gradlew --init-script tests/porting/core-check.gradle --init-script tests/porting/neoforge-bootstrap-check.gradle :neoforge:checkPortingBootstrap --no-parallel --no-daemon --console=plain
+```
+
+This separate selected-core fixture runs real FML 11.0.16 dedicated startup and the real
+`ServerModLoader.load(false)`. FML instantiates the production `PLib` constructor, delivers common,
+dedicated and load-complete events, and executes the original `CommonEvents` deferred queue.
+The actual NeoForge finder scans real mod annotation data, including a Java 25 CLIENT candidate
+with a Minecraft client superclass that must never load on a server. The actual manager registers
+the SERVER fixture plugin once. No fake ModList, lifecycle event, event bus or registry is supplied.
+
+Production Common/NeoForge Mixin configs, AT and service descriptors are included unchanged in the
+fixture. Its extra mod metadata and assertions are test-only; this JAR is not a distribution.
+The launcher uses FML's dedicated content loader, then closes it before MinecraftServer/world
+creation. Success requires a marker in the real log, absence of world state, positive loading of
+production bootstrap classes, and zero Minecraft client, Blaze3D or PulseLib GL/legacy backend
+classes in the JVM class-loading log. Only a fresh directory under `neoforge/build/porting-core`
+is used, with a two-minute timeout. EULA acceptance, world ticks, datapack loading and graphics are
+outside this check.
+
+The production NeoForge entrypoint now resolves an internal client bootstrap service only inside
+its existing physical-client branch. That provider calls the same `ClientEvents.registerClientEvents`
+method as before; its resource descriptor is mandatory and uses the existing strict PulseServices
+contract. The server fixture intentionally does not package the client implementation, so a server
+attempt to resolve it would fail. Production source sets still include it. Actual client execution
+of the provider remains part of client/render integration validation.

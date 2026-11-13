@@ -9,9 +9,10 @@
 
 package com.arcanc.pulselib;
 
-import com.arcanc.pulselib.content.event.ClientEvents;
 import com.arcanc.pulselib.content.event.CommonEvents;
 import com.arcanc.pulselib.content.registration.PLibRegistration;
+import com.arcanc.pulselib.neoforge.INeoForgeClientBootstrap;
+import com.arcanc.pulselib.platform.PulseServices;
 import com.arcanc.pulselib.util.PLibDatabase;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -24,14 +25,14 @@ public class PLib
 	public PLib(IEventBus modEventBus, ModContainer modContainer)
 	{
 		PLibRegistration.init();
-	    
+
 		setupEvents(modEventBus);
 	}
-	
+
 	private void setupEvents(final IEventBus modEventBus)
 	{
 		CommonEvents.registerCommonEvents(modEventBus);
 		if (FMLLoader.getCurrent().getDist().isClient())
-			ClientEvents.registerClientEvents(modEventBus);
+			PulseServices.load(INeoForgeClientBootstrap.class).register(modEventBus);
 	}
 }

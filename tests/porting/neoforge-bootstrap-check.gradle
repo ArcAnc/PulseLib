@@ -1,0 +1,122 @@
+/**
+ * @author ArcAnc
+ * Created at: 13.11.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
+initscript
+{
+	repositories { mavenCentral() }
+	dependencies { classpath 'org.ow2.asm:asm:9.10.1' }
+}
+
+import org.gradle.api.artifacts.component.ProjectComponentIdentifier
+import org.objectweb.asm.ClassWriter
+import org.objectweb.asm.Opcodes
+
+gradle.projectsEvaluated
+{
+	def common = gradle.rootProject.findProject(':common')
+	if (common == null)
+		return
+	def neo = gradle.rootProject.project(':neoforge')
+	def fixture = gradle.rootProject.file('tests/porting')
+	def integration = common.layout.buildDirectory.dir('porting-core/integration')
+	def external = neo.configurations.compileClasspath.incoming.artifactView
+	{
+		componentFilter { !(it instanceof ProjectComponentIdentifier) }
+	}.files
+	def runtime = neo.configurations.runtimeClasspath.incoming.artifactView
+	{
+		componentFilter { !(it instanceof ProjectComponentIdentifier) }
+	}.files
+	def output = neo.layout.buildDirectory.dir('porting-core/bootstrap-classes')
+	def compile = neo.tasks.register('compilePortingBootstrapFixture', JavaCompile)
+	{
+		dependsOn common.tasks.named('compilePortingIntegrationChecks'), neo.tasks.named('createMinecraftArtifacts')
+		source new File(fixture, 'src/neoforge/java')
+		source(['PLib', 'content/event/CommonEvents', 'neoforge/NeoForgePlatform',
+				'neoforge/NeoForgePulsePluginFinder', 'neoforge/INeoForgeClientBootstrap'].collect
+		{ neo.file('src/main/java/com/arcanc/pulselib/' + it + '.java') })
+		classpath = neo.files(integration, external)
+		javaCompiler = neo.javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(25) }
+		options.release = 25
+		options.encoding = 'UTF-8'
+		options.compilerArgs.add('-proc:none')
+		options.sourcepath = neo.files()
+		destinationDirectory = output
+		doLast
+		{
+			def writer = new ClassWriter(0)
+			writer.visit(69, Opcodes.ACC_PUBLIC | Opcodes.ACC_ABSTRACT,
+					'com/arcanc/pulselib/porting/ForbiddenNeoForgeClientPlugin', null,
+					'net/minecraft/client/renderer/texture/AbstractTexture', null)
+			def annotation = writer.visitAnnotation('Lcom/arcanc/pulselib/api/plugin/PulsePlugin;', true)
+			annotation.visitEnum('value', 'Lcom/arcanc/pulselib/api/plugin/PulsePlugin$Side;', 'CLIENT')
+			annotation.visitEnd()
+			writer.visitEnd()
+			new File(output.get().asFile, 'com/arcanc/pulselib/porting/ForbiddenNeoForgeClientPlugin.class').bytes = writer.toByteArray()
+		}
+	}
+	def jar = neo.tasks.register('portingBootstrapFixtureJar', Jar)
+	{
+		dependsOn compile
+		archiveFileName = 'pulselib-stage2-neoforge-fixture.jar'
+		destinationDirectory = neo.layout.buildDirectory.dir('porting-core')
+		from(integration) { exclude 'com/arcanc/pulselib/porting/**' }
+		from output
+		from new File(fixture, 'src/neoforge/resources')
+		from(neo.file('src/main/resources')) { include 'META-INF/services/**', 'pulselib.neoforge.mixins.json' }
+		from(common.file('src/main/resources')) { include 'pulselib.mixins.json', 'META-INF/accesstransformer.cfg' }
+	}
+	neo.tasks.register('checkPortingBootstrap', JavaExec)
+	{
+		group = 'verification'
+		description = 'Runs actual FML dedicated mod bootstrap against a selected-core fixture; no MinecraftServer/world.'
+		dependsOn jar
+		classpath = neo.files(jar.flatMap { it.archiveFile }, runtime)
+		mainClass = 'com.arcanc.pulselib.porting.NeoForgeFixtureLauncher'
+		jvmArgs '--enable-native-access=ALL-UNNAMED', '--sun-misc-unsafe-memory-access=allow',
+				'--add-opens=java.base/java.lang.invoke=ALL-UNNAMED', '--add-exports=jdk.naming.dns/com.sun.jndi.dns=java.naming'
+		maxHeapSize = '1G'
+		timeout = java.time.Duration.ofMinutes(2)
+		doFirst
+		{
+			def parent = neo.layout.buildDirectory.dir('porting-core').get().asFile.toPath()
+			workingDir = java.nio.file.Files.createTempDirectory(parent, 'bootstrap-run-').toFile()
+			jvmArgs '-Xlog:class+load=info:file=' + new File(workingDir, 'classloading.log').absolutePath
+			logger.lifecycle('Isolated NeoForge fixture directory: {}', workingDir)
+		}
+		doLast
+		{
+			def log = new File(workingDir, 'logs/latest.log')
+			if (!log.isFile() || !log.text.contains('PULSELIB_NEOFORGE_FIXTURE_PASSED'))
+				throw new GradleException('NeoForge fixture ended without its success marker')
+			if (!neo.fileTree(workingDir) { include '**/level.dat', '**/session.lock' }.isEmpty())
+				throw new GradleException('NeoForge fixture unexpectedly created world state')
+			def loaded = new File(workingDir, 'classloading.log').text
+			['com.arcanc.pulselib.PLib', 'com.arcanc.pulselib.content.event.CommonEvents',
+					'com.arcanc.pulselib.neoforge.NeoForgePulsePluginFinder'].each
+			{ name ->
+				if (!loaded.contains(name + ' source:'))
+					throw new GradleException('Expected production class not loaded: ' + name)
+			}
+			['net.minecraft.client.', 'com.mojang.blaze3d.',
+					'com.arcanc.pulselib.content.renderer.gl.', 'com.arcanc.pulselib.content.renderer.legacy.'].each
+			{ prefix ->
+				if (loaded.readLines().any { it.contains('] ' + prefix) })
+					throw new GradleException('Client/GPU class loaded on dedicated side: ' + prefix)
+			}
+			['com.arcanc.pulselib.content.event.ClientEvents', 'com.arcanc.pulselib.neoforge.NeoForgeClientBootstrap',
+					'com.arcanc.pulselib.porting.ForbiddenNeoForgeClientPlugin'].each
+			{ name ->
+				if (loaded.contains(name + ' source:'))
+					throw new GradleException('Client implementation loaded on dedicated side: ' + name)
+			}
+			logger.lifecycle('Class loading audit passed: production entrypoints present, no Minecraft client/Blaze3D/Pulse GPU classes')
+		}
+	}
+}
