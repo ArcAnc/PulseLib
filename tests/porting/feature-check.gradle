@@ -20,7 +20,7 @@ gradle.projectsEvaluated
 	def shared = common.layout.buildDirectory.dir('porting-rhi/classes')
 	def output = common.layout.buildDirectory.dir('porting-feature/classes')
 	def names = [
-		'content/mixin/ItemSubmitMixin', 'content/mixin/ItemFeatureRendererMixin',
+		'content/mixin/ItemSubmitMixin', 'content/mixin/ItemFeatureRendererMixin', 'content/mixin/WeatherEffectRendererMixin',
 		'content/mixin/ModelPartSubmitMixin', 'content/mixin/ModelPartFeatureRendererMixin',
 		'content/mixin/PlayerModelSubmitMixin', 'content/mixin/PlayerModelFeatureMixin',
 		'content/mixin/ArmorProviderSubmitMixin', 'content/mixin/ArmorProviderFeatureMixin',

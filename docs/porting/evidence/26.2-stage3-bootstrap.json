@@ -4,7 +4,7 @@
   "copyright": "Copyright (c) 2026",
   "license": "Arc's License of Common Sense (LICENSE.txt)",
   "start_commit": "1d2470ffc21cea0dd4a92bb6f153f8f1b572421c",
-  "stage3_status": "PARTIAL: Common/Fabric production compilation, Fabric build and full OpenGL bootstrap now work; native model draw/game matrix and complete NeoForge/Vulkan still pending",
+  "stage3_status": "PARTIAL: all three modules build from clean committed sources; earlier Fabric OpenGL client/world smoke passed; final native loader corrections passed strict class transformation. NeoForge full run reached warning screen and timed out, final Fabric repeat timed out, full Vulkan reload failed on 10 legacy shader layouts. Pulse model game draws not verified",
   "whole_migration_complete": false,
   "source_refs": {
     "26.1.2-multiloader": "5065103d1bccc7880445f9e93bc6ed709cfbb809",
@@ -58,7 +58,14 @@
     "common/src/main/java/com/arcanc/pulselib/content/renderer/PWorldRenderPass.java": "4df3958e8f4850e439d4faa38419795fd73199da8bc6b2f45bc68b3a6c8c332b",
     "fabric/src/main/java/com/arcanc/pulselib/fabric/PulseLibFabricClient.java": "712c192253a9b3310967e8a512a4a546dc495bb512ef1a210b6f4eae310bb92b",
     "tests/porting/README.md": "b2e3eca7628a99d5700530f6f0ee0804350d0700220d6706f3706bab333227e5",
-    "tests/porting/client-check.gradle": "c01b2e427de9ef8cf9cbc0e9077fca2dfc07ff2e9adea60559c20182163013d1"
+    "tests/porting/client-check.gradle": "c01b2e427de9ef8cf9cbc0e9077fca2dfc07ff2e9adea60559c20182163013d1",
+    "tests/porting/feature-check.gradle": "c96d537bdbcb168704b8ee23a393d4d761a93b7a32649ccd59d962bc79995d78",
+    "tests/porting/rhi-loader-check.gradle": "2af8f272cafa4c39284e015542ad5b05b8c9a0c81da423fe49268bedb7bb4b9d",
+    "tests/porting/src/feature/java/com/arcanc/pulselib/content/player/deformer/FeatureChecks.java": "3b1bf8ab1caf52a1466194e14f4cd01cb5a33e7e5a2aebd4111d76fa82ba857a",
+    "tests/porting/src/feature/resources/pulselib-feature-fixture.mixins.json": "9d4e514f7adc5d0444db81a5616d9b13366658e12e8ce9ed22986efbe863a4aa",
+    "tests/porting/src/rhi-fabric/java/com/arcanc/pulselib/content/renderer/rhi/FabricPipelineChecks.java": "72aa8b22bf432e98e06293e913d2183bdf2184295e59baee252efb2844f76b80",
+    "tests/porting/src/rhi-fabric/resources/fabric.mod.json": "cddb7e28decc00b083e3ff597ed0ee78af52f783b97de058a493e27702599afd",
+    "tests/porting/src/rhi-fabric/resources/pulselib-weather-fixture.mixins.json": "aa134da5a5c38099d01eef5aca443d1c3b86a687ab01dd6e51764d6f7a5dcb1b"
   },
   "user_state": {
     "AGENTS.md": {
@@ -115,7 +122,10 @@
     "fabric_Vulkan": "FAIL full production resource reload: ten legacy instanced pipelines lack shader vertex inputs. Actual Vulkan selected. Gradle exit 0 is NOT a successful game/render test",
     "full_game_Pulse_models_OIT_GUI_player": "NOT VERIFIED; no Pulse model declarations, explicit screenshot only vanilla scene/pause menu; title/world bootstrap is not acceptance of model rendering or all lazy Mixin targets",
     "full_Vulkan": "NOT CONFIRMED",
-    "API": "Native GUI constructor replaces removed MultiBufferSource parameter; existing 3-argument prepare and 2-argument protected renderToTexture preserved as delegates, new native overloads added. Removed Mixin Shadow clearSubmitNodes: native method no longer exists; failure cleanup now clears invocation storage"
+    "API": "Native GUI constructor replaces removed MultiBufferSource parameter; existing 3-argument prepare and 2-argument protected renderToTexture preserved as delegates, new native overloads added. Removed Mixin Shadow clearSubmitNodes: native method no longer exists; failure cleanup now clears invocation storage",
+    "neoforge_production_bootstrap": "PARTIAL: actual OpenGL, strict production config, built-in/plugin registration and default resource reload completed; deprecated logoFile warning screen inspected. Run timed out at 180s (124); no title/world or normal Quit verified. Isolated JVM stopped afterwards",
+    "final_full_Fabric_repeat": "INCOMPLETE/FAIL timeout: final source repeat after loader fixes selected OpenGL but did not finish initialization before 3m timeout. Earlier pre-follow-up full client/world smoke passed; not substituted for this result. No root cause inferred from absent errors",
+    "final_native_weather_regressions": "PASS current source in actual NeoForge FML CLIENT and Fabric Knot CLIENT, strict production WeatherEffectRendererMixin; no game instance or weather GPU draw"
   },
   "Vulkan_missing_inputs": [
     "InstanceOverlay",
@@ -145,24 +155,31 @@
   ],
   "screenshot": "26.2-stage3-bootstrap-opengl.png: actual fresh test world pause menu, not a Pulse model/rendering assertion",
   "user_saves": "UNTOUCHED: all client work directories under build; one new isolated test world created/saved there",
-  "next": "Continue stage 3: validate committed clean NeoForge tree, actual Pulse model queue/default preparation game checks; resolve required shader attribute layout without disabling pipelines or Vulkan; full GUI/world/player/OIT acceptance stays in later stages",
+  "next": "Continue stage 3: investigate final full-client timeout, address NeoForge deprecated logo metadata, prepare minimal Pulse production scene/default queue/material checks; preserve user draft metadata, do not suppress native shader-layout failure or disable Vulkan/OIT",
   "clean_checkout_build": {
     "commit": "9b386ae9a13f9e5a2e8b5414af0bbffca90c6ab0",
     "command": "./gradlew :common:compileJava :neoforge:build :fabric:build --no-parallel --no-daemon --console=plain",
     "exit_code": 0,
     "source_exclusions": false,
-    "user_changes_included": false
+    "user_changes_included": false,
+    "final_commit": "0099f6d0465e8aa08ff70abae11799c7d9447c11",
+    "final_exit_code": 0,
+    "latest_task_status": "UP-TO-DATE from successful compile/build phase of the same committed tree; no source exclusions"
   },
   "NeoForge_hand_erasure": {
     "source_type": "AvatarlikeEntity extends Avatar & ClientAvatarEntity",
     "erased_type": "net.minecraft.world.entity.Avatar",
     "initial_full_bootstrap": "FAIL group expected 1, matched 0: AbstractClientPlayer source argument was not the descriptor",
     "correction": "actual Avatar descriptor and private handler/helper argument types, no suppression",
-    "runtime_recheck": "pending final audit"
+    "runtime_recheck": "PASS full committed NeoForge client transform: strict right/left hand groups accepted; native resource reload completed"
   },
   "NeoForge_weather_overload": {
     "initial_full_bootstrap": "FAIL: NeoForge two-argument render is a forwarding overload; native weather body is three-argument render with nullable LevelRenderState",
     "correction": "two exact loader descriptors selected, require=1 and allow=1 across them; one native transparency call, no suppression",
-    "runtime_recheck": "pending final audit"
-  }
+    "runtime_recheck": "PASS full NeoForge transform/reload plus strict targeted FML CLIENT and Fabric Knot CLIENT weather class transformation, require=1/allow=1"
+  },
+  "audit_date": "2026-11-14",
+  "production_commit": "0099f6d0465e8aa08ff70abae11799c7d9447c11",
+  "clean_NeoForge_log_sha256": "44a843a933ecf707cde9b72941c19e93dccbebb926dfd1197892776489305d6f",
+  "clean_NeoForge_game_exit_code": 124
 }

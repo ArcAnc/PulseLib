@@ -70,6 +70,8 @@ public final class FeatureChecks
 		SharedConstants.tryDetectVersion();
 		NativeLibrariesBootstrap.loadLibraries();
 		Bootstrap.bootStrap();
+		Class.forName("net.minecraft.client.renderer.WeatherEffectRenderer", false, FeatureChecks.class.getClassLoader());
+		System.out.println("PASS strict NeoForge weather Redirect: native overloads, require=1/allow=1; no weather GPU draw");
 		items();
 		modelParts();
 		playerGeometry();

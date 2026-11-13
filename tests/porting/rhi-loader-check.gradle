@@ -31,6 +31,7 @@ gradle.projectsEvaluated
 	{
 		dependsOn common.tasks.named('compilePortingRhiChecks')
 		source root.file('tests/porting/src/rhi-fabric/java')
+		source root.file('common/src/main/java/com/arcanc/pulselib/content/mixin/WeatherEffectRendererMixin.java')
 		source fabric.file('src/main/java/com/arcanc/pulselib/fabric/FabricRhiPipelines.java')
 		classpath = fabric.files(shared, external)
 		javaCompiler = fabric.javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(25) }

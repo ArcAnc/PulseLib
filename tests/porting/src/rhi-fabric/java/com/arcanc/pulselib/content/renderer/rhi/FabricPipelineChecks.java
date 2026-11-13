@@ -22,7 +22,7 @@ import java.util.HashSet;
 /** Verifies the production helper against the real widened native registry in Knot's CLIENT loader. */
 public final class FabricPipelineChecks
 {
-	public static void main(String[] args)
+	public static void main(String[] args) throws ClassNotFoundException
 	{
 		SharedConstants.tryDetectVersion();
 		if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT)
@@ -31,6 +31,8 @@ public final class FabricPipelineChecks
 		if (game == ClassLoader.getSystemClassLoader() || FabricRhiPipelines.class.getClassLoader() != game ||
 				PRhiPipelines.class.getClassLoader() != game || RenderPipelines.class.getClassLoader() != game)
 			throw new AssertionError("Registration must execute entirely in Knot's game class loader");
+		Class.forName("net.minecraft.client.renderer.WeatherEffectRenderer", false, game);
+		System.out.println("PASS strict Fabric weather Redirect: native overloads, require=1/allow=1; no weather GPU draw");
 		var before = new HashSet<>(RenderPipelines.getStaticPipelines());
 		FabricRhiPipelines.register();
 		var after = new HashSet<>(RenderPipelines.getStaticPipelines());

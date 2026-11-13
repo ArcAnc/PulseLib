@@ -1,0 +1,9 @@
+{
+  "required": true,
+  "package": "com.arcanc.pulselib.content.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "client": ["WeatherEffectRendererMixin"],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
