@@ -1,0 +1,10 @@
+# @author ArcAnc; Created at: 14.11.2026; Copyright (c) 2026
+license="Arc's License of Common Sense"
+[[mods]]
+modId="pulselib_client_scene"
+version="1.0.0"
+displayName="PulseLib production scene (test only)"
+authors="ArcAnc"
+description="Client-only native queue/readback scene. Not a distribution."
+[[mixins]]
+config="pulselib-scene.mixins.json"

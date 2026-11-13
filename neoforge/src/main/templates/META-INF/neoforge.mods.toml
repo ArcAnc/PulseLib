@@ -1,3 +1,5 @@
+# @author ArcAnc; Created at: 21.10.2026; Copyright (c) 2026
+# Arc's License of Common Sense (LICENSE.txt).
 license="${mod_license}"
 issueTrackerURL="https://github.com/ArcAnc/PulseLib/issues"
 [[mods]]
@@ -6,7 +8,7 @@ version="${mod_version}"
 displayName="${mod_name}"
 #updateJSONURL="https://change.me.example.invalid/updates.json"
 displayURL="https://github.com/ArcAnc/PulseLib"
-logoFile="logo.png"
+iconFile="logo.png"
 #credits=""
 authors="ArcAnc"
 description='''

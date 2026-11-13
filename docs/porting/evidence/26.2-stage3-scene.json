@@ -1,0 +1,118 @@
+{
+  "author": "ArcAnc",
+  "created_at": "2026-11-14",
+  "copyright": "Copyright (c) 2026",
+  "license": "Arc's License of Common Sense (LICENSE.txt)",
+  "start_commit": "29ac5803129dc3ec6f641334627512f2cdc9c682",
+  "source_refs": {
+    "26.1.2-multiloader": "5065103d1bccc7880445f9e93bc6ed709cfbb809",
+    "master": "e85973a7a71fde0a237da1153a42c12d3578ebae"
+  },
+  "stage3_status": "COMPLETE: basic geometry/backend criteria, native client offscreen acceptance on NeoForge/OpenGL and Fabric/OpenGL; world/player/GUI/OIT/GPU deformers and full Vulkan remain later stages",
+  "whole_migration_complete": false,
+  "checks": {
+    "full_client_scene": "PASS both real loader clients, all production classes/resources/Mixins, no material/prepared/output callbacks; actual TextureManager/overlay/UI lightmap, native projection capture, PRenderQueue -> PFrameCompiler -> RHI -> native GPU/readback",
+    "geometry": "PASS four profiles x 1025 alternating canonical portable/baked-mesh instance pixel assertions; indexed draws; alpha visible/discard/force-opaque; dynamic CPU data move 0/4/0, close and GPU cleanup/recreate; borrowed targets remain open",
+    "dispatch": "MEASURED 20 non-empty PRhiDrawExecutor.execute calls and 0 legacy executions per client, observed with non-cancelling test-only Mixins",
+    "shutdown": "PASS explicit result files, natural client.stop()/Stopping!/exit 0; no timeout or UI action required",
+    "regressions": "PASS full Fabric build/Common compile, native feature and weather hooks, std140 and offsets, registration/AW and actual OpenGL/Vulkan basic RHI fixtures",
+    "build": "PASS isolated tracked-source checkout with only owned scene/metadata overlay: Common compileJava, NeoForge build, Fabric build; no source exclusions",
+    "metadata": "NeoForge iconFile replaces deprecated logoFile for unchanged 1024x1024 logo; creation date 21.10.2026 verified at 908b17a73a2c2488af97928bf1ec7e5531d359e0",
+    "API": "UNCHANGED production public/protected declarations; no production Java file changed this turn",
+    "timeout_diagnosis": "Fresh Gradle client reached normal FramerateLimiter.limitDisplayFPS loop. Historical final timeout not proven to be deadlock; auto scene now uses explicit result + shutdown. IDE stale ASM duplicates bypassed with remote debugger on actual Gradle classpath",
+    "failed_test_diagnosis": "Initial dynamic move assertion failed due to default new Vector4f().w=1 clear alpha; debugger showed new x=3.0 and alreadyUploaded=false. Test clear changed to explicit 0/0/0/0; production backend unchanged",
+    "world_GUI_player_OIT_deformers": "NOT ACCEPTED by this offscreen scene; remain stages 4-8",
+    "full_Vulkan": "NOT CONFIRMED: historical full-client reload still known FAIL on legacy shader vertex inputs; basic Vulkan GPU fixture passes do not change this"
+  },
+  "images": [
+    {
+      "profile": "lit-solid",
+      "evidence": "26.2-stage3-scene-lit-solid.png",
+      "neoforge_sha256": "42f2fea9b8277b9f7953b44f7ce5257418870943ac299364f19d2aee4a489be5",
+      "fabric_sha256": "42f2fea9b8277b9f7953b44f7ce5257418870943ac299364f19d2aee4a489be5",
+      "pixel_bytes_equal": true
+    },
+    {
+      "profile": "lit-cutout",
+      "evidence": "26.2-stage3-scene-lit-cutout.png",
+      "neoforge_sha256": "42f2fea9b8277b9f7953b44f7ce5257418870943ac299364f19d2aee4a489be5",
+      "fabric_sha256": "42f2fea9b8277b9f7953b44f7ce5257418870943ac299364f19d2aee4a489be5",
+      "pixel_bytes_equal": true
+    },
+    {
+      "profile": "emissive-solid",
+      "evidence": "26.2-stage3-scene-emissive-solid.png",
+      "neoforge_sha256": "ca2e2aede89c3fe9361665144df501a4c5c2fbc3543983ca3d641fcf47acab82",
+      "fabric_sha256": "ca2e2aede89c3fe9361665144df501a4c5c2fbc3543983ca3d641fcf47acab82",
+      "pixel_bytes_equal": true
+    },
+    {
+      "profile": "emissive-cutout",
+      "evidence": "26.2-stage3-scene-emissive-cutout.png",
+      "neoforge_sha256": "ca2e2aede89c3fe9361665144df501a4c5c2fbc3543983ca3d641fcf47acab82",
+      "fabric_sha256": "ca2e2aede89c3fe9361665144df501a4c5c2fbc3543983ca3d641fcf47acab82",
+      "pixel_bytes_equal": true
+    }
+  ],
+  "source_hashes": {
+    "neoforge/src/main/templates/META-INF/neoforge.mods.toml": "16f17357d1d7bd8b60dcddabea01770bce68c53dff8611119f31c96ff468a01a",
+    "tests/porting/README.md": "32348ca939534aafce1d414dd5d8396f10cecd32d611c9b32e4075705196f488",
+    "tests/porting/scene-check.gradle": "dccb4285833598f15d66621d7578f0cbeb3bcaedaf20b5feb2406d66afee476c",
+    "tests/porting/src/scene/java/com/arcanc/pulselib/porting/scene/SceneChecks.java": "6b7556432c2751c0169ecef4e1e282fdbaa0ac168d3be76be499f74a99cde178",
+    "tests/porting/src/scene/java/com/arcanc/pulselib/porting/scene/mixin/LegacyObserver.java": "3ba12c9be0158cd3159e8732dd9dd232ea11963d78148868f8e544be9f874b48",
+    "tests/porting/src/scene/java/com/arcanc/pulselib/porting/scene/mixin/RhiObserver.java": "ccebfecb97036698d8ffc7fa70a615b988dd92bf85a8a8267e7bfb716adf4318",
+    "tests/porting/src/scene/java/com/arcanc/pulselib/porting/scene/mixin/SceneMixin.java": "2c5bdba77eff5c753126d8c76b1fa13bdf000f40e2fe8bb7cdbb591f1fc1ca45",
+    "tests/porting/src/scene/java/com/arcanc/pulselib/porting/scene/mixin/package-info.java": "dde4a3dfb75daeb31f929bce9df1b3c79edec8e53a2d9c71fa39402aba3ad32d",
+    "tests/porting/src/scene/java/com/arcanc/pulselib/porting/scene/package-info.java": "616f97da16933a986dc4ec18c6515031a11427b715ce89db7abc4784dc35c645",
+    "tests/porting/src/scene/resources/META-INF/neoforge.mods.toml": "20d9282782d62e3172db5c1222ffec21a21842513f8cb7ad74fb8e8bda5a644a",
+    "tests/porting/src/scene/resources/fabric.mod.json": "6cbb319856b4c627de67a99682d68fc75d43d8ef58f04880cb977fe449e0dd7b",
+    "tests/porting/src/scene/resources/pulselib-scene.mixins.json": "a981e6498964f1754e2dd16f82a761240ec9d011dd2f4ce8b5b50f11cefd6380"
+  },
+  "user_state": {
+    "AGENTS.md": {
+      "sha256": "f36caed236f51dd48ff3c166937be845b7e32a9ddf40ebf5b942a37e9ca7fe82",
+      "index": "100644 c474ce7487bde7e5cdf3548cf0c4950e92acb551 0\tAGENTS.md\n"
+    },
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderContexts.java": {
+      "sha256": "fe3bf6e617b90e93b908a8bffadd669ebd4da6192157861a02cca28a0625571f",
+      "index": "100644 9f875d6d798e1d605359f5eb9e46aeaced966917 0\tcommon/src/main/java/com/arcanc/pulselib/content/renderer/PRenderContexts.java\n"
+    },
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java": {
+      "sha256": "33ec83996ec05c2a1e2130f0266bb4f8cc311908ac507b29bf5e8e84eb1692eb",
+      "index": "100644 e884c98b792b9c300820406e2c065894785c43d6 0\tcommon/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java\n"
+    },
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java": {
+      "sha256": "62dffd0b684b25e0647a31b9e71759da156002106c216ada8431c6b3617f355b",
+      "index": "100644 93898dc40c6725c5c0f38cedccb446480ed88e10 0\tcommon/src/main/java/com/arcanc/pulselib/content/renderer/legacy/GlRenderState.java\n"
+    },
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/FieldsAreNonnullByDefault.java": {
+      "sha256": null,
+      "index": ""
+    },
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/MethodsReturnNonnullByDefault.java": {
+      "sha256": null,
+      "index": ""
+    },
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/PRhiOpaqueRenderer.java": {
+      "sha256": "07872a5fd5e8671089dd7fa96d117ac899aaf34ef158a84b193b83e881b94a74",
+      "index": "100644 d1a1f3427b9ea0264fdecb4e9d10f7579bf55da0 0\tcommon/src/main/java/com/arcanc/pulselib/content/renderer/rhi/PRhiOpaqueRenderer.java\n"
+    },
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/package-info.java": {
+      "sha256": "92d0458ab74f4d0e474b4fd2797bbc1d7bc47607a504a1d649b3dc459cb54622",
+      "index": "100644 ea5e97b0f40ba6fb3ad7be0bceb4d86d3321e2ce 0\tcommon/src/main/java/com/arcanc/pulselib/content/renderer/rhi/package-info.java\n"
+    },
+    "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java": {
+      "sha256": "085e21372822673278291204eb63994058b82cc4a490167c4608a9de5d9cf73f",
+      "index": "100644 ce3349e93d77fd34bdc144d47d9c3ce37125b967 0\tcommon/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java\n"
+    },
+    "neoforge/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PArmorClientExtensions.java": {
+      "sha256": "2c19cca4379326157256962bd97122118c8c8bc4adf28f9f26fbef88a47a3ac9",
+      "index": "100644 94593125609efda834f750facc00d57e417a4eed 0\tneoforge/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PArmorClientExtensions.java\n"
+    },
+    "neoforge/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/package-info.java": {
+      "sha256": "5eab3c404490528351fbc4e1a5fb36f59a828884fec8d6adaf4be9c8c22c3101",
+      "index": "100644 2e8e943b56e750abaea5e630b91a1cd7b2a7651d 0\tneoforge/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/package-info.java\n"
+    }
+  },
+  "next_stage": "Stage 4: consistent pipeline/shader instance UBO layouts, all shader families and deformers; address native Vulkan catalog failure. Do not downgrade four-layer OIT or modern render plans."
+}

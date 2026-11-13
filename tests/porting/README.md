@@ -214,3 +214,25 @@ package uses native Blaze3D abstractions only. Both backends were tested on one 
 is not a claim of full Minecraft/PulseLib Vulkan support. Remaining shader families, world/GUI integration,
 deformers, four-layer OIT/Fabulous and Fabric runtime remain pending. Vulkan validation layers and
 long-running GPU memory profiling were not enabled. See the migration journal and stage 3 evidence.
+
+The automated production scene launches a separate test mod alongside the complete PulseLib client:
+
+```bash
+./gradlew --init-script tests/porting/scene-check.gradle :fabric:runClient --no-parallel --no-daemon --console=plain
+./gradlew --init-script tests/porting/scene-check.gradle :neoforge:runClient -PportingSceneLoader=neoforge --no-parallel --no-daemon --console=plain
+```
+
+Use a clean checkout for NeoForge if local draft package metadata duplicates Common. The init script
+changes no production source set or Mixin requirement. It creates a fresh `build/porting-scene/client-*`
+directory, installs only the separate scene JAR and requires an explicit `PASS` result after normal
+Minecraft shutdown; exit code zero without a result fails. No existing save is opened or created.
+The actual backend must be OpenGL. The test waits for native resource loading and renders offscreen
+inside GameRenderer with native TextureManager, lighting/overlay/UI lightmap and default RenderType
+preparation. Production queue/compiler/host/backend are called without material/output callbacks.
+
+For each lit/emissive solid/cutout profile, the scene checks 1025 mixed portable/baked-mesh instance
+pixels, visible/discarded alpha, dynamic geometry updates and close, queue cleanup/recreation and
+borrowed target lifetime. Non-cancelling test-only Mixins require 20 RHI executions and zero legacy
+executions. PNG readbacks and `pulselib-scene-result.txt` remain in the test directory. This is a basic
+renderer acceptance test; it does not validate world stages, OIT/Fabulous, GPU deformation, GUI scopes,
+player integration or full Vulkan support. Scene content is never packaged in production Common.

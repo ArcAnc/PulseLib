@@ -1,0 +1,73 @@
+/**
+ * @author ArcAnc
+ * Created at: 14.11.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
+// Actual game + production PulseLib, with a separate client-only test mod in a fresh mods directory.
+gradle.projectsEvaluated
+{
+	def root = gradle.rootProject
+	def common = root.findProject(':common')
+	if (common == null)
+		return
+	def compile = common.tasks.register('compilePortingScene', JavaCompile)
+	{
+		dependsOn common.tasks.named('classes')
+		source root.fileTree('tests/porting/src/scene/java') { include '**/*.java' }
+		classpath = common.sourceSets.main.output + common.configurations.compileClasspath
+		javaCompiler = common.javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(25) }
+		options.release = 25
+		options.compilerArgs.add('-proc:none')
+		destinationDirectory = common.layout.buildDirectory.dir('porting-scene/classes')
+	}
+	def jar = common.tasks.register('portingSceneJar', Jar)
+	{
+		dependsOn compile
+		archiveFileName = 'pulselib-client-scene.jar'
+		destinationDirectory = common.layout.buildDirectory.dir('porting-scene')
+		from compile.flatMap { it.destinationDirectory }
+		from root.file('tests/porting/src/scene/resources')
+	}
+	def loader = root.providers.gradleProperty('portingSceneLoader').getOrElse('fabric')
+	if (!(loader in ['fabric', 'neoforge']))
+		throw new GradleException('portingSceneLoader must be fabric or neoforge')
+	def project = root.project(':' + loader)
+	def parent = project.layout.buildDirectory.dir('porting-scene').get().asFile
+	parent.mkdirs()
+	def directory = java.nio.file.Files.createTempDirectory(parent.toPath(), 'client-').toFile()
+	if (loader == 'fabric')
+	{
+		project.loom.runs.client.runDirectory.set(project.layout.dir(project.provider { directory }))
+		project.loom.runs.client.programArgs('--graphicsBackend', 'OPENGL')
+	}
+	else
+		project.neoForge.runs.named('client')
+		{
+			gameDirectory = directory
+			programArguments.addAll('--graphicsBackend', 'OPENGL')
+		}
+	project.tasks.named('runClient')
+	{
+		dependsOn jar
+		timeout = java.time.Duration.ofMinutes(2)
+		doFirst
+		{
+			project.copy
+			{
+				from jar.flatMap { it.archiveFile }
+				into new File(directory, 'mods')
+			}
+			logger.lifecycle('PulseLib production scene: ' + directory)
+		}
+		doLast
+		{
+			def result = new File(directory, 'pulselib-scene-result.txt')
+			if (!result.isFile() || result.text.trim() != 'PASS')
+				throw new GradleException('Production scene did not pass: ' + (result.isFile() ? result.text : 'no result'))
+		}
+	}
+}

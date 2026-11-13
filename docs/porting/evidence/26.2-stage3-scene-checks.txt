@@ -1,0 +1,410 @@
+@author ArcAnc
+Created at: 14.11.2026
+Copyright (c) 2026
+This code is licensed under "Arc's License of Common Sense" (LICENSE.txt).
+
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.6.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build
+> Task :buildSrc:extractPluginRequests UP-TO-DATE
+> Task :buildSrc:generatePluginAdapters UP-TO-DATE
+> Task :buildSrc:compileJava UP-TO-DATE
+> Task :buildSrc:compileGroovy UP-TO-DATE
+> Task :buildSrc:compileGroovyPlugins UP-TO-DATE
+> Task :buildSrc:pluginDescriptors UP-TO-DATE
+> Task :buildSrc:processResources UP-TO-DATE
+> Task :buildSrc:classes UP-TO-DATE
+> Task :buildSrc:jar UP-TO-DATE
+
+> Configure project :fabric
+Fabric Loom: 1.17.21
+
+> Task :common:createMinecraftArtifacts UP-TO-DATE
+> Task :common:compileJava UP-TO-DATE
+> Task :fabric:compileJava UP-TO-DATE
+> Task :fabric:processResources UP-TO-DATE
+> Task :fabric:classes UP-TO-DATE
+> Task :fabric:processIncludeJars UP-TO-DATE
+> Task :fabric:jar UP-TO-DATE
+> Task :fabric:javadoc UP-TO-DATE
+> Task :fabric:javadocJar UP-TO-DATE
+> Task :fabric:sourcesJar UP-TO-DATE
+> Task :fabric:assemble UP-TO-DATE
+> Task :neoforge:createMinecraftArtifacts UP-TO-DATE
+> Task :common:compilePortingRhiChecks UP-TO-DATE
+> Task :fabric:compilePortingRhiRegistration UP-TO-DATE
+> Task :fabric:portingRhiRegistrationFixtureJar UP-TO-DATE
+> Task :fabric:compileTestJava NO-SOURCE
+> Task :fabric:processTestResources NO-SOURCE
+> Task :fabric:testClasses UP-TO-DATE
+> Task :fabric:test NO-SOURCE
+> Task :fabric:validateAccessWidener UP-TO-DATE
+> Task :fabric:check UP-TO-DATE
+> Task :fabric:build UP-TO-DATE
+> Task :common:compilePortingFeatureChecks UP-TO-DATE
+> Task :neoforge:portingFeatureFixtureJar UP-TO-DATE
+
+> Task :neoforge:checkPortingFeatures
+2026-11-13T23:07:16.011864868Z main WARN Advanced terminal features are not available in this environment
+[01:07:16] [main/INFO] [ne.ne.fm.st.Entrypoint/]: JVM Uptime at startup: 65ms
+[01:07:16] [main/INFO] [ne.ne.fm.lo.FMLLoader/]: Starting FancyModLoader version 11.0.16 (CLIENT in DEV)
+[01:07:16] [main/INFO] [ne.ne.fm.lo.FMLLoader/]: Game directory: $WORKSPACE/neoforge/build/porting-feature/client-148959662356712503
+[01:07:16] [main/INFO] [ne.ne.fm.lo.EarlyServiceDiscovery/]: Found 2 early service jars (out of 107) in 20ms
+[01:07:16] [main/INFO] [ne.ne.fm.lo.FMLLoader/]: Loading FML Early Services:
+[01:07:16] [main/INFO] [ne.ne.fm.lo.FMLLoader/]:  - $GRADLE_CACHE/caches/modules-2/files-2.1/net.neoforged.fancymodloader/loader/11.0.16/42d3bfead0ba3aa89c7d45ac29115defc9967219/loader-11.0.16.jar
+[01:07:16] [main/INFO] [ne.ne.fm.lo.FMLLoader/]:  - $GRADLE_CACHE/caches/modules-2/files-2.1/net.neoforged.fancymodloader/earlydisplay/11.0.16/2d357375a7ea94a1ca86042d48fa4f719a552894/earlydisplay-11.0.16.jar
+[01:07:16] [main/INFO] [ne.ne.fm.lo.ImmediateWindowHandler/]: Not loading early display in headless mode.
+[01:07:16] [main/INFO] [ne.ne.fm.lo.mo.lo.GameLocator/]: Detected a joined NeoForge and Minecraft configuration. Applying filtering...
+[01:07:16] [main/INFO] [ne.ne.fm.lo.mo.lo.JarInJarDependencyLocator/]: Found 2 dependencies adding them to mods collection
+[01:07:16] [main/INFO] [ne.ne.fm.lo.mo.ModDiscoverer/]:
+     Mod List:
+        Name Version (Mod Id)
+
+        Minecraft 26.2 (minecraft)
+        NeoForge 26.2.0.57 (neoforge)
+        PulseLib native feature fixture (not a distribution) 1.0.0 (pulselib_feature_fixture)
+[01:07:16] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.7 Source=file:$GRADLE_CACHE/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.17.3+mixin.0.8.7/41c4a3984a80f4679e759fb9f495587acc5cdac7/sponge-mixin-0.17.3+mixin.0.8.7.jar Service=FML Env=CLIENT
+[01:07:16] [main/INFO] [ne.ne.fm.lo.FMLLoader/]: Loading FML Plugins:
+[01:07:16] [main/INFO] [ne.ne.fm.lo.FMLLoader/]:  - $GRADLE_CACHE/caches/modules-2/files-2.1/net.neoforged/neoforge/26.2.0.57/c598bbb0216d68504465ee84075ae2915cf956f8/neoforge-26.2.0.57-universal.jar > net.neoforged.neoforge-coremods-26.2.0.57.jar
+[01:07:16] [main/INFO] [ne.ne.fm.lo.FMLLoader/]: Building game content classloader:
+ - minecraft (composite(filtered(jar($WORKSPACE/neoforge/build/moddev/artifacts/minecraft-patched-26.2.0.57.jar)), filtered(jar($WORKSPACE/neoforge/build/moddev/artifacts/minecraft-patched-26.2.0.57.jar))))
+ - mixinextras.neoforge (jar($GRADLE_CACHE/caches/modules-2/files-2.1/net.neoforged/neoforge/26.2.0.57/c598bbb0216d68504465ee84075ae2915cf956f8/neoforge-26.2.0.57-universal.jar > mixinextras-neoforge-0.5.4.jar))
+ - neoforge (composite(filtered(jar($GRADLE_CACHE/caches/modules-2/files-2.1/net.neoforged/neoforge/26.2.0.57/c598bbb0216d68504465ee84075ae2915cf956f8/neoforge-26.2.0.57-universal.jar))))
+ - net.neoforged.fml.generated (empty(VirtualJar/net.neoforged.fml.generated))
+ - pulselib_feature_fixture (jar($WORKSPACE/neoforge/build/porting-feature/pulselib-feature-fixture.jar))
+[01:07:16] [main/INFO] [ne.ne.fm.lo.FMLLoader/]: Built game content classloader in 23ms
+[01:07:16] [main/INFO] [mixin/]: Compatibility level set to JAVA_25
+[01:07:17] [main/INFO] [MixinExtras|Service/]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.5.4).
+PASS strict NeoForge weather Redirect: native overloads, require=1/allow=1; no weather GPU draw
+PASS native item nodes: immutable inputs, main/foil batches, tint fallback, nesting and per-vertex exception restoration
+PASS native Model.Simple/Submit: frozen ModelPart pose/deformation, nested replay, caller flags/bindings and pose-stack rollback
+PASS native model nodes: captured player geometry, post-setup replay and caller restoration without live owner callbacks
+PASS native armor nodes: frozen provider ownership, post-setup replay and exception-safe shared-model restoration
+PULSELIB_FEATURES_PASSED strict production Mixins/native submit and prepare; CPU vertex output only, no full game or GPU draw
+[01:07:21] [main/INFO] [ne.ne.fm.lo.FMLLoader/]: Closing FML Loader 6db65597
+[01:07:21] [main/INFO] [ne.ne.fm.ModLoader/]: Clearing ModLoader
+
+> Task :common:checkPortingRhiLayout
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by org.joml.MemUtil$MemUtilUnsafe (file:$GRADLE_CACHE/caches/modules-2/files-2.1/org.joml/joml/1.10.8/fc0a71dad90a2cf41d82a76156a0e700af8e4f8d/joml-1.10.8.jar)
+WARNING: Please consider reporting this to the maintainers of class org.joml.MemUtil$MemUtilUnsafe
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+PASS canonical/RHI CPU geometry sources, facade layout, listener replacement/removal, all-listener failure propagation and idempotent close
+PASS std140 bytes, zero/511/512/513/1025 instances, multiple-group order, packed firstInstance, alignment 256 and full-block padding
+
+> Task :fabric:checkPortingRhiRegistration
+[01:07:21] [main/INFO]: Loading Minecraft 26.2 with Fabric Loader 0.20.1
+[01:07:21] [main/INFO]: Mappings not present!
+[01:07:21] [main/INFO]: Loading 52 mods:
+    - fabric-advancement-api-v1 1.0.0+58719a3b9e
+    - fabric-api 0.161.0+26.2
+    - fabric-api-base 2.0.4+ece063239e
+    - fabric-api-lookup-api-v1 2.0.18+11e1c9a39e
+    - fabric-biome-api-v1 18.0.6+c7bd5b8e9e
+    - fabric-block-api-v1 3.1.0+53515aab9e
+    - fabric-block-getter-api-v2 2.0.7+ec56b6019e
+    - fabric-client-gametest-api-v1 6.0.2+0f4f1dca9e
+    - fabric-command-api-v2 3.1.0+00cb03469e
+    - fabric-content-registries-v0 11.3.2+37b1aa249e
+    - fabric-convention-tags-v2 4.7.1+1f023a9e9e
+    - fabric-crash-report-info-v1 1.0.5+086d547a9e
+    - fabric-creative-tab-api-v1 5.0.15+6468574f9e
+    - fabric-data-attachment-api-v1 2.2.19+515ac5339e
+    - fabric-data-generation-api-v1 25.6.0+c0da0b829e
+    - fabric-debug-api-v1 1.0.2+c792624d9e
+    - fabric-dimensions-v1 5.1.12+515ac5339e
+    - fabric-entity-events-v1 5.0.5+06488ac19e
+    - fabric-events-interaction-v0 5.2.8+515ac5339e
+    - fabric-game-rule-api-v1 4.0.8+46a6d00c9e
+    - fabric-gametest-api-v1 4.0.22+4a7fa0819e
+    - fabric-item-api-v1 14.5.0+c68f6cbe9e
+    - fabric-key-mapping-api-v1 2.0.5+e2bdee789e
+    - fabric-lifecycle-events-v1 4.1.4+29b6eb019e
+    - fabric-loot-api-v3 3.0.17+06488ac19e
+    - fabric-menu-api-v1 2.0.17+086d547a9e
+    - fabric-message-api-v1 7.0.8+bb2ed3f79e
+    - fabric-model-loading-api-v1 8.0.17+c80601bb9e
+    - fabric-networking-api-v1 6.3.4+2989c6a09e
+    - fabric-object-builder-api-v1 24.1.1+6fcd5f039e
+    - fabric-particles-v1 5.0.19+d1756aa99e
+    - fabric-permission-api-v1 1.0.5+e442d8d09e
+    - fabric-recipe-api-v1 9.0.22+11e1c9a39e
+    - fabric-registry-sync-v0 7.1.1+c7bd5b8e9e
+    - fabric-renderer-api-v1 14.1.4+2b0d8a229e
+    - fabric-renderer-indigo 9.1.4+2b0d8a229e
+    - fabric-rendering-fluids-v1 6.0.4+06488ac19e
+    - fabric-rendering-v1 25.3.3+515ac5339e
+    - fabric-resource-conditions-api-v1 6.1.0+10e9a28b9e
+    - fabric-resource-loader-v0 3.3.20+4fc5413f9e
+    - fabric-resource-loader-v1 2.0.13+9edec1269e
+    - fabric-screen-api-v1 5.2.1+5087f8249e
+    - fabric-serialization-api-v1 2.0.4+11a26f319e
+    - fabric-sound-api-v1 2.0.5+11a26f319e
+    - fabric-tag-api-v1 2.1.4+515ac5339e
+    - fabric-transfer-api-v1 8.0.13+11dbb7d79e
+    - fabric-transitive-access-wideners-v1 8.1.4+67c847259e
+    - fabricloader 0.20.1
+    - java 25
+    - minecraft 26.2
+    - mixinextras 0.5.5
+    - pulselib_rhi_registration_fixture 1.0.0
+[01:07:22] [main/INFO]: SpongePowered MIXIN Subsystem Version=0.8.7 Source=file:$GRADLE_CACHE/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.17.5+mixin.0.8.7/cef8519a91129d0c21fa03bb9378f0e8ca810e5/sponge-mixin-0.17.5+mixin.0.8.7.jar Service=Knot/Fabric Env=CLIENT
+[01:07:22] [main/INFO]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.5.5).
+PASS strict Fabric weather Redirect: native overloads, require=1/allow=1; no weather GPU draw
+PASS production pipeline catalog: all 19 public definitions, native bind groups, vec4 texel formats and shared 24-byte geometry
+PULSELIB_FABRIC_RHI_REGISTRATION_PASSED 19 production + 4 shared profiles and real factory; actual Knot CLIENT/access widener/native registry; no Minecraft instance
+
+
+> Task :neoforge:portingRhiFixtureJar UP-TO-DATE
+
+> Task :neoforge:checkPortingRhiOpenGL
+2026-11-13T23:07:23.444057506Z main WARN Advanced terminal features are not available in this environment
+[01:07:23] [main/INFO] [ne.ne.fm.st.Entrypoint/]: JVM Uptime at startup: 60ms
+[01:07:23] [main/INFO] [ne.ne.fm.lo.FMLLoader/]: Starting FancyModLoader version 11.0.16 (CLIENT in DEV)
+[01:07:23] [main/INFO] [ne.ne.fm.lo.FMLLoader/]: Game directory: $WORKSPACE/neoforge/build/porting-rhi/OpenGL-1029401265921001049
+[01:07:23] [main/INFO] [ne.ne.fm.lo.EarlyServiceDiscovery/]: Found 2 early service jars (out of 107) in 19ms
+[01:07:23] [main/INFO] [ne.ne.fm.lo.FMLLoader/]: Loading FML Early Services:
+[01:07:23] [main/INFO] [ne.ne.fm.lo.FMLLoader/]:  - $GRADLE_CACHE/caches/modules-2/files-2.1/net.neoforged.fancymodloader/loader/11.0.16/42d3bfead0ba3aa89c7d45ac29115defc9967219/loader-11.0.16.jar
+[01:07:23] [main/INFO] [ne.ne.fm.lo.FMLLoader/]:  - $GRADLE_CACHE/caches/modules-2/files-2.1/net.neoforged.fancymodloader/earlydisplay/11.0.16/2d357375a7ea94a1ca86042d48fa4f719a552894/earlydisplay-11.0.16.jar
+[01:07:23] [main/INFO] [ne.ne.fm.lo.ImmediateWindowHandler/]: Not loading early display in headless mode.
+[01:07:23] [main/INFO] [ne.ne.fm.lo.mo.lo.GameLocator/]: Detected a joined NeoForge and Minecraft configuration. Applying filtering...
+[01:07:23] [main/INFO] [ne.ne.fm.lo.mo.lo.JarInJarDependencyLocator/]: Found 2 dependencies adding them to mods collection
+[01:07:23] [main/INFO] [ne.ne.fm.lo.mo.ModDiscoverer/]:
+     Mod List:
+        Name Version (Mod Id)
+
+        Minecraft 26.2 (minecraft)
+        NeoForge 26.2.0.57 (neoforge)
+        PulseLib offscreen RHI fixture (not a distribution) 1.0.0 (pulselib_rhi_fixture)
+[01:07:23] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.7 Source=file:$GRADLE_CACHE/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.17.3+mixin.0.8.7/41c4a3984a80f4679e759fb9f495587acc5cdac7/sponge-mixin-0.17.3+mixin.0.8.7.jar Service=FML Env=CLIENT
+[01:07:23] [main/INFO] [ne.ne.fm.lo.FMLLoader/]: Loading FML Plugins:
+[01:07:23] [main/INFO] [ne.ne.fm.lo.FMLLoader/]:  - $GRADLE_CACHE/caches/modules-2/files-2.1/net.neoforged/neoforge/26.2.0.57/c598bbb0216d68504465ee84075ae2915cf956f8/neoforge-26.2.0.57-universal.jar > net.neoforged.neoforge-coremods-26.2.0.57.jar
+[01:07:24] [main/INFO] [ne.ne.fm.lo.FMLLoader/]: Building game content classloader:
+ - minecraft (composite(filtered(jar($WORKSPACE/neoforge/build/moddev/artifacts/minecraft-patched-26.2.0.57.jar)), filtered(jar($WORKSPACE/neoforge/build/moddev/artifacts/minecraft-patched-26.2.0.57.jar))))
+ - mixinextras.neoforge (jar($GRADLE_CACHE/caches/modules-2/files-2.1/net.neoforged/neoforge/26.2.0.57/c598bbb0216d68504465ee84075ae2915cf956f8/neoforge-26.2.0.57-universal.jar > mixinextras-neoforge-0.5.4.jar))
+ - neoforge (composite(filtered(jar($GRADLE_CACHE/caches/modules-2/files-2.1/net.neoforged/neoforge/26.2.0.57/c598bbb0216d68504465ee84075ae2915cf956f8/neoforge-26.2.0.57-universal.jar))))
+ - net.neoforged.fml.generated (empty(VirtualJar/net.neoforged.fml.generated))
+ - pulselib_rhi_fixture (jar($WORKSPACE/neoforge/build/porting-rhi/pulselib-rhi-fixture.jar))
+[01:07:24] [main/INFO] [ne.ne.fm.lo.FMLLoader/]: Built game content classloader in 19ms
+[01:07:24] [main/INFO] [mixin/]: Compatibility level set to JAVA_25
+PASS production pipeline catalog: all 19 public definitions, native bind groups, vec4 texel formats and shared 24-byte geometry
+PASS NeoForge native mod-bus production/RHI registration: 19 canonical + 4 shared portable profiles, capacity 128
+Failed to load plugin 'libdecor-gtk.so': failed to init
+[01:07:24] [main/INFO] [MixinExtras|Service/]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.5.4).
+PASS native pass tracker: fresh encoders, shared active state and normal/exceptional close; backend cache accessor where applicable
+PASS production projection Mixin/native host: copied matrices, cached/replaced uploads, active buffer switching, legacy facade and close/untracked rejection
+GPU NVIDIA GeForce GTX 1660 Ti/PCIe/SSE2 / OpenGL alignment=256 blockLimit=65536
+PASS 1025 unique instances, packed firstInstance=9, firstIndex=3, baseVertex=-1, frame uniforms and ring reuse
+PASS canonical PFrameCompiler -> PRenderPlan -> RHI, 1025 readback pixels
+PASS invalid index bounds and unsupported OIT rejected before drawing (no alpha fallback)
+PASS texture/sampler binding and cutout discard/visible pixel
+PASS real dynamic geometry upload/update/draw/close
+PASS canonical PGlDynamicGeometry/GlDynamicGeometry -> compiler -> RHI pixels, updates, aliases, cross-registry release and listener-failure cleanup
+PASS prepared native material: one snapshot per execution, scissor, 1025 pixels, targets, Sampler0/1/2, default uniforms, frame ownership and missing/duplicate binding rejection
+PASS static GPU buffers closed, stale handles rejected; borrowed target resources remain open until fixture cleanup
+PASS opaque queue adapter lit solid: production factories/registry/compiler, 1025 pixels, packed firstInstance=9, native prepare/cache and dynamic/cleanup/recreate
+PASS production lit solid: 1025 baked-mesh pixels, native captured frame, 24-byte vertices, UV/color/light/overlay, normal/backface update and forced alpha/cutout
+PASS opaque queue adapter lit cutout: production factories/registry/compiler, 1025 pixels, packed firstInstance=9, native prepare/cache and dynamic/cleanup/recreate
+PASS production lit cutout: 1025 baked-mesh pixels, native captured frame, 24-byte vertices, UV/color/light/overlay, normal/backface update and forced alpha/cutout
+PASS opaque queue adapter emissive solid: production factories/registry/compiler, 1025 pixels, packed firstInstance=9, native prepare/cache and dynamic/cleanup/recreate
+PASS production emissive solid: 1025 baked-mesh pixels, native captured frame, 24-byte vertices, UV/color/light/overlay, normal/backface update and forced alpha/cutout
+PASS opaque queue adapter emissive cutout: production factories/registry/compiler, 1025 pixels, packed firstInstance=9, native prepare/cache and dynamic/cleanup/recreate
+PASS production emissive cutout: 1025 baked-mesh pixels, native captured frame, 24-byte vertices, UV/color/light/overlay, normal/backface update and forced alpha/cutout
+PULSELIB_RHI_GPU_PASSED OpenGL (offscreen fixture, not full Minecraft client)
+[01:07:25] [main/INFO] [ne.ne.fm.lo.FMLLoader/]: Closing FML Loader b112b13
+[01:07:25] [main/INFO] [ne.ne.fm.ModLoader/]: Clearing ModLoader
+
+> Task :neoforge:checkPortingRhiVulkan
+2026-11-13T23:07:25.628339885Z main WARN Advanced terminal features are not available in this environment
+[01:07:25] [main/INFO] [ne.ne.fm.st.Entrypoint/]: JVM Uptime at startup: 70ms
+[01:07:25] [main/INFO] [ne.ne.fm.lo.FMLLoader/]: Starting FancyModLoader version 11.0.16 (CLIENT in DEV)
+[01:07:25] [main/INFO] [ne.ne.fm.lo.FMLLoader/]: Game directory: $WORKSPACE/neoforge/build/porting-rhi/Vulkan-10659872878256921294
+[01:07:25] [main/INFO] [ne.ne.fm.lo.EarlyServiceDiscovery/]: Found 2 early service jars (out of 107) in 21ms
+[01:07:25] [main/INFO] [ne.ne.fm.lo.FMLLoader/]: Loading FML Early Services:
+[01:07:25] [main/INFO] [ne.ne.fm.lo.FMLLoader/]:  - $GRADLE_CACHE/caches/modules-2/files-2.1/net.neoforged.fancymodloader/loader/11.0.16/42d3bfead0ba3aa89c7d45ac29115defc9967219/loader-11.0.16.jar
+[01:07:25] [main/INFO] [ne.ne.fm.lo.FMLLoader/]:  - $GRADLE_CACHE/caches/modules-2/files-2.1/net.neoforged.fancymodloader/earlydisplay/11.0.16/2d357375a7ea94a1ca86042d48fa4f719a552894/earlydisplay-11.0.16.jar
+[01:07:25] [main/INFO] [ne.ne.fm.lo.ImmediateWindowHandler/]: Not loading early display in headless mode.
+[01:07:25] [main/INFO] [ne.ne.fm.lo.mo.lo.GameLocator/]: Detected a joined NeoForge and Minecraft configuration. Applying filtering...
+[01:07:25] [main/INFO] [ne.ne.fm.lo.mo.lo.JarInJarDependencyLocator/]: Found 2 dependencies adding them to mods collection
+[01:07:25] [main/INFO] [ne.ne.fm.lo.mo.ModDiscoverer/]:
+     Mod List:
+        Name Version (Mod Id)
+
+        Minecraft 26.2 (minecraft)
+        NeoForge 26.2.0.57 (neoforge)
+        PulseLib offscreen RHI fixture (not a distribution) 1.0.0 (pulselib_rhi_fixture)
+[01:07:26] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.7 Source=file:$GRADLE_CACHE/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.17.3+mixin.0.8.7/41c4a3984a80f4679e759fb9f495587acc5cdac7/sponge-mixin-0.17.3+mixin.0.8.7.jar Service=FML Env=CLIENT
+[01:07:26] [main/INFO] [ne.ne.fm.lo.FMLLoader/]: Loading FML Plugins:
+[01:07:26] [main/INFO] [ne.ne.fm.lo.FMLLoader/]:  - $GRADLE_CACHE/caches/modules-2/files-2.1/net.neoforged/neoforge/26.2.0.57/c598bbb0216d68504465ee84075ae2915cf956f8/neoforge-26.2.0.57-universal.jar > net.neoforged.neoforge-coremods-26.2.0.57.jar
+[01:07:26] [main/INFO] [ne.ne.fm.lo.FMLLoader/]: Building game content classloader:
+ - minecraft (composite(filtered(jar($WORKSPACE/neoforge/build/moddev/artifacts/minecraft-patched-26.2.0.57.jar)), filtered(jar($WORKSPACE/neoforge/build/moddev/artifacts/minecraft-patched-26.2.0.57.jar))))
+ - mixinextras.neoforge (jar($GRADLE_CACHE/caches/modules-2/files-2.1/net.neoforged/neoforge/26.2.0.57/c598bbb0216d68504465ee84075ae2915cf956f8/neoforge-26.2.0.57-universal.jar > mixinextras-neoforge-0.5.4.jar))
+ - neoforge (composite(filtered(jar($GRADLE_CACHE/caches/modules-2/files-2.1/net.neoforged/neoforge/26.2.0.57/c598bbb0216d68504465ee84075ae2915cf956f8/neoforge-26.2.0.57-universal.jar))))
+ - net.neoforged.fml.generated (empty(VirtualJar/net.neoforged.fml.generated))
+ - pulselib_rhi_fixture (jar($WORKSPACE/neoforge/build/porting-rhi/pulselib-rhi-fixture.jar))
+[01:07:26] [main/INFO] [ne.ne.fm.lo.FMLLoader/]: Built game content classloader in 20ms
+[01:07:26] [main/INFO] [mixin/]: Compatibility level set to JAVA_25
+PASS production pipeline catalog: all 19 public definitions, native bind groups, vec4 texel formats and shared 24-byte geometry
+PASS NeoForge native mod-bus production/RHI registration: 19 canonical + 4 shared portable profiles, capacity 128
+Failed to load plugin 'libdecor-gtk.so': failed to init
+[01:07:27] [main/INFO] [MixinExtras|Service/]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.5.4).
+PASS native pass tracker: fresh encoders, shared active state and normal/exceptional close; backend cache accessor where applicable
+PASS production projection Mixin/native host: copied matrices, cached/replaced uploads, active buffer switching, legacy facade and close/untracked rejection
+GPU NVIDIA GeForce GTX 1660 Ti / Vulkan alignment=64 blockLimit=16384
+PASS 1025 unique instances, packed firstInstance=9, firstIndex=3, baseVertex=-1, frame uniforms and ring reuse
+PASS canonical PFrameCompiler -> PRenderPlan -> RHI, 1025 readback pixels
+PASS invalid index bounds and unsupported OIT rejected before drawing (no alpha fallback)
+PASS texture/sampler binding and cutout discard/visible pixel
+PASS real dynamic geometry upload/update/draw/close
+PASS canonical PGlDynamicGeometry/GlDynamicGeometry -> compiler -> RHI pixels, updates, aliases, cross-registry release and listener-failure cleanup
+PASS prepared native material: one snapshot per execution, scissor, 1025 pixels, targets, Sampler0/1/2, default uniforms, frame ownership and missing/duplicate binding rejection
+PASS static GPU buffers closed, stale handles rejected; borrowed target resources remain open until fixture cleanup
+PASS opaque queue adapter lit solid: production factories/registry/compiler, 1025 pixels, packed firstInstance=9, native prepare/cache and dynamic/cleanup/recreate
+PASS production lit solid: 1025 baked-mesh pixels, native captured frame, 24-byte vertices, UV/color/light/overlay, normal/backface update and forced alpha/cutout
+PASS opaque queue adapter lit cutout: production factories/registry/compiler, 1025 pixels, packed firstInstance=9, native prepare/cache and dynamic/cleanup/recreate
+PASS production lit cutout: 1025 baked-mesh pixels, native captured frame, 24-byte vertices, UV/color/light/overlay, normal/backface update and forced alpha/cutout
+PASS opaque queue adapter emissive solid: production factories/registry/compiler, 1025 pixels, packed firstInstance=9, native prepare/cache and dynamic/cleanup/recreate
+PASS production emissive solid: 1025 baked-mesh pixels, native captured frame, 24-byte vertices, UV/color/light/overlay, normal/backface update and forced alpha/cutout
+PASS opaque queue adapter emissive cutout: production factories/registry/compiler, 1025 pixels, packed firstInstance=9, native prepare/cache and dynamic/cleanup/recreate
+PASS production emissive cutout: 1025 baked-mesh pixels, native captured frame, 24-byte vertices, UV/color/light/overlay, normal/backface update and forced alpha/cutout
+PULSELIB_RHI_GPU_PASSED Vulkan (offscreen fixture, not full Minecraft client)
+[01:07:27] [main/INFO] [ne.ne.fm.lo.FMLLoader/]: Closing FML Loader 66f28a1f
+[01:07:27] [main/INFO] [ne.ne.fm.ModLoader/]: Clearing ModLoader
+
+> Task :common:processResources UP-TO-DATE
+> Task :common:classes UP-TO-DATE
+> Task :common:compilePortingScene
+> Task :common:portingSceneJar
+> Task :fabric:generateLog4jConfig UP-TO-DATE
+> Task :fabric:generateDLIConfig UP-TO-DATE
+> Task :fabric:configureLaunch UP-TO-DATE
+> Task :fabric:downloadAssets
+> Task :fabric:configureClientLaunch
+
+> Task :fabric:runClient
+PulseLib production scene: $WORKSPACE/fabric/build/porting-scene/client-10493321562729198386
+[01:07:29] [main/INFO] (FabricLoader/GameProvider) Loading Minecraft 26.2 with Fabric Loader 0.20.1
+[01:07:29] [main/INFO] (FabricLoader/Mappings) Mappings not present!
+[01:07:29] [main/INFO] (FabricLoader) Loading 53 mods:
+    - fabric-advancement-api-v1 1.0.0+58719a3b9e
+    - fabric-api 0.161.0+26.2
+    - fabric-api-base 2.0.4+ece063239e
+    - fabric-api-lookup-api-v1 2.0.18+11e1c9a39e
+    - fabric-biome-api-v1 18.0.6+c7bd5b8e9e
+    - fabric-block-api-v1 3.1.0+53515aab9e
+    - fabric-block-getter-api-v2 2.0.7+ec56b6019e
+    - fabric-client-gametest-api-v1 6.0.2+0f4f1dca9e
+    - fabric-command-api-v2 3.1.0+00cb03469e
+    - fabric-content-registries-v0 11.3.2+37b1aa249e
+    - fabric-convention-tags-v2 4.7.1+1f023a9e9e
+    - fabric-crash-report-info-v1 1.0.5+086d547a9e
+    - fabric-creative-tab-api-v1 5.0.15+6468574f9e
+    - fabric-data-attachment-api-v1 2.2.19+515ac5339e
+    - fabric-data-generation-api-v1 25.6.0+c0da0b829e
+    - fabric-debug-api-v1 1.0.2+c792624d9e
+    - fabric-dimensions-v1 5.1.12+515ac5339e
+    - fabric-entity-events-v1 5.0.5+06488ac19e
+    - fabric-events-interaction-v0 5.2.8+515ac5339e
+    - fabric-game-rule-api-v1 4.0.8+46a6d00c9e
+    - fabric-gametest-api-v1 4.0.22+4a7fa0819e
+    - fabric-item-api-v1 14.5.0+c68f6cbe9e
+    - fabric-key-mapping-api-v1 2.0.5+e2bdee789e
+    - fabric-lifecycle-events-v1 4.1.4+29b6eb019e
+    - fabric-loot-api-v3 3.0.17+06488ac19e
+    - fabric-menu-api-v1 2.0.17+086d547a9e
+    - fabric-message-api-v1 7.0.8+bb2ed3f79e
+    - fabric-model-loading-api-v1 8.0.17+c80601bb9e
+    - fabric-networking-api-v1 6.3.4+2989c6a09e
+    - fabric-object-builder-api-v1 24.1.1+6fcd5f039e
+    - fabric-particles-v1 5.0.19+d1756aa99e
+    - fabric-permission-api-v1 1.0.5+e442d8d09e
+    - fabric-recipe-api-v1 9.0.22+11e1c9a39e
+    - fabric-registry-sync-v0 7.1.1+c7bd5b8e9e
+    - fabric-renderer-api-v1 14.1.4+2b0d8a229e
+    - fabric-renderer-indigo 9.1.4+2b0d8a229e
+    - fabric-rendering-fluids-v1 6.0.4+06488ac19e
+    - fabric-rendering-v1 25.3.3+515ac5339e
+    - fabric-resource-conditions-api-v1 6.1.0+10e9a28b9e
+    - fabric-resource-loader-v0 3.3.20+4fc5413f9e
+    - fabric-resource-loader-v1 2.0.13+9edec1269e
+    - fabric-screen-api-v1 5.2.1+5087f8249e
+    - fabric-serialization-api-v1 2.0.4+11a26f319e
+    - fabric-sound-api-v1 2.0.5+11a26f319e
+    - fabric-tag-api-v1 2.1.4+515ac5339e
+    - fabric-transfer-api-v1 8.0.13+11dbb7d79e
+    - fabric-transitive-access-wideners-v1 8.1.4+67c847259e
+    - fabricloader 0.20.1
+    - java 25
+    - minecraft 26.2
+    - mixinextras 0.5.5
+    - pulselib 1.1.5.3
+    - pulselib_client_scene 1.0.0
+[01:07:30] [main/INFO] (FabricLoader/Mixin) SpongePowered MIXIN Subsystem Version=0.8.7 Source=file:$GRADLE_CACHE/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.17.5+mixin.0.8.7/cef8519a91129d0c21fa03bb9378f0e8ca810e5/sponge-mixin-0.17.5+mixin.0.8.7.jar Service=Knot/Fabric Env=CLIENT
+[01:07:30] [main/INFO] (FabricLoader/MixinExtras|Service) Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.5.5).
+[01:07:31] [Datafixer Bootstrap #0/INFO] (Minecraft) 295 Datafixer optimizations took 439 milliseconds
+[01:07:35] [Render thread/INFO] (Minecraft) Environment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, profilesHost=https://api.mojang.com, name=PROD]
+[01:07:35] [Render thread/INFO] (Minecraft) Setting user: Player732
+[01:07:35] [Render thread/INFO] (Indigo) [Indigo] Registering Indigo renderer!
+[01:07:35] [Render thread/INFO] (Pulse Lib) PulseLib Fabric ASM scan: 52 roots, 0 candidates, 154 ms
+[01:07:35] [Render thread/INFO] (Pulse Lib) PulseLib discovered 0 plugin(s) from 0 candidate(s) in 154 ms: []
+[01:07:35] [Render thread/INFO] (Minecraft) Backend library: LWJGL version 3.4.1-snapshot
+[01:07:35] [Render thread/WARN] (Minecraft) Graphics backend forced to opengl by launch argument, in-game preferred graphics backend setting is ignored
+[01:07:35] [Render thread/INFO] (Minecraft) Using graphics backend OpenGL, using drivers: 3.3.0 NVIDIA 615.78.08
+[01:07:35] [Render thread/INFO] (Minecraft) Using graphics device: NVIDIA GeForce GTX 1660 Ti/PCIe/SSE2 (NVIDIA Corporation)
+[01:07:35] [Render thread/INFO] (Minecraft) Using graphics device extensions: GL_ARB_multi_draw_indirect, GL_ARB_buffer_storage, GL_ARB_shader_draw_parameters, GL_ARB_base_instance, GL_KHR_debug, GL_ARB_draw_indirect, GL_ARB_clip_control, GL_ARB_vertex_attrib_binding, GL_ARB_direct_state_access, GL_EXT_texture_filter_anisotropic
+[01:07:36] [Render thread/INFO] (Pulse Lib) PulseLib resource reload: collected 0 model declarations
+[01:07:36] [Render thread/INFO] (Minecraft) Reloading ResourceManager: vanilla, fabric-advancement-api-v1, fabric-api, fabric-api-base, fabric-api-lookup-api-v1, fabric-biome-api-v1, fabric-block-api-v1, fabric-block-getter-api-v2, fabric-client-gametest-api-v1, fabric-command-api-v2, fabric-content-registries-v0, fabric-convention-tags-v2, fabric-crash-report-info-v1, fabric-creative-tab-api-v1, fabric-data-attachment-api-v1, fabric-data-generation-api-v1, fabric-debug-api-v1, fabric-dimensions-v1, fabric-entity-events-v1, fabric-events-interaction-v0, fabric-game-rule-api-v1, fabric-gametest-api-v1, fabric-item-api-v1, fabric-key-mapping-api-v1, fabric-lifecycle-events-v1, fabric-loot-api-v3, fabric-menu-api-v1, fabric-message-api-v1, fabric-model-loading-api-v1, fabric-networking-api-v1, fabric-object-builder-api-v1, fabric-particles-v1, fabric-permission-api-v1, fabric-recipe-api-v1, fabric-registry-sync-v0, fabric-renderer-api-v1, fabric-renderer-indigo, fabric-rendering-fluids-v1, fabric-rendering-v1, fabric-resource-conditions-api-v1, fabric-resource-loader-v0, fabric-resource-loader-v1, fabric-screen-api-v1, fabric-serialization-api-v1, fabric-sound-api-v1, fabric-tag-api-v1, fabric-transfer-api-v1, fabric-transitive-access-wideners-v1, fabricloader, pulselib
+[01:07:36] [Download-2/INFO] (Minecraft) Could not authorize you against Realms server: java.lang.RuntimeException: Failed to parse into SignedJWT: FabricMC
+[01:07:36] [Worker-Main-5/INFO] (Minecraft) Found unifont_all_no_pua-17.0.01.hex, loading
+[01:07:36] [Worker-Main-4/INFO] (Minecraft) Found unifont_pua-17.0.01.hex, loading
+[01:07:36] [Worker-Main-9/INFO] (Minecraft) Found unifont_jp_patch-17.0.01.hex, loading
+[01:07:37] [Render thread/WARN] (Minecraft) pulselib:pipeline/triangles_oit_emissive_no_cull shader program does not use sampler Sampler2 defined in the pipeline. This might be a bug.
+[01:07:37] [Render thread/WARN] (Minecraft) pulselib:pipeline/triangles_instant_emissive_translucent shader program does not use sampler Sampler2 defined in the pipeline. This might be a bug.
+[01:07:37] [Render thread/WARN] (Minecraft) pulselib:pipeline/triangles_instant_emissive_solid shader program does not use sampler Sampler2 defined in the pipeline. This might be a bug.
+[01:07:37] [Render thread/WARN] (Minecraft) pulselib:pipeline/triangles_emissive_solid_no_cull shader program does not use sampler Sampler2 defined in the pipeline. This might be a bug.
+[01:07:37] [Render thread/INFO] (Minecraft) Info log when linking program containing VS pulselib:core/oit_composite and FS pulselib:core/oit_fabulous_composite. Log output: Fragment info
+-------------
+0(22) : warning C7050: "frontColors[0]" might be used before being initialized
+0(22) : warning C7050: "frontColors[1]" might be used before being initialized
+0(22) : warning C7050: "frontColors[2]" might be used before being initialized
+0(22) : warning C7050: "frontColors[3]" might be used before being initialized
+0(22) : warning C7050: "frontColors[4]" might be used before being initialized
+0(23) : warning C7050: "frontDepths[0]" might be used before being initialized
+0(23) : warning C7050: "frontDepths[1]" might be used before being initialized
+0(23) : warning C7050: "frontDepths[2]" might be used before being initialized
+0(23) : warning C7050: "frontDepths[3]" might be used before being initialized
+0(23) : warning C7050: "frontDepths[4]" might be used before being initialized
+
+[01:07:37] [Render thread/WARN] (Minecraft) pulselib:pipeline/triangles_instant_emissive_cutout shader program does not use sampler Sampler2 defined in the pipeline. This might be a bug.
+[01:07:37] [Render thread/WARN] (Minecraft) pulselib:pipeline/triangles_emissive_translucent_no_cull shader program does not use sampler Sampler2 defined in the pipeline. This might be a bug.
+[01:07:37] [Render thread/WARN] (Minecraft) pulselib:pipeline/triangles_oit_depth_no_cull shader program does not use sampler Sampler2 defined in the pipeline. This might be a bug.
+[01:07:37] [Render thread/WARN] (Minecraft) pulselib:pipeline/triangles_oit_depth_no_cull shader program does not use sampler Sampler1 defined in the pipeline. This might be a bug.
+[01:07:37] [Render thread/WARN] (Minecraft) pulselib:pipeline/triangles_emissive_cutout_no_cull shader program does not use sampler Sampler2 defined in the pipeline. This might be a bug.
+[01:07:37] [Render thread/WARN] (Minecraft) pulselib:pipeline/triangles_oit_depth_peel_no_cull shader program does not use sampler Sampler2 defined in the pipeline. This might be a bug.
+[01:07:37] [Render thread/WARN] (Minecraft) pulselib:pipeline/triangles_oit_depth_peel_no_cull shader program does not use sampler Sampler1 defined in the pipeline. This might be a bug.
+[01:07:37] [Render thread/INFO] (Minecraft) OpenAL initialized on device Starship/Matisse HD Audio Controller Аналоговый стерео
+[01:07:37] [Render thread/INFO] (Minecraft) Sound engine started
+[01:07:37] [Render thread/INFO] (Minecraft) Created: 512x256x0 minecraft:textures/atlas/particles.png-atlas
+[01:07:37] [Render thread/INFO] (Minecraft) Created: 128x128x0 minecraft:textures/atlas/decorated_pot.png-atlas
+[01:07:37] [Render thread/INFO] (Minecraft) Created: 2048x1024x0 minecraft:textures/atlas/armor_trims.png-atlas
+[01:07:37] [Render thread/INFO] (Minecraft) Created: 512x256x0 minecraft:textures/atlas/paintings.png-atlas
+[01:07:37] [Render thread/INFO] (Minecraft) Created: 1024x512x0 minecraft:textures/atlas/shield_patterns.png-atlas
+[01:07:37] [Render thread/INFO] (Minecraft) Created: 2048x2048x4 minecraft:textures/atlas/blocks.png-atlas
+[01:07:37] [Render thread/INFO] (Minecraft) Created: 512x512x0 minecraft:textures/atlas/chest.png-atlas
+[01:07:37] [Render thread/INFO] (Minecraft) Created: 256x128x0 minecraft:textures/atlas/celestials.png-atlas
+[01:07:37] [Render thread/INFO] (Minecraft) Created: 32x32x0 pulselib:textures/atlas.png-atlas
+[01:07:37] [Render thread/INFO] (Minecraft) Created: 1024x512x0 minecraft:textures/atlas/banner_patterns.png-atlas
+[01:07:37] [Render thread/INFO] (Minecraft) Created: 1024x512x0 minecraft:textures/atlas/items.png-atlas
+[01:07:38] [Render thread/INFO] (Minecraft) Created: 1024x1024x0 minecraft:textures/atlas/gui.png-atlas
+[01:07:38] [Render thread/INFO] (Minecraft) Created: 128x64x0 minecraft:textures/atlas/map_decorations.png-atlas
+[01:07:38] [Render thread/INFO] (Minecraft) Created: 512x512x0 minecraft:textures/atlas/shulker_boxes.png-atlas
+[01:07:38] [Render thread/INFO] (Minecraft) [STDOUT]: Production scene device: DeviceInfo[name=NVIDIA GeForce GTX 1660 Ti/PCIe/SSE2, vendorName=NVIDIA Corporation, driverInfo=3.3.0 NVIDIA 615.78.08, isZZeroToOne=true, backendName=OpenGL, timestampPeriod=1.0, limits=DeviceLimits[maxAnisotropy=16, minUniformOffsetAlignment=256, maxTextureSize=32768, maxMemoryAllocationSize=9223372036854775807, maxMultiDrawDirectInterleavedDrawCount=0, maxColorAttachments=8], features=DeviceFeatures[shaderDrawParameters=true, multiDrawDirectInterleaved=false, multiDrawDirectSeparate=true, multiDrawIndirect=true, drawIndirect=true, nonZeroFirstInstance=true, persistentMapping=true], underlyingExtensions=[GL_ARB_multi_draw_indirect, GL_ARB_buffer_storage, GL_ARB_shader_draw_parameters, GL_ARB_base_instance, GL_KHR_debug, GL_ARB_draw_indirect, GL_ARB_clip_control, GL_ARB_vertex_attrib_binding, GL_ARB_direct_state_access, GL_EXT_texture_filter_anisotropic], hintsAndWorkarounds=HintsAndWorkarounds[writeToBufferIsSlow=false, anisotropyHasKnownIssues=false], type=OTHER]
+[01:07:38] [Render thread/INFO] (Minecraft) [STDOUT]: PASS production queue lit-solid: 1025 portable/baked-mesh instance pixels, native alpha, dynamic move/update/close and cleanup
+[01:07:38] [Render thread/INFO] (Minecraft) [STDOUT]: PASS production queue lit-cutout: 1025 portable/baked-mesh instance pixels, native alpha, dynamic move/update/close and cleanup
+[01:07:38] [Render thread/INFO] (Minecraft) [STDOUT]: PASS production queue emissive-solid: 1025 portable/baked-mesh instance pixels, native alpha, dynamic move/update/close and cleanup
+[01:07:38] [Render thread/INFO] (Minecraft) [STDOUT]: PASS production queue emissive-cutout: 1025 portable/baked-mesh instance pixels, native alpha, dynamic move/update/close and cleanup
+[01:07:38] [Render thread/INFO] (Minecraft) [STDOUT]: PASS production dispatch RHI=20, legacy=0
+[01:07:38] [Render thread/INFO] (Minecraft) [STDOUT]: PULSELIB_PRODUCTION_SCENE_PASSED actual Minecraft, native textures/prepare, queue/host/compiler/RHI/readback; offscreen, no world acceptance
+[01:07:38] [Render thread/INFO] (Minecraft) Stopping!
+
+BUILD SUCCESSFUL in 29s
+37 actionable tasks: 9 executed, 28 up-to-date
