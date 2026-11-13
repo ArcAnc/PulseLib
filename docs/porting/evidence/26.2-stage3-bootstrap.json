@@ -52,7 +52,7 @@
     "common/src/main/java/com/arcanc/pulselib/content/mixin/ItemInHandRendererMixin.java": "126e4bf7aae26ddf30ee69b31b4aebd8da8b458fdf3832a616b94522627de970",
     "common/src/main/java/com/arcanc/pulselib/content/mixin/LevelRendererMixin.java": "0f40ba1c31829c15d7c644ba40c833eb427b686d19924a55b15942c8a03baece",
     "common/src/main/java/com/arcanc/pulselib/content/mixin/PictureInPictureRendererMixin.java": "9254d93d3c74474c09588001127bae5d01767a2df1df3f413285a7e33bb84c2b",
-    "common/src/main/java/com/arcanc/pulselib/content/mixin/WeatherEffectRendererMixin.java": "bc4df8fe129d8fc2849bd56147b0e8a40dca8dcbcc390c027cbcb7d391e8712b",
+    "common/src/main/java/com/arcanc/pulselib/content/mixin/WeatherEffectRendererMixin.java": "fc927ea38847984baa5b9fa2fcb86520ee6eda3912ec829708a8dae7cac8858c",
     "common/src/main/java/com/arcanc/pulselib/content/renderer/PModelGuiRenderer.java": "929d9911f71049f7b366ad05f17bbe64e60ec79505591f560b6a04c320a2ce27",
     "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java": "9c90f5acd672a2bfb26ad104556135604aaa9dd8977a3a494cc6125cf3114cc9",
     "common/src/main/java/com/arcanc/pulselib/content/renderer/PWorldRenderPass.java": "4df3958e8f4850e439d4faa38419795fd73199da8bc6b2f45bc68b3a6c8c332b",
@@ -158,6 +158,11 @@
     "erased_type": "net.minecraft.world.entity.Avatar",
     "initial_full_bootstrap": "FAIL group expected 1, matched 0: AbstractClientPlayer source argument was not the descriptor",
     "correction": "actual Avatar descriptor and private handler/helper argument types, no suppression",
+    "runtime_recheck": "pending final audit"
+  },
+  "NeoForge_weather_overload": {
+    "initial_full_bootstrap": "FAIL: NeoForge two-argument render is a forwarding overload; native weather body is three-argument render with nullable LevelRenderState",
+    "correction": "two exact loader descriptors selected, require=1 and allow=1 across them; one native transparency call, no suppression",
     "runtime_recheck": "pending final audit"
   }
 }

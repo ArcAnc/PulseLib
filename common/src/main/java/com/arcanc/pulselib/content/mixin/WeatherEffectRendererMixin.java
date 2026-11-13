@@ -20,7 +20,10 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(WeatherEffectRenderer.class)
 public abstract class WeatherEffectRendererMixin
 {
-	@Redirect(method = "render(Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/client/renderer/state/level/WeatherRenderState;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/state/GameRenderState;useShaderTransparency()Z"))
+	@Redirect(method = {
+			"render(Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/client/renderer/state/level/WeatherRenderState;)V",
+			"render(Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/client/renderer/state/level/WeatherRenderState;Lnet/minecraft/client/renderer/state/level/LevelRenderState;)V"},
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/state/GameRenderState;useShaderTransparency()Z"), require = 1, allow = 1)
 	private boolean pulselib$writeSeparatedWeatherDepth(GameRenderState state)
 	{
 		return state.useShaderTransparency() || Minecraft.getInstance().levelRenderer.weatherTarget() != null;
