@@ -1,0 +1,28 @@
+# @author ArcAnc; Created at: 13.11.2026; Copyright (c) 2026; Arc's License of Common Sense (LICENSE.txt)
+# Parse-only public/protected declarations; imports/package metadata and eight pre-existing user paths excluded.
+--- a6dcf05-public-declarations
++++ opaque-queue-working-declarations
+@@ -2222,6 +2222,7 @@
+    METHOD public PGlDynamicGeometry dynamicSource(PMeshHandle handle)
+    METHOD public PGeometryData geometryData(PMeshHandle handle)
+    METHOD public boolean isGeometry(PMeshHandle handle)
++   METHOD @ApiStatus.Internal public Object geometryResource(PMeshHandle handle)
+    METHOD public void clear()
+
+ FILE common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlWeightedBlendedOit.java
+@@ -2508,6 +2509,15 @@
+    METHOD public PRhiNativeMaterial(RenderType type, int capacity, PTransparencyMode transparency, Map<String, Supplier<GpuBufferSlice>> extraUniforms)
+    METHOD public PRhiNativeMaterial(RenderType type, int capacity, PTransparencyMode transparency, Map<String, Supplier<GpuBufferSlice>> extraUniforms, Supplier<PreparedRenderType> prepare, Function<PreparedRenderType, PRhiMaterial.Attachments> target)
+    METHOD public PPipelineHandle register(PRhiResourceRegistry resources)
++
++FILE common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/PRhiOpaqueRenderer.java
++TYPE @ApiStatus.Internal public final class PRhiOpaqueRenderer implements PRenderExecutor
++   METHOD public PRhiOpaqueRenderer(Function<PPipelineHandle, RenderType> types, Function<PPipelineHandle, PTransparencyMode> policies, Function<PMeshHandle, Object> geometry)
++   METHOD public PRhiOpaqueRenderer(Function<PPipelineHandle, RenderType> types, Function<PPipelineHandle, PTransparencyMode> policies, Function<PMeshHandle, Object> geometry, Supplier<GpuDevice> device, Function<RenderType, PreparedRenderType> prepare, Function<PreparedRenderType, PRhiMaterial.Attachments> target)
++   METHOD public boolean canExecute(PRenderPlan plan)
++   METHOD @Override public PRenderCapabilities capabilities()
++   METHOD @Override public void execute(PRenderPlan plan, PRenderFrame frame)
++   METHOD @Override public void cleanup()
+
+ FILE common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/PRhiPassState.java
+ TYPE @ApiStatus.Internal public record PRhiPassState(PRhiMaterial.Attachments target, Map<String, GpuBufferSlice> uniforms, Map<String, PRhiMaterial.Texture> textures, Scissor scissor)

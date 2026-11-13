@@ -154,6 +154,15 @@ final class RhiProfileChecks
 						{
 							RhiLayoutChecks.assertTrue(expected.getMessage().contains("deformer streams"), "Explicit unsupported-deformation rejection");
 						}
+						RhiOpaqueChecks.run(device, target, source -> new PreparedRenderType(source.pipeline(), OutputTarget.MAIN_TARGET,
+								nativeTransforms.slice(), new ScissorState(), List.of(
+										new PreparedRenderType.Texture("Sampler0", diffuseView, sampler),
+										new PreparedRenderType.Texture("Sampler1", overlayView, sampler),
+										new PreparedRenderType.Texture("Sampler2", lightmapView, sampler))), frame, baked, cutout, emissive, visible ->
+						{
+							encoder.writeToTexture(diffuse, diffusePixels(visible), 0, 0, 0, 0, 2, 2);
+							encoder.clearColorAndDepthTextures(color, new Vector4f(0, 0, 0, 0), depth, 0);
+						}, () -> pixels(device, color));
 						System.out.println("PASS production " + (emissive ? "emissive " : "lit ") + (cutout ? "cutout" : "solid") +
 								": 1025 baked-mesh pixels, native captured frame, 24-byte vertices, UV/color/light/overlay, normal/backface update and forced alpha/cutout");
 					}
@@ -181,7 +190,7 @@ final class RhiProfileChecks
 				cutout ? PAlphaMode.CUTOUT : PAlphaMode.OPAQUE, source, Identifier.fromNamespaceAndPath("pulselib", "profile_fixture"));
 	}
 
-	private static PGeometryData geometry(int normal, boolean integers)
+	static PGeometryData geometry(int normal, boolean integers)
 	{
 		return geometry(normal, integers, false);
 	}
@@ -203,7 +212,7 @@ final class RhiProfileChecks
 		return new PGeometryData(vertices, indices, 24, 3, integers ? PGeometryData.IndexType.UNSIGNED_INT : PGeometryData.IndexType.UNSIGNED_SHORT);
 	}
 
-	private static PInstanceHeader instance(int i)
+	static PInstanceHeader instance(int i)
 	{
 		float x = (i % GRID + 0.5f) / GRID * 2 - 1;
 		float y = (i / GRID + 0.5f) / GRID * 2 - 1;
@@ -265,13 +274,13 @@ final class RhiProfileChecks
 		}
 	}
 
-	private static void checkPixels(ByteBuffer pixels, boolean discarded)
+	static void checkPixels(ByteBuffer pixels, boolean discarded)
 	{
 		for (int i = 0; i < 1025; i++)
 			checkPixel(pixels, i, discarded ? 0 : i % 2 != 0 ? 0xFF00FF00 : color(i));
 	}
 
-	private static void checkPixel(ByteBuffer pixels, int i, int expected)
+	static void checkPixel(ByteBuffer pixels, int i, int expected)
 	{
 		int x = (int)((i % GRID + 0.5f) / GRID * SIZE);
 		int y = (int)((i / GRID + 0.5f) / GRID * SIZE);
@@ -281,12 +290,12 @@ final class RhiProfileChecks
 		RhiLayoutChecks.assertTrue(actual == expected, "Production pixel " + i + ": " + Integer.toHexString(actual) + " expected " + Integer.toHexString(expected));
 	}
 
-	private static int color(int i)
+	static int color(int i)
 	{
 		return 0xFF00003F | ((i % 254 + 1) << 16) | ((i / 254 + 1) << 8);
 	}
 
-	private static int shade(int color)
+	static int shade(int color)
 	{
 		return 0xFF000000 | Math.round((color >> 16 & 255) * 0.4f) << 16 |
 				Math.round((color >> 8 & 255) * 0.4f) << 8 | Math.round((color & 255) * 0.4f);

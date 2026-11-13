@@ -18,6 +18,7 @@ import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
 import com.arcanc.pulselib.content.renderer.gl.PGlMultiDrawExecutor;
 import com.arcanc.pulselib.content.renderer.gl.PGlResourceRegistry;
 import com.arcanc.pulselib.content.renderer.plan.*;
+import com.arcanc.pulselib.content.renderer.rhi.PRhiOpaqueRenderer;
 import com.arcanc.pulselib.content.renderer.rhi.PRhiRenderHost;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
@@ -38,6 +39,8 @@ public final class PRenderQueue
 	private static final PGlResourceRegistry RESOURCES = new PGlResourceRegistry();
 	private static final PFrameCompiler<RenderStage> COMPILER = new PFrameCompiler<>();
 	private static final PGlMultiDrawExecutor EXECUTOR = new PGlMultiDrawExecutor(RESOURCES);
+	private static final PRhiOpaqueRenderer OPAQUE_EXECUTOR = new PRhiOpaqueRenderer(
+			RESOURCES::pipeline, RESOURCES::transparency, RESOURCES::geometryResource);
 
 	private PRenderQueue()
 	{
@@ -429,7 +432,7 @@ public final class PRenderQueue
 	 */
 	public static void flush(RenderStage stage)
 	{
-		flush(stage, PLibRenderHelper.mc().getMainRenderTarget());
+		flush(stage, PLibRenderHelper.mc().gameRenderer.mainRenderTarget());
 	}
 
 	/**
@@ -447,7 +450,13 @@ public final class PRenderQueue
 	/** Consumes opaque geometry while retaining transparent submissions for their later pass. */
 	public static void flushOpaque(RenderStage stage)
 	{
-		EXECUTOR.execute(COMPILER.compileOpaque(stage));
+		PRenderPlan plan = COMPILER.compileOpaque(stage);
+		if (plan.isEmpty())
+			return;
+		if (OPAQUE_EXECUTOR.canExecute(plan))
+			OPAQUE_EXECUTOR.execute(plan, new PRhiRenderHost().captureFrame());
+		else
+			EXECUTOR.execute(plan);
 	}
 
 	/**
@@ -514,10 +523,17 @@ public final class PRenderQueue
 	public static void cleanUp()
 	{
 		COMPILER.clear();
-		EXECUTOR.cleanup();
-		PDeformedMeshBuffers.cleanup();
-		PGpuDeformedMeshBuffers.cleanup();
-		PGpuDeformerBuffers.cleanup();
+		try
+		{
+			OPAQUE_EXECUTOR.cleanup();
+		}
+		finally
+		{
+			EXECUTOR.cleanup();
+			PDeformedMeshBuffers.cleanup();
+			PGpuDeformedMeshBuffers.cleanup();
+			PGpuDeformerBuffers.cleanup();
+		}
 	}
 
 	/** Canonical cleanup entry point; both names operate on the same queue and executor. */

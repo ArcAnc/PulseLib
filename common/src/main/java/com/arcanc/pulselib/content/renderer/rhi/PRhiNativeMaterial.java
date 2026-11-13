@@ -121,7 +121,7 @@ public final class PRhiNativeMaterial
 		return Objects.requireNonNull(value, "Missing native uniform " + name);
 	}
 
-	private static PRhiMaterial.Attachments attachments(PreparedRenderType prepared)
+	static PRhiMaterial.Attachments attachments(PreparedRenderType prepared)
 	{
 		var target = prepared.outputTarget().getRenderTarget();
 		var color = RenderSystem.outputColorTextureOverride != null ? RenderSystem.outputColorTextureOverride : target.getColorTextureView();

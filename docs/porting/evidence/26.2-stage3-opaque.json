@@ -1,0 +1,143 @@
+{
+  "author": "ArcAnc",
+  "created_at": "2026-11-13",
+  "copyright": "Copyright (c) 2026",
+  "license": "Arc's License of Common Sense (LICENSE.txt)",
+  "start_commit": "a6dcf056adcdc8396808dde607275af7f2fb2d59",
+  "stage3_status": "PARTIAL: production flushOpaque wired to conservative whole-plan RHI selection; adapter GPU execution verified; full queue/client bootstrap still blocked by existing client compilation",
+  "whole_migration_complete": false,
+  "source_refs": {
+    "26.1.2-multiloader": "5065103d1bccc7880445f9e93bc6ed709cfbb809",
+    "master": "e85973a7a71fde0a237da1153a42c12d3578ebae"
+  },
+  "checks": {
+    "opaque_adapter_OpenGL_and_Vulkan": "PASS four canonical pipeline ID mappings, 1025 pixel readbacks/profile, packed firstInstance=9",
+    "whole_plan_selection": "PASS OIT, GPU deformer streams, unknown profiles, mixed plans and non-writing depth policy rejected without device lookup or preparation",
+    "native_preparation": "PASS once per used binding/execute, cache reuse, repeated native context refresh, wrong source pipeline rejected before drawing",
+    "geometry": "PASS PBakedMesh portable data and canonical PGlDynamicGeometry update/close; no GPU ownership moved into baked models",
+    "cleanup": "PASS idempotent native release, borrowed targets stay live, lazy recreation and successful readback after cleanup",
+    "production_flushOpaque": "SOURCE WIRED at actual queue call site; complete plan executes through one selected backend; full method not run in a Minecraft instance",
+    "production_geometryResource_callback": "SOURCE WIRED from canonical registry; real full queue registry path not executed in isolated fixture",
+    "CPU_deformation_fallback": "UNCHANGED production preparation algorithms; already CPU-deformed geometry is eligible. Actual algorithm/GPU-CPU comparison not run in this fixture",
+    "GPU_deformation_and_transparency": "PRESERVED existing executor path for entire unsupported plans; not ported to RHI by this change",
+    "production_RenderType_factories_and_default_prepare": "NOT EXECUTED: fixtures use native metadata with canonical IDs/shader references and explicit prepared/output context, not production PRenderTypes factories or Minecraft instance",
+    "production_client_gameplay_world_GUI_Fabric_GPU_full_Vulkan": "NOT TESTED",
+    "previous_RHI_geometry_instance_host_material_shader_regressions": "PASS",
+    "user_paths_bytes_and_index": "PASS eight pre-existing paths excluded and unchanged",
+    "canonical_compiler_to_adapter": "PASS PFrameCompiler.compileOpaque -> PRhiOpaqueRenderer -> native GPU -> 1025 pixels after cleanup/recreation on both backend, all four mappings"
+  },
+  "gpu_runs": [
+    {
+      "backend": "OpenGL",
+      "device": "NVIDIA GeForce GTX 1660 Ti",
+      "uniform_alignment": 256,
+      "measured_GL_uniform_block_limit": 65536,
+      "instance_capacity": 128,
+      "exit_code": 0
+    },
+    {
+      "backend": "Vulkan",
+      "device": "NVIDIA GeForce GTX 1660 Ti",
+      "uniform_alignment": 64,
+      "configured_test_uniform_limit": 16384,
+      "hardware_max_block_limit": "not queried this run",
+      "instance_capacity": 128,
+      "exit_code": 0
+    }
+  ],
+  "capabilities": {
+    "pose_storage": "CPU",
+    "submission": "DIRECT",
+    "upload": "WRITE",
+    "multi_draw_indirect": false,
+    "persistent_mapping": false
+  },
+  "ordinary_common_compile": {
+    "exit_code": 1,
+    "errors": 32,
+    "production_source_sets_modified": false
+  },
+  "diagnostics_comparison_base": "26.2-stage3-host.json: complete path/line/message lists identical except the one removed PRenderQueue error in each module",
+  "removed_native_API_error": "Minecraft.getMainRenderTarget() -> Minecraft.gameRenderer.mainRenderTarget() in PRenderQueue.flush(RenderStage), verified against resolved 26.2 sources",
+  "diagnostics": [
+    {
+      "module": "common",
+      "exit_code": 1,
+      "source_count": 406,
+      "error_count": 99,
+      "removed_errors": [
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java",
+          "line": 432,
+          "message": "cannot find symbol",
+          "count": 1
+        }
+      ],
+      "added_errors": [],
+      "changed_sources_errors": []
+    },
+    {
+      "module": "fabric",
+      "exit_code": 1,
+      "source_count": 417,
+      "error_count": 100,
+      "removed_errors": [
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java",
+          "line": 432,
+          "message": "cannot find symbol",
+          "count": 1
+        }
+      ],
+      "added_errors": [],
+      "changed_sources_errors": []
+    },
+    {
+      "module": "neoforge",
+      "exit_code": 1,
+      "source_count": 422,
+      "error_count": 101,
+      "removed_errors": [
+        {
+          "path": "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java",
+          "line": 432,
+          "message": "cannot find symbol",
+          "count": 1
+        }
+      ],
+      "added_errors": [],
+      "changed_sources_errors": []
+    }
+  ],
+  "api": {
+    "existing_public_protected_declarations_removed_or_changed": [],
+    "additions": [
+      "common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/PRhiOpaqueRenderer.java",
+      "@ApiStatus.Internal PGlResourceRegistry.geometryResource(PMeshHandle): Object"
+    ],
+    "scope": "parse-only declarations, not binary/runtime proof; canonical baseline unchanged"
+  },
+  "preserved_user_paths": [
+    "AGENTS.md",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderContexts.java",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/FieldsAreNonnullByDefault.java",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/MethodsReturnNonnullByDefault.java",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/package-info.java",
+    "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java",
+    "neoforge/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PArmorClientExtensions.java",
+    "neoforge/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/package-info.java"
+  ],
+  "changed_source_sha256": {
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java": "ee3065f379692be3d5e634011a02fff103e17b7d52c74763426440f916834580",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlResourceRegistry.java": "ccc4518a4c642106ce3527139ba1a224dad467f20c338cac256fbe4a6eb183be",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/PRhiNativeMaterial.java": "864de79a133ff7a903dbf962a36248ea27e0ec86e3b5149c33e0301a8a0f7c7d",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/PRhiOpaqueRenderer.java": "d7b69096a4bcfe64e76aae25677ca45be709f6834b82633f9311f42a6364038d",
+    "tests/porting/src/rhi/java/com/arcanc/pulselib/content/renderer/rhi/RhiProfileChecks.java": "3cadc58ddbbb3498901060c87056c685b266d7a6ffe296bc1e1a4a49f6ddd009",
+    "tests/porting/src/rhi/java/com/arcanc/pulselib/content/renderer/rhi/RhiOpaqueChecks.java": "e0b98a48a89e96d0744eea134e7f269557aa779bc25260fc23726692b54fbed1"
+  },
+  "fixture_setup_failure": {
+    "status": "RESOLVED",
+    "reason": "New negative fullscreen metadata fixture omitted mandatory PrimitiveTopology; failed native RenderPipeline.Builder.build before any adapter draw",
+    "fix": "Added explicit TRIANGLES only in fixture and reran both GPU backends successfully; no exception/mixin suppression"
+  }
+}

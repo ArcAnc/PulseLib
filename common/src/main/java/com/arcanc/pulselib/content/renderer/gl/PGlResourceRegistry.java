@@ -14,6 +14,7 @@ import com.arcanc.pulselib.content.renderer.legacy.GlDynamicGeometry;
 import com.arcanc.pulselib.content.renderer.plan.*;
 import com.arcanc.pulselib.util.PRenderTypes;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.EnumMap;
 import java.util.IdentityHashMap;
@@ -183,6 +184,13 @@ public final class PGlResourceRegistry
 		if (resource == null)
 			throw new IllegalStateException("Unknown PulseLib mesh handle: " + handle.value());
 		return resource;
+	}
+
+	/** Borrows CPU geometry for native backend adaptation; no GL allocation or ownership is transferred. */
+	@ApiStatus.Internal
+	public Object geometryResource(PMeshHandle handle)
+	{
+		return resource(handle);
 	}
 
 	/** Drops handles after their executor has released its GPU allocations. */
