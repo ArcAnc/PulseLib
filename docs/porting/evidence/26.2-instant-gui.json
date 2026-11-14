@@ -456,5 +456,28 @@
     "No full vanilla GUI extraction/item/PIP/world/OIT/Fabulous/player acceptance",
     "No performance/stress/leak acceptance"
   ],
-  "log_normalization": "Tracked log copies trim trailing whitespace only; raw hashes preserve originals."
+  "log_normalization": "Tracked log copies trim trailing whitespace only; raw hashes preserve originals.",
+  "implementation_commit": "5aa32edc3f350a90bd744f8814aac3ed45829d32",
+  "committed_build": {
+    "result": "PASS",
+    "exit_code": 0,
+    "log": "26.2-instant-gui-committed-build.txt",
+    "raw_log_sha256": "9b17241f91bd58c1beb86eba0fa3b9f928a5e0fd6e6fdf6b22cca83b9837b3c4",
+    "log_sha256": "7afb65ed40dc42529c3f178550f9059498960eab8a4765dceba94508c782b6ec",
+    "command": "./gradlew :common:compileJava :neoforge:build :fabric:build --no-parallel --no-daemon --console=plain",
+    "checkout": "/mnt/MainDrive/Programs/MC mods/ArcsLib/build/porting/clean-bootstrap",
+    "checkout_head": "5aa32edc3f350a90bd744f8814aac3ed45829d32",
+    "tracked_checkout_clean": true,
+    "tasks": "26 actionable tasks: 26 up-to-date; these outputs were fully built before the four final clients"
+  },
+  "regressions": {
+    "result": "PASS",
+    "exit_code": 0,
+    "log": "26.2-instant-gui-regressions.txt",
+    "raw_log_sha256": "9c5df23db78d4ec583723bac8953aec90260e450a4e39f1097c5a60a3b800c80",
+    "log_sha256": "64e84419f9d2505fe374b0172df43caea266974c7e19f66eecaa1131a5d75973",
+    "note": "Independent native layout, Fabric registration, NeoForge feature/weather and OpenGL/Vulkan tests; final four clients also repeat all shader/deformer/GUI scenarios with the final counter assertion."
+  },
+  "committed_api_sha256": "0fbd70d6ba2b17cdaa727f0d7b1a3ba2d13a530b595e479939d3645ce2f2415c",
+  "committed_api_matches_accepted_sources": true
 }
