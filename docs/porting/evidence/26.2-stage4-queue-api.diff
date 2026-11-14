@@ -1,0 +1,16 @@
+--- 864cba5 canonical parent
++++ stage4 queue/immediate declarations
+@@ -2965,10 +2965,13 @@
+ package com.arcanc.pulselib.content.renderer.rhi;
+ TYPE @ApiStatus.Internal public final class PRhiOpaqueRenderer implements PRenderExecutor
+    METHOD public PRhiOpaqueRenderer(Function<PPipelineHandle, RenderType> types, Function<PPipelineHandle, PTransparencyMode> policies, Function<PMeshHandle, Object> geometry)
++   METHOD public PRhiOpaqueRenderer(Function<PPipelineHandle, RenderType> types, Function<PPipelineHandle, PTransparencyMode> policies, Function<PMeshHandle, Object> geometry, Map<String, Supplier<GpuBufferSlice>> deformerUniforms)
+    METHOD public PRhiOpaqueRenderer(Function<PPipelineHandle, RenderType> types, Function<PPipelineHandle, PTransparencyMode> policies, Function<PMeshHandle, Object> geometry, Supplier<GpuDevice> device, Function<RenderType, PreparedRenderType> prepare, Function<PreparedRenderType, PRhiMaterial.Attachments> target)
+    METHOD public boolean canExecute(PRenderPlan plan)
++   METHOD public boolean canExecuteImmediate(PRenderPlan plan)
+    METHOD @Override public PRenderCapabilities capabilities()
+    METHOD @Override public void execute(PRenderPlan plan, PRenderFrame frame)
++   METHOD public void executeImmediate(PRenderPlan plan, PRenderFrame frame)
+    METHOD @Override public void cleanup()
+
+ FILE common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/PRhiPassState.java

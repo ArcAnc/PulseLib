@@ -260,8 +260,9 @@ requires exactly 20 RHI and zero legacy executions.
 
 This validates shader transport and math through real RHI draws. It does not accept automatic queue
 selection for GPU-deformed plans, all seven operations, composed stacks/masks, CPU fallback/subdivision,
-immediate rendering, transparent/OIT passes, Fabulous, or full Vulkan compatibility. Those checks remain
-pending; catalog shader compilation alone is insufficient.
+immediate rendering, transparent/OIT passes, Fabulous, or full Vulkan compatibility. The additional
+production queue suite below checks queue selection, immediate, all operations and subdivision;
+OIT/Fabulous and full Vulkan compatibility remain pending. Catalog compilation alone is insufficient.
 
 NeoForge/FML 11.0.16 with its default early window failed Vulkan surface creation in the tested setup:
 GLFW requires a window created with `GLFW_NO_API`, while FML's early display creates an OpenGL window.
@@ -269,3 +270,39 @@ The init script accepts `-PportingSceneEarlyWindow=false` for a separate run usi
 `earlyWindowControl = false` setting. It writes only the new test directory's `config/fml.toml`;
 production configuration, source sets and user directories remain unchanged. The backend guard still
 requires actual Vulkan. A passing run with that setting does not make the default startup pass.
+
+The remaining stage 4 production queue/immediate checks are enabled with `-PportingSceneQueue=true`:
+
+```bash
+./gradlew --init-script tests/porting/scene-check.gradle :fabric:runClient -PportingSceneQueue=true -PportingSceneShaders=true -PportingSceneBackend=opengl --no-parallel --no-daemon --console=plain
+./gradlew --init-script tests/porting/scene-check.gradle :fabric:runClient -PportingSceneQueue=true -PportingSceneShaders=true -PportingSceneBackend=vulkan --no-parallel --no-daemon --console=plain
+```
+
+For NeoForge use `:neoforge:runClient -PportingSceneLoader=neoforge`; the existing explicit
+`-PportingSceneEarlyWindow=false` is required for the tested FML 11.0.16 Vulkan bootstrap.
+`QueueChecks` uses public `PRenderQueue.submit/flushOpaque/drawImmediate` only. Native preparation,
+canonical pipeline identities and nonzero deformation headers are observed by non-cancelling test
+Mixins. It does not construct an executor or supply prepared materials, target callbacks or replacement
+shaders. The reference path uses actual `PDeformedMeshBuffers` and the same subdivided source geometry.
+
+There are 44 queue cases: seven deformer operations, a composed stack, the eight-operation GPU limit,
+a nine-operation CPU fallback and an unsupported custom deformer CPU fallback, each on four lit/emissive
+solid/cutout profiles with subdivision levels 0/1/2. Hinge tests include vertices on both sides of its
+mask. Each case compares undeformed, CPU reference and production deformation readbacks and requires
+changed coverage, coverage difference <=8 pixels, maximum RGB difference <=5/255 and mean <=1/255.
+A further 513-instance test alternates sampled values, verifies distinct per-instance value offsets,
+subdivision and portable UBO chunk boundaries, and requires byte-identical CPU/GPU output.
+
+Public drawImmediate covers twelve ordinary/instant lit/emissive solid/cutout/translucent pipelines,
+CPU/GPU normal lighting, separate frame/instance transforms, native alpha and transparent-texture
+cutout/discard. Additional draws prove that an offscreen instance transform is applied and that a
+translucent primitive does not write reversed-Z depth. This adds exactly 185 RHI executions, including
+61 plans with nonzero deformation counts, and no legacy execution. With both optional suites enabled,
+total dispatch must be RHI=227; OpenGL also has the four explicitly invoked compatibility checks,
+while Vulkan requires legacy=0. These are executor entries, not GPU draw-call counts.
+
+This accepts basic shaders, deformation and public immediate submission. It does not accept the
+four-layer OIT/Fabulous algorithm, world transparency integration, nested GUI/PIP state restoration,
+player animation rendering, stress reload/resize, resource leaks or performance. Those retain their
+separate migration stages. Default NeoForge Vulkan early-window startup remains a recorded failure;
+the test-only native setting is never written to production or user configuration.

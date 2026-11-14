@@ -103,6 +103,7 @@ public final class PRenderTypes
 				withShaderDefine("ALPHA_CUTOUT", 0.1F).
 				withCull(false).
 				withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT)).
+				withDepthStencilState(new DepthStencilState(DepthStencilState.DEFAULT.depthTest(), false)).
 				build());
 
 		public static final RenderPipeline TRIANGLES_EMISSIVE_SOLID = registerPipeline(RenderPipeline.builder(TRIANGLES_SNIPPET).
@@ -134,6 +135,7 @@ public final class PRenderTypes
 				withShaderDefine("ALPHA_CUTOUT", 0.1F).
 				withCull(false).
 				withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT)).
+				withDepthStencilState(new DepthStencilState(DepthStencilState.DEFAULT.depthTest(), false)).
 				build());
 
 		public static final RenderPipeline TRIANGLES_OIT = registerPipeline(RenderPipeline.builder(TRIANGLES_LIT_SNIPPET).
@@ -232,11 +234,12 @@ public final class PRenderTypes
 		private static final RenderPipeline.Snippet TRIANGLES_INSTANT_SNIPPET = RenderPipeline.builder().
 				withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION).
 				withVertexShader(PLibDatabase.rl("core/triangles_instant")).
+				withShaderDefine("PULSELIB_INSTANCE_CAPACITY", PRhiInstanceLayout.PORTABLE_CAPACITY).
 				withFragmentShader(PLibDatabase.rl("core/triangles_instant")).
 				withBindGroupLayout(BindGroupLayout.builder().
 					withSampler("Sampler0").
 					withSampler("Sampler1").
-					withUniform("ColorOverlay", UniformType.UNIFORM_BUFFER).
+					withUniform("InstanceData", UniformType.UNIFORM_BUFFER).
 					withUniform("DeformerOperations", UniformType.TEXEL_BUFFER, GpuFormat.RGBA32_FLOAT).
 					withUniform("DeformerValues", UniformType.TEXEL_BUFFER, GpuFormat.RGBA32_FLOAT).
 					build()).
@@ -267,6 +270,7 @@ public final class PRenderTypes
 				withLocation(PLibDatabase.rl("pipeline/triangles_instant_translucent")).
 				withShaderDefine("ALPHA_CUTOUT", 0.1F).
 				withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT)).
+				withDepthStencilState(new DepthStencilState(DepthStencilState.DEFAULT.depthTest(), false)).
 				build());
 
 		public static final RenderPipeline TRIANGLES_INSTANT_EMISSIVE_SOLID = registerPipeline(RenderPipeline.builder(TRIANGLES_INSTANT_SNIPPET).
@@ -286,6 +290,7 @@ public final class PRenderTypes
 				withShaderDefine("EMISSIVE").
 				withShaderDefine("ALPHA_CUTOUT", 0.1F).
 				withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT)).
+				withDepthStencilState(new DepthStencilState(DepthStencilState.DEFAULT.depthTest(), false)).
 				build());
 		
 		/**

@@ -18,6 +18,8 @@ import com.arcanc.pulselib.content.renderer.gl.PGlDynamicGeometry;
 import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
 import com.arcanc.pulselib.content.renderer.plan.PInstanceHeader;
 import com.arcanc.pulselib.content.renderer.plan.PTransparencyMode;
+import com.arcanc.pulselib.content.renderer.plan.PRenderPlan;
+import com.arcanc.pulselib.content.renderer.rhi.PRhiResourceRegistry;
 import com.arcanc.pulselib.util.PModelCache;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.mojang.blaze3d.GpuFormat;
@@ -53,6 +55,8 @@ public final class SceneChecks
 	private static boolean done;
 	private static int rhiDraws;
 	private static int legacyDraws;
+	private static int deformedDraws;
+	private static String lastPipeline = "";
 	private static int additionalRhiDraws;
 	private static int additionalLegacyDraws;
 
@@ -67,6 +71,25 @@ public final class SceneChecks
 			rhiDraws++;
 		else
 			legacyDraws++;
+	}
+
+	public static void recordPlan(PRenderPlan plan,
+			PRhiResourceRegistry resources)
+	{
+		if (plan.instances().stream().anyMatch(instance -> instance.auxiliaryOperationCount() > 0))
+			deformedDraws++;
+		if (!plan.groups().isEmpty())
+			lastPipeline = resources.pipelineType(plan.groups().getLast().pipeline()).pipeline().getLocation().toString();
+	}
+
+	static int[] counters()
+	{
+		return new int[]{rhiDraws, legacyDraws, deformedDraws};
+	}
+
+	static String lastPipeline()
+	{
+		return lastPipeline;
 	}
 
 	public static void tick()
@@ -187,6 +210,9 @@ public final class SceneChecks
 					if (backend.equals("opengl"))
 						additionalLegacyDraws = ShaderChecks.legacy(device, color, depth, visible);
 				}
+				if (Boolean.getBoolean("pulselib.scene.queue"))
+					additionalRhiDraws += QueueChecks.run(device, color, depth, visible, hidden);
+
 			}
 			finally
 			{
@@ -233,7 +259,7 @@ public final class SceneChecks
 		return new PGeometryData(vertices.flip(), indices.flip(), 24, 3, PGeometryData.IndexType.UNSIGNED_SHORT);
 	}
 
-	private static PBakedMesh baked(PGeometryData geometry, Identifier texture, boolean cutout, boolean emissive)
+	static PBakedMesh baked(PGeometryData geometry, Identifier texture, boolean cutout, boolean emissive)
 	{
 		var source = new PMeshPrimitive(3, FloatBuffer.wrap(new float[]{-1, -1, 0.5f, 1, -1, 0.5f, 0, 1, 0.5f}),
 				FloatBuffer.wrap(new float[]{0, 0, 1, 0, 0, 1, 0, 0, 1}), FloatBuffer.wrap(new float[]{0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f}),

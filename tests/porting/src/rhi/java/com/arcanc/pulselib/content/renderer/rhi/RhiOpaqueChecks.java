@@ -21,6 +21,7 @@ import com.arcanc.pulselib.content.renderer.plan.PRenderPlan;
 import com.arcanc.pulselib.content.renderer.plan.PTransparencyMode;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.mojang.blaze3d.PrimitiveTopology;
+import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.systems.GpuDevice;
@@ -33,6 +34,7 @@ import org.joml.Matrix4f;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -101,6 +103,22 @@ final class RhiOpaqueChecks
 			var deformed = new PInstanceHeader(new Matrix4f(), -1, 0, 0, 0, 0, 1);
 			var unsupported = new PDrawGroup(pipeline, mesh, new PDrawCommand(3, 1, 0, 0, 0), true, List.of(deformed));
 			RhiLayoutChecks.assertTrue(!renderer.canExecute(new PRenderPlan(List.of(group, unsupported))), "Mixed supported/GPU-deformed plan is not split");
+			var nativeStreams = new PRhiOpaqueRenderer(registry::pipeline, registry::transparency, registry::geometryResource,
+					Map.of("DeformerOperations", RhiOpaqueChecks::forbiddenUpload,
+							"DeformerValues", RhiOpaqueChecks::forbiddenUpload));
+			RhiLayoutChecks.assertTrue(nativeStreams.canExecute(new PRenderPlan(List.of(group, unsupported))), "Explicit streams accept a complete mixed static/GPU plan without uploads");
+			RhiLayoutChecks.assertTrue(!nativeStreams.canExecute(unknownPlan) && !nativeStreams.canExecute(oitPlan), "Native streams do not enable unknown types or world OIT");
+			try
+			{
+				new PRhiOpaqueRenderer(registry::pipeline, registry::transparency, registry::geometryResource,
+						Map.of("DeformerOperations", RhiOpaqueChecks::forbiddenUpload));
+				throw new AssertionError("Partial deformer bindings accepted");
+			}
+			catch (IllegalArgumentException expected)
+			{
+				RhiLayoutChecks.assertTrue(expected.getMessage().contains("together"), "Both stream bindings required atomically");
+			}
+			nativeStreams.cleanup();
 			RhiLayoutChecks.assertTrue(!renderer.canExecute(new PRenderPlan(List.of(
 					new PDrawGroup(pipeline, mesh, command, false, group.instances())))), "Transparent draw-depth policy not rewritten");
 			clear.accept(false);
@@ -154,6 +172,11 @@ final class RhiOpaqueChecks
 			renderer.cleanup();
 			registry.clear();
 		}
+	}
+
+	private static GpuBufferSlice forbiddenUpload()
+	{
+		throw new AssertionError("Selection must not invoke native stream suppliers");
 	}
 
 	/** Uses the actual MultiLoader public factories, including their native setup and cache. */

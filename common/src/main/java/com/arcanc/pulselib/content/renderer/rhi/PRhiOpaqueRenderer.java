@@ -20,6 +20,8 @@ import com.arcanc.pulselib.content.renderer.plan.PRenderExecutor;
 import com.arcanc.pulselib.content.renderer.plan.PRenderFrame;
 import com.arcanc.pulselib.content.renderer.plan.PRenderPlan;
 import com.arcanc.pulselib.content.renderer.plan.PTransparencyMode;
+import com.mojang.blaze3d.buffers.GpuBufferSlice;
+import com.mojang.blaze3d.pipeline.BindGroupLayout;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.systems.GpuDevice;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -33,13 +35,14 @@ import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
  * Adapts one complete opaque queue plan to the shared native backend. Selection is conservative:
- * unsupported types, transparent policies and GPU deformer streams remain with the caller's existing
- * executor. Never splits or reorders a plan, and never draws any group twice. Native resources are lazy
+ * unsupported types and world transparency remain with the caller's existing executor. Explicit native
+ * deformer streams enable canonical GPU deformation; local draws retain ordinary blending. Never splits or reorders a plan, and never draws any group twice. Native resources are lazy
  * and owned here; portable CPU geometry and host textures/targets stay with their original owners.
  */
 @ApiStatus.Internal
@@ -51,6 +54,7 @@ public final class PRhiOpaqueRenderer implements PRenderExecutor
 	private final Supplier<GpuDevice> device;
 	private final Function<RenderType, PreparedRenderType> prepare;
 	private final Function<PreparedRenderType, PRhiMaterial.Attachments> target;
+	private final Map<String, Supplier<GpuBufferSlice>> deformerUniforms;
 	private final PRhiPipelines profiles = PRhiPipelines.portable();
 	private final Map<RenderType, PPipelineHandle> bindings = new IdentityHashMap<>();
 	private @Nullable PRhiResourceRegistry resources;
@@ -62,12 +66,31 @@ public final class PRhiOpaqueRenderer implements PRenderExecutor
 		this(types, policies, geometry, RenderSystem::getDevice, RenderType::prepare, PRhiNativeMaterial::attachments);
 	}
 
+	/** Borrows canonical deformer streams without introducing global upload ownership into the adapter. */
+	public PRhiOpaqueRenderer(Function<PPipelineHandle, RenderType> types,
+			Function<PPipelineHandle, PTransparencyMode> policies, Function<PMeshHandle, Object> geometry,
+			Map<String, Supplier<GpuBufferSlice>> deformerUniforms)
+	{
+		this(types, policies, geometry, RenderSystem::getDevice, RenderType::prepare, PRhiNativeMaterial::attachments, deformerUniforms);
+	}
+
 	/** Allows an explicit native preparation/output context, as used by local and offscreen rendering. */
 	public PRhiOpaqueRenderer(Function<PPipelineHandle, RenderType> types,
 			Function<PPipelineHandle, PTransparencyMode> policies, Function<PMeshHandle, Object> geometry,
 			Supplier<GpuDevice> device, Function<RenderType, PreparedRenderType> prepare,
 			Function<PreparedRenderType, PRhiMaterial.Attachments> target)
 	{
+		this(types, policies, geometry, device, prepare, target, Map.of());
+	}
+
+	private PRhiOpaqueRenderer(Function<PPipelineHandle, RenderType> types,
+			Function<PPipelineHandle, PTransparencyMode> policies, Function<PMeshHandle, Object> geometry,
+			Supplier<GpuDevice> device, Function<RenderType, PreparedRenderType> prepare,
+			Function<PreparedRenderType, PRhiMaterial.Attachments> target, Map<String, Supplier<GpuBufferSlice>> deformerUniforms)
+	{
+		this.deformerUniforms = Map.copyOf(deformerUniforms);
+		if (!this.deformerUniforms.isEmpty() && !this.deformerUniforms.keySet().equals(Set.of("DeformerOperations", "DeformerValues")))
+			throw new IllegalArgumentException("Both native deformer streams must be supplied together");
 		this.types = Objects.requireNonNull(types);
 		this.policies = Objects.requireNonNull(policies);
 		this.geometry = Objects.requireNonNull(geometry);
@@ -79,16 +102,34 @@ public final class PRhiOpaqueRenderer implements PRenderExecutor
 	/** Inspects CPU metadata only; no preparation, upload, device lookup or OpenGL call occurs here. */
 	public boolean canExecute(PRenderPlan plan)
 	{
+		return canExecute(plan, false);
+	}
+
+	/** Local/immediate plans use ordinary alpha, including types whose world policy is OIT. */
+	public boolean canExecuteImmediate(PRenderPlan plan)
+	{
+		return canExecute(plan, true);
+	}
+
+	private boolean canExecute(PRenderPlan plan, boolean immediate)
+	{
 		for (PDrawGroup group : plan.groups())
 		{
-			if (!group.writeDepth() || this.policies.apply(group.pipeline()) != PTransparencyMode.ORDINARY ||
-					profile(this.types.apply(group.pipeline())) == null)
+			RenderPipeline selected = profile(this.types.apply(group.pipeline()), immediate);
+			if (selected == null || (!immediate && (!group.writeDepth() || this.policies.apply(group.pipeline()) != PTransparencyMode.ORDINARY)) ||
+					(selected.getDepthStencilState() != null && selected.getDepthStencilState().writeDepth()) != group.writeDepth())
 				return false;
 			if ((long)group.command().firstInstance() + group.command().instanceCount() > plan.instances().size())
 				throw new IllegalArgumentException("Opaque command exceeds its packed instance range");
 			for (int i = 0; i < group.command().instanceCount(); i++)
-				if (plan.instances().get(group.command().firstInstance() + i).auxiliaryOperationCount() != 0)
+			{
+				var instance = plan.instances().get(group.command().firstInstance() + i);
+				if (instance.auxiliaryOperationCount() < 0 || instance.auxiliaryOperationCount() > 8 ||
+						(instance.auxiliaryOperationCount() > 0 && (instance.auxiliaryOperationOffset() < 0 || instance.auxiliaryValueOffset() < 0)))
+					throw new IllegalArgumentException("Invalid canonical deformer range");
+				if (instance.auxiliaryOperationCount() > 0 && !usesDeformers(selected))
 					return false;
+			}
 		}
 		return true;
 	}
@@ -103,16 +144,27 @@ public final class PRhiOpaqueRenderer implements PRenderExecutor
 	@Override
 	public void execute(PRenderPlan plan, PRenderFrame frame)
 	{
+		execute(plan, frame, false);
+	}
+
+	/** Executes one complete local plan without consuming world OIT submissions. */
+	public void executeImmediate(PRenderPlan plan, PRenderFrame frame)
+	{
+		execute(plan, frame, true);
+	}
+
+	private void execute(PRenderPlan plan, PRenderFrame frame, boolean immediate)
+	{
 		if (plan.isEmpty())
 			return;
-		if (!canExecute(plan))
+		if (!canExecute(plan, immediate))
 			throw new UnsupportedOperationException("Plan requires an opaque feature not yet adapted to RHI");
 		PRhiResourceRegistry resources = resources();
 		var groups = new ArrayList<PDrawGroup>(plan.groups().size());
 		for (PDrawGroup group : plan.groups())
 		{
 			RenderType type = this.types.apply(group.pipeline());
-			PPipelineHandle pipeline = this.bindings.computeIfAbsent(type, source -> material(source).register(resources));
+			PPipelineHandle pipeline = this.bindings.computeIfAbsent(type, source -> material(source, immediate).register(resources));
 			PMeshHandle mesh = switch (this.geometry.apply(group.mesh()))
 			{
 				case PBakedMesh baked -> resources.mesh(baked);
@@ -136,12 +188,12 @@ public final class PRhiOpaqueRenderer implements PRenderExecutor
 		return this.resources;
 	}
 
-	private PRhiNativeMaterial material(RenderType source)
+	private PRhiNativeMaterial material(RenderType source, boolean immediate)
 	{
-		RenderPipeline profile = Objects.requireNonNull(profile(source));
+		RenderPipeline profile = Objects.requireNonNull(profile(source, immediate));
 		RenderType nativeType = RenderType.create("pulselib_rhi_opaque_" + source.pipeline().getLocation(),
 				RenderSetup.builder(profile).createRenderSetup());
-		return new PRhiNativeMaterial(nativeType, this.profiles.instanceCapacity(), PTransparencyMode.ORDINARY, Map.of(), () ->
+		return new PRhiNativeMaterial(nativeType, this.profiles.instanceCapacity(), PTransparencyMode.ORDINARY, usesDeformers(profile) ? this.deformerUniforms : Map.of(), () ->
 		{
 			PreparedRenderType prepared = Objects.requireNonNull(this.prepare.apply(source));
 			if (prepared.pipeline() != source.pipeline())
@@ -151,7 +203,7 @@ public final class PRhiOpaqueRenderer implements PRenderExecutor
 		}, this.target);
 	}
 
-	private @Nullable RenderPipeline profile(RenderType type)
+	private @Nullable RenderPipeline profile(RenderType type, boolean immediate)
 	{
 		RenderPipeline pipeline = type.pipeline();
 		@Nullable RenderPipeline selected = null;
@@ -172,10 +224,28 @@ public final class PRhiOpaqueRenderer implements PRenderExecutor
 				default -> null;
 			};
 		}
-		if (selected == null || type.hasBlending() || pipeline.isCull() || pipeline.getDepthStencilState() == null ||
-				!pipeline.getDepthStencilState().writeDepth() || type.format().getVertexSize() != 24)
+		if (!this.deformerUniforms.isEmpty())
+		{
+			String path = pipeline.getLocation().getPath();
+			boolean instant = Set.of("pipeline/triangles_instant_solid", "pipeline/triangles_instant_cutout",
+					"pipeline/triangles_instant_emissive_solid", "pipeline/triangles_instant_emissive_cutout").contains(path);
+			boolean translucent = Set.of("pipeline/triangles_translucent_no_cull", "pipeline/triangles_emissive_translucent_no_cull",
+					"pipeline/triangles_instant_translucent", "pipeline/triangles_instant_emissive_translucent").contains(path);
+			if ((selected != null && usesDeformers(pipeline)) || instant || (immediate && translucent))
+				selected = pipeline;
+		}
+
+		if (selected == null || (!immediate && type.hasBlending()) || pipeline.isCull() || pipeline.getDepthStencilState() == null ||
+				(!immediate && !pipeline.getDepthStencilState().writeDepth()) || type.format().getVertexSize() != 24)
 			return null;
 		return selected;
+	}
+
+	private static boolean usesDeformers(RenderPipeline pipeline)
+	{
+		var uniforms = BindGroupLayout.flattenUniforms(pipeline.getBindGroupLayouts());
+		return uniforms.stream().anyMatch(uniform -> uniform.name().equals("DeformerOperations")) &&
+				uniforms.stream().anyMatch(uniform -> uniform.name().equals("DeformerValues"));
 	}
 
 	/** Reload/disconnect invalidates native handles; the next supported plan recreates them lazily. */

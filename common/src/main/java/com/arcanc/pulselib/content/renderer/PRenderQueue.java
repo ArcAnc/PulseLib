@@ -29,6 +29,7 @@ import org.joml.Matrix4f;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -40,7 +41,9 @@ public final class PRenderQueue
 	private static final PFrameCompiler<RenderStage> COMPILER = new PFrameCompiler<>();
 	private static final PGlMultiDrawExecutor EXECUTOR = new PGlMultiDrawExecutor(RESOURCES);
 	private static final PRhiOpaqueRenderer OPAQUE_EXECUTOR = new PRhiOpaqueRenderer(
-			RESOURCES::pipeline, RESOURCES::transparency, RESOURCES::geometryResource);
+			RESOURCES::pipeline, RESOURCES::transparency, RESOURCES::geometryResource,
+			Map.of("DeformerOperations", () -> PGpuDeformerBuffers.upload().operations().slice(),
+					"DeformerValues", () -> PGpuDeformerBuffers.upload().values().slice()));
 
 	private PRenderQueue()
 	{
@@ -218,7 +221,7 @@ public final class PRenderQueue
 	{
 		try
 		{
-			EXECUTOR.executeImmediate(compiler.compileAll(ignored -> false), frame);
+			executeImmediate(compiler.compileAll(ignored -> false), frame);
 		}
 		finally
 		{
@@ -405,7 +408,15 @@ public final class PRenderQueue
 		PreparedMesh prepared = prepare(mesh, deformation, data);
 		var group = new PDrawGroup(RESOURCES.pipeline(type), prepared.mesh(),
 				new PDrawCommand(prepared.indexCount(), 1, 0, 0, 0), !PRenderTypes.isTransparent(type), List.of(prepared.header()));
-		EXECUTOR.executeImmediate(new PRenderPlan(List.of(group)), frame);
+		executeImmediate(new PRenderPlan(List.of(group)), frame);
+	}
+
+	private static void executeImmediate(PRenderPlan plan, PRenderFrame frame)
+	{
+		if (OPAQUE_EXECUTOR.canExecuteImmediate(plan))
+			OPAQUE_EXECUTOR.executeImmediate(plan, frame);
+		else
+			EXECUTOR.executeImmediate(plan, frame);
 	}
 
 	private static PreparedMesh prepare(PBakedMesh mesh, @Nullable PMeshDeformation deformation, PInstanceHeader data)

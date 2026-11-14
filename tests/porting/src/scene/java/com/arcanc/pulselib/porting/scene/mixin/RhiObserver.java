@@ -12,8 +12,11 @@ package com.arcanc.pulselib.porting.scene.mixin;
 import com.arcanc.pulselib.content.renderer.plan.PRenderFrame;
 import com.arcanc.pulselib.content.renderer.plan.PRenderPlan;
 import com.arcanc.pulselib.content.renderer.rhi.PRhiDrawExecutor;
+import com.arcanc.pulselib.content.renderer.rhi.PRhiResourceRegistry;
 import com.arcanc.pulselib.porting.scene.SceneChecks;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -22,10 +25,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value = PRhiDrawExecutor.class, remap = false)
 public abstract class RhiObserver
 {
+	@Shadow
+	@Final
+	private PRhiResourceRegistry resources;
+
 	@Inject(method = "execute(Lcom/arcanc/pulselib/content/renderer/plan/PRenderPlan;Lcom/arcanc/pulselib/content/renderer/plan/PRenderFrame;)V", at = @At("HEAD"))
 	private void scene$count(PRenderPlan plan, PRenderFrame frame, CallbackInfo callback)
 	{
 		if (!plan.isEmpty())
+		{
 			SceneChecks.recordBackend(true);
+			SceneChecks.recordPlan(plan, this.resources);
+		}
 	}
 }
