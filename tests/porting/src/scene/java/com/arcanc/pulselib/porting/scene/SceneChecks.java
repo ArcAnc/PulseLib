@@ -19,6 +19,7 @@ import com.arcanc.pulselib.content.renderer.plan.PGeometryData;
 import com.arcanc.pulselib.content.renderer.plan.PInstanceHeader;
 import com.arcanc.pulselib.content.renderer.plan.PTransparencyMode;
 import com.arcanc.pulselib.content.renderer.plan.PRenderPlan;
+import com.arcanc.pulselib.content.renderer.plan.PPipelineHandle;
 import com.arcanc.pulselib.content.renderer.rhi.PRhiResourceRegistry;
 import com.arcanc.pulselib.util.PModelCache;
 import com.arcanc.pulselib.util.PRenderTypes;
@@ -46,6 +47,7 @@ import java.nio.FloatBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
+import java.util.function.Function;
 
 /** Full Minecraft/production queue/native preparation; no supplied PreparedRenderType or GPU callback. */
 public final class SceneChecks
@@ -56,6 +58,8 @@ public final class SceneChecks
 	private static int rhiDraws;
 	private static int legacyDraws;
 	private static int deformedDraws;
+	private static int instantDraws;
+	private static int instantExecutions;
 	private static String lastPipeline = "";
 	private static int additionalRhiDraws;
 	private static int additionalLegacyDraws;
@@ -80,6 +84,27 @@ public final class SceneChecks
 			deformedDraws++;
 		if (!plan.groups().isEmpty())
 			lastPipeline = resources.pipelineType(plan.groups().getLast().pipeline()).pipeline().getLocation().toString();
+	}
+
+	public static void recordInstantPlan(PRenderPlan plan, Function<PPipelineHandle, RenderType> types)
+	{
+		if (plan.isEmpty())
+			return;
+		recordBackend(true);
+		instantExecutions++;
+		if (plan.instances().stream().anyMatch(instance -> instance.auxiliaryOperationCount() > 0))
+			deformedDraws++;
+		lastPipeline = types.apply(plan.groups().getLast().pipeline()).pipeline().getLocation().toString();
+	}
+
+	public static void recordInstantDraw()
+	{
+		instantDraws++;
+	}
+
+	public static int[] instantCounters()
+	{
+		return new int[]{instantExecutions, instantDraws};
 	}
 
 	static int[] counters()
@@ -213,6 +238,8 @@ public final class SceneChecks
 				if (Boolean.getBoolean("pulselib.scene.queue"))
 					additionalRhiDraws += QueueChecks.run(device, color, depth, visible, hidden);
 
+				if (Boolean.getBoolean("pulselib.scene.gui"))
+					additionalRhiDraws += GuiQueueChecks.run(device, color, depth, visible);
 			}
 			finally
 			{

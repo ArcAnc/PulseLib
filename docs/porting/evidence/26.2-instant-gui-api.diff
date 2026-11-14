@@ -1,0 +1,43 @@
+--- 6790a5a declarations
++++ instant correction declarations
+@@ -2933,6 +2933,15 @@
+    METHOD @Override public void removeCloseListener(Object owner)
+    METHOD @Override public void close()
+
++FILE common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/PRhiImmediateRenderer.java
++package com.arcanc.pulselib.content.renderer.rhi;
++TYPE @ApiStatus.Internal public final class PRhiImmediateRenderer implements PRenderExecutor
++   METHOD public PRhiImmediateRenderer(Function<PPipelineHandle, RenderType> types, Function<PMeshHandle, Object> geometry, Map<String, Supplier<GpuBufferSlice>> deformerUniforms)
++   METHOD public boolean canExecute(PRenderPlan plan)
++   METHOD @Override public PRenderCapabilities capabilities()
++   METHOD @Override public void execute(PRenderPlan plan, PRenderFrame frame)
++   METHOD @Override public void cleanup()
++
+ FILE common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/PRhiInstanceLayout.java
+ package com.arcanc.pulselib.content.renderer.rhi;
+ TYPE @ApiStatus.Internal public record PRhiInstanceLayout(int alignment, int capacity, int uniformByteLimit)
+@@ -3006,6 +3015,13 @@
+    METHOD public static synchronized void opened(CommandEncoder encoder)
+    METHOD public static synchronized void closed(CommandEncoder encoder)
+    METHOD public static synchronized boolean hasActivePass()
++
++FILE common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/PRhiRenderState.java
++package com.arcanc.pulselib.content.renderer.rhi;
++TYPE @ApiStatus.Internal public final class PRhiRenderState implements AutoCloseable
++   METHOD public PRhiRenderState()
++   METHOD public void bindTarget()
++   METHOD @Override public void close()
+
+ FILE common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/PRhiResourceRegistry.java
+ package com.arcanc.pulselib.content.renderer.rhi;
+@@ -3027,6 +3043,10 @@
+    METHOD @Override public void close()
+    TYPE record Buffers(GpuBuffer vertices, GpuBuffer indices, IndexType indexType) implements AutoCloseable
+        METHOD @Override public void close()
++
++FILE common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/PRhiTargetPipelines.java
++package com.arcanc.pulselib.content.renderer.rhi;
++TYPE final class PRhiTargetPipelines
+
+ FILE common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/PRhiUploadRing.java
+ package com.arcanc.pulselib.content.renderer.rhi;

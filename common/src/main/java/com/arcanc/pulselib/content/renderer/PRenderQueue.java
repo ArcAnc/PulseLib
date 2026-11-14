@@ -19,6 +19,7 @@ import com.arcanc.pulselib.content.renderer.gl.PGlMultiDrawExecutor;
 import com.arcanc.pulselib.content.renderer.gl.PGlResourceRegistry;
 import com.arcanc.pulselib.content.renderer.plan.*;
 import com.arcanc.pulselib.content.renderer.rhi.PRhiOpaqueRenderer;
+import com.arcanc.pulselib.content.renderer.rhi.PRhiImmediateRenderer;
 import com.arcanc.pulselib.content.renderer.rhi.PRhiRenderHost;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
@@ -42,6 +43,11 @@ public final class PRenderQueue
 	private static final PGlMultiDrawExecutor EXECUTOR = new PGlMultiDrawExecutor(RESOURCES);
 	private static final PRhiOpaqueRenderer OPAQUE_EXECUTOR = new PRhiOpaqueRenderer(
 			RESOURCES::pipeline, RESOURCES::transparency, RESOURCES::geometryResource,
+			Map.of("DeformerOperations", () -> PGpuDeformerBuffers.upload().operations().slice(),
+					"DeformerValues", () -> PGpuDeformerBuffers.upload().values().slice()));
+
+	private static final PRhiImmediateRenderer INSTANT_EXECUTOR = new PRhiImmediateRenderer(
+			RESOURCES::pipeline, RESOURCES::geometryResource,
 			Map.of("DeformerOperations", () -> PGpuDeformerBuffers.upload().operations().slice(),
 					"DeformerValues", () -> PGpuDeformerBuffers.upload().values().slice()));
 
@@ -413,10 +419,22 @@ public final class PRenderQueue
 
 	private static void executeImmediate(PRenderPlan plan, PRenderFrame frame)
 	{
-		if (OPAQUE_EXECUTOR.canExecuteImmediate(plan))
+		if (INSTANT_EXECUTOR.canExecute(plan))
+			INSTANT_EXECUTOR.execute(plan, frame);
+		else if (OPAQUE_EXECUTOR.canExecuteImmediate(plan))
 			OPAQUE_EXECUTOR.executeImmediate(plan, frame);
 		else
-			EXECUTOR.executeImmediate(plan, frame);
+			for (PDrawGroup group : plan.groups())
+			{
+				// Keep the compiled local order when instant and ordinary materials share one GUI scope.
+				PRenderPlan single = new PRenderPlan(List.of(group), plan.instances());
+				if (INSTANT_EXECUTOR.canExecute(single))
+					INSTANT_EXECUTOR.execute(single, frame);
+				else if (OPAQUE_EXECUTOR.canExecuteImmediate(single))
+					OPAQUE_EXECUTOR.executeImmediate(single, frame);
+				else
+					EXECUTOR.executeImmediate(single, frame);
+			}
 	}
 
 	private static PreparedMesh prepare(PBakedMesh mesh, @Nullable PMeshDeformation deformation, PInstanceHeader data)
@@ -536,7 +554,14 @@ public final class PRenderQueue
 		COMPILER.clear();
 		try
 		{
-			OPAQUE_EXECUTOR.cleanup();
+			try
+			{
+				INSTANT_EXECUTOR.cleanup();
+			}
+			finally
+			{
+				OPAQUE_EXECUTOR.cleanup();
+			}
 		}
 		finally
 		{

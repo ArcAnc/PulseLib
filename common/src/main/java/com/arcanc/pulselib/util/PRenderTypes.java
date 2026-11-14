@@ -234,12 +234,11 @@ public final class PRenderTypes
 		private static final RenderPipeline.Snippet TRIANGLES_INSTANT_SNIPPET = RenderPipeline.builder().
 				withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION).
 				withVertexShader(PLibDatabase.rl("core/triangles_instant")).
-				withShaderDefine("PULSELIB_INSTANCE_CAPACITY", PRhiInstanceLayout.PORTABLE_CAPACITY).
 				withFragmentShader(PLibDatabase.rl("core/triangles_instant")).
 				withBindGroupLayout(BindGroupLayout.builder().
 					withSampler("Sampler0").
 					withSampler("Sampler1").
-					withUniform("InstanceData", UniformType.UNIFORM_BUFFER).
+					withUniform("ColorOverlay", UniformType.UNIFORM_BUFFER).
 					withUniform("DeformerOperations", UniformType.TEXEL_BUFFER, GpuFormat.RGBA32_FLOAT).
 					withUniform("DeformerValues", UniformType.TEXEL_BUFFER, GpuFormat.RGBA32_FLOAT).
 					build()).

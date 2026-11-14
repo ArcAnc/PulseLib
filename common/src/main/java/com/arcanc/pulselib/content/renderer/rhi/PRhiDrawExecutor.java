@@ -18,6 +18,7 @@ import com.arcanc.pulselib.content.renderer.plan.PRenderFrame;
 import com.arcanc.pulselib.content.renderer.plan.PRenderPlan;
 import com.arcanc.pulselib.content.renderer.plan.PTransparencyMode;
 import com.mojang.blaze3d.buffers.Std140Builder;
+import com.mojang.blaze3d.pipeline.BindGroupLayout;
 import com.mojang.blaze3d.systems.GpuDevice;
 import org.jetbrains.annotations.ApiStatus;
 import org.joml.Matrix4f;
@@ -73,6 +74,11 @@ public final class PRhiDrawExecutor implements PRenderExecutor
 		checkThread();
 		if (plan.isEmpty())
 			return;
+		for (var group : plan.groups())
+			if (this.resources.material(group.pipeline()).instanceCapacity() == 1 &&
+					BindGroupLayout.flattenUniforms(this.resources.material(group.pipeline()).pipeline().getBindGroupLayouts()).stream().
+							anyMatch(uniform -> uniform.name().equals("ColorOverlay")))
+				throw new IllegalArgumentException("Instant rendering requires the single-object executor");
 		PRhiInstanceLayout.Packet packet = this.layout.pack(plan);
 		if (packet.batches().isEmpty())
 			return;
@@ -120,7 +126,7 @@ public final class PRhiDrawExecutor implements PRenderExecutor
 				try (var pass = encoder.createRenderPass(() -> "PulseLib RHI " + group.mesh().value(),
 						target.color(), Optional.empty(), target.depth(), OptionalDouble.empty()))
 				{
-					pass.setPipeline(material.pipeline());
+					pass.setPipeline(PRhiTargetPipelines.select(material.pipeline(), target.depth() != null));
 					var scissor = state.scissor();
 					if (scissor.enabled())
 						pass.enableScissor(scissor.x(), scissor.y(), scissor.width(), scissor.height());

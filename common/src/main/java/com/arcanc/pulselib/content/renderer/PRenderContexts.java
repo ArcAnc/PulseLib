@@ -13,6 +13,7 @@ import com.arcanc.pulselib.content.renderer.legacy.GlRenderState;
 import com.arcanc.pulselib.content.renderer.plan.PFrameCompiler;
 import com.arcanc.pulselib.content.renderer.plan.PRenderFrame;
 import com.arcanc.pulselib.content.renderer.rhi.PRhiRenderHost;
+import com.arcanc.pulselib.content.renderer.rhi.PRhiRenderState;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.GpuTextureView;
 import org.jspecify.annotations.Nullable;
@@ -99,6 +100,7 @@ public final class PRenderContexts
 		private final @Nullable GpuTextureView colorOverride = RenderSystem.outputColorTextureOverride;
 		private final @Nullable GpuTextureView depthOverride = RenderSystem.outputDepthTextureOverride;
 		private final @Nullable GlRenderState state;
+		private final @Nullable PRhiRenderState nativeState;
 		private final @Nullable PRenderFrame frame;
 		final @Nullable PFrameCompiler<PRenderQueue.RenderStage> compiler;
 		private boolean closed;
@@ -107,14 +109,16 @@ public final class PRenderContexts
 		{
 			this.context = context;
 			boolean local = context == Context.GUI || context == Context.OFFSCREEN;
-			this.state = local ? new GlRenderState() : null;
+			this.nativeState = local ? new PRhiRenderState() : null;
+			this.state = local && RenderSystem.getDevice().getDeviceInfo().backendName().equals("OpenGL") ? new GlRenderState() : null;
 			this.frame = local ? new PRhiRenderHost().captureFrame() : null;
 			this.compiler = local ? new PFrameCompiler<>(instance ->
 			{
 				Vector4f position = new Vector4f(instance.transform().m30(), instance.transform().m31(), instance.transform().m32(), 1);
 				this.frame.modelView().transform(position);
 				this.frame.projection().transform(position);
-				return position.w == 0 ? position.z : position.z / position.w;
+				// The compiler sorts descending; reversed-Z needs smaller native depth first.
+				return -(position.w == 0 ? position.z : position.z / position.w);
 			}) : null;
 		}
 
@@ -143,7 +147,9 @@ public final class PRenderContexts
 			{
 				if (this.compiler != null)
 				{
-					Objects.requireNonNull(this.state).bindTarget();
+					Objects.requireNonNull(this.nativeState).bindTarget();
+					if (this.state != null)
+						this.state.bindTarget();
 					PRenderQueue.flushLocal(this.compiler, Objects.requireNonNull(this.frame));
 				}
 			}
@@ -151,8 +157,16 @@ public final class PRenderContexts
 			{
 				try
 				{
-					if (this.state != null)
-						this.state.close();
+					try
+					{
+						if (this.state != null)
+							this.state.close();
+					}
+					finally
+					{
+						if (this.nativeState != null)
+							this.nativeState.close();
+					}
 				}
 				finally
 				{

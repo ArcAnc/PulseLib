@@ -306,3 +306,43 @@ four-layer OIT/Fabulous algorithm, world transparency integration, nested GUI/PI
 player animation rendering, stress reload/resize, resource leaks or performance. Those retain their
 separate migration stages. Default NeoForge Vulkan early-window startup remains a recorded failure;
 the test-only native setting is never written to production or user configuration.
+
+Correction: `triangles_instant` means immediate rendering, not instanced rendering. Its shader uses a
+single 48-byte `ColorOverlay` block, no `InstanceData` array, capacity define or `gl_InstanceID`.
+`PRhiImmediateRenderer` submits one native draw per object, always with instanceCount=1. The ordinary
+world renderer remains instanced. The earlier stage 4 instant-array acceptance did not establish this
+contract and is superseded by the GUI queue suite below.
+
+```bash
+./gradlew --init-script tests/porting/scene-check.gradle :fabric:runClient -PportingSceneGui=true -PportingSceneQueue=true -PportingSceneShaders=true -PportingSceneBackend=opengl --no-parallel --no-daemon --console=plain
+./gradlew --init-script tests/porting/scene-check.gradle :fabric:runClient -PportingSceneGui=true -PportingSceneQueue=true -PportingSceneShaders=true -PportingSceneBackend=vulkan --no-parallel --no-daemon --console=plain
+```
+
+For NeoForge use `:neoforge:runClient -PportingSceneLoader=neoforge`; Vulkan still needs the documented
+explicit test-only `-PportingSceneEarlyWindow=false`. All suites are separate, unpublished test-mod
+content. Normal builds and CI do not run GPU checks.
+
+`GuiQueueChecks` uses real `PRenderContexts.enter(GUI/OFFSCREEN)` and public queue submissions. It checks
+that local scope close flushes only that compiler, that a pending world sentinel survives, that a world
+flush never replays GUI objects, and that sibling and nested targets remain independent. Nested scopes
+mutate target/projection/model-view/scissor after submission; the captured inputs must still render the
+right pixels and restore the caller. Parent/child sampled deformation values (0.5 versus 1.2) must survive
+the child's flush. Discard and an intentional malformed-geometry flush test queue cleanup, stack pop,
+state restoration and recovery of the next GUI scope.
+
+A direct drawImmediate inside a GUI scope must appear before scope close without draining pending local
+submissions. 130 objects sharing geometry and pipeline must produce exactly 130 native single draws and
+individual colors/transforms. A native RenderPass observer rejects any instant InstanceData binding,
+non-48-byte ColorOverlay or draw instanceCount !=1. Alpha must composite far red then near blue under
+reversed-Z (ARGB C0400080). A depthless target checks both instant and ordinary materials, with no main
+world depth inheritance; target-aware native pipeline variants disable depth state when absent.
+
+The GUI suite has 14 instant-executor entries (one expected rejected geometry case), 144 successful
+native single-object draws, plus two ordinary-renderer entries. With all suites enabled the full scene
+requires RHI=243; OpenGL has four explicitly invoked legacy compatibility checks and Vulkan has none.
+Those RHI counts are executor entries, not GPU draw counts. Existing world instancing/deformation,
+CPU fallback and all twelve ordinary/instant material checks remain enabled.
+
+These are isolated GUI/offscreen scope tests in real Minecraft clients, not full vanilla GUI extraction,
+item/PIP/armor integration acceptance. Full world/Fabulous/OIT/player scenarios and performance/leak
+stress retain their migration stages. Default NeoForge Vulkan early-window startup is still unaccepted.

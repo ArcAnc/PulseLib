@@ -136,6 +136,9 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 		{
 			if (group.instances().isEmpty() || group.command().indexCount() == 0)
 				continue;
+			if (BindGroupLayout.flattenUniforms(this.resources.pipeline(group.pipeline()).pipeline().getBindGroupLayouts()).stream().
+					anyMatch(uniform -> uniform.name().equals("ColorOverlay")))
+				throw new UnsupportedOperationException("Single-object instant draws require the immediate renderer, not the GL instancing executor");
 			PDrawCommand command = group.command();
 			if ((long)command.firstIndex() + command.indexCount() > this.resources.indexCount(group.mesh()) ||
 					(long)command.firstInstance() + command.instanceCount() > plan.instances().size())

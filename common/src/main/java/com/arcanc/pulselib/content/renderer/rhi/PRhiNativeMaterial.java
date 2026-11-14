@@ -36,7 +36,7 @@ import java.util.function.Supplier;
 @ApiStatus.Internal
 public final class PRhiNativeMaterial
 {
-	private static final Set<String> OWNED_UNIFORMS = Set.of("DynamicTransforms", "Projection", "InstanceData");
+	private static final Set<String> OWNED_UNIFORMS = Set.of("DynamicTransforms", "Projection", "InstanceData", "ColorOverlay");
 	private final RenderType type;
 	private final Supplier<PreparedRenderType> prepare;
 	private final Function<PreparedRenderType, PRhiMaterial.Attachments> target;
@@ -125,8 +125,8 @@ public final class PRhiNativeMaterial
 	{
 		var target = prepared.outputTarget().getRenderTarget();
 		var color = RenderSystem.outputColorTextureOverride != null ? RenderSystem.outputColorTextureOverride : target.getColorTextureView();
-		var depth = target.useDepth ?
-				(RenderSystem.outputDepthTextureOverride != null ? RenderSystem.outputDepthTextureOverride : target.getDepthTextureView()) : null;
+		var depth = RenderSystem.outputColorTextureOverride != null ? RenderSystem.outputDepthTextureOverride :
+				(target.useDepth ? (RenderSystem.outputDepthTextureOverride != null ? RenderSystem.outputDepthTextureOverride : target.getDepthTextureView()) : null);
 		return new PRhiMaterial.Attachments(Objects.requireNonNull(color, "Native render target has no color view"), depth);
 	}
 }

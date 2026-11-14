@@ -43,9 +43,15 @@ public record PRhiMaterial(RenderPipeline pipeline, Supplier<Attachments> target
 			throw new IllegalArgumentException("Shader/CPU instance capacities differ");
 		uniforms = Map.copyOf(uniforms);
 		textures = Map.copyOf(textures);
-		Set<String> owned = Set.of("Projection", "DynamicTransforms", "InstanceData");
+		boolean instant = BindGroupLayout.flattenUniforms(pipeline.getBindGroupLayouts()).stream().
+				anyMatch(uniform -> uniform.name().equals("ColorOverlay"));
+		if (instant && (instanceCapacity != 1 || shaderCapacity != null))
+			throw new IllegalArgumentException("Instant materials require single-object uniforms, without an instance array");
+		Set<String> owned = Set.of("Projection", "DynamicTransforms", instant ? "ColorOverlay" : "InstanceData");
 		var declarations = BindGroupLayout.flattenUniforms(pipeline.getBindGroupLayouts());
 		Set<String> declared = declarations.stream().map(BindGroupLayout.UniformDescription::name).collect(Collectors.toSet());
+		if (instant && declared.contains("InstanceData"))
+			throw new IllegalArgumentException("Instant material cannot declare InstanceData");
 		Set<String> samplers = Set.copyOf(BindGroupLayout.flattenSamplers(pipeline.getBindGroupLayouts()));
 		for (String reserved : owned)
 		{

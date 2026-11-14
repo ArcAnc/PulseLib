@@ -36,13 +36,22 @@ public final class RhiCatalogChecks
 			for (var uniform : BindGroupLayout.flattenUniforms(pipeline.getBindGroupLayouts()))
 				if (uniform.type() == UniformType.TEXEL_BUFFER && uniform.gpuFormat() != GpuFormat.RGBA32_FLOAT)
 					throw new AssertionError("Packed vec4 deformer format differs from shader data: " + id);
-			if (pipeline.getVertexShader().getPath().equals("core/triangles") || pipeline.getVertexShader().getPath().equals("core/triangles_instant"))
+			if (pipeline.getVertexShader().getPath().equals("core/triangles"))
 			{
 				if (!Integer.toString(PRhiInstanceLayout.PORTABLE_CAPACITY).equals(pipeline.getShaderDefines().values().get("PULSELIB_INSTANCE_CAPACITY")) ||
 						BindGroupLayout.flattenUniforms(pipeline.getBindGroupLayouts()).stream().
 								noneMatch(uniform -> uniform.name().equals("InstanceData") && uniform.type() == UniformType.UNIFORM_BUFFER))
 					throw new AssertionError("Canonical shader must declare the portable instance block: " + id);
 			}
+			if (pipeline.getVertexShader().getPath().equals("core/triangles_instant"))
+			{
+				var uniforms = BindGroupLayout.flattenUniforms(pipeline.getBindGroupLayouts());
+				if (pipeline.getShaderDefines().values().containsKey("PULSELIB_INSTANCE_CAPACITY") ||
+						uniforms.stream().anyMatch(uniform -> uniform.name().equals("InstanceData")) ||
+						uniforms.stream().noneMatch(uniform -> uniform.name().equals("ColorOverlay")))
+					throw new AssertionError("Instant shaders require single-object ColorOverlay only: " + id);
+			}
+
 			registrar.accept(pipeline);
 		});
 		if (catalog.size() != 19)

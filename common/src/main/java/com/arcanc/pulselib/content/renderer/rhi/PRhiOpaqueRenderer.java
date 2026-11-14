@@ -227,11 +227,8 @@ public final class PRhiOpaqueRenderer implements PRenderExecutor
 		if (!this.deformerUniforms.isEmpty())
 		{
 			String path = pipeline.getLocation().getPath();
-			boolean instant = Set.of("pipeline/triangles_instant_solid", "pipeline/triangles_instant_cutout",
-					"pipeline/triangles_instant_emissive_solid", "pipeline/triangles_instant_emissive_cutout").contains(path);
-			boolean translucent = Set.of("pipeline/triangles_translucent_no_cull", "pipeline/triangles_emissive_translucent_no_cull",
-					"pipeline/triangles_instant_translucent", "pipeline/triangles_instant_emissive_translucent").contains(path);
-			if ((selected != null && usesDeformers(pipeline)) || instant || (immediate && translucent))
+			boolean translucent = Set.of("pipeline/triangles_translucent_no_cull", "pipeline/triangles_emissive_translucent_no_cull").contains(path);
+			if ((selected != null && usesDeformers(pipeline)) || (immediate && translucent))
 				selected = pipeline;
 		}
 
