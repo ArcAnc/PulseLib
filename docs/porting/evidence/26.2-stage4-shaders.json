@@ -193,5 +193,15 @@
   "all_four_final_driver_classes_identical": true,
   "all_four_final_readbacks_identical": true,
   "user_drafts_preserved": true,
-  "log_normalization": "Tracked log copies trim trailing whitespace only; raw_log_sha256 identifies untouched build/porting originals."
+  "log_normalization": "Tracked log copies trim trailing whitespace only; raw_log_sha256 identifies untouched build/porting originals.",
+  "implementation_commit": "630892565bd58b330131f4c44a1007d9e0fbea37",
+  "committed_clean_build": {
+    "commit": "630892565bd58b330131f4c44a1007d9e0fbea37",
+    "command": "./gradlew :common:compileJava :neoforge:build :fabric:build --no-parallel --no-daemon --console=plain",
+    "result": "PASS",
+    "log": "26.2-stage4-committed-build.txt",
+    "raw_log_sha256": "0f5c2672196fa94d52ed02b579b2511d830961856766471887221ff624ade5cb",
+    "log_sha256": "36347d3fd672bda93cecb92ceb82a66107b92fa2c7b84249e0f4be2c5bebeee8"
+  },
+  "clean_committed_api_declarations_equal_parent": true
 }
