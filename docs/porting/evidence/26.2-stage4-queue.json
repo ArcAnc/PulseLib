@@ -413,5 +413,16 @@
     "raw_diff_sha256": "bad15a83605337b70d5aea0da164dd8ee85fdc0d56411706fa55b5fe7616dcf6",
     "evidence_sha256": "5e2d78b62a82c9b902608527e6919c15391bfdac4461f314e36cfbf5a55facd8",
     "normalization": "Presentation copy expands tabs and trims trailing context whitespace; raw parse-only comparison retained under build/porting. Only three additive internal RHI declarations."
-  }
+  },
+  "implementation_commit": "f5debdc6c1755c8a04e710163585f3647ae15090",
+  "stage4_status": "complete for main shader families/deformation and first Vulkan acceptance; four-layer OIT algorithm/peeling/Fabulous belongs to stage 5 and is unaccepted",
+  "committed_clean_build": {
+    "commit": "f5debdc6c1755c8a04e710163585f3647ae15090",
+    "command": "./gradlew :common:compileJava :neoforge:build :fabric:build --no-parallel --no-daemon --console=plain",
+    "result": "PASS",
+    "log": "26.2-stage4-queue-committed-build.txt",
+    "log_sha256": "0bb197253d29c173433d5e6a827f53a4e672c4a9de2de2eb203888654b351a9a",
+    "raw_log_sha256": "df9369275b0362bab0209c8637542192d295dd1adad12829eb3a384fbfe3301d"
+  },
+  "committed_api_matches_runtime_source_api": true
 }
