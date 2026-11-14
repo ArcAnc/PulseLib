@@ -226,7 +226,8 @@ Use a clean checkout for NeoForge if local draft package metadata duplicates Com
 changes no production source set or Mixin requirement. It creates a fresh `build/porting-scene/client-*`
 directory, installs only the separate scene JAR and requires an explicit `PASS` result after normal
 Minecraft shutdown; exit code zero without a result fails. No existing save is opened or created.
-The actual backend must be OpenGL. The test waits for native resource loading and renders offscreen
+The default backend is OpenGL; `-PportingSceneBackend=vulkan` requests and requires actual Vulkan.
+The test waits for native resource loading and renders offscreen
 inside GameRenderer with native TextureManager, lighting/overlay/UI lightmap and default RenderType
 preparation. Production queue/compiler/host/backend are called without material/output callbacks.
 
@@ -236,3 +237,35 @@ borrowed target lifetime. Non-cancelling test-only Mixins require 20 RHI executi
 executions. PNG readbacks and `pulselib-scene-result.txt` remain in the test directory. This is a basic
 renderer acceptance test; it does not validate world stages, OIT/Fabulous, GPU deformation, GUI scopes,
 player integration or full Vulkan support. Scene content is never packaged in production Common.
+
+Canonical shader and deformer checks can be added explicitly:
+
+```bash
+./gradlew --init-script tests/porting/scene-check.gradle :fabric:runClient -PportingSceneShaders=true -PportingSceneBackend=opengl --no-parallel --no-daemon --console=plain
+./gradlew --init-script tests/porting/scene-check.gradle :fabric:runClient -PportingSceneShaders=true -PportingSceneBackend=vulkan --no-parallel --no-daemon --console=plain
+```
+
+These checks also support `:neoforge:runClient -PportingSceneLoader=neoforge`. They use the canonical
+solid lit/emissive pipelines with `PRhiNativeMaterial`, `PRhiDrawExecutor` and actual native preparation;
+they do not substitute the basic four RHI shader profiles. Production GPU deformer streams supply
+stretch/twist/bend operations with nonzero value offsets. CPU positions and finite-difference normals
+are packed into reference geometry and compared with GPU image readbacks. Coverage differences must
+stay within 8 pixels, RGB differences within 5/255 and mean RGB error within 1/255; undeformed coverage
+must differ by more than 50 pixels, so ignoring the operations cannot pass. Two additional 513-instance
+CPU/GPU comparisons require byte-identical results across portable 128-record UBO chunks. There are
+22 additional RHI executions. OpenGL also calls the isolated compatibility executor directly for four
+1025-instance profiles with two meshes, arena offsets, packed instance ranges and a zero-index command,
+and requires four additional legacy executions. The default queue test still
+requires exactly 20 RHI and zero legacy executions.
+
+This validates shader transport and math through real RHI draws. It does not accept automatic queue
+selection for GPU-deformed plans, all seven operations, composed stacks/masks, CPU fallback/subdivision,
+immediate rendering, transparent/OIT passes, Fabulous, or full Vulkan compatibility. Those checks remain
+pending; catalog shader compilation alone is insufficient.
+
+NeoForge/FML 11.0.16 with its default early window failed Vulkan surface creation in the tested setup:
+GLFW requires a window created with `GLFW_NO_API`, while FML's early display creates an OpenGL window.
+The init script accepts `-PportingSceneEarlyWindow=false` for a separate run using FML's native
+`earlyWindowControl = false` setting. It writes only the new test directory's `config/fml.toml`;
+production configuration, source sets and user directories remain unchanged. The backend guard still
+requires actual Vulkan. A passing run with that setting does not make the default startup pass.

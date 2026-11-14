@@ -1,9 +1,11 @@
 #version 330
 
-#moj_import <minecraft:light.glsl>
 #moj_import <minecraft:dynamictransforms.glsl>
 #moj_import <minecraft:projection.glsl>
+#ifndef EMISSIVE
+#moj_import <minecraft:light.glsl>
 #moj_import <minecraft:sample_lightmap.glsl>
+#endif
 #moj_import <pulselib:deformers.glsl>
 
 in vec3 Position;

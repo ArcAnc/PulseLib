@@ -11,6 +11,7 @@ package com.arcanc.pulselib.util;
 
 
 import com.arcanc.pulselib.content.model.textures.PAlphaMode;
+import com.arcanc.pulselib.content.renderer.rhi.PRhiInstanceLayout;
 import com.arcanc.pulselib.content.renderer.rhi.PRhiPipelines;
 import com.mojang.blaze3d.GpuFormat;
 import com.mojang.blaze3d.PrimitiveTopology;
@@ -56,11 +57,11 @@ public final class PRenderTypes
 		private static final RenderPipeline.Snippet TRIANGLES_SNIPPET = RenderPipeline.builder().
 				withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION).
 				withVertexShader(PLibDatabase.rl("core/triangles")).
+				withShaderDefine("PULSELIB_INSTANCE_CAPACITY", PRhiInstanceLayout.PORTABLE_CAPACITY).
 				withFragmentShader(PLibDatabase.rl("core/triangles")).
 				withBindGroupLayout(BindGroupLayout.builder().
 					withSampler("Sampler0").
-					withSampler("Sampler2").
-					withUniform("Lighting", UniformType.UNIFORM_BUFFER).
+					withUniform("InstanceData", UniformType.UNIFORM_BUFFER).
 					withUniform("DeformerOperations", UniformType.TEXEL_BUFFER, GpuFormat.RGBA32_FLOAT).
 					withUniform("DeformerValues", UniformType.TEXEL_BUFFER, GpuFormat.RGBA32_FLOAT).
 					build()).
@@ -69,7 +70,14 @@ public final class PRenderTypes
 				withDepthStencilState(DepthStencilState.DEFAULT).
 				buildSnippet();
 		
-		public static final RenderPipeline TRIANGLES_SOLID = registerPipeline(RenderPipeline.builder(TRIANGLES_SNIPPET).
+		private static final RenderPipeline.Snippet TRIANGLES_LIT_SNIPPET = RenderPipeline.builder(TRIANGLES_SNIPPET).
+				withBindGroupLayout(BindGroupLayout.builder().
+					withSampler("Sampler2").
+					withUniform("Lighting", UniformType.UNIFORM_BUFFER).
+					build()).
+				buildSnippet();
+
+		public static final RenderPipeline TRIANGLES_SOLID = registerPipeline(RenderPipeline.builder(TRIANGLES_LIT_SNIPPET).
 				withLocation(PLibDatabase.rl("pipeline/triangles_solid_no_cull")).
 				withBindGroupLayout(BindGroupLayout.builder().
 					withSampler("Sampler1").
@@ -78,7 +86,7 @@ public final class PRenderTypes
 				withCull(false).
 				build());
 		
-		public static final RenderPipeline TRIANGLES_CUTOUT = registerPipeline(RenderPipeline.builder(TRIANGLES_SNIPPET).
+		public static final RenderPipeline TRIANGLES_CUTOUT = registerPipeline(RenderPipeline.builder(TRIANGLES_LIT_SNIPPET).
 				withLocation(PLibDatabase.rl("pipeline/triangles_cutout_no_cull")).
 				withBindGroupLayout(BindGroupLayout.builder().
 					withSampler("Sampler1").
@@ -87,7 +95,7 @@ public final class PRenderTypes
 				withCull(false).
 				build());
 		
-		public static final RenderPipeline TRIANGLES_TRANSLUCENT = registerPipeline(RenderPipeline.builder(TRIANGLES_SNIPPET).
+		public static final RenderPipeline TRIANGLES_TRANSLUCENT = registerPipeline(RenderPipeline.builder(TRIANGLES_LIT_SNIPPET).
 				withLocation(PLibDatabase.rl("pipeline/triangles_translucent_no_cull")).
 				withBindGroupLayout(BindGroupLayout.builder().
 					withSampler("Sampler1").
@@ -128,7 +136,7 @@ public final class PRenderTypes
 				withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT)).
 				build());
 
-		public static final RenderPipeline TRIANGLES_OIT = registerPipeline(RenderPipeline.builder(TRIANGLES_SNIPPET).
+		public static final RenderPipeline TRIANGLES_OIT = registerPipeline(RenderPipeline.builder(TRIANGLES_LIT_SNIPPET).
 				withLocation(PLibDatabase.rl("pipeline/triangles_oit_no_cull")).
 				withFragmentShader(PLibDatabase.rl("core/triangles_oit")).
 				withBindGroupLayout(BindGroupLayout.builder().
@@ -151,7 +159,7 @@ public final class PRenderTypes
 				withCull(false).
 				build());
 
-		public static final RenderPipeline TRIANGLES_OIT_DEPTH = registerPipeline(RenderPipeline.builder(TRIANGLES_SNIPPET).
+		public static final RenderPipeline TRIANGLES_OIT_DEPTH = registerPipeline(RenderPipeline.builder(TRIANGLES_LIT_SNIPPET).
 				withLocation(PLibDatabase.rl("pipeline/triangles_oit_depth_no_cull")).
 				withFragmentShader(PLibDatabase.rl("core/triangles_oit_depth")).
 				withBindGroupLayout(BindGroupLayout.builder().
@@ -161,7 +169,7 @@ public final class PRenderTypes
 				withCull(false).
 				build());
 
-		public static final RenderPipeline TRIANGLES_OIT_DEPTH_PEEL = registerPipeline(RenderPipeline.builder(TRIANGLES_SNIPPET).
+		public static final RenderPipeline TRIANGLES_OIT_DEPTH_PEEL = registerPipeline(RenderPipeline.builder(TRIANGLES_LIT_SNIPPET).
 				withLocation(PLibDatabase.rl("pipeline/triangles_oit_depth_peel_no_cull")).
 				withFragmentShader(PLibDatabase.rl("core/triangles_oit_depth_peel")).
 				withBindGroupLayout(BindGroupLayout.builder().
@@ -228,8 +236,6 @@ public final class PRenderTypes
 				withBindGroupLayout(BindGroupLayout.builder().
 					withSampler("Sampler0").
 					withSampler("Sampler1").
-					withSampler("Sampler2").
-					withUniform("Lighting", UniformType.UNIFORM_BUFFER).
 					withUniform("ColorOverlay", UniformType.UNIFORM_BUFFER).
 					withUniform("DeformerOperations", UniformType.TEXEL_BUFFER, GpuFormat.RGBA32_FLOAT).
 					withUniform("DeformerValues", UniformType.TEXEL_BUFFER, GpuFormat.RGBA32_FLOAT).
@@ -240,17 +246,24 @@ public final class PRenderTypes
 				withPrimitiveTopology(PrimitiveTopology.TRIANGLES).
 				buildSnippet();
 
-		public static final RenderPipeline TRIANGLES_INSTANT_SOLID = registerPipeline(RenderPipeline.builder(TRIANGLES_INSTANT_SNIPPET).
+		private static final RenderPipeline.Snippet TRIANGLES_INSTANT_LIT_SNIPPET = RenderPipeline.builder(TRIANGLES_INSTANT_SNIPPET).
+				withBindGroupLayout(BindGroupLayout.builder().
+					withSampler("Sampler2").
+					withUniform("Lighting", UniformType.UNIFORM_BUFFER).
+					build()).
+				buildSnippet();
+
+		public static final RenderPipeline TRIANGLES_INSTANT_SOLID = registerPipeline(RenderPipeline.builder(TRIANGLES_INSTANT_LIT_SNIPPET).
 				withLocation(PLibDatabase.rl("pipeline/triangles_instant_solid")).
 				withShaderDefine("FORCE_OPAQUE").
 				build());
 
-		public static final RenderPipeline TRIANGLES_INSTANT_CUTOUT = registerPipeline(RenderPipeline.builder(TRIANGLES_INSTANT_SNIPPET).
+		public static final RenderPipeline TRIANGLES_INSTANT_CUTOUT = registerPipeline(RenderPipeline.builder(TRIANGLES_INSTANT_LIT_SNIPPET).
 				withLocation(PLibDatabase.rl("pipeline/triangles_instant_cutout")).
 				withShaderDefine("ALPHA_CUTOUT", 0.1F).
 				build());
 
-		public static final RenderPipeline TRIANGLES_INSTANT_TRANSLUCENT = registerPipeline(RenderPipeline.builder(TRIANGLES_INSTANT_SNIPPET).
+		public static final RenderPipeline TRIANGLES_INSTANT_TRANSLUCENT = registerPipeline(RenderPipeline.builder(TRIANGLES_INSTANT_LIT_SNIPPET).
 				withLocation(PLibDatabase.rl("pipeline/triangles_instant_translucent")).
 				withShaderDefine("ALPHA_CUTOUT", 0.1F).
 				withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT)).

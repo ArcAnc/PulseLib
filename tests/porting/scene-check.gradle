@@ -35,6 +35,13 @@ gradle.projectsEvaluated
 	def loader = root.providers.gradleProperty('portingSceneLoader').getOrElse('fabric')
 	if (!(loader in ['fabric', 'neoforge']))
 		throw new GradleException('portingSceneLoader must be fabric or neoforge')
+	def backend = root.providers.gradleProperty('portingSceneBackend').getOrElse('opengl')
+	if (!(backend in ['opengl', 'vulkan']))
+		throw new GradleException('portingSceneBackend must be opengl or vulkan')
+	def shaders = root.providers.gradleProperty('portingSceneShaders').getOrElse('false')
+	def earlyWindow = root.providers.gradleProperty('portingSceneEarlyWindow').getOrElse('true')
+	if (!(earlyWindow in ['true', 'false']))
+		throw new GradleException('portingSceneEarlyWindow must be true or false')
 	def project = root.project(':' + loader)
 	def parent = project.layout.buildDirectory.dir('porting-scene').get().asFile
 	parent.mkdirs()
@@ -42,13 +49,17 @@ gradle.projectsEvaluated
 	if (loader == 'fabric')
 	{
 		project.loom.runs.client.runDirectory.set(project.layout.dir(project.provider { directory }))
-		project.loom.runs.client.programArgs('--graphicsBackend', 'OPENGL')
+		project.loom.runs.client.programArgs('--graphicsBackend', backend.toUpperCase())
+		project.loom.runs.client.vmArg('-Dpulselib.scene.backend=' + backend)
+		project.loom.runs.client.vmArg('-Dpulselib.scene.shaders=' + shaders)
 	}
 	else
 		project.neoForge.runs.named('client')
 		{
 			gameDirectory = directory
-			programArguments.addAll('--graphicsBackend', 'OPENGL')
+			programArguments.addAll('--graphicsBackend', backend.toUpperCase())
+			jvmArguments.add('-Dpulselib.scene.backend=' + backend)
+			jvmArguments.add('-Dpulselib.scene.shaders=' + shaders)
 		}
 	project.tasks.named('runClient')
 	{
@@ -56,6 +67,13 @@ gradle.projectsEvaluated
 		timeout = java.time.Duration.ofMinutes(2)
 		doFirst
 		{
+			if (loader == 'neoforge' && earlyWindow == 'false')
+			{
+				def config = new File(directory, 'config/fml.toml')
+				config.parentFile.mkdirs()
+				config.text = 'earlyWindowControl = false\n'
+				logger.lifecycle('Scene-only FML earlyWindowControl=false; Vulkan still required by backend guard')
+			}
 			project.copy
 			{
 				from jar.flatMap { it.archiveFile }

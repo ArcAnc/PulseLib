@@ -186,6 +186,15 @@ public final class PGlGeometryArena
 			return this.vertexArray;
 		}
 
+		/** Binds mesh attributes only; canonical 26.2 instances are read from a uniform block. */
+		void bindGeometry()
+		{
+			GL30.glBindVertexArray(this.vertexArray);
+			for (int attribute = 4; attribute <= 10; attribute++)
+				GL20.glDisableVertexAttribArray(attribute);
+			this.instanceBuffer = -1;
+		}
+
 		/**
 		 * Performs the bind operation.
 		 * @param instanceBuffer the instance buffer to use.

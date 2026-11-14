@@ -1,33 +1,15 @@
 #ifndef PULSELIB_DEFORMERS_GLSL
 #define PULSELIB_DEFORMERS_GLSL
 
-uniform isamplerBuffer DeformerOperations;
-uniform isamplerBuffer DeformerValues;
-
-float pulselib_float_fetch(isamplerBuffer source, int index) {
-    uint bits = uint(texelFetch(source, index * 4).r) & 255u;
-    bits |= (uint(texelFetch(source, index * 4 + 1).r) & 255u) << 8;
-    bits |= (uint(texelFetch(source, index * 4 + 2).r) & 255u) << 16;
-    bits |= (uint(texelFetch(source, index * 4 + 3).r) & 255u) << 24;
-    return uintBitsToFloat(bits);
-}
+uniform samplerBuffer DeformerOperations;
+uniform samplerBuffer DeformerValues;
 
 vec4 pulselib_deformer_operation_fetch(int index) {
-    return vec4(
-        pulselib_float_fetch(DeformerOperations, index * 4),
-        pulselib_float_fetch(DeformerOperations, index * 4 + 1),
-        pulselib_float_fetch(DeformerOperations, index * 4 + 2),
-        pulselib_float_fetch(DeformerOperations, index * 4 + 3)
-    );
+    return texelFetch(DeformerOperations, index);
 }
 
 vec4 pulselib_deformer_value_fetch(int index) {
-    return vec4(
-        pulselib_float_fetch(DeformerValues, index * 4),
-        pulselib_float_fetch(DeformerValues, index * 4 + 1),
-        pulselib_float_fetch(DeformerValues, index * 4 + 2),
-        pulselib_float_fetch(DeformerValues, index * 4 + 3)
-    );
+    return texelFetch(DeformerValues, index);
 }
 
 const float PULSELIB_EPSILON = 0.00001;

@@ -10,7 +10,9 @@
 package com.arcanc.pulselib.content.renderer.gl;
 
 import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
+import com.arcanc.pulselib.content.mixin.GlBufferAccessor;
 import com.arcanc.pulselib.content.renderer.plan.*;
+import com.arcanc.pulselib.content.renderer.rhi.PRhiInstanceLayout;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.arcanc.pulselib.util.PResourceCache;
 import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
@@ -20,6 +22,7 @@ import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.opengl.GlStateManager;
+import com.mojang.blaze3d.pipeline.BindGroupLayout;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
@@ -131,7 +134,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 		List<PDrawGroup> groups = new ArrayList<>();
 		for (PDrawGroup group : plan.groups())
 		{
-			if (group.instances().isEmpty())
+			if (group.instances().isEmpty() || group.command().indexCount() == 0)
 				continue;
 			PDrawCommand command = group.command();
 			if ((long)command.firstIndex() + command.indexCount() > this.resources.indexCount(group.mesh()) ||
@@ -148,6 +151,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 		if (frameSlot < 0)
 			return;
 		boolean multiDraw = capabilities.submissionMode() == PRenderCapabilities.SubmissionMode.MULTI_DRAW_INDIRECT;
+		@Nullable GpuBuffer instanceUniforms = null;
 		GpuBufferSlice previousProjection = RenderSystem.getProjectionMatrixBuffer();
 		ProjectionType previousProjectionType = RenderSystem.getProjectionType();
 		try
@@ -155,7 +159,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 			List<Draw> draws = new ArrayList<>();
 			for (PDrawGroup group : groups)
 				draws.add(new Draw(this.resources.pipeline(group.pipeline()), "PulseLib mesh " + group.mesh().value(),
-						this.geometry.resolve(this.resources.geometryResource(group.mesh()), frameSlot), group.command(), group.writeDepth(), this.resources.transparency(group.pipeline())));
+						this.geometry.resolve(this.resources.geometryResource(group.mesh()), frameSlot), group.command(), group.writeDepth(), this.resources.transparency(group.pipeline()), group));
 			if (this.stateVertices == null)
 				this.stateVertices = RenderSystem.getDevice().createBuffer(() -> "PulseLib pass state vertices", GpuBuffer.USAGE_VERTEX,
 						PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize());
@@ -165,7 +169,17 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 				this.projectionBuffer = new ProjectionMatrixBuffer("PulseLib render frame");
 			RenderSystem.setProjectionMatrix(this.projectionBuffer.getBuffer(frame.projection()),
 					frame.projection().m33() == 0.0f ? ProjectionType.PERSPECTIVE : ProjectionType.ORTHOGRAPHIC);
-			PGlInstanceStream.Upload instanceStream = this.instances.uploadHeaders(plan.instances(), frameSlot, persistent);
+			PRhiInstanceLayout layout = new PRhiInstanceLayout(RenderSystem.getDevice().getDeviceInfo().limits().minUniformOffsetAlignment(),
+					PRhiInstanceLayout.PORTABLE_CAPACITY, 16_384);
+			PRhiInstanceLayout.Packet packet = layout.pack(plan);
+			instanceUniforms = RenderSystem.getDevice().createBuffer(() -> "PulseLib legacy instance uniforms",
+					GpuBuffer.USAGE_UNIFORM, packet.bytes());
+			Map<PDrawGroup, List<PRhiInstanceLayout.Batch>> chunks = new IdentityHashMap<>();
+			for (PRhiInstanceLayout.Batch chunk : packet.batches())
+				chunks.computeIfAbsent(chunk.group(), ignored -> new ArrayList<>()).add(chunk);
+			boolean attributeInstances = draws.stream().anyMatch(draw -> !usesInstanceUniforms(draw.type().pipeline()));
+			InstanceUploads instanceStream = new InstanceUploads(attributeInstances ?
+					this.instances.uploadHeaders(plan.instances(), frameSlot, persistent) : null, instanceUniforms, chunks);
 			List<Draw> standardDraws = new ArrayList<>();
 			List<Draw> oitDraws = new ArrayList<>();
 			for (Draw draw : draws)
@@ -228,6 +242,8 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 		}
 		finally
 		{
+			if (instanceUniforms != null)
+				instanceUniforms.close();
 			RenderSystem.setProjectionMatrix(previousProjection, previousProjectionType);
 			if (persistent)
 				this.frameArena.finish(frameSlot);
@@ -343,7 +359,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 	 * @param oitPass the oit pass to use.
 	 * @param frame the captured frame matrices
 	 */
-	private void drawGroups(List<Draw> draws, PGlInstanceStream.Upload instanceStream, boolean multiDraw, OitPass oitPass, PRenderFrame frame)
+	private void drawGroups(List<Draw> draws, InstanceUploads instanceStream, boolean multiDraw, OitPass oitPass, PRenderFrame frame)
 	{
 		for (int start = 0; start < draws.size();)
 		{
@@ -402,7 +418,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 	 * @param instanceStream the instance stream to use.
 	 * @param multiDraw the multi draw to use.
 	 */
-	private void drawOpaquePipeline(List<Draw> draws, PGlInstanceStream.Upload instanceStream, boolean multiDraw, PRenderFrame frame)
+	private void drawOpaquePipeline(List<Draw> draws, InstanceUploads instanceStream, boolean multiDraw, PRenderFrame frame)
 	{
 		Map<ArenaKey, List<Draw>> batches = new LinkedHashMap<>();
 		for (Draw draw : draws)
@@ -419,7 +435,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 	 * @param oitPass the oit pass to use.
 	 * @param frame the captured frame matrices
 	 */
-	private void draw(List<Draw> batch, PGlInstanceStream.Upload instanceStream, boolean multiDraw, OitPass oitPass, PRenderFrame frame)
+	private void draw(List<Draw> batch, InstanceUploads instanceStream, boolean multiDraw, OitPass oitPass, PRenderFrame frame)
 	{
 		Draw first = batch.getFirst();
 		RenderType type = first.type();
@@ -437,7 +453,13 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 		try (RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
 				first :: label, attachments.color(), Optional.empty(), attachments.depth(), OptionalDouble.empty()))
 		{
-			pass.setPipeline(resolvePipeline(type, oitPass));
+			RenderPipeline pipeline = resolvePipeline(type, oitPass);
+			boolean uniformInstances = usesInstanceUniforms(pipeline);
+			pass.setPipeline(pipeline);
+			if (uniformInstances)
+				pass.setUniform("InstanceData", instanceStream.uniforms().slice(
+						instanceStream.chunks().get(first.group()).getFirst().uniformOffset(),
+						(long)PRhiInstanceLayout.PORTABLE_CAPACITY * PRhiInstanceLayout.STRIDE));
 			RenderSystem.bindDefaultUniforms(pass);
 			pass.setUniform("DynamicTransforms", dynamicTransforms);
 			pass.setUniform("DeformerOperations", deformerBuffers.operations());
@@ -460,23 +482,27 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 				GlStateManager._depthMask(false);
 			try
 			{
-				first.slice().page().bind(instanceStream.buffer(), instanceStream.offset());
-				if (multiDraw)
+				if (uniformInstances)
 				{
-					List<PGlIndirectStream.Command> commands = new ArrayList<>(batch.size());
+					// This compatibility backend still owns raw GL pages. The universal RHI executor
+					// binds the same blocks exclusively through RenderPass.setUniform.
+					int program = GL11.glGetInteger(GL20.GL_CURRENT_PROGRAM);
+					int block = GL31.glGetUniformBlockIndex(program, "InstanceData");
+					int binding = GL31.glGetActiveUniformBlocki(program, block, GL31.GL_UNIFORM_BLOCK_BINDING);
+					first.slice().page().bindGeometry();
 					for (Draw draw : batch)
-						commands.add(command(draw));
-					PGlIndirectStream.Upload indirectStream = this.indirect.upload(commands);
-					ARBMultiDrawIndirect.glMultiDrawElementsIndirect(GL11.GL_TRIANGLES, first.slice().indexType(), indirectStream.offset(), commands.size(), 0);
+						for (PRhiInstanceLayout.Batch chunk : instanceStream.chunks().get(draw.group()))
+						{
+							GL30.glBindBufferRange(GL31.GL_UNIFORM_BUFFER, binding,
+									((GlBufferAccessor)instanceStream.uniforms()).pulselib$getHandle(), chunk.uniformOffset(),
+									(long)PRhiInstanceLayout.PORTABLE_CAPACITY * PRhiInstanceLayout.STRIDE);
+							PGlIndirectStream.Command command = command(draw);
+							GL32.glDrawElementsInstancedBaseVertex(GL11.GL_TRIANGLES, command.indexCount(), draw.slice().indexType(),
+									(long)command.firstIndex() * indexBytes(draw.slice()), chunk.instanceCount(), command.baseVertex());
+						}
 				}
 				else
-					for (Draw draw : batch)
-					{
-						PGlIndirectStream.Command command = command(draw);
-						draw.slice().page().setInstanceOffset(instanceStream.offset() + (long)command.baseInstance() * PGlInstanceStream.STRIDE);
-						GL32.glDrawElementsInstancedBaseVertex(GL11.GL_TRIANGLES, command.indexCount(), draw.slice().indexType(),
-								(long)command.firstIndex() * indexBytes(draw.slice()), command.instanceCount(), command.baseVertex());
-					}
+					drawAttributeInstances(batch, Objects.requireNonNull(instanceStream.attributes()), multiDraw);
 			}
 			finally
 			{
@@ -487,6 +513,34 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 				GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 			}
 		}
+	}
+
+	private static boolean usesInstanceUniforms(RenderPipeline pipeline)
+	{
+		return BindGroupLayout.flattenUniforms(pipeline.getBindGroupLayouts()).stream().
+				anyMatch(uniform -> uniform.name().equals("InstanceData"));
+	}
+
+	private void drawAttributeInstances(List<Draw> batch, PGlInstanceStream.Upload instanceStream, boolean multiDraw)
+	{
+		Draw first = batch.getFirst();
+		first.slice().page().bind(instanceStream.buffer(), instanceStream.offset());
+		if (multiDraw)
+		{
+			List<PGlIndirectStream.Command> commands = new ArrayList<>(batch.size());
+			for (Draw draw : batch)
+				commands.add(command(draw));
+			PGlIndirectStream.Upload indirectStream = this.indirect.upload(commands);
+			ARBMultiDrawIndirect.glMultiDrawElementsIndirect(GL11.GL_TRIANGLES, first.slice().indexType(), indirectStream.offset(), commands.size(), 0);
+		}
+		else
+			for (Draw draw : batch)
+			{
+				PGlIndirectStream.Command command = command(draw);
+				draw.slice().page().setInstanceOffset(instanceStream.offset() + (long)command.baseInstance() * PGlInstanceStream.STRIDE);
+				GL32.glDrawElementsInstancedBaseVertex(GL11.GL_TRIANGLES, command.indexCount(), draw.slice().indexType(),
+						(long)command.firstIndex() * indexBytes(draw.slice()), command.instanceCount(), command.baseVertex());
+			}
 	}
 
 	/**
@@ -578,7 +632,12 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 	 * Immutable value object representing draw.
     */
 	private record Draw(RenderType type, String label, PGlGeometryArena.Slice slice,
-	                    PDrawCommand command, boolean writeDepth, PTransparencyMode transparency)
+	                    PDrawCommand command, boolean writeDepth, PTransparencyMode transparency, PDrawGroup group)
+	{
+	}
+
+	private record InstanceUploads(PGlInstanceStream.@Nullable Upload attributes, GpuBuffer uniforms,
+			Map<PDrawGroup, List<PRhiInstanceLayout.Batch>> chunks)
 	{
 	}
 

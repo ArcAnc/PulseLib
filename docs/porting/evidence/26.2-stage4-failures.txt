@@ -1,0 +1,50 @@
+Initial native API compile failure
+Raw log SHA-256: 36fbece1b066155364f3d39f1e13ce01c373a8ef4037c860eddfcb36574a2cf9
+/mnt/MainDrive/Programs/MC mods/ArcsLib/common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java:170: error: cannot find symbol
+  symbol:   method getUniformOffsetAlignment()
+/mnt/MainDrive/Programs/MC mods/ArcsLib/common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java:454: error: cannot find symbol
+  symbol:   method getUniformsByName()
+  /mnt/MainDrive/Programs/MC mods/ArcsLib/common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java:170: error: cannot find symbol
+    symbol:   method getUniformOffsetAlignment()
+  /mnt/MainDrive/Programs/MC mods/ArcsLib/common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java:454: error: cannot find symbol
+    symbol:   method getUniformsByName()
+
+Canonical emissive preparation failure
+Raw log SHA-256: 066808a71752e891cbcb0d45cfb5bb44514852e413c0de3b916d850853ebb533
+[14:12:34] [Render thread/INFO] (Minecraft) [STDERR]: java.lang.NullPointerException: Missing prepared native texture Sampler2
+[14:12:34] [Render thread/INFO] (Minecraft) [STDERR]: 	at knot//com.arcanc.pulselib.porting.scene.ShaderChecks$Executor.draw(ShaderChecks.java:227)
+> Production scene did not pass: FAIL: java.lang.NullPointerException: Missing prepared native texture Sampler2
+BUILD FAILED in 20s
+
+Intermediate Vulkan Lighting declaration failure
+Raw log SHA-256: bd52a0d00977e222cca7bbaa0de63f6d67f5167be7ee2a87b480af1840024433
+[14:16:23] [Render thread/ERROR] (Minecraft) Couldn't compile pipeline pulselib:pipeline/triangles_instant_emissive_solid: Unable to find shader defined uniform (Lighting)
+[14:16:23] [Render thread/ERROR] (Minecraft) Couldn't compile pipeline pulselib:pipeline/triangles_emissive_cutout_no_cull: Unable to find shader defined uniform (Lighting)
+[14:16:23] [Render thread/ERROR] (Minecraft) Couldn't compile pipeline pulselib:pipeline/triangles_instant_emissive_translucent: Unable to find shader defined uniform (Lighting)
+[14:16:23] [Render thread/ERROR] (Minecraft) Couldn't compile pipeline pulselib:pipeline/triangles_emissive_translucent_no_cull: Unable to find shader defined uniform (Lighting)
+[14:16:23] [Render thread/ERROR] (Minecraft) Couldn't compile pipeline pulselib:pipeline/triangles_emissive_solid_no_cull: Unable to find shader defined uniform (Lighting)
+[14:16:23] [Render thread/ERROR] (Minecraft) Couldn't compile pipeline pulselib:pipeline/triangles_oit_emissive_no_cull: Unable to find shader defined uniform (Lighting)
+[14:16:23] [Render thread/ERROR] (Minecraft) Couldn't compile pipeline pulselib:pipeline/triangles_instant_emissive_cutout: Unable to find shader defined uniform (Lighting)
+[14:16:25] [Render thread/ERROR] (Minecraft) Couldn't compile pipeline pulselib:pipeline/triangles_instant_emissive_solid: Unable to find shader defined uniform (Lighting)
+[14:16:25] [Render thread/ERROR] (Minecraft) Couldn't compile pipeline pulselib:pipeline/triangles_emissive_cutout_no_cull: Unable to find shader defined uniform (Lighting)
+[14:16:25] [Render thread/ERROR] (Minecraft) Couldn't compile pipeline pulselib:pipeline/triangles_instant_emissive_translucent: Unable to find shader defined uniform (Lighting)
+[14:16:25] [Render thread/ERROR] (Minecraft) Couldn't compile pipeline pulselib:pipeline/triangles_emissive_translucent_no_cull: Unable to find shader defined uniform (Lighting)
+[14:16:25] [Render thread/ERROR] (Minecraft) Couldn't compile pipeline pulselib:pipeline/triangles_emissive_solid_no_cull: Unable to find shader defined uniform (Lighting)
+[14:16:25] [Render thread/ERROR] (Minecraft) Couldn't compile pipeline pulselib:pipeline/triangles_oit_emissive_no_cull: Unable to find shader defined uniform (Lighting)
+[14:16:25] [Render thread/ERROR] (Minecraft) Couldn't compile pipeline pulselib:pipeline/triangles_instant_emissive_cutout: Unable to find shader defined uniform (Lighting)
+BUILD FAILED in 1m 39s
+
+Default NeoForge Vulkan early window failure
+Raw log SHA-256: 9247af758800019173d54b156b9bb5bea1c1a77c9a133ed24a4a5ac7f1bb683c
+com.mojang.blaze3d.platform.Window$WindowInitFailed: GLFW error 65540: Vulkan: Window surface creation requires the window to have the client API set to GLFW_NO_API
+	at TRANSFORMER/minecraft@26.2/com.mojang.blaze3d.vulkan.VulkanGpuSurface.<init>(VulkanGpuSurface.java:75) ~[minecraft-patched-26.2.0.57.jar:?] {}
+BUILD FAILED in 34s
+
+Resolved FML source inspection (no production loader modifications):
+loader-11.0.16-sources.jar SHA-256: 9a0abaf4886ae9a7899e8d1abd27211ea42e557fd7e8032bf6d152e11a79b0f3
+earlydisplay-11.0.16-sources.jar SHA-256: f69198cc941e0f47124d4e53b4926585389df11603f675e09a2cca7cee9e969d
+ImmediateWindowHandler.load selects the early window only when FML EARLY_WINDOW_CONTROL is true.
+DisplayWindow.initWindow (line 349) explicitly requests GLFW_OPENGL_API.
+Observed WindowInitFailed reports a Vulkan surface requires GLFW_NO_API.
+Explicit earlyWindowControl=false in the fresh test config reaches actual Vulkan and the shader scene passes.
+Default early-window Vulkan remains FAIL. No user config was edited.

@@ -48,11 +48,13 @@ import java.util.UUID;
 /** Full Minecraft/production queue/native preparation; no supplied PreparedRenderType or GPU callback. */
 public final class SceneChecks
 {
-	private static final int SIZE = 128;
+	static final int SIZE = 128;
 	private static final int GRID = 34;
 	private static boolean done;
 	private static int rhiDraws;
 	private static int legacyDraws;
+	private static int additionalRhiDraws;
+	private static int additionalLegacyDraws;
 
 	private SceneChecks()
 	{
@@ -76,7 +78,7 @@ public final class SceneChecks
 		try
 		{
 			run(client);
-			check(rhiDraws == 20 && legacyDraws == 0, "Expected 20 RHI executions and no legacy execution: " + rhiDraws + "/" + legacyDraws);
+			check(rhiDraws == 20 + additionalRhiDraws && legacyDraws == additionalLegacyDraws, "Unexpected RHI/legacy dispatch: " + rhiDraws + "/" + legacyDraws);
 			System.out.println("PASS production dispatch RHI=" + rhiDraws + ", legacy=" + legacyDraws);
 			Files.writeString(Path.of("pulselib-scene-result.txt"), "PASS\n");
 			System.out.println("PULSELIB_PRODUCTION_SCENE_PASSED actual Minecraft, native textures/prepare, queue/host/compiler/RHI/readback; offscreen, no world acceptance");
@@ -103,7 +105,8 @@ public final class SceneChecks
 	{
 		GpuDevice device = RenderSystem.getDevice();
 		System.out.println("Production scene device: " + device.getDeviceInfo());
-		check(device.getDeviceInfo().backendName().equals("OpenGL"), "Scene requires actual OpenGL, not a backend fallback");
+		String backend = System.getProperty("pulselib.scene.backend", "opengl");
+		check(device.getDeviceInfo().backendName().equalsIgnoreCase(backend), "Scene requires actual " + backend + ", not a backend fallback");
 		var previousProjection = RenderSystem.getProjectionMatrixBuffer();
 		var previousType = RenderSystem.getProjectionType();
 		var previousModelView = RenderSystem.getModelViewMatrixCopy();
@@ -178,6 +181,12 @@ public final class SceneChecks
 						check(!color.isClosed() && !depth.isClosed(), "Queue cleanup must not close borrowed native targets");
 						System.out.println("PASS production queue " + name + ": 1025 portable/baked-mesh instance pixels, native alpha, dynamic move/update/close and cleanup");
 					}
+				if (Boolean.getBoolean("pulselib.scene.shaders"))
+				{
+					additionalRhiDraws = ShaderChecks.run(device, color, depth, visible);
+					if (backend.equals("opengl"))
+						additionalLegacyDraws = ShaderChecks.legacy(device, color, depth, visible);
+				}
 			}
 			finally
 			{
@@ -199,7 +208,7 @@ public final class SceneChecks
 		}
 	}
 
-	private static RenderType type(Identifier texture, boolean cutout, boolean emissive)
+	static RenderType type(Identifier texture, boolean cutout, boolean emissive)
 	{
 		return emissive ? (cutout ? PRenderTypes.RenderTypeProvider.trianglesEmissiveCutout(texture) : PRenderTypes.RenderTypeProvider.trianglesEmissiveSolid(texture)) :
 				(cutout ? PRenderTypes.RenderTypeProvider.trianglesCutout(texture) : PRenderTypes.RenderTypeProvider.trianglesSolid(texture));
@@ -214,7 +223,7 @@ public final class SceneChecks
 		return id;
 	}
 
-	private static PGeometryData geometry(float offset)
+	static PGeometryData geometry(float offset)
 	{
 		var vertices = ByteBuffer.allocate(72).order(ByteOrder.nativeOrder());
 		for (float[] p : new float[][]{{-1, -1, 0.5f}, {1, -1, 0.5f}, {0, 1, 0.5f}})
@@ -232,7 +241,7 @@ public final class SceneChecks
 		return new PBakedMesh(UUID.randomUUID(), geometry, "scene", emissive, cutout ? PAlphaMode.CUTOUT : PAlphaMode.OPAQUE, source, texture);
 	}
 
-	private static PInstanceHeader instance(int i)
+	static PInstanceHeader instance(int i)
 	{
 		return new PInstanceHeader(new Matrix4f().translation((i % GRID + 0.5f) / GRID * 2 - 1, (i / GRID + 0.5f) / GRID * 2 - 1, 0).
 				scale(1.2f / GRID, 1.2f / GRID, 1), color(i), 0xF000F0, OverlayTexture.NO_OVERLAY);
@@ -243,12 +252,12 @@ public final class SceneChecks
 		return 0xFF00003F | ((i % 254 + 1) << 16) | ((i / 254 + 1) << 8);
 	}
 
-	private static void clear(GpuDevice device, GpuTexture color, GpuTexture depth)
+	static void clear(GpuDevice device, GpuTexture color, GpuTexture depth)
 	{
 		device.createCommandEncoder().clearColorAndDepthTextures(color, new Vector4f(0, 0, 0, 0), depth, 0);
 	}
 
-	private static ByteBuffer pixels(GpuDevice device, GpuTexture texture)
+	static ByteBuffer pixels(GpuDevice device, GpuTexture texture)
 	{
 		try (var buffer = device.createBuffer(() -> "Pulse scene readback", GpuBuffer.USAGE_COPY_DST | GpuBuffer.USAGE_MAP_READ, SIZE * SIZE * 4))
 		{
@@ -266,13 +275,13 @@ public final class SceneChecks
 		}
 	}
 
-	private static int pixel(ByteBuffer pixels, int x, int y)
+	static int pixel(ByteBuffer pixels, int x, int y)
 	{
 		int p = (y * SIZE + x) * 4;
 		return (pixels.get(p + 3) & 255) << 24 | (pixels.get(p) & 255) << 16 | (pixels.get(p + 1) & 255) << 8 | pixels.get(p + 2) & 255;
 	}
 
-	private static void image(ByteBuffer pixels, String name) throws Exception
+	static void image(ByteBuffer pixels, String name) throws Exception
 	{
 		try (var image = new NativeImage(SIZE, SIZE, false))
 		{
@@ -283,7 +292,7 @@ public final class SceneChecks
 		}
 	}
 
-	private static void check(boolean condition, String message)
+	static void check(boolean condition, String message)
 	{
 		if (!condition)
 			throw new AssertionError(message);

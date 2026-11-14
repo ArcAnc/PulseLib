@@ -1,0 +1,197 @@
+{
+  "initial_head": "21726b121668da8472f9e3599d0368b805c12a70",
+  "canonical": "5065103d1bccc7880445f9e93bc6ed709cfbb809",
+  "donor": "e85973a7a71fde0a237da1153a42c12d3578ebae",
+  "stage4_status": "partial",
+  "sources_sha256": {
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlGeometryArena.java": "1ace8a9f90de8af716ee147024aa4f9351c338739cf37573c82218e45d91578a",
+    "common/src/main/java/com/arcanc/pulselib/content/renderer/gl/PGlMultiDrawExecutor.java": "820514885c6488d47dbe78acec125b2ba274cb9adabba8d28f764746e0f50a1a",
+    "common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java": "a99d6d105cb48245ff85e107a0bb2c792ace9a7847a2f4896f6528720360e836",
+    "common/src/main/resources/assets/pulselib/shaders/core/triangles.vsh": "8693cca0a1112495eefe0e4dc5e781789dd15d99a95b0fb1d7fca0c2598ba196",
+    "common/src/main/resources/assets/pulselib/shaders/core/triangles_instant.vsh": "627ce7923c0a880450dc5a8827a31683131720a0c38b22a07578789f7f2eafe5",
+    "common/src/main/resources/assets/pulselib/shaders/include/deformers.glsl": "f558f65efbb493c84635d24af545609d6ccd4c1dde54ab2025034195223369c0",
+    "common/src/main/resources/assets/pulselib/shaders/include/instances.glsl": "fbe48f5cef8dd922f820cc6fd16e8fac00602b3370234d796d3aa3ea9716aace",
+    "tests/porting/README.md": "48edb0a9489240591bfdf615d7a2d6a3249ba46e108ca310979b1713d60d0596",
+    "tests/porting/scene-check.gradle": "510ba3435672c23e981a6a21f13a3860a3f58e1dff812e2f55c0f21b24fd46dc",
+    "tests/porting/src/rhi/java/com/arcanc/pulselib/content/renderer/rhi/RhiCatalogChecks.java": "6b6679909fac68e709f1fa3167e250956817e01416375c968bf2280149fdb00d",
+    "tests/porting/src/scene/java/com/arcanc/pulselib/porting/scene/SceneChecks.java": "48d75a83ee0c1f4d825fa04a2b26814fe06fdad7cfb6a204fec057cda60db3d0",
+    "tests/porting/src/scene/java/com/arcanc/pulselib/porting/scene/ShaderChecks.java": "3fadeb45950e220c057a6158ede33ea27a23d204d31bc7983586bd0a06ae694e"
+  },
+  "runs": {
+    "checks": {
+      "log": "26.2-stage4-checks.txt",
+      "log_sha256": "0969bc820dc06c36475c6b384c8a45e81e884fb48cd9f7bc9641fecd05feda56",
+      "build_successful": true,
+      "directory": "/mnt/MainDrive/Programs/MC mods/ArcsLib/fabric/build/porting-scene/client-1892505304153730738",
+      "result": "PASS",
+      "images": {
+        "scene-deformer-0-emissive.png": "69c93d46851f58a8af5c0b755b64fdbe5195a3e2c1cf7d630978afc36cec8d1f",
+        "scene-deformer-0-lit.png": "d1fac8ee57ee067edfdac6cbb5368438251986a08fd2aa280b25c3620b416646",
+        "scene-deformer-1-emissive.png": "8d61081226588c87d79f48e03e1c7d111b03a16543844bf10cdfbb455d00415e",
+        "scene-deformer-1-lit.png": "ee6d777c529bfbd0314c5a00ca8dee4f2fbc9c818b52d166416f8791ec1e9548",
+        "scene-deformer-2-emissive.png": "b6ca9cc3fc38e3bdb51faf09dc51c5312912a9d5f5e29c1df7363266ab3589fe",
+        "scene-deformer-2-lit.png": "f2249376f17fc55a79bd8dafeb0516189b47b4c168969a4240da336a8c7101f9",
+        "scene-emissive-cutout.png": "ca2e2aede89c3fe9361665144df501a4c5c2fbc3543983ca3d641fcf47acab82",
+        "scene-emissive-solid.png": "ca2e2aede89c3fe9361665144df501a4c5c2fbc3543983ca3d641fcf47acab82",
+        "scene-lit-cutout.png": "42f2fea9b8277b9f7953b44f7ce5257418870943ac299364f19d2aee4a489be5",
+        "scene-lit-solid.png": "42f2fea9b8277b9f7953b44f7ce5257418870943ac299364f19d2aee4a489be5"
+      },
+      "driver_classes": {
+        "com/arcanc/pulselib/porting/scene/SceneChecks.class": "5b8496fd81b3c0ac8e3acf5403b21616442d3699279043204b4c7131bb50f947",
+        "com/arcanc/pulselib/porting/scene/ShaderChecks$Executor.class": "2c7f58f8d895aee987b1dfc1be87d3917893909cc81df061f25890f1a9b633b3",
+        "com/arcanc/pulselib/porting/scene/ShaderChecks.class": "91a42d910eb11a3198ae3ac14cd9745bf5646de250d1802fa6476703c8f81837",
+        "com/arcanc/pulselib/porting/scene/package-info.class": "e44e9227b6538cffbbd4cce7254a4725c8744aeea9a2caf546e5bcd46391e9b1",
+        "com/arcanc/pulselib/porting/scene/mixin/LegacyObserver.class": "7d174d6e30cb7d370041c7a37c2d9ee0d841584094b46d46c0f367f5165cac3e",
+        "com/arcanc/pulselib/porting/scene/mixin/RhiObserver.class": "6fef07574dfc328a69ce532f628e3b0603a5c8147c0490602ec7cb22c380cf8b",
+        "com/arcanc/pulselib/porting/scene/mixin/SceneMixin.class": "d3d1726abb28afba9436bcfcadca8c92639fa65b9fd28a8f84bd5dc897a3de05",
+        "com/arcanc/pulselib/porting/scene/mixin/package-info.class": "c7bfeb20bc51a1c033a54bfd3c897467796b97d3bc7b75c62af5584944880861"
+      },
+      "driver_jar_sha256": "eb34fa7a84dbb9b35d8097c59b55073110f2e9c05c91a1bf43e141ae7ad1b5b4",
+      "raw_log_sha256": "d7308dc8f3d8eacc852ca1c8dd999f7f09219677be0695d61f3e72c1f2f000d7"
+    },
+    "fabric-vulkan": {
+      "log": "26.2-stage4-fabric-vulkan.txt",
+      "log_sha256": "a798a63b6333631327f129cd5b288529d6cfe745eae80c84d6188a3a50fb0aff",
+      "build_successful": true,
+      "directory": "/mnt/MainDrive/Programs/MC mods/ArcsLib/fabric/build/porting-scene/client-7493345205068514908",
+      "result": "PASS",
+      "images": {
+        "scene-deformer-0-emissive.png": "69c93d46851f58a8af5c0b755b64fdbe5195a3e2c1cf7d630978afc36cec8d1f",
+        "scene-deformer-0-lit.png": "d1fac8ee57ee067edfdac6cbb5368438251986a08fd2aa280b25c3620b416646",
+        "scene-deformer-1-emissive.png": "8d61081226588c87d79f48e03e1c7d111b03a16543844bf10cdfbb455d00415e",
+        "scene-deformer-1-lit.png": "ee6d777c529bfbd0314c5a00ca8dee4f2fbc9c818b52d166416f8791ec1e9548",
+        "scene-deformer-2-emissive.png": "b6ca9cc3fc38e3bdb51faf09dc51c5312912a9d5f5e29c1df7363266ab3589fe",
+        "scene-deformer-2-lit.png": "f2249376f17fc55a79bd8dafeb0516189b47b4c168969a4240da336a8c7101f9",
+        "scene-emissive-cutout.png": "ca2e2aede89c3fe9361665144df501a4c5c2fbc3543983ca3d641fcf47acab82",
+        "scene-emissive-solid.png": "ca2e2aede89c3fe9361665144df501a4c5c2fbc3543983ca3d641fcf47acab82",
+        "scene-lit-cutout.png": "42f2fea9b8277b9f7953b44f7ce5257418870943ac299364f19d2aee4a489be5",
+        "scene-lit-solid.png": "42f2fea9b8277b9f7953b44f7ce5257418870943ac299364f19d2aee4a489be5"
+      },
+      "driver_classes": {
+        "com/arcanc/pulselib/porting/scene/SceneChecks.class": "5b8496fd81b3c0ac8e3acf5403b21616442d3699279043204b4c7131bb50f947",
+        "com/arcanc/pulselib/porting/scene/ShaderChecks$Executor.class": "2c7f58f8d895aee987b1dfc1be87d3917893909cc81df061f25890f1a9b633b3",
+        "com/arcanc/pulselib/porting/scene/ShaderChecks.class": "91a42d910eb11a3198ae3ac14cd9745bf5646de250d1802fa6476703c8f81837",
+        "com/arcanc/pulselib/porting/scene/package-info.class": "e44e9227b6538cffbbd4cce7254a4725c8744aeea9a2caf546e5bcd46391e9b1",
+        "com/arcanc/pulselib/porting/scene/mixin/LegacyObserver.class": "7d174d6e30cb7d370041c7a37c2d9ee0d841584094b46d46c0f367f5165cac3e",
+        "com/arcanc/pulselib/porting/scene/mixin/RhiObserver.class": "6fef07574dfc328a69ce532f628e3b0603a5c8147c0490602ec7cb22c380cf8b",
+        "com/arcanc/pulselib/porting/scene/mixin/SceneMixin.class": "d3d1726abb28afba9436bcfcadca8c92639fa65b9fd28a8f84bd5dc897a3de05",
+        "com/arcanc/pulselib/porting/scene/mixin/package-info.class": "c7bfeb20bc51a1c033a54bfd3c897467796b97d3bc7b75c62af5584944880861"
+      },
+      "driver_jar_sha256": "eb34fa7a84dbb9b35d8097c59b55073110f2e9c05c91a1bf43e141ae7ad1b5b4",
+      "raw_log_sha256": "23625aec8811fef83d03c138f8e83bf781ddf56280ac19f9747953657ab9ca72"
+    },
+    "neoforge-opengl": {
+      "log": "26.2-stage4-neoforge-opengl.txt",
+      "log_sha256": "a59ce72e23a90e9d3bcd0c49e4350b9025492eadc853ad3d6b0c8f361cde7dfb",
+      "build_successful": true,
+      "directory": "/mnt/MainDrive/Programs/MC mods/ArcsLib/build/porting/clean-bootstrap/neoforge/build/porting-scene/client-11323482162837891058",
+      "result": "PASS",
+      "images": {
+        "scene-deformer-0-emissive.png": "69c93d46851f58a8af5c0b755b64fdbe5195a3e2c1cf7d630978afc36cec8d1f",
+        "scene-deformer-0-lit.png": "d1fac8ee57ee067edfdac6cbb5368438251986a08fd2aa280b25c3620b416646",
+        "scene-deformer-1-emissive.png": "8d61081226588c87d79f48e03e1c7d111b03a16543844bf10cdfbb455d00415e",
+        "scene-deformer-1-lit.png": "ee6d777c529bfbd0314c5a00ca8dee4f2fbc9c818b52d166416f8791ec1e9548",
+        "scene-deformer-2-emissive.png": "b6ca9cc3fc38e3bdb51faf09dc51c5312912a9d5f5e29c1df7363266ab3589fe",
+        "scene-deformer-2-lit.png": "f2249376f17fc55a79bd8dafeb0516189b47b4c168969a4240da336a8c7101f9",
+        "scene-emissive-cutout.png": "ca2e2aede89c3fe9361665144df501a4c5c2fbc3543983ca3d641fcf47acab82",
+        "scene-emissive-solid.png": "ca2e2aede89c3fe9361665144df501a4c5c2fbc3543983ca3d641fcf47acab82",
+        "scene-lit-cutout.png": "42f2fea9b8277b9f7953b44f7ce5257418870943ac299364f19d2aee4a489be5",
+        "scene-lit-solid.png": "42f2fea9b8277b9f7953b44f7ce5257418870943ac299364f19d2aee4a489be5"
+      },
+      "driver_classes": {
+        "com/arcanc/pulselib/porting/scene/SceneChecks.class": "5b8496fd81b3c0ac8e3acf5403b21616442d3699279043204b4c7131bb50f947",
+        "com/arcanc/pulselib/porting/scene/ShaderChecks$Executor.class": "1524aea889f500123c466b8cc8f7b9644189d752e1562a41231ec795a2fdcb3f",
+        "com/arcanc/pulselib/porting/scene/ShaderChecks.class": "67bf9c9f8c2df08baf61e4416c51161d7ef65d2fae00493896c6ca917b66b786",
+        "com/arcanc/pulselib/porting/scene/package-info.class": "e44e9227b6538cffbbd4cce7254a4725c8744aeea9a2caf546e5bcd46391e9b1",
+        "com/arcanc/pulselib/porting/scene/mixin/LegacyObserver.class": "7d174d6e30cb7d370041c7a37c2d9ee0d841584094b46d46c0f367f5165cac3e",
+        "com/arcanc/pulselib/porting/scene/mixin/RhiObserver.class": "6fef07574dfc328a69ce532f628e3b0603a5c8147c0490602ec7cb22c380cf8b",
+        "com/arcanc/pulselib/porting/scene/mixin/SceneMixin.class": "d3d1726abb28afba9436bcfcadca8c92639fa65b9fd28a8f84bd5dc897a3de05",
+        "com/arcanc/pulselib/porting/scene/mixin/package-info.class": "c7bfeb20bc51a1c033a54bfd3c897467796b97d3bc7b75c62af5584944880861"
+      },
+      "driver_jar_sha256": "bff6d02cfe87b7ef58c241eb4376815037d8f43bebfb015a3d27a0553bd48c59",
+      "raw_log_sha256": "d892f08f056c6f8f40fde6b5f8f4e4397c5244bfa76a399b6019e59637403fe5"
+    },
+    "neoforge-vulkan-default-fail": {
+      "log": "26.2-stage4-neoforge-vulkan-default-fail.txt",
+      "log_sha256": "56db1cf3e951d5c22e7beefbf51319f31f958cdb0bf01eb48f85deaa7f62a0a4",
+      "build_successful": false,
+      "directory": "/mnt/MainDrive/Programs/MC mods/ArcsLib/build/porting/clean-bootstrap/neoforge/build/porting-scene/client-5818804099144621515",
+      "result": "no result",
+      "images": {},
+      "raw_log_sha256": "9247af758800019173d54b156b9bb5bea1c1a77c9a133ed24a4a5ac7f1bb683c"
+    },
+    "neoforge-vulkan-noearly": {
+      "log": "26.2-stage4-neoforge-vulkan-noearly.txt",
+      "log_sha256": "45ec728a9ac4d27f64d75dd2a188498f639b97d13d9acd8ec4e065ee8accf06a",
+      "build_successful": true,
+      "directory": "/mnt/MainDrive/Programs/MC mods/ArcsLib/build/porting/clean-bootstrap/neoforge/build/porting-scene/client-4634572533616366253",
+      "result": "PASS",
+      "images": {
+        "scene-deformer-0-emissive.png": "69c93d46851f58a8af5c0b755b64fdbe5195a3e2c1cf7d630978afc36cec8d1f",
+        "scene-deformer-0-lit.png": "d1fac8ee57ee067edfdac6cbb5368438251986a08fd2aa280b25c3620b416646",
+        "scene-deformer-1-emissive.png": "8d61081226588c87d79f48e03e1c7d111b03a16543844bf10cdfbb455d00415e",
+        "scene-deformer-1-lit.png": "ee6d777c529bfbd0314c5a00ca8dee4f2fbc9c818b52d166416f8791ec1e9548",
+        "scene-deformer-2-emissive.png": "b6ca9cc3fc38e3bdb51faf09dc51c5312912a9d5f5e29c1df7363266ab3589fe",
+        "scene-deformer-2-lit.png": "f2249376f17fc55a79bd8dafeb0516189b47b4c168969a4240da336a8c7101f9",
+        "scene-emissive-cutout.png": "ca2e2aede89c3fe9361665144df501a4c5c2fbc3543983ca3d641fcf47acab82",
+        "scene-emissive-solid.png": "ca2e2aede89c3fe9361665144df501a4c5c2fbc3543983ca3d641fcf47acab82",
+        "scene-lit-cutout.png": "42f2fea9b8277b9f7953b44f7ce5257418870943ac299364f19d2aee4a489be5",
+        "scene-lit-solid.png": "42f2fea9b8277b9f7953b44f7ce5257418870943ac299364f19d2aee4a489be5"
+      },
+      "driver_classes": {
+        "com/arcanc/pulselib/porting/scene/SceneChecks.class": "5b8496fd81b3c0ac8e3acf5403b21616442d3699279043204b4c7131bb50f947",
+        "com/arcanc/pulselib/porting/scene/ShaderChecks$Executor.class": "2c7f58f8d895aee987b1dfc1be87d3917893909cc81df061f25890f1a9b633b3",
+        "com/arcanc/pulselib/porting/scene/ShaderChecks.class": "91a42d910eb11a3198ae3ac14cd9745bf5646de250d1802fa6476703c8f81837",
+        "com/arcanc/pulselib/porting/scene/package-info.class": "e44e9227b6538cffbbd4cce7254a4725c8744aeea9a2caf546e5bcd46391e9b1",
+        "com/arcanc/pulselib/porting/scene/mixin/LegacyObserver.class": "7d174d6e30cb7d370041c7a37c2d9ee0d841584094b46d46c0f367f5165cac3e",
+        "com/arcanc/pulselib/porting/scene/mixin/RhiObserver.class": "6fef07574dfc328a69ce532f628e3b0603a5c8147c0490602ec7cb22c380cf8b",
+        "com/arcanc/pulselib/porting/scene/mixin/SceneMixin.class": "d3d1726abb28afba9436bcfcadca8c92639fa65b9fd28a8f84bd5dc897a3de05",
+        "com/arcanc/pulselib/porting/scene/mixin/package-info.class": "c7bfeb20bc51a1c033a54bfd3c897467796b97d3bc7b75c62af5584944880861"
+      },
+      "driver_jar_sha256": "eb34fa7a84dbb9b35d8097c59b55073110f2e9c05c91a1bf43e141ae7ad1b5b4",
+      "raw_log_sha256": "d5f73353919091a2d9632aadbefe82611640bee9f8f933c1af62f50f03b23d93"
+    },
+    "neoforge-opengl-final": {
+      "log": "26.2-stage4-neoforge-opengl-final.txt",
+      "log_sha256": "ca59aa067e0a087dc846441ce4f591a76e2bda94ee836e4fe2abf4b23442df64",
+      "build_successful": true,
+      "directory": "/mnt/MainDrive/Programs/MC mods/ArcsLib/build/porting/clean-bootstrap/neoforge/build/porting-scene/client-7894220683707434340",
+      "result": "PASS",
+      "images": {
+        "scene-deformer-0-emissive.png": "69c93d46851f58a8af5c0b755b64fdbe5195a3e2c1cf7d630978afc36cec8d1f",
+        "scene-deformer-0-lit.png": "d1fac8ee57ee067edfdac6cbb5368438251986a08fd2aa280b25c3620b416646",
+        "scene-deformer-1-emissive.png": "8d61081226588c87d79f48e03e1c7d111b03a16543844bf10cdfbb455d00415e",
+        "scene-deformer-1-lit.png": "ee6d777c529bfbd0314c5a00ca8dee4f2fbc9c818b52d166416f8791ec1e9548",
+        "scene-deformer-2-emissive.png": "b6ca9cc3fc38e3bdb51faf09dc51c5312912a9d5f5e29c1df7363266ab3589fe",
+        "scene-deformer-2-lit.png": "f2249376f17fc55a79bd8dafeb0516189b47b4c168969a4240da336a8c7101f9",
+        "scene-emissive-cutout.png": "ca2e2aede89c3fe9361665144df501a4c5c2fbc3543983ca3d641fcf47acab82",
+        "scene-emissive-solid.png": "ca2e2aede89c3fe9361665144df501a4c5c2fbc3543983ca3d641fcf47acab82",
+        "scene-lit-cutout.png": "42f2fea9b8277b9f7953b44f7ce5257418870943ac299364f19d2aee4a489be5",
+        "scene-lit-solid.png": "42f2fea9b8277b9f7953b44f7ce5257418870943ac299364f19d2aee4a489be5"
+      },
+      "driver_classes": {
+        "com/arcanc/pulselib/porting/scene/SceneChecks.class": "5b8496fd81b3c0ac8e3acf5403b21616442d3699279043204b4c7131bb50f947",
+        "com/arcanc/pulselib/porting/scene/ShaderChecks$Executor.class": "2c7f58f8d895aee987b1dfc1be87d3917893909cc81df061f25890f1a9b633b3",
+        "com/arcanc/pulselib/porting/scene/ShaderChecks.class": "91a42d910eb11a3198ae3ac14cd9745bf5646de250d1802fa6476703c8f81837",
+        "com/arcanc/pulselib/porting/scene/package-info.class": "e44e9227b6538cffbbd4cce7254a4725c8744aeea9a2caf546e5bcd46391e9b1",
+        "com/arcanc/pulselib/porting/scene/mixin/LegacyObserver.class": "7d174d6e30cb7d370041c7a37c2d9ee0d841584094b46d46c0f367f5165cac3e",
+        "com/arcanc/pulselib/porting/scene/mixin/RhiObserver.class": "6fef07574dfc328a69ce532f628e3b0603a5c8147c0490602ec7cb22c380cf8b",
+        "com/arcanc/pulselib/porting/scene/mixin/SceneMixin.class": "d3d1726abb28afba9436bcfcadca8c92639fa65b9fd28a8f84bd5dc897a3de05",
+        "com/arcanc/pulselib/porting/scene/mixin/package-info.class": "c7bfeb20bc51a1c033a54bfd3c897467796b97d3bc7b75c62af5584944880861"
+      },
+      "driver_jar_sha256": "eb34fa7a84dbb9b35d8097c59b55073110f2e9c05c91a1bf43e141ae7ad1b5b4",
+      "raw_log_sha256": "434cbaf87953ea2cfb82c2576298e4e420e48567ff97ba7b3220e29fe7fe0094"
+    }
+  },
+  "limits": [
+    "GPU-deformed production queue selection pending",
+    "Immediate ColorOverlay path pending",
+    "Other operations/compositions/masks/subdivision/CPU fallback not accepted",
+    "Default NeoForge Vulkan early-window startup FAIL; explicit native config retry PASS",
+    "OIT/Fabulous/world/GUI/player/performance/leak acceptance pending"
+  ],
+  "all_four_final_driver_classes_identical": true,
+  "all_four_final_readbacks_identical": true,
+  "user_drafts_preserved": true,
+  "log_normalization": "Tracked log copies trim trailing whitespace only; raw_log_sha256 identifies untouched build/porting originals."
+}
