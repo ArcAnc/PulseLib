@@ -383,5 +383,38 @@
     "world-phases-opengl-7.log": "a1146be8a4dd654a0a2d1b5630e665f0417f4b0bbaf327b01603deeb07e8508f",
     "world-phases-opengl.log": "f5e39dd317b58a8b84fa226dd70ae3a65c4e2a50c58e90f8e17dfde6c82f4b02",
     "world-resources-compile.log": "45608fe9345d555cfae7501d31e257303fe9ace8397cb3120416d996c9f112cd"
+  },
+  "implementationCommit": "0dbeeb33d77878b2c8a49727c4f0e7a65dacd044",
+  "committedBuild": {
+    "command": [
+      "./gradlew",
+      ":common:compileJava",
+      ":neoforge:build",
+      ":fabric:build",
+      "--no-parallel",
+      "--no-daemon",
+      "--console=plain"
+    ],
+    "exit": 0,
+    "checkout": "clean detached at exact implementation SHA, no source exclusions",
+    "tasks": "26 up-to-date; full execution was performed before final NeoForge clients",
+    "rawLogSha256": "9b17241f91bd58c1beb86eba0fa3b9f928a5e0fd6e6fdf6b22cca83b9837b3c4",
+    "log": "26.2-oit-world-committed-build.txt",
+    "logSha256": "7afb65ed40dc42529c3f178550f9059498960eab8a4765dceba94508c782b6ec"
+  },
+  "committedApi": {
+    "exit": 0,
+    "sha256": "5c2d66145bed6c1d28d05ef4eb7726d84fc82b4b04e08704d6da366c8bb06a68",
+    "sameAsAcceptedApi": true,
+    "note": "Parse-only public/protected declarations; stage 0 baseline remains immutable. Only Internal frame resource helper added."
+  },
+  "audit": {
+    "sourceHashesMatchImplementationTree": true,
+    "userPathsAndStagedEntriesPreserved": 11,
+    "protectedRefsUnchanged": true,
+    "debugSessionsRemaining": 0,
+    "originalDisabledUserExceptionBreakpoints": 2,
+    "agentBreakpointsRemaining": 0,
+    "temporaryRemoteConfigRemoved": true
   }
 }
