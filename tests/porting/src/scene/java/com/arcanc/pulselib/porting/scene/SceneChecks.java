@@ -167,7 +167,7 @@ public final class SceneChecks
 		Identifier hidden = texture(client, "hidden", 0x00FFFFFF);
 		try (var color = device.createTexture("Pulse production scene", GpuTexture.USAGE_RENDER_ATTACHMENT | GpuTexture.USAGE_COPY_SRC | GpuTexture.USAGE_COPY_DST,
 				GpuFormat.RGBA8_UNORM, SIZE, SIZE, 1, 1);
-				var depth = device.createTexture("Pulse production scene depth", GpuTexture.USAGE_RENDER_ATTACHMENT | GpuTexture.USAGE_COPY_DST,
+				var depth = device.createTexture("Pulse production scene depth", GpuTexture.USAGE_RENDER_ATTACHMENT | GpuTexture.USAGE_COPY_DST | GpuTexture.USAGE_TEXTURE_BINDING,
 						GpuFormat.D32_FLOAT, SIZE, SIZE, 1, 1);
 				var colorView = device.createTextureView(color);
 				var depthView = device.createTextureView(depth);
@@ -240,6 +240,13 @@ public final class SceneChecks
 
 				if (Boolean.getBoolean("pulselib.scene.gui"))
 					additionalRhiDraws += GuiQueueChecks.run(device, color, depth, visible);
+
+				if (Boolean.getBoolean("pulselib.scene.oit"))
+				{
+					int[] compatibility = OitChecks.run(device, color, depth, visible);
+					additionalRhiDraws += compatibility[0];
+					additionalLegacyDraws += compatibility[1];
+				}
 			}
 			finally
 			{

@@ -31,7 +31,7 @@ import java.util.OptionalDouble;
 /**
  * Direct instanced RHI execution, adapted from master RhiDrawExecutor to canonical packed plans.
  * Caller supplies current targets/textures/extra uniforms; no RenderSystem globals are changed.
- * OIT composition is a separate pending integration and is rejected explicitly, never alpha-blended.
+ * OIT is executed by PRhiOitRenderer; this ordinary executor rejects it explicitly, never alpha-blends it.
  */
 @ApiStatus.Internal
 public final class PRhiDrawExecutor implements PRenderExecutor

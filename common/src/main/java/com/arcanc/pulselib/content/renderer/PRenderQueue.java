@@ -19,11 +19,15 @@ import com.arcanc.pulselib.content.renderer.gl.PGlMultiDrawExecutor;
 import com.arcanc.pulselib.content.renderer.gl.PGlResourceRegistry;
 import com.arcanc.pulselib.content.renderer.plan.*;
 import com.arcanc.pulselib.content.renderer.rhi.PRhiOpaqueRenderer;
+import com.arcanc.pulselib.content.renderer.rhi.PRhiOitRenderer;
 import com.arcanc.pulselib.content.renderer.rhi.PRhiImmediateRenderer;
 import com.arcanc.pulselib.content.renderer.rhi.PRhiRenderHost;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
 import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.mojang.blaze3d.pipeline.TextureTarget;
+import com.mojang.blaze3d.GpuFormat;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.world.item.ItemDisplayContext;
 import org.joml.Matrix4f;
@@ -50,6 +54,13 @@ public final class PRenderQueue
 			RESOURCES::pipeline, RESOURCES::geometryResource,
 			Map.of("DeformerOperations", () -> PGpuDeformerBuffers.upload().operations().slice(),
 					"DeformerValues", () -> PGpuDeformerBuffers.upload().values().slice()));
+
+	private static final PRhiOitRenderer OIT_EXECUTOR = new PRhiOitRenderer(
+			RESOURCES::pipeline, RESOURCES::geometryResource,
+			Map.of("DeformerOperations", () -> PGpuDeformerBuffers.upload().operations().slice(),
+					"DeformerValues", () -> PGpuDeformerBuffers.upload().values().slice()));
+	private static @Nullable TextureTarget worldOpaqueDepth;
+	private static boolean worldDepthValid;
 
 	private PRenderQueue()
 	{
@@ -237,7 +248,7 @@ public final class PRenderQueue
 
 	static void finishLocalFrame()
 	{
-		if (COMPILER.isEmpty())
+		if (COMPILER.isEmpty() && !OIT_EXECUTOR.hasPending())
 			PGpuDeformerBuffers.finishFrame();
 	}
 
@@ -256,6 +267,8 @@ public final class PRenderQueue
 	public static void endWorldFrame()
 	{
 		COMPILER.discard(List.of(RenderStage.ENTITIES, RenderStage.SOLID_BLOCKS, RenderStage.TRANSLUCENT_BLOCKS));
+		OIT_EXECUTOR.discard();
+		worldDepthValid = false;
 		EXECUTOR.endWorldFrame();
 	}
 
@@ -472,8 +485,7 @@ public final class PRenderQueue
 	 */
 	public static void flush(RenderStage stage, RenderTarget depthSource)
 	{
-		EXECUTOR.execute(COMPILER.compile(stage, pipeline -> canBatchWithOit(pipeline) && depthSource.useDepth),
-				new PRhiRenderHost().captureFrame(), depthSource);
+		executeWorldPlan(COMPILER.compile(stage, PRenderQueue::canBatchWithOit), depthSource);
 	}
 
 	/** Consumes opaque geometry while retaining transparent submissions for their later pass. */
@@ -494,7 +506,7 @@ public final class PRenderQueue
 	 */
 	public static void flushCombined(RenderStage... stages)
 	{
-		EXECUTOR.execute(COMPILER.compileCombined(List.of(stages), PRenderQueue::canBatchWithOit));
+		executeWorldPlan(COMPILER.compileCombined(List.of(stages), PRenderQueue::canBatchWithOit), PLibRenderHelper.mc().gameRenderer.mainRenderTarget());
 	}
 
 	private static boolean canBatchWithOit(PPipelineHandle pipeline)
@@ -508,7 +520,7 @@ public final class PRenderQueue
 	 */
 	public static void compositeTranslucency()
 	{
-		EXECUTOR.compositeOit();
+		OIT_EXECUTOR.composite();
 	}
 
 	/**
@@ -518,7 +530,7 @@ public final class PRenderQueue
 	 */
 	public static void compositeTranslucency(RenderTarget destination)
 	{
-		EXECUTOR.compositeOit(destination);
+		OIT_EXECUTOR.composite(Objects.requireNonNull(destination.getColorTextureView()));
 	}
 
 	/**
@@ -530,20 +542,57 @@ public final class PRenderQueue
 	 */
 	public static void compositeFabulousTranslucency(RenderTarget destination, List<RenderTarget> targets)
 	{
-		EXECUTOR.compositeFabulousOit(destination, targets);
+		OIT_EXECUTOR.compositeFabulous(Objects.requireNonNull(destination.getColorTextureView()), targets);
 	}
 
 	/** Captures the opaque world depth before Minecraft starts transparency. */
 	public static void captureWorldDepth(RenderTarget source)
 	{
-		EXECUTOR.captureWorldDepth(source);
+		OIT_EXECUTOR.discard();
+		if (worldOpaqueDepth == null || worldOpaqueDepth.width != source.width || worldOpaqueDepth.height != source.height)
+		{
+			if (worldOpaqueDepth != null)
+			{
+				OIT_EXECUTOR.cleanup();
+				worldOpaqueDepth.destroyBuffers();
+			}
+			worldOpaqueDepth = new TextureTarget("PulseLib RHI opaque depth", source.width, source.height, true, GpuFormat.RGBA8_UNORM);
+		}
+		worldOpaqueDepth.copyDepthFrom(source);
+		worldDepthValid = true;
 	}
 
 	/** Executes the shared world plan against the opaque depth snapshot. */
 	public static void flushWorld()
 	{
-		EXECUTOR.executeWorld(COMPILER.compileCombined(List.of(RenderStage.ENTITIES, RenderStage.SOLID_BLOCKS,
-				RenderStage.TRANSLUCENT_BLOCKS), PRenderQueue::canBatchWithOit));
+		executeWorldPlan(COMPILER.compileCombined(List.of(RenderStage.ENTITIES, RenderStage.SOLID_BLOCKS,
+				RenderStage.TRANSLUCENT_BLOCKS), PRenderQueue::canBatchWithOit),
+				worldDepthValid && worldOpaqueDepth != null ? worldOpaqueDepth : PLibRenderHelper.mc().gameRenderer.mainRenderTarget());
+	}
+
+	private static void executeWorldPlan(PRenderPlan plan, RenderTarget depthSource)
+	{
+		if (plan.isEmpty())
+			return;
+		var oit = plan.groups().stream().filter(group -> !group.writeDepth() && RESOURCES.transparency(group.pipeline()) == PTransparencyMode.OIT).toList();
+		var ordinary = plan.groups().stream().filter(group -> group.writeDepth() || RESOURCES.transparency(group.pipeline()) != PTransparencyMode.OIT).toList();
+		var color = RenderSystem.outputColorTextureOverride;
+		var depth = RenderSystem.outputDepthTextureOverride;
+		var frame = new PRhiRenderHost().captureFrame();
+		try
+		{
+			RenderSystem.outputColorTextureOverride = color == null ? PLibRenderHelper.mc().gameRenderer.mainRenderTarget().getColorTextureView() : color;
+			RenderSystem.outputDepthTextureOverride = depthSource.getDepthTextureView();
+			if (!ordinary.isEmpty())
+				executeImmediate(new PRenderPlan(ordinary, plan.instances()), frame);
+			if (!oit.isEmpty())
+				OIT_EXECUTOR.execute(new PRenderPlan(oit, plan.instances()), frame);
+		}
+		finally
+		{
+			RenderSystem.outputColorTextureOverride = color;
+			RenderSystem.outputDepthTextureOverride = depth;
+		}
 	}
 
 	/**
@@ -554,21 +603,32 @@ public final class PRenderQueue
 		COMPILER.clear();
 		try
 		{
-			try
-			{
-				INSTANT_EXECUTOR.cleanup();
-			}
-			finally
-			{
-				OPAQUE_EXECUTOR.cleanup();
-			}
+			OIT_EXECUTOR.cleanup();
+			if (worldOpaqueDepth != null)
+				worldOpaqueDepth.destroyBuffers();
+			worldOpaqueDepth = null;
+			worldDepthValid = false;
 		}
 		finally
 		{
-			EXECUTOR.cleanup();
-			PDeformedMeshBuffers.cleanup();
-			PGpuDeformedMeshBuffers.cleanup();
-			PGpuDeformerBuffers.cleanup();
+			try
+			{
+				try
+				{
+					INSTANT_EXECUTOR.cleanup();
+				}
+				finally
+				{
+					OPAQUE_EXECUTOR.cleanup();
+				}
+			}
+			finally
+			{
+				EXECUTOR.cleanup();
+				PDeformedMeshBuffers.cleanup();
+				PGpuDeformedMeshBuffers.cleanup();
+				PGpuDeformerBuffers.cleanup();
+			}
 		}
 	}
 

@@ -34,7 +34,7 @@ bool pulselib_oit_matches_layer_depth()
 
 float pulselib_oit_weight(float alpha, float depth) {
     float rawWeight = clamp(
-        pow(alpha + 0.01, 4.0) * 10000.0 * pow(1.0 - depth * 0.9, 3.0),
+        pow(alpha + 0.01, 4.0) * 10000.0 * pow(0.1 + depth * 0.9, 3.0),
         PULSELIB_OIT_MIN_WEIGHT,
         PULSELIB_OIT_MAX_WEIGHT
     );

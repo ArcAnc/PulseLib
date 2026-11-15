@@ -25,12 +25,12 @@ int frontCount = 0;
 
 void insertFront(vec4 color, float depth, float oitDepth)
 {
-	if (color.a == 0.0 || depth >= oitDepth)
+	if (color.a == 0.0 || depth <= oitDepth)
 		return;
 	int index = frontCount++;
 	frontColors[index] = color;
 	frontDepths[index] = depth;
-	while (index > 0 && frontDepths[index] > frontDepths[index - 1])
+	while (index > 0 && frontDepths[index] < frontDepths[index - 1])
 	{
 		vec4 colorSwap = frontColors[index - 1];
 		float depthSwap = frontDepths[index - 1];

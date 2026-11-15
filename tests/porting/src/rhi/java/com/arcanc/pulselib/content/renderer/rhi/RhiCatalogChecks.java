@@ -77,6 +77,22 @@ public final class RhiCatalogChecks
 		if (PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL != PRhiPipelines.POSITION_TEX_NORMAL ||
 				PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL.getVertexSize() != 24)
 			throw new AssertionError("Production and RHI geometry layouts must share the canonical 24-byte format");
+		for (boolean emissive : new boolean[]{false, true})
+		{
+			var accumulation = PRenderTypes.ShadersProvider.trianglesOit(emissive);
+			if (accumulation.getColorTargetStates().length != 2 || accumulation.getColorTargetState().format() != GpuFormat.RGBA16_FLOAT ||
+					accumulation.getColorTargetStates()[1].format() != GpuFormat.R16_FLOAT || accumulation.getDepthStencilState().writeDepth())
+				throw new AssertionError("OIT requires two floating-point targets and read-only opaque depth");
+		}
+		for (var depth : new RenderPipeline[]{PRenderTypes.ShadersProvider.trianglesOitDepth(false), PRenderTypes.ShadersProvider.trianglesOitDepthPeel(false)})
+			if (!depth.getDepthStencilState().writeDepth() || depth.getColorTargetState().format() != GpuFormat.R8_UNORM ||
+					!BindGroupLayout.flattenSamplers(depth.getBindGroupLayouts()).contains("SceneDepthSampler"))
+				throw new AssertionError("Native peeling requires D32 writes, scratch R8 and opaque depth sampling");
+		if (PRenderTypes.ShadersProvider.oitComposite().getDepthStencilState() != null ||
+				PRenderTypes.ShadersProvider.oitFabulousComposite().getDepthStencilState() != null ||
+				PRenderTypes.ShadersProvider.oitFabulousMetadata().getColorTargetState().format() != GpuFormat.RG32_FLOAT)
+			throw new AssertionError("OIT composites must be depthless; Fabulous metadata must preserve float depth");
+		System.out.println("PASS native OIT MRT formats, peeling/depth states and floating-point Fabulous metadata");
 		System.out.println("PASS production pipeline catalog: all 19 public definitions, native bind groups, vec4 texel formats and shared 24-byte geometry");
 	}
 }

@@ -346,3 +346,18 @@ CPU fallback and all twelve ordinary/instant material checks remain enabled.
 These are isolated GUI/offscreen scope tests in real Minecraft clients, not full vanilla GUI extraction,
 item/PIP/armor integration acceptance. Full world/Fabulous/OIT/player scenarios and performance/leak
 stress retain their migration stages. Default NeoForge Vulkan early-window startup is still unaccepted.
+
+
+### Stage 5: native four-layer OIT (partial world acceptance)
+
+Run the production shader/queue/GUI regressions and the new OIT fixture in a fresh client directory:
+
+```bash
+./gradlew --init-script tests/porting/scene-check.gradle :fabric:runClient -PportingSceneOit=true -PportingSceneGui=true -PportingSceneQueue=true -PportingSceneShaders=true -PportingSceneBackend=opengl --no-parallel --no-daemon --console=plain
+```
+
+Repeat with `-PportingSceneBackend=vulkan`. For NeoForge use `:neoforge:runClient -PportingSceneLoader=neoforge`; on Vulkan also use the existing test-only `-PportingSceneEarlyWindow=false` bootstrap setting. No test content enters production Common or standard CI.
+
+`OitChecks` exercises real native targets, canonical packed plans and public queue depth capture/flush/composition. It checks four distinct layers under shuffled split producers, nearest-four truncation, opaque clipping, lit versus ordered alpha reference, coplanar weighted/log accumulation, 129 objects across UBO chunks, all five vanilla color/depth slots before/behind OIT, nine interleaved surfaces against an independent CPU depth-sorted reference, invalid-input retry, GUI/deformer-buffer growth, dynamic revision snapshots/close, fenced retirement, discard/cleanup/recreate and ten resizes (28 owned textures/views closed each replacement). Original GUI instant tests remain mandatory in the combined run.
+
+This is GPU component/public-queue acceptance inside Minecraft. It does not claim a world with actual terrain/particles/weather/clouds through the LevelRenderer framegraph, actual reload/disconnect or full Fabulous acceptance. Keep stage 5 partial until those scenarios really run. GPU memory/performance measurements remain outstanding.

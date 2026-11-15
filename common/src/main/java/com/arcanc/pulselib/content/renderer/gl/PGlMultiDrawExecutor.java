@@ -9,6 +9,7 @@
 
 package com.arcanc.pulselib.content.renderer.gl;
 
+import com.arcanc.pulselib.content.renderer.rhi.PRhiOitRenderer;
 import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
 import com.arcanc.pulselib.content.mixin.GlBufferAccessor;
 import com.arcanc.pulselib.content.renderer.plan.*;
@@ -55,10 +56,8 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 	private final PGlInstanceStream instances = new PGlInstanceStream();
 	private final PGlIndirectStream indirect = new PGlIndirectStream();
 	private final PGlFrameArena frameArena = new PGlFrameArena(9);
-	private final Map<RenderTarget, PGlWeightedBlendedOit> weightedBlendedOits = new IdentityHashMap<>();
-	private @Nullable PGlWeightedBlendedOit activeWeightedBlendedOit;
-	private @Nullable RenderTargetAttachments activeOitAttachments;
 	private @Nullable ProjectionMatrixBuffer projectionBuffer;
+	private final PRhiOitRenderer nativeOit;
 	private @Nullable TextureTarget worldOpaqueDepth;
 	private boolean worldDepthValid;
 	private @Nullable GpuBuffer stateVertices;
@@ -80,6 +79,9 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 	{
 		this.resources = resources;
 		this.geometry = geometry;
+		this.nativeOit = new PRhiOitRenderer(resources::pipeline, resources::geometryResource,
+				Map.of("DeformerOperations", () -> PGpuDeformerBuffers.upload().operations().slice(),
+						"DeformerValues", () -> PGpuDeformerBuffers.upload().values().slice()));
 	}
 
 	/** Reports the actual 26.1 backend strategies, without selecting another renderer. */
@@ -130,6 +132,31 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 	{
 		if (plan.isEmpty())
 			return;
+
+		// Preserve the legacy executor API, but all OIT is submitted through the same native backend.
+		if (useOit)
+		{
+			var oit = plan.groups().stream().filter(group -> !group.writeDepth() && this.resources.transparency(group.pipeline()) == PTransparencyMode.OIT).toList();
+			if (!oit.isEmpty())
+			{
+				var source = Objects.requireNonNull(depthSource, "OIT opaque depth source");
+				var color = RenderSystem.outputColorTextureOverride;
+				try
+				{
+					if (color == null)
+						RenderSystem.outputColorTextureOverride = source.getColorTextureView();
+					this.nativeOit.execute(new PRenderPlan(oit, plan.instances()), frame, source.getDepthTextureView());
+				}
+				finally
+				{
+					RenderSystem.outputColorTextureOverride = color;
+				}
+				var ordinary = plan.groups().stream().filter(group -> group.writeDepth() || this.resources.transparency(group.pipeline()) != PTransparencyMode.OIT).toList();
+				plan = new PRenderPlan(ordinary, plan.instances());
+				if (plan.isEmpty())
+					return;
+			}
+		}
 
 		List<PDrawGroup> groups = new ArrayList<>();
 		for (PDrawGroup group : plan.groups())
@@ -183,65 +210,8 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 			boolean attributeInstances = draws.stream().anyMatch(draw -> !usesInstanceUniforms(draw.type().pipeline()));
 			InstanceUploads instanceStream = new InstanceUploads(attributeInstances ?
 					this.instances.uploadHeaders(plan.instances(), frameSlot, persistent) : null, instanceUniforms, chunks);
-			List<Draw> standardDraws = new ArrayList<>();
-			List<Draw> oitDraws = new ArrayList<>();
-			for (Draw draw : draws)
-			{
-				if (useOit && !draw.writeDepth() && draw.transparency() == PTransparencyMode.OIT)
-					oitDraws.add(draw);
-				else
-					standardDraws.add(draw);
-			}
-			int maximumIndirectCommands = standardDraws.size() + oitDraws.size() * PGlWeightedBlendedOit.LAYER_COUNT * 2;
-			this.indirect.begin(maximumIndirectCommands, frameSlot, persistent && multiDraw);
-
-			drawGroups(standardDraws, instanceStream, multiDraw, OitPass.NONE, frame);
-			if (!oitDraws.isEmpty())
-			{
-				RenderTarget source = Objects.requireNonNull(depthSource, "OIT opaque depth source");
-				List<Draw> targetDraws = oitDraws;
-				this.activeWeightedBlendedOit = this.weightedBlendedOits.computeIfAbsent(source, ignored -> new PGlWeightedBlendedOit());
-				try
-				{
-					RenderTargetAttachments attachments = new RenderTargetAttachments(
-							Objects.requireNonNull(source.getColorTextureView(), "OIT depth source color"), source.getDepthTextureView());
-					this.activeOitAttachments = attachments;
-					if (activeOit().begin(attachments.color(), attachments.depth()))
-					{
-						for (int layer = 0; layer < PGlWeightedBlendedOit.LAYER_COUNT; layer++)
-						{
-							activeOit().beginDepthPass(layer);
-							try
-							{
-								drawGroups(targetDraws, instanceStream, multiDraw,
-										layer == 0 ? OitPass.DEPTH : OitPass.DEPTH_PEEL, frame);
-							}
-							finally
-							{
-								activeOit().endPass();
-							}
-
-							activeOit().beginAccumulationPass(layer);
-							try
-							{
-								drawGroups(targetDraws, instanceStream, multiDraw, OitPass.ACCUMULATION, frame);
-								activeOit().markContent(layer);
-							}
-							finally
-							{
-								activeOit().endPass();
-							}
-						}
-					}
-					else
-						drawGroups(targetDraws, instanceStream, multiDraw, OitPass.NONE, frame);
-				}
-				finally
-				{
-					this.activeWeightedBlendedOit = null;
-					this.activeOitAttachments = null;
-				}
-			}
+			this.indirect.begin(draws.size(), frameSlot, persistent && multiDraw);
+			drawGroups(draws, instanceStream, multiDraw, frame);
 		}
 		finally
 		{
@@ -258,25 +228,19 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 	 */
 	public void compositeOit()
 	{
-		this.weightedBlendedOits.values().forEach(PGlWeightedBlendedOit :: composite);
+		this.nativeOit.composite();
 	}
 
 	/** Resolves pending transparency into the requested color target, preserving its depth. */
 	public void compositeOit(RenderTarget destination)
 	{
-		GpuTextureView color = Objects.requireNonNull(destination.getColorTextureView(), "OIT destination color");
-		// Validate every pending source before consuming or writing any of them.
-		this.weightedBlendedOits.values().forEach(oit -> oit.validateDestination(color));
-		this.weightedBlendedOits.values().forEach(oit -> oit.composite(color));
+		this.nativeOit.composite(Objects.requireNonNull(destination.getColorTextureView()));
 	}
 
 	/** Inserts pending OIT layers into the resolved vanilla Fabulous image. */
 	public void compositeFabulousOit(RenderTarget destination, List<RenderTarget> targets)
 	{
-		GpuTextureView color = Objects.requireNonNull(destination.getColorTextureView(), "OIT destination color");
-		PGlWeightedBlendedOit.validateFabulousTargets(color, targets);
-		this.weightedBlendedOits.values().forEach(oit -> oit.validateDestination(color));
-		this.weightedBlendedOits.values().forEach(oit -> oit.compositeFabulous(color, targets));
+		this.nativeOit.compositeFabulous(Objects.requireNonNull(destination.getColorTextureView()), targets);
 	}
 
 	/** Copies only opaque depth; ownership stays with this executor through reload/disconnect. */
@@ -286,16 +250,11 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 		{
 			if (this.worldOpaqueDepth != null)
 			{
-				PGlWeightedBlendedOit old = this.weightedBlendedOits.remove(this.worldOpaqueDepth);
-				if (old != null)
-					old.close();
 				this.worldOpaqueDepth.destroyBuffers();
 			}
 			this.worldOpaqueDepth = new TextureTarget("PulseLib opaque world depth", source.width, source.height, true, GpuFormat.RGBA8_UNORM);
 		}
-		PGlWeightedBlendedOit pending = this.weightedBlendedOits.get(this.worldOpaqueDepth);
-		if (pending != null)
-			pending.discard();
+		this.nativeOit.discard();
 		this.worldOpaqueDepth.copyDepthFrom(source);
 		this.worldDepthValid = true;
 	}
@@ -311,6 +270,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 	/** Invalidates the snapshot when the world's framegraph pass has completed. */
 	public void endWorldFrame()
 	{
+		this.nativeOit.discard();
 		this.worldDepthValid = false;
 	}
 
@@ -326,19 +286,17 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 	/** Releases execution state, optionally retaining caller-owned geometry and handles. */
 	public void cleanup(boolean clearGeometry)
 	{
+		this.nativeOit.cleanup();
 		this.frameArena.awaitAll();
 		if (clearGeometry)
 			this.geometry.clear();
 		this.instances.close();
 		this.indirect.close();
-		this.weightedBlendedOits.values().forEach(PGlWeightedBlendedOit :: close);
-		this.weightedBlendedOits.clear();
 		if (this.worldOpaqueDepth != null)
 			this.worldOpaqueDepth.destroyBuffers();
 		this.worldOpaqueDepth = null;
+		this.nativeOit.discard();
 		this.worldDepthValid = false;
-		this.activeWeightedBlendedOit = null;
-		this.activeOitAttachments = null;
 		if (this.projectionBuffer != null)
 			this.projectionBuffer.close();
 		this.projectionBuffer = null;
@@ -359,10 +317,9 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 	 * @param draws the draws to use.
 	 * @param instanceStream the instance stream to use.
 	 * @param multiDraw the multi draw to use.
-	 * @param oitPass the oit pass to use.
 	 * @param frame the captured frame matrices
 	 */
-	private void drawGroups(List<Draw> draws, InstanceUploads instanceStream, boolean multiDraw, OitPass oitPass, PRenderFrame frame)
+	private void drawGroups(List<Draw> draws, InstanceUploads instanceStream, boolean multiDraw, PRenderFrame frame)
 	{
 		for (int start = 0; start < draws.size();)
 		{
@@ -374,7 +331,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 				continue;
 			}
 			int end = findBatchEnd(draws, start);
-			draw(draws.subList(start, end), instanceStream, multiDraw && end - start > 1, oitPass, frame);
+			draw(draws.subList(start, end), instanceStream, multiDraw && end - start > 1, frame);
 			start = end;
 		}
 	}
@@ -427,7 +384,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 		for (Draw draw : draws)
 			batches.computeIfAbsent(new ArenaKey(draw.slice().page(), draw.slice().indexType()), ignored -> new ArrayList<>()).add(draw);
 		for (List<Draw> batch : batches.values())
-			draw(batch, instanceStream, multiDraw && batch.size() > 1, OitPass.NONE, frame);
+			draw(batch, instanceStream, multiDraw && batch.size() > 1, frame);
 	}
 
 	/**
@@ -435,10 +392,9 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 	 * @param batch the batch to use.
 	 * @param instanceStream the instance stream to use.
 	 * @param multiDraw the multi draw to use.
-	 * @param oitPass the oit pass to use.
 	 * @param frame the captured frame matrices
 	 */
-	private void draw(List<Draw> batch, InstanceUploads instanceStream, boolean multiDraw, OitPass oitPass, PRenderFrame frame)
+	private void draw(List<Draw> batch, InstanceUploads instanceStream, boolean multiDraw, PRenderFrame frame)
 	{
 		Draw first = batch.getFirst();
 		RenderType type = first.type();
@@ -450,13 +406,12 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 		GpuBufferSlice dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(
 				frame.modelView(), new Vector4f(1.0F), new Vector3f(), new Matrix4f());
 
-		RenderTargetAttachments attachments = oitPass == OitPass.NONE ? attachments(first) :
-				Objects.requireNonNull(this.activeOitAttachments, "OIT pass attachments");
+		RenderTargetAttachments attachments = attachments(first);
 
 		try (RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
 				first :: label, attachments.color(), Optional.empty(), attachments.depth(), OptionalDouble.empty()))
 		{
-			RenderPipeline pipeline = resolvePipeline(type, oitPass);
+			RenderPipeline pipeline = type.pipeline();
 			boolean uniformInstances = usesInstanceUniforms(pipeline);
 			pass.setPipeline(pipeline);
 			if (uniformInstances)
@@ -471,17 +426,11 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 			pass.bindTexture("Sampler0", atlas.getTextureView(), atlas.getSampler());
 			pass.bindTexture("Sampler1", overlayTexture.getTextureView(), RenderSystem.getSamplerCache().getClampToEdge(FilterMode.LINEAR));
 			pass.bindTexture("Sampler2", lightTexture, RenderSystem.getSamplerCache().getClampToEdge(FilterMode.LINEAR));
-			if (oitPass.usesLayerDepth())
-				pass.bindTexture("LayerDepthSampler", oitPass == OitPass.DEPTH_PEEL ?
-						activeOit().previousLayerDepthView() : activeOit().activeLayerDepthView(),
-						RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST));
 			pass.setVertexBuffer(0, this.stateVertices.slice());
 			pass.setIndexBuffer(this.stateIndices, IndexType.INT);
 			pass.drawIndexed(0, 1, 0, 0, 0);
-			if (oitPass != OitPass.NONE)
-				activeOit().bindForDraw();
 
-			if (!first.writeDepth() && oitPass == OitPass.NONE)
+			if (!first.writeDepth())
 				GlStateManager._depthMask(false);
 			try
 			{
@@ -509,7 +458,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 			}
 			finally
 			{
-				if (!first.writeDepth() && oitPass == OitPass.NONE)
+				if (!first.writeDepth())
 					GlStateManager._depthMask(true);
 				GL30.glBindVertexArray(0);
 				GL15.glBindBuffer(GL40.GL_DRAW_INDIRECT_BUFFER, 0);
@@ -546,33 +495,7 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 			}
 	}
 
-	/**
-	 * Performs the active oit operation.
-	 * @return the value produced by this operation.
-	 */
-	private PGlWeightedBlendedOit activeOit()
-	{
-		if (this.activeWeightedBlendedOit == null)
-			throw new IllegalStateException("No weighted blended OIT target is active");
-		return this.activeWeightedBlendedOit;
-	}
 
-	/**
-	 * Resolves the pipeline.
-	 * @param type the type to use.
-	 * @param oitPass the oit pass to use.
-	 * @return the value produced by this operation.
-	 */
-	private RenderPipeline resolvePipeline(RenderType type, OitPass oitPass)
-	{
-		return switch (oitPass)
-		{
-			case NONE -> type.pipeline();
-			case DEPTH -> PRenderTypes.RenderPipelinesProvider.TRIANGLES_OIT_DEPTH;
-			case DEPTH_PEEL -> PRenderTypes.RenderPipelinesProvider.TRIANGLES_OIT_DEPTH_PEEL;
-			case ACCUMULATION -> PRenderTypes.oitPipeline(type);
-		};
-	}
 
 	/**
 	 * Performs the attachments operation.
@@ -651,25 +574,6 @@ public final class PGlMultiDrawExecutor implements PRenderExecutor
 	{
 	}
 
-	/**
-	 * Enumerates the available oit pass values.
-    */
-	private enum OitPass
-	{
-		NONE,
-		DEPTH,
-		DEPTH_PEEL,
-		ACCUMULATION;
-
-		/**
-		 * Performs the uses layer depth operation.
-		 * @return the value produced by this operation.
-		 */
-		private boolean usesLayerDepth()
-		{
-			return this == DEPTH_PEEL || this == ACCUMULATION;
-		}
-	}
 
 	/**
 	 * Immutable value object representing render target attachments.

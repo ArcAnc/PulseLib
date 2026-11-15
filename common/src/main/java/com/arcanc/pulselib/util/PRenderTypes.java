@@ -147,6 +147,9 @@ public final class PRenderTypes
 					build()).
 				withShaderDefine("ALPHA_CUTOUT", 0.1F).
 				withCull(false).
+				withColorTargetState(new ColorTargetState(Optional.of(new BlendFunction(BlendFactor.ONE, BlendFactor.ONE)), GpuFormat.RGBA16_FLOAT, ColorTargetState.WRITE_ALL)).
+				withColorTargetState(1, new ColorTargetState(Optional.of(new BlendFunction(BlendFactor.ONE, BlendFactor.ONE)), GpuFormat.R16_FLOAT, ColorTargetState.WRITE_RED)).
+				withDepthStencilState(new DepthStencilState(DepthStencilState.DEFAULT.depthTest(), false)).
 				build());
 
 		public static final RenderPipeline TRIANGLES_OIT_EMISSIVE = registerPipeline(RenderPipeline.builder(TRIANGLES_SNIPPET).
@@ -159,6 +162,9 @@ public final class PRenderTypes
 				withShaderDefine("EMISSIVE").
 				withShaderDefine("ALPHA_CUTOUT", 0.1F).
 				withCull(false).
+				withColorTargetState(new ColorTargetState(Optional.of(new BlendFunction(BlendFactor.ONE, BlendFactor.ONE)), GpuFormat.RGBA16_FLOAT, ColorTargetState.WRITE_ALL)).
+				withColorTargetState(1, new ColorTargetState(Optional.of(new BlendFunction(BlendFactor.ONE, BlendFactor.ONE)), GpuFormat.R16_FLOAT, ColorTargetState.WRITE_RED)).
+				withDepthStencilState(new DepthStencilState(DepthStencilState.DEFAULT.depthTest(), false)).
 				build());
 
 		public static final RenderPipeline TRIANGLES_OIT_DEPTH = registerPipeline(RenderPipeline.builder(TRIANGLES_LIT_SNIPPET).
@@ -166,9 +172,11 @@ public final class PRenderTypes
 				withFragmentShader(PLibDatabase.rl("core/triangles_oit_depth")).
 				withBindGroupLayout(BindGroupLayout.builder().
 					withSampler("Sampler1").
+					withSampler("SceneDepthSampler").
 					build()).
 				withShaderDefine("ALPHA_CUTOUT", 0.1F).
 				withCull(false).
+				withColorTargetState(new ColorTargetState(Optional.empty(), GpuFormat.R8_UNORM, ColorTargetState.WRITE_RED)).
 				build());
 
 		public static final RenderPipeline TRIANGLES_OIT_DEPTH_PEEL = registerPipeline(RenderPipeline.builder(TRIANGLES_LIT_SNIPPET).
@@ -176,10 +184,12 @@ public final class PRenderTypes
 				withFragmentShader(PLibDatabase.rl("core/triangles_oit_depth_peel")).
 				withBindGroupLayout(BindGroupLayout.builder().
 					withSampler("Sampler1").
+					withSampler("SceneDepthSampler").
 					withSampler("LayerDepthSampler").
 					build()).
 				withShaderDefine("ALPHA_CUTOUT", 0.1F).
 				withCull(false).
+				withColorTargetState(new ColorTargetState(Optional.empty(), GpuFormat.R8_UNORM, ColorTargetState.WRITE_RED)).
 				build());
 
 		public static final RenderPipeline OIT_COMPOSITE = registerPipeline(RenderPipeline.builder().
@@ -194,6 +204,7 @@ public final class PRenderTypes
 				withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT)).
 				withCull(false).
 				withPrimitiveTopology(PrimitiveTopology.TRIANGLES).
+				withDepthStencilState(Optional.empty()).
 				build());
 		
 		public static final RenderPipeline OIT_FABULOUS_METADATA = registerPipeline(RenderPipeline.builder().
@@ -205,6 +216,8 @@ public final class PRenderTypes
 					build()).
 				withCull(false).
 				withPrimitiveTopology(PrimitiveTopology.TRIANGLES).
+				withDepthStencilState(Optional.empty()).
+				withColorTargetState(new ColorTargetState(Optional.empty(), GpuFormat.RG32_FLOAT, ColorTargetState.WRITE_ALL)).
 				build());
 
 		public static final RenderPipeline OIT_FABULOUS_COMPOSITE = registerPipeline(RenderPipeline.builder().
@@ -229,6 +242,7 @@ public final class PRenderTypes
 						BlendFactor.ONE_MINUS_SRC_ALPHA, BlendFactor.ZERO, BlendFactor.ONE))).
 				withCull(false).
 				withPrimitiveTopology(PrimitiveTopology.TRIANGLES).
+				withDepthStencilState(Optional.empty()).
 				build());
 
 		private static final RenderPipeline.Snippet TRIANGLES_INSTANT_SNIPPET = RenderPipeline.builder().

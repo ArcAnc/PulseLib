@@ -3,13 +3,14 @@
 #moj_import <minecraft:dynamictransforms.glsl>
 
 uniform sampler2D Sampler0;
+uniform sampler2D SceneDepthSampler;
 uniform sampler2D LayerDepthSampler;
 
 in vec4 vertexColorBack;
 in vec4 vertexColorFront;
 in vec2 texCoord0;
 
-layout(location = 0) out float layerDepth;
+layout(location = 0) out float ignoredColor;
 
 const float PULSELIB_OIT_EPSILON = 0.000001;
 
@@ -28,9 +29,13 @@ void main()
     }
 
     float previousLayerDepth = texelFetch(LayerDepthSampler, ivec2(gl_FragCoord.xy), 0).r;
-    if (gl_FragCoord.z <= previousLayerDepth + PULSELIB_OIT_EPSILON) {
+    if (gl_FragCoord.z >= previousLayerDepth - PULSELIB_OIT_EPSILON) {
         discard;
     }
 
-    layerDepth = gl_FragCoord.z;
+    // Hardware depth stores the nearest remaining surface in reversed-Z.
+    if (gl_FragCoord.z < texelFetch(SceneDepthSampler, ivec2(gl_FragCoord.xy), 0).r) {
+        discard;
+    }
+    ignoredColor = 0.0;
 }

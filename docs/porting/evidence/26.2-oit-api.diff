@@ -1,0 +1,46 @@
+--- fa20f7a declarations
++++ native OIT declarations
+@@ -2628,6 +2628,20 @@
+    METHOD public PRhiNativeMaterial(RenderType type, int capacity, PTransparencyMode transparency, Map<String, Supplier<GpuBufferSlice>> extraUniforms)
+    METHOD public PRhiNativeMaterial(RenderType type, int capacity, PTransparencyMode transparency, Map<String, Supplier<GpuBufferSlice>> extraUniforms, Supplier<PreparedRenderType> prepare, Function<PreparedRenderType, PRhiMaterial.Attachments> target)
+    METHOD public PPipelineHandle register(PRhiResourceRegistry resources)
++FILE common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/PRhiOitRenderer.java
++package com.arcanc.pulselib.content.renderer.rhi;
++TYPE @ApiStatus.Internal public final class PRhiOitRenderer implements PRenderExecutor
++   METHOD public PRhiOitRenderer(Function<PPipelineHandle, RenderType> types, Function<PMeshHandle, Object> geometry, Map<String, Supplier<GpuBufferSlice>> streams)
++   METHOD public boolean canExecute(PRenderPlan plan)
++   METHOD @Override public PRenderCapabilities capabilities()
++   METHOD @Override public void execute(PRenderPlan plan, PRenderFrame frame)
++   METHOD public void execute(PRenderPlan plan, PRenderFrame frame, @Nullable GpuTextureView opaqueDepth)
++   METHOD public void composite()
++   METHOD public void composite(GpuTextureView destination)
++   METHOD public void compositeFabulous(GpuTextureView destination, List<RenderTarget> vanilla)
++   METHOD public boolean hasPending()
++   METHOD public void discard()
++   METHOD @Override public void cleanup()
+ FILE common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/PRhiOpaqueRenderer.java
+ package com.arcanc.pulselib.content.renderer.rhi;
+ TYPE @ApiStatus.Internal public final class PRhiOpaqueRenderer implements PRenderExecutor
+@@ -2702,6 +2716,22 @@
+ package com.arcanc.pulselib.content.renderer.rhi;
+ TYPE final class PRhiUploadRing implements AutoCloseable
+    METHOD @Override public void close()
++FILE common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/PRhiWeightedBlendedOit.java
++package com.arcanc.pulselib.content.renderer.rhi;
++TYPE @ApiStatus.Internal public final class PRhiWeightedBlendedOit
++   FIELD public static final int LAYER_COUNT = 4
++   METHOD public boolean begin(GpuTextureView colorAttachment, @Nullable GpuTextureView depthAttachment)
++   METHOD public RenderPass createDepthPass(int layer, Supplier<String> label)
++   METHOD public RenderPass createAccumulationPass(int layer, Supplier<String> label)
++   METHOD public GpuTextureView layerDepthView(int layer)
++   METHOD public void markContent(int layer)
++   METHOD public void composite()
++   METHOD public void validateDestination(GpuTextureView color)
++   METHOD public void composite(GpuTextureView destination)
++   METHOD public static void validateFabulousTargets(GpuTextureView destination, List<RenderTarget> targets)
++   METHOD public void compositeFabulous(GpuTextureView destination, List<RenderTarget> targets)
++   METHOD public void close()
++   METHOD public void discard()
+ FILE common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/package-info.java
+ @ParametersAreNonnullByDefault
+ @MethodsReturnNonnullByDefault

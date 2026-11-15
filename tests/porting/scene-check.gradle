@@ -38,6 +38,7 @@ gradle.projectsEvaluated
 	def backend = root.providers.gradleProperty('portingSceneBackend').getOrElse('opengl')
 	if (!(backend in ['opengl', 'vulkan']))
 		throw new GradleException('portingSceneBackend must be opengl or vulkan')
+	def oit = root.providers.gradleProperty('portingSceneOit').getOrElse('false')
 	def gui = root.providers.gradleProperty('portingSceneGui').getOrElse('false')
 	def queue = root.providers.gradleProperty('portingSceneQueue').getOrElse('false')
 	def shaders = root.providers.gradleProperty('portingSceneShaders').getOrElse('false')
@@ -56,6 +57,7 @@ gradle.projectsEvaluated
 		project.loom.runs.client.vmArg('-Dpulselib.scene.shaders=' + shaders)
 		project.loom.runs.client.vmArg('-Dpulselib.scene.queue=' + queue)
 		project.loom.runs.client.vmArg('-Dpulselib.scene.gui=' + gui)
+		project.loom.runs.client.vmArg('-Dpulselib.scene.oit=' + oit)
 	}
 	else
 		project.neoForge.runs.named('client')
@@ -66,6 +68,7 @@ gradle.projectsEvaluated
 			jvmArguments.add('-Dpulselib.scene.shaders=' + shaders)
 			jvmArguments.add('-Dpulselib.scene.queue=' + queue)
 			jvmArguments.add('-Dpulselib.scene.gui=' + gui)
+			jvmArguments.add('-Dpulselib.scene.oit=' + oit)
 		}
 	project.tasks.named('runClient')
 	{
