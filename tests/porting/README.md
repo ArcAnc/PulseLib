@@ -7,6 +7,43 @@ This code is licensed under "Arc's License of Common Sense" (LICENSE.txt).
 
 # Minecraft 26.2 component checks
 
+## Real world OIT acceptance (stage 5)
+
+```bash
+./gradlew --init-script tests/porting/scene-check.gradle :fabric:runClient -PportingSceneWorld=true -PportingSceneBackend=opengl --no-parallel --no-daemon --console=plain
+./gradlew --init-script tests/porting/scene-check.gradle :fabric:runClient -PportingSceneWorld=true -PportingSceneBackend=vulkan --no-parallel --no-daemon --console=plain
+./gradlew --init-script tests/porting/scene-check.gradle :neoforge:runClient -PportingSceneLoader=neoforge -PportingSceneWorld=true -PportingSceneBackend=opengl --no-parallel --no-daemon --console=plain
+./gradlew --init-script tests/porting/scene-check.gradle :neoforge:runClient -PportingSceneLoader=neoforge -PportingSceneWorld=true -PportingSceneBackend=vulkan -PportingSceneEarlyWindow=false --no-parallel --no-daemon --console=plain
+```
+
+This opt-in fixture creates its own flat integrated world in a fresh `build/porting-scene/client-*`
+directory. It never opens user saves. All production source sets, loader callbacks, Mixins, native
+world passes and the production OIT compositor remain enabled. Backend fallback fails the run.
+NeoForge Vulkan still needs the test-only native FML early-window setting described below; this
+does not validate the default early-window bootstrap. The world variant has a five-minute timeout.
+
+The eight phases exercise Fabulous dry/rain, opaque stone occlusion, ordinary transparency, resize,
+real resource-pack reload, clouds, and disconnect/reopen. The native terrain, item, particle, weather
+and cloud transparency targets must each have nonempty pixels. Four canonical queue submissions
+use alternating 0.3/0.9 GPU deformation. Each phase compares six center/silhouette pixel pairs against
+a CPU insertion reference using actual opaque depth, pre-composite color and native transparency
+inputs, with a maximum per-channel difference of 3/255. The stone phase must hide three OIT layers.
+The silhouette probe detects stale deformer values that a center-only check would miss.
+
+One explicitly marked test exception interrupts the actual framegraph composite. The fixture catches
+only that marker after production cleanup, checks caller model-view restoration and empty pending
+plans/deformer values, then requires subsequent real frames to pass. Other errors fail the run.
+A native framegraph with CPU-counted leases additionally verifies exact acquire/release counts and
+preservation of a render exception when resource cleanup also fails. Disconnect must close the OIT
+resource registry before reopening. Readback observers do not replace native targets or passes.
+
+Success requires `pulselib-scene-result.txt` containing `PASS`, 48 comparisons in
+`pulselib-world-evidence.json`, all five positive coverage counts, and eight `world-*.png` readbacks.
+Images retain the native GPU row order. World time, clouds and particles vary, so images from separate
+runs need not have equal hashes; each run is checked against its own native inputs. The existing
+offscreen OIT/GUI suites remain separate. This fixture does not validate every model/player/first-person
+hook, prolonged GPU-memory usage, or comparative performance; these belong to stages 6–8.
+
 Full production Fabric client bootstrap can also be checked explicitly:
 
 ```bash

@@ -18,15 +18,15 @@ import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
 import com.arcanc.pulselib.content.renderer.gl.PGlMultiDrawExecutor;
 import com.arcanc.pulselib.content.renderer.gl.PGlResourceRegistry;
 import com.arcanc.pulselib.content.renderer.plan.*;
-import com.arcanc.pulselib.content.renderer.rhi.PRhiOpaqueRenderer;
-import com.arcanc.pulselib.content.renderer.rhi.PRhiOitRenderer;
 import com.arcanc.pulselib.content.renderer.rhi.PRhiImmediateRenderer;
+import com.arcanc.pulselib.content.renderer.rhi.PRhiOitRenderer;
+import com.arcanc.pulselib.content.renderer.rhi.PRhiOpaqueRenderer;
 import com.arcanc.pulselib.content.renderer.rhi.PRhiRenderHost;
 import com.arcanc.pulselib.util.PRenderTypes;
 import com.arcanc.pulselib.util.helpers.PLibRenderHelper;
+import com.mojang.blaze3d.GpuFormat;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
-import com.mojang.blaze3d.GpuFormat;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -267,9 +267,17 @@ public final class PRenderQueue
 	public static void endWorldFrame()
 	{
 		COMPILER.discard(List.of(RenderStage.ENTITIES, RenderStage.SOLID_BLOCKS, RenderStage.TRANSLUCENT_BLOCKS));
-		OIT_EXECUTOR.discard();
-		worldDepthValid = false;
-		EXECUTOR.endWorldFrame();
+		try
+		{
+			OIT_EXECUTOR.discard();
+			worldDepthValid = false;
+			EXECUTOR.endWorldFrame();
+		}
+		finally
+		{
+			// Native OIT consumes sampled values during the framegraph composite, after afterParticles.
+			PGpuDeformerBuffers.finishFrame();
+		}
 	}
 
 

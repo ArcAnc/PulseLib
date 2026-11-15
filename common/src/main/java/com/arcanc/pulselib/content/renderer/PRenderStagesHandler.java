@@ -9,7 +9,6 @@
 
 package com.arcanc.pulselib.content.renderer;
 
-import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import net.minecraft.client.Minecraft;
 
@@ -48,7 +47,6 @@ public class PRenderStagesHandler
 	public static void afterParticles()
 	{
 		PRenderQueue.flushWorld();
-		PGpuDeformerBuffers.finishFrame();
 	}
 	/**
 	 * Composites deferred translucency into the destination after weather rendering.

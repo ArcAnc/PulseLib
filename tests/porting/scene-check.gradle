@@ -38,6 +38,7 @@ gradle.projectsEvaluated
 	def backend = root.providers.gradleProperty('portingSceneBackend').getOrElse('opengl')
 	if (!(backend in ['opengl', 'vulkan']))
 		throw new GradleException('portingSceneBackend must be opengl or vulkan')
+	def world = root.providers.gradleProperty('portingSceneWorld').getOrElse('false')
 	def oit = root.providers.gradleProperty('portingSceneOit').getOrElse('false')
 	def gui = root.providers.gradleProperty('portingSceneGui').getOrElse('false')
 	def queue = root.providers.gradleProperty('portingSceneQueue').getOrElse('false')
@@ -58,6 +59,7 @@ gradle.projectsEvaluated
 		project.loom.runs.client.vmArg('-Dpulselib.scene.queue=' + queue)
 		project.loom.runs.client.vmArg('-Dpulselib.scene.gui=' + gui)
 		project.loom.runs.client.vmArg('-Dpulselib.scene.oit=' + oit)
+		project.loom.runs.client.vmArg('-Dpulselib.scene.world=' + world)
 	}
 	else
 		project.neoForge.runs.named('client')
@@ -69,11 +71,12 @@ gradle.projectsEvaluated
 			jvmArguments.add('-Dpulselib.scene.queue=' + queue)
 			jvmArguments.add('-Dpulselib.scene.gui=' + gui)
 			jvmArguments.add('-Dpulselib.scene.oit=' + oit)
+			jvmArguments.add('-Dpulselib.scene.world=' + world)
 		}
 	project.tasks.named('runClient')
 	{
 		dependsOn jar
-		timeout = java.time.Duration.ofMinutes(2)
+		timeout = java.time.Duration.ofMinutes(world == 'true' ? 5 : 2)
 		doFirst
 		{
 			if (loader == 'neoforge' && earlyWindow == 'false')

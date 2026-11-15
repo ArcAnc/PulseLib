@@ -1,0 +1,10 @@
+--- f31cc8e public API
++++ world OIT public API
+@@ -2597,0 +2598,7 @@
++FILE common/src/main/java/com/arcanc/pulselib/content/renderer/rhi/PRhiFrameResources.java
++package com.arcanc.pulselib.content.renderer.rhi;
++TYPE @ApiStatus.Internal public final class PRhiFrameResources implements GraphicsResourceAllocator, AutoCloseable
++	METHOD public PRhiFrameResources(GraphicsResourceAllocator allocator)
++	METHOD @Override public <T> T acquire(ResourceDescriptor<T> descriptor)
++	METHOD @Override public <T> void release(ResourceDescriptor<T> descriptor, T resource)
++	METHOD @Override public void close()

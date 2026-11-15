@@ -10,7 +10,6 @@
 package com.arcanc.pulselib.porting.scene.mixin;
 
 import com.arcanc.pulselib.porting.scene.SceneChecks;
-
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.GameRenderer;
 import org.spongepowered.asm.mixin.Mixin;
@@ -26,6 +25,9 @@ public abstract class SceneMixin
 			target = "Lnet/minecraft/client/gui/render/GuiRenderer;endFrame()V"))
 	private void scene$draw(DeltaTracker delta, boolean advance, CallbackInfo callback)
 	{
-		SceneChecks.tick();
+		if (Boolean.getBoolean("pulselib.scene.world"))
+			com.arcanc.pulselib.porting.scene.WorldChecks.tick();
+		else
+			SceneChecks.tick();
 	}
 }
