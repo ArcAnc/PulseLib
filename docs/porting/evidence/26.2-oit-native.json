@@ -470,5 +470,20 @@
     "NeoForge Vulkan uses test-only earlyWindowControl=false",
     "Owned texture/view lifecycle checked, not a long-running GPU memory/performance measurement",
     "Unused Sampler1 warnings in depth profiles remain; no missing uniform checks are suppressed"
-  ]
+  ],
+  "implementation_commit": "61aed29fae0dd46bafd30ea9069cbf3d05142609",
+  "committed_build": {
+    "result": "PASS",
+    "exit_code": 0,
+    "command": "./gradlew :common:compileJava :neoforge:build :fabric:build --no-parallel --no-daemon --console=plain",
+    "checkout": "/mnt/MainDrive/Programs/MC mods/ArcsLib/build/porting/clean-bootstrap",
+    "checkout_head": "61aed29fae0dd46bafd30ea9069cbf3d05142609",
+    "tracked_checkout_clean": true,
+    "note": "26 tasks up-to-date from full build before final clients, no exclusions",
+    "log": "26.2-oit-committed-build.txt",
+    "sha256": "7afb65ed40dc42529c3f178550f9059498960eab8a4765dceba94508c782b6ec",
+    "raw_sha256": "9b17241f91bd58c1beb86eba0fa3b9f928a5e0fd6e6fdf6b22cca83b9837b3c4"
+  },
+  "committed_api_sha256": "574b08d99566f681845a5eb622a59b411f915c199a38c59b5737f78f1d9f9f1f",
+  "committed_api_matches_accepted_sources": true
 }
