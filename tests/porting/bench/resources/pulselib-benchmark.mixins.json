@@ -1,0 +1,7 @@
+{
+  "required": true,
+  "package": "com.arcanc.pulselib.porting.bench.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "client": ["BenchmarkFrame", "CounterMixins$Pass", "CounterMixins$Uploads", "CounterMixins$Indirect"],
+  "injectors": {"defaultRequire": 1}
+}

@@ -1,0 +1,61 @@
+/**
+ * @author ArcAnc
+ * Created at: 20.11.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
+gradle.projectsEvaluated
+{
+	def root = gradle.rootProject
+	def loader = root.providers.gradleProperty('portingServerLoader').getOrElse('fabric')
+	def project = root.findProject(':' + loader)
+	if (project == null || !(loader in ['fabric', 'neoforge']))
+		return
+	def parent = project.layout.buildDirectory.dir('porting-server').get().asFile
+	parent.mkdirs()
+	def directory = java.nio.file.Files.createTempDirectory(parent.toPath(), 'server-').toFile()
+	def world = 'pulselib-isolated-server'
+
+	if (loader == 'fabric')
+	{
+		project.loom.runs.server.runDirectory.set(project.layout.dir(project.provider { directory }))
+		project.loom.runs.server.programArgs('nogui')
+	}
+	else
+		project.neoForge.runs.named('server')
+		{
+			gameDirectory = directory
+		}
+
+	project.tasks.named('runServer')
+	{
+		standardInput = System.in
+		timeout = java.time.Duration.ofMinutes(3)
+		doFirst
+		{
+			new File(directory, 'eula.txt').text = 'eula=true\n'
+			new File(directory, 'server.properties').text = """server-ip=127.0.0.1
+server-port=0
+online-mode=false
+enable-query=false
+enable-rcon=false
+level-name=${world}
+level-type=minecraft\\:flat
+generator-settings={"layers":[{"block":"minecraft:bedrock","height":1},{"block":"minecraft:dirt","height":2},{"block":"minecraft:grass_block","height":1}],"biome":"minecraft:plains"}
+generate-structures=false
+view-distance=3
+simulation-distance=5
+max-tick-time=60000
+"""
+			logger.lifecycle("PulseLib dedicated fixture: " + directory)
+		}
+		doLast
+		{
+			if (!new File(directory, world + '/level.dat').isFile())
+				throw new GradleException('Dedicated server did not save the isolated world')
+		}
+	}
+}

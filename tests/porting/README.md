@@ -398,3 +398,53 @@ Repeat with `-PportingSceneBackend=vulkan`. For NeoForge use `:neoforge:runClien
 `OitChecks` exercises real native targets, canonical packed plans and public queue depth capture/flush/composition. It checks four distinct layers under shuffled split producers, nearest-four truncation, opaque clipping, lit versus ordered alpha reference, coplanar weighted/log accumulation, 129 objects across UBO chunks, all five vanilla color/depth slots before/behind OIT, nine interleaved surfaces against an independent CPU depth-sorted reference, invalid-input retry, GUI/deformer-buffer growth, dynamic revision snapshots/close, fenced retirement, discard/cleanup/recreate and ten resizes (28 owned textures/views closed each replacement). Original GUI instant tests remain mandatory in the combined run.
 
 This is GPU component/public-queue acceptance inside Minecraft. It does not claim a world with actual terrain/particles/weather/clouds through the LevelRenderer framegraph, actual reload/disconnect or full Fabulous acceptance. Keep stage 5 partial until those scenarios really run. GPU memory/performance measurements remain outstanding.
+
+## Final validation (stage 8)
+
+Run from the root of a clean 26.2 checkout. The server driver requires Python 3.10 or newer
+and runs the production mod in a fresh loopback-only flat world. It checks a positive native
+game time, console save, shutdown and the final dimension-save marker. Gradle checks `level.dat`.
+
+```bash
+python3 tests/porting/check-server.py fabric /tmp/pulselib-fabric-server.log
+python3 tests/porting/check-server.py neoforge /tmp/pulselib-neoforge-server.log
+./gradlew --init-script tests/porting/core-check.gradle \
+  --init-script tests/porting/fabric-native-check.gradle --init-script tests/porting/neoforge-bootstrap-check.gradle \
+  :common:build :fabric:build :neoforge:build :common:checkPortingCore :common:checkPortingIntegration \
+  :fabric:checkPortingDiscovery :neoforge:checkPortingDiscovery :fabric:checkPortingNativeItemStack \
+  :neoforge:checkPortingBootstrap --offline --no-parallel --no-daemon --console=plain
+```
+
+The full offscreen scene additionally runs the production Gecko and glTF parsers and Animation
+Graph. It checks Gecko pre/post discontinuities and four-key Euler Catmull–Rom, glTF quaternion
+interpolation, transition weights, one-shot trigger consumption, reverse intervals and graph reset.
+
+The OpenGL benchmark requires a working graphics session and NVIDIA driver support for
+`GL_NVX_gpu_memory_info`. Run the clients sequentially with the same GPU and driver. Use a
+disposable archive for the reference. Its original hands Mixin fails at client startup because
+two hooks match a group with maximum one. The command removes that registration in the
+disposable reference directory. The benchmark draws static geometry without player hands.
+
+```bash
+fixture_root="$PWD/tests/porting"
+reference_dir="$(mktemp -d)"
+git archive 5065103d1bccc7880445f9e93bc6ed709cfbb809 | tar -x -C "$reference_dir"
+(
+  cd "$reference_dir" || exit
+  sed -i '/^    "ItemInHandRendererMixin",$/d' common/src/main/resources/pulselib.mixins.json
+  bash ./gradlew --init-script "$fixture_root/performance-check.gradle" :fabric:runClient \
+    "-PportingBenchFixtures=$fixture_root/bench" --offline --no-parallel --no-daemon --console=plain
+)
+./gradlew --init-script tests/porting/performance-check.gradle :fabric:runClient \
+  --offline --no-parallel --no-daemon --console=plain
+```
+
+Each run emits `pulselib-benchmark.csv` in a fresh `fabric/build/porting-performance/client-*`
+directory. The three modes use 16 meshes and 768 instances with opaque, ordinary transparency
+or four overlapping OIT layers. Each mode collects 120 synchronized samples after 180
+warmup frames. Draw calls count indexed and array submissions, with an indirect submission counting
+once. Batches count individual draw commands inside those calls. Stream bytes count PulseLib instance
+and indirect command uploads. The timing and allocated bytes cover the production queue and
+compositor on the render thread. Target setup, CSV writes and presentation are outside
+the timing window. Twelve resize/cleanup cycles add 2,400 OIT frames and log available VRAM
+before and after release. The driver VRAM counter is global to the GPU.

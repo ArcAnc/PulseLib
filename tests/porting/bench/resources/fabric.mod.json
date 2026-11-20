@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "id": "pulselib_porting_benchmark",
+  "version": "1.0.0",
+  "name": "PulseLib render benchmark (test only)",
+  "environment": "client",
+  "depends": {"pulselib": "*"},
+  "mixins": ["pulselib-benchmark.mixins.json"]
+}

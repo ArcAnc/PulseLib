@@ -155,6 +155,7 @@ public final class SceneChecks
 
 	private static void run(Minecraft client) throws Exception
 	{
+		AnimationChecks.run();
 		GpuDevice device = RenderSystem.getDevice();
 		System.out.println("Production scene device: " + device.getDeviceInfo());
 		String backend = System.getProperty("pulselib.scene.backend", "opengl");
