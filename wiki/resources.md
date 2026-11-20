@@ -183,8 +183,8 @@ Both loaders decode the same `pulselib` metadata section. `PLibMetadata` supplie
 
 Runtime atlas classes:
 
-* [`PResourceCache`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/util/PResourceCache.java)
-* [`RuntimeLoader`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/textures/atlas/RuntimeLoader.java)
+* [`PResourceCache`](../common/src/main/java/com/arcanc/pulselib/util/PResourceCache.java)
+* [`RuntimeLoader`](../common/src/main/java/com/arcanc/pulselib/content/model/textures/atlas/RuntimeLoader.java)
 
 PulseLib registers the atlas at:
 
@@ -240,7 +240,7 @@ Prefer `withColor(...)`, `withPackedLight(...)`, `withPackedOverlay(...)`, and t
 
 ## Emissive textures
 
-Emissive textures are useful for eyes, screens, lamps, energy parts, and other pieces that should ignore normal light. PulseLib reads this flag from texture metadata through [`PLibSpriteMetadata`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/textures/atlas/PLibSpriteMetadata.java).
+Emissive textures are useful for eyes, screens, lamps, energy parts, and other pieces that should ignore normal light. PulseLib reads this flag from texture metadata through [`PLibSpriteMetadata`](../common/src/main/java/com/arcanc/pulselib/content/model/textures/atlas/PLibSpriteMetadata.java).
 
 To mark a texture as emissive, add a `.png.mcmeta` file next to it:
 
@@ -275,9 +275,9 @@ Choose the solid, cutout, or translucent variant according to the desired alpha 
 
 Classes used:
 
-* [`PResourceCache`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/util/PResourceCache.java)
-* [`RuntimeLoader`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/textures/atlas/RuntimeLoader.java)
-* [`PLibSpriteMetadata`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/textures/atlas/PLibSpriteMetadata.java)
-* [`PAlphaMode`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/textures/PAlphaMode.java)
-* [`PTextureAlphaClassifier`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/textures/PTextureAlphaClassifier.java)
-* [`PRenderTypes`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java)
+* [`PResourceCache`](../common/src/main/java/com/arcanc/pulselib/util/PResourceCache.java)
+* [`RuntimeLoader`](../common/src/main/java/com/arcanc/pulselib/content/model/textures/atlas/RuntimeLoader.java)
+* [`PLibSpriteMetadata`](../common/src/main/java/com/arcanc/pulselib/content/model/textures/atlas/PLibSpriteMetadata.java)
+* [`PAlphaMode`](../common/src/main/java/com/arcanc/pulselib/content/model/textures/PAlphaMode.java)
+* [`PTextureAlphaClassifier`](../common/src/main/java/com/arcanc/pulselib/content/model/textures/PTextureAlphaClassifier.java)
+* [`PRenderTypes`](../common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java)

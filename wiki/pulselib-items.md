@@ -2,11 +2,11 @@
 
 Items need a slightly different setup from entities and block entities. Minecraft creates one `Item` object for the item type, but the player can hold many `ItemStack`s of that type. If animation state lived directly on the item object, every stack would share the same animation.
 
-PulseLib handles this by using [`AnimManagerKey`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/AnimManagerKey.java) and [`SingletonAnimationManager`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/singleton/SingletonAnimationManager.java). The item implements [`PAnimatable`](../common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimatable.java), while its manager is resolved per key.
+PulseLib handles this by using [`AnimManagerKey`](../common/src/main/java/com/arcanc/pulselib/content/animatable/AnimManagerKey.java) and [`SingletonAnimationManager`](../common/src/main/java/com/arcanc/pulselib/content/animatable/singleton/SingletonAnimationManager.java). The item implements [`PAnimatable`](../common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimatable.java), while its manager is resolved per key.
 
 ## Item model definition
 
-The old `models/item/<item>.json` file with `"parent": "builtin/entity"` does not select a PulseLib renderer on 26.1.2. Register a `SpecialModelRenderer.Unbaked` codec, then reference that registered special-model type from the item's 26.1.2 model definition. The wrapper below is the PulseLib side of that setup.
+For Minecraft 26.2, register a `SpecialModelRenderer.Unbaked` codec and reference its registered type in the item definition under `assets/<modid>/items/`.
 
 ## Item class
 
@@ -44,7 +44,7 @@ public class WandItem extends Item implements PAnimatable<WandItem>
 
 ## Renderer
 
-The 26.1.2 renderer is a `SpecialModelRenderer`, not a `BlockEntityWithoutLevelRenderer`. It points at model data, selects a PulseLib render type, and creates a render state for every item render.
+The renderer implements Minecraft 26.2’s `SpecialModelRenderer` through `PItemRenderer`. It selects a PulseLib render type and creates a render state for each item submission.
 
 ```java
 public class WandRenderer extends PItemRenderer<WandItem, WandRenderState>
@@ -160,6 +160,6 @@ The item animation contract is `PAnimatable`; renderer registration is independe
 
 Classes used:
 
-* [`PItemRenderer`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java)
-* [`SingletonAnimationManager`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/singleton/SingletonAnimationManager.java)
+* [`PItemRenderer`](../common/src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java)
+* [`SingletonAnimationManager`](../common/src/main/java/com/arcanc/pulselib/content/animatable/singleton/SingletonAnimationManager.java)
 * [`PModelData.item(...)`](modeldata.md)

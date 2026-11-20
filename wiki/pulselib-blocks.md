@@ -2,7 +2,7 @@
 
 Animated blocks in Minecraft are really animated block entities. The block still handles placement, collision, interaction, redstone behavior, and blockstate data. The visible animated model is rendered by the block entity renderer.
 
-That split is important: implement [`PAnimatable`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimatable.java) on the `BlockEntity`, not on the `Block`.
+That split is important: implement [`PAnimatable`](../common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimatable.java) on the `BlockEntity`, not on the `Block`.
 
 ## Block class
 
@@ -120,7 +120,7 @@ public void postSubmit(PoseStack poseStack,
 
 Classes used:
 
-* [`PBlockRenderer`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PBlockRenderer.java)
+* [`PBlockRenderer`](../common/src/main/java/com/arcanc/pulselib/content/renderer/PBlockRenderer.java)
 * [`PModelData.block(...)`](modeldata.md)
-* [`PAnimatable`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimatable.java)
-* [`PLibHelper`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/util/helpers/PLibHelper.java)
+* [`PAnimatable`](../common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimatable.java)
+* [`PLibHelper`](../common/src/main/java/com/arcanc/pulselib/util/helpers/PLibHelper.java)

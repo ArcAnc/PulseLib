@@ -12,7 +12,7 @@
 
 ## TechStack
 
-- Java 25 / Minecraft 26.1.2
+- Java 25 / Minecraft 26.2
 - [Fabric](https://github.com/FabricMC/fabric) (loader and modding API)
 - [NeoForge](https://github.com/neoforged/NeoForge) (modding API for Minecraft)
 - [SpongePowered Mixin](https://github.com/SpongePowered/Mixin) (mixin and bytecode weaving framework)

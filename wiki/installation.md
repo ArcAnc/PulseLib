@@ -1,6 +1,6 @@
 # Installation
 
-This branch targets **Minecraft 26.1.2**, **Java 25**, and **PulseLib 1.1.5.3**. Its platform versions are pinned in [`gradle.properties`](../gradle.properties): Fabric Loader `0.19.5`, Fabric API `0.155.3+26.1.2`, and NeoForge `26.1.2.95`.
+This branch targets **Minecraft 26.2**, **Java 25**, and **PulseLib 1.1.5.3**. It pins Fabric Loader `0.20.1`, Fabric API `0.161.0+26.2`, and NeoForge `26.2.0.57`. [Gradle properties](../gradle.properties)
 
 ## For developers
 
@@ -8,8 +8,8 @@ Use the loader-specific artifact. The Common module contains shared code and res
 
 | Project | Dependency coordinate |
 | --- | --- |
-| Fabric | `com.arcanc.pulselib:pulselib-fabric:26.1.2-1.1.5.3` |
-| NeoForge | `com.arcanc.pulselib:pulselib-neoforge:26.1.2-1.1.5.3` |
+| Fabric | `com.arcanc.pulselib:pulselib-fabric:26.2-1.1.5.3` |
+| NeoForge | `com.arcanc.pulselib:pulselib-neoforge:26.2-1.1.5.3` |
 
 Both loader projects support Maven, Modrinth and CurseForge publication. The coordinates above describe this branch; use a version available in the public repository, or build locally until that version is released.
 
@@ -22,7 +22,7 @@ repositories {
 
 dependencies {
     // NeoForge consumer; use only a version available in the repository.
-    implementation "com.arcanc.pulselib:pulselib-neoforge:26.1.2-1.1.5.3"
+    implementation "com.arcanc.pulselib:pulselib-neoforge:26.2-1.1.5.3"
 }
 ```
 
@@ -36,7 +36,7 @@ The loader JARs are written to `fabric/build/libs/` and `neoforge/build/libs/`. 
 
 ```gradle
 dependencies {
-    implementation files("libs/pulselib-26.1.2-neoforge-1.1.5.3.jar")
+    implementation files("libs/pulselib-26.2-neoforge-1.1.5.3.jar")
 }
 ```
 
@@ -44,7 +44,7 @@ Keep shared PulseLib integration in your Common source set and Minecraft rendere
 
 ## Publishing from this checkout
 
-The shared release configuration is implemented by [`MultiloaderPublishingPlugin.groovy`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/buildSrc/src/main/groovy/MultiloaderPublishingPlugin.groovy). Its `multiloader-publishing` ID is registered in [`buildSrc/build.gradle`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/buildSrc/build.gradle) and applied by both loader projects.
+The shared release configuration is implemented by [`MultiloaderPublishingPlugin.groovy`](../buildSrc/src/main/groovy/MultiloaderPublishingPlugin.groovy). Its `multiloader-publishing` ID is registered in [`buildSrc/build.gradle`](../buildSrc/build.gradle) and applied by both loader projects.
 
 `publish` writes both loader publications to a local Maven repository. The default destination is `build/maven-repository/`; `mavenRepoDir` selects another directory:
 
@@ -61,3 +61,7 @@ Provide `MODRINTH_TOKEN` and `CURSEFORGE_TOKEN` in the environment, or Gradle pr
 ## For players
 
 Download a release matching your Minecraft version and loader from [CurseForge](https://www.curseforge.com/minecraft/mc-mods/pulselib) or [Modrinth](https://modrinth.com/mod/pulselib). Install one loader-specific PulseLib JAR; Fabric installations also require Fabric API. The development branch and an uploaded release may have different availability.
+
+### NeoForge Vulkan
+
+With NeoForge `26.2.0.57`, the default FML early window can fail Vulkan startup with `GLFW error 65540`. Set `earlyWindowControl = false` in the instance’s `config/fml.toml` before starting the Vulkan client. [26.2 validation matrix](../docs/porting/26.2-multiloader.md#итоговая-матрица)

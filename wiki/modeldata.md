@@ -1,6 +1,6 @@
 # Model Data
 
-[`PModelData`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/modelData/PModelData.java) tells a renderer which canonical model to obtain. It never contains a loader root or filename extension. [`PModelResource`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/resource/PModelResource.java) holds the matching registration and texture mappings.
+[`PModelData`](../common/src/main/java/com/arcanc/pulselib/content/renderer/modelData/PModelData.java) tells a renderer which canonical model to obtain. It never contains a loader root or filename extension. [`PModelResource`](../common/src/main/java/com/arcanc/pulselib/content/model/resource/PModelResource.java) holds the matching registration and texture mappings.
 
 Use the factories for the conventional canonical IDs:
 

@@ -1,6 +1,6 @@
 # Getting Started
 
-These examples target Minecraft 26.1.2 with Java 25. You need basic Java and familiarity with your loader's mod setup: Fabric or NeoForge. Install the matching PulseLib artifact using [Installation](installation.md).
+These examples target Minecraft 26.2 with Java 25. You need basic Java and familiarity with your loader's mod setup: Fabric or NeoForge. Install the matching PulseLib artifact using [Installation](installation.md).
 
 ## Integration order
 

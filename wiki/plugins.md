@@ -1,6 +1,6 @@
 # Automatic PulseLib plugins
 
-The Minecraft 26.1.2 MultiLoader branch uses the public plugin API from `1.21.1-multiloader`. Both Fabric and NeoForge discover plugins and route their lifecycle through shared Common services.
+Minecraft 26.2 MultiLoader uses the shared PulseLib plugin API. Both Fabric and NeoForge discover plugins and route their lifecycle through shared Common services.
 
 A public annotated class with a public no-argument constructor is discovered automatically among installed mods. Register ordinary Minecraft blocks, items and entities with the loader; declare PulseLib extensions through plugin callbacks.
 

@@ -8,21 +8,21 @@ First-person arm attachments are rendered only by PulseLib's opt-in player-anima
 
 Important classes:
 
-* [`PLivingAttachmentDefinition`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentDefinition.java)
-* [`PLivingAttachments`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachments.java)
-* [`PLivingAttachmentSource`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentSource.java)
-* [`PLivingAttachmentSources`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentSources.java)
-* [`PAttachmentBinding`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentBinding.java)
-* [`PAttachmentAnchor`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentAnchor.java)
-* [`PAttachmentAnchorResolvers`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentAnchorResolvers.java)
-* [`PTransform`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PTransform.java)
-* [`PHumanoidAnchors`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidAnchors.java)
-* [`PHumanoidBindings`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidBindings.java)
-* [`PLivingAttachmentLayer`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentLayer.java)
-* [`PHumanoidAttachmentLayer`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidAttachmentLayer.java)
-* [`PArmorClientExtensions`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/neoforge/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PArmorClientExtensions.java)
+* [`PLivingAttachmentDefinition`](../common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentDefinition.java)
+* [`PLivingAttachments`](../common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachments.java)
+* [`PLivingAttachmentSource`](../common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentSource.java)
+* [`PLivingAttachmentSources`](../common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentSources.java)
+* [`PAttachmentBinding`](../common/src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentBinding.java)
+* [`PAttachmentAnchor`](../common/src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentAnchor.java)
+* [`PAttachmentAnchorResolvers`](../common/src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentAnchorResolvers.java)
+* [`PTransform`](../common/src/main/java/com/arcanc/pulselib/util/attachments/PTransform.java)
+* [`PHumanoidAnchors`](../common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidAnchors.java)
+* [`PHumanoidBindings`](../common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidBindings.java)
+* [`PLivingAttachmentLayer`](../common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingAttachmentLayer.java)
+* [`PHumanoidAttachmentLayer`](../common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidAttachmentLayer.java)
+* [`PArmorClientExtensions`](../neoforge/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PArmorClientExtensions.java)
 
-PulseLib adds attachment render layers for players and living entities automatically through [`PLibArmorHandler`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PLibArmorHandler.java). Attachment definitions are contributed through [`IPulseClientPlugin.registerAttachments(PAttachmentRegistrar)`](plugins.md).
+PulseLib adds attachment render layers for players and living entities automatically through [`PLibArmorHandler`](../common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/armor/PLibArmorHandler.java). Attachment definitions are contributed through [`IPulseClientPlugin.registerAttachments(PAttachmentRegistrar)`](plugins.md).
 
 Before registering an attachment definition, register its model and material texture references in `IPulseClientPlugin.registerModels(PModelRegistrar)`; otherwise that model is not loaded. See [Resources](resources.md#register-model-resources).
 
@@ -107,7 +107,7 @@ registrar.registerGlobalLiving(new PLivingAttachmentDefinition(
 
 ## Humanoid anchors
 
-Built-in anchors from [`PHumanoidAnchors`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidAnchors.java):
+Built-in anchors from [`PHumanoidAnchors`](../common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidAnchors.java):
 
 * `HEAD`
 * `HAT`
@@ -117,7 +117,7 @@ Built-in anchors from [`PHumanoidAnchors`](https://github.com/ArcAnc/PulseLib/bl
 * `RIGHT_LEG`
 * `LEFT_LEG`
 
-Use [`PHumanoidBindings`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidBindings.java) for common bindings:
+Use [`PHumanoidBindings`](../common/src/main/java/com/arcanc/pulselib/util/attachments/humanoid/PHumanoidBindings.java) for common bindings:
 
 ```java
 PHumanoidBindings.head("helmet");
@@ -130,7 +130,7 @@ Use `PHumanoidBindings.bind(anchor, bone, transform)` when you need offset, rota
 
 ## Custom anchors
 
-Register anchors for custom vanilla `EntityModel` classes through [`PAttachmentAnchorResolvers`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentAnchorResolvers.java):
+Register anchors for custom vanilla `EntityModel` classes through [`PAttachmentAnchorResolvers`](../common/src/main/java/com/arcanc/pulselib/util/attachments/PAttachmentAnchorResolvers.java):
 
 ```java
 public static final PAttachmentAnchor SHELL =
@@ -145,7 +145,7 @@ public static void registerAnchors()
 
 ## Custom mesh rendering
 
-Each definition takes a [`PLivingMeshRenderResolver`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingMeshRenderResolver.java). The resolver receives the living entity, stack, baked bone, baked mesh, inherited render context, and partial tick.
+Each definition takes a [`PLivingMeshRenderResolver`](../common/src/main/java/com/arcanc/pulselib/util/attachments/PLivingMeshRenderResolver.java). The resolver receives the living entity, stack, baked bone, baked mesh, inherited render context, and partial tick.
 
 ```java
 PLivingMeshRenderResolver resolver = (entity, stack, bone, mesh, inherited, partialTick) ->
@@ -184,6 +184,6 @@ The provider above illustrates sampling a controller; creating it on every extra
 
 PulseLib installs compatible living/player layers on both loaders and extracts attachment entries into the native living render state. Bone matrices and render inputs are captured when queued; later controller mutations do not change matrices already submitted. Do not treat the returned controller collection as an immutable extraction snapshot or manually invoke a second automatic attachment pass.
 
-`PArmorModelProvider` remains the shared customization point for armor models. On NeoForge, automatic client-extension registration preserves an item's existing external extension. When a mod explicitly composes its own extension, use `PArmorClientExtensions.buildFor(item, base)` to preserve unrelated font, arm, overlay, tint and other native callbacks. Use the shared provider for PulseLib model selection; native equipment queries now use `EquipmentClientInfo.LayerType`.
+`PArmorModelProvider` remains the shared customization point for armor models. On NeoForge, automatic client-extension registration preserves an item's existing external extension. When a mod explicitly composes its own extension, use `PArmorClientExtensions.buildFor(item, base)` to preserve unrelated font, arm, overlay, tint and other native callbacks. Use the shared provider for PulseLib model selection. Native equipment queries use `EquipmentClientInfo.LayerType`. The renderer captures the hidden-slot decision for each wearer and freezes shared model geometry for each deferred draw.
 
 The old BEWLR `getCustomRenderer()` integration is retired. The legacy dimension-only `renderHelmetOverlay(...)` overload is a deprecated no-op; implement the native `renderFirstPersonOverlay` callback with `GuiGraphicsExtractor` in a NeoForge extension when an overlay is required.

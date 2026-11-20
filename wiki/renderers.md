@@ -1,10 +1,10 @@
 # Renderers
 
-Examples on this page use `Identifier` from `net.minecraft.resources`, `RenderType` from `net.minecraft.client.renderer.rendertype`, and the state interfaces in `com.arcanc.pulselib.content.renderer.base`.
+Examples on this page use `Identifier` from `net.minecraft.resources`, `RenderType` from `net.minecraft.client.renderer.rendertype`, and PulseLib state interfaces from `com.arcanc.pulselib.content.renderer.base`. Import `CameraRenderState` from `net.minecraft.client.renderer.state.level` for submit hooks.
 
 A PulseLib renderer is the bridge between Minecraft's render call and PulseLib's baked animated model. It gets the current animatable, asks for model data, binds the animation manager to the baked model, and submits every posed bone to the render queue.
 
-All built-in renderers implement [`PRenderer`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderer.java) and use the same submit lifecycle:
+All built-in renderers implement [`PRenderer`](../common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderer.java) and use the same submit lifecycle:
 
 * `preSubmit(...)` - hook before PulseLib submits model meshes.
 * `trueSubmit(...)` - default PulseLib model submission.
@@ -18,7 +18,7 @@ The built-in entity, block entity, and item renderers prepare a Molang context o
 
 ## Block renderer
 
-Use [`PBlockRenderer`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PBlockRenderer.java) for block entities. The block itself should hide vanilla rendering; the block entity renderer becomes the visible model.
+Use [`PBlockRenderer`](../common/src/main/java/com/arcanc/pulselib/content/renderer/PBlockRenderer.java) for block entities. The block itself should hide vanilla rendering; the block entity renderer becomes the visible model.
 
 ```java
 public class CrusherRenderer extends PBlockRenderer<CrusherBlockEntity, CrusherRenderState>
@@ -62,7 +62,7 @@ BlockEntityRendererRegistry.register(MyBlockEntities.CRUSHER.get(), CrusherRende
 
 ## Item renderer
 
-Use [`PItemRenderer`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java) when the item model needs real animation instead of a static baked item JSON. The item must implement [`PAnimatable`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimatable.java).
+Use [`PItemRenderer`](../common/src/main/java/com/arcanc/pulselib/content/renderer/PItemRenderer.java) when the item model needs real animation instead of a static baked item JSON. The item must implement [`PAnimatable`](../common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimatable.java).
 
 ```java
 public class WandRenderer extends PItemRenderer<WandItem, WandRenderState>
@@ -91,7 +91,7 @@ In GUI context, `PItemRenderer` executes in an isolated local scope and flushes 
 
 ## Entity renderer
 
-Use [`PEntityRenderer`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java) when the entire entity model is a PulseLib model.
+Use [`PEntityRenderer`](../common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java) when the entire entity model is a PulseLib model.
 
 ```java
 public class RobotRenderer extends PEntityRenderer<RobotEntity, PEntityRenderState.LivingImpl<RobotEntity>>
@@ -115,7 +115,7 @@ For `LivingEntity` subclasses, `PEntityRenderer` applies vanilla body rotation, 
 
 ## Render type requirement
 
-PulseLib models are triangle meshes. Use [`PRenderTypes.RenderTypeProvider`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java):
+PulseLib models are triangle meshes. Use [`PRenderTypes.RenderTypeProvider`](../common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java):
 
 ```java
 PRenderTypes.RenderTypeProvider::trianglesSolid
@@ -125,4 +125,4 @@ PRenderTypes.RenderTypeProvider::trianglesTranslucent
 
 These are the queued variants used by all three renderer classes, including `PItemRenderer` in GUI display context. `trianglesGui` is an instant-rendering compatibility alias and is not compatible with the instanced queue. Do not pass vanilla entity/block `RenderType` values unless they use a compatible triangle vertex format and shader setup.
 
-The renderer APIs use 26.1.2 render states and `SubmitNodeCollector`; the old `MultiBufferSource`/`BlockEntityWithoutLevelRenderer` examples do not apply to this branch.
+Renderer hooks use Minecraft 26.2 render states and `SubmitNodeCollector`. Capture the inputs needed by deferred draws during submission.

@@ -4,10 +4,10 @@ An animatable is any object that can provide animation state to a PulseLib rende
 
 Animation state is built around:
 
-* [`PAnimatable`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimatable.java)
-* [`PAnimationManager`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimationManager.java)
-* [`PAnimationController`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimationController.java)
-* [`PRawAnimation`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/animation/PRawAnimation.java)
+* [`PAnimatable`](../common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimatable.java)
+* [`PAnimationManager`](../common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimationManager.java)
+* [`PAnimationController`](../common/src/main/java/com/arcanc/pulselib/content/animatable/PAnimationController.java)
+* [`PRawAnimation`](../common/src/main/java/com/arcanc/pulselib/content/model/animation/PRawAnimation.java)
 
 ## PAnimatable
 
@@ -49,9 +49,9 @@ public class ExampleEntity extends PathfinderMob implements PAnimatable<ExampleE
 
 Entities and block entities are real world instances, so they can usually keep one manager field. Items are different: there is one `Item` object for many `ItemStack`s, so PulseLib uses keys to separate stack animation state.
 
-[`PLibHelper.createManager`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/util/helpers/PLibHelper.java) chooses instance managers for entities and block entities, and singleton managers for other animatables.
+[`PLibHelper.createManager`](../common/src/main/java/com/arcanc/pulselib/util/helpers/PLibHelper.java) chooses instance managers for entities and block entities, and singleton managers for other animatables.
 
-For items, use [`SingletonAnimationManager.getManager`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/singleton/SingletonAnimationManager.java) with the key passed by the renderer:
+For items, use [`SingletonAnimationManager.getManager`](../common/src/main/java/com/arcanc/pulselib/content/animatable/singleton/SingletonAnimationManager.java) with the key passed by the renderer:
 
 ```java
 @Override
@@ -61,7 +61,7 @@ public PAnimationManager<ExampleItem> getAnimationManager(AnimManagerKey key)
 }
 ```
 
-[`AnimManagerKey`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/AnimManagerKey.java) can derive keys from `ItemStack`, `Entity`, `BlockEntity`, or an arbitrary object.
+[`AnimManagerKey`](../common/src/main/java/com/arcanc/pulselib/content/animatable/AnimManagerKey.java) can derive keys from `ItemStack`, `Entity`, `BlockEntity`, or an arbitrary object.
 
 ## PRawAnimation
 
@@ -118,11 +118,11 @@ private static final PRawAnimation FAST_OPEN = PRawAnimation.begin().
 		build();
 ```
 
-Built-in interpolation types are defined in [`PInterpolationType`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/animation/PInterpolationType.java): `LINEAR`, `CATMULLROM`, `BEZIER`, `STEP`.
+Built-in interpolation types are defined in [`PInterpolationType`](../common/src/main/java/com/arcanc/pulselib/content/model/animation/PInterpolationType.java): `LINEAR`, `CATMULLROM`, `BEZIER`, `STEP`.
 
 ## Controller state handler
 
-A controller owns one active `PRawAnimation` at a time. Think of the state handler as the current animation rule. It is called while ticking, checks the animatable's current state, and returns [`ControllerState`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/animatable/ControllerState.java).
+A controller owns one active `PRawAnimation` at a time. Think of the state handler as the current animation rule. It is called while ticking, checks the animatable's current state, and returns [`ControllerState`](../common/src/main/java/com/arcanc/pulselib/content/animatable/ControllerState.java).
 
 ```java
 registrar.add("attack", () -> state ->

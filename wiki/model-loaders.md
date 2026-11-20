@@ -1,10 +1,10 @@
 # Model Loaders
 
-[`PModelLoader`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/data/PModelLoader.java) resolves a registered canonical model ID into physical resources, parses the selected source, and returns a [`PLoadedModel`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/data/PLoadedModel.java). [`PModelCache`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/util/PModelCache.java) bakes and keys models by canonical ID.
+[`PModelLoader`](../common/src/main/java/com/arcanc/pulselib/data/PModelLoader.java) resolves a registered canonical model ID into physical resources, parses the selected source, and returns a [`PLoadedModel`](../common/src/main/java/com/arcanc/pulselib/data/PLoadedModel.java). [`PModelCache`](../common/src/main/java/com/arcanc/pulselib/util/PModelCache.java) bakes and keys models by canonical ID.
 
 ## Built-in glTF loader
 
-[`PGltfModelLoader`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/data/gltf/PGltfModelLoader.java) is registered by default. `PModelData.entity(examplemod:robot)` has the canonical ID `examplemod:entity/robot`; the loader resolves it in this order:
+[`PGltfModelLoader`](../common/src/main/java/com/arcanc/pulselib/data/gltf/PGltfModelLoader.java) is registered by default. `PModelData.entity(examplemod:robot)` has the canonical ID `examplemod:entity/robot`; the loader resolves it in this order:
 
 ```text
 assets/examplemod/glmodels/entity/robot.glb
@@ -15,7 +15,7 @@ The loaded representation is private to the loader. Replacing the GLB with a glT
 
 ## Gecko loader
 
-[`PGeckoModelLoader`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/data/gecko/PGeckoModelLoader.java) is also built in. A canonical ID such as `examplemod:entity/robot` resolves to:
+[`PGeckoModelLoader`](../common/src/main/java/com/arcanc/pulselib/data/gecko/PGeckoModelLoader.java) is also built in. A canonical ID such as `examplemod:entity/robot` resolves to:
 
 ```text
 assets/examplemod/geckolib/models/entity/robot.geo.json

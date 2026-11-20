@@ -1,6 +1,6 @@
 # Entity Render Layers
 
-[`PEntityRenderLayer`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderLayer.java) renders an additional PulseLib model on top of a [`PEntityRenderer`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java).
+[`PEntityRenderLayer`](../common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderLayer.java) renders an additional PulseLib model on top of a [`PEntityRenderer`](../common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderer.java).
 
 Layers are useful for armor pieces, equipment, accessories, conditional attachments, or model variants. The layer and its parent renderer must use the same native render-state type. Owner-based hooks remain available; state overloads let a custom state provide captured appearance data. Resolve inputs before creating deferred collector callbacks.
 
@@ -93,7 +93,7 @@ The default layer resolver applies these hooks through `PMeshRenderContext.withC
 
 Classes used:
 
-* [`PEntityRenderLayer`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderLayer.java)
+* [`PEntityRenderLayer`](../common/src/main/java/com/arcanc/pulselib/content/renderer/PEntityRenderLayer.java)
 * [`PModelData.entityLayer(...)`](modeldata.md)
-* [`PBakedBone`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java)
-* [`PBakedMesh`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedMesh.java)
+* [`PBakedBone`](../common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedBone.java)
+* [`PBakedMesh`](../common/src/main/java/com/arcanc/pulselib/content/model/baked/PBakedMesh.java)

@@ -1,6 +1,6 @@
 # Render Types and Queue
 
-PulseLib models are triangle meshes. [`PRenderTypes`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java) supplies their native render pipelines and material states; [`PRenderQueue`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java) compiles captured submissions and executes them through the shared GPU backend.
+PulseLib models are triangle meshes. [`PRenderTypes`](../common/src/main/java/com/arcanc/pulselib/util/PRenderTypes.java) supplies their native render pipelines and material states; [`PRenderQueue`](../common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderQueue.java) compiles captured submissions and executes them through the shared GPU backend.
 
 ## Choosing a render type
 
@@ -27,17 +27,13 @@ A blended material and an OIT submission are separate choices. `PTransparencyMod
 
 Overloads without a policy default to OIT for the two supported queued translucent pipelines and to ordinary rendering for other types. Living attachments and player effects may explicitly use ordinary alpha even with a translucent material. Custom transparent types are not automatically OIT-enabled; explicitly requesting OIT for an unsupported type is rejected.
 
-OIT also needs a suitable depth target and driver support. Unsupported execution uses ordinary sorted alpha. The current implementation keeps four depth layers and composites them into the appropriate native targets. The native `Improved Transparency` option changes the target layout and composition route; it does not change which material a renderer requests.
+World OIT requires an opaque depth attachment with the same dimensions as the color target. The compositor keeps four peeled layers and uses Minecraft’s active transparency targets. GUI and offscreen scopes flush local transparency using sorted alpha.
 
 ## Pipeline contract
 
-Minecraft's native type is `net.minecraft.client.renderer.rendertype.RenderType`. A compatible custom type needs:
+Minecraft's native type is `net.minecraft.client.renderer.rendertype.RenderType`. Use the built-in factories for PulseLib draws on both OpenGL and Vulkan. They select `PrimitiveTopology.TRIANGLES`, `POSITION_TEX_NORMAL`, the matching `InstanceData` or `ColorOverlay` binding, and the appropriate blend, depth and target state. The native executors select supported pipeline variants by their registered identities. Matching the mesh layout alone does not establish support for a custom pipeline. [Shaders](shaders.md)
 
-* `VertexFormat.Mode.TRIANGLES` and `PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL`.
-* A shader that reads the queued instance attributes or the instant per-draw inputs appropriate to the caller.
-* A native `RenderSetup` / `RenderPipeline` with the intended blend, depth and target state.
-
-Vanilla block/entity pipelines usually use different mesh layouts and cannot consume PulseLib instances correctly. `RenderPipeline.getColorTargetState().blendFunction()` exposes the native `Optional<BlendFunction>`. The internal `PRenderTypes.getTransparencyState(...)` / `isTransparent(...)` helpers use that same material state. Neither alone determines OIT policy. See [Shaders](shaders.md) for the vertex and per-draw inputs.
+`RenderPipeline.getColorTargetState().blendFunction()` exposes the native blend state. `PRenderTypes.getTransparencyState(...)` and `isTransparent(...)` use that state. OIT policy is selected separately at submission.
 
 ## Queue stages and scopes
 
@@ -49,9 +45,9 @@ Vanilla block/entity pipelines usually use different mesh layouts and cannot con
 | `FIRST_PERSON` | Physical left/right first-person item and attachment rendering |
 | `GUI` | Item display context inside an isolated GUI scope |
 
-World hooks flush opaque entity/block geometry after collection, capture native opaque depth, then compile world transparency together after particles. Deferred OIT composition follows the active native transparency/weather route. [`PRenderStagesHandler`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java) contains shared operations; loader adapters and native hooks own their timing. Mods should not install a second set of world flush callbacks.
+The world hooks flush PulseLib depth writers after the native opaque features and capture opaque depth after the native feature batches. After translucent particles they sort ordinary alpha across the world stages and prepare OIT groups. A native framegraph pass inserts the OIT layers into the active transparency route before always-on-top rendering. The loader integration owns these flushes. [World stage handlers](../common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderStagesHandler.java) · [Framegraph pass](../common/src/main/java/com/arcanc/pulselib/content/renderer/PWorldRenderPass.java)
 
-First-person geometry is flushed after the hand pass. GUI and offscreen [`PRenderContexts`](https://github.com/ArcAnc/PulseLib/blob/26.1.2-multiloader/common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderContexts.java) own local compilers and restore captured output state on close. They never consume the world compiler's pending geometry or OIT. Establish local scopes around execution, after selecting output attachments; collector extraction alone does not establish an execution lifetime.
+First-person geometry is flushed after the hand pass. GUI and offscreen [`PRenderContexts`](../common/src/main/java/com/arcanc/pulselib/content/renderer/PRenderContexts.java) own local compilers and restore captured output state on close. They never consume the world compiler's pending geometry or OIT. Establish local scopes around execution, after selecting output attachments; collector extraction alone does not establish an execution lifetime.
 
 ## Manual submission
 
@@ -69,15 +65,15 @@ PRenderQueue.submit(
 
 Portable submissions use `PGeometryData` or `PDynamicGeometry` with a `PInstanceHeader`. Geometry uses the same triangle layout, with unsigned 16-bit or 32-bit indices. Reuse immutable geometry objects so the registry can reuse their arena allocation.
 
-For changing geometry, reuse one `PGlDynamicGeometry` and call `update(PGeometryData)` on the render thread. Queued work resolves that source at execution time; flush before changing its index count or layout. Close caller-owned dynamic sources when finished. Do not pass a retired vanilla `VertexBuffer` to the queue.
+For changing geometry, reuse one `PGlDynamicGeometry` and call `update(PGeometryData)` on the render thread. This compatibility type supplies CPU geometry to the native queue on either backend. Flush before changing the layout or index count of pending geometry. Deferred OIT captures the selected geometry revision when the queue flushes. Close caller-owned sources after their queued work has flushed.
 
 ## Compiled plans and resource ownership
 
 `PFrameCompiler<S>` produces a `PRenderPlan` containing `PPipelineHandle` / `PMeshHandle`, indexed `PDrawCommand` values and packed `PInstanceHeader` data. Combined compilation sorts ordinary transparency across the requested stages and keeps OIT groups separate. `compileOpaque(...)` consumes only opaque submissions.
 
-`PGlMultiDrawExecutor` executes plans using the 26.1 geometry arena, instance streams, indirect submission and OIT implementation. Canonical `legacy.Gl*` classes delegate to this same backend. They do not create another renderer. `PRenderFrame` captures model-view/projection state; an external host can supply its own frame. `PRenderCapabilities` reports pose storage, upload and draw modes independently; CPU pose evaluation can coexist with GPU mesh deformation.
+Built-in queued draws execute through Minecraft’s render hardware interface (RHI) on OpenGL and Vulkan. The executor reads packed plans and uses native indexed instancing for queued geometry. The instant path submits individual native draws. `PRenderFrame` captures model-view and projection state; `PRenderCapabilities` describes storage, upload and submission modes. Classes named `PGl*` and `legacy.Gl*` retain compatibility entry points; the built-in queue owns its RHI resources.
 
-Executor cleanup releases its execution resources. A separately owned `PGlResourceRegistry` retains registered geometry until its own `clear()` or source close; custom hosts must manage both lifetimes. The normal loader reload/disconnect/shutdown integration already owns the library's cleanup.
+The loader integration releases the queue’s GPU resources on reload, disconnect and shutdown. Explicitly managed executors and registries have their own lifetimes. For native backend coverage and the measured cost of ordered alpha draws, see the [26.2 migration validation](../docs/porting/26.2-multiloader.md#этап-8--стабилизация).
 
 ## Renderer hooks
 
