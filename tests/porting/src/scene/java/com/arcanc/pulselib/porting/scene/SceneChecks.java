@@ -80,6 +80,7 @@ public final class SceneChecks
 	public static void recordPlan(PRenderPlan plan,
 			PRhiResourceRegistry resources)
 	{
+		WorldIntegrationChecks.recordPlan(plan);
 		if (plan.instances().stream().anyMatch(instance -> instance.auxiliaryOperationCount() > 0))
 			deformedDraws++;
 		if (!plan.groups().isEmpty())
@@ -92,6 +93,7 @@ public final class SceneChecks
 			return;
 		recordBackend(true);
 		instantExecutions++;
+		WorldIntegrationChecks.recordPlan(plan);
 		if (plan.instances().stream().anyMatch(instance -> instance.auxiliaryOperationCount() > 0))
 			deformedDraws++;
 		lastPipeline = types.apply(plan.groups().getLast().pipeline()).pipeline().getLocation().toString();
@@ -274,7 +276,7 @@ public final class SceneChecks
 				(cutout ? PRenderTypes.RenderTypeProvider.trianglesCutout(texture) : PRenderTypes.RenderTypeProvider.trianglesSolid(texture));
 	}
 
-	private static Identifier texture(Minecraft client, String name, int color)
+	static Identifier texture(Minecraft client, String name, int color)
 	{
 		var id = Identifier.fromNamespaceAndPath("pulselib_client_scene", name);
 		var image = new NativeImage(1, 1, false);

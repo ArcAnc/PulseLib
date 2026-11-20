@@ -92,6 +92,14 @@ public final class PRenderContexts
 		return scope != null && scope.compiler != null ? scope : null;
 	}
 
+	static boolean hasLocalScopes()
+	{
+		for (Scope scope : SCOPES)
+			if (scope.compiler != null)
+				return true;
+		return false;
+	}
+
 	/** Each local scope owns submissions and never drains the world compiler or its pending OIT. */
 	public static final class Scope implements AutoCloseable
 	{
@@ -171,9 +179,11 @@ public final class PRenderContexts
 				finally
 				{
 					SCOPES.pop();
-					if (SCOPES.isEmpty() && this.compiler != null)
-						PRenderQueue.finishLocalFrame();
 					this.closed = true;
+					if (this.context == Context.FIRST_PERSON)
+						PRenderQueue.endFirstPersonFrame();
+					else if (SCOPES.isEmpty() && this.compiler != null)
+						PRenderQueue.finishLocalFrame();
 				}
 			}
 		}

@@ -55,12 +55,18 @@ public final class PRenderQueue
 			Map.of("DeformerOperations", () -> PGpuDeformerBuffers.upload().operations().slice(),
 					"DeformerValues", () -> PGpuDeformerBuffers.upload().values().slice()));
 
-	private static final PRhiOitRenderer OIT_EXECUTOR = new PRhiOitRenderer(
-			RESOURCES::pipeline, RESOURCES::geometryResource,
-			Map.of("DeformerOperations", () -> PGpuDeformerBuffers.upload().operations().slice(),
-					"DeformerValues", () -> PGpuDeformerBuffers.upload().values().slice()));
+	private static final PRhiOitRenderer OIT_EXECUTOR = createOitRenderer();
+	private static final PRhiOitRenderer HAND_OIT_EXECUTOR = createOitRenderer();
 	private static @Nullable TextureTarget worldOpaqueDepth;
 	private static boolean worldDepthValid;
+
+	private static PRhiOitRenderer createOitRenderer()
+	{
+		return new PRhiOitRenderer(
+				RESOURCES::pipeline, RESOURCES::geometryResource,
+				Map.of("DeformerOperations", () -> PGpuDeformerBuffers.upload().operations().slice(),
+						"DeformerValues", () -> PGpuDeformerBuffers.upload().values().slice()));
+	}
 
 	private PRenderQueue()
 	{
@@ -248,8 +254,15 @@ public final class PRenderQueue
 
 	static void finishLocalFrame()
 	{
-		if (COMPILER.isEmpty() && !OIT_EXECUTOR.hasPending())
+		if (!PRenderContexts.hasLocalScopes() && COMPILER.isEmpty() && !OIT_EXECUTOR.hasPending() && !HAND_OIT_EXECUTOR.hasPending())
 			PGpuDeformerBuffers.finishFrame();
+	}
+
+	static void endFirstPersonFrame()
+	{
+		COMPILER.discard(List.of(RenderStage.FIRST_PERSON));
+		HAND_OIT_EXECUTOR.discard();
+		finishLocalFrame();
 	}
 
 	private static RenderStage stage(ItemDisplayContext context)
@@ -276,7 +289,8 @@ public final class PRenderQueue
 		finally
 		{
 			// Native OIT consumes sampled values during the framegraph composite, after afterParticles.
-			PGpuDeformerBuffers.finishFrame();
+			if (!PRenderContexts.hasLocalScopes())
+				PGpuDeformerBuffers.finishFrame();
 		}
 	}
 
@@ -493,7 +507,8 @@ public final class PRenderQueue
 	 */
 	public static void flush(RenderStage stage, RenderTarget depthSource)
 	{
-		executeWorldPlan(COMPILER.compile(stage, PRenderQueue::canBatchWithOit), depthSource);
+		var oit = stage == RenderStage.FIRST_PERSON ? currentOitRenderer() : OIT_EXECUTOR;
+		executePlan(COMPILER.compile(stage, PRenderQueue::canBatchWithOit), depthSource, oit);
 	}
 
 	/** Consumes opaque geometry while retaining transparent submissions for their later pass. */
@@ -528,7 +543,12 @@ public final class PRenderQueue
 	 */
 	public static void compositeTranslucency()
 	{
-		OIT_EXECUTOR.composite();
+		currentOitRenderer().composite();
+	}
+
+	private static PRhiOitRenderer currentOitRenderer()
+	{
+		return PRenderContexts.current() == PRenderContexts.Context.FIRST_PERSON ? HAND_OIT_EXECUTOR : OIT_EXECUTOR;
 	}
 
 	/**
@@ -580,6 +600,11 @@ public final class PRenderQueue
 
 	private static void executeWorldPlan(PRenderPlan plan, RenderTarget depthSource)
 	{
+		executePlan(plan, depthSource, OIT_EXECUTOR);
+	}
+
+	private static void executePlan(PRenderPlan plan, RenderTarget depthSource, PRhiOitRenderer oitRenderer)
+	{
 		if (plan.isEmpty())
 			return;
 		var oit = plan.groups().stream().filter(group -> !group.writeDepth() && RESOURCES.transparency(group.pipeline()) == PTransparencyMode.OIT).toList();
@@ -594,7 +619,7 @@ public final class PRenderQueue
 			if (!ordinary.isEmpty())
 				executeImmediate(new PRenderPlan(ordinary, plan.instances()), frame);
 			if (!oit.isEmpty())
-				OIT_EXECUTOR.execute(new PRenderPlan(oit, plan.instances()), frame);
+				oitRenderer.execute(new PRenderPlan(oit, plan.instances()), frame);
 		}
 		finally
 		{
@@ -609,13 +634,27 @@ public final class PRenderQueue
 	public static void cleanUp()
 	{
 		COMPILER.clear();
+		var depth = worldOpaqueDepth;
+		worldOpaqueDepth = null;
+		worldDepthValid = false;
 		try
 		{
-			OIT_EXECUTOR.cleanup();
-			if (worldOpaqueDepth != null)
-				worldOpaqueDepth.destroyBuffers();
-			worldOpaqueDepth = null;
-			worldDepthValid = false;
+			try
+			{
+				OIT_EXECUTOR.cleanup();
+			}
+			finally
+			{
+				try
+				{
+					HAND_OIT_EXECUTOR.cleanup();
+				}
+				finally
+				{
+					if (depth != null)
+						depth.destroyBuffers();
+				}
+			}
 		}
 		finally
 		{

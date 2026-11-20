@@ -10,12 +10,15 @@
 package com.arcanc.pulselib.content.mixin;
 
 import com.arcanc.pulselib.content.renderer.PRenderContexts;
-import com.arcanc.pulselib.content.renderer.legacy.GlRenderState;
+import com.arcanc.pulselib.content.renderer.rhi.PRhiRenderState;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.render.DynamicAtlasAllocator;
 import net.minecraft.client.gui.render.GuiItemAtlas;
+import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.item.TrackingItemStackRenderState;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -33,6 +36,14 @@ public abstract class GuiItemAtlasMixin
 	@Final
 	private PoseStack poseStack;
 
+	@Shadow
+	@Final
+	private SubmitNodeStorage submitNodeStorage;
+
+	@Shadow
+	@Final
+	private DynamicAtlasAllocator<Object> allocator;
+
 	@Unique
 	private PRenderContexts.@Nullable Scope pulselib$scope;
 
@@ -43,30 +54,48 @@ public abstract class GuiItemAtlasMixin
 		int depth = ((PoseStackAccessor)this.poseStack).pulselib$getDepth();
 		PoseStack.Pose pose = this.poseStack.last().copy();
 		this.pulselib$scope = null;
-		try (var caller = new GlRenderState())
+		try (var caller = new PRhiRenderState())
 		{
 			try
 			{
 				original.call(x, y, clear, item);
+				if (this.pulselib$scope != null)
+					this.pulselib$scope.close();
 			}
 			catch (RuntimeException | Error failure)
 			{
-				if (this.pulselib$scope != null)
-					this.pulselib$scope.discard();
-				while (((PoseStackAccessor)this.poseStack).pulselib$getDepth() > depth)
-					this.poseStack.popPose();
-				this.poseStack.last().set(pose);
-				throw failure;
-			}
-			finally
-			{
-				if (this.pulselib$scope != null)
-					this.pulselib$scope.close();
+				this.submitNodeStorage.getSubmitsPerOrder().clear();
+				try (var scope = this.pulselib$scope)
+				{
+					if (scope != null)
+						scope.discard();
+					while (((PoseStackAccessor)this.poseStack).pulselib$getDepth() > depth)
+						this.poseStack.popPose();
+					this.poseStack.last().set(pose);
+					throw failure;
+				}
 			}
 		}
 		finally
 		{
 			this.pulselib$scope = previous;
+		}
+	}
+
+	/** An aborted draw must be retried as a stale slot, including its color/depth clear. */
+	@WrapMethod(method = "getOrUpdate")
+	private GuiItemAtlas.@Nullable SlotView pulselib$releaseFailedSlot(TrackingItemStackRenderState item,
+			Operation<GuiItemAtlas.@Nullable SlotView> original)
+	{
+		try
+		{
+			return original.call(item);
+		}
+		catch (RuntimeException | Error failure)
+		{
+			Object key = item.getModelIdentity();
+			((DynamicAtlasAllocatorAccessor)(Object)this.allocator).pulselib$freeSlotIf((candidate, slot) -> key.equals(candidate));
+			throw failure;
 		}
 	}
 

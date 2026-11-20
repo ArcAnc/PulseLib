@@ -22,6 +22,7 @@
     "GameRendererMixin",
     "PictureInPictureRendererMixin",
     "GuiItemAtlasMixin",
+    "DynamicAtlasAllocatorAccessor",
     "GuiGraphicsExtractorAccessor",
     "PoseStackAccessor",
     "FeatureRenderDispatcherMixin",

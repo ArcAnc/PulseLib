@@ -24,6 +24,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LevelTargetBundle;
 import net.minecraft.client.renderer.PostChain;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
@@ -52,7 +53,7 @@ public abstract class LevelRendererMixin
 
 	@Shadow
 	@Final
-	private LevelRenderState levelRenderState;
+	private SubmitNodeStorage submitNodeStorage;
 
 	@Shadow
 	@Final
@@ -63,6 +64,9 @@ public abstract class LevelRendererMixin
 
 	@Unique
 	private boolean pulselib$modelViewPushed;
+
+	@Unique
+	private boolean pulselib$needsTransparencyTargets;
 
 	@WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix4fStack;pushMatrix()Lorg/joml/Matrix4fStack;"))
 	private Matrix4fStack pulselib$captureWorldMatrix(Matrix4fStack stack, Operation<Matrix4fStack> original)
@@ -120,8 +124,14 @@ public abstract class LevelRendererMixin
 			{
 				original.call(resources, delta, outline, camera, modelView, fog, fogColor, sky);
 			}
+			catch (RuntimeException | Error failure)
+			{
+				this.submitNodeStorage.getSubmitsPerOrder().clear();
+				throw failure;
+			}
 			finally
 			{
+				this.pulselib$needsTransparencyTargets = false;
 				try
 				{
 					try
@@ -149,11 +159,18 @@ public abstract class LevelRendererMixin
 		}
 	}
 
+	/** Minecraft consumes the owner lists before it chooses the native transparency chain. */
+	@Inject(method = "submitFeatures", at = @At("HEAD"))
+	private void pulselib$captureTransparencyEligibility(LevelRenderState state, SubmitNodeCollector collector, boolean outline, CallbackInfo callback)
+	{
+		this.pulselib$needsTransparencyTargets = PWorldRenderPass.requiresSeparateTargets(state);
+	}
+
 	/** Reuse the host's pooled targets and postchain without changing the extracted graphics option. */
 	@Inject(method = "getTransparencyChain", at = @At("RETURN"), cancellable = true)
 	private void pulselib$retainNativeTransparency(CallbackInfoReturnable<@Nullable PostChain> callback)
 	{
-		if (callback.getReturnValue() != null || !PWorldRenderPass.requiresSeparateTargets(this.levelRenderState))
+		if (callback.getReturnValue() != null || !this.pulselib$needsTransparencyTargets)
 			return;
 		callback.setReturnValue(PLibRenderHelper.mc().getShaderManager().getPostChain(
 				TRANSPARENCY_POST_CHAIN_ID, LevelTargetBundle.SORTING_TARGETS));

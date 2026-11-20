@@ -11,6 +11,7 @@ package com.arcanc.pulselib.porting.scene.mixin;
 
 import com.arcanc.pulselib.content.renderer.PRenderStagesHandler;
 import com.arcanc.pulselib.porting.scene.WorldChecks;
+import com.arcanc.pulselib.porting.scene.WorldIntegrationChecks;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -24,5 +25,18 @@ public abstract class WorldStageObserver
 	private static void scene$world(CallbackInfo callback)
 	{
 		WorldChecks.submit();
+		WorldIntegrationChecks.afterNative();
+	}
+
+	@Inject(method = "afterOpaqueFeatures", at = @At("RETURN"))
+	private static void scene$afterOpaque(CallbackInfo callback)
+	{
+		WorldIntegrationChecks.afterOpaque();
+	}
+
+	@Inject(method = "afterParticles", at = @At("RETURN"))
+	private static void scene$afterParticles(CallbackInfo callback)
+	{
+		WorldIntegrationChecks.afterParticles();
 	}
 }

@@ -30,6 +30,7 @@ public final class PRhiRenderState implements AutoCloseable
 	private final @Nullable GpuTextureView depthAttachment;
 	private final GpuBufferSlice projection = RenderSystem.getProjectionMatrixBuffer();
 	private final ProjectionType projectionType = RenderSystem.getProjectionType();
+	private final @Nullable GpuBufferSlice lights = RenderSystem.getShaderLights();
 	private final Matrix4f modelView = RenderSystem.getModelViewMatrixCopy();
 	private final PRhiPassState.Scissor scissor = PRhiPassState.Scissor.copyOf(RenderSystem.getScissorStateForRenderTypeDraws());
 
@@ -65,6 +66,7 @@ public final class PRhiRenderState implements AutoCloseable
 		RenderSystem.outputColorTextureOverride = this.colorOverride;
 		RenderSystem.outputDepthTextureOverride = this.depthOverride;
 		RenderSystem.setProjectionMatrix(this.projection, this.projectionType);
+		RenderSystem.setShaderLights(this.lights);
 		RenderSystem.getModelViewStack().set(this.modelView);
 		restoreScissor();
 	}

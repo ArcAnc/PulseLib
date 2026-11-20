@@ -184,20 +184,32 @@ public abstract class PEntityRenderer<T extends Entity & PAnimatable<T>, RS exte
 	@Override
 	public void submit(RS renderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState)
 	{
-		super.submit(renderState, poseStack, submitNodeCollector, cameraRenderState);
+		try (var scope = PRenderContexts.enterEntity())
+		{
+			try
+			{
+				super.submit(renderState, poseStack, submitNodeCollector, cameraRenderState);
 
-		preSubmit(poseStack, renderState, cameraRenderState, submitNodeCollector);
-		poseStack.pushPose();
-		try
-		{
-			poseStack.mulPose(Axis.YP.rotationDegrees(180));
-			trueSubmit(poseStack, renderState, cameraRenderState, submitNodeCollector);
+				preSubmit(poseStack, renderState, cameraRenderState, submitNodeCollector);
+				poseStack.pushPose();
+				try
+				{
+					poseStack.mulPose(Axis.YP.rotationDegrees(180));
+					trueSubmit(poseStack, renderState, cameraRenderState, submitNodeCollector);
+				}
+				finally
+				{
+					poseStack.popPose();
+				}
+				postSubmit(poseStack, renderState, cameraRenderState, submitNodeCollector);
+			}
+			catch (RuntimeException | Error failure)
+			{
+				if (scope != null)
+					scope.discard();
+				throw failure;
+			}
 		}
-		finally
-		{
-			poseStack.popPose();
-		}
-		postSubmit(poseStack, renderState, cameraRenderState, submitNodeCollector);
 	}
 
 	/**

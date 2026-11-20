@@ -149,18 +149,30 @@ public abstract class PBlockRenderer<T extends BlockEntity & PAnimatable<T>, RS 
 	                   SubmitNodeCollector submitNodeCollector,
 	                   CameraRenderState cameraRenderState)
 	{
-		poseStack.pushPose();
-		try
+		try (var scope = PRenderContexts.enterEntity())
 		{
-			poseStack.translate(0.5f, 0, 0.5f);
-			tryRotateToRealRotation(poseStack, getAnimatableFacing(renderState));
-			preSubmit(poseStack, renderState, cameraRenderState, submitNodeCollector);
-			trueSubmit(poseStack, renderState, cameraRenderState, submitNodeCollector);
-			postSubmit(poseStack, renderState, cameraRenderState, submitNodeCollector);
-		}
-		finally
-		{
-			poseStack.popPose();
+			try
+			{
+				poseStack.pushPose();
+				try
+				{
+					poseStack.translate(0.5f, 0, 0.5f);
+					tryRotateToRealRotation(poseStack, getAnimatableFacing(renderState));
+					preSubmit(poseStack, renderState, cameraRenderState, submitNodeCollector);
+					trueSubmit(poseStack, renderState, cameraRenderState, submitNodeCollector);
+					postSubmit(poseStack, renderState, cameraRenderState, submitNodeCollector);
+				}
+				finally
+				{
+					poseStack.popPose();
+				}
+			}
+			catch (RuntimeException | Error failure)
+			{
+				if (scope != null)
+					scope.discard();
+				throw failure;
+			}
 		}
 	}
 

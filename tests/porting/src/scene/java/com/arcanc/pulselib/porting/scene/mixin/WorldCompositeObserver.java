@@ -11,6 +11,9 @@ package com.arcanc.pulselib.porting.scene.mixin;
 
 import com.arcanc.pulselib.content.renderer.rhi.PRhiOitRenderer;
 import com.arcanc.pulselib.porting.scene.WorldChecks;
+import com.arcanc.pulselib.porting.scene.WorldIntegrationChecks;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.textures.GpuTextureView;
 import org.spongepowered.asm.mixin.Mixin;
@@ -49,4 +52,12 @@ public abstract class WorldCompositeObserver
 		WorldChecks.afterComposite();
 	}
 
+	@WrapMethod(method = "composite()V")
+	private void scene$handResolve(Operation<Void> original)
+	{
+		var renderer = (PRhiOitRenderer)(Object)this;
+		boolean pending = renderer.hasPending();
+		original.call();
+		WorldIntegrationChecks.handComposite(pending, renderer.hasPending());
+	}
 }

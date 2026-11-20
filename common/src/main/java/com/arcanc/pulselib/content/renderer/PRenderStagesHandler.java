@@ -12,7 +12,7 @@ package com.arcanc.pulselib.content.renderer;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import net.minecraft.client.Minecraft;
 
-/** Shared 26.1 world-stage operations; loader adapters own event subscription. */
+/** Shared world-stage operations; loader adapters own event subscription. */
 public class PRenderStagesHandler
 {
 	/** Populates world depth before Minecraft copies it into translucent targets. */
@@ -26,6 +26,8 @@ public class PRenderStagesHandler
 	{
 		PRenderQueue.flushOpaque(PRenderQueue.RenderStage.ENTITIES);
 		PRenderQueue.flushOpaque(PRenderQueue.RenderStage.SOLID_BLOCKS);
+		// Ground and fixed items share this stage even when their material writes opaque depth.
+		PRenderQueue.flushOpaque(PRenderQueue.RenderStage.TRANSLUCENT_BLOCKS);
 	}
 
 	/** Captures native depth writers after their batches finish, before terrain and particles. */
