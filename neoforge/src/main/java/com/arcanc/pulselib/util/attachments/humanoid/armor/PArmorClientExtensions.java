@@ -103,7 +103,7 @@ public class PArmorClientExtensions implements IClientItemExtensions
 	@Override
 	public Model<?> getGenericArmorModel(ItemStack stack, EquipmentClientInfo.LayerType type, Model original)
 	{
-		if (PLivingAttachments.hidesVanillaArmor(stack))
+		if (!PArmorModelSnapshots.usesCapturedArmorPolicy(stack) && PLivingAttachments.hidesVanillaArmor(stack))
 			return EMPTY_ARMOR_MODEL;
 		return this.base.getGenericArmorModel(stack, type, original);
 	}
@@ -143,9 +143,9 @@ public class PArmorClientExtensions implements IClientItemExtensions
 	@Override
 	public int getArmorLayerTintColor(ItemStack stack, EquipmentClientInfo.Layer layer, int layerIdx, int fallbackColor)
 	{
-		if (PLivingAttachments.hidesVanillaArmor(stack))
+		if (!PArmorModelSnapshots.usesCapturedArmorPolicy(stack) && PLivingAttachments.hidesVanillaArmor(stack))
 			return 0;
-		return this.base == IClientItemExtensions.DEFAULT ? fallbackColor : this.base.getArmorLayerTintColor(stack, layer, layerIdx, fallbackColor);
+		return this.base.getArmorLayerTintColor(stack, layer, layerIdx, fallbackColor);
 	}
 
 	/** Returns the default dye color selected by the wrapped extension. */

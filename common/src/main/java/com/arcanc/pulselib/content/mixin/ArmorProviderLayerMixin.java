@@ -14,7 +14,6 @@ import com.arcanc.pulselib.content.player.deformer.PPlayerModelGeometry;
 import com.arcanc.pulselib.content.renderer.base.PModelPartSnapshot;
 import com.arcanc.pulselib.content.renderer.base.PRenderCallbackScope;
 import com.arcanc.pulselib.platform.PClientRenderHooks;
-import com.arcanc.pulselib.util.attachments.PLivingAttachments;
 import com.arcanc.pulselib.util.attachments.humanoid.armor.PArmorModelProvider;
 import com.arcanc.pulselib.util.attachments.humanoid.armor.PArmorModelSnapshots;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
@@ -58,6 +57,7 @@ public abstract class ArmorProviderLayerMixin implements PArmorModelSnapshots.La
 	public void pulselib$captureArmorProviders(LivingEntity owner, HumanoidRenderState state, float partialTick,
 			Map<Object, Map<EquipmentSlot, PArmorModelSnapshots.Entry>> entries)
 	{
+		var hidden = ((PArmorModelSnapshots.State)state).pulselib$getHiddenArmor();
 		Map<EquipmentSlot, PArmorModelSnapshots.Entry> slots = new EnumMap<>(EquipmentSlot.class);
 		for (EquipmentSlot slot : List.of(EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.HEAD))
 		{
@@ -69,7 +69,7 @@ public abstract class ArmorProviderLayerMixin implements PArmorModelSnapshots.La
 				case HEAD -> state.headEquipment;
 				default -> ItemStack.EMPTY;
 			};
-			if (!(stack.getItem() instanceof PArmorModelProvider provider) || !HumanoidArmorLayer.shouldRender(stack, slot) || PLivingAttachments.hidesVanillaArmor(stack, slot, owner))
+			if (!(stack.getItem() instanceof PArmorModelProvider provider) || !HumanoidArmorLayer.shouldRender(stack, slot) || (hidden != null && hidden.contains(slot)))
 				continue;
 			var original = this.getArmorModel(state, slot);
 			var type = state.isBaby && state.entityType != EntityTypes.ARMOR_STAND ? EquipmentClientInfo.LayerType.HUMANOID_BABY :
@@ -77,7 +77,7 @@ public abstract class ArmorProviderLayerMixin implements PArmorModelSnapshots.La
 			try (var caller = PModelPartSnapshot.capture(original.root()))
 			{
 				pulselib$setup(original, state);
-				var base = PClientRenderHooks.armorModel(stack, type, original);
+				var base = PArmorModelSnapshots.withCapturedArmor(stack, () -> PClientRenderHooks.armorModel(stack, type, original));
 				var humanoid = base instanceof HumanoidModel<?> model ? model : original;
 				try (var baseCaller = PModelPartSnapshot.capture(humanoid.root()))
 				{
@@ -127,12 +127,18 @@ public abstract class ArmorProviderLayerMixin implements PArmorModelSnapshots.La
 	private void pulselib$submitProvider(PoseStack poses, SubmitNodeCollector collector, ItemStack stack,
 			EquipmentSlot slot, int light, HumanoidRenderState state, Operation<Void> original)
 	{
+		var access = (PArmorModelSnapshots.State)state;
+		var hidden = access.pulselib$getHiddenArmor();
+		if (hidden != null && hidden.contains(slot))
+			return;
 		if (!(stack.getItem() instanceof PArmorModelProvider))
 		{
-			original.call(poses, collector, stack, slot, light, state);
+			if (hidden == null || !HumanoidArmorLayer.shouldRender(stack, slot))
+				original.call(poses, collector, stack, slot, light, state);
+			else
+				PArmorModelSnapshots.withCapturedArmor(stack, () -> original.call(poses, collector, stack, slot, light, state));
 			return;
 		}
-		var access = (PArmorModelSnapshots.State)state;
 		var slots = access.pulselib$getArmorProviders().get(this.pulselib$providerKey);
 		var entry = slots == null ? null : slots.get(slot);
 		if (entry == null)
@@ -141,7 +147,7 @@ public abstract class ArmorProviderLayerMixin implements PArmorModelSnapshots.La
 		access.pulselib$setSubmittingArmorProvider(entry);
 		try (var caller = PRenderCallbackScope.capture(poses, entry.model().root()))
 		{
-			original.call(poses, collector, stack, slot, light, state);
+			PArmorModelSnapshots.withCapturedArmor(stack, () -> original.call(poses, collector, stack, slot, light, state));
 		}
 		finally
 		{

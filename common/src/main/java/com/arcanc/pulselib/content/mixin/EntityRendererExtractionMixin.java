@@ -74,6 +74,8 @@ public abstract class EntityRendererExtractionMixin
 					if (pose != null && !pose.isEmpty())
 						PWorldRenderEligibility.markGeometry();
 				}
+				if (entity instanceof LivingEntity living && state instanceof HumanoidRenderState humanoid && (Object)this instanceof LivingEntityRenderer<?, ?, ?> renderer)
+					PArmorModelSnapshots.capture(living, humanoid, renderer, partialTick);
 				if (state instanceof PPlayerGeometryRenderState geometry)
 				{
 					geometry.pulselib$setPlayerGeometry(null);
@@ -88,8 +90,6 @@ public abstract class EntityRendererExtractionMixin
 				}
 				if (entity instanceof AbstractClientPlayer player && PPlayerAttachmentEligibility.hasRenderer(player, partialTick))
 					PWorldRenderEligibility.markGeometry();
-				if (entity instanceof LivingEntity living && state instanceof HumanoidRenderState humanoid && (Object)this instanceof LivingEntityRenderer<?, ?, ?> renderer)
-					PArmorModelSnapshots.capture(living, humanoid, renderer, partialTick);
 				return state;
 			});
 		}

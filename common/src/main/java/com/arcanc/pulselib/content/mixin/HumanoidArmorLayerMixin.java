@@ -14,7 +14,7 @@ import com.arcanc.pulselib.content.player.deformer.PPlayerGeometryRenderState;
 import com.arcanc.pulselib.content.player.deformer.PPlayerModelGeometry;
 import com.arcanc.pulselib.content.renderer.base.PModelPartSnapshot;
 import com.arcanc.pulselib.platform.PClientRenderHooks;
-import com.arcanc.pulselib.util.attachments.PLivingAttachments;
+import com.arcanc.pulselib.util.attachments.humanoid.armor.PArmorModelSnapshots;
 import com.arcanc.pulselib.util.attachments.humanoid.armor.PArmorModelProvider;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -51,6 +51,7 @@ public abstract class HumanoidArmorLayerMixin implements PPlayerArmorGeometryLay
 	public void pulselib$captureArmorGeometry(Player player, AvatarRenderState state, float partialTick,
 			Map<Object, Map<EquipmentSlot, PPlayerModelGeometry.Entry>> armor)
 	{
+		var hidden = ((PArmorModelSnapshots.State)state).pulselib$getHiddenArmor();
 		for (EquipmentSlot slot : List.of(EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.HEAD))
 		{
 			ItemStack stack = switch (slot)
@@ -61,7 +62,7 @@ public abstract class HumanoidArmorLayerMixin implements PPlayerArmorGeometryLay
 				case HEAD -> state.headEquipment;
 				default -> ItemStack.EMPTY;
 			};
-			if (!HumanoidArmorLayer.shouldRender(stack, slot) || PLivingAttachments.hidesVanillaArmor(stack) || stack.getItem() instanceof PArmorModelProvider)
+			if (!HumanoidArmorLayer.shouldRender(stack, slot) || (hidden != null && hidden.contains(slot)) || stack.getItem() instanceof PArmorModelProvider)
 				continue;
 			HumanoidModel<?> original = this.getArmorModel(state, slot);
 			EquipmentClientInfo.LayerType type = state.isBaby && state.entityType != EntityTypes.ARMOR_STAND ?
@@ -70,7 +71,7 @@ public abstract class HumanoidArmorLayerMixin implements PPlayerArmorGeometryLay
 			try (PModelPartSnapshot caller = PModelPartSnapshot.capture(original.root()))
 			{
 				PPlayerModelGeometry.setup(original, state);
-				Model<?> model = PClientRenderHooks.armorModel(stack, type, original);
+				Model<?> model = PArmorModelSnapshots.withCapturedArmor(stack, () -> PClientRenderHooks.armorModel(stack, type, original));
 				PPlayerModelGeometry.Entry entry = PPlayerModelGeometry.capture(player, state, partialTick, original, model);
 				PPlayerModelGeometry.putArmor(armor, this.pulselib$geometryKey, slot, entry);
 			}

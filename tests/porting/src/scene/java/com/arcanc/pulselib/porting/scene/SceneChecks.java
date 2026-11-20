@@ -81,6 +81,7 @@ public final class SceneChecks
 			PRhiResourceRegistry resources)
 	{
 		WorldIntegrationChecks.recordPlan(plan);
+		PlayerChecks.recordPlan(plan);
 		if (plan.instances().stream().anyMatch(instance -> instance.auxiliaryOperationCount() > 0))
 			deformedDraws++;
 		if (!plan.groups().isEmpty())
@@ -94,6 +95,7 @@ public final class SceneChecks
 		recordBackend(true);
 		instantExecutions++;
 		WorldIntegrationChecks.recordPlan(plan);
+		PlayerChecks.recordPlan(plan);
 		if (plan.instances().stream().anyMatch(instance -> instance.auxiliaryOperationCount() > 0))
 			deformedDraws++;
 		lastPipeline = types.apply(plan.groups().getLast().pipeline()).pipeline().getLocation().toString();

@@ -17,14 +17,30 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
 import java.util.Map;
+import java.util.Set;
 
 @Mixin(HumanoidRenderState.class)
 public abstract class ArmorProviderStateMixin implements PArmorModelSnapshots.State
 {
 	@Unique
+	private @Nullable Set<EquipmentSlot> pulselib$hiddenArmor;
+
+	@Unique
 	private Map<Object, Map<EquipmentSlot, PArmorModelSnapshots.Entry>> pulselib$providers = Map.of();
 	@Unique
 	private PArmorModelSnapshots.@Nullable Entry pulselib$provider;
+
+	@Override
+	public @Nullable Set<EquipmentSlot> pulselib$getHiddenArmor()
+	{
+		return this.pulselib$hiddenArmor;
+	}
+
+	@Override
+	public void pulselib$setHiddenArmor(Set<EquipmentSlot> slots)
+	{
+		this.pulselib$hiddenArmor = slots;
+	}
 
 	@Override
 	public Map<Object, Map<EquipmentSlot, PArmorModelSnapshots.Entry>> pulselib$getArmorProviders()

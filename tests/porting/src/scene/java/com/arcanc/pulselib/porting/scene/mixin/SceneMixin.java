@@ -10,6 +10,7 @@
 package com.arcanc.pulselib.porting.scene.mixin;
 
 import com.arcanc.pulselib.porting.scene.IntegrationChecks;
+import com.arcanc.pulselib.porting.scene.PlayerChecks;
 import com.arcanc.pulselib.porting.scene.SceneChecks;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.GameRenderer;
@@ -26,7 +27,9 @@ public abstract class SceneMixin
 			target = "Lnet/minecraft/client/gui/render/GuiRenderer;endFrame()V"))
 	private void scene$draw(DeltaTracker delta, boolean advance, CallbackInfo callback)
 	{
-		if (Boolean.getBoolean("pulselib.scene.integration"))
+		if (Boolean.getBoolean("pulselib.scene.player"))
+			PlayerChecks.tick();
+		else if (Boolean.getBoolean("pulselib.scene.integration"))
 			IntegrationChecks.tick();
 		else if (Boolean.getBoolean("pulselib.scene.world"))
 			com.arcanc.pulselib.porting.scene.WorldChecks.tick();
