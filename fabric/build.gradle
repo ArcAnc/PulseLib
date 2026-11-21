@@ -4,6 +4,8 @@ plugins {
     id 'multiloader-publishing'
 }
 
+apply from: rootProject.file('testmod/source-set.gradle')
+
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
     implementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
@@ -17,8 +19,19 @@ dependencies {
 
 loom {
     accessWidenerPath = file("src/main/resources/pulselib.accesswidener")
+    mods {
+        pulselib { sourceSet sourceSets.main }
+        pulselib_test { sourceSet sourceSets.testmod }
+    }
     runs {
         client { client(); configName = 'Fabric Client (PulseLib)'; ideConfigGenerated true; runDir 'runs/client' }
+        testClient {
+            client()
+            source sourceSets.testmod
+            configName = 'Fabric Test Client (PulseLib)'
+            ideConfigGenerated true
+            runDir 'runs/testmod'
+        }
         server { server(); configName = 'Fabric Server (PulseLib)'; ideConfigGenerated true; runDir 'runs/server' }
     }
 }

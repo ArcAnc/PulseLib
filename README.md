@@ -27,6 +27,8 @@ Welcome to our [Wiki][wiki]
 
 Release changes are listed in the [changelog](changelog.md).
 
+[Run the test mod](testmod/README.md) to check animation and rendering on Fabric or NeoForge.
+
 ### Maven
 
 You can find Maven setup details in the [installation guide](wiki/installation.md).

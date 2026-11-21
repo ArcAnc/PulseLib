@@ -4,9 +4,15 @@ plugins {
     id 'multiloader-publishing'
 }
 
+apply from: rootProject.file('testmod/source-set.gradle')
+
 neoForge {
     version = neo_version
     accessTransformers.from rootProject.file('common/src/main/resources/META-INF/accesstransformer.cfg')
+    mods {
+        pulselib { sourceSet sourceSets.main }
+        pulselib_test { sourceSet sourceSets.testmod }
+    }
     runs {
         client {
             client()
@@ -21,14 +27,17 @@ neoForge {
             programArguments.addAll '--mod', mod_id, '--all', '--output',
                     file('src/generated/resources/').absolutePath, '--existing', file('src/main/resources/').absolutePath
         }
+        testClient {
+            client()
+            sourceSet = sourceSets.testmod
+            gameDirectory = project.file('runs/testmod')
+        }
         configureEach {
+            loadedMods.set(name == 'testClient' ? [mods.pulselib, mods.pulselib_test] : [mods.pulselib])
             ideName = "NeoForge ${it.name.capitalize()} (PulseLib)"
             systemProperty 'forge.logging.markers', 'REGISTRIES'
             logLevel = org.slf4j.event.Level.DEBUG
         }
-    }
-    mods {
-        pulselib { sourceSet sourceSets.main }
     }
 }
 

@@ -26,5 +26,5 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
 
-      - name: Build with Gradle
-        run: ./gradlew assemble
+      - name: Build and check both loaders
+        run: ./gradlew build
