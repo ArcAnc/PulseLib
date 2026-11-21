@@ -1,4 +1,4 @@
-# PulseLib 1.1.5.3 — Minecraft 26.1.2
+# PulseLib 1.2.0 — Minecraft 26.1.2
 
 ## Changes
 
