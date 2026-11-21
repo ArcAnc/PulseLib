@@ -1,0 +1,5 @@
+{
+  "textures": {
+    "particle": "pulselib_test:block/test_block/cube_texture"
+  }
+}

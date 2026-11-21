@@ -16,7 +16,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.function.Supplier;
 
-/** Captures Pulse geometry discovered during native entity extraction, including nested vanilla states. */
+/** Captures early declarations for deferred world rendering during native entity extraction. */
 @ApiStatus.Internal
 public final class PWorldRenderEligibility
 {
@@ -35,7 +35,7 @@ public final class PWorldRenderEligibility
 		{
 			S state = extract.get();
 			if (state instanceof PWorldRenderState pulse)
-				pulse.pulselib$setRequiresSeparateTargets(extraction.item);
+				pulse.pulselib$setRequiresSeparateTargets(extraction.requiresTargets);
 			return state;
 		}
 		finally
@@ -47,22 +47,22 @@ public final class PWorldRenderEligibility
 		}
 	}
 
-	/** Called only when a Pulse special renderer has successfully extracted a non-null argument. */
+	/** Compatibility hook for special renderers that require targets for deferred OIT. */
 	public static void markItem()
 	{
 		markGeometry();
 	}
 
-	/** Marks successfully extracted Pulse geometry, including automatic meshes on native players. */
+	/** Declares a possible deferred OIT submission from the current entity. */
 	public static void markGeometry()
 	{
 		Extraction extraction = CURRENT.get();
 		if (extraction != null)
-			extraction.item = true;
+			extraction.requiresTargets = true;
 	}
 
 	private static final class Extraction
 	{
-		private boolean item;
+		private boolean requiresTargets;
 	}
 }

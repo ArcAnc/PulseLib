@@ -55,10 +55,10 @@ public static void registerRenderers(EntityRenderersEvent.RegisterRenderers even
 Fabric uses the same renderer class:
 
 ```java
-BlockEntityRendererRegistry.register(MyBlockEntities.CRUSHER.get(), CrusherRenderer::new);
+BlockEntityRenderers.register(MyBlockEntities.CRUSHER.get(), CrusherRenderer::new);
 ```
 
-`BlockEntityRendererRegistry` is in Fabric API's `net.fabricmc.fabric.api.client.rendering.v1` package. The registry holders shown here are placeholders for your mod's block-entity type references.
+`BlockEntityRenderers` is in `net.minecraft.client.renderer.blockentity`. Fabric API provides transitive access to its registration method. The registry holders shown here are placeholders for your mod's block-entity type references.
 
 ## Item renderer
 

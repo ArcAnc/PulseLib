@@ -101,7 +101,7 @@ public class CrusherRenderState extends PBlockRenderState.Impl<CrusherBlockEntit
 }
 ```
 
-Register the block-entity renderer in client setup. NeoForge uses `EntityRenderersEvent.RegisterRenderers`; Fabric uses `BlockEntityRendererRegistry.register(...)`. Both accept `CrusherRenderer::new`; see the [renderer overview](renderers.md#block-renderer) for the two registration examples. Register the model and textures through a [client plugin](resources.md#register-model-resources) on either loader.
+Register the block-entity renderer in client setup. NeoForge uses `EntityRenderersEvent.RegisterRenderers`; Fabric uses `BlockEntityRenderers.register(...)`. Both accept `CrusherRenderer::new`; see the [renderer overview](renderers.md#block-renderer) for the two registration examples. Register the model and textures through a [client plugin](resources.md#register-model-resources) on either loader.
 
 ## Custom render hooks
 

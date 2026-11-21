@@ -1,9 +1,5 @@
 #version 330
 
-// @author ArcAnc; Created at: 13.11.2026; Copyright (c) 2026
-// Arc's License of Common Sense (LICENSE.txt).
-// Canonical MultiLoader lighting/overlay behavior; master 26.2 std140 instance transport.
-
 #moj_import <minecraft:dynamictransforms.glsl>
 #moj_import <minecraft:projection.glsl>
 #ifndef EMISSIVE

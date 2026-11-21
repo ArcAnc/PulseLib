@@ -15,11 +15,7 @@ import com.arcanc.pulselib.content.renderer.rhi.PRhiInstanceLayout;
 import com.arcanc.pulselib.content.renderer.rhi.PRhiPipelines;
 import com.mojang.blaze3d.GpuFormat;
 import com.mojang.blaze3d.PrimitiveTopology;
-import com.mojang.blaze3d.pipeline.BindGroupLayout;
-import com.mojang.blaze3d.pipeline.BlendFunction;
-import com.mojang.blaze3d.pipeline.ColorTargetState;
-import com.mojang.blaze3d.pipeline.DepthStencilState;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.pipeline.*;
 import com.mojang.blaze3d.platform.BlendFactor;
 import com.mojang.blaze3d.shaders.UniformType;
 import com.mojang.blaze3d.vertex.VertexFormat;
@@ -35,8 +31,8 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Provides support for render types.
@@ -53,7 +49,7 @@ public final class PRenderTypes
 	public static class RenderPipelinesProvider
 	{
 		private static final Set<RenderPipeline> PIPELINES = new HashSet<>();
-		
+
 		private static final RenderPipeline.Snippet TRIANGLES_SNIPPET = RenderPipeline.builder().
 				withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION).
 				withVertexShader(PLibDatabase.rl("core/triangles")).
@@ -69,7 +65,7 @@ public final class PRenderTypes
 				withPrimitiveTopology(PrimitiveTopology.TRIANGLES).
 				withDepthStencilState(DepthStencilState.DEFAULT).
 				buildSnippet();
-		
+
 		private static final RenderPipeline.Snippet TRIANGLES_LIT_SNIPPET = RenderPipeline.builder(TRIANGLES_SNIPPET).
 				withBindGroupLayout(BindGroupLayout.builder().
 					withSampler("Sampler2").
@@ -85,7 +81,7 @@ public final class PRenderTypes
 				withShaderDefine("FORCE_OPAQUE").
 				withCull(false).
 				build());
-		
+
 		public static final RenderPipeline TRIANGLES_CUTOUT = registerPipeline(RenderPipeline.builder(TRIANGLES_LIT_SNIPPET).
 				withLocation(PLibDatabase.rl("pipeline/triangles_cutout_no_cull")).
 				withBindGroupLayout(BindGroupLayout.builder().
@@ -94,7 +90,7 @@ public final class PRenderTypes
 				withShaderDefine("ALPHA_CUTOUT", 0.1F).
 				withCull(false).
 				build());
-		
+
 		public static final RenderPipeline TRIANGLES_TRANSLUCENT = registerPipeline(RenderPipeline.builder(TRIANGLES_LIT_SNIPPET).
 				withLocation(PLibDatabase.rl("pipeline/triangles_translucent_no_cull")).
 				withBindGroupLayout(BindGroupLayout.builder().
@@ -206,7 +202,7 @@ public final class PRenderTypes
 				withPrimitiveTopology(PrimitiveTopology.TRIANGLES).
 				withDepthStencilState(Optional.empty()).
 				build());
-		
+
 		public static final RenderPipeline OIT_FABULOUS_METADATA = registerPipeline(RenderPipeline.builder().
 				withLocation(PLibDatabase.rl("pipeline/oit_fabulous_metadata")).
 				withVertexShader(PLibDatabase.rl("core/oit_composite")).
@@ -305,7 +301,7 @@ public final class PRenderTypes
 				withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT)).
 				withDepthStencilState(new DepthStencilState(DepthStencilState.DEFAULT.depthTest(), false)).
 				build());
-		
+
 		/**
 		 * Registers the pipeline.
 		 * @param pipeline the pipeline to use.
@@ -316,7 +312,7 @@ public final class PRenderTypes
 			PIPELINES.add(pipeline);
 			return pipeline;
 		}
-		
+
 		/**
 		 * Registers the custom pipelines.
 		 * @param registrar the platform pipeline registry callback.
@@ -327,7 +323,7 @@ public final class PRenderTypes
 			PIPELINES.clear();
 		}
 	}
-	
+
 /**
  * Provides vertex format.
  */
@@ -335,7 +331,7 @@ public final class PRenderTypes
 	{
 		public static final VertexFormat POSITION_TEX_NORMAL = PRhiPipelines.POSITION_TEX_NORMAL;
 	}
-	
+
 /**
  * Provides render type.
  */
@@ -357,7 +353,7 @@ public final class PRenderTypes
 		private static final Function<Identifier, RenderType> TRIANGLES_INSTANT_EMISSIVE_SOLID = Util.memoize(RenderTypeProvider :: createTrianglesInstantEmissiveSolid);
 		private static final Function<Identifier, RenderType> TRIANGLES_INSTANT_EMISSIVE_CUTOUT = Util.memoize(RenderTypeProvider :: createTrianglesInstantEmissiveCutout);
 		private static final Function<Identifier, RenderType> TRIANGLES_INSTANT_EMISSIVE_TRANSLUCENT = Util.memoize(RenderTypeProvider :: createTrianglesInstantEmissiveTranslucent);
-		
+
 		/**
 		 * Creates the triangles solid.
 		 * @param texture the texture to use.
@@ -372,10 +368,10 @@ public final class PRenderTypes
 					affectsCrumbling().
 					setOutline(RenderSetup.OutlineProperty.AFFECTS_OUTLINE).
 					createRenderSetup();
-			
+
 			return RenderType.create(PLibDatabase.rl("triangles_solid").toString(), setup);
 		}
-		
+
 		/**
 		 * Creates the triangles cutout.
 		 * @param texture the texture to use.
@@ -390,10 +386,10 @@ public final class PRenderTypes
 					affectsCrumbling().
 					setOutline(RenderSetup.OutlineProperty.AFFECTS_OUTLINE).
 					createRenderSetup();
-			
+
 			return RenderType.create(PLibDatabase.rl("triangles_cutout").toString(), setup);
 		}
-		
+
 		/**
 		 * Creates the triangles translucent.
 		 * @param texture the texture to use.
@@ -409,7 +405,7 @@ public final class PRenderTypes
 					affectsCrumbling().
 					setOutline(RenderSetup.OutlineProperty.AFFECTS_OUTLINE).
 					createRenderSetup();
-			
+
 			return RenderType.create(PLibDatabase.rl("triangles_translucent").toString(), setup);
 		}
 
@@ -481,7 +477,7 @@ public final class PRenderTypes
 
 			return RenderType.create(PLibDatabase.rl("triangles_instant_solid").toString(), setup);
 		}
-		
+
 		/**
 		 * Creates the triangles instant cutout.
 		 * @param texture the texture to use.
@@ -563,7 +559,7 @@ public final class PRenderTypes
 
 			return RenderType.create(PLibDatabase.rl("triangles_instant_emissive_translucent").toString(), setup);
 		}
-		
+
 		/**
 		 * Performs the triangles solid operation.
 		 * @param texture the texture to use.
@@ -573,7 +569,7 @@ public final class PRenderTypes
 		{
 			return TRIANGLES_SOLID.apply(texture);
 		}
-		
+
 		/**
 		 * Performs the triangles cutout operation.
 		 * @param texture the texture to use.
@@ -583,7 +579,7 @@ public final class PRenderTypes
 		{
 			return TRIANGLES_CUTOUT.apply(texture);
 		}
-		
+
 		/**
 		 * Performs the triangles translucent operation.
 		 * @param texture the texture to use.
@@ -623,7 +619,7 @@ public final class PRenderTypes
 		{
 			return TRIANGLES_EMISSIVE_TRANSLUCENT.apply(texture);
 		}
-		
+
 		/**
 		 * Performs the triangles gui operation.
 		 * @param texture the texture to use.
@@ -827,7 +823,7 @@ public final class PRenderTypes
 			};
 		}
 	}
-	
+
 	/** Native replacement for shader instances, using the renderer's immutable pipelines. */
 	public static final class ShadersProvider
 	{
@@ -962,7 +958,7 @@ public final class PRenderTypes
 	{
 		RenderPipelinesProvider.registerCustomPipelines(registrar);
 	}
-	
+
 	/**
 	 * Determines whether transparent.
 	 * @param renderType the render type to use.

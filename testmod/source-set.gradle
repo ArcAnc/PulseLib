@@ -1,0 +1,18 @@
+/**
+ * @author ArcAnc
+ * Created at: 21.11.2026
+ * Copyright (c) 2026
+ * <p>
+ * This code is licensed under "Arc's License of Common Sense"
+ * Details can be found in the license file in the root folder of this project
+ */
+
+sourceSets {
+	testmod {
+		def fixture = rootProject.file('testmod')
+		java.srcDirs = [new File(fixture, 'common/src/main/java'), new File(fixture, "${project.name}/src/main/java")]
+		resources.srcDirs = [new File(fixture, 'common/src/main/resources'), new File(fixture, "${project.name}/src/main/resources")]
+		compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+		runtimeClasspath += sourceSets.main.runtimeClasspath
+	}
+}

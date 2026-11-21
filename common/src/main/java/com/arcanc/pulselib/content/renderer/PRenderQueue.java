@@ -44,6 +44,7 @@ public final class PRenderQueue
 {
 	private static final PGlResourceRegistry RESOURCES = new PGlResourceRegistry();
 	private static final PFrameCompiler<RenderStage> COMPILER = new PFrameCompiler<>();
+	private static final List<RenderStage> WORLD_STAGES = List.of(RenderStage.ENTITIES, RenderStage.SOLID_BLOCKS, RenderStage.TRANSLUCENT_BLOCKS);
 	private static final PGlMultiDrawExecutor EXECUTOR = new PGlMultiDrawExecutor(RESOURCES);
 	private static final PRhiOpaqueRenderer OPAQUE_EXECUTOR = new PRhiOpaqueRenderer(
 			RESOURCES::pipeline, RESOURCES::transparency, RESOURCES::geometryResource,
@@ -59,6 +60,7 @@ public final class PRenderQueue
 	private static final PRhiOitRenderer HAND_OIT_EXECUTOR = createOitRenderer();
 	private static @Nullable TextureTarget worldOpaqueDepth;
 	private static boolean worldDepthValid;
+	private static boolean worldTargetsRequested;
 
 	private static PRhiOitRenderer createOitRenderer()
 	{
@@ -279,7 +281,8 @@ public final class PRenderQueue
 	/** Drops unconsumed world commands, including when world rendering throws. */
 	public static void endWorldFrame()
 	{
-		COMPILER.discard(List.of(RenderStage.ENTITIES, RenderStage.SOLID_BLOCKS, RenderStage.TRANSLUCENT_BLOCKS));
+		worldTargetsRequested = false;
+		COMPILER.discard(WORLD_STAGES);
 		try
 		{
 			OIT_EXECUTOR.discard();
@@ -590,11 +593,31 @@ public final class PRenderQueue
 		worldDepthValid = true;
 	}
 
+	/**
+	 * Requests native transparency targets for OIT submitted by a deferred world callback.
+	 * Call during feature submission, before Minecraft builds the world framegraph.
+	 */
+	public static void requestWorldTransparencyTargets()
+	{
+		if (PRenderContexts.current() == PRenderContexts.Context.WORLD)
+			worldTargetsRequested = true;
+	}
+
+	/** Includes the resolved world submissions already queued before the framegraph is built. */
+	public static boolean needsWorldTransparencyTargets()
+	{
+		if (worldTargetsRequested)
+			return true;
+		for (RenderStage stage : WORLD_STAGES)
+			if (COMPILER.hasTranslucent(stage, PRenderQueue::canBatchWithOit))
+				return true;
+		return false;
+	}
+
 	/** Executes the shared world plan against the opaque depth snapshot. */
 	public static void flushWorld()
 	{
-		executeWorldPlan(COMPILER.compileCombined(List.of(RenderStage.ENTITIES, RenderStage.SOLID_BLOCKS,
-				RenderStage.TRANSLUCENT_BLOCKS), PRenderQueue::canBatchWithOit),
+		executeWorldPlan(COMPILER.compileCombined(WORLD_STAGES, PRenderQueue::canBatchWithOit),
 				worldDepthValid && worldOpaqueDepth != null ? worldOpaqueDepth : PLibRenderHelper.mc().gameRenderer.mainRenderTarget());
 	}
 
@@ -634,6 +657,7 @@ public final class PRenderQueue
 	public static void cleanUp()
 	{
 		COMPILER.clear();
+		worldTargetsRequested = false;
 		var depth = worldOpaqueDepth;
 		worldOpaqueDepth = null;
 		worldDepthValid = false;

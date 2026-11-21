@@ -1,8 +1,6 @@
 #ifndef PULSELIB_INSTANCES_GLSL
 #define PULSELIB_INSTANCES_GLSL
 
-// @author ArcAnc; Created at: 14.11.2026; Copyright (c) 2026
-// Arc's License of Common Sense (LICENSE.txt).
 // std140: mat4 + vec4 + vec2 + vec2 + ivec4 = 112 bytes, shared with PRhiInstanceLayout.
 struct PulseInstance {
     mat4 InstanceModel;

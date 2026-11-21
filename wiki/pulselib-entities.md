@@ -79,10 +79,10 @@ public static void registerRenderers(EntityRenderersEvent.RegisterRenderers even
 On Fabric, register the same renderer during client initialization:
 
 ```java
-EntityRendererRegistry.register(MyEntities.ROBOT.get(), RobotRenderer::new);
+EntityRenderers.register(MyEntities.ROBOT.get(), RobotRenderer::new);
 ```
 
-`EntityRendererRegistry` is in `net.fabricmc.fabric.api.client.rendering.v1`. The registry holders are placeholders for your mod's entity type. On either loader, also declare the model and texture mappings through [a client plugin](resources.md#register-model-resources).
+`EntityRenderers` is in `net.minecraft.client.renderer.entity`. Fabric API provides transitive access to its registration method. The registry holders are placeholders for your mod's entity type. On either loader, also declare the model and texture mappings through [a client plugin](resources.md#register-model-resources).
 
 ## LivingEntity behavior
 

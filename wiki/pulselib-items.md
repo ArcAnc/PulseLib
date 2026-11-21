@@ -98,28 +98,14 @@ public static void registerSpecialModels(RegisterSpecialModelRendererEvent event
 }
 ```
 
-On Fabric, register the same codec in Minecraft's `SpecialModelRenderers.ID_MAPPER` during client initialization, before item JSON baking. For the pinned Fabric API, expose the mapper with a client-only Mixin accessor:
+On Fabric, register the same codec in Minecraft’s `SpecialModelRenderers.ID_MAPPER` during client initialization, before item JSON baking. Fabric API provides transitive access to the mapper.
 
 ```java
-@Mixin(SpecialModelRenderers.class)
-public interface SpecialTypesAccessor
-{
-	@Accessor("ID_MAPPER")
-	static ExtraCodecs.LateBoundIdMapper<Identifier, MapCodec<? extends SpecialModelRenderer.Unbaked<?>>> types()
-	{
-		throw new AssertionError();
-	}
-}
-```
-
-Import `Mixin` and `Accessor` from `org.spongepowered.asm.mixin` and `org.spongepowered.asm.mixin.gen`; `ExtraCodecs` is in `net.minecraft.util`. Put the accessor in your mod's client mixin configuration, then call it from your Fabric client initializer:
-
-```java
-SpecialTypesAccessor.types().put(
+SpecialModelRenderers.ID_MAPPER.put(
 		Identifier.fromNamespaceAndPath("examplemod", "wand"), Unbaked.MAP_CODEC);
 ```
 
-`SpecialTypesAccessor` belongs to your mod. The PulseLib plugin registrar declares model resources; Minecraft special-model codec registration remains part of loader client setup.
+`SpecialModelRenderers` is in `net.minecraft.client.renderer.special`. The PulseLib plugin registrar declares model resources. Register the Minecraft codec during loader client setup.
 
 Reference the registered type from `assets/examplemod/items/wand.json`:
 

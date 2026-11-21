@@ -10,8 +10,8 @@
 package com.arcanc.pulselib.content.renderer.gl;
 
 import com.arcanc.pulselib.content.renderer.rhi.PRhiOitRenderer;
-import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
 import com.arcanc.pulselib.content.mixin.GlBufferAccessor;
+import com.arcanc.pulselib.content.model.deformer.gpu.PGpuDeformerBuffers;
 import com.arcanc.pulselib.content.renderer.plan.*;
 import com.arcanc.pulselib.content.renderer.rhi.PRhiInstanceLayout;
 import com.arcanc.pulselib.util.PRenderTypes;
@@ -32,7 +32,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.systems.ScissorState;
 import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.textures.GpuTextureView;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ProjectionMatrixBuffer;
 import net.minecraft.client.renderer.rendertype.RenderType;

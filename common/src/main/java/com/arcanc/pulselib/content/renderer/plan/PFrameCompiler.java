@@ -227,6 +227,18 @@ public final class PFrameCompiler<S>
 		}
 	}
 
+	/** Checks queued translucent submissions without consuming the stage. */
+	public boolean hasTranslucent(S stage, Predicate<PPipelineHandle> pipeline)
+	{
+		var submissions = this.translucent.get(stage);
+		if (submissions == null)
+			return false;
+		for (var submission : submissions)
+			if (pipeline.test(submission.key().pipeline()))
+				return true;
+		return false;
+	}
+
 	/**
 	 * Returns whether no render submissions remain queued.
 	 *

@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": {"model": "pulselib_test:block/test_block"}
+  }
+}

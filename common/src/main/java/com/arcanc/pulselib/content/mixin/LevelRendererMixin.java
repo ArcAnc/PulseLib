@@ -68,6 +68,9 @@ public abstract class LevelRendererMixin
 	@Unique
 	private boolean pulselib$needsTransparencyTargets;
 
+	@Unique
+	private boolean pulselib$panorama;
+
 	@WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix4fStack;pushMatrix()Lorg/joml/Matrix4fStack;"))
 	private Matrix4fStack pulselib$captureWorldMatrix(Matrix4fStack stack, Operation<Matrix4fStack> original)
 	{
@@ -132,6 +135,7 @@ public abstract class LevelRendererMixin
 			finally
 			{
 				this.pulselib$needsTransparencyTargets = false;
+				this.pulselib$panorama = false;
 				try
 				{
 					try
@@ -163,6 +167,7 @@ public abstract class LevelRendererMixin
 	@Inject(method = "submitFeatures", at = @At("HEAD"))
 	private void pulselib$captureTransparencyEligibility(LevelRenderState state, SubmitNodeCollector collector, boolean outline, CallbackInfo callback)
 	{
+		this.pulselib$panorama = state.cameraRenderState.isPanoramicMode;
 		this.pulselib$needsTransparencyTargets = PWorldRenderPass.requiresSeparateTargets(state);
 	}
 
@@ -170,7 +175,9 @@ public abstract class LevelRendererMixin
 	@Inject(method = "getTransparencyChain", at = @At("RETURN"), cancellable = true)
 	private void pulselib$retainNativeTransparency(CallbackInfoReturnable<@Nullable PostChain> callback)
 	{
-		if (callback.getReturnValue() != null || !this.pulselib$needsTransparencyTargets)
+		if (callback.getReturnValue() != null || this.pulselib$panorama)
+			return;
+		if (!this.pulselib$needsTransparencyTargets && !PRenderQueue.needsWorldTransparencyTargets())
 			return;
 		callback.setReturnValue(PLibRenderHelper.mc().getShaderManager().getPostChain(
 				TRANSPARENCY_POST_CHAIN_ID, LevelTargetBundle.SORTING_TARGETS));

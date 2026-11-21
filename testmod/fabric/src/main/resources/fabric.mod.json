@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "pulselib_test",
+  "version": "1.0.0",
+  "name": "PulseLib Test Content",
+  "authors": ["ArcAnc"],
+  "license": "Arc's License of Common Sense",
+  "entrypoints": {
+    "main": ["com.arcanc.pulselib.testmod.FabricTestMod"],
+    "client": ["com.arcanc.pulselib.testmod.FabricTestClient"]
+  },
+  "depends": {
+    "pulselib": "*",
+    "fabric-api": "*"
+  }
+}

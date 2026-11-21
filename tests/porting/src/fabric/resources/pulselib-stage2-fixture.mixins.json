@@ -1,7 +1,0 @@
-{
-  "required": true,
-  "package": "com.arcanc.pulselib.content.mixin",
-  "compatibilityLevel": "JAVA_25",
-  "mixins": ["ItemStackMixin"],
-  "injectors": {"defaultRequire": 1}
-}

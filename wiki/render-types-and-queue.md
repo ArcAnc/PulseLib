@@ -29,6 +29,8 @@ Overloads without a policy default to OIT for the two supported queued transluce
 
 World OIT requires an opaque depth attachment with the same dimensions as the color target. The compositor keeps four peeled layers and uses Minecraft’s active transparency targets. GUI and offscreen scopes flush local transparency using sorted alpha.
 
+During world rendering, queued OIT submissions request the native transparency targets before Minecraft builds its framegraph. Opaque meshes, cutouts and ordinary alpha use the selected Minecraft route. If an extension submits OIT from a later callback, call `PRenderQueue.requestWorldTransparencyTargets()` during feature submission in the same frame.
+
 ## Pipeline contract
 
 Minecraft's native type is `net.minecraft.client.renderer.rendertype.RenderType`. Use the built-in factories for PulseLib draws on both OpenGL and Vulkan. They select `PrimitiveTopology.TRIANGLES`, `POSITION_TEX_NORMAL`, the matching `InstanceData` or `ColorOverlay` binding, and the appropriate blend, depth and target state. The native executors select supported pipeline variants by their registered identities. Matching the mesh layout alone does not establish support for a custom pipeline. [Shaders](shaders.md)

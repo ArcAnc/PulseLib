@@ -206,7 +206,7 @@ public final class PRhiOpaqueRenderer implements PRenderExecutor
 	private @Nullable RenderPipeline profile(RenderType type, boolean immediate)
 	{
 		RenderPipeline pipeline = type.pipeline();
-		@Nullable RenderPipeline selected = null;
+		RenderPipeline selected = null;
 		for (int variant = 0; variant < 4; variant++)
 			if (pipeline == this.profiles.pipeline((variant & 1) != 0, (variant & 2) != 0))
 				selected = pipeline;

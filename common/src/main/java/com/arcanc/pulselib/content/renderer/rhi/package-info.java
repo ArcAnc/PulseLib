@@ -8,12 +8,8 @@
  */
 
 /** Blaze3D/RHI implementation of the canonical render-plan contracts. Resources are render-thread owned. */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
-@FieldsAreNonnullByDefault
+
 @NullMarked
 package com.arcanc.pulselib.content.renderer.rhi;
 
 import org.jspecify.annotations.NullMarked;
-
-import javax.annotation.ParametersAreNonnullByDefault;

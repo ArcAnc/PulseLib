@@ -63,16 +63,12 @@ public abstract class EntityRendererExtractionMixin
 						PoseStack root = new PoseStack();
 						PPlayerAnimations.applyRoot(player, root, partialTick);
 						snapshot.pulselib$setPlayerRoot(root.last().pose());
-						if (!PPlayerAnimations.meshAttachmentPoses(player, partialTick).isEmpty())
-							PWorldRenderEligibility.markGeometry();
 					}
 				}
 				if (state instanceof PPlayerRigRenderState rig)
 				{
 					PPlayerRigPose pose = entity instanceof Player player ? PPlayerRigPose.capture(player, partialTick) : null;
 					rig.pulselib$setPlayerRig(pose);
-					if (pose != null && !pose.isEmpty())
-						PWorldRenderEligibility.markGeometry();
 				}
 				if (entity instanceof LivingEntity living && state instanceof HumanoidRenderState humanoid && (Object)this instanceof LivingEntityRenderer<?, ?, ?> renderer)
 					PArmorModelSnapshots.capture(living, humanoid, renderer, partialTick);
@@ -84,8 +80,6 @@ public abstract class EntityRendererExtractionMixin
 					{
 						var shapes = renderer.pulselib$captureGeometry(player, avatar, partialTick);
 						geometry.pulselib$setPlayerGeometry(shapes);
-						if (shapes.hasArmor())
-							PWorldRenderEligibility.markGeometry();
 					}
 				}
 				if (entity instanceof AbstractClientPlayer player && PPlayerAttachmentEligibility.hasRenderer(player, partialTick))

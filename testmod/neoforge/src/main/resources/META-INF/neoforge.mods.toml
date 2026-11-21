@@ -1,0 +1,16 @@
+# @author ArcAnc | 21.11.2026 | Copyright (c) 2026 | Arc's License of Common Sense
+modLoader="javafml"
+loaderVersion="[1,)"
+license="Arc's License of Common Sense"
+
+[[mods]]
+modId="pulselib_test"
+version="1.0.0"
+displayName="PulseLib Test Content"
+authors="ArcAnc"
+
+[[dependencies.pulselib_test]]
+modId="pulselib"
+type="required"
+ordering="AFTER"
+side="BOTH"
