@@ -1,3 +1,9 @@
+# PulseLib 1.2.0 — Minecraft 26.2
+
+* Ported PulseLib to Minecraft 26.2 for Fabric and NeoForge. Java 25 is required. Fabric installations also require Fabric API.
+* Adapted world and GUI rendering to Minecraft 26.2’s native OpenGL and Vulkan backends.
+* Implemented four-layer order-independent transparency (OIT) and restored isolated rendering for individual GUI models.
+
 # PulseLib 1.1.5.3 — Minecraft 26.1.2
 
 ## Changes

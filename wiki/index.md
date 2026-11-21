@@ -21,7 +21,7 @@ PulseLib is a modern animation library for Minecraft designed to deliver high pe
 
 ---
 
-This wiki documents **Minecraft 26.2 · PulseLib 1.1.5.3 · Java 25** on the `26.2-multiloader` branch. Fabric and NeoForge share the animation API and render queue in Common. Client rendering follows Minecraft’s extract/submit lifecycle and uses the native OpenGL or Vulkan backend.
+This wiki documents **Minecraft 26.2 · PulseLib 1.2.0 · Java 25** on the `26.2-multiloader` branch. Fabric and NeoForge share the animation API and render queue in Common. Client rendering follows Minecraft’s extract/submit lifecycle and uses the native OpenGL or Vulkan backend.
 
 Installation instructions are available [here](installation.md).
 

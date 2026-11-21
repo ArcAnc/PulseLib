@@ -1,6 +1,6 @@
 # Installation
 
-This branch targets **Minecraft 26.2**, **Java 25**, and **PulseLib 1.1.5.3**. It pins Fabric Loader `0.20.1`, Fabric API `0.161.0+26.2`, and NeoForge `26.2.0.57`. [Gradle properties](../gradle.properties)
+This branch targets **Minecraft 26.2**, **Java 25**, and **PulseLib 1.2.0**. It pins Fabric Loader `0.20.1`, Fabric API `0.161.0+26.2`, and NeoForge `26.2.0.57`. [Gradle properties](../gradle.properties)
 
 ## For developers
 
@@ -8,8 +8,8 @@ Use the loader-specific artifact. The Common module contains shared code and res
 
 | Project | Dependency coordinate |
 | --- | --- |
-| Fabric | `com.arcanc.pulselib:pulselib-fabric:26.2-1.1.5.3` |
-| NeoForge | `com.arcanc.pulselib:pulselib-neoforge:26.2-1.1.5.3` |
+| Fabric | `com.arcanc.pulselib:pulselib-fabric:26.2-1.2.0` |
+| NeoForge | `com.arcanc.pulselib:pulselib-neoforge:26.2-1.2.0` |
 
 Both loader projects support Maven, Modrinth and CurseForge publication. The coordinates above describe this branch; use a version available in the public repository, or build locally until that version is released.
 
@@ -22,7 +22,7 @@ repositories {
 
 dependencies {
     // NeoForge consumer; use only a version available in the repository.
-    implementation "com.arcanc.pulselib:pulselib-neoforge:26.2-1.1.5.3"
+    implementation "com.arcanc.pulselib:pulselib-neoforge:26.2-1.2.0"
 }
 ```
 
@@ -36,7 +36,7 @@ The loader JARs are written to `fabric/build/libs/` and `neoforge/build/libs/`. 
 
 ```gradle
 dependencies {
-    implementation files("libs/pulselib-26.2-neoforge-1.1.5.3.jar")
+    implementation files("libs/pulselib-26.2-neoforge-1.2.0.jar")
 }
 ```
 
