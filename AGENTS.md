@@ -29,6 +29,6 @@ if (condition)
 }
 ```
 - Add the project's author, creation date, copyright and `Arc's License of Common Sense` header. Preserve existing authors/dates; use verified Git history for migrated files.
-- Check each new package for `package-info.java` with `ParametersAreNonnullByDefault`, `MethodsReturnNonnullByDefault` and `FieldsAreNonnullByDefault`. Declare real nullable values with `@Nullable`; avoid duplicate package descriptions when Common is included in loader builds.
+- Check each new package for `package-info.java` with `NullMarked`. Declare real nullable values with `@Nullable`; avoid duplicate package descriptions when Common is included in loader builds.
 - Preserve useful Javadoc, annotations and logical import groups; do not replace imports with wildcards just for formatting.
 - Formatting tasks must preserve logic, public API and runtime behavior.
