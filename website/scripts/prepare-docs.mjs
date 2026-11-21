@@ -6,11 +6,11 @@ import {versionedSidebars} from './versioned-sidebars.mjs';
 
 const websiteDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const repositoryDir = path.resolve(websiteDir, '..');
-const currentDocsRef = process.env.PULSELIB_CURRENT_DOCS_REF ?? 'HEAD';
+const currentDocsRef = process.env.PULSELIB_CURRENT_DOCS_REF ?? 'origin/26.2-multiloader';
 const docSources = [
   {ref: currentDocsRef, destination: 'docs'},
-  {ref: 'origin/26.1', destination: 'versioned_docs/version-26.1'},
-  {ref: 'origin/1.21.1', destination: 'versioned_docs/version-1.21.1'},
+  {ref: 'origin/26.1.2-multiloader', destination: 'versioned_docs/version-26.1'},
+  {ref: 'origin/1.21.1-multiloader', destination: 'versioned_docs/version-1.21.1'},
 ];
 
 function extractWiki(ref, destination) {
@@ -27,15 +27,27 @@ async function markdownFiles(directory) {
 }
 
 async function normalizeMarkdown(directory, ref) {
-  const sourceRef = ref === currentDocsRef ? 'master' : ref.replace(/^origin\//, '');
+  const sourceRef = ref.replace(/^origin\//, '');
+  const sourceDirectories = new Set(execFileSync('git', ['ls-tree', '-dr', '--name-only', '-z', ref], {
+    cwd: repositoryDir,
+    encoding: 'utf8',
+  }).split('\0'));
   await rm(path.join(directory, 'mkdocs.yml'), {force: true});
   for (const file of await markdownFiles(directory)) {
+    const relativeDirectory = path.relative(directory, path.dirname(file)).split(path.sep).join('/');
+    const wikiDirectory = path.posix.join('wiki', relativeDirectory);
     let content = await readFile(file, 'utf8');
     content = content.
         replace(/<br>/g, '<br />').
         replace(/<img\b([^>]*?)(?<!\/)>/g, '<img$1 />').
         replace('(Entity-Render-Layers)', '(entity-render-layers.md)').
-        replace(/\]\(\.\.\/(src\/[^)\s]+)\)/g, `](https://github.com/ArcAnc/PulseLib/blob/${sourceRef}/$1)`);
+        replace(/\]\((\.\.\/[^)#?\s]+)([?#][^)\s]*)?\)/g, (link, target, suffix = '') => {
+          const repositoryPath = path.posix.join(wikiDirectory, target);
+          if (repositoryPath === 'wiki' || repositoryPath.startsWith('wiki/') || repositoryPath.startsWith('../')) return link;
+
+          const kind = sourceDirectories.has(repositoryPath) ? 'tree' : 'blob';
+          return `](https://github.com/ArcAnc/PulseLib/${kind}/${sourceRef}/${repositoryPath}${suffix})`;
+        });
     if (path.basename(file) === 'index.md' && !content.startsWith('---\n')) content = `---\ntitle: PulseLib\nhide_title: true\nslug: /\n---\n\n${content}`;
     await writeFile(file, content);
   }

@@ -31,7 +31,11 @@ jobs:
           fetch-depth: 0
 
       - name: Fetch versioned documentation sources
-        run: git fetch origin 1.21.1:refs/remotes/origin/1.21.1 26.1:refs/remotes/origin/26.1
+        run: |
+          git fetch origin \
+            refs/heads/1.21.1-multiloader:refs/remotes/origin/1.21.1-multiloader \
+            refs/heads/26.1.2-multiloader:refs/remotes/origin/26.1.2-multiloader \
+            refs/heads/26.2-multiloader:refs/remotes/origin/26.2-multiloader
 
       - name: Set up Node.js
         uses: actions/setup-node@v5
