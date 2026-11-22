@@ -31,7 +31,7 @@ Release changes are listed in the [changelog](changelog.md).
 
 ### Maven
 
-You can find Maven setup details in the [installation guide](wiki/installation.md).
+You can find Maven setup details in the [installation guide](https://arcanc.github.io/PulseLib/26.2/installation/).
 
 ### Contributing
 
@@ -42,4 +42,4 @@ If you need help feel free to [join our Discord][discord]
 
 [download]: https://www.curseforge.com/minecraft/mc-mods/pulselib
 [discord]: https://discord.gg/cwydhvYb2M
-[wiki]: wiki/index.md
+[wiki]: https://arcanc.github.io/PulseLib/26.2/
