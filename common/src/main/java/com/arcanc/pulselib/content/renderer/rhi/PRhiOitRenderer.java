@@ -250,7 +250,8 @@ public final class PRhiOitRenderer implements PRenderExecutor
 						for (var draw : entry.getValue())
 						{
 							boolean emissive = resources.material(draw.batch().group().pipeline()).pipeline().getShaderDefines().flags().contains("EMISSIVE");
-							var pipeline = layer == 0 ? PRenderTypes.ShadersProvider.trianglesOitDepth(emissive) : PRenderTypes.ShadersProvider.trianglesOitDepthPeel(emissive);
+							var pipeline = layer == 0 ? PRenderTypes.RenderPipelinesProvider.TRIANGLES_OIT_DEPTH :
+									PRenderTypes.RenderPipelinesProvider.TRIANGLES_OIT_DEPTH_PEEL;
 							if (emissive)
 								pipeline = emissive(pipeline);
 							bind(pass, draw, pipeline, upload);
@@ -268,7 +269,9 @@ public final class PRhiOitRenderer implements PRenderExecutor
 						for (var draw : entry.getValue())
 						{
 							boolean emissive = resources.material(draw.batch().group().pipeline()).pipeline().getShaderDefines().flags().contains("EMISSIVE");
-							bind(pass, draw, PRenderTypes.ShadersProvider.trianglesOit(emissive), upload);
+							var pipeline = emissive ? PRenderTypes.RenderPipelinesProvider.TRIANGLES_OIT_EMISSIVE :
+									PRenderTypes.RenderPipelinesProvider.TRIANGLES_OIT;
+							bind(pass, draw, pipeline, upload);
 							pass.bindTexture("LayerDepthSampler", oit.layerDepthView(layer), deviceSampler());
 							draw(pass, draw);
 						}

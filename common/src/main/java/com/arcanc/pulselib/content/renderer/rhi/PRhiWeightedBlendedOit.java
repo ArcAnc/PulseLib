@@ -220,7 +220,7 @@ public final class PRhiWeightedBlendedOit
 				try (var pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
 						() -> "PulseLib Fabulous metadata", requireView(this.metadataView, "metadata"), Optional.empty()))
 				{
-					pass.setPipeline(PRenderTypes.ShadersProvider.oitFabulousMetadata());
+					pass.setPipeline(PRenderTypes.RenderPipelinesProvider.OIT_FABULOUS_METADATA);
 					pass.disableScissor();
 					pass.bindTexture("RevealSampler", revealageView(layer), sampler);
 					pass.bindTexture("DepthSampler", layerDepthView(layer), sampler);
@@ -229,7 +229,7 @@ public final class PRhiWeightedBlendedOit
 				try (var pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
 						() -> "PulseLib Fabulous composite", destination, Optional.empty()))
 				{
-					pass.setPipeline(PRenderTypes.ShadersProvider.oitFabulousComposite());
+					pass.setPipeline(PRenderTypes.RenderPipelinesProvider.OIT_FABULOUS_COMPOSITE);
 					pass.disableScissor();
 					pass.bindTexture("AccumSampler", accumulationView(layer), sampler);
 					pass.bindTexture("OitMetadataSampler", requireView(this.metadataView, "metadata"), sampler);

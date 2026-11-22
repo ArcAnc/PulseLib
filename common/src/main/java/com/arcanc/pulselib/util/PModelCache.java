@@ -35,6 +35,7 @@ import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Unmodifiable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.jspecify.annotations.Nullable;
@@ -96,7 +97,7 @@ public class PModelCache
 	 * Returns the model loaders.
 	 * @return the value produced by this operation.
 	 */
-	public static List<PModelLoader> getModelLoaders()
+	public static @Unmodifiable List<PModelLoader> getModelLoaders()
 	{
 		return List.copyOf(MODEL_LOADERS.values());
 	}

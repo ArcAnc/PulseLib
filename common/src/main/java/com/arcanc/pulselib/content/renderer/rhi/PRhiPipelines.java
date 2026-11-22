@@ -9,13 +9,12 @@
 
 package com.arcanc.pulselib.content.renderer.rhi;
 
-import com.mojang.blaze3d.GpuFormat;
+import com.arcanc.pulselib.util.PRenderTypes;
 import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.pipeline.BindGroupLayout;
 import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.shaders.UniformType;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.renderer.BindGroupLayouts;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.ApiStatus;
@@ -30,12 +29,6 @@ import java.util.function.Consumer;
 @ApiStatus.Internal
 public final class PRhiPipelines
 {
-	public static final VertexFormat POSITION_TEX_NORMAL = VertexFormat.builder(0).
-			addAttribute("Position", GpuFormat.RGB32_FLOAT).
-			addAttribute("UV0", GpuFormat.RG32_FLOAT).
-			addAttribute("Normal", GpuFormat.RGBA8_SNORM).
-			build();
-
 	private final int instanceCapacity;
 	private final RenderPipeline[] pipelines = new RenderPipeline[4];
 
@@ -85,7 +78,7 @@ public final class PRhiPipelines
 				withFragmentShader(id("core/triangles")).
 				withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION).
 				withBindGroupLayout(layout.build()).
-				withVertexBinding(0, POSITION_TEX_NORMAL).
+				withVertexBinding(0, PRenderTypes.VertexFormatProvider.POSITION_TEX_NORMAL).
 				withPrimitiveTopology(PrimitiveTopology.TRIANGLES).
 				withDepthStencilState(DepthStencilState.DEFAULT).
 				withCull(false).

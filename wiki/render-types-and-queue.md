@@ -8,7 +8,7 @@ PulseLib models are triangle meshes. [`PRenderTypes`](../common/src/main/java/co
 | --- | --- | --- |
 | Opaque | `trianglesSolid` | `trianglesInstantSolid` |
 | Hard alpha cutout | `trianglesCutout` | `trianglesInstantCutout` |
-| Blended alpha | `trianglesTranslucent` | `trianglesInstantTranslucent` / `trianglesGui` |
+| Blended alpha | `trianglesTranslucent` | `trianglesInstantTranslucent` |
 | Emissive | `trianglesEmissiveSolid`, `trianglesEmissiveCutout`, `trianglesEmissiveTranslucent` | matching `trianglesInstantEmissive...` variant |
 
 All factories above belong to `PRenderTypes.RenderTypeProvider` and take the atlas `Identifier`. `PBlockRenderer`, `PEntityRenderer`, and `PItemRenderer` use queued variants, including GUI items:
@@ -19,7 +19,7 @@ super(modelData, PRenderTypes.RenderTypeProvider::trianglesSolid);
 
 Solid forces output alpha to one. Cutout discards low-alpha fragments; translucent blends surviving fragments. Default mesh resolvers choose a matching emissive variant for emissive sprites. [Resources](resources.md#alpha-modes) explains alpha metadata and explicit per-mesh overrides.
 
-Canonical factory aliases are also retained: `trianglesImmediate` uses instant cutout; `trianglesSolidEmissive`, `trianglesCutoutEmissive`, and `trianglesTranslucentEmissive` select queued emissive variants; `trianglesGuiEmissive` and `trianglesImmediateEmissive` select instant emissive translucent and cutout respectively. `emissiveVariant(...)` preserves the layout/alpha mode of known types and leaves an unknown custom type unchanged.
+`emissiveVariant(...)` preserves the layout/alpha mode of known types and leaves an unknown custom type unchanged.
 
 ## Material transparency and OIT
 
@@ -35,7 +35,7 @@ During world rendering, queued OIT submissions request the native transparency t
 
 Minecraft's native type is `net.minecraft.client.renderer.rendertype.RenderType`. Use the built-in factories for PulseLib draws on both OpenGL and Vulkan. They select `PrimitiveTopology.TRIANGLES`, `POSITION_TEX_NORMAL`, the matching `InstanceData` or `ColorOverlay` binding, and the appropriate blend, depth and target state. The native executors select supported pipeline variants by their registered identities. Matching the mesh layout alone does not establish support for a custom pipeline. [Shaders](shaders.md)
 
-`RenderPipeline.getColorTargetState().blendFunction()` exposes the native blend state. `PRenderTypes.getTransparencyState(...)` and `isTransparent(...)` use that state. OIT policy is selected separately at submission.
+`RenderPipeline.getColorTargetState().blendFunction()` exposes the native blend state. `PRenderTypes.isTransparent(...)` checks whether that blend function is present. OIT policy is selected separately at submission.
 
 ## Queue stages and scopes
 

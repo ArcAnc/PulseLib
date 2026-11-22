@@ -271,7 +271,7 @@ PRenderTypes.RenderTypeProvider::trianglesEmissiveTranslucent
 PRenderTypes.RenderTypeProvider::trianglesEmissiveSolid
 ```
 
-Choose the solid, cutout, or translucent variant according to the desired alpha mode. Direct `PBakedBone.instantDraw(...)` rendering has matching `trianglesInstantEmissiveSolid`, `trianglesInstantEmissiveCutout`, and `trianglesInstantEmissiveTranslucent` variants; `trianglesGui` remains a compatibility alias for the non-emissive instant translucent pipeline.
+Choose the solid, cutout, or translucent variant according to the desired alpha mode. Direct `PBakedBone.instantDraw(...)` rendering has matching `trianglesInstantEmissiveSolid`, `trianglesInstantEmissiveCutout`, and `trianglesInstantEmissiveTranslucent` variants. Use `trianglesInstantTranslucent` for the non-emissive instant translucent pipeline.
 
 Classes used:
 

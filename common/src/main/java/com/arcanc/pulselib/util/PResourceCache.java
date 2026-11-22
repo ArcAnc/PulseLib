@@ -48,10 +48,10 @@ public final class PResourceCache
 	{
 		if (TEXTURES == null)
 			TEXTURES = PLibRenderHelper.mc().getAtlasManager().getAtlasOrThrow(ATLAS_FILE_LOCATION);
-		
+
 		return TEXTURES;
 	}
-	
+
 	@ApiStatus.Internal
 	public static Map<Identifier, PModelResource> getResourceCache()
 	{
@@ -120,7 +120,7 @@ public final class PResourceCache
 
 	/**
 	 * Creates the id used for a texture inside PulseLib's atlas.
-	 *
+	 * <p>
 	 * The source texture id may also be present in a vanilla or another mod's
 	 * atlas.  An atlas-local id prevents the global sprite lookup from treating
 	 * that legitimate reuse as a duplicate registration.
@@ -133,5 +133,5 @@ public final class PResourceCache
 	{
 		return PLibDatabase.rl(SPRITE_PATH_PREFIX + texture.getNamespace() + "/" + texture.getPath());
 	}
-	
+
 }

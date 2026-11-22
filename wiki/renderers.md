@@ -123,6 +123,6 @@ PRenderTypes.RenderTypeProvider::trianglesCutout
 PRenderTypes.RenderTypeProvider::trianglesTranslucent
 ```
 
-These are the queued variants used by all three renderer classes, including `PItemRenderer` in GUI display context. `trianglesGui` is an instant-rendering compatibility alias and is not compatible with the instanced queue. Do not pass vanilla entity/block `RenderType` values unless they use a compatible triangle vertex format and shader setup.
+These are the queued variants used by all three renderer classes, including `PItemRenderer` in GUI display context. Use `trianglesInstantTranslucent` for direct drawing. Do not pass vanilla entity/block `RenderType` values unless they use a compatible triangle vertex format and shader setup.
 
 Renderer hooks use Minecraft 26.2 render states and `SubmitNodeCollector`. Capture the inputs needed by deferred draws during submission.

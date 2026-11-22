@@ -12,7 +12,6 @@ package com.arcanc.pulselib.util;
 
 import com.arcanc.pulselib.content.model.textures.PAlphaMode;
 import com.arcanc.pulselib.content.renderer.rhi.PRhiInstanceLayout;
-import com.arcanc.pulselib.content.renderer.rhi.PRhiPipelines;
 import com.mojang.blaze3d.GpuFormat;
 import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.pipeline.*;
@@ -27,7 +26,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -43,9 +41,9 @@ public final class PRenderTypes
 	{
 	}
 
-/**
- * Provides render pipelines.
- */
+	/**
+	* Provides render pipelines.
+    */
 	public static class RenderPipelinesProvider
 	{
 		private static final Set<RenderPipeline> PIPELINES = new HashSet<>();
@@ -324,17 +322,21 @@ public final class PRenderTypes
 		}
 	}
 
-/**
- * Provides vertex format.
- */
+	/**
+	* Provides vertex format.
+    */
 	public static class VertexFormatProvider
 	{
-		public static final VertexFormat POSITION_TEX_NORMAL = PRhiPipelines.POSITION_TEX_NORMAL;
+		public static final VertexFormat POSITION_TEX_NORMAL = VertexFormat.builder(0).
+			addAttribute("Position", GpuFormat.RGB32_FLOAT).
+			addAttribute("UV0", GpuFormat.RG32_FLOAT).
+			addAttribute("Normal", GpuFormat.RGBA8_SNORM).
+			build();
 	}
 
-/**
- * Provides render type.
- */
+	/**
+    * Provides render type.
+    */
 	public static final class RenderTypeProvider
 	{
 		private RenderTypeProvider()
@@ -621,16 +623,6 @@ public final class PRenderTypes
 		}
 
 		/**
-		 * Performs the triangles gui operation.
-		 * @param texture the texture to use.
-		 * @return the value produced by this operation.
-		 */
-		public static RenderType trianglesGui(Identifier texture)
-		{
-			return trianglesInstantTranslucent(texture);
-		}
-
-		/**
 		 * Performs the triangles instant solid operation.
 		 * @param texture the texture to use.
 		 * @return the value produced by this operation.
@@ -699,15 +691,15 @@ public final class PRenderTypes
 		public static RenderType emissiveVariant(RenderType baseType, Identifier texture)
 		{
 			if (baseType.pipeline() == RenderPipelinesProvider.TRIANGLES_SOLID)
-				return trianglesSolidEmissive(texture);
+				return trianglesEmissiveSolid(texture);
 			if (baseType.pipeline() == RenderPipelinesProvider.TRIANGLES_CUTOUT)
-				return trianglesCutoutEmissive(texture);
+				return trianglesEmissiveCutout(texture);
 			if (baseType.pipeline() == RenderPipelinesProvider.TRIANGLES_TRANSLUCENT)
-				return trianglesTranslucentEmissive(texture);
+				return trianglesEmissiveTranslucent(texture);
 			if (baseType.pipeline() == RenderPipelinesProvider.TRIANGLES_INSTANT_TRANSLUCENT)
-				return trianglesGuiEmissive(texture);
+				return trianglesInstantEmissiveTranslucent(texture);
 			if (baseType.pipeline() == RenderPipelinesProvider.TRIANGLES_INSTANT_CUTOUT)
-				return trianglesImmediateEmissive(texture);
+				return trianglesInstantEmissiveCutout(texture);
 			if (baseType.pipeline() == RenderPipelinesProvider.TRIANGLES_INSTANT_SOLID)
 				return trianglesInstantEmissiveSolid(texture);
 			return baseType;
@@ -758,54 +750,6 @@ public final class PRenderTypes
 			};
 		}
 
-		/** Returns the cached native material for the canonical trianglesImmediate entry point. */
-		public static RenderType trianglesImmediate(Identifier texture)
-		{
-			return trianglesInstantCutout(texture);
-		}
-
-		/** Returns the cached native material for the canonical trianglesSolidEmissive entry point. */
-		public static RenderType trianglesSolidEmissive(Identifier texture)
-		{
-			return trianglesEmissiveSolid(texture);
-		}
-
-		/** Returns the cached native material for the canonical trianglesCutoutEmissive entry point. */
-		public static RenderType trianglesCutoutEmissive(Identifier texture)
-		{
-			return trianglesEmissiveCutout(texture);
-		}
-
-		/** Returns the cached native material for the canonical trianglesTranslucentEmissive entry point. */
-		public static RenderType trianglesTranslucentEmissive(Identifier texture)
-		{
-			return trianglesEmissiveTranslucent(texture);
-		}
-
-		/** Returns the cached native material for the canonical trianglesGuiEmissive entry point. */
-		public static RenderType trianglesGuiEmissive(Identifier texture)
-		{
-			return trianglesInstantEmissiveTranslucent(texture);
-		}
-
-		/** Returns the cached native material for the canonical trianglesImmediateEmissive entry point. */
-		public static RenderType trianglesImmediateEmissive(Identifier texture)
-		{
-			return trianglesInstantEmissiveCutout(texture);
-		}
-
-		/** Returns whether the native material supports PulseLib OIT. */
-		public static boolean usesOit(RenderType renderType)
-		{
-			return PRenderTypes.usesOit(renderType);
-		}
-
-		/** Returns whether the native material supports emissive PulseLib OIT. */
-		public static boolean usesEmissiveOit(RenderType renderType)
-		{
-			return renderType.pipeline() == RenderPipelinesProvider.TRIANGLES_EMISSIVE_TRANSLUCENT;
-		}
-
 		/**
 		 * Performs the for instant alpha mode operation.
 		 * @param alphaMode the alpha mode to use.
@@ -822,132 +766,6 @@ public final class PRenderTypes
 				case AUTO -> throw new IllegalArgumentException("AUTO alpha mode must be resolved before selecting a render type");
 			};
 		}
-	}
-
-	/** Native replacement for shader instances, using the renderer's immutable pipelines. */
-	public static final class ShadersProvider
-	{
-		private ShadersProvider()
-		{
-		}
-
-		/** Returns the existing native TRIANGLES_SOLID pipeline. */
-		public static RenderPipeline trianglesSolid()
-		{
-			return RenderPipelinesProvider.TRIANGLES_SOLID;
-		}
-
-		/** Returns the existing native TRIANGLES_CUTOUT pipeline. */
-		public static RenderPipeline trianglesCutout()
-		{
-			return RenderPipelinesProvider.TRIANGLES_CUTOUT;
-		}
-
-		/** Returns the existing native TRIANGLES_TRANSLUCENT pipeline. */
-		public static RenderPipeline trianglesTranslucent()
-		{
-			return RenderPipelinesProvider.TRIANGLES_TRANSLUCENT;
-		}
-
-		/** Returns the existing native TRIANGLES_INSTANT_CUTOUT pipeline. */
-		public static RenderPipeline trianglesImmediateLit()
-		{
-			return RenderPipelinesProvider.TRIANGLES_INSTANT_CUTOUT;
-		}
-
-		/** Returns the existing native TRIANGLES_EMISSIVE_SOLID pipeline. */
-		public static RenderPipeline trianglesSolidEmissive()
-		{
-			return RenderPipelinesProvider.TRIANGLES_EMISSIVE_SOLID;
-		}
-
-		/** Returns the existing native TRIANGLES_EMISSIVE_CUTOUT pipeline. */
-		public static RenderPipeline trianglesCutoutEmissive()
-		{
-			return RenderPipelinesProvider.TRIANGLES_EMISSIVE_CUTOUT;
-		}
-
-		/** Returns the existing native TRIANGLES_EMISSIVE_TRANSLUCENT pipeline. */
-		public static RenderPipeline trianglesTranslucentEmissive()
-		{
-			return RenderPipelinesProvider.TRIANGLES_EMISSIVE_TRANSLUCENT;
-		}
-
-		/** Returns the existing native TRIANGLES_INSTANT_EMISSIVE_CUTOUT pipeline. */
-		public static RenderPipeline trianglesImmediateEmissive()
-		{
-			return RenderPipelinesProvider.TRIANGLES_INSTANT_EMISSIVE_CUTOUT;
-		}
-
-		/** Returns the existing native OIT_COMPOSITE pipeline. */
-		public static RenderPipeline oitComposite()
-		{
-			return RenderPipelinesProvider.OIT_COMPOSITE;
-		}
-
-		/** Returns the existing native OIT_FABULOUS_COMPOSITE pipeline. */
-		public static RenderPipeline oitFabulousComposite()
-		{
-			return RenderPipelinesProvider.OIT_FABULOUS_COMPOSITE;
-		}
-
-		/** Returns the existing native OIT_FABULOUS_METADATA pipeline. */
-		public static RenderPipeline oitFabulousMetadata()
-		{
-			return RenderPipelinesProvider.OIT_FABULOUS_METADATA;
-		}
-
-		/** Returns the native pass pipeline. Depth-only passes share lit and emissive geometry. */
-		public static RenderPipeline trianglesOit(boolean emissive)
-		{
-			return emissive ? RenderPipelinesProvider.TRIANGLES_OIT_EMISSIVE : RenderPipelinesProvider.TRIANGLES_OIT;
-		}
-
-		/** Returns the native pass pipeline. Depth-only passes share lit and emissive geometry. */
-		public static RenderPipeline trianglesOitDepth(boolean emissive)
-		{
-			return RenderPipelinesProvider.TRIANGLES_OIT_DEPTH;
-		}
-
-		/** Returns the native pass pipeline. Depth-only passes share lit and emissive geometry. */
-		public static RenderPipeline trianglesOitDepthPeel(boolean emissive)
-		{
-			return RenderPipelinesProvider.TRIANGLES_OIT_DEPTH_PEEL;
-		}
-
-		/**
-		 * Registers the native pipelines through the same one-shot registry used by the loaders.
-		 * Call during pipeline registration, before resource preparation. Pipelines exist before registration.
-		 *
-		 * @param registrar the native pipeline registration callback
-		 * @throws IOException retained for canonical caller compatibility
-		 */
-		public static void registerShaders(ShaderRegistrar registrar) throws IOException
-		{
-			PRenderTypes.register(registrar :: register);
-		}
-	}
-
-	/** Loader-neutral callback receiving a complete immutable native pipeline. */
-	@FunctionalInterface
-	public interface ShaderRegistrar
-	{
-		/** Registers an existing pipeline, including its shader identifiers and vertex format. */
-		void register(RenderPipeline pipeline);
-	}
-
-	/** Returns the pipeline blend function, or empty for an opaque material. */
-	@ApiStatus.Internal
-	public static Optional<BlendFunction> getTransparencyState(RenderType renderType)
-	{
-		return renderType.pipeline().getColorTargetState().blendFunction();
-	}
-
-	/** Returns whether the native pipeline enables blending. */
-	@ApiStatus.Internal
-	public static boolean isTranslucent(RenderType renderType)
-	{
-		return isTransparent(renderType);
 	}
 
 	/**
@@ -981,17 +799,5 @@ public final class PRenderTypes
 		RenderPipeline pipeline = renderType.pipeline();
 		return pipeline == RenderPipelinesProvider.TRIANGLES_TRANSLUCENT ||
 				pipeline == RenderPipelinesProvider.TRIANGLES_EMISSIVE_TRANSLUCENT;
-	}
-
-	/**
-	 * Performs the oit pipeline operation.
-	 * @param renderType the render type to use.
-	 * @return the value produced by this operation.
-	 */
-	@ApiStatus.Internal
-	public static RenderPipeline oitPipeline(RenderType renderType)
-	{
-		return renderType.pipeline() == RenderPipelinesProvider.TRIANGLES_EMISSIVE_TRANSLUCENT ?
-				RenderPipelinesProvider.TRIANGLES_OIT_EMISSIVE : RenderPipelinesProvider.TRIANGLES_OIT;
 	}
 }
