@@ -58,6 +58,8 @@ The Maven workflow runs both publications and pushes the generated repository to
 
 Provide `MODRINTH_TOKEN` and `CURSEFORGE_TOKEN` in the environment, or Gradle properties `modrinthToken` and `curseforgeToken`, before running upload tasks. Keep credentials outside the repository. Use `./gradlew publishAll --dry-run` to inspect the release task graph without uploading files.
 
+To send a release announcement to Discord, set `DISCORD_WEBHOOK_URL` in the environment or `discordWebhookUrl` in your user Gradle properties, then run `./gradlew :publishDiscord`. The task runs by itself and posts the changelog and download links for both loaders. Set the optional `discordRoleIds` Gradle property to a comma-separated list of role IDs to mention.
+
 ## For players
 
 Download a release matching your Minecraft version and loader from [CurseForge](https://www.curseforge.com/minecraft/mc-mods/pulselib) or [Modrinth](https://modrinth.com/mod/pulselib). Install one loader-specific PulseLib JAR; Fabric installations also require Fabric API. The development branch and an uploaded release may have different availability.
