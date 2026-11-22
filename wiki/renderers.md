@@ -123,6 +123,6 @@ PRenderTypes.RenderTypeProvider::trianglesCutout
 PRenderTypes.RenderTypeProvider::trianglesTranslucent
 ```
 
-These are the queued variants used by all three renderer classes, including `PItemRenderer` in GUI display context. `trianglesGui` is an instant-rendering compatibility alias and is not compatible with the instanced queue. Do not pass vanilla entity/block `RenderType` values unless they use a compatible triangle vertex format and shader setup.
+These are the queued variants used by all three renderer classes, including `PItemRenderer` in GUI display context. Use `trianglesInstantTranslucent` for direct drawing. Do not pass vanilla entity/block `RenderType` values unless they use a compatible triangle vertex format and shader setup.
 
 The renderer APIs use 26.1.2 render states and `SubmitNodeCollector`; the old `MultiBufferSource`/`BlockEntityWithoutLevelRenderer` examples do not apply to this branch.

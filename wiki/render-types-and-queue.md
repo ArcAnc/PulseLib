@@ -8,7 +8,7 @@ PulseLib models are triangle meshes. [`PRenderTypes`](https://github.com/ArcAnc/
 | --- | --- | --- |
 | Opaque | `trianglesSolid` | `trianglesInstantSolid` |
 | Hard alpha cutout | `trianglesCutout` | `trianglesInstantCutout` |
-| Blended alpha | `trianglesTranslucent` | `trianglesInstantTranslucent` / `trianglesGui` |
+| Blended alpha | `trianglesTranslucent` | `trianglesInstantTranslucent` |
 | Emissive | `trianglesEmissiveSolid`, `trianglesEmissiveCutout`, `trianglesEmissiveTranslucent` | matching `trianglesInstantEmissive...` variant |
 
 All factories above belong to `PRenderTypes.RenderTypeProvider` and take the atlas `Identifier`. `PBlockRenderer`, `PEntityRenderer`, and `PItemRenderer` use queued variants, including GUI items:
@@ -19,7 +19,7 @@ super(modelData, PRenderTypes.RenderTypeProvider::trianglesSolid);
 
 Solid forces output alpha to one. Cutout discards low-alpha fragments; translucent blends surviving fragments. Default mesh resolvers choose a matching emissive variant for emissive sprites. [Resources](resources.md#alpha-modes) explains alpha metadata and explicit per-mesh overrides.
 
-Canonical factory aliases are also retained: `trianglesImmediate` uses instant cutout; `trianglesSolidEmissive`, `trianglesCutoutEmissive`, and `trianglesTranslucentEmissive` select queued emissive variants; `trianglesGuiEmissive` and `trianglesImmediateEmissive` select instant emissive translucent and cutout respectively. `emissiveVariant(...)` preserves the layout/alpha mode of known types and leaves an unknown custom type unchanged.
+`emissiveVariant(...)` preserves the layout/alpha mode of known types and leaves an unknown custom type unchanged.
 
 ## Material transparency and OIT
 
@@ -37,7 +37,7 @@ Minecraft's native type is `net.minecraft.client.renderer.rendertype.RenderType`
 * A shader that reads the queued instance attributes or the instant per-draw inputs appropriate to the caller.
 * A native `RenderSetup` / `RenderPipeline` with the intended blend, depth and target state.
 
-Vanilla block/entity pipelines usually use different mesh layouts and cannot consume PulseLib instances correctly. `RenderPipeline.getColorTargetState().blendFunction()` exposes the native `Optional<BlendFunction>`. The internal `PRenderTypes.getTransparencyState(...)` / `isTransparent(...)` helpers use that same material state. Neither alone determines OIT policy. See [Shaders](shaders.md) for the vertex and per-draw inputs.
+Vanilla block/entity pipelines usually use different mesh layouts and cannot consume PulseLib instances correctly. `RenderPipeline.getColorTargetState().blendFunction()` exposes the native `Optional<BlendFunction>`. `PRenderTypes.isTransparent(...)` checks whether that blend function is present. OIT policy is selected separately at submission. See [Shaders](shaders.md) for the vertex and per-draw inputs.
 
 ## Queue stages and scopes
 

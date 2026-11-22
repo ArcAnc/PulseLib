@@ -26,7 +26,7 @@ Use these public factories as renderer inputs:
 | Translucent | `trianglesTranslucent` | `trianglesInstantTranslucent` |
 | Emissive | `trianglesEmissiveSolid`, `trianglesEmissiveCutout`, `trianglesEmissiveTranslucent` | matching `trianglesInstantEmissive...` variant |
 
-`trianglesGui` is a compatibility alias for `trianglesInstantTranslucent`. It is for direct drawing only; a `PItemRenderer` remains on the queued path even in a GUI. `PAlphaMode` maps to the queued solid, cutout, and translucent variants, while `forInstantAlphaMode(...)` selects the instant equivalents. See [Resources](resources.md#alpha-modes) for texture alpha classification.
+Use `trianglesInstantTranslucent` for direct drawing. A `PItemRenderer` remains on the queued path even in a GUI. `PAlphaMode` maps to the queued solid, cutout, and translucent variants, while `forInstantAlphaMode(...)` selects the instant equivalents. See [Resources](resources.md#alpha-modes) for texture alpha classification.
 
 ## Vertex and per-draw contract
 
@@ -62,7 +62,5 @@ The shader currently supports up to eight operations per submitted mesh. This is
 `trianglesTranslucent` and `trianglesEmissiveTranslucent` support the internal OIT path. The submission must also select `PTransparencyMode.OIT`, the target must have usable depth, and the driver must support independent per-target blending. PulseLib depth-peels four layers, accumulates weighted colour/revealage, and composites them according to the active native transparency route.
 
 `PTransparencyMode.ORDINARY` keeps the same material and uses sorted alpha blending. Queue overloads without a policy default supported built-in queued translucent types to OIT; callers such as living attachments may explicitly request ordinary alpha. Custom translucent types are not automatically OIT-enabled. Application code selects a normal material and policy; it does not bind internal OIT pass shaders.
-
-`ShaderProvider` compatibility getters now return native `RenderPipeline` values. `ShaderProvider.registerShaders(ShaderRegistrar)` passes each complete pipeline to `ShaderRegistrar.register(RenderPipeline)`; no `ShaderInstance`, vertex-format argument or mutable setter is involved. Normal loader initialization already registers built-ins, so consumer mods should not register them again.
 
 For render stages, queue batching, and the normal renderer entry points, see [Render types and queue](render-types-and-queue.md).
