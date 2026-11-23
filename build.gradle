@@ -1,3 +1,10 @@
+import groovy.json.JsonOutput
+
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import java.time.Duration
+
 plugins {
     id 'base'
 }
@@ -15,4 +22,81 @@ tasks.register('publishMods') {
 tasks.register('publishAll') {
     group = 'publishing'
     dependsOn ':neoforge:publish', ':fabric:publish', 'publishMods'
+}
+
+tasks.register('publishDiscord')
+{
+	group = 'publishing'
+	description = 'Sends the release announcement to Discord.'
+
+	def webhookUrl = providers.gradleProperty('discordWebhookUrl').
+			orElse(providers.environmentVariable('DISCORD_WEBHOOK_URL'))
+	def roleIds = providers.gradleProperty('discordRoleIds').getOrElse('').
+			split(',').collect { it.trim() }.findAll { it }
+	def curseForgeEmoji = providers.gradleProperty('discordCurseForgeEmoji').getOrElse('🟠')
+	def modrinthEmoji = providers.gradleProperty('discordModrinthEmoji').getOrElse('🟢')
+	def changelogFile = providers.fileContents(layout.projectDirectory.file('changelog.md')).asText
+	def minecraftVersion = minecraft_version
+	def modVersion = mod_version
+
+	doLast
+	{
+		def url = webhookUrl.orNull?.trim()
+		if (!url)
+		{
+			throw new GradleException('Set DISCORD_WEBHOOK_URL or the discordWebhookUrl Gradle property.')
+		}
+
+		def changelog = changelogFile.get().trim()
+		if (changelog.length() > 3800)
+		{
+			changelog = changelog.take(3800) + '\n\n_Changelog was shortened._'
+		}
+
+		def curseForgeUrl = 'https://www.curseforge.com/minecraft/mc-mods/pulselib'
+		def modrinthUrl = 'https://modrinth.com/mod/pulselib'
+		def logoUrl = 'https://raw.githubusercontent.com/ArcAnc/PulseLib/1.21.1-multiloader/common/src/main/resources/logo.png'
+		def payload = JsonOutput.toJson([
+				content: roleIds.collect { "<@&${it}>" }.join(' '),
+				allowed_mentions: [parse: [], roles: roleIds],
+				embeds: [[
+						author: [name: 'ArcAnc • Pulse Lib', icon_url: logoUrl],
+						title: "✨ Pulse Lib v${modVersion} has been released!",
+						url: modrinthUrl,
+						description: "## 📋 Changelog\n${changelog}",
+						color: 0x5865F2,
+						thumbnail: [url: logoUrl],
+						fields: [
+								[name: '📦 Downloads', value: "${curseForgeEmoji} [CurseForge](${curseForgeUrl})\n${modrinthEmoji} [Modrinth](${modrinthUrl})", inline: false],
+								[name: '⛏️ Minecraft', value: minecraftVersion, inline: true],
+								[name: '🧩 Loaders', value: 'NeoForge and Fabric', inline: true]
+						]
+				]]
+		])
+
+		int status
+		try
+		{
+			def request = HttpRequest.newBuilder(URI.create(url)).
+					timeout(Duration.ofSeconds(15)).
+					header('Content-Type', 'application/json').
+					POST(HttpRequest.BodyPublishers.ofString(payload)).
+					build()
+			status = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.discarding()).statusCode()
+		}
+		catch (IllegalArgumentException ignored)
+		{
+			throw new GradleException('The Discord webhook URL is invalid.')
+		}
+		catch (IOException ignored)
+		{
+			throw new GradleException('Could not send the announcement to the Discord webhook.')
+		}
+
+		if (status < 200 || status >= 300)
+		{
+			throw new GradleException("Discord webhook returned HTTP ${status}.")
+		}
+		logger.lifecycle('Discord release announcement sent.')
+	}
 }
