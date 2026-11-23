@@ -34,8 +34,8 @@ pre,
 }
 
 @media (min-width: 997px) {
-  #autocomplete {
-    transform: translateY(-0.5rem);
+  .navbar__items--right {
+    height: 100%;
   }
 }
 
