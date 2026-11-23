@@ -40,7 +40,6 @@ const config = {
       theme: {customCss: './src/css/custom.css'},
     },
   ]],
-  plugins: ['./plugins/algolia-experiences.mjs'],
   themeConfig: {
     image: 'img/logo.svg',
     colorMode: {
@@ -52,7 +51,7 @@ const config = {
       items: [
         {type: 'docSidebar', sidebarId: 'docs', position: 'left', label: 'Documentation'},
         {type: 'docsVersionDropdown', position: 'left'},
-        {type: 'html', position: 'right', value: '<div id="autocomplete"></div>'},
+        {type: 'search', position: 'right'},
         {href: 'https://github.com/ArcAnc/PulseLib', label: 'GitHub', position: 'right'},
       ],
     },

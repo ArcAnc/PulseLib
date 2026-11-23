@@ -33,12 +33,6 @@ pre,
   min-width: 16rem;
 }
 
-.navbar__item:has(#autocomplete) {
-  display: flex;
-  align-self: stretch;
-  align-items: center;
-}
-
 @media (min-width: 997px) {
   #autocomplete {
     transform: translateY(-0.5rem);
