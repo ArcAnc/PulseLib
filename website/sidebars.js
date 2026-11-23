@@ -4,7 +4,7 @@ module.exports = {
     {type: 'category', label: 'Start', items: ['index', 'installation', 'getting-started', 'basic']},
     {
       type: 'category', label: 'Core API', items: [
-        'modeldata', 'animatables-and-controllers', 'animation-events', 'molang-animations',
+        'plugins', 'modeldata', 'animatables-and-controllers', 'animation-events', 'molang-animations',
         'renderers', 'render-types-and-queue', 'shaders', 'resources',
       ],
     },
